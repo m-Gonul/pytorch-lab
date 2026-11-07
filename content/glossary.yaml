@@ -145,3 +145,6 @@ terms:
   bank çakışması: "Paylaşımlı bellek 32 banka (4 bayt) bölünür; bir warp'ta aynı bankın farklı adreslerine erişen thread'ler sırayla hizmet alır."
   özelleştirme: "Privatization: paylaşılan bir çıktı yapısının (histogram, biriktirici) her thread/blok için ayrı kopyası tutulur, sonda birleştirilir; çekişmeyi ve atomik maliyetini azaltır."
   sabit bellek: "CUDA'da 64 KB'lık salt okunur bellek alanı; önbelleklidir ve bir warp'ın tüm thread'leri aynı adresi okuduğunda değeri tek erişimle yayınlar (konvolüsyon filtreleri)."
+  evrensel yaklaşım: "Yeterli genişlikte tek gizli katmanlı bir ağın kompakt bir küme üzerindeki her sürekli fonksiyonu istenen doğrulukla yaklaşıklayabileceğini söyleyen teorem (Cybenko 1989, Hornik 1991)."
+  çift iniş: "Double descent: model kapasitesi (parametre sayısı) eğitim örneği sayısına yaklaşınca test hatasının tepe yapıp, daha da artınca yeniden düştüğü gözlem."
+  perceptron: "Rosenblatt'ın eşik birimli doğrusal sınıflandırıcısı; hatalı her örnekte w ← w + η(y − ŷ)x kuralıyla öğrenir, doğrusal ayrılabilir veride sonlu adımda yakınsar."

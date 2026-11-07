@@ -1,0 +1,107 @@
+id: m3-8-perceptron
+code: M3.8
+title: Perceptron, TLU ve evrensel yaklaşım — derinlik, genişlik ve çift iniş
+phase: 3
+minutes: 360
+prereq: [m3-2-mlp-backprop]
+summary: >
+  Biyolojik nörondan McCulloch–Pitts mantık birimlerine, eşik mantık birimi
+  (TLU) ve Rosenblatt perceptronuna: öğrenme kuralı, yakınsama teoremi
+  (Novikoff sınırı), XOR'un doğrusal ayrılamazlığı ve gizli katmanla çözümü.
+  Doğrusal sınıflandırıcıya akıllı bir öznitelik dönüşümüyle (2B → 3B)
+  ayrılabilirlik kazandırma, MLP'nin son katmanının da bir doğrusal
+  sınıflandırıcı olduğu görüşü (önceki katmanlar dönüşümü öğrenir). Evrensel
+  yaklaşım: ReLU birimleriyle parçalı doğrusal inşa; ders alıştırmasındaki
+  gibi skaler, 2B Gauss ve vektör değerli fonksiyonları artan derinlikteki
+  MLP'lerle yaklaşıklama; rastgele özniteliklerle en küçük normlu
+  regresyonda çift iniş (double descent). Saf Python'da TLU/perceptron,
+  NumPy'da rastgele öznitelik regresyonu ve çift iniş, PyTorch'ta derinlik
+  deneyi ve öğrenilmiş gösterimlerin doğrusal ayrılabilirliği, sonda onlarca
+  MLP'yi tek seferde eğiten toplu eğitim.
+goals:
+  - "[[perceptron]] kuralı $w\\leftarrow w+\\eta(y-\\hat y)x$ ve Novikoff sınırı $(R/\\gamma)^2$"
+  - "XOR: doğrusal ayrılamazlık, iki gizli TLU ile çözüm; öznitelik dönüşümüyle ayrılabilirlik"
+  - "[[evrensel yaklaşım]]: genişlik bir katmanda yeter ama derinlik verimlidir"
+  - "[[çift iniş]]: parametre sayısı veri sayısını geçerken test hatasının tepe yapıp yeniden düşmesi"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 10", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Rosenblatt — The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain (Psych. Review 1958)", url: "https://doi.org/10.1037/h0042519", license: "©", use: link}
+  - {title: "Novikoff — On Convergence Proofs on Perceptrons (1962)", url: "https://apps.dtic.mil/sti/citations/AD0298258", license: "kamu", use: link}
+  - {title: "Cybenko — Approximation by Superpositions of a Sigmoidal Function (MCSS 1989)", url: "https://doi.org/10.1007/BF02551274", license: "©", use: link}
+  - {title: "Belkin, Hsu, Ma, Mandal — Reconciling modern machine-learning practice and the classical bias–variance trade-off (PNAS 2019)", url: "https://doi.org/10.1073/pnas.1903070116", license: "©", use: link}
+  - {title: "Nakkiran ve ark. — Deep Double Descent (ICLR 2020)", url: "https://arxiv.org/abs/1912.02292", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "TLU, adım fonksiyonu $\\mathrm{step}(z)=\\mathbb 1[z\\ge0]$"
+      fields:
+        - {id: andg, label: "w = (1, 1), b = −1.5: girdi (1, 1) için çıktı", answer: 1}
+        - {id: and0, label: "Aynı TLU, girdi (1, 0)", answer: 0}
+    - title: "Perceptron güncellemesi: w = (0.5, −1), b = 0, x = (1, 1), y = 1, η = 1"
+      fields:
+        - {id: w1, label: "Yeni $w_1$", answer: 1.5}
+        - {id: bb, label: "Yeni b", answer: 1}
+    - title: "Kuram ve sayım"
+      fields:
+        - {id: nov, label: "Novikoff: R = 2, kenar payı γ = 0.5 → en çok hata sayısı", answer: 16}
+        - {id: xor, label: "XOR için gereken en az gizli TLU", answer: 2}
+        - {id: par, label: "784-300-100-10 MLP'nin parametre sayısı", answer: 266610}
+  verify: |
+    step = lambda z: 1 if z >= 0 else 0
+    yhat = step(0.5 * 1 - 1 * 1 + 0)
+    answers = dict(andg=step(1 + 1 - 1.5), and0=step(1 - 1.5), w1=0.5 + (1 - yhat) * 1, bb=0 + (1 - yhat), nov=(2 / 0.5) ** 2, xor=2,
+                   par=784 * 300 + 300 + 300 * 100 + 100 + 100 * 10 + 10)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Dönüştürülmüş veride perceptron ve SVC karar sınırları", engine: browser}
+  - {id: x2, title: "Her Boole fonksiyonu iki katman TLU'dur (VE-VEYA inşası)", engine: browser}
+  - {id: x3, title: "Sigmoid ve tanh: sıfır merkezlilik, doygunluk ve küçük aktivasyonlar", engine: browser}
+
+quiz:
+  - q: "Perceptron XOR'u neden öğrenemez?"
+    options:
+      - {t: "Tek perceptron bir hiperdüzlemle ayırır; XOR'un pozitif örnekleri (0,1), (1,0) ile negatifleri (0,0), (1,1) hiçbir doğruyla ayrılamaz", ok: true, why: "Bir gizli katman (iki TLU) yeter — Minsky–Papert eleştirisinin cevabı."}
+      - {t: "Öğrenme oranı küçük olduğu için", why: "Hiçbir oran yetmez."}
+      - {t: "Adım fonksiyonu türevlenemediği için", why: "Perceptron kuralı türev kullanmaz."}
+  - q: "Eğitilmiş bir MLP'de son katman için ne söylenebilir?"
+    options:
+      - {t: "Son katman, önceki katmanların ürettiği özniteliklerde bir doğrusal sınıflandırıcıdır; gizli katmanlar veriyi doğrusal ayrılabilir hâle getiren dönüşümü öğrenir", ok: true, why: "Elle tasarlanan çekirdek/dönüşüm yerine öğrenilmiş dönüşüm."}
+      - {t: "Son katman doğrusal değildir", why: "Softmax/sigmoid öncesi doğrusaldır."}
+      - {t: "Gizli katmanlar sınıflandırma yapar", why: "Gösterim öğrenir."}
+  - q: "Rastgele öznitelikli en küçük normlu regresyonda test hatası p ≈ n'de neden patlar?"
+    options:
+      - {t: "Tam enterpolasyon eşiğinde öznitelik matrisi kötü koşulludur: gürültüyü sığdırmak için ağırlık normu çok büyür; p ≫ n'de birçok çözüm arasından en küçük normlu olanı seçmek örtük düzenleme sağlar", ok: true, why: "Belkin ve ark. 2019: 'çift iniş'."}
+      - {t: "Aşırı uyum her zaman p ile artar", why: "p ≫ n'de yeniden düşer."}
+      - {t: "Optimizasyon yakınsamadığı için", why: "Kapalı form çözüm."}
+
+homework:
+  - title: "Belkin ve ark. (2019): Çift iniş"
+    paper: "Belkin, Hsu, Ma, Mandal — Reconciling modern ML practice and the classical bias–variance trade-off (PNAS 2019)"
+    url: "https://doi.org/10.1073/pnas.1903070116"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin Şekil 2 deneyini MNIST'in 10 000 örneklik alt kümesinde rastgele Fourier öznitelikleriyle (RFF) yeniden üret: öznitelik sayısı N = 10³ … 6·10⁴, en küçük normlu çözüm, sıfır-bir ve kare kayıp, ağırlık normu. Ardından c aşamasındaki deneye ridge düzenlemesi ekle ve λ arttıkça tepenin nasıl kaybolduğunu göster; Nakkiran ve ark. (2020)'deki "epoch-wise" çift inişi küçük bir CNN'de (CIFAR-10 %20 etiket gürültüsü) gözlemle.
+    steps:
+      - "Çözüm için `torch.linalg.lstsq` ya da çekirdek trick'i (N > n'de n × n sistem)."
+    accept:
+      - "Test hatası N ≈ n'de tepe yapar, N ≫ n'de klasik U'nun en iyisinden düşer."
+      - "Ağırlık normu da N ≈ n'de tepe yapar."
+  - title: "Cybenko (1989): Sigmoidlerin süperpozisyonuyla yaklaşım"
+    paper: "Cybenko — Approximation by Superpositions of a Sigmoidal Function (MCSS 1989)"
+    url: "https://doi.org/10.1007/BF02551274"
+    level: orta
+    hours: 6
+    goal: |
+      Teoremin yapıcı bir sürümünü uygula: [0,1]'de sürekli f için dik sigmoidlerin farklarından "basamaklar" kurarak N birimli tek gizli katmanlı ağı elle oluştur (eğitim yok) ve sup hatasını N'ye karşı çiz. Aynı fonksiyonu derin ama dar (ör. 4 × 8) eğitilmiş bir ağla karşılaştır; Telgarsky (2016)'nın derinlik ayrımı örneği olan "testere dişi" (tent map'in k kez bileşkesi) fonksiyonunun sığ ağla üstel genişlik gerektirdiğini deneyle göster.
+    steps:
+      - "Testere dişi: k ReLU katmanı ile 2^k doğrusal parça; sığ ağın aynı hatayı yakalamak için gereken genişliği ölç."
+    accept:
+      - "Elle kurulan ağın hatası ~1/N azalır."
+      - "Testere dişinde derin ağ birkaç birimle, sığ ağ ~2^k birimle başarılı."
