@@ -1,0 +1,101 @@
+id: m11-10-planning
+code: M11.10
+title: Modelli RL ve planlama — Dyna, öğrenilmiş modelle MPC, Monte Carlo ağaç araması
+phase: 11
+minutes: 440
+prereq: [m11-5-sarsa-q]
+summary: >
+  Geçiş ve ödül modelini açıkça öğren, modelle planla: örnek verimliliği
+  artar, karmaşıklık da. Model öğrenme (sayımlar, doğrusal ve sinir ağı
+  modelleri), kısmi planlama (her gerçek adımda birkaç simüle Q-öğrenme
+  adımı: Dyna), tekrar tamponu ile modelin farkı, değişen ortamda Dyna-Q+,
+  öncelikli tarama; şimdiki durumdan planlama: model öngörülü kontrol (MPC)
+  ve Monte Carlo ağaç araması (seçim, genişletme, simülasyon, geri yayılım;
+  UCT ve AlphaGo'nun PUCT'u). Saf Python'da Dyna labirenti, NumPy'da
+  kesinlik eşdeğerli planlama, PyTorch'ta öğrenilmiş sinir ağı modeliyle
+  CartPole MPC'si ve vektörel rastgele oyunlarla MCTS.
+goals:
+  - "Modelli döngü: eylem → gözlem → modeli güncelle → planla (değer/politika güncelle)"
+  - "Dyna-Q: n planlama adımı; tampon gerçek örnek tekrarlar, model genelleyebilir"
+  - "[[Monte Carlo ağaç araması]]: yaprakta varsayılan politika, şans düğümünde örnekleme, karar düğümünde yalnız umut veren eylemleri genişlet"
+  - "UCT $\\bar Q+c\\sqrt{\\ln N/n}$ ve PUCT $Q+c\\,\\pi(a|s)\\sqrt N/(1+n)$"
+sources:
+  - {title: "Sutton — Dyna, an Integrated Architecture for Learning, Planning, and Reacting (SIGART 1991)", url: "https://doi.org/10.1145/122344.122377", license: "©", use: link}
+  - {title: "Kocsis & Szepesvári — Bandit Based Monte-Carlo Planning (ECML 2006)", url: "https://doi.org/10.1007/11871842_29", license: "©", use: link}
+  - {title: "Browne ve ark. — A Survey of Monte Carlo Tree Search Methods (IEEE TCIAIG 2012)", url: "https://doi.org/10.1109/TCIAIG.2012.2186810", license: "©", use: link}
+  - {title: "Nagabandi ve ark. — Neural Network Dynamics for Model-Based Deep RL with Model-Free Fine-Tuning (ICRA 2018)", url: "https://arxiv.org/abs/1708.02596", license: "arXiv", use: link}
+  - {title: "Moore & Atkeson — Prioritized Sweeping (Machine Learning 1993)", url: "https://doi.org/10.1007/BF00993104", license: "©", use: link}
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 8", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+
+hand:
+  groups:
+    - title: "Ağaç araması seçim puanları"
+      fields:
+        - {id: uct, label: "UCT: $\\bar Q=0.5$, $N=100$, $n=10$, $c=\\sqrt2$", answer: 1.4597051824376164, tol: 1.0e-6}
+        - {id: puct, label: "PUCT: $Q=0.2$, $\\pi=0.3$, $N=100$, $n=4$, $c=1$", answer: 0.8}
+    - title: "Model ve Dyna"
+      fields:
+        - {id: ph, label: "(s,a)'dan s₁ 3 kez, s₂ 1 kez gözlendi: $\\hat P(s_1|s,a)$", answer: 0.75}
+        - {id: up, label: "Dyna-Q, n = 5, 50 gerçek adım: toplam Q güncellemesi", answer: 300}
+        - {id: kp, label: "Dyna-Q+ bonusu $\\kappa\\sqrt\\tau$, κ = 0.01, τ = 100", answer: 0.1}
+    - title: "Tic-tac-toe, boş tahtadan rastgele oyunlar"
+      fields:
+        - {id: tt, label: "X'in bakışından beklenen sonuç (X kazanır %58.5, O %28.8)", answer: 0.297}
+  verify: |
+    import math
+    answers = dict(uct=0.5 + math.sqrt(2) * math.sqrt(math.log(100) / 10), puct=0.2 + 1 * 0.3 * 10 / 5, ph=0.75, up=50 * 6, kp=0.1, tt=0.585 - 0.288)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Değişen ortam: Dyna-Q+ ile kısayol labirenti", engine: browser}
+  - {id: x2, title: "Öncelikli tarama", engine: browser}
+  - {id: x3, title: "Minimax ve alfa–beta budama", engine: browser}
+
+quiz:
+  - q: "Dyna'daki model ile DQN'deki tekrar tamponu arasındaki fark nedir?"
+    options:
+      - {t: "Tampon yalnız gerçekten yaşanan geçişleri tekrarlar (basit, genelleme yok); model simüle geçiş üretir ve görülmemiş (s,a)'lara genelleyebilir (ama model hatası taşır)", ok: true, why: "Tablo Dyna-Q'nun deterministik modeli aslında bir tampona çok benzer."}
+      - {t: "Fark yok", why: "Parametrik model genelleyebilir."}
+      - {t: "Model yalnız ödülü öğrenir", why: "Geçişleri de."}
+  - q: "MCTS'te yaprak değeri nasıl kestirilir?"
+    options:
+      - {t: "Varsayılan (ör. rastgele) politikayla oyun sonuna kadar simülasyon — ya da AlphaGo'da değer ağı", ok: true, why: "Şans düğümleri modelden örneklenir."}
+      - {t: "Tam minimax ile", why: "O tam aramadır."}
+      - {t: "Sıfır kabul edilir", why: "Bilgi taşımaz."}
+  - q: "Dyna-Q kısayol labirentinde yeni açılan kısa yolu neden bulamaz?"
+    options:
+      - {t: "Mevcut yol hâlâ iyi çalıştığı için model yanlışlığı fark edilmez; ε-açgözlü keşif kısayola giden uzun bir eylem dizisini neredeyse hiç denemez", ok: true, why: "Dyna-Q+ uzun süredir denenmeyen geçişlere κ√τ bonusu vererek planlamada keşfi teşvik eder."}
+      - {t: "Öğrenme oranı çok küçük", why: "α = 1."}
+      - {t: "Model deterministik olduğu için", why: "Ortam da deterministik."}
+
+homework:
+  - title: "Kocsis & Szepesvári (2006): UCT"
+    paper: "Kocsis & Szepesvári — Bandit Based Monte-Carlo Planning (ECML 2006)"
+    url: "https://doi.org/10.1007/11871842_29"
+    level: orta
+    hours: 8
+    goal: |
+      UCT'yi makalenin P-game ağaçlarında (rastgele dallanma 2–8, derinlik 4–20, yapraklarda rastgele değer) uygula ve minimax değerine göre hata–örnek sayısı eğrisini, alfa–beta ve düz Monte Carlo (UCB'siz) ile karşılaştır. Sonra d/e aşamalarındaki tic-tac-toe kodunu Connect-4'e (6×7) genişlet ve UCT'yi saf rastgele oyuncuya ve sınırlı derinlikte minimax'a karşı oynat.
+    steps:
+      - "e aşamasındaki vektörel rastgele oyun fonksiyonunu Connect-4 kazanma çizgileriyle genelleştir."
+      - "Benzetim sayısı 100, 1000, 10 000."
+    accept:
+      - "UCT'nin hatası örnekle düz MC'den hızlı düşer (makale Şekil 2 nitel)."
+      - "Connect-4'te 10 000 benzetimli UCT, rastgele oyuncuyu ≥ %95 yener."
+  - title: "Nagabandi ve ark. (2018): Sinir ağı dinamik modeli + MPC"
+    paper: "Nagabandi ve ark. — Neural Network Dynamics for Model-Based Deep RL with Model-Free Fine-Tuning (ICRA 2018)"
+    url: "https://arxiv.org/abs/1708.02596"
+    level: ileri
+    hours: 12
+    goal: |
+      d aşamasındaki modeli Gymnasium MuJoCo (HalfCheetah, Swimmer) ortamlarına taşı: girdi/çıktı normalizasyonu, Δs tahmini, rastgele atış MPC (K = 1000, H = 10–20), veri birleştirme (Algoritma 1); ardından MPC'yi taklit eden bir politikayla model-free (PPO) ince ayarı başlat (Bölüm IV-B).
+    steps:
+      - "Çok adımlı model hatasını H'ye karşı ölç."
+      - "Örnek sayısına göre ödül eğrisi: MB, MB-MF ve saf MF."
+    accept:
+      - "MB, MF'ye göre 1–2 büyüklük mertebesi az örnekle makul performansa ulaşır (makale Şekil 6 nitel)."

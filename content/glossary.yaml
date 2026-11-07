@@ -130,3 +130,4 @@ terms:
   politika dışı değerlendirme: "Off-policy evaluation: bir politikanın değerini, başka bir politikayla toplanmış kayıtlardan (bağlam, eylem, ödül, eylem olasılığı) kestirmek; IPS, DM, DR, tekrar oynatma."
   avantaj fonksiyonu: "A(s, a) = Q(s, a) − V(s): bu durumda bu eylemin politikanın ortalamasından ne kadar iyi olduğu; politika gradyanında taban çizgili ağırlık."
   deterministik politika gradyanı: "Sürekli eylemli deterministik politika μ_θ(s) için ∇J = E[∇_θ μ_θ(s) ∇_a Q(s, a)|_{a = μ_θ(s)}] (Silver ve ark. 2014); eleştirmenin eylem gradyanı aktörü yönlendirir."
+  monte carlo ağaç araması: "MCTS: arama ağacını tekrar tekrar seçim (UCT/PUCT), genişletme, simülasyon (rastgele oyun ya da değer ağı) ve geri yayılımla büyütür; aramayı umut veren dallara yoğunlaştırır."
