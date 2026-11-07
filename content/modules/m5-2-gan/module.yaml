@@ -1,0 +1,74 @@
+id: m5-2-gan
+code: M5.2
+title: GAN
+phase: 5
+minutes: 300
+prereq: [m5-1-vae, m1-4-logreg]
+summary: >
+  İki ağın oyunu. 1-boyutlu bir GAN'da kayıpları ve gradyanları elle
+  hesaplıyor, saf Python'da "Dirac GAN" ile eşzamanlı gradient descent'in
+  neden döndüğünü ve R1 cezasının nasıl yakınsattığını görüyor, NumPy'da
+  optimal discriminator ile JSD bağını ve doymuş/doymamış gradyan farkını
+  sayısal olarak doğruluyor, PyTorch'ta 8 Gauss'lu halka üzerinde bir GAN
+  eğitiyor ve en sonda WGAN-GP gradient penalty'sini örnek başı döngü
+  olmadan hesaplıyorsun.
+goals:
+  - "Minimax amacını, optimal discriminator'ı ve $V(D^*,G)=-\\log4+2\\,\\mathrm{JSD}$ bağını görmek"
+  - "[[non-saturating loss]]'un neden kullanıldığını gradyan büyüklüğüyle göstermek"
+  - "GAN eğitiminin bir optimizasyon değil bir oyun olduğunu ve eşzamanlı GD'nin döndüğünü (Dirac GAN) deneyimlemek"
+  - "Örnek başı gradyan normlarını tek bir `autograd.grad` çağrısıyla almak ([[gradient penalty]])"
+sources:
+  - {title: "Goodfellow ve ark. — Generative Adversarial Nets", url: "https://arxiv.org/abs/1406.2661", license: "arXiv", use: link}
+  - {title: "Mescheder, Geiger, Nowozin — Which Training Methods for GANs do actually Converge? (Dirac GAN, R1)", url: "https://arxiv.org/abs/1801.04406", license: "arXiv", use: link}
+  - {title: "Gulrajani ve ark. — Improved Training of Wasserstein GANs (WGAN-GP)", url: "https://arxiv.org/abs/1704.00028", license: "arXiv", use: link}
+  - {title: "Prince — Understanding Deep Learning, Bölüm 15 (GAN)", url: "https://udlbook.github.io/udlbook/", license: "kitap ©; notebook'lar MIT", use: link}
+  - {title: "Stanford CS236 — Deep Generative Models", url: "https://deepgenerativemodels.github.io/", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "$D(x)=\\sigma(wx+b)$, $w=1$, $b=0$; $G(z)=az+c$, $a=2$, $c=-1$; gerçek $x=2$, gürültü $z=0.5$"
+      fields:
+        - {id: dreal, label: "$D(x)$", answer: 0.880797, tol: 0.0005}
+        - {id: ld, label: "$L_D=-\\log D(x)-\\log(1-D(G(z)))$", answer: 0.820075, tol: 0.0005, hint: "$G(z)=0$, $D(0)=0.5$"}
+        - {id: dw, label: "$\\partial L_D/\\partial w$", answer: -0.238406, tol: 0.0005, hint: "$-(1-D(x))\\,x + D(G)\\,G$"}
+    - title: "Üreteç, non-saturating kayıp $L_G=-\\log D(G(z))$"
+      fields:
+        - {id: lg, label: "$L_G$", answer: 0.693147, tol: 0.0005}
+        - {id: da, label: "$\\partial L_G/\\partial a$", answer: -0.25, tol: 0.0005, hint: "$-(1-D(G))\\cdot w\\cdot z$"}
+        - {id: dsat, label: "Doymuş kayıp $\\log(1-D(G))$ ile $\\partial/\\partial a$", answer: -0.25, tol: 0.0005, hint: "$-D(G)\\,w\\,z$; $D(G)=0.5$'te ikisi eşit"}
+  verify: |
+    import math
+    s = lambda t: 1 / (1 + math.exp(-t))
+    w, b, a, c, x, z = 1.0, 0.0, 2.0, -1.0, 2.0, 0.5
+    def LD(w, b):
+        return -math.log(s(w * x + b)) - math.log(1 - s(w * (a * z + c) + b))
+    def LG(a, c):
+        return -math.log(s(w * (a * z + c) + b))
+    def LS(a, c):
+        return math.log(1 - s(w * (a * z + c) + b))
+    h = 1e-6
+    answers = dict(dreal=s(w * x + b), ld=LD(w, b), dw=(LD(w + h, b) - LD(w - h, b)) / (2 * h),
+                   lg=LG(a, c), da=(LG(a + h, c) - LG(a - h, c)) / (2 * h), dsat=(LS(a + h, c) - LS(a - h, c)) / (2 * h))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Eğitimin başında D sahte örnekleri kolayca ayırt ediyor ($D(G(z))\\approx0$). Üreteç için hangi kayıp işe yarar gradyan verir?"
+    options:
+      - {t: "Non-saturating $-\\log D(G(z))$: logit'e göre gradyanı $-(1-D)\\approx-1$", ok: true, why: "Doymuş $\\log(1-D)$'nin gradyanı $-D\\approx0$; üreteç tam en çok öğrenmesi gereken anda öğrenemez."}
+      - {t: "Orijinal $\\log(1-D(G(z)))$", why: "Bu durumda gradyanı neredeyse sıfır (c aşamasında ölçüyorsun)."}
+      - {t: "İkisi aynı gradyanı verir", why: "Sabit noktaları aynı, gradyan büyüklükleri değil."}
+  - q: "WGAN-GP'de gradient penalty'yi batch'li tek bir `autograd.grad` çağrısıyla almak hangi koşulda yanlış olur?"
+    options:
+      - {t: "Critic'te BatchNorm varsa: örneklerin çıktıları birbirine bağlı olur, $\\nabla_{x_i}\\sum_j D(x_j)\\ne\\nabla_{x_i}D(x_i)$", ok: true, why: "WGAN-GP makalesi bu yüzden critic'te BatchNorm yerine LayerNorm önerir."}
+      - {t: "Batch boyutu 1'den büyükse", why: "Örnekler bağımsızsa toplamın gradyanı tam olarak örnek başı gradyanlardır."}
+      - {t: "Hiçbir zaman", why: "Örnekler arası etkileşim varsa bozulur."}
+  - q: "Dirac GAN'da eşzamanlı gradient descent neden yakınsamaz?"
+    options:
+      - {t: "Dengedeki Jacobian'ın özdeğerleri saf sanal: akış dönme hareketi yapar; açık Euler adımı her turda yarıçapı büyütür", ok: true, why: "R1 cezası özdeğerlere negatif reel kısım ekler ve yakınsatır."}
+      - {t: "Öğrenme oranı fazla büyük", why: "Her pozitif adım boyunda yarıçap büyür; küçültmek yalnız yavaşlatır."}
+      - {t: "Kayıp konveks olmadığı için", why: "Mesele konvekslik değil, oyunun dönme bileşeni."}
