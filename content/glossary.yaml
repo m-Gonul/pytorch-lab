@@ -47,3 +47,6 @@ terms:
   kernel trick: "Özellik uzayını açıkça kurmadan, yalnız k(x, x′) iç çarpımlarıyla o uzayda lineer model eğitmek."
   gini: "Gini safsızlığı: 1 − Σ pₖ². Rastgele seçilen bir örneğe, düğümün sınıf dağılımından rastgele etiket verilirse yanlış etiketlenme olasılığı; saf düğümde 0."
   pseudo-residual: "Gradient boosting'de kaybın mevcut tahmine göre negatif gradyanı, −∂L/∂F. MSE için gerçek residual (y − F); her tur bu değerlere bir ağaç oturtulur."
+  özvektör: "Eigenvector: Cv = λv olan, matrisin yalnız ölçeklediği (yönünü değiştirmediği) sıfırdan farklı vektör; λ özdeğer."
+  inertia: "k-means amacı: her noktanın kendi küme merkezine kare uzaklıklarının toplamı, Σ‖xᵢ − c_{zᵢ}‖²."
+  responsibility: "GMM'de bir noktanın bir bileşenden gelme posterior olasılığı, r_ik = p(z = k | xᵢ); EM'in E adımında hesaplanan yumuşak atama."

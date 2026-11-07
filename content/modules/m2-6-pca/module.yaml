@@ -1,0 +1,67 @@
+id: m2-6-pca
+code: M2.6
+title: PCA ve SVD
+phase: 2
+minutes: 210
+prereq: [m0-2-matmul, m0-4-probability]
+summary: >
+  Verinin en çok değiştiği yönler. 2×2 kovaryansın özdeğerlerini ve power
+  iteration'ın bir adımını elle hesaplıyor, saf Python'da deflation ile ilk k
+  bileşeni buluyor, NumPy'da SVD ile PCA ve yeniden kurma yapıyor, PyTorch'ta
+  baş bileşeni Rayleigh bölümünü autograd ile maksimize ederek buluyor ve en
+  sonda yüzlerce küçük veri setinin PCA'sını tek batched SVD ile alıyorsun.
+goals:
+  - "Kovaryans matrisinin [[özvektör|özvektörlerinin]] maksimum varyans yönleri olduğunu göstermek"
+  - "Power iteration ve deflation ile en büyük özdeğerleri bulmak"
+  - "Ortalanmış verinin SVD'si $X_c=USV^\\top$ ile PCA'yı ($V$ bileşenler, $s^2/(n-1)$ varyanslar) ilişkilendirmek"
+  - "Özvektörlerin işaret belirsizliğini sabit bir kuralla gidermek"
+  - "Rayleigh bölümü $\\frac{v^\\top Cv}{v^\\top v}$'yu gradyanla maksimize etmek"
+sources:
+  - {title: "Mathematics for Machine Learning — Bölüm 10 (PCA)", url: "https://mml-book.github.io/", license: "© (PDF ücretsiz)", use: link}
+  - {title: "MIT 18.06 — Singular Value Decomposition (Strang)", url: "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/", license: "CC BY-NC-SA 4.0", use: link}
+  - {title: "ISLP — §12.2 Principal Components Analysis", url: "https://www.statlearning.com/", license: "doğrulanmadı", use: link}
+  - {title: "PyTorch — torch.linalg.svd / eigh (batched)", url: "https://docs.pytorch.org/docs/stable/generated/torch.linalg.svd.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "Kovaryans $C=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$; $\\det(C-\\lambda I)=(2-\\lambda)^2-1=0$"
+      fields:
+        - {id: l1, label: "$\\lambda_1$ (büyük)", answer: 3, hint: "$2-\\lambda=\\pm1$"}
+        - {id: l2, label: "$\\lambda_2$", answer: 1}
+        - {id: v1x, label: "$v_1$'in 1. bileşeni (birim, pozitif)", answer: 0.707107, tol: 0.002, hint: "$(C-3I)v=0\\Rightarrow v\\propto(1,1)$, normu $\\sqrt2$"}
+        - {id: ratio, label: "1. bileşenin açıkladığı varyans oranı", answer: 0.75, tol: 0.001, hint: "$3/(3+1)$"}
+        - {id: proj, label: "$x=(2,0)$'ın $v_1$ üzerine izdüşümü $x\\cdot v_1$", answer: 1.414214, tol: 0.002, hint: "$2\\cdot0.7071$"}
+    - title: "Power iteration $v\\leftarrow Cv/\\lVert Cv\\rVert$, $v_0=(1,0)$"
+      fields:
+        - {id: p1x, label: "$v_1$'in 1. bileşeni (bir adım)", answer: 0.894427, tol: 0.002, hint: "$Cv_0=(2,1)$, normu $\\sqrt5$"}
+        - {id: p1y, label: "… 2. bileşeni", answer: 0.447214, tol: 0.002, hint: "$1/\\sqrt5$"}
+        - {id: rq, label: "Rayleigh $v^\\top Cv$ (bir adım sonra)", answer: 2.8, tol: 0.002, hint: "$2(0.8)+2\\cdot0.4+2(0.2)$; gerçek $\\lambda_1=3$'e yaklaşıyor"}
+  verify: |
+    import math
+    v = (2 / math.sqrt(5), 1 / math.sqrt(5))
+    rq = 2 * v[0] ** 2 + 2 * v[0] * v[1] + 2 * v[1] ** 2
+    answers = dict(l1=3, l2=1, v1x=round(1 / math.sqrt(2), 6), ratio=0.75, proj=round(2 / math.sqrt(2), 6),
+                   p1x=round(v[0], 6), p1y=round(v[1], 6), rq=round(rq, 6))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "PCA'dan önce veriyi neden ortalarız?"
+    options:
+      - {t: "PCA varyans yönlerini arar; ortalanmamış veride ilk bileşen çoğu zaman yalnız orijinden ortalamaya giden yönü gösterir", ok: true, why: "Ortalamadan uzaklık bir varyans değildir. $X_c=X-\\bar x$ ile $\\frac1{n-1}X_c^\\top X_c$ gerçekten kovaryanstır."}
+      - {t: "SVD yalnız ortalanmış matriste çalışır", why: "SVD her matriste çalışır; ortalamazsan farklı (yanlış) bir şey hesaplarsın."}
+      - {t: "Gerekmez", why: "Gerekir; c aşamasında kontrol bunu test ediyor."}
+  - q: "Kovaryans matrisini kurup `eigh` yapmak yerine $X_c$'nin SVD'sini almak neden tercih edilir?"
+    options:
+      - {t: "$X^\\top X$ koşul sayısının karesini alır; küçük özdeğerler kayan noktada kaybolur. SVD doğrudan $X$ üzerinde çalışır", ok: true, why: "$\\kappa(X^\\top X)=\\kappa(X)^2$. $d\\gg n$ olduğunda SVD ayrıca $d\\times d$ matrisi hiç kurmaz."}
+      - {t: "eigh yanlış sonuç verir", why: "Matematiksel olarak aynı; fark sayısal kararlılık ve maliyette."}
+      - {t: "SVD her zaman daha hızlıdır", why: "$n\\gg d$ iken $d\\times d$ eigh daha ucuz olabilir; ana fark kararlılık."}
+  - q: "Bir özvektörün işareti neden belirsizdir ve neden önemli?"
+    options:
+      - {t: "$v$ özvektörse $-v$ de öyle; farklı kütüphaneler/çalıştırmalar farklı işaret döndürür, testler ve görselleştirmeler kararsız olur", ok: true, why: "Bu modülde kural: her bileşenin mutlak değerce en büyük elemanı pozitif."}
+      - {t: "Negatif özvektör negatif varyans demektir", why: "Varyans özdeğerdir, işaretten bağımsız."}
+      - {t: "Belirsiz değildir", why: "$C(-v)=\\lambda(-v)$."}
