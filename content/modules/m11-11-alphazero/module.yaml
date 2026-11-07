@@ -1,0 +1,102 @@
+id: m11-11-alphazero
+code: M11.11
+title: AlphaGo'dan AlphaZero'ya — politika/değer ağları ve kendine karşı oyunla MCTS
+phase: 11
+minutes: 460
+prereq: [m11-10-planning, m11-9-actor-critic]
+summary: >
+  AlphaGo'nun dört aşaması (uzman hamleleriyle denetimli politika ağı,
+  kendine karşı oyunda REINFORCE, değer ağı regresyonu, politika ve değer
+  ağlarıyla PUCT araması) ve AlphaGo Zero'nun sadeleştirmesi: tek ağ
+  $(p,v)=f_\theta(s)$, yalnız kendine karşı oyun, MCTS ziyaret sayılarından
+  politika hedefi, $(z-v)^2-\pi^\top\log p+c\|\theta\|^2$ kaybı, kökte
+  Dirichlet gürültüsü, sıcaklık ve simetri artırımı. Saf Python'da PUCT,
+  NumPy'da 8 simetri ve Elo/Bradley–Terry, PyTorch'ta tic-tac-toe'yu
+  sıfırdan öğrenip kusursuz oyuncuyla berabere kalan mini AlphaZero, sonda
+  yüzlerce oyunu aynı anda oynatan toplu yaprak değerlendirmeli kendine
+  karşı oyun.
+goals:
+  - "AlphaGo: SL politika $p_\\sigma$, RL politika $p_\\rho$ ($G_n=\\pm1$ ile REINFORCE), değer ağı $v_\\theta$, yaprakta $(1-\\lambda)v_\\theta+\\lambda z$"
+  - "AlphaGo Zero: $\\pi\\propto N^{1/\\tau}$ ile arama politika iyileştirme operatörü, sonuç $z$ değerlendirme operatörü"
+  - "PUCT seçimi $Q(s,a)+c\\,P(s,a)\\sqrt{\\sum_bN(s,b)}/(1+N(s,a))$"
+  - "[[Elo derecelendirmesi]] ve Bradley–Terry modeli"
+sources:
+  - {title: "Silver ve ark. — Mastering the game of Go with deep neural networks and tree search (Nature 2016)", url: "https://doi.org/10.1038/nature16961", license: "©", use: link}
+  - {title: "Silver ve ark. — Mastering the game of Go without human knowledge (Nature 2017)", url: "https://doi.org/10.1038/nature24270", license: "©", use: link}
+  - {title: "Silver ve ark. — A general reinforcement learning algorithm that masters chess, shogi, and Go through self-play (Science 2018)", url: "https://doi.org/10.1126/science.aar6404", license: "©", use: link}
+  - {title: "Hunter — MM algorithms for generalized Bradley–Terry models (Ann. Stat. 2004)", url: "https://doi.org/10.1214/aos/1079120141", license: "©", use: link}
+  - {title: "Anthony, Tian, Barber — Thinking Fast and Slow with Deep Learning and Tree Search (NeurIPS 2017)", url: "https://arxiv.org/abs/1705.08439", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "AlphaGo"
+      fields:
+        - {id: mix, label: "Yaprak değeri, λ = 0.5: $v_\\theta=0.2$, rastgele oyun sonucu $z=1$", answer: 0.6}
+        - {id: syms, label: "Kare tahtanın simetri sayısı (döndürme + yansıma)", answer: 8}
+    - title: "AlphaGo Zero"
+      fields:
+        - {id: tau, label: "N = (10, 30, 60), τ = 0.5: $\\pi(a_3)$", answer: 0.782608695652174, tol: 1.0e-9}
+        - {id: loss, label: "Kayıp: z = 1, v = 0.5, π = p = (½, ½), c = 0", answer: 0.9431471805599453, tol: 1.0e-9}
+        - {id: dir, label: "Kök önseli: P = 0.4, Dirichlet örneği η = 0.2, ε = 0.25", answer: 0.35}
+    - title: "Elo"
+      fields:
+        - {id: elo, label: "200 puan farkı: güçlü oyuncunun beklenen skoru", answer: 0.7597469266479578, tol: 1.0e-9}
+  verify: |
+    import math
+    answers = dict(mix=0.5 * 0.2 + 0.5 * 1, syms=8, tau=3600 / 4600, loss=0.25 + math.log(2), dir=0.75 * 0.4 + 0.25 * 0.2, elo=1 / (1 + 10 ** (-200 / 400)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Kökte Dirichlet gürültüsü neden gerekli?", engine: browser}
+  - {id: x2, title: "Simetri artırımı ile genelleme", engine: browser}
+  - {id: x3, title: "Maç sonuçlarından Elo farkı ve belirsizliği", engine: browser}
+
+quiz:
+  - q: "AlphaGo Zero'da MCTS neden 'politika iyileştirme operatörü' olarak görülür?"
+    options:
+      - {t: "Ağın p önselinden başlayan arama, ziyaret sayılarıyla daha güçlü bir π üretir; ağ π'yi taklit ederek iyileşir, iyileşen ağ daha iyi arama sağlar", ok: true, why: "Politika yinelemesinin örneklemeli hâli; z değerlendirmedir."}
+      - {t: "Arama ağ ağırlıklarını doğrudan günceller", why: "Ağırlıklar SGD ile güncellenir."}
+      - {t: "Rastgele oyunlarla değer kestirdiği için", why: "AlphaGo Zero'da rastgele oyun yoktur."}
+  - q: "AlphaGo değer ağını eğitirken neden her kendine karşı oyundan yalnız bir konum örnekler?"
+    options:
+      - {t: "Aynı oyunun ardışık konumları çok koreledir ve aynı sonucu paylaşır; ağ konumu değil oyunu ezberler (aşırı uyum)", ok: true, why: "Makalede tüm KGS konumlarıyla eğitim test MSE'sini belirgin kötüleştirmişti."}
+      - {t: "Bellek yetmediği için", why: "Asıl neden istatistiksel."}
+      - {t: "Simetri artırımı yapabilmek için", why: "İlgisiz."}
+  - q: "Kökteki Dirichlet gürültüsünün işlevi nedir?"
+    options:
+      - {t: "Önselin neredeyse sıfır verdiği hamlelerin de denenmesini sağlar (keşif); yalnız kökte ve yalnız kendine karşı oyunda kullanılır", ok: true, why: "Değerlendirme maçlarında gürültü kapatılır."}
+      - {t: "Ağın aşırı uyumunu önler", why: "Düzenleme L2 ile yapılır."}
+      - {t: "Değer kestirimini yumuşatır", why: "Önsele eklenir, değere değil."}
+
+homework:
+  - title: "Silver ve ark. (2016): AlphaGo'nun boru hattı"
+    paper: "Silver ve ark. — Mastering the game of Go with deep neural networks and tree search (Nature 2016)"
+    url: "https://doi.org/10.1038/nature16961"
+    level: ileri
+    hours: 20
+    goal: |
+      AlphaGo'nun dört aşamasını küçük bir oyunda (9×9 Go yerine 6×6 Othello ya da Connect-4) yeniden kur: (1) güçlü bir arama motorunun (ör. derin MCTS) oyunlarından SL politika ağı, (2) havuzdan rastgele seçilen eski sürümlere karşı REINFORCE ile RL politika ağı, (3) her oyundan tek konum örnekleyerek değer ağı, (4) PUCT araması: önsel = SL politikası, yaprak = $(1-\lambda)v_\theta+\lambda z$ (hızlı rollout politikasıyla). λ ∈ {0, 0.5, 1} ve "önsel olarak RL politikası" ablation'larını yap.
+    steps:
+      - "Makalenin Şekil 4'ündeki gibi bileşen ablation tablosu: Elo'yu c aşamasındaki Bradley–Terry ile hesapla."
+      - "Her oyundan tek konum vs tüm konumlar ile değer ağı test MSE'si."
+    accept:
+      - "λ = 0.5 karışımı tek başına değer ağı ya da tek başına rollout'tan güçlü (makale Şekil 4b nitel)."
+      - "SL politikası önsel olarak RL politikasından iyi (makalenin şaşırtıcı bulgusu: daha çeşitli)."
+  - title: "Silver ve ark. (2017): AlphaGo Zero"
+    paper: "Silver ve ark. — Mastering the game of Go without human knowledge (Nature 2017)"
+    url: "https://doi.org/10.1038/nature24270"
+    level: ileri
+    hours: 20
+    goal: |
+      d ve e aşamalarındaki mini AlphaZero'yu Connect-4'e (6×7) taşı: artık ağ (ResNet, politika ve değer başlıkları), toplu kendine karşı oyun, değerlendirici (yeni ağ eskisini %55 ile yenerse kabul; AlphaZero'da bu adım yok — ikisini karşılaştır), 8 yerine 2 simetri (yalnız yatay yansıma). Elo eğrisini eğitim süresine karşı çiz.
+    steps:
+      - "Bilinen çözüm: ilk oyuncu orta sütundan başlarsa kazanır — ağın değer başlığının boş tahtada pozitif olduğunu doğrula."
+      - "Ablation: tek ağ vs ayrı politika/değer ağları (makale Şekil 4)."
+    accept:
+      - "Elo düzenli artar; birleşik ağ ayrı ağlardan iyi (makale Şekil 4 nitel)."
+      - "Son ağ + 800 benzetim, d aşamasındaki rastgele-oyunlu UCT'yi ≥ %90 yener."
