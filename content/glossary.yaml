@@ -137,3 +137,5 @@ terms:
   amdahl yasası: "Programın f oranı N işlemciye bölünür, kalan 1 − f seri kalırsa hızlanma S = 1/((1 − f) + f/N) ≤ 1/(1 − f): sabit problem boyunda seri kısım tavanı belirler."
   gustafson yasası: "Problem işlemci sayısıyla büyütülür ve seri süre sabit kalırsa ölçeklenmiş hızlanma S = (1 − f) + fN: zayıf ölçekleme."
   pcam: "Foster'ın paralel tasarım adımları: Partitioning (görevlere böl), Communication (bağımlılıkları belirle), Agglomeration (iletişimi azaltmak için grupla), Mapping (gruplari işlemcilere dengeli ata)."
+  veri yarışı: "Data race: iki thread aynı bellek konumuna eşzamanlama olmadan aynı anda erişir ve en az biri yazar; C/C++'ta tanımsız davranıştır."
+  yarış koşulu: "Race condition: programın doğruluğunun thread'lerin göreli zamanlamasına bağlı olması; veri yarışı olmadan da (ör. ayrı atomik oku ve yaz) ortaya çıkabilir."

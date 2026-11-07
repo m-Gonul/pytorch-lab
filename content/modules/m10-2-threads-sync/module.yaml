@@ -1,0 +1,102 @@
+id: m10-2-threads-sync
+code: M10.2
+title: Thread'ler ve eşzamanlama — yarışlar, atomikler, kilitler, koşul değişkenleri
+phase: 10
+minutes: 420
+prereq: [m10-1-parallel-models]
+summary: >
+  Süreçten (fork, ayrı adres uzayı) thread'e (yalnız yığını ayrı, belleği
+  paylaşan hafif yürütme birimi); POSIX thread'lerinden C++11 `std::thread`'e:
+  oluşturma, argüman geçirme (değerle/`std::ref`), `join`/`detach`, ömür.
+  Paylaşılan veri: veri yarışı (data race, C/C++'ta tanımsız davranış) ve
+  yarış koşulu (race condition), banka hesabı örneği, oku–değiştir–yaz
+  atomikliği, `std::atomic`, `std::mutex`/`lock_guard`, koşul değişkenleriyle
+  sınırlı tampon, kilitlenme (deadlock) ve kilit sıralaması, sahte paylaşım
+  (false sharing). Saf Python'da tüm iç içe geçmeleri (interleaving) gezen bir
+  doğrulayıcı, NumPy'da yarış olasılığı, C++'ta atomik/mutex/özel histogram,
+  sahte paylaşım ve üretici–tüketici, sonda kendi thread havuzumuz ve görev
+  ayrıntı düzeyi.
+goals:
+  - "[[veri yarışı]]: en az biri yazma olan eşzamanlı, eşzamanlanmamış erişim; [[yarış koşulu]]: sonuç zamanlamaya bağlı"
+  - "Atomik oku–değiştir–yaz (`fetch_add`) vs mutex vs thread'e özel kopya + birleştirme"
+  - "Koşul değişkeni ile bekleme (`wait(lock, pred)`), sahte uyanmalar"
+  - "Kilitlenmenin dört koşulu ve kilit sıralaması; sahte paylaşım ve önbellek satırı hizalama"
+sources:
+  - {title: "Barlas — Multicore and GPU Programming (2. baskı), Bölüm 3: Threads and concurrency in standard C++", url: "https://www.elsevier.com/books/multicore-and-gpu-programming/barlas/978-0-12-814120-5", license: "©", use: link}
+  - {title: "Williams — C++ Concurrency in Action (2. baskı)", url: "https://www.manning.com/books/c-plus-plus-concurrency-in-action-second-edition", license: "©", use: link}
+  - {title: "cppreference — Concurrency support library", url: "https://en.cppreference.com/w/cpp/thread", license: "CC BY-SA 3.0", use: link}
+  - {title: "Boehm — Threads Cannot Be Implemented as a Library (PLDI 2005)", url: "https://doi.org/10.1145/1065010.1065042", license: "©", use: link}
+  - {title: "Peterson — Myths About the Mutual Exclusion Problem (IPL 1981)", url: "https://doi.org/10.1016/0020-0190(81)90106-X", license: "©", use: link}
+  - {title: "Coffman, Elphick, Shoshani — System Deadlocks (ACM Computing Surveys 1971)", url: "https://doi.org/10.1145/356586.356588", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "İki thread, her biri x = x + 1'i iki adımda yapar: LOAD, STORE(+1); x = 0"
+      fields:
+        - {id: il, label: "Olası iç içe geçme (interleaving) sayısı", answer: 6}
+        - {id: lost, label: "Bunlardan kaç tanesi x = 1 bırakır (kayıp güncelleme)?", answer: 4}
+    - title: "Banka: bakiye 10 000, eşzamanlı 1000 ve 500 yatırma (oku → topla → yaz)"
+      fields:
+        - {id: bank, label: "Olası farklı son bakiye sayısı", answer: 3}
+    - title: "Diğer"
+      fields:
+        - {id: phil, label: "5 filozof, 5 çatal: aynı anda en çok kaç kişi yiyebilir?", answer: 2}
+        - {id: cl, label: "64 baytlık önbellek satırına sığan int64 sayaç", answer: 8}
+        - {id: merge, label: "4 thread'e özel 256 kutulu histogramın birleştirilmesi: toplama sayısı", answer: 1024}
+  verify: |
+    from math import comb
+    answers = dict(il=comb(4, 2), lost=comb(4, 2) - 2, bank=len({11500, 11000, 10500}), phil=5 // 2, cl=64 // 8, merge=4 * 256)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Yemek yiyen filozoflar: kilitlenme ve kaynak sıralaması", engine: browser}
+  - {id: x2, title: "Peterson algoritması: karşılıklı dışlamanın kanıtı (durum uzayı)", engine: browser}
+  - {id: x3, title: "Okuyucu–yazıcı kilidi ve yazıcı açlığı", engine: browser}
+
+quiz:
+  - q: "Veri yarışı ile yarış koşulu arasındaki fark nedir?"
+    options:
+      - {t: "Veri yarışı: aynı bellek konumuna eşzamanlanmamış eşzamanlı erişim (en az biri yazma) — C++'ta tanımsız davranış. Yarış koşulu: doğruluğun zamanlamaya bağlı olması; atomik işlemlerle de (veri yarışı olmadan) oluşabilir", ok: true, why: "Banka örneğinde ayrı atomik oku ve yaz → veri yarışı yok ama yarış koşulu var."}
+      - {t: "Aynı şeyler", why: "Ayrı kavramlar."}
+      - {t: "Yarış koşulu yalnız GPU'da olur", why: "Her paylaşımlı bellek sisteminde."}
+  - q: "Koşul değişkeninde `wait` neden bir döngü (ya da yüklem) içinde çağrılır?"
+    options:
+      - {t: "Sahte uyanmalar ve uyandıktan sonra kilidi yeniden alana kadar başka bir thread'in koşulu değiştirmesi mümkündür; koşul yeniden kontrol edilmelidir", ok: true, why: "`cv.wait(lock, pred)` bunu yapar."}
+      - {t: "Performans için", why: "Doğruluk için."}
+      - {t: "Gerekmez", why: "Gerekir."}
+  - q: "Her thread kendi sayacını artırıyor ama sayaçlar bitişik bir dizide; neden yavaş?"
+    options:
+      - {t: "Sayaçlar aynı önbellek satırında: bir çekirdeğin yazması diğer çekirdeklerdeki kopyayı geçersiz kılar, satır çekirdekler arasında gidip gelir (sahte paylaşım)", ok: true, why: "`alignas(64)` ile her sayaç kendi satırına."}
+      - {t: "Atomik işlemler yavaştır", why: "Dolgulu sürümde de atomik, ama hızlı."}
+      - {t: "Yarış koşulu", why: "Her thread kendi sayacına yazar."}
+
+homework:
+  - title: "Boehm (2005): Thread'ler kütüphane olarak gerçeklenemez"
+    paper: "Boehm — Threads Cannot Be Implemented as a Library (PLDI 2005)"
+    url: "https://doi.org/10.1145/1065010.1065042"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin üç örneğini (eşzamanlı değişken değiştirme, bitişik bit alanlarının yeniden yazılması, kayıt yükseltme/register promotion) C++'ta yeniden üret: `-O0` ve `-O3` ile derle, x86-64 assembly'sini (`objdump -d` ya da godbolt) incele, hatalı davranışı gösteren bir test yaz. Sonra `std::atomic` ve C++11 bellek modeliyle düzelt ve neden düzeldiğini bellek sırası (memory order) kavramlarıyla açıkla.
+    steps:
+      - "d aşamasındaki `racy` modunun neden tanımlı ama yanlış olduğunu tartış."
+      - "Bit alanı örneğinde iki thread'in komşu alanlara yazmasını test et."
+    accept:
+      - "Her örnek için hatalı çıktı veren bir çalıştırma (ya da derleyici dönüşümünü gösteren assembly)."
+      - "Düzeltilmiş sürümler 10⁶ denemede doğru."
+  - title: "Peterson (1981) ve donanım bellek modeli"
+    paper: "Peterson — Myths About the Mutual Exclusion Problem (IPL 1981)"
+    url: "https://doi.org/10.1016/0020-0190(81)90106-X"
+    level: ileri
+    hours: 8
+    goal: |
+      x2'de durum uzayında kanıtladığın Peterson algoritmasını C++'ta (a) düz `int` değişkenlerle, (b) `std::atomic` + `memory_order_relaxed` ile, (c) `memory_order_seq_cst` ile yaz. Kritik bölgede ortak bir sayacı artırıp 10⁷ girişte ihlal say. x86'nın TSO modelinde (a)/(b)'nin neden bozulduğunu (store buffer) açıkla ve `std::atomic_thread_fence` ile düzelt.
+    steps:
+      - "İki thread farklı çekirdeklere sabitlenmeli (`pthread_setaffinity_np`)."
+    accept:
+      - "(a) ve (b)'de ihlal gözlenir, (c)'de gözlenmez."
