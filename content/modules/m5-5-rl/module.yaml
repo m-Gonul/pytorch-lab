@@ -1,0 +1,73 @@
+id: m5-5-rl
+code: M5.5
+title: "RL temelleri: value iteration, REINFORCE"
+phase: 5
+minutes: 300
+prereq: [m1-5-softmax]
+summary: >
+  Pekiştirmeli öğrenmenin iki ucu: modeli bilinen bir MDP'de dinamik
+  programlama, bilinmeyen bir ortamda policy gradient. İki durumlu bir MDP'de
+  value iteration'ı elle yürütüyor, saf Python'da kaygan bir ızgara dünyası
+  için value iteration ve policy evaluation yazıyor, NumPy'da Bellman
+  operatörünü einsum'la ve politika değerini doğrusal sistem çözerek
+  hesaplıyor, PyTorch'ta REINFORCE ile bir zincir ortamını öğreniyor ve en
+  sonda 64 ortamı paralel yürütüp getirileri tek bir matris çarpımıyla
+  hesaplıyorsun.
+goals:
+  - "Bellman optimallik denklemini ve value iteration'ın neden yakınsadığını ($\\gamma$-büzülme) görmek"
+  - "Politika değerini $(I-\\gamma P_\\pi)V=R_\\pi$ doğrusal sistemiyle tam çözmek"
+  - "[[policy gradient]] (REINFORCE) tahmincisini ve baseline'ın varyansı neden düşürdüğünü anlamak"
+  - "Batch'li ortam ve maskeli, döngüsüz indirimli getiri hesabı"
+sources:
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı)", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+  - {title: "Williams — Simple Statistical Gradient-Following Algorithms (REINFORCE)", url: "https://link.springer.com/article/10.1007/BF00992696", license: "©", use: link}
+  - {title: "OpenAI Spinning Up — Intro to Policy Optimization", url: "https://spinningup.openai.com/", license: "MIT", use: adapt}
+  - {title: "UC Berkeley CS285 — Deep Reinforcement Learning", url: "https://rail.eecs.berkeley.edu/deeprlcourse/", license: "doğrulanmadı", use: link}
+  - {title: "David Silver — UCL RL Course", url: "https://www.davidsilver.uk/teaching/", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "İki durum, deterministik. $s_0$: kal → ödül 0, $s_0$'da kal; git → ödül 1, $s_1$'e. $s_1$: kal → ödül 2, $s_1$'de kal; git → ödül 0, $s_0$'a. $\\gamma=0.5$, $V_0=0$"
+      fields:
+        - {id: v1s0, label: "$V_1(s_0)$", answer: 1}
+        - {id: v2s0, label: "$V_2(s_0)$", answer: 2, hint: "$\\max(0+0.5\\cdot1,\\ 1+0.5\\cdot2)$"}
+        - {id: v2s1, label: "$V_2(s_1)$", answer: 3}
+        - {id: vs1, label: "$V^*(s_1)$", answer: 4, hint: "Hep kal: $2/(1-\\gamma)$"}
+        - {id: vs0, label: "$V^*(s_0)$", answer: 3}
+        - {id: qst, label: "$Q^*(s_0,\\text{kal})$", answer: 1.5}
+    - title: "REINFORCE, iki kollu bandit: $\\pi=\\operatorname{softmax}(\\theta)$, $\\theta=(0,0)$; örneklenen eylem 0, ödül 1"
+      fields:
+        - {id: g0, label: "$R\\,\\partial\\log\\pi(0)/\\partial\\theta_0$", answer: 0.5, hint: "$\\nabla_\\theta\\log\\pi(a)=e_a-\\pi$"}
+        - {id: gb, label: "Baseline $b=0.6$ ile aynı bileşen: $(R-b)\\,\\partial\\log\\pi(0)/\\partial\\theta_0$", answer: 0.2}
+  verify: |
+    P = {0: {0: (0, 0.0), 1: (1, 1.0)}, 1: {0: (1, 2.0), 1: (0, 0.0)}}
+    g = 0.5
+    V = [0.0, 0.0]; hist = []
+    for _ in range(200):
+        V = [max(r + g * V[s2] for s2, r in P[s].values()) for s in (0, 1)]
+        hist.append(V)
+    answers = dict(v1s0=hist[0][0], v2s0=hist[1][0], v2s1=hist[1][1], vs1=V[1], vs0=V[0], qst=0 + g * V[0],
+                   g0=1 * (1 - 0.5), gb=(1 - 0.6) * (1 - 0.5))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "REINFORCE'ta getiriden bir baseline $b(s)$ çıkarmak tahmincinin beklentisini neden değiştirmez?"
+    options:
+      - {t: "$\\mathbb E_{a\\sim\\pi}[\\nabla\\log\\pi(a\\mid s)]=\\nabla\\sum_a\\pi(a\\mid s)=\\nabla1=0$; $b$ eylemden bağımsız olduğu sürece katkısı sıfır", ok: true, why: "Yansızlık korunur, varyans düşer. Actor-critic'te $b(s)=V(s)$ öğrenilir."}
+      - {t: "Değiştirir ama önemsiz ölçüde", why: "Beklenti tam olarak aynı kalır."}
+      - {t: "Baseline yalnız ortalamayı ölçekler", why: "Çıkarma ölçekleme değil; yansızlık skor fonksiyonunun sıfır ortalamasından gelir."}
+  - q: "Value iteration neden her başlangıç $V_0$'dan $V^*$'a yakınsar?"
+    options:
+      - {t: "Bellman optimallik operatörü sonsuz-normda $\\gamma$-büzülmedir; Banach sabit nokta teoremi tek sabit noktaya yakınsamayı garanti eder", ok: true, why: "Hata her iterasyonda en az $\\gamma$ katına iner: $\\lVert V_k-V^*\\rVert_\\infty\\le\\gamma^k\\lVert V_0-V^*\\rVert_\\infty$."}
+      - {t: "Politika her adımda iyileştiği için", why: "O, policy iteration'ın argümanı."}
+      - {t: "Ödüller sınırlı olduğu için", why: "Gerekli ama yeterli değil; $\\gamma<1$ büzülmeyi sağlar."}
+  - q: "Policy gradient yöntemleri neden \"on-policy\"dir?"
+    options:
+      - {t: "Gradyan $\\mathbb E_{\\tau\\sim\\pi_\\theta}$ altında tanımlı; eski politikayla toplanan veri, önem ağırlığı olmadan yanlı gradyan verir", ok: true, why: "PPO önem oranını kırparak eski veriyi birkaç adım daha kullanmaya izin verir."}
+      - {t: "Q-değeri kullanmadıkları için", why: "Mesele örnekleme dağılımı."}
+      - {t: "Ortam deterministik olmak zorunda olduğu için", why: "Stokastik ortamlarda da çalışır."}

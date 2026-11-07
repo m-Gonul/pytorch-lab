@@ -1,0 +1,18 @@
+import numpy as np
+
+
+def bellman_q(V, P, R, gamma):
+    ...
+
+
+def policy_eval_exact(P, R, pi, gamma):
+    ...
+
+
+def policy_iteration(P, R, gamma):
+    ...
+
+
+P = np.zeros((2, 2, 2)); P[0, 0, 0] = P[0, 1, 1] = P[1, 0, 1] = P[1, 1, 0] = 1
+R = np.array([[0.0, 1.0], [2.0, 0.0]])
+print(policy_iteration(P, R, 0.5))   # V = [3, 4], politika [1, 0]
