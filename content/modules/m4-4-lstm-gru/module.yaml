@@ -1,0 +1,69 @@
+id: m4-4-lstm-gru
+code: M4.4
+title: LSTM ve GRU
+phase: 4
+minutes: 240
+prereq: [m4-3-rnn]
+summary: >
+  Kapılı hücrelerle uzun bellek. Bir LSTM ve bir GRU adımını elle hesaplayıp
+  hücre durumunun gradyanı neden taşıdığını görüyor, saf Python'da iki hücreyi
+  PyTorch'un formülleriyle yazıyor, NumPy'da LSTM adımının ileri/geri
+  geçişini kuruyor, PyTorch'ta `nn.LSTMCell` ile aynı sayıları veren kendi
+  hücreni yazıyor ve en sonda farklı uzunluktaki dizileri maskeleyerek tek
+  batch'te işliyorsun.
+goals:
+  - "LSTM'in dört kapısını (input, forget, cell, output) ve hücre durumu güncellemesini yazmak"
+  - "$\\partial c_t/\\partial c_{t-1}=f_t$ ilişkisinin gradyanın uzun mesafe taşınmasını nasıl sağladığını göstermek"
+  - "GRU'nun reset/update kapılarını PyTorch'un formülüyle uygulamak"
+  - "Dört kapıyı tek bir matmul ile hesaplamak ve değişken uzunluklu dizileri maskeyle işlemek"
+sources:
+  - {title: "Hochreiter & Schmidhuber — Long Short-Term Memory", url: "https://www.bioinf.jku.at/publications/older/2604.pdf", license: "©", use: link}
+  - {title: "Colah — Understanding LSTM Networks", url: "https://colah.github.io/posts/2015-08-Understanding-LSTMs/", license: "©", use: link}
+  - {title: "Dive into Deep Learning §10.1–10.2 LSTM, GRU", url: "https://d2l.ai/chapter_recurrent-modern/index.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "CS231n Assignment 3 — LSTM (lstm_step_forward/backward)", url: "https://cs231n.github.io/assignments2025/assignment3/", license: "MIT", use: adapt}
+  - {title: "PyTorch — nn.LSTMCell / nn.GRUCell formülleri", url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTMCell.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "LSTM adımı; kapı ön-aktivasyonları $a_i=0$, $a_f=1$, $a_g=1$, $a_o=0$; $c_{t-1}=0.5$"
+      fields:
+        - {id: f, label: "$f=\\sigma(a_f)$", answer: 0.731059, tol: 0.002, hint: "$1/(1+e^{-1})$"}
+        - {id: c, label: "$c_t=f\\,c_{t-1}+i\\,g$", answer: 0.746326, tol: 0.003, hint: "$i=0.5$, $g=\\tanh1=0.7616$"}
+        - {id: h, label: "$h_t=o\\tanh(c_t)$", answer: 0.316476, tol: 0.003, hint: "$o=0.5$; $\\tanh(0.7463)\\approx0.6331$"}
+        - {id: dc, label: "$\\partial c_t/\\partial c_{t-1}$", answer: 0.731059, tol: 0.002, hint: "toplamsal yol: yalnız $f$"}
+        - {id: car, label: "$f=0.9$ ile 10 adım: $\\prod f$", answer: 0.348678, tol: 0.002, hint: "$0.9^{10}$ — sade RNN'deki $0.25^{10}$ ile karşılaştır"}
+    - title: "GRU: $z=0.5$, $h_{t-1}=0.4$, aday $n=\\tanh(0.8)$: $h_t=(1-z)\\,n+z\\,h_{t-1}$"
+      fields:
+        - {id: n, label: "$n$", answer: 0.664037, tol: 0.002}
+        - {id: hg, label: "$h_t$", answer: 0.532018, tol: 0.002, hint: "$0.5\\cdot0.664+0.5\\cdot0.4$"}
+  verify: |
+    import math
+    s = lambda x: 1 / (1 + math.exp(-x))
+    i, f, g, o = s(0), s(1), math.tanh(1), s(0)
+    c = f * 0.5 + i * g
+    n = math.tanh(0.8)
+    answers = dict(f=round(f, 6), c=round(c, 6), h=round(o * math.tanh(c), 6), dc=round(f, 6), car=round(0.9 ** 10, 6),
+                   n=round(n, 6), hg=round(0.5 * n + 0.5 * 0.4, 6))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "LSTM'de gradyan neden RNN'e göre çok daha uzak geçmişe ulaşır?"
+    options:
+      - {t: "$c_t=f_t\\odot c_{t-1}+i_t\\odot g_t$ toplamsal; $\\partial c_t/\\partial c_{t-1}=f_t$ ağırlık matrisi ve tanh türevi içermez. Forget kapısı 1'e yakınken gradyan neredeyse kayıpsız taşınır", ok: true, why: "\"Constant error carousel\". Residual bağlantıyla (M4.2) aynı fikir: toplamsal yol."}
+      - {t: "LSTM'in daha çok parametresi olduğu için", why: "Parametre sayısı değil, hücre durumunun toplamsal güncellemesi."}
+      - {t: "Gradient clipping içerdiği için", why: "LSTM'in kendisi clipping içermez."}
+  - q: "Forget kapısının bias'ı neden sıklıkla 1 (ya da daha büyük) başlatılır?"
+    options:
+      - {t: "Başlangıçta $f\\approx\\sigma(1)=0.73$ ya da daha yüksek olur; hücre varsayılan olarak hatırlar ve gradyan uzak geçmişe erişebilir", ok: true, why: "Jozefowicz et al. (2015) bunun LSTM performansını belirgin artırdığını gösterdi."}
+      - {t: "Simetriyi kırmak için", why: "Simetriyi rastgele ağırlıklar kırar."}
+      - {t: "Aşırı uyumu önlemek için", why: "Amaç optimizasyon, regularization değil."}
+  - q: "Değişken uzunluklu dizileri tek batch'te işlerken maskeleme neden gerekir?"
+    options:
+      - {t: "Kısa diziler bitince dolgu (padding) adımları durumu değiştirmemeli; aksi hâlde son gizli durum dolguyla kirlenir", ok: true, why: "`pack_padded_sequence` ya da $h\\leftarrow m\\,h_{\\text{yeni}}+(1-m)\\,h$ maskesi. e aşamasında ikincisini yazıyorsun."}
+      - {t: "Dolgu değerleri NaN olduğu için", why: "Dolgu genelde 0; sorun durumun güncellenmesi."}
+      - {t: "Gerekli değil", why: "Son durum yanlış olur; kontrol bunu test ediyor."}
