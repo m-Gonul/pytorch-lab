@@ -49,7 +49,8 @@ def check_module(d: Path) -> list[str]:
                 continue
             want = float(answers[fid])
             tol = float(f.get("tol", 0))
-            if not math.isclose(float(f["answer"]), want, abs_tol=max(tol, 1e-9)):
+            # Yazılan cevap verify'ın hesapladığıyla (yuvarlama payı dışında) aynı olmalı; tol yalnız öğrenciye tanınan pay.
+            if not math.isclose(float(f["answer"]), want, rel_tol=2e-6, abs_tol=max(tol * 0.01, 1e-9)):
                 errs.append(f"a: {fid} cevabı {f['answer']} ama verify {want}")
             if g.get("layout") == "matrix" and len(g["fields"]) != g["rows"] * g["cols"]:
                 errs.append(f"a: '{g['title']}' matris düzeninde alan sayısı rows*cols değil")

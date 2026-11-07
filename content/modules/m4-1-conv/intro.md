@@ -1,0 +1,15 @@
+Bir [[convolution]] katmanı, $F$ adet $C\times K_h\times K_w$ çekirdeği girdi üzerinde kaydırır; her konumda pencere ile çekirdeğin iç çarpımı bir çıktı pikseli verir:
+
+$$
+Y_{n,f,i,j}=b_f+\sum_{c=1}^{C}\sum_{a=0}^{K_h-1}\sum_{b=0}^{K_w-1}W_{f,c,a,b}\;X^{\text{pad}}_{n,c,\,iS+a,\,jS+b},
+\qquad
+H_{\text{out}}=\Big\lfloor\frac{H+2P-K_h}{S}\Big\rfloor+1 .
+$$
+
+Doğrudan uygulama altı iç içe döngüdür. [[im2col]] bunu tek matris çarpımına çevirir: her pencereyi bir sütuna aç ($C K_hK_w\times H_{\text{out}}W_{\text{out}}$ matris), çekirdekleri satırlara diz ($F\times CK_hK_w$), çarp:
+
+$$
+Y_{\text{mat}}=W_{\text{mat}}\cdot\text{im2col}(X)+b .
+$$
+
+Geri geçişte $dW=dY_{\text{mat}}\,\text{im2col}(X)^\top$; girdi gradyanı ise $W_{\text{mat}}^\top dY_{\text{mat}}$'yi pencere konumlarına geri dağıtan **col2im** (örtüşen pencerelerde toplanır). PyTorch'ta im2col `F.unfold`, col2im `F.fold`.

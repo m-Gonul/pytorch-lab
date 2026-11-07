@@ -54,3 +54,7 @@ terms:
   bias düzeltmesi: "Adam'da sıfırdan başlatılan hareketli ortalamaların ilk adımlardaki küçüklüğünü 1/(1 − βᵗ) ile çarparak telafi etmek."
   xavier init: "Glorot başlatması: Var(w) = 2/(n_in + n_out); lineer/tanh ağlarda aktivasyon ve gradyan varyansını katmanlar boyunca korur."
   kaiming init: "He başlatması: Var(w) = 2/n_in; ReLU'nun ikinci momenti yarıya indirmesini telafi ederek ReLU ağlarında varyansı korur."
+  im2col: "Convolution'ı matris çarpımına çevirme hilesi: girdinin her pencere konumunu bir sütuna açar; tersi (col2im) pencereleri geri toplar."
+  receptive field: "Bir çıktı nöronunun girdide 'gördüğü' bölgenin boyutu; katman katman r ← r + (k − 1)·j ile büyür, j o ana kadarki toplam stride."
+  residual bağlantı: "Skip connection: bir bloğun çıktısına girdisini eklemek, y = x + F(x). Jacobian'a birim matris ekler, gradyanın sönmesini engeller."
+  associative scan: "Birleşmeli bir işlemin tüm önek (prefix) sonuçlarını O(log T) paralel adımda hesaplamak; doğrusal rekürsiyonlar ve SSM'ler (Mamba) bunu kullanır."

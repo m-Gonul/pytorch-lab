@@ -1,0 +1,70 @@
+id: m4-1-conv
+code: M4.1
+title: Convolution ve im2col
+phase: 4
+minutes: 270
+prereq: [m0-5-tensor-tools, m3-2-mlp-backprop]
+summary: >
+  Görüntü modellerinin çekirdek işlemi. 3×3 bir girdide 2×2'lik çekirdekle
+  convolution'ı elle yapıyor, saf Python'da altı iç içe döngüyle yazıyor,
+  NumPy'da kayan pencere view'u + einsum ile döngüsüz hâle getiriyor,
+  PyTorch'ta `unfold` (im2col) + matmul ile `F.conv2d`'yi yeniden kurup girdi
+  gradyanını `fold` (col2im) ile hesaplıyor ve en sonda dört uygulamayı
+  yarıştırıyorsun.
+goals:
+  - "Çıktı boyutu formülü $\\lfloor\\frac{H+2P-K}{S}\\rfloor+1$ ve parametre sayısı $F\\cdot C\\cdot K_h\\cdot K_w+F$'yi kullanmak"
+  - "[[convolution|Convolution]]'ı [[im2col]] ile tek bir matris çarpımına indirgemek"
+  - "Convolution'ın girdi gradyanının, im2col'un adjoint'i olan col2im (`fold`) ile hesaplandığını göstermek"
+  - "Stride'lı view (`unfold`) ile kopyasız pencereler kurup einsum ile toplamak"
+sources:
+  - {title: "CS231n — Convolutional Neural Networks (conv layer, im2col)", url: "https://cs231n.github.io/convolutional-networks/", license: "MIT", use: adapt}
+  - {title: "CS231n Assignment 2 — conv_forward_naive / conv_backward_naive", url: "https://cs231n.github.io/assignments2025/assignment2/", license: "MIT", use: adapt}
+  - {title: "Dive into Deep Learning §7.2–7.3 Convolutions for Images, Padding and Stride", url: "https://d2l.ai/chapter_convolutional-neural-networks/index.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "Dumoulin & Visin — A guide to convolution arithmetic for deep learning", url: "https://arxiv.org/abs/1603.07285", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "$X=\\begin{bmatrix}1&2&0\\\\0&1&3\\\\2&1&0\\end{bmatrix}$, $K=\\begin{bmatrix}1&0\\\\-1&2\\end{bmatrix}$, stride 1, padding yok (çapraz korelasyon)"
+      layout: matrix
+      rows: 2
+      cols: 2
+      fields:
+        - {id: y11, label: "$Y_{11}$", answer: 3, hint: "sol üst 2×2 pencere $\\begin{bmatrix}1&2\\\\0&1\\end{bmatrix}$ ile eleman eleman çarp, topla: $1+0+0+2$"}
+        - {id: y12, label: "$Y_{12}$", answer: 7, hint: "pencere $\\begin{bmatrix}2&0\\\\1&3\\end{bmatrix}$: $2+0-1+6$"}
+        - {id: y21, label: "$Y_{21}$", answer: 0, hint: "pencere $\\begin{bmatrix}0&1\\\\2&1\\end{bmatrix}$: $0+0-2+2$"}
+        - {id: y22, label: "$Y_{22}$", answer: 0, hint: "pencere $\\begin{bmatrix}1&3\\\\1&0\\end{bmatrix}$: $1+0-1+0$"}
+    - title: "Boyutlar"
+      fields:
+        - {id: o1, label: "$H=32$, $K=5$, $P=2$, $S=1$: çıktı yüksekliği", answer: 32, hint: "$\\frac{32+4-5}{1}+1$ — \"same\" padding"}
+        - {id: o2, label: "$H=32$, $K=3$, $P=1$, $S=2$", answer: 16, hint: "$\\lfloor\\frac{31}{2}\\rfloor+1$"}
+        - {id: params, label: "Conv $3\\to64$ kanal, $3\\times3$, bias'lı: parametre", answer: 1792, hint: "$64\\cdot3\\cdot9+64$"}
+        - {id: cols, label: "Üstteki örnekte im2col matrisinin sütun (pencere) sayısı", answer: 4, hint: "her çıktı konumu bir sütun; satır sayısı $C\\cdot K_h\\cdot K_w=4$"}
+  verify: |
+    X = [[1, 2, 0], [0, 1, 3], [2, 1, 0]]; K = [[1, 0], [-1, 2]]
+    Y = [[sum(X[i + a][j + b] * K[a][b] for a in range(2) for b in range(2)) for j in range(2)] for i in range(2)]
+    out = lambda H, k, p, s: (H + 2 * p - k) // s + 1
+    answers = dict(y11=Y[0][0], y12=Y[0][1], y21=Y[1][0], y22=Y[1][1], o1=out(32, 5, 2, 1), o2=out(32, 3, 1, 2),
+                   params=64 * 3 * 9 + 64, cols=4)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Derin öğrenmedeki \"convolution\" aslında hangi işlemdir?"
+    options:
+      - {t: "Çapraz korelasyon (cross-correlation): çekirdek ters çevrilmeden kaydırılır", ok: true, why: "Matematiksel convolution çekirdeği 180° döndürür. Çekirdek öğrenildiği için fark önemsizdir; ağ döndürülmüş hâlini öğrenir."}
+      - {t: "Matematiksel convolution", why: "PyTorch `conv2d` çekirdeği döndürmez."}
+      - {t: "Fourier dönüşümü", why: "Convolution teoremiyle ilişkili ama işlem uzamsal kaydırmalı iç çarpım."}
+  - q: "Bir conv katmanının girdi gradyanı $dX$ neden bir \"transposed convolution\"dır?"
+    options:
+      - {t: "İleri geçiş $Y=W_{\\text{mat}}\\cdot\\text{im2col}(X)$; geri geçiş $dX=\\text{col2im}(W_{\\text{mat}}^\\top dY)$ ve col2im, im2col'un adjoint'i: örtüşen pencerelerin katkılarını toplar", ok: true, why: "Aynı işlem upsampling için katman olarak da kullanılır (`ConvTranspose2d`)."}
+      - {t: "Çekirdek simetrik olduğu için", why: "Çekirdek simetrik olmak zorunda değil."}
+      - {t: "Girdi gradyanı hesaplanmaz", why: "Önceki katmanlara gradyan akması için gerekir."}
+  - q: "im2col'un bedeli nedir?"
+    options:
+      - {t: "Bellek: her girdi pikseli $K_h K_w$ pencerede kopyalanır; 3×3 çekirdekte 9 kat", ok: true, why: "Karşılığında işlem BLAS matmul'una iner. cuDNN gibi kütüphaneler implicit GEMM, Winograd ve FFT gibi alternatifler de kullanır."}
+      - {t: "Yanlış sonuç verir", why: "Birebir aynı sonucu verir."}
+      - {t: "Yalnız stride 1'de çalışır", why: "Her stride ve padding'de çalışır."}
