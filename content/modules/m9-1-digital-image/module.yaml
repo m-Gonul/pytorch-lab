@@ -1,0 +1,98 @@
+id: m9-1-digital-image
+code: M9.1
+title: "Dijital görüntü: örnekleme, interpolasyon, geometri"
+phase: 9
+minutes: 300
+prereq: [m0-2-matmul]
+summary: >
+  Bir görüntü, sürekli bir sahnenin örneklenmiş ve kuantalanmış hâlidir. Bit
+  derinliğini, komşuluk ve mesafe ölçülerini, en yakın komşu ve bilineer
+  interpolasyonu elle hesaplıyor; saf Python'da `cv2.resize`'ın piksel merkezi
+  kuralını birebir yeniden üretiyor, NumPy'da bilineer ve bikübik yeniden
+  boyutlandırmayı döngüsüz yazıp OpenCV ile karşılaştırıyor, PyTorch'ta
+  `grid_sample` ile türevlenebilir afin dönüşüm yazıp iki görüntüyü gradient
+  descent ile hizalıyor (image registration) ve en sonda yüzlerce farklı
+  dönüşümü tek çağrıda uyguluyorsun.
+goals:
+  - "Örnekleme ve kuantalama: uzamsal çözünürlük, bit derinliği, yanlış kontur"
+  - "En yakın komşu, [[bilineer interpolasyon]] ve bikübik interpolasyon; OpenCV'nin piksel merkezi kuralı"
+  - "Ters eşleme (inverse mapping) ile geometrik dönüşümler ve görüntü kayıtlama"
+  - "Komşuluklar (4-, 8-) ve mesafeler: Öklid, şehir bloğu $D_4$, satranç tahtası $D_8$"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 2", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "OpenCV — Geometric Image Transformations (resize, warpAffine)", url: "https://docs.opencv.org/4.x/da/d54/group__imgproc__transform.html", license: "Apache-2.0", use: adapt}
+  - {title: "Keys — Cubic convolution interpolation for digital image processing (1981)", url: "https://doi.org/10.1109/TASSP.1981.1163711", license: "©", use: link}
+  - {title: "Szeliski — Computer Vision: Algorithms and Applications, Bölüm 3.6", url: "https://szeliski.org/Book/", license: "© (PDF ücretsiz)", use: link}
+  - {title: "PyTorch — torch.nn.functional.grid_sample / affine_grid", url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.grid_sample.html", license: "BSD-3-Clause", use: adapt}
+
+hand:
+  groups:
+    - title: "Örnekleme ve kuantalama"
+      fields:
+        - {id: bytes, label: "1024 × 768, 8 bit gri görüntü: bayt", answer: 786432}
+        - {id: levels, label: "3 bitlik kuantalamada seviye sayısı", answer: 8}
+        - {id: q200, label: "200 değerini 3 bite indir: $\\lfloor 200/32\\rfloor\\cdot32$", answer: 192}
+    - title: "$I=\\begin{bmatrix}10&20\\\\30&40\\end{bmatrix}$ (satır $y$, sütun $x$)"
+      fields:
+        - {id: bil, label: "Bilineer $I(x=0.25,\\ y=0.5)$", answer: 22.5, hint: "Önce satırlarda $x$ yönünde: 12.5 ve 32.5"}
+        - {id: nn, label: "En yakın komşu $I(x=0.6,\\ y=0.4)$", answer: 20}
+        - {id: src, label: "OpenCV: 4 piksellik satır 2'ye küçülürken hedef $x=0$'ın kaynak koordinatı $(x+0.5)\\cdot s-0.5$", answer: 0.5}
+    - title: "$p=(0,0)$, $q=(3,4)$"
+      fields:
+        - {id: de, label: "Öklid mesafesi", answer: 5}
+        - {id: d4, label: "$D_4$ (şehir bloğu)", answer: 7}
+        - {id: d8, label: "$D_8$ (satranç tahtası)", answer: 4}
+  verify: |
+    I = [[10, 20], [30, 40]]
+    def bil(x, y):
+        top = I[0][0] * (1 - x) + I[0][1] * x
+        bot = I[1][0] * (1 - x) + I[1][1] * x
+        return top * (1 - y) + bot * y
+    answers = dict(bytes=1024 * 768, levels=2 ** 3, q200=(200 // 32) * 32, bil=bil(0.25, 0.5), nn=I[round(0.4)][round(0.6)],
+                   src=(0 + 0.5) * 2 - 0.5, de=5.0, d4=3 + 4, d8=max(3, 4))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Bit düzlemleri ve yanlış kontur", engine: browser}
+  - {id: x2, title: "Mesafe dönüşümleri: iki geçişli $D_4$ ve $D_8$", engine: browser}
+  - {id: x3, title: "Döndürme ve bağlantı noktalarından afin kestirimi", engine: browser}
+
+quiz:
+  - q: "`cv2.resize` hedef pikselin kaynak koordinatını neden $(x+0.5)s-0.5$ ile hesaplar, $x\\cdot s$ ile değil?"
+    options:
+      - {t: "Pikseller birim karelerin merkezleri olarak düşünülür; iki ızgaranın merkezlerini hizalamak görüntüyü yarım piksel kaydırmadan ölçekler", ok: true, why: "$x\\cdot s$ köşeleri hizalar ve büyütmede görüntüyü sağ-aşağı kaydırır. PyTorch'ta `align_corners=False` aynı kuraldır."}
+      - {t: "Daha hızlı olduğu için", why: "Hesap maliyeti aynı; mesele geometri."}
+      - {t: "Yalnız büyütmede kullanılır", why: "Her iki yönde aynı formül."}
+  - q: "Bir görüntüyü 8 bitten 4 bite indirince düz bölgelerde görülen bantlara ne denir?"
+    options:
+      - {t: "Yanlış kontur (false contouring)", ok: true, why: "Yumuşak geçişler az seviyeye düşünce basamaklar görünür hâle gelir; dithering bunu gizler."}
+      - {t: "Aliasing", why: "Aliasing uzamsal örneklemenin (çözünürlüğün) sonucudur, yoğunluk kuantalamasının değil."}
+      - {t: "Moiré", why: "Moiré bir aliasing türüdür."}
+  - q: "Geometrik dönüşümde neden ters eşleme (her çıkış pikseli için kaynağı bul) kullanılır?"
+    options:
+      - {t: "İleri eşleme bazı çıkış piksellerini boş bırakır, bazılarına birden çok değer yazar; ters eşleme her çıkış pikselini tam bir kez ve interpolasyonla doldurur", ok: true, why: "`warpAffine` ve `grid_sample` bu yüzden çıkış ızgarasından başlar."}
+      - {t: "İleri eşleme türevlenebilir değildir", why: "Mesele boşluklar ve çakışmalar."}
+      - {t: "Ters dönüşüm her zaman vardır", why: "Tekil dönüşümlerde yoktur; yine de sebep bu değil."}
+
+homework:
+  - title: "Çok aşamalı görüntü yeniden örnekleme kütüphanesi"
+    paper: "Keys (1981) — Cubic convolution interpolation; Lanczos yeniden örnekleme"
+    url: "https://doi.org/10.1109/TASSP.1981.1163711"
+    level: orta
+    hours: 6
+    goal: |
+      Kendi `resize(img, size, method)` fonksiyonunu `nearest`, `bilinear`, `bicubic` ve `lanczos4` yöntemleriyle, **küçültmede antialiasing'li** (alan ortalamalı, `cv2.INTER_AREA` eşdeğeri) olarak yaz. Yöntemlerin kalitesini ve aliasing'i karşılaştır.
+    steps:
+      - "Ayrılabilir 1-boyutlu çekirdek fonksiyonları yaz (kutu, üçgen, Keys $a=-0.75$, Lanczos-4) ve her eksende ayrı uygula."
+      - "Küçültmede çekirdeği ölçek oranı kadar genişlet (antialias); `cv2.INTER_AREA` tam sayı oranlarda alan ortalamasıdır."
+      - "Bir zone-plate (eş merkezli halka) test görüntüsü üret; 4× küçült ve yöntemlerin aliasing'ini görsel ve sayısal (yüksek frekans enerjisi) karşılaştır."
+      - "Bir görüntüyü 2× küçültüp tekrar büyüt; her yöntem için orijinale göre PSNR hesapla."
+    accept:
+      - "`bilinear` ve `bicubic` float32'de `cv2.resize` ile en fazla $10^{-3}$ farklı."
+      - "Tam sayı küçültme oranlarında `area` yöntemi `cv2.INTER_AREA` ile en fazla $10^{-3}$ farklı."
+      - "Zone-plate'te antialias'lı küçültmenin yüksek frekans enerjisi naif bilineerinkinin en az 5 katı düşük."

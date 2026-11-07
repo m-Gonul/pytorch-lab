@@ -1,0 +1,4 @@
+PyTorch ile türevlenebilir geometri.
+
+- `warp_affine(img, A, t)` — `img: (H, W)`; çıkış pikseli $(x, y)$'nin kaynak koordinatı $\begin{bmatrix}x_s\\y_s\end{bmatrix}=A\begin{bmatrix}x\\y\end{bmatrix}+t$ (ters eşleme, piksel biriminde). `F.grid_sample(..., mode="bilinear", padding_mode="zeros", align_corners=False)` için koordinatları normalize et: $x_n=(2x_s+1)/W-1$.
+- `register(fixed, moving, steps=300, lr=0.05)` → `(theta, tx, ty)`: `moving` görüntüyü merkez etrafında $\theta$ döndürüp $(t_x, t_y)$ kaydıran parametreleri, `warp_affine(moving, …)` ile `fixed` arasındaki MSE'yi Adam ile küçülterek bul. Kayıp kenarlardan 16 piksel içeride hesaplanmalı: dönmüş görüntünün sıfırla doldurulmuş köşeleri kaybı kirletir ve optimumu birim dönüşüme doğru çeker (dene ve gör). Parametreleri benzer ölçekte tutmak için kaydırmayı `10 × p` olarak parametrize et.
