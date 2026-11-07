@@ -38,6 +38,9 @@ def check_module(d: Path) -> list[str]:
     for g in hand.get("groups", []):
         for f in g["fields"]:
             fid = f["id"]
+            if not isinstance(fid, str):
+                errs.append(f"a: alan id {fid!r} metin değil (YAML 1.1: on/off/yes/no boolean okunur)")
+                continue
             if fid in seen:
                 errs.append(f"a: alan id tekrar ediyor: {fid}")
             seen.add(fid)

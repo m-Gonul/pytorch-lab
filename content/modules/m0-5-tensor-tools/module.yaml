@@ -1,0 +1,70 @@
+id: m0-5-tensor-tools
+code: M0.5
+title: Tensor araçları ve benchmark disiplini
+phase: 0
+minutes: 180
+prereq: [m0-2-matmul]
+summary: >
+  Bir tensörün bellekte nasıl durduğunu (shape, stride, offset) elle hesaplıyor,
+  stride'larla kopyasız transpoze ve kayan pencere yazıyor, NumPy'da
+  `as_strided` ile aynı numarayı yapıyor, PyTorch'ta view/reshape/contiguous
+  farkını ölçüyor ve en sonda doğru benchmark alışkanlıklarını
+  `torch.utils.benchmark` ile kuruyorsun.
+goals:
+  - "Bir elemanın bellekteki konumunu $\\text{offset}=\\sum_k i_k\\cdot\\text{stride}_k$ ile hesaplamak"
+  - "Transpoze, dilimleme ve `expand`'in neden kopya yapmadan yalnız [[stride]] değiştirdiğini açıklamak"
+  - "`view` ile `reshape` farkını, [[contiguous]] olmayan bir tensörde neyin kopyalandığını göstermek"
+  - "Kayan pencereyi (sliding window) kopyasız kurup hareketli ortalamayı döngüsüz hesaplamak"
+  - "Isınma, tekrar, medyan ve senkronizasyonu içeren güvenilir bir zaman ölçümü yazmak"
+sources:
+  - {title: "PyTorch — Tensor Views", url: "https://docs.pytorch.org/docs/stable/tensor_view.html", license: "BSD-3", use: adapt}
+  - {title: "NumPy — Internal memory layout of an ndarray / as_strided", url: "https://numpy.org/doc/stable/reference/generated/numpy.lib.stride_tricks.as_strided.html", license: "BSD-3", use: link}
+  - {title: "PyTorch Tutorials — PyTorch Benchmark (torch.utils.benchmark)", url: "https://docs.pytorch.org/tutorials/recipes/recipes/benchmark.html", license: "BSD-3", use: adapt}
+  - {title: "Edward Z. Yang — PyTorch internals", url: "http://blog.ezyang.com/2019/05/pytorch-internals/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "$A$: shape $(2,3)$, row-major (C sırası), float32; elemanlar bellekte $[a_{00},a_{01},a_{02},a_{10},a_{11},a_{12}]$"
+      fields:
+        - {id: s0, label: "stride$_0$ (eleman cinsinden)", answer: 3, hint: "bir satır ilerlemek için kaç eleman atlanır?"}
+        - {id: s1, label: "stride$_1$", answer: 1, hint: "bir sütun ilerlemek"}
+        - {id: aoff, label: "$A[1,2]$'nin offset'i", answer: 5, hint: "$1\\cdot3+2\\cdot1$"}
+        - {id: bytes, label: "$(1000\\times1000)$ float32 kaç bayt?", answer: 4000000, hint: "eleman başına 4 bayt"}
+    - title: "$B=A^\\top$: shape $(3,2)$, aynı bellek, yalnız stride'lar yer değiştirir"
+      fields:
+        - {id: t0, label: "$B$ stride$_0$", answer: 1, hint: "A'nın stride$_1$'i"}
+        - {id: t1, label: "$B$ stride$_1$", answer: 3, hint: "A'nın stride$_0$'ı"}
+        - {id: toff, label: "$B[2,1]$'in offset'i", answer: 5, hint: "$2\\cdot1+1\\cdot3$ — yani $A[1,2]$ ile aynı eleman"}
+        - {id: contig, label: "$B$ contiguous mu? (evet 1, hayır 0)", answer: 0, hint: "contiguous: stride'lar row-major düzendekiyle aynı olmalı, yani $(2,1)$"}
+    - title: "Kayan pencere: $x$ uzunluk 6, pencere $w=3$; pencereler bir $(n-w+1)\\times w$ view"
+      fields:
+        - {id: nwin, label: "pencere sayısı", answer: 4, hint: "$6-3+1$"}
+        - {id: ws0, label: "view stride$_0$", answer: 1, hint: "bir sonraki pencere 1 eleman sonra başlar"}
+        - {id: ws1, label: "view stride$_1$", answer: 1, hint: "pencere içinde komşu eleman"}
+  verify: |
+    answers = dict(s0=3, s1=1, aoff=1 * 3 + 2 * 1, bytes=1000 * 1000 * 4,
+                   t0=1, t1=3, toff=2 * 1 + 1 * 3, contig=int((1, 3) == (2, 1)),
+                   nwin=6 - 3 + 1, ws0=1, ws1=1)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "`x.T.view(-1)` neden hata verir, `x.T.reshape(-1)` neden vermez?"
+    options:
+      - {t: "`view` yalnız stride'ları yeniden yorumlayabilir; transpoze bellekte satır sırasında olmadığından tek bir stride ile düzleştirilemez. `reshape` gerekirse kopyalar", ok: true, why: "`reshape` = mümkünse view, değilse `contiguous()` + view. Hangisinin olduğunu `data_ptr()` karşılaştırmasıyla anlayabilirsin."}
+      - {t: "`view` yalnız 2-boyutlu tensörlerde çalışır", why: "Her boyutta çalışır; sorun bellek düzeni."}
+      - {t: "`reshape` sonucu yanlıştır", why: "İkisi de geçerli olduğunda aynı değerleri verir."}
+  - q: "`a = torch.zeros(3).expand(1000, 3)` ne kadar bellek kullanır?"
+    options:
+      - {t: "3 eleman; satır boyutunun stride'ı 0", ok: true, why: "`expand` stride'ı 0 yaparak aynı satırı 1000 kez gösterir. Broadcasting de içeride böyle çalışır. Böyle bir tensöre yazmak tehlikelidir: tüm satırlar aynı belleği paylaşır."}
+      - {t: "3000 eleman", why: "O `repeat` olurdu; `expand` kopya yapmaz."}
+      - {t: "Hata verir", why: "Boyutu 1 olan bir ekseni genişletmek serbest."}
+  - q: "Bir GPU işlemini `time.perf_counter()` ile ölçerken en sık hata?"
+    options:
+      - {t: "CUDA asenkron: süre, kernel bitmeden ölçülür; `torch.cuda.synchronize()` gerekir", ok: true, why: "Python çağrıyı kuyruğa atıp hemen döner. `torch.utils.benchmark.Timer` senkronizasyonu kendisi yapar."}
+      - {t: "perf_counter yeterince hassas değildir", why: "Nanosaniye çözünürlüğü var; sorun asenkronluk."}
+      - {t: "GPU işlemleri ölçülemez", why: "Ölçülebilir; senkronizasyon ya da CUDA event'leriyle."}
