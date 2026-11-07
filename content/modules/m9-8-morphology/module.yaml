@@ -1,0 +1,103 @@
+id: m9-8-morphology
+code: M9.8
+title: Morfolojik görüntü işleme
+phase: 9
+minutes: 420
+prereq: [m9-3-spatial-filtering]
+summary: >
+  Kümeler kuramının diliyle görüntü işleme: yansıma ve öteleme, erozyon ve
+  genişleme (dilation), ikilikleri, açma ve kapama, hit-or-miss dönüşümü,
+  gri seviye (düz ve düz olmayan) morfoloji, morfolojik gradyan, top-hat ve
+  bottom-hat. Saf Python'da ders kitabı tanımlarıyla ikili işlemleri yazıp
+  OpenCV'nin genişlemeyi neden yansıtmadan hesapladığını yakalıyorsun;
+  NumPy'da gri seviye işlemlerin hepsini `cv2.morphologyEx` ile birebir
+  eşliyorsun; PyTorch'ta genişlemeyi `max` + toplama olarak kurup yapı
+  elemanını gradyanla öğreniyorsun; en sonda van Herk / Gil-Werman
+  algoritmasıyla pencere boyutundan bağımsız sürede çalışan dikdörtgen
+  morfolojiyi vektörel yazıyorsun.
+goals:
+  - "Erozyon $A\\ominus B=\\{z\\mid(B)_z\\subseteq A\\}$, genişleme $A\\oplus B=\\{z\\mid(\\hat B)_z\\cap A\\neq\\varnothing\\}$ ve ikilik"
+  - "Açma = erozyon + genişleme (B'nin sığdığı ötelemelerin birleşimi); kapama ikilisi; idempotentlik"
+  - "[[hit-or-miss]] ve 'umursamaz' (don't care) elemanlar"
+  - "Gri seviye: düz yapı elemanıyla min/max, düz olmayanla $f\\mp b_N$; gradyan, top-hat, granülometri"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, 4. baskı, Bölüm 9", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "OpenCV — erode, dilate, morphologyEx", url: "https://docs.opencv.org/4.x/d4/d86/group__imgproc__filter.html", license: "Apache-2.0", use: adapt}
+  - {title: "van Herk — A fast algorithm for local minimum and maximum filters on rectangular and octagonal kernels (PRL 1992)", url: "https://doi.org/10.1016/0167-8655(92)90069-C", license: "©", use: link}
+  - {title: "scikit-image — morphology", url: "https://scikit-image.org/docs/stable/api/skimage.morphology.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "9 × 9 görüntüde 5 × 5 kare $A$ (dışarısı arka plan)"
+      fields:
+        - {id: e33, label: "$A\\ominus B$, $B$ = 3 × 3 kare: ön plan piksel sayısı", answer: 9}
+        - {id: d33, label: "$A\\oplus B$, 3 × 3 kare", answer: 49}
+        - {id: ecr, label: "$A\\ominus B$, $B$ = 3 × 3 artı (+)", answer: 9}
+        - {id: dcr, label: "$A\\oplus B$, artı", answer: 45}
+        - {id: bnd, label: "Sınır $A-(A\\ominus B)$, 3 × 3 kare", answer: 16}
+    - title: "1-B, düz yapı elemanı uzunluk 3 (merkezli): $f=[3, 7, 2, 9, 4]$"
+      fields:
+        - {id: ge, label: "Erozyon, indis 2", answer: 2}
+        - {id: gd, label: "Genişleme, indis 1", answer: 7}
+        - {id: gg, label: "Morfolojik gradyan, indis 2", answer: 7}
+    - title: "Diğer"
+      fields:
+        - {id: nf, label: "Düz olmayan erozyon: $f=[5,8,6]$, $b_N=[1,2,1]$, merkezde $\\min(f-b_N)$", answer: 4}
+        - {id: op, label: "İkili $[0,1,1,0,1,1,1,0,1]$'in uzunluk 3 ile açılması: kaç 1 kalır?", answer: 3}
+  verify: |
+    import numpy as np
+    from scipy import ndimage
+    A = np.zeros((9, 9), bool); A[2:7, 2:7] = True
+    sq = np.ones((3, 3), bool); cr = ndimage.generate_binary_structure(2, 1)
+    f = np.array([3, 7, 2, 9, 4])
+    x = np.array([0, 1, 1, 0, 1, 1, 1, 0, 1], bool)
+    answers = dict(e33=ndimage.binary_erosion(A, sq).sum(), d33=ndimage.binary_dilation(A, sq).sum(),
+                   ecr=ndimage.binary_erosion(A, cr).sum(), dcr=ndimage.binary_dilation(A, cr).sum(),
+                   bnd=(A & ~ndimage.binary_erosion(A, sq)).sum(), ge=f[1:4].min(), gd=f[0:3].max(), gg=f[1:4].max() - f[1:4].min(),
+                   nf=min(5 - 1, 8 - 2, 6 - 1), op=ndimage.binary_opening(x, np.ones(3, bool)).sum())
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Morfolojik algoritmalar: delik doldurma ve bağlı bileşenler", engine: browser}
+  - {id: x2, title: "İskelet (Lantuéjoul) ve geri çatma", engine: browser}
+  - {id: x3, title: "Granülometri ve açma–kapama ile yumuşatma", engine: browser}
+
+quiz:
+  - q: "Açma işleminin geometrik yorumu nedir?"
+    options:
+      - {t: "B'nin A'nın içine tamamen sığdığı tüm ötelemelerinin birleşimi", ok: true, why: "B'den küçük çıkıntılar ve ince bağlar kaybolur; B'nin sığdığı yerler aynen kalır."}
+      - {t: "A'nın sınırının B kadar kalınlaştırılması", why: "Bu genişlemenin etkisi."}
+      - {t: "B'nin A'ya değdiği tüm noktalar", why: "Bu genişlemenin tanımı."}
+  - q: "`cv2.dilate` asimetrik bir çekirdekle ders kitabındaki genişlemeyle neden farklı sonuç verir?"
+    options:
+      - {t: "OpenCV yapı elemanını yansıtmadan max alır; ders kitabı tanımı $\\hat B$ ile çalışır", ok: true, why: "Simetrik çekirdeklerde fark yoktur; asimetriklerde çekirdeği 180° döndürerek eşitlenir."}
+      - {t: "OpenCV gri seviye kullandığı için", why: "İkili görüntüde de aynı fark var."}
+      - {t: "Kenar kuralı yüzünden", why: "Fark görüntünün ortasında da var."}
+  - q: "Top-hat dönüşümü $f-(f\\circ b)$ ne işe yarar?"
+    options:
+      - {t: "Yapı elemanından küçük parlak ayrıntıları, yavaş değişen arka plan aydınlatmasından ayırır", ok: true, why: "Açma, b'ye sığmayan parlak yapıları siler; fark yalnız onları bırakır."}
+      - {t: "Kenarları inceltir", why: "Bu iskelet/inceltme."}
+      - {t: "Delikleri doldurur", why: "Bu kapama ya da delik doldurma."}
+
+homework:
+  - title: "Morfolojik ağlar: genişleme–erozyon katmanları"
+    paper: "Mondal, Santra, Chanda — Dense Morphological Network: An Universal Function Approximator (2019)"
+    url: "https://arxiv.org/abs/1901.00109"
+    level: orta
+    hours: 10
+    goal: |
+      Toplama–max (genişleme) ve toplama–min (erozyon) nöronlarından oluşan yoğun bir morfolojik katman (DenMo-Net) uygula; tek gizli katmanlı sürümün bir fonksiyon yaklaşıklayıcı olduğunu deneyle göster ve MNIST / Fashion-MNIST'te aynı parametre sayısındaki ReLU MLP ile karşılaştır.
+    steps:
+      - "Genişleme nöronu $\\max_i(x_i+w_i)$ ve erozyon nöronu $\\min_i(x_i-w_i)$; bu modüldeki öğrenilebilir yapı elemanını genelleştir."
+      - "Gradyanın yalnız argmax'a aktığını gözlemle; seyrek gradyan için öğrenme oranı ve ilklendirme deneyleri."
+      - "2-B oyuncak sınıflandırma (iç içe halkalar) karar sınırları; gizli nöron sayısının etkisi."
+      - "Konvolüsyonel sürüm: 3 × 3 morfolojik filtrelerle küçük bir ağ."
+    accept:
+      - "Halka verisinde %98 üstü doğruluk ve karar sınırı görseli."
+      - "Fashion-MNIST'te morfolojik ağ ve MLP doğruluk/parametre tablosu."
+      - "Öğrenilen yapı elemanlarının görselleştirilmesi."
