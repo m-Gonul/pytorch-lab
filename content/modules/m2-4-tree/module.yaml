@@ -1,0 +1,74 @@
+id: m2-4-tree
+code: M2.4
+title: Decision tree
+phase: 2
+minutes: 210
+prereq: [m0-4-probability]
+summary: >
+  Gradyansız öğrenen model. Altı örnekte Gini ve en iyi bölünmeyi elle
+  buluyor, saf Python'da özyinelemeli bir ağaç kuruyor, NumPy'da tüm
+  özelliklerin tüm eşiklerini cumsum ile tek seferde değerlendiriyor,
+  PyTorch'ta türevlenebilir "yumuşak" bir karar düğümünü autograd ile eğitiyor
+  ve en sonda örnek ağırlıklı bölünmeyi (boosting'in ihtiyacı) döngüsüz
+  hesaplıyorsun.
+goals:
+  - "[[gini|Gini]] safsızlığı ve entropiyi hesaplayıp bir bölünmenin ağırlıklı safsızlığını bulmak"
+  - "Açgözlü (greedy) özyinelemeli ağaç kurma algoritmasını yazmak"
+  - "Sıralama + kümülatif sınıf sayımlarıyla $O(nd)$ adayın hepsini döngüsüz değerlendirmek"
+  - "Sert eşik $[x_j\\le t]$ yerine $\\sigma((w^\\top x+b)/\\tau)$ kullanarak bir ağacı gradyanla eğitilebilir yapmak"
+sources:
+  - {title: "ISLP — Bölüm 8.1 The Basics of Decision Trees", url: "https://www.statlearning.com/", license: "doğrulanmadı", use: link}
+  - {title: "Elements of Statistical Learning — §9.2 Tree-Based Methods", url: "https://hastie.su.domains/ElemStatLearn/", license: "doğrulanmadı", use: link}
+  - {title: "scikit-learn User Guide — Decision Trees (CART, Gini)", url: "https://scikit-learn.org/stable/modules/tree.html", license: "BSD-3", use: link}
+  - {title: "Frosst & Hinton — Distilling a Neural Network Into a Soft Decision Tree", url: "https://arxiv.org/abs/1711.09784", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "$x=[1,2,3,4,5,6]$, $y=[0,0,1,1,1,0]$. Gini $G=1-\\sum_c p_c^2$"
+      fields:
+        - {id: groot, label: "Kök Gini", answer: 0.5, tol: 0.001, hint: "$p_0=p_1=\\tfrac12$: $1-(\\tfrac14+\\tfrac14)$"}
+        - {id: eroot, label: "Kök entropi (bit)", answer: 1, tol: 0.001, hint: "$-2\\cdot\\tfrac12\\log_2\\tfrac12$"}
+    - title: "Eşik $t=2.5$: sol $x\\le t$, sağ $x>t$"
+      fields:
+        - {id: gl, label: "Sol Gini", answer: 0, tol: 0.001, hint: "sol $[0,0]$: saf"}
+        - {id: gr, label: "Sağ Gini", answer: 0.375, tol: 0.001, hint: "sağ $[1,1,1,0]$: $1-(\\tfrac{9}{16}+\\tfrac1{16})$"}
+        - {id: wg, label: "Ağırlıklı Gini $\\frac{n_L}{n}G_L+\\frac{n_R}{n}G_R$", answer: 0.25, tol: 0.001, hint: "$\\tfrac26\\cdot0+\\tfrac46\\cdot0.375$"}
+    - title: "Tüm eşikler (1.5, 2.5, 3.5, 4.5, 5.5) içinde"
+      fields:
+        - {id: w45, label: "$t=4.5$ ağırlıklı Gini", answer: 0.5, tol: 0.002, hint: "sol $[0,0,1,1]$ ve sağ $[1,0]$, ikisi de 0.5"}
+        - {id: best, label: "En iyi eşik", answer: 2.5, tol: 0.001, hint: "en küçük ağırlıklı Gini"}
+        - {id: gain, label: "Kazanç (kök − ağırlıklı)", answer: 0.25, tol: 0.001, hint: "$0.5-0.25$"}
+  verify: |
+    import math
+    x = [1, 2, 3, 4, 5, 6]; y = [0, 0, 1, 1, 1, 0]
+    G = lambda s: 1 - sum((s.count(c) / len(s)) ** 2 for c in (0, 1)) if s else 0.0
+    def W(t):
+        L = [b for a, b in zip(x, y) if a <= t]; Rr = [b for a, b in zip(x, y) if a > t]
+        return len(L) / 6 * G(L) + len(Rr) / 6 * G(Rr)
+    ts = [1.5, 2.5, 3.5, 4.5, 5.5]
+    best = min(ts, key=W)
+    answers = dict(groot=G(y), eroot=-sum(y.count(c) / 6 * math.log2(y.count(c) / 6) for c in (0, 1)),
+                   gl=G([0, 0]), gr=G([1, 1, 1, 0]), wg=W(2.5), w45=W(4.5), best=best, gain=G(y) - W(best))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Derinliği sınırsız bir ağaç eğitim verisinde ne olur?"
+    options:
+      - {t: "Her yaprak saflaşana kadar böler; eğitim hatası 0'a iner ve aşırı uyum riski çok yüksektir", ok: true, why: "Tek ağaç yüksek varyanslı bir modeldir. Derinlik/yaprak sınırı, budama ya da topluluk (M2.5) ile kontrol edilir."}
+      - {t: "Yakınsamaz", why: "Sonlu sayıda bölünme var; her zaman durur."}
+      - {t: "Lineer modele indirgenir", why: "Tam tersi: eksene paralel parçalı sabit bir fonksiyon olur."}
+  - q: "Ağaçlar neden özellik ölçeklemeye ihtiyaç duymaz?"
+    options:
+      - {t: "Bölünmeler yalnız tek bir özelliğin sıralamasına bakar; monoton dönüşümler sıralamayı değiştirmez", ok: true, why: "log, standartlaştırma, birim değişikliği: hepsi aynı ağacı verir (eşik değerleri dönüşür)."}
+      - {t: "Gini ölçek bağımsız bir sayı olduğu için", why: "Gini sınıf oranlarına bakar; asıl neden eşiğin sıraya dayanması."}
+      - {t: "İhtiyaç duyar", why: "Mesafe ya da iç çarpım kullanmayan modeller ölçekten etkilenmez."}
+  - q: "c aşamasında neden her özelliği **sıralıyoruz**?"
+    options:
+      - {t: "Sıralı sırada eşik bir adım kaydıkça yalnız bir örnek sağdan sola geçer; sol sınıf sayımları bir cumsum'dur", ok: true, why: "Böylece $n-1$ eşiğin hepsi $O(n)$'de değerlendirilir; sıralama $O(n\\log n)$. Naive yol her eşik için $O(n)$ sayım: $O(n^2)$."}
+      - {t: "Sıralamadan eşik tanımlanamaz", why: "Tanımlanabilir; sıralama hız için."}
+      - {t: "Gini sıralı veri ister", why: "Gini yalnız sayımlara bakar."}
