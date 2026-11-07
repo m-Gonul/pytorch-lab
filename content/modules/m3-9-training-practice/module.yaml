@@ -1,0 +1,100 @@
+id: m3-9-training-practice
+code: M3.9
+title: Eğitim pratiği — kapasite ve aşırı uyum, model seçimi, transfer öğrenme, veri sızıntısı
+phase: 3
+minutes: 360
+prereq: [m3-8-perceptron, m3-7-regularization-nn]
+summary: >
+  Derin ağ eğitmenin mühendislik tarafı. Daha geniş ve daha derin tam bağlı
+  ağlar (784-300-100-10'dan 7 katmana: ders alıştırması 4) eğitim kaybını
+  sıfıra indirirken doğrulama kaybının yükselmesi — aşırı uyum; erken
+  durdurma ve kontrol noktası; k-katlı çapraz doğrulama ve öğrenme eğrileri.
+  Önceden eğitilmiş katmanları yeniden kullanmak: alt katmanları dondurma,
+  yalnız başlığı eğitme, kademeli çözme ve ince ayar; benzer görevlerde
+  transferin neden işe yaradığı. Veri sızıntısı: ölçekleme istatistiğini
+  testten öğrenmek, tekrarlanan/gruplu örneklerin iki tarafa düşmesi, zaman
+  serisinde rastgele bölme. Saf Python'da 1-NN ile grup sızıntısı, NumPy'da
+  k-katlı CV ve erken durdurma, PyTorch'ta kapasite deneyi ve transfer,
+  sonda tüm katlar × kapasiteleri tek seferde eğiten toplu CV.
+goals:
+  - "Eğitim ve doğrulama eğrilerinin ayrışması: [[aşırı uyum]]; erken durdurma"
+  - "k-katlı CV ile model seçimi; test kümesine yalnız en sonda dokunmak"
+  - "[[transfer öğrenme]]: dondur → başlığı eğit → çöz → küçük öğrenme oranıyla ince ayar"
+  - "[[veri sızıntısı]] türleri: ön işlemede, gruplarda, zamanda, hedefte"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 10–11", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Yosinski, Clune, Bengio, Lipson — How transferable are features in deep neural networks? (NeurIPS 2014)", url: "https://arxiv.org/abs/1411.1792", license: "arXiv", use: link}
+  - {title: "Kaufman, Rosset, Perlich — Leakage in Data Mining: Formulation, Detection, and Avoidance (KDD 2011 / TKDD 2012)", url: "https://doi.org/10.1145/2382577.2382579", license: "©", use: link}
+  - {title: "Prechelt — Early Stopping — But When? (Neural Networks: Tricks of the Trade 1998)", url: "https://doi.org/10.1007/3-540-49430-8_3", license: "©", use: link}
+  - {title: "scikit-learn — Cross-validation: evaluating estimator performance", url: "https://scikit-learn.org/stable/modules/cross_validation.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "Ders alıştırması 4'ün modelleri (Fashion-MNIST, 784 girdi, 10 sınıf): parametre sayısı"
+      fields:
+        - {id: p1, label: "784-300-100-10", answer: 266610}
+        - {id: p2, label: "784-400-500-300-100-10", answer: 695910}
+        - {id: p3, label: "784-600-700-500-400-300-100-10", answer: 1594010}
+    - title: "Transfer"
+      fields:
+        - {id: fz, label: "784-300-100-10'da iki gizli katman dondurulursa eğitilebilir parametre", answer: 1010}
+        - {id: kf, label: "5 katlı CV, 3 aday model: eğitilen toplam model (son yeniden eğitim hariç)", answer: 15}
+  verify: |
+    def params(s):
+        return sum(a * b + b for a, b in zip(s[:-1], s[1:]))
+    answers = dict(p1=params([784, 300, 100, 10]), p2=params([784, 400, 500, 300, 100, 10]), p3=params([784, 600, 700, 500, 400, 300, 100, 10]),
+                   fz=100 * 10 + 10, kf=5 * 3)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Çapraz doğrulamanın yanlış yolu: öznitelik seçimi sızıntısı", engine: browser}
+  - {id: x2, title: "Öğrenme eğrileri: daha çok veri mi, daha büyük model mi?", engine: browser}
+  - {id: x3, title: "Az veriyle veri artırma (1-NN)", engine: browser}
+
+quiz:
+  - q: "Ders alıştırması 4'te modeller büyüdükçe eğitim kaybı sıfıra giderken doğrulama kaybı yükseliyor. Bu nedir?"
+    options:
+      - {t: "Aşırı uyum (overfitting): model eğitim örneklerini ezberler, genelleme kötüleşir; kapasite arttıkça daha erken ve daha belirgin başlar", ok: true, why: "Doğrulama doğruluğu çoğu zaman benzer kalır — kayıp, aşırı güvenli yanlışları da cezalandırır."}
+      - {t: "Yetersiz uyum", why: "Eğitim kaybı çok düşük."}
+      - {t: "Öğrenme oranı çok küçük", why: "Eğitim kaybı düşüyor."}
+  - q: "Ölçekleme (standardizasyon) istatistiklerini tüm veriden hesaplayıp sonra bölmek neden sızıntıdır?"
+    options:
+      - {t: "Test örneklerinin bilgisi (ortalama/varyans) eğitim sürecine girer; test skoru gerçek dağıtım koşulunu yansıtmaz", ok: true, why: "Ön işleme yalnız eğitim katında öğrenilmeli (Pipeline)."}
+      - {t: "Standardizasyon modeli bozduğu için", why: "Sorun sıralama."}
+      - {t: "Sızıntı değildir", why: "Küçük de olsa sızıntıdır; bazı ön işlemelerde büyük."}
+  - q: "Transfer öğrenmede neden önce yalnız yeni başlık eğitilir, sonra katmanlar küçük öğrenme oranıyla çözülür?"
+    options:
+      - {t: "Rastgele başlatılmış başlığın büyük gradyanları önceden eğitilmiş öznitelikleri bozmasın diye; başlık oturunca ince ayar güvenlidir", ok: true, why: "Alt katmanlar genel (kenar, doku), üst katmanlar göreve özgüdür."}
+      - {t: "Hesap tasarrufu için", why: "Asıl neden kararlılık."}
+      - {t: "Alt katmanlar hiç eğitilemez", why: "Çözülüp ince ayar yapılabilir."}
+
+homework:
+  - title: "Yosinski ve ark. (2014): Özellikler ne kadar aktarılabilir?"
+    paper: "Yosinski, Clune, Bengio, Lipson — How transferable are features in deep neural networks? (NeurIPS 2014)"
+    url: "https://arxiv.org/abs/1411.1792"
+    level: orta
+    hours: 10
+    goal: |
+      Makalenin A/B bölünmesi deneyini küçük ölçekte yeniden üret: CIFAR-100'ü (ya da Fashion-MNIST'i) iki rastgele sınıf yarısına böl, iki taban ağ eğit (baseA, baseB), sonra n = 1…L katmanı kopyalayıp (i) dondurarak (AnB) ve (ii) ince ayarla (AnB+) B görevinde eğit; ayrıca BnB ve BnB+ kontrollerini yap. Doğruluk – n eğrisini makalenin Şekil 2'siyle nitel karşılaştır: "kırılgan birlikte uyum" (fragile co-adaptation) ve "özgüllük" etkilerini ayır.
+    steps:
+      - "d aşamasındaki transfer fonksiyonunu katman sayısı parametresiyle genelleştir."
+      - "Her nokta için en az 3 tohum."
+    accept:
+      - "BnB orta katmanlarda düşer (birlikte uyum), BnB+ toparlanır."
+      - "AnB+ taban ağdan iyi ya da eşit (transferin genelleme bonusu)."
+  - title: "Kaufman ve ark. (2012): Veri madenciliğinde sızıntı"
+    paper: "Kaufman, Rosset, Perlich — Leakage in Data Mining (TKDD 2012)"
+    url: "https://doi.org/10.1145/2382577.2382579"
+    level: başlangıç
+    hours: 4
+    goal: |
+      Makaledeki sızıntı sınıflandırmasını (öznitelik sızıntısı, eğitim örneği sızıntısı) kullanarak bu modüldeki üç örneği (b, x1 ve ölçekleme) sınıfla; gerçek bir Kaggle yarışması sızıntısını (makalede örnekler var) özetleyip kendi küçük veri kümende yeniden canlandır. "Öğrenme-tahmin ayrımı" (learn-predict separation) ilkesini bir scikit-learn `Pipeline` + `GroupKFold`/`TimeSeriesSplit` ile uygula.
+    steps:
+      - "Sızıntılı ve sızıntısız skorları aynı tabloda raporla."
+    accept:
+      - "Her sızıntı türü için skor farkı ve düzeltilmiş protokol."

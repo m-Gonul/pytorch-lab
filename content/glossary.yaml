@@ -148,3 +148,5 @@ terms:
   evrensel yaklaşım: "Yeterli genişlikte tek gizli katmanlı bir ağın kompakt bir küme üzerindeki her sürekli fonksiyonu istenen doğrulukla yaklaşıklayabileceğini söyleyen teorem (Cybenko 1989, Hornik 1991)."
   çift iniş: "Double descent: model kapasitesi (parametre sayısı) eğitim örneği sayısına yaklaşınca test hatasının tepe yapıp, daha da artınca yeniden düştüğü gözlem."
   perceptron: "Rosenblatt'ın eşik birimli doğrusal sınıflandırıcısı; hatalı her örnekte w ← w + η(y − ŷ)x kuralıyla öğrenir, doğrusal ayrılabilir veride sonlu adımda yakınsar."
+  transfer öğrenme: "Bir görevde eğitilmiş ağın (genellikle alt) katmanlarını başka bir görevde yeniden kullanmak: dondurup yeni başlığı eğitmek, sonra küçük öğrenme oranıyla ince ayar."
+  veri sızıntısı: "Modelin eğitimde, dağıtım anında erişemeyeceği bilgiyi (test istatistikleri, aynı grubun kopyaları, gelecekten değerler, hedefin sonucu) görmesi; skorları gerçek dışı şişirir."
