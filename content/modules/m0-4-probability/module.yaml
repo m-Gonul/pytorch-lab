@@ -1,0 +1,73 @@
+id: m0-4-probability
+code: M0.4
+title: Olasılık ve MLE özeti
+phase: 0
+minutes: 180
+prereq: [m0-1-dot]
+summary: >
+  ML'deki her kayıp fonksiyonunun arkasındaki fikir: maximum likelihood. Bir
+  yazı-tura, bir Gauss ve bir zar için MLE'yi elle buluyor, saf Python'da
+  log-likelihood yazıyor, NumPy'da bir ızgara üzerinde döngüsüz arıyor,
+  `torch.distributions` ile gradyanla optimize ediyor ve en sonda bootstrap'ı
+  tek tensör işlemiyle yapıyorsun.
+goals:
+  - "Bernoulli, Gauss ve kategorik dağılım için [[mle|MLE]] tahminlerini türetmek: oran, ortalama, varyans, frekans"
+  - "Çarpım yerine log-likelihood toplamı kullanmanın sayısal nedenini göstermek"
+  - "MLE varyansı ($\\frac1n$) ile yansız varyansın ($\\frac1{n-1}$) farkını bilmek"
+  - "Negatif log-likelihood'u gradyanla minimize edip kapalı formla karşılaştırmak; MSE ve cross-entropy'nin birer [[nll|NLL]] olduğunu görmek"
+  - "Bootstrap ile bir tahminin belirsizliğini döngüsüz ölçmek"
+sources:
+  - {title: "Mathematics for Machine Learning, Bölüm 6 (Probability) ve 8.3 (Parameter Estimation)", url: "https://mml-book.github.io/", license: "© (PDF ücretsiz)", use: link}
+  - {title: "Murphy — Probabilistic Machine Learning: An Introduction, Bölüm 2 ve 4", url: "https://probml.github.io/pml-book/book1.html", license: "CC BY-NC-ND", use: link}
+  - {title: "Dive into Deep Learning §2.6 Probability and Statistics", url: "https://d2l.ai/chapter_preliminaries/probability.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "PyTorch — torch.distributions", url: "https://docs.pytorch.org/docs/stable/distributions.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "Yazı-tura: $y=[1,0,1,1]$ (1 = tura), $y_i\\sim\\text{Bernoulli}(p)$"
+      fields:
+        - {id: lik05, label: "$L(p=0.5)=\\prod_i p^{y_i}(1-p)^{1-y_i}$", answer: 0.0625, tol: 0.0001, hint: "her atış $0.5$; $0.5^4$"}
+        - {id: lik075, label: "$L(p=0.75)$", answer: 0.10546875, tol: 0.0005, hint: "$0.75^3\\cdot0.25=0.421875\\cdot0.25$"}
+        - {id: phat, label: "$\\hat p_{\\text{MLE}}$", answer: 0.75, tol: 0.001, hint: "$\\frac{d}{dp}\\log L=0\\Rightarrow\\hat p=\\frac1n\\sum y_i$"}
+        - {id: ll, label: "$\\log L(\\hat p)=3\\ln0.75+\\ln0.25$", answer: -2.249340, tol: 0.003, hint: "$\\ln0.75\\approx-0.2877$, $\\ln0.25\\approx-1.3863$"}
+    - title: "Gauss: $x=[2,4,6]$, $x_i\\sim\\mathcal N(\\mu,\\sigma^2)$"
+      fields:
+        - {id: mu, label: "$\\hat\\mu$", answer: 4, hint: "ortalama"}
+        - {id: var_mle, label: "$\\hat\\sigma^2_{\\text{MLE}}=\\frac1n\\sum(x_i-\\hat\\mu)^2$", answer: 2.666667, tol: 0.002, hint: "$(4+0+4)/3$"}
+        - {id: var_unb, label: "Yansız $s^2=\\frac1{n-1}\\sum(x_i-\\hat\\mu)^2$", answer: 4, tol: 0.001, hint: "$8/2$"}
+    - title: "Zar: atışlar $[1,3,3,6,3,1]$; $\\hat p_k=\\frac{\\#k}{n}$"
+      fields:
+        - {id: p1, label: "$\\hat p_1$", answer: 0.333333, tol: 0.002, hint: "6 atışın 2'si"}
+        - {id: p3, label: "$\\hat p_3$", answer: 0.5, tol: 0.001, hint: "3 kez"}
+        - {id: p2, label: "$\\hat p_2$", answer: 0, tol: 0.0001, hint: "hiç gelmedi → MLE sıfır olasılık verir; Laplace düzeltmesi (M2.2) bu yüzden var"}
+  verify: |
+    import math
+    y = [1, 0, 1, 1]; x = [2, 4, 6]; r = [1, 3, 3, 6, 3, 1]
+    L = lambda p: math.prod(p ** v * (1 - p) ** (1 - v) for v in y)
+    ph = sum(y) / len(y); mu = sum(x) / 3; ss = sum((v - mu) ** 2 for v in x)
+    answers = dict(lik05=L(0.5), lik075=L(0.75), phat=ph, ll=round(math.log(L(ph)), 6),
+                   mu=mu, var_mle=round(ss / 3, 6), var_unb=ss / 2,
+                   p1=round(r.count(1) / 6, 6), p3=r.count(3) / 6, p2=r.count(2) / 6)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Neden likelihood'u değil log-likelihood'u maksimize ederiz?"
+    options:
+      - {t: "Çarpım 10 000 örnekte float64'ün en küçük pozitif değerinin altına düşer; log toplama çevirir ve argmax'ı değiştirmez", ok: true, why: "$0.5^{10000}\\approx10^{-3010}$, float64 alt sınırı $\\approx10^{-308}$. log monoton artan olduğu için en iyi parametre aynı kalır; toplamın gradyanı da çok daha kolaydır."}
+      - {t: "Log-likelihood farklı bir (daha iyi) tahmin verir", why: "Monoton dönüşüm argmax'ı değiştirmez; aynı tahmin."}
+      - {t: "Likelihood negatif olabilir", why: "Olasılık (yoğunluk) çarpımı her zaman ≥ 0."}
+  - q: "Sabit $\\sigma$ ile Gauss gürültü varsayımı altında NLL'yi minimize etmek neye eşittir?"
+    options:
+      - {t: "MSE'yi minimize etmeye", ok: true, why: "$-\\log\\mathcal N(y\\mid\\hat y,\\sigma^2)=\\frac{(y-\\hat y)^2}{2\\sigma^2}+\\text{sabit}$. M1.1'deki kayıp aslında bir Gauss NLL."}
+      - {t: "Cross-entropy'yi minimize etmeye", why: "O, Bernoulli/kategorik NLL (M1.4–M1.5)."}
+      - {t: "Mutlak hatayı (L1) minimize etmeye", why: "L1, Laplace dağılımının NLL'sidir."}
+  - q: "$\\hat\\sigma^2_{\\text{MLE}}$ neden sistematik olarak küçük çıkar?"
+    options:
+      - {t: "Sapmalar gerçek $\\mu$ yerine verinin kendi ortalamasından ölçülür; ortalama veriye en yakın nokta olduğu için kareler toplamı küçülür", ok: true, why: "$\\mathbb E[\\hat\\sigma^2_{\\text{MLE}}]=\\frac{n-1}{n}\\sigma^2$. Bir serbestlik derecesi ortalamaya harcanır; $n-1$ ile bölmek bunu düzeltir (Bessel düzeltmesi)."}
+      - {t: "Kayan nokta hatası yüzünden", why: "Tam aritmetikte de geçerli; istatistiksel bir yanlılık."}
+      - {t: "Küçük çıkmaz; MLE her zaman yansızdır", why: "MLE tutarlıdır ($n\\to\\infty$'da doğru) ama her zaman yansız değildir."}

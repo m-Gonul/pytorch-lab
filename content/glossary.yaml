@@ -29,3 +29,7 @@ terms:
   dispatch: "PyTorch'un bir işlem çağrısında dtype/device/autograd durumuna göre doğru kernel'ı seçmesi; çağrı başına sabit maliyeti vardır."
   pyodide: "CPython'un WebAssembly'ye derlenmiş hâli; Python'u (NumPy, pandas, scikit-learn dahil) tarayıcıda çalıştırır."
   web worker: "Tarayıcıda sayfayı dondurmadan arka planda kod çalıştıran ayrı iş parçacığı."
+  mle: "Maximum likelihood estimation: gözlenen veriye en yüksek olasılığı veren parametreyi seçmek, θ̂ = argmax Σ log p(xᵢ|θ)."
+  nll: "Negatif log-likelihood: −Σ log p(xᵢ|θ); MLE'yi minimizasyon problemi olarak yazmanın yolu. MSE ve cross-entropy birer NLL'dir."
+  stride: "Bir tensörde bir eksen boyunca bir adım ilerlemek için bellekte atlanan eleman sayısı. Row-major (n, m) tensörün stride'ı (m, 1)."
+  contiguous: "Elemanları bellekte row-major sırada, aradaki boşluksuz duran tensör. Transpoze ve adımlı dilimler contiguous değildir."
