@@ -1,0 +1,107 @@
+id: m9-15-matching
+code: M9.15
+title: Eşleştirme — şablon, homografi, RANSAC, panorama, korelasyon filtreleri
+phase: 9
+minutes: 480
+prereq: [m9-14-features, m9-10-frequency]
+summary: >
+  Örüntü tanımanın en yalın biçimi şablon eşleme ve normalize korelasyon
+  katsayısı; öznitelik eşleştirmeden homografiye (DLT, Hartley
+  normalizasyonu), aykırı değerlere dayanıklı RANSAC ve alıştırma 6'nın
+  panoraması; şablonu her karede yeniden öğrenen ayırt edici korelasyon
+  süzgeçleri (MOSSE → CSRT). Saf Python'da NCC ve 4 noktadan homografi;
+  NumPy'da `cv2.matchTemplate` ile aynı NCC haritası ve tüm hipotezleri tek
+  SVD çağrısında çözen vektörel RANSAC; PyTorch'ta frekans uzayında MOSSE
+  izleyici; en sonda torch'ta toplu RANSAC + `grid_sample` ile panorama.
+goals:
+  - "Normalize korelasyon katsayısı $\\gamma\\in[-1,1]$: genlik ve ofset değişimine dayanıklı şablon eşleme"
+  - "[[homografi]] ve DLT: 4 nokta, 8 serbestlik; normalizasyonun koşul sayısına etkisi"
+  - "[[RANSAC]]: gereken iterasyon $N=\\frac{\\log(1-p)}{\\log(1-w^s)}$; içerdeğerlerle yeniden kestirim"
+  - "DCF/MOSSE: $H^*=\\frac{\\sum G\\odot F^*}{\\sum F\\odot F^*+\\lambda}$, PSR ile güven"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, 4. baskı, Bölüm 12.2–12.3", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "Hartley & Zisserman — Multiple View Geometry, Bölüm 4 (DLT, normalizasyon, RANSAC)", url: "https://www.robots.ox.ac.uk/~vgg/hzbook/", license: "©", use: link}
+  - {title: "Fischler & Bolles — Random Sample Consensus (CACM 1981)", url: "https://doi.org/10.1145/358669.358692", license: "©", use: link}
+  - {title: "Bolme, Beveridge, Draper, Lui — Visual Object Tracking using Adaptive Correlation Filters (CVPR 2010)", url: "https://doi.org/10.1109/CVPR.2010.5539960", license: "©", use: link}
+  - {title: "OpenCV — matchTemplate, findHomography", url: "https://docs.opencv.org/4.x/df/dfb/group__imgproc__object.html", license: "Apache-2.0", use: adapt}
+
+hand:
+  groups:
+    - title: "Korelasyon ve homografi"
+      fields:
+        - {id: ncc, label: "$\\gamma([1,2,3,4],[2,1,4,3])$", answer: 0.6}
+        - {id: npt, label: "Homografiyi belirlemek için gereken en az nokta eşi", answer: 4}
+        - {id: hp, label: "$H=\\begin{bmatrix}1&0&0\\\\0&1&0\\\\0.01&0&1\\end{bmatrix}$ ile $(100,50)$'nin $x'$'i", answer: 50}
+    - title: "RANSAC ve MOSSE"
+      fields:
+        - {id: N, label: "$p=0.99$, içerdeğer oranı $w=0.5$, $s=4$: gereken iterasyon (yukarı yuvarla)", answer: 72}
+        - {id: N2, label: "Aynı, $w=0.8$", answer: 9}
+        - {id: mo, label: "1-B MOSSE: $F=2$, $G=4$, $\\lambda=1$: $H^*=GF^*/(FF^*+\\lambda)$", answer: 1.6}
+  verify: |
+    import math
+    import numpy as np
+    x, y = np.array([1, 2, 3, 4.]), np.array([2, 1, 4, 3.])
+    xz, yz = x - x.mean(), y - y.mean()
+    H = np.array([[1, 0, 0], [0, 1, 0], [0.01, 0, 1]])
+    p = H @ [100, 50, 1]
+    N = lambda w: math.ceil(math.log(1 - 0.99) / math.log(1 - w ** 4))
+    answers = dict(ncc=(xz @ yz) / math.sqrt((xz @ xz) * (yz @ yz)), npt=4, hp=p[0] / p[2], N=N(0.5), N2=N(0.8), mo=4 * 2 / (2 * 2 + 1))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Şablon eşleme yöntemleri ve çok ölçekli arama", engine: browser}
+  - {id: x2, title: "Hartley normalizasyonu neden şart?", engine: browser}
+  - {id: x3, title: "Laplacian piramidiyle dikişsiz harmanlama", engine: browser}
+
+quiz:
+  - q: "Normalize korelasyon katsayısı neden ham korelasyondan iyidir?"
+    options:
+      - {t: "Şablonun ve pencerenin ortalamasını çıkarıp standart sapmalarına bölerek parlaklık ofsetine ve kazanca karşı değişmez olur", ok: true, why: "Ham korelasyon parlak bölgelerde her zaman büyüktür."}
+      - {t: "Daha hızlı hesaplanır", why: "Daha pahalıdır (integral görüntüyle hızlandırılır)."}
+      - {t: "Dönmeye karşı değişmezdir", why: "Değildir; döndürülmüş şablonlar gerekir."}
+  - q: "RANSAC'ta neden önce minimal örnek (4 nokta) kullanılır?"
+    options:
+      - {t: "Örneğin tamamen içerdeğerlerden oluşma olasılığı w^s, s küçüldükçe büyür", ok: true, why: "Bulunan en iyi hipotezin içerdeğerleriyle sonra en küçük kareler kestirimi yapılır."}
+      - {t: "4 noktadan fazlasıyla homografi çözülemez", why: "Fazlası en küçük kareler ile çözülür."}
+      - {t: "Hesap belleği yetmediği için", why: "Sebep olasılıksal."}
+  - q: "MOSSE izleyicide süzgeç neden her karede güncellenir?"
+    options:
+      - {t: "Hedefin görünümü (dönme, ölçek, aydınlatma) değiştikçe sabit bir şablon kayar; hareketli ortalama süzgeci uyarlar", ok: true, why: "Öğrenme oranı η ile $A_t=\\eta G F^*+(1-\\eta)A_{t-1}$."}
+      - {t: "FFT boyutu değiştiği için", why: "Pencere boyutu sabit."}
+      - {t: "Gürültüyü artırmak için", why: "Tersine, birçok örnekte ortalar."}
+
+homework:
+  - title: "CSR-DCF: kanal ve uzamsal güvenilirlikli korelasyon süzgeci"
+    paper: "Lukežič, Vojíř, Čehovin Zajc, Matas, Kristan — Discriminative Correlation Filter with Channel and Spatial Reliability (CVPR 2017)"
+    url: "https://arxiv.org/abs/1611.08461"
+    level: ileri
+    hours: 16
+    goal: |
+      d aşamasındaki MOSSE'yi CSRT'ye (OpenCV'deki adıyla) genişlet: HOG + renk adları (color names) öznitelik kanalları, ön plan/arka plan histogramlarından uzamsal güvenilirlik haritası ve bu maskeyle kısıtlı süzgeç öğrenimi (ADMM), kanal başına güvenilirlik ağırlıkları. VOT ya da OTB'den birkaç dizide `cv2.TrackerCSRT_create` ve MOSSE ile karşılaştır.
+    steps:
+      - "Çok kanallı DCF: kanal başına süzgeç, yanıtların ağırlıklı toplamı."
+      - "Uzamsal güvenilirlik: renk histogramlarından olasılık + Markov rastgele alan düzgünleştirmesi (basitleştirilmiş: morfolojik kapama, M9.8)."
+      - "Maskeli süzgeç için ADMM (makaledeki Algoritma 1)."
+      - "Başarı grafiği (IoU eşiğine karşı başarı oranı) ve hassasiyet grafiği (merkez hatası)."
+    accept:
+      - "En az 5 dizide başarı grafiği; CSR-DCF'in AUC'si MOSSE'den yüksek."
+      - "Uzamsal maskenin kapalı/açık ablasyonu."
+  - title: "Otomatik panorama (alıştırma 6'nın tamamı)"
+    paper: "Brown & Lowe — Automatic Panoramic Image Stitching using Invariant Features (IJCV 2007)"
+    url: "https://doi.org/10.1007/s11263-006-0002-3"
+    level: orta
+    hours: 12
+    goal: |
+      Sırasız bir görüntü kümesinden panorama: SIFT eşleştirme, RANSAC ile homografi, görüntü eşleşme grafiği ve bağlı bileşenler, demet ayarı (bundle adjustment; basitleştirilmiş: dönme + odak uzaklığı), silindirik izdüşüm, kazanç telafisi ve çok bantlı (Laplacian piramidi, x3) harmanlama. Altın Kapı (goldengate-00…05) dizisinde `cv2.Stitcher` ile karşılaştır.
+    steps:
+      - "Her görüntü çifti için eşleşme sayısı ve olasılıksal doğrulama ($n_i>8+0.3n_f$)."
+      - "Silindirik çarpıtma ve yalnız ötelemeli hizalamanın basit sürümü; sonra tam homografi zinciri."
+      - "Kazanç telafisi: örtüşmelerde ortalama yoğunluk eşitleme (en küçük kareler)."
+    accept:
+      - "6 görüntülük dizide gözle görülür dikiş ve hayalet olmadan panorama."
+      - "Çift başına RANSAC içerdeğer sayıları tablosu ve `cv2.Stitcher` çıktısıyla yan yana görsel."

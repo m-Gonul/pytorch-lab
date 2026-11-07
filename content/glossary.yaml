@@ -108,3 +108,5 @@ terms:
   non-local means: "Her pikseli, arama penceresindeki tüm piksellerin yama benzerliğiyle ağırlıklandırılmış ortalamasıyla değiştiren gürültü giderme yöntemi."
   ssim: "Structural Similarity: iki görüntüyü yerel pencerelerde parlaklık, kontrast ve yapı (korelasyon) karşılaştırmalarının çarpımıyla ölçen, 1'de en büyük olan kalite ölçütü."
   ölçek uzayı: "Bir görüntünün giderek artan σ'lı Gauss süzgeçleriyle yumuşatılmış hallerinden oluşan tek parametreli aile; öznitelikleri bilinmeyen ölçekte aramak için kullanılır."
+  homografi: "Düzlemsel bir sahnenin ya da yalnız dönen bir kameranın iki görüntüsü arasındaki 3 × 3 projektif dönüşüm (8 serbestlik)."
+  ransac: "Random Sample Consensus: minimal rastgele örneklerden model kurup en çok veri noktasıyla uyuşanı seçen, aykırı değerlere dayanıklı kestirim yöntemi."
