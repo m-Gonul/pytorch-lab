@@ -165,3 +165,6 @@ terms:
   arima: "Autoregressive integrated moving average: seriyi d kez farklayıp (trendleri silip) ARMA(p, q) uygulayan, tahmine farkları geri ekleyen model (Box & Jenkins 1970); mevsimsel sürümü SARIMA."
   yule–walker denklemleri: "AR(p) katsayıları ile otokorelasyonlar arasındaki doğrusal ilişki ρ_k = Σ φ_i ρ_{k−i}; örnek otokorelasyonlardan AR katsayılarını tahmin etmeye ya da tersine kullanılır."
   nedensel konvolüsyon: "Causal convolution: çıkışın t anında yalnız t ve öncesindeki girdilere bağlı olduğu, solda (k − 1)d dolgulu 1B konvolüsyon; WaveNet'in yapı taşı."
+  oov kovası: "Out-of-vocabulary bucket: eğitimde görülmemiş kategori/kelimelerin karma (hash) ile atandığı birkaç yer tutucu indeks; sözlüğü sabit tutarken bilinmeyenleri temsil eder."
+  skip-gram: "word2vec'in merkez kelimeden pencere içindeki bağlam kelimelerini tahmin eden biçimi; tersi (bağlamdan merkezi tahmin) CBOW'dur."
+  negatif örnekleme: "Negative sampling: V sınıflı softmax yerine gerçek (kelime, bağlam) çiftini k adet gürültü çiftinden ayıran ikili lojistik kayıp; gürültü dağılımı ∝ sayı^{3/4}."

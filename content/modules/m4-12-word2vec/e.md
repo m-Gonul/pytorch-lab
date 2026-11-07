@@ -1,0 +1,3 @@
+- `full_softmax_loss(Win, Wout, c, o)` — `cross_entropy(Win[c] @ Wout.T, o)`.
+- `neg_sampling_loss(Win, Wout, c, o, neg)`.
+- Ölçüm: V ∈ {1 000, 10 000, 50 000}, d = 100, batch 1024, k = 5: ileri + geri süre.

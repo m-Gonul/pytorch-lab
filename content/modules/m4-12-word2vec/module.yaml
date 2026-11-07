@@ -1,0 +1,107 @@
+id: m4-12-word2vec
+code: M4.12
+title: Kelime gömmeleri — one-hot, OOV, word2vec
+phase: 4
+minutes: 380
+prereq: [m4-5-embed-bpe]
+summary: >
+  Kategorik bir özniteliği (ör. ocean_proximity) ya da bir kelimeyi ağa
+  vermek: one-hot kodlama ve sözlük dışı (OOV) kovaları, one-hot + biassız
+  yoğun katman = embedding katmanı, "10'dan az kategori one-hot, 50'den
+  fazla embedding" kuralı. Ardından word2vec (Mikolov ve ark. 2013):
+  skip-gram ve CBOW, negatif örneklemeli kayıp ve gradyanları elle,
+  unigram^0.75 gürültü dağılımı ve sık kelime alt-örneklemesi; NumPy'da
+  döngüsüz toplu SGNS ile analojilerin (kral − erkek + kadın ≈ kraliçe)
+  ortaya çıkışı, PyTorch'ta nn.Embedding, seyrek gradyanlar ve CBOW,
+  sonda tam softmax ile negatif örneklemenin maliyet farkı. Ekler:
+  PPMI + SVD (sayım tabanlı gömmeler), Huffman ağaçlı hiyerarşik softmax ve
+  fastText alt-kelime n-gramları.
+goals:
+  - "One-hot vs embedding; [[oov kovası]]; one-hot × W = satır seçimi"
+  - "[[skip-gram]] ve CBOW; [[negatif örnekleme]] kaybı ve gradyanı elle"
+  - "Toplu SGNS'i `np.add.at` ile döngüsüz yazıp analojileri ölçmek"
+  - "SGNS ≈ kaydırılmış PMI'nin çarpanlara ayrılması; hiyerarşik softmax; alt-kelime vektörleri"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 13 ve 16", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Mikolov ve ark. — Efficient Estimation of Word Representations in Vector Space (2013)", url: "https://arxiv.org/abs/1301.3781", license: "arXiv", use: link}
+  - {title: "Mikolov ve ark. — Distributed Representations of Words and Phrases and their Compositionality (NeurIPS 2013)", url: "https://arxiv.org/abs/1310.4546", license: "arXiv", use: link}
+  - {title: "Levy & Goldberg — Neural Word Embedding as Implicit Matrix Factorization (NeurIPS 2014)", url: "https://papers.nips.cc/paper/2014/hash/feab05aa91085b7a8012516bc3533958-Abstract.html", license: "©", use: link}
+  - {title: "Pennington, Socher, Manning — GloVe (EMNLP 2014)", url: "https://nlp.stanford.edu/pubs/glove.pdf", license: "©", use: link}
+  - {title: "Bojanowski ve ark. — Enriching Word Vectors with Subword Information (fastText, TACL 2017)", url: "https://arxiv.org/abs/1607.04606", license: "arXiv", use: link}
+  - {title: "Stanford CS224n — Lecture 1–2, Assignment 2 (word2vec)", url: "https://web.stanford.edu/class/cs224n/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "One-hot, OOV, embedding"
+      fields:
+        - {id: d2, label: "İki farklı one-hot vektör arasındaki Öklid uzaklığının karesi", answer: 2}
+        - {id: oov, label: "10 000 kelimelik sözlük + 100 OOV kovası: one-hot vektör boyu", answer: 10100}
+        - {id: emb, label: "20 kategori, 10 boyutlu embedding = one-hot + biassız yoğun katman: parametre", answer: 200}
+    - title: "Skip-gram ve negatif örnekleme"
+      fields:
+        - {id: pairs, label: "5 kelimelik cümle, pencere 2: (merkez, bağlam) çifti sayısı", answer: 14}
+        - {id: loss, label: "$u_o\\cdot v_c=1$, iki negatif $u_k\\cdot v_c\\in\\{0,-1\\}$: $J=-\\log\\sigma(u_o^\\top v_c)-\\sum_k\\log\\sigma(-u_k^\\top v_c)$", answer: 1.3196705557466014, tol: 1.0e-6}
+        - {id: grad, label: "1 boyutlu: $v_c=1$, $u_o=1$, $u_1=0$, $u_2=-1$ → $\\partial J/\\partial v_c$", answer: -0.5378828427399902, tol: 1.0e-6}
+        - {id: noise, label: "İki kelime, sayılar 81 ve 16: $P_n\\propto c^{3/4}$ ile ilkinin olasılığı", answer: 0.7714285714285715, tol: 1.0e-6}
+        - {id: disc, label: "Alt-örnekleme: frekans $f=10^{-3}$, $t=10^{-5}$ → atılma olasılığı $1-\\sqrt{t/f}$", answer: 0.9, tol: 1.0e-9}
+  verify: |
+    import math
+    sig = lambda x: 1 / (1 + math.exp(-x))
+    answers = dict(d2=2, oov=10100, emb=200, pairs=sum(len([j for j in range(max(0, i - 2), min(5, i + 3)) if j != i]) for i in range(5)),
+                   loss=-math.log(sig(1)) - math.log(sig(0)) - math.log(sig(1)),
+                   grad=(sig(1) - 1) * 1 + sig(0) * 0 + sig(-1) * (-1), noise=81 ** 0.75 / (81 ** 0.75 + 16 ** 0.75),
+                   disc=1 - math.sqrt(1e-5 / 1e-3))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Sayım tabanlı gömmeler: PPMI + SVD", engine: browser}
+  - {id: x2, title: "Hiyerarşik softmax ve Huffman ağacı", engine: browser}
+  - {id: x3, title: "fastText: alt-kelime n-gramlarıyla OOV vektörleri", engine: browser}
+
+quiz:
+  - q: "One-hot kodlamanın kelimeler için temel kusuru nedir?"
+    options:
+      - {t: "Boyut sözlük kadar büyür ve tüm vektörler ortonormaldir: her iki kelime arasındaki uzaklık aynı (karesi 2), iç çarpım 0 — benzerlik bilgisi yoktur", ok: true, why: "Embedding'ler öğrenilir ve benzer anlamlar yakınlaşır."}
+      - {t: "Öğrenilebilir olması", why: "One-hot öğrenilmez."}
+      - {t: "Negatif değer içermesi", why: "İçermez."}
+  - q: "Negatif örnekleme tam softmax'ı neden ucuzlatır?"
+    options:
+      - {t: "Her (merkez, bağlam) çifti için V sınıflı normalizasyon yerine 1 pozitif + k negatif ikili lojistik regresyon yapılır: maliyet O(V) yerine O(k)", ok: true, why: "e aşamasında V büyüdükçe fark açılır."}
+      - {t: "Gradyanı sıfırlayarak", why: "Hayır."}
+      - {t: "Embedding boyutunu azaltarak", why: "Boyut değişmez."}
+  - q: "Gürültü dağılımında neden unigram sayısının 3/4 kuvveti kullanılır?"
+    options:
+      - {t: "Dağılımı düzleştirir: nadir kelimeler daha sık negatif örnek olur, 'the' gibi çok sık kelimelerin baskınlığı azalır (deneysel olarak en iyi)", ok: true, why: "Mikolov ve ark. 2013b."}
+      - {t: "Olasılıkları normalize etmek için", why: "Normalizasyon ayrıca yapılır."}
+      - {t: "Matematiksel olarak zorunlu", why: "Deneysel bir seçim."}
+
+homework:
+  - title: "Mikolov ve ark. (2013b): word2vec'in tam sürümü"
+    paper: "Mikolov, Sutskever, Chen, Corrado, Dean — Distributed Representations of Words and Phrases and their Compositionality (NeurIPS 2013)"
+    url: "https://arxiv.org/abs/1310.4546"
+    level: orta
+    hours: 12
+    goal: |
+      text8 (Wikipedia'nın ilk 100 MB'ı) üzerinde d aşamasındaki SGNS'i alt-örnekleme (Denk. 5), dinamik pencere ve doğrusal azalan öğrenme oranıyla eğit; makaledeki analoji test setinin (Google analogy) anlamsal ve sözdizimsel bölümlerinde doğruluğu raporla. Ardından ifade (phrase) birleştirmeyi uygula: $\mathrm{score}(w_i,w_j)=(c(w_iw_j)-\delta)/(c(w_i)c(w_j))$ ile "new_york" gibi bigramları tek token yap ve vektör toplamsallığını (Tablo 5) göster.
+    steps:
+      - "Alt-örnekleme olmadan / ile eğitim süresi ve analoji doğruluğu tablosu."
+    accept:
+      - "Anlamsal analojilerde %30'un üzerinde doğruluk (text8, d = 100)."
+      - "Alt-örnekleme eğitimi hızlandırır ve nadir kelimelerin vektörlerini iyileştirir."
+  - title: "Levy & Goldberg (2014): SGNS = kaydırılmış PMI'nin çarpanlara ayrılması"
+    paper: "Levy & Goldberg — Neural Word Embedding as Implicit Matrix Factorization (NeurIPS 2014)"
+    url: "https://papers.nips.cc/paper/2014/hash/feab05aa91085b7a8012516bc3533958-Abstract.html"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin ana sonucunu deneyle doğrula: yeterli boyutta SGNS'in optimumunda $w\cdot c=\mathrm{PMI}(w,c)-\log k$. c aşamasındaki sentetik derlemde ve küçük bir gerçek derlemde k ∈ {1, 5, 15} ve d ∈ {10, 50, V} için öğrenilmiş $W_{in}W_{out}^\top$ ile kaydırılmış PMI arasındaki korelasyonu ölç; x1'deki SPPMI + SVD gömmeleriyle analoji doğruluğunu karşılaştır (Tablo 2).
+    steps:
+      - "Sayımı sıfır olan çiftler için PMI = −∞: değerlendirmeyi gözlenen çiftlerle sınırla."
+    accept:
+      - "d büyüdükçe korelasyon 1'e yaklaşır."
+      - "SPPMI-SVD ile SGNS'in analoji doğrulukları aynı mertebede."
