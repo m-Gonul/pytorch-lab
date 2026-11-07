@@ -140,3 +140,6 @@ terms:
   veri yarışı: "Data race: iki thread aynı bellek konumuna eşzamanlama olmadan aynı anda erişir ve en az biri yazar; C/C++'ta tanımsız davranıştır."
   yarış koşulu: "Race condition: programın doğruluğunun thread'lerin göreli zamanlamasına bağlı olması; veri yarışı olmadan da (ör. ayrı atomik oku ve yaz) ortaya çıkabilir."
   aritmetik yoğunluk: "Bir çekirdeğin bellekten taşınan bayt başına yaptığı işlem sayısı (FLOP/bayt); roofline modelinde bellek-bağımlı ile hesap-bağımlıyı ayırır."
+  simt: "Single Instruction, Multiple Threads: GPU'da 32 thread'lik warp aynı komutu yürütür; her thread'in yazmaçları ayrıdır, dallanınca yollar maskelenerek sırayla yürür."
+  birleştirilmiş erişim: "Coalesced access: bir warp'ın global bellek erişimlerinin az sayıda ardışık 32 baytlık sektörde toplanması; ardışık thread → ardışık adres."
+  bank çakışması: "Paylaşımlı bellek 32 banka (4 bayt) bölünür; bir warp'ta aynı bankın farklı adreslerine erişen thread'ler sırayla hizmet alır."

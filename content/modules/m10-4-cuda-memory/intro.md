@@ -1,0 +1,13 @@
+**GPU ve CPU:** CPU geniş önbellek ve karmaşık kontrolle tek thread gecikmesini düşürür; GPU transistörleri hesap birimlerine ayırır ve gecikmeyi binlerce thread arasında geçiş yaparak gizler (yüksek GFLOP/s ve bellek bant genişliği). **SIMT:** aynı komutu çok thread yürütür; her thread'in kendi yazmaçları vardır.
+
+**CUDA yaklaşımı:** (1) darboğazı bul, (2) veri paralel kısmı bul (vektör/matris işlemleri, konvolüsyon, görüntü/video işleme…), (3) girdiyi GPU'ya kopyala, (4) GPU'da hesapla, (5) sonucu geri kopyala, (6) CPU sonucuyla doğrula, (7) yinele. Bellek: `cudaMalloc(&p, bayt)`, `cudaMemcpy(dst, src, bayt, cudaMemcpyHostToDevice…)` (engelleyici), `cudaFree`. Fonksiyon nitelikleri: `__global__` (cihazda çalışır, konaktan çağrılır), `__device__` (cihazdan), `__host__`. Başlatma `kernel<<<grid, block>>>(…)`; for döngüsü yok: her thread `blockIdx`, `blockDim`, `threadIdx` ile kendi verisini seçer.
+
+**Derleme:** nvcc cihaz kodunu **PTX** (sanal ISA) ve/veya **cubin**'e (belirli mimari) derler. cubin `sm_XY`, aynı ana sürümde X.z ≥ X.y cihazlarda çalışır; PTX `compute_XY` sürücünün **JIT** derleyicisiyle ≥ X.Y her cihazda çalışır (ileri uyum). `-arch`/`-gencode` hem cubin hem PTX gömebilir.
+
+**Hatalar:** tüm çalışma zamanı fonksiyonları hata kodu döndürür; çekirdek başlatma döndürmez. `cudaPeekAtLastError()` (sıfırlamaz) / `cudaGetLastError()` (sıfırlar) başlatma hatalarını, `cudaDeviceSynchronize()` sonrası kontrol asenkron (çalışma sırasındaki) hataları yakalar.
+
+**Ayrışma:** bir warp'ın thread'leri farklı dallara giderse yollar sırayla yürür (aktif olmayan thread'ler maskelenir). Kısa dallarda derleyici **tahminleme** (predication) kullanır: her iki yolun komutları yürür, yalnız koşulu doğru olanlar yazar. Koşulu warp sınırlarına hizala (`threadIdx.x / 32`). **Döngü açma:** `#pragma unroll [n]`; işaretli döngü sayaçları derleyiciye taşma varsayımı yapmama özgürlüğü verir (işaretsiz sarmalama tanımlıdır).
+
+**Bellek hiyerarşisi:** yazmaçlar (thread), yerel (thread'e özel ama DRAM'de: taşan yazmaçlar), **paylaşımlı** (blok, çip üstünde, ~100 KB/SM, 32 bank × 4 B), **sabit** (salt okunur, tüm warp aynı adresi okursa yayın), doku (2B önbellek), **global** (DRAM). Global erişim warp başına **32 B sektörlerle** yapılır: ardışık 32 float = 4 sektör (birleştirilmiş); adım büyüdükçe sektör sayısı 32'ye çıkar. Paylaşımlı bellekte aynı banktaki farklı adresler sıralanır (aynı adres yayın). **Doluluk:** SM'de aynı anda çalışan warp'lar / en çok warp; thread, yazmaç, paylaşımlı bellek ve blok sınırlarından en darı belirler.
+
+Bu ortamda GPU yok: analizleri sayarak, çekirdekleri Triton'un CPU yorumlayıcısında çalıştırarak ve önbellek satırının CPU'daki karşılığını ölçerek öğreniyoruz.

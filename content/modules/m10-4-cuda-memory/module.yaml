@@ -1,0 +1,113 @@
+id: m10-4-cuda-memory
+code: M10.4
+title: CUDA programlama ve bellek modeli — SIMT, birleştirilmiş erişim, bank çakışması, ayrışma
+phase: 10
+minutes: 420
+prereq: [m10-3-cpu-parallel, m7-2-triton]
+summary: >
+  GPU neden hesaba transistör ayırır, CUDA programının yaşam döngüsü (darboğazı
+  bul → veri paralel kısmı bul → GPU'ya kopyala → hesapla → geri kopyala →
+  CPU ile doğrula → yinele), çekirdek nitelikleri (`__global__`, `__device__`,
+  `__host__`), grid/blok/thread hiyerarşisi, `cudaMalloc`/`cudaMemcpy`, nvcc
+  derleme akışı (PTX, cubin, JIT, hesap yeteneği uyumluluğu), hata denetimi
+  (asenkron hatalar, `cudaGetLastError`), dal ayrışması ve tahminleme
+  (predication), döngü açma. Bellek hiyerarşisi: yazmaç, yerel, paylaşımlı,
+  sabit, doku, global; warp başına bellek işlemi (32 baytlık sektörler) ve
+  birleştirme (coalescing), paylaşımlı bellekte 32 bank ve çakışmalar,
+  doluluk (occupancy). Saf Python'da warp analizörleri, NumPy'da tüm grid
+  için trafik ve çakışma sayımı (naif ve karolu transpoz, dolgu), Triton
+  (CPU yorumlayıcısı) ile kopya/transpoz çekirdekleri, sonda CPU'da önbellek
+  satırı etkisini ölçen gerçek bant genişliği deneyleri.
+goals:
+  - "[[SIMT]]: warp = 32 thread, aynı komut; dallanınca yollar sırayla yürür"
+  - "[[birleştirilmiş erişim]]: bir warp'ın adresleri kaç 32 B sektöre düşüyor"
+  - "[[bank çakışması]]: 32 bank × 4 B; aynı bankta farklı adresler sıralanır; dolgu (`[32][33]`)"
+  - "Doluluk: thread, yazmaç ve paylaşımlı bellek sınırlarından en dar olanı"
+sources:
+  - {title: "NVIDIA — CUDA C++ Programming Guide", url: "https://docs.nvidia.com/cuda/cuda-c-programming-guide/", license: "NVIDIA", use: link}
+  - {title: "NVIDIA — CUDA C++ Best Practices Guide (bellek erişimi, doluluk)", url: "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/", license: "NVIDIA", use: link}
+  - {title: "Hwu, Kirk, El Hajj — Programming Massively Parallel Processors (4. baskı), Bölüm 2–6", url: "https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0", license: "©", use: link}
+  - {title: "Harris — An Efficient Matrix Transpose in CUDA C/C++ (NVIDIA Developer Blog)", url: "https://developer.nvidia.com/blog/efficient-matrix-transpose-cuda-cc/", license: "©", use: link}
+  - {title: "Volkov — Better Performance at Lower Occupancy (GTC 2010)", url: "https://www.nvidia.com/content/GTC-2010/pdfs/2238_GTC2010.pdf", license: "©", use: link}
+  - {title: "Triton — Tutorials", url: "https://triton-lang.org/main/getting-started/tutorials/index.html", license: "MIT", use: link}
+
+hand:
+  groups:
+    - title: "Bir warp (32 thread) float32 okuyor, taban adres 128 B hizalı; kaç 32 B sektör?"
+      fields:
+        - {id: s1, label: "thread t → eleman t", answer: 4}
+        - {id: s2, label: "thread t → eleman 2t", answer: 8}
+        - {id: s32, label: "thread t → eleman 32t (satır-öncelikli 32 sütunlu matrisin bir sütunu)", answer: 32}
+    - title: "Paylaşımlı bellek, 32 bank × 4 B: warp'ın çakışma derecesi"
+      fields:
+        - {id: b2, label: "s[2t]", answer: 2}
+        - {id: b32, label: "s[32t] (32×32 karonun bir sütunu)", answer: 32}
+        - {id: b33, label: "s[33t] (32×33 dolgulu karo)", answer: 1}
+    - title: "Doluluk ve ayrışma"
+      fields:
+        - {id: occ, label: "SM: 2048 thread, 65 536 yazmaç; blok 256 thread, thread başına 64 yazmaç → doluluk", answer: 0.5}
+        - {id: div, label: "`if (threadIdx.x % 2)` ile her warp kaç yolu sırayla yürütür?", answer: 2}
+  verify: |
+    secs = lambda st: len({(4 * st * t) // 32 for t in range(32)})
+    def bank(st):
+        d = {}
+        for t in range(32):
+            a = st * t
+            d.setdefault(a % 32, set()).add(a)
+        return max(len(v) for v in d.values())
+    blocks = min(2048 // 256, 65536 // (64 * 256))
+    answers = dict(s1=secs(1), s2=secs(2), s32=secs(32), b2=bank(2), b32=bank(32), b33=bank(33), occ=blocks * 256 / 2048, div=2)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "nvcc, PTX ve hesap yeteneği uyumluluğu", engine: browser}
+  - {id: x2, title: "Dal ayrışmasının maliyet modeli", engine: browser}
+  - {id: x3, title: "Grid-stride döngüsü", engine: browser}
+
+quiz:
+  - q: "Naif transpozda okumalar birleştirilmiş, yazmalar neden değil?"
+    options:
+      - {t: "Warp'ın ardışık thread'leri girişte ardışık sütunları okur ama çıkışta ardışık satırlara yazar: adımlar N·4 bayt, her thread ayrı sektör", ok: true, why: "Karolu transpoz, karoyu paylaşımlı belleğe okuyup ters indeksle yazarak iki tarafı da birleştirir."}
+      - {t: "Yazmalar her zaman yavaştır", why: "Birleştirilmiş yazma okumayla aynı verimlidir."}
+      - {t: "Paylaşımlı bellek kullanılmadığı için okumalar da yavaştır", why: "Okumalar zaten birleştirilmiş."}
+  - q: "32×32 paylaşımlı karoyu sütun boyunca okurken neden `[32][33]` dolgusu kullanılır?"
+    options:
+      - {t: "Satır uzunluğu 32 kelimeyken bir sütunun tüm elemanları aynı bankta (32-yollu çakışma); 33 ile ardışık satırlar bir bank kayar ve çakışma kalkar", ok: true, why: "Bellek israfı yalnız 32 kelime."}
+      - {t: "Hizalama için", why: "Tersine, hizayı bozar."}
+      - {t: "Sınır kontrolünü kaldırmak için", why: "İlgisiz."}
+  - q: "Bir çekirdek çağrısından hemen sonra `cudaGetLastError()` neyi yakalar, neyi yakalamaz?"
+    options:
+      - {t: "Başlatma öncesi hataları (geçersiz yapılandırma gibi) yakalar; çekirdek çalışırken oluşan asenkron hatalar ancak bir eşzamanlama (`cudaDeviceSynchronize`) sonrası raporlanır", ok: true, why: "Çekirdek başlatmaları hata kodu döndürmez."}
+      - {t: "Her şeyi yakalar", why: "Asenkron hatalar sonra gelir."}
+      - {t: "Hiçbir şey", why: "Başlatma hatalarını yakalar."}
+
+homework:
+  - title: "Karolu transpoz ve bant genişliği (Harris, NVIDIA blog)"
+    paper: "Harris — An Efficient Matrix Transpose in CUDA C/C++"
+    url: "https://developer.nvidia.com/blog/efficient-matrix-transpose-cuda-cc/"
+    level: orta
+    hours: 6
+    goal: |
+      GPU'lu bir ortamda (Colab) CUDA C++ ile kopya, naif transpoz, paylaşımlı bellekli karolu transpoz ve dolgulu karolu transpozu yaz; `cudaEvent` ile zamanla, efektif bant genişliğini (GB/s) hesapla ve cihazın tepe değeriyle karşılaştır. Nsight Compute ile her çekirdeğin `l1tex__t_sectors_pipe_lsu_mem_global_op_ld/st` ve `l1tex__data_bank_conflicts_pipe_lsu_mem_shared` sayaçlarını oku ve c aşamasındaki modelin öngörüleriyle karşılaştır.
+    steps:
+      - "Hata denetimi makrosu (`CUDA_CHECK`) ve çekirdek sonrası `cudaGetLastError` + `cudaDeviceSynchronize`."
+      - "TILE_DIM 32, BLOCK_ROWS 8 (thread başına 4 eleman)."
+    accept:
+      - "Dolgulu karolu transpoz kopyanın ≥ %80'i."
+      - "Profil sayaçları c aşamasının sektör ve çakışma sayılarıyla ±%5 uyumlu."
+  - title: "Volkov (2010): Daha düşük dolulukla daha iyi performans"
+    paper: "Volkov — Better Performance at Lower Occupancy (GTC 2010)"
+    url: "https://www.nvidia.com/content/GTC-2010/pdfs/2238_GTC2010.pdf"
+    level: ileri
+    hours: 10
+    goal: |
+      Sunumdaki deneyleri yeniden üret: thread başına bağımsız işlem sayısını (ILP) artırıp dolulukla birlikte azaltarak a·x + b ve bellek kopyası çekirdeklerinde verimi ölç. b aşamasındaki doluluk hesaplayıcısıyla her yapılandırmanın doluluğunu raporla; Little yasasıyla (gecikme × verim = eşzamanlılık) sonucu açıkla.
+    steps:
+      - "Thread başına 1, 2, 4, 8 bağımsız yükleme; blok başına 64–1024 thread."
+    accept:
+      - "%25 dolulukla tepe verime yakın bir yapılandırma bulunur."
