@@ -1,0 +1,104 @@
+id: m11-9-actor-critic
+code: M11.9
+title: Politika gradyanı ve aktör–eleştirmen — REINFORCE, A2C, DPG
+phase: 11
+minutes: 440
+prereq: [m11-6-dqn, m5-5-rl]
+summary: >
+  Değer tabanlı (Q-öğrenme) ile politika tabanlı (politika gradyanı)
+  yöntemlerin birleşimi. Rastgele politika $\pi_\theta(a|s)$: ayrık eylemlerde
+  softmax, sürekli eylemlerde Gauss. Uzman verisinden en çok olabilirlik
+  (taklit) ve ödülden öğrenme (REINFORCE, $\gamma^nG_n$ terimi), rastgele
+  politika gradyanı teoremi, taban çizgisi ve avantaj, Monte Carlo yerine TD
+  eleştirmen (aktör–eleştirmen), n adımlı avantajla A2C ve sürekli eylemler
+  için deterministik politika gradyanı (DPG). Kısa koridor örneğinde
+  rastgele politikanın optimal olması, NumPy'da teoremin sonlu farklarla
+  doğrulanması, PyTorch'ta paralel ortamlı A2C ile CartPole ve doğrusal–
+  karesel düzenleyicide (LQR) Riccati çözümüne yakınsayan DPG.
+goals:
+  - "Politika gradyanı teoremi: $\\nabla J=\\sum_s\\mu_\\theta(s)\\sum_a\\nabla\\pi_\\theta(a|s)\\,Q_\\theta(s,a)$"
+  - "Taban çizgisi yansızdır: $\\sum_a\\nabla\\pi(a|s)b(s)=0$; [[avantaj fonksiyonu]] $A(s,a)=Q(s,a)-V(s)$"
+  - "Aktör–eleştirmen: TD hatası $\\delta=r+\\gamma V_w(s')-V_w(s)$ avantajın tek örnekli kestirimidir"
+  - "[[deterministik politika gradyanı]]: $\\nabla J=\\mathbb E[\\nabla_\\theta\\mu_\\theta(s)\\,\\nabla_aQ(s,a)|_{a=\\mu_\\theta(s)}]$"
+sources:
+  - {title: "Sutton, McAllester, Singh, Mansour — Policy Gradient Methods for RL with Function Approximation (NeurIPS 2000)", url: "https://papers.nips.cc/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html", license: "©", use: link}
+  - {title: "Mnih ve ark. — Asynchronous Methods for Deep Reinforcement Learning (ICML 2016)", url: "https://arxiv.org/abs/1602.01783", license: "arXiv", use: link}
+  - {title: "Silver ve ark. — Deterministic Policy Gradient Algorithms (ICML 2014)", url: "https://proceedings.mlr.press/v32/silver14.html", license: "PMLR", use: link}
+  - {title: "Lillicrap ve ark. — Continuous control with deep reinforcement learning (DDPG, ICLR 2016)", url: "https://arxiv.org/abs/1509.02971", license: "arXiv", use: link}
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 13", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+  - {title: "Gymnasium — CartPole-v1", url: "https://gymnasium.farama.org/environments/classic_control/cart_pole/", license: "MIT", use: link}
+
+hand:
+  groups:
+    - title: "Log-olabilirlik gradyanları"
+      fields:
+        - {id: sm, label: "Softmax, θ = (0,0,0), örneklenen eylem 0: $\\partial\\log\\pi(0)/\\partial\\theta_0$", answer: 0.6666666666666666, tol: 1.0e-9}
+        - {id: ga, label: "Gauss, σ = 1, μ = 1, a = 1.5: $\\partial\\log\\pi/\\partial\\mu$", answer: 0.5}
+    - title: "Güncelleme katsayıları"
+      fields:
+        - {id: rf, label: "REINFORCE: n = 2, γ = 0.9, $G_n=10$: $\\gamma^nG_n$", answer: 8.1}
+        - {id: ad, label: "Aktör–eleştirmen: r = 1, γ = 0.9, V(s′) = 5, V(s) = 4: δ", answer: 1.5}
+        - {id: dp, label: "DPG: $Q(s,a)=-(a-2)^2$, $\\mu_\\theta(s)=\\theta s$, s = 1, θ = 0.5: $\\nabla_\\theta J$", answer: 3}
+    - title: "Kısa koridor (Sutton Örnek 13.1): $J(p)=\\dfrac{2p-4}{p(1-p)}$"
+      fields:
+        - {id: ps, label: "En iyi 'sağ' olasılığı $p^*$", answer: 0.5857864376269049, tol: 1.0e-6}
+        - {id: js, label: "$J(p^*)$", answer: -11.65685424949238, tol: 1.0e-6}
+  verify: |
+    import math
+    ps = 2 - math.sqrt(2)
+    answers = dict(sm=2 / 3, ga=0.5, rf=0.81 * 10, ad=1 + 0.9 * 5 - 4, dp=1 * (-2 * (0.5 - 2)), ps=ps, js=(2 * ps - 4) / (ps * (1 - ps)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Gauss politikası: sürekli eylemde REINFORCE", engine: browser}
+  - {id: x2, title: "Taklit (en çok olabilirlik) mi, ödülden öğrenme mi?", engine: browser}
+  - {id: x3, title: "Gradyan kestiricilerinin varyansı", engine: browser}
+
+quiz:
+  - q: "Kısa koridorda neden deterministik bir politika optimal değildir?"
+    options:
+      - {t: "Durumlar öznitelik olarak ayırt edilemiyor (hepsi aynı x); deterministik 'hep sağ' ya da 'hep sol' sonsuza takılır, rastgele politika p ≈ 0.59 ile en iyisidir", ok: true, why: "Kısmi gözlemlenebilirlikte rastgele politika gerekebilir; ε-açgözlü bunu ifade edemez."}
+      - {t: "Ödüller rastgele olduğu için", why: "Ödüller deterministik −1."}
+      - {t: "γ < 1 olduğu için", why: "γ = 1."}
+  - q: "A2C'de avantaj neden G yerine kullanılır?"
+    options:
+      - {t: "Aynı beklentiyle (taban çizgisi yansızdır) çok daha düşük varyans: yalnız 'ortalamadan ne kadar iyi' bilgisi taşır", ok: true, why: "Daha hızlı ampirik yakınsama."}
+      - {t: "Yanlılığı sıfırladığı için", why: "n adımlı önyükleme biraz yanlılık getirir."}
+      - {t: "Ödül gerektirmediği için", why: "Avantaj ödülden hesaplanır."}
+  - q: "DPG'nin rastgele politika gradyanına göre avantajı nedir?"
+    options:
+      - {t: "Eylem uzayı üzerinde integral yok: gradyan yalnız durumlar üzerinde beklenti; yüksek boyutlu sürekli eylemlerde çok daha verimli", ok: true, why: "Keşif ayrı bir davranış gürültüsüyle (politika dışı) sağlanır."}
+      - {t: "Eleştirmen gerektirmez", why: "∇ₐQ için eleştirmen gerekir."}
+      - {t: "Ayrık eylemlerde daha iyidir", why: "∇ₐQ sürekli eylem ister."}
+
+homework:
+  - title: "Silver ve ark. (2014): Deterministik politika gradyanı"
+    paper: "Silver ve ark. — Deterministic Policy Gradient Algorithms (ICML 2014)"
+    url: "https://proceedings.mlr.press/v32/silver14.html"
+    level: ileri
+    hours: 10
+    goal: |
+      Teorem 1'i (deterministik politika gradyanı) ve rastgele politika gradyanının σ → 0 limiti olduğunu (Teorem 2) LQR üzerinde sayısal olarak göster. COPDAC-Q'yu (uyumlu doğrusal eleştirmen, Bölüm 4.3) uygula ve e aşamasındaki LQR'de, ardından d-boyutlu LQR'de (d = 10, 50) rastgele politika gradyanıyla (aynı örnek bütçesi) karşılaştır.
+    steps:
+      - "Uyumlu öznitelikler: $\\phi(s,a)=(a-\\mu_\\theta(s))^\\top\\nabla_\\theta\\mu_\\theta(s)$."
+      - "Gradyanın varyansını σ'nın fonksiyonu olarak ölç."
+    accept:
+      - "Eylem boyutu arttıkça DPG'nin üstünlüğü büyür (makale Şekil 1'in nitel biçimi)."
+      - "σ → 0'da rastgele politika gradyanının varyansı patlar, DPG'ninki sonlu kalır."
+  - title: "Mnih ve ark. (2016): A3C / A2C"
+    paper: "Mnih ve ark. — Asynchronous Methods for Deep Reinforcement Learning (ICML 2016)"
+    url: "https://arxiv.org/abs/1602.01783"
+    level: orta
+    hours: 10
+    goal: |
+      d aşamasındaki A2C'yi (eşzamanlı) Algoritma S3'teki asenkron sürüme (A3C, `torch.multiprocessing` ile Hogwild paylaşımlı parametreler) dönüştür; CartPole ve LunarLander'da işçi sayısının (1, 2, 4, 8) duvar saati süresi ve örnek verimliliği üzerindeki etkisini ölç. Entropi düzenlemesinin etkisini ablation ile göster.
+    steps:
+      - "Paylaşımlı RMSProp istatistikleri (makale Bölüm 4)."
+    accept:
+      - "İşçi sayısıyla duvar saati hızlanması ≈ doğrusal (makale Şekil 3 nitel)."
+      - "Entropi bonusu olmadan erken deterministikleşme ve daha kötü son performans."

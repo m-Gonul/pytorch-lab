@@ -128,3 +128,5 @@ terms:
   thompson örneklemesi: "Her kolun ortalama ödülü için sonsaldan örnek çekip en büyük örneğe sahip kolu oynamak; seçim olasılığı kolun en iyi olma sonsal olasılığına eşittir."
   sherman–morrison: "(A + uvᵀ)⁻¹ = A⁻¹ − A⁻¹uvᵀA⁻¹ / (1 + vᵀA⁻¹u): rank-1 güncellemeden sonra ters matrisi O(d²)'de hesaplar."
   politika dışı değerlendirme: "Off-policy evaluation: bir politikanın değerini, başka bir politikayla toplanmış kayıtlardan (bağlam, eylem, ödül, eylem olasılığı) kestirmek; IPS, DM, DR, tekrar oynatma."
+  avantaj fonksiyonu: "A(s, a) = Q(s, a) − V(s): bu durumda bu eylemin politikanın ortalamasından ne kadar iyi olduğu; politika gradyanında taban çizgili ağırlık."
+  deterministik politika gradyanı: "Sürekli eylemli deterministik politika μ_θ(s) için ∇J = E[∇_θ μ_θ(s) ∇_a Q(s, a)|_{a = μ_θ(s)}] (Silver ve ark. 2014); eleştirmenin eylem gradyanı aktörü yönlendirir."
