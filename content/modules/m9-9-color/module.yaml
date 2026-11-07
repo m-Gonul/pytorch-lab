@@ -1,0 +1,104 @@
+id: m9-9-color
+code: M9.9
+title: Renkli görüntü işleme
+phase: 9
+minutes: 400
+prereq: [m9-2-intensity-histogram]
+summary: >
+  Renk biliminden (koniler, CIE ana renkleri, renklilik diyagramı, gamut)
+  renk modellerine: RGB, CMY/CMYK, HSI, HSV, YCbCr, CIE L*a*b*. Elle
+  dönüşümler; saf Python'da HSI ve CMYK gidiş-dönüş; NumPy'da OpenCV'nin
+  8 bitlik HSV ve YCrCb dönüşümlerini sabit noktalı (fixed-point) tamsayı
+  aritmetiğiyle birebir; PyTorch'ta Di Zenzo vektör gradyanı ve Mahalanobis
+  uzaklığıyla renk bölütleme; en sonda renkleri sıralamadan vektör median
+  filtreyi vektörel yazıyorsun. Ek alıştırmalar sahte renk, renk dilimleme,
+  HSI'da histogram eşitleme ve L*a*b*.
+goals:
+  - "Ton (hue), doygunluk (saturation), parlaklık; renklilik ve trikromatik katsayılar"
+  - "Donanım modelleri (RGB, CMYK, YCbCr) ve algı modelleri (HSI, L*a*b*) arasında dönüşüm"
+  - "Bileşen bazlı ve vektör bazlı işleme ne zaman aynı, ne zaman farklı"
+  - "Renk vektörlerinde gradyan ([[Di Zenzo gradyanı]]) ve median"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 6", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "OpenCV — Color conversions (imgproc/src/color_hsv, color_yuv)", url: "https://docs.opencv.org/4.x/de/d25/imgproc_color_conversions.html", license: "Apache-2.0", use: adapt}
+  - {title: "Di Zenzo — A note on the gradient of a multi-image (CVGIP 1986)", url: "https://doi.org/10.1016/0734-189X(86)90223-9", license: "©", use: link}
+  - {title: "Astola, Haavisto, Neuvo — Vector median filters (Proc. IEEE 1990)", url: "https://doi.org/10.1109/5.54807", license: "©", use: link}
+  - {title: "scikit-image — color", url: "https://scikit-image.org/docs/stable/api/skimage.color.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "CMY ve CMYK ($[0,1]$): RGB = (0.2, 0.5, 0.9)"
+      fields:
+        - {id: c, label: "C", answer: 0.8}
+        - {id: k, label: "K = min(C, M, Y)", answer: 0.1}
+        - {id: cp, label: "C′ = (C − K)/(1 − K)", answer: 0.777778, tol: 0.0001}
+    - title: "HSI: RGB = (0.8, 0.4, 0.2)"
+      fields:
+        - {id: h, label: "H (derece)", answer: 19.1066, tol: 0.001}
+        - {id: s, label: "S", answer: 0.571429, tol: 0.0001}
+        - {id: i, label: "I", answer: 0.466667, tol: 0.0001}
+    - title: "Diğer"
+      fields:
+        - {id: y, label: "RGB (200, 100, 50) için Y = 0.299R + 0.587G + 0.114B", answer: 124.2, tol: 0.001}
+        - {id: cr, label: "Cr = 0.713(R − Y) + 128", answer: 182.0454, tol: 0.001}
+        - {id: d, label: "Öklid uzaklığı: (200, 100, 50) ile a = (180, 110, 40)", answer: 24.4949, tol: 0.001}
+        - {id: sl, label: "Küp dilimleme, a = (0.6, 0.3, 0.2), W = 0.2: (0.65, 0.42, 0.18) pikselinin G çıkışı (dışarıdaysa nötr 0.5)", answer: 0.5}
+  verify: |
+    import math
+    R, G, B = 0.2, 0.5, 0.9
+    C, M, Y = 1 - R, 1 - G, 1 - B
+    K = min(C, M, Y)
+    r, g, b = 0.8, 0.4, 0.2
+    th = math.degrees(math.acos(0.5 * ((r - g) + (r - b)) / math.sqrt((r - g) ** 2 + (r - b) * (g - b))))
+    H = th if b <= g else 360 - th
+    Yv = 0.299 * 200 + 0.587 * 100 + 0.114 * 50
+    a, z = (0.6, 0.3, 0.2), (0.65, 0.42, 0.18)
+    inside = all(abs(zz - aa) <= 0.1 for zz, aa in zip(z, a))
+    answers = dict(c=C, k=K, cp=(C - K) / (1 - K), h=H, s=1 - 3 * min(r, g, b) / (r + g + b), i=(r + g + b) / 3,
+                   y=Yv, cr=0.713 * (200 - Yv) + 128, d=math.dist((200, 100, 50), (180, 110, 40)), sl=z[1] if inside else 0.5)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Sahte renk: yoğunluk dilimleme ve sinüs dönüşümleri", engine: browser}
+  - {id: x2, title: "Renk dilimleme ve HSI'da histogram eşitleme", engine: browser}
+  - {id: x3, title: "CIE XYZ, renklilik ve L*a*b* (ΔE)", engine: browser}
+
+quiz:
+  - q: "Renkli bir görüntüde R, G, B kanallarını ayrı ayrı histogram eşitlemek neden genelde kötü bir fikirdir?"
+    options:
+      - {t: "Kanallar farklı eğrilerle değiştiği için renk oranları, yani ton bozulur", ok: true, why: "Doğrusu yalnız yoğunluğu (I, V ya da L*) eşitleyip tonu ve doygunluğu korumaktır."}
+      - {t: "Üç kat yavaş olduğu için", why: "Asıl sorun renk bozulması."}
+      - {t: "Eşitleme yalnız 8 bit için tanımlı olduğu için", why: "Kanallar 8 bit."}
+  - q: "Kanal kanal gradyan büyüklüklerini toplamak renk kenarı için neden yetersiz olabilir?"
+    options:
+      - {t: "Farklı kanallardaki kenarların yönleri birbirini tutmasa da toplam aynı çıkar; vektör gradyanı yön uyumunu hesaba katar", ok: true, why: "Di Zenzo gradyanı $g_{xx}, g_{yy}, g_{xy}$ ile en hızlı değişim yönünü bulur."}
+      - {t: "Renkli görüntülerde Sobel tanımsızdır", why: "Her kanala uygulanabilir."}
+      - {t: "Toplam her zaman daha küçüktür", why: "Tersine, toplam hep vektör gradyanından büyük ya da eşittir."}
+  - q: "Kanal bazlı (marjinal) median filtrenin vektör median'a göre sorunu nedir?"
+    options:
+      - {t: "Çıkış penceredeki hiçbir piksele ait olmayan yeni bir renk olabilir", ok: true, why: "Vektör median ise penceredeki renklerden birini seçer."}
+      - {t: "Tuz-biber gürültüsünü temizlemez", why: "Temizler; ama renk sahteleri üretebilir."}
+      - {t: "Daha yavaştır", why: "Aslında çok daha hızlıdır."}
+
+homework:
+  - title: "Renkli görüntü renklendirme (colorization)"
+    paper: "Zhang, Isola, Efros — Colorful Image Colorization (ECCV 2016)"
+    url: "https://arxiv.org/abs/1603.08511"
+    level: ileri
+    hours: 14
+    goal: |
+      L*a*b* uzayında L kanalından ab kanallarını tahmin eden bir CNN eğit. ab düzlemini 313 bölmeye nicemle, regresyon yerine çok sınıflı sınıflandırma ve nadir renkleri yeniden ağırlıklandırma (class rebalancing) uygula; tahmini dağılımdan "annealed mean" ile renk seç.
+    steps:
+      - "Bu modüldeki L*a*b* dönüşümünü kullanarak veri hattı (ör. bir ImageNet alt kümesi ya da Places)."
+      - "ab nicemleme ızgarası (10'luk adım, gamut içi bölmeler) ve yumuşak kodlama (5 komşu, Gauss ağırlık)."
+      - "Ampirik renk dağılımından sınıf ağırlıkları $w\\propto((1-\\lambda)\\tilde p+\\lambda/Q)^{-1}$."
+      - "Regresyon (L2) taban çizgisiyle karşılaştır: L2'nin neden soluk, kahverengimsi sonuç verdiğini göster."
+    accept:
+      - "Aynı ağda L2 regresyon ve sınıflandırma çıktılarının görsel karşılaştırması."
+      - "Ortalama doygunluk (HSV S) tablosu: sınıflandırma > regresyon."
+      - "Annealed mean sıcaklığının (T = 1, 0.38, 0) etkisi gösterilmiş."

@@ -100,3 +100,4 @@ terms:
   histerezis eşikleme: "İki eşikli eşikleme: yüksek eşiği geçenler kesin, iki eşik arasındakiler yalnız kesin bir piksele bağlıysa kabul edilir."
   harris matrisi: "Yerel penceredeki gradyanların ağırlıklı ikinci moment (yapı) tensörü M = Σw[[fx², fxfy],[fxfy, fy²]]; özdeğerleri pencerenin hangi yönlerde değiştiğini söyler."
   hit-or-miss: "Bir yapı elemanının ön plan kısmının nesneye, arka plan kısmının arka plana aynı anda sığdığı konumları bulan morfolojik şekil dedektörü."
+  di zenzo gradyanı: "Çok kanallı (renkli) bir görüntüde en hızlı değişim yönünü ve büyüklüğünü, kanal türevlerinin iç çarpımlarından (gxx, gyy, gxy) oluşan 2 × 2 matrisin en büyük özdeğeriyle veren vektör gradyanı."
