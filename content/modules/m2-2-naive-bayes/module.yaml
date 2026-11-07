@@ -1,0 +1,65 @@
+id: m2-2-naive-bayes
+code: M2.2
+title: Naive Bayes
+phase: 2
+minutes: 180
+prereq: [m0-4-probability]
+summary: >
+  Sayarak öğrenen sınıflandırıcı. Altı satırlık bir tabloda posterior'u
+  Laplace düzeltmesiyle ve düzeltmesiz elle hesaplıyor; saf Python'da
+  kategorik Naive Bayes yazıyor; NumPy'da Gaussian NB'yi, pandas'ta olasılık
+  tablolarını döngüsüz kuruyor; PyTorch'ta metin için multinomial NB eğitiyor
+  ve en sonda 20 farklı α değerini tek tensörle değerlendiriyorsun.
+goals:
+  - "Bayes kuralını ve [[naive bayes|koşullu bağımsızlık]] varsayımını $p(y\\mid x)\\propto p(y)\\prod_j p(x_j\\mid y)$ olarak uygulamak"
+  - "Sıfır sayımın tüm posterior'u neden öldürdüğünü ve [[laplace düzeltmesi|Laplace düzeltmesinin]] bunu nasıl çözdüğünü göstermek"
+  - "Olasılık çarpımlarını log uzayında toplayıp logsumexp ile normalize etmek"
+  - "Sayım tabanlı bir modelin parametrelerini tek bir one-hot matris çarpımıyla hesaplamak"
+sources:
+  - {title: "Stanford CS229 — Lecture notes: Generative learning algorithms, Naive Bayes", url: "https://cs229.stanford.edu/main_notes.pdf", license: "doğrulanmadı", use: link}
+  - {title: "Murphy — PML1 §9.3 Naive Bayes classifiers", url: "https://probml.github.io/pml-book/book1.html", license: "CC BY-NC-ND", use: link}
+  - {title: "scikit-learn User Guide — Naive Bayes", url: "https://scikit-learn.org/stable/modules/naive_bayes.html", license: "BSD-3", use: link}
+  - {title: "Manning, Raghavan, Schütze — IR Book, Bölüm 13 (multinomial NB)", url: "https://nlp.stanford.edu/IR-book/html/htmledition/naive-bayes-text-classification-1.html", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "Tablo (hava, rüzgâr → oyna): (güneş, zayıf, E), (güneş, güçlü, E), (yağmur, güçlü, H), (yağmur, zayıf, E), (güneş, güçlü, H), (yağmur, güçlü, H). Sorgu: (güneş, güçlü)"
+      fields:
+        - {id: prior, label: "$P(E)$", answer: 0.5, tol: 0.001, hint: "6 satırın 3'ü E"}
+        - {id: sunE, label: "$P(\\text{güneş}\\mid E)$", answer: 0.666667, tol: 0.002, hint: "3 E'nin 2'si güneşli"}
+        - {id: strE, label: "$P(\\text{güçlü}\\mid E)$", answer: 0.333333, tol: 0.002, hint: "3 E'nin 1'i güçlü rüzgârlı"}
+        - {id: strH, label: "$P(\\text{güçlü}\\mid H)$", answer: 1, tol: 0.001, hint: "3 H'nin 3'ü"}
+        - {id: post, label: "$P(E\\mid \\text{güneş},\\text{güçlü})$", answer: 0.4, tol: 0.002, hint: "skorlar $0.5\\cdot\\frac23\\cdot\\frac13=\\frac19$ ve $0.5\\cdot\\frac13\\cdot1=\\frac16$; normalize et"}
+    - title: "Sıfır sayım ve Laplace ($\\alpha=1$, her özellik 2 değerli): $\\frac{\\#+\\alpha}{N_c+2\\alpha}$"
+      fields:
+        - {id: zero, label: "Düzeltmesiz $P(\\text{zayıf}\\mid H)$", answer: 0, tol: 0.0001, hint: "H'lerde zayıf rüzgâr hiç yok → (yağmur, zayıf) sorgusunda H skoru tam 0"}
+        - {id: lstrH, label: "Laplace $P(\\text{güçlü}\\mid H)$", answer: 0.8, tol: 0.001, hint: "$(3+1)/(3+2)$"}
+        - {id: lpost, label: "Laplace ile $P(E\\mid\\text{güneş},\\text{güçlü})$", answer: 0.428571, tol: 0.002, hint: "E: $0.5\\cdot0.6\\cdot0.4=0.12$; H: $0.5\\cdot0.4\\cdot0.8=0.16$"}
+  verify: |
+    rows = [("g", "z", "E"), ("g", "s", "E"), ("y", "s", "H"), ("y", "z", "E"), ("g", "s", "H"), ("y", "s", "H")]
+    def P(f, v, c, a=0):
+        sub = [r for r in rows if r[2] == c]
+        return (sum(r[f] == v for r in sub) + a) / (len(sub) + 2 * a)
+    pE = sum(r[2] == "E" for r in rows) / 6
+    sE, sH = pE * P(0, "g", "E") * P(1, "s", "E"), (1 - pE) * P(0, "g", "H") * P(1, "s", "H")
+    lE, lH = pE * P(0, "g", "E", 1) * P(1, "s", "E", 1), (1 - pE) * P(0, "g", "H", 1) * P(1, "s", "H", 1)
+    answers = dict(prior=pE, sunE=round(P(0, "g", "E"), 6), strE=round(P(1, "s", "E"), 6), strH=P(1, "s", "H"),
+                   post=round(sE / (sE + sH), 6), zero=P(1, "z", "H"), lstrH=P(1, "s", "H", 1), lpost=round(lE / (lE + lH), 6))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Naive Bayes'in \"naive\" varsayımı yanlış olsa bile neden sıklıkla iyi sınıflandırır?"
+    options:
+      - {t: "Sınıflandırma için yalnız argmax'ın doğru olması gerekir; olasılıklar kötü kalibre olsa da sıralama çoğu zaman korunur", ok: true, why: "Bağımlı özellikler kanıtı çift sayar ve olasılıkları uçlara iter (0 ya da 1'e yakın), ama karar sınırı çoğu zaman makul kalır."}
+      - {t: "Varsayım pratikte hep doğrudur", why: "Metinde kelimeler, görüntüde pikseller açıkça bağımlıdır."}
+      - {t: "Laplace düzeltmesi bağımlılığı giderir", why: "Laplace yalnız sıfır sayımları düzeltir."}
+  - q: "Multinomial NB'de log-olasılıkları toplamanın matris karşılığı nedir?"
+    options:
+      - {t: "Sayım matrisi $X\\,(n\\times V)$ çarpı $\\log\\theta^\\top\\,(V\\times C)$, artı log-prior: lineer bir sınıflandırıcı", ok: true, why: "$\\log p(y=c\\mid x)=\\log\\pi_c+\\sum_v x_v\\log\\theta_{cv}+\\text{sabit}$. NB, ağırlıkları sayılardan hesaplanan bir lineer modeldir."}
+      - {t: "Eleman eleman çarpım", why: "Kelime sayıları log-olasılıklarla ağırlıklandırılıp toplanır: bu bir iç çarpım."}
+      - {t: "Matris karşılığı yoktur", why: "Tam bir matris çarpımıdır; e aşamasında bunu kullanıyorsun."}
