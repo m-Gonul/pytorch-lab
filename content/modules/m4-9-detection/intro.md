@@ -1,0 +1,11 @@
+**Sınıflandırma + konum:** GAP katmanının üstüne ikinci bir 4 birimli çıkış (merkez x, y, genişlik, yükseklik; [0, 1]'e normalize, genişlik/yükseklik çoğu zaman karekökle) eklenir ve MSE ile eğitilir. Değerlendirmede MSE yerine **IoU**: kesişim alanı / birleşim alanı.
+
+**Çok nesne:** eski yaklaşım tek nesne sınıflandırıcısını görüntü üzerinde farklı boyutlarda kaydırmaktır. Aynı nesne komşu konumlarda tekrar tekrar bulunur → **NMS**: (1) nesnellik (sigmoid + BCE) eşiğinin altını at, (2) en yüksek skorlu kutuyu al, onunla IoU'su eşiği (ör. 0.6) aşanları sil, (3) kalanlarla tekrarla.
+
+**FCN (Long ve ark. 2015):** 100 × 7 × 7 öznitelik üzerindeki 200 nöronlu yoğun katman, 200 adet 7 × 7 "valid" filtreyle **aynı** hesaptır; konvolüsyon ise her girdi boyutunda çalışır. 224'te eğitilen ağa 448 verilirse darboğaz 14 × 14 olur, çıkış 8 × 8 ızgara — ağı 64 konumda kaydırmakla eşdeğer ama tek geçiş: **You Only Look Once**.
+
+**YOLOv3:** hücre başına 5 kutu (her biri 4 koordinat + nesnellik) ve 20 sınıf olasılığı = 45 sayı. Merkez, hücreye göre sigmoid ofset ((0, 0) sol üst, (1, 1) sağ alt); her hücre yalnız merkezi kendi içinde olan kutulardan sorumlu. **Çapa kutuları**: eğitim kutularının (w, h)'sine k-means; ağ çapa başına $\ln$ ölçek faktörlerini tahmin eder (100 × 50 çapa, 1.5 ve 0.9 → 150 × 45). Çok ölçekli eğitim (her birkaç batch'te 330–608 arası rastgele çözünürlük), atlama bağlantıları.
+
+**Ölçüt:** precision $TP/(TP+FP)$, recall $TP/(TP+FN)$. **AP**: recall 0, 0.1, …, 1'de "en az bu recall'daki en yüksek precision"ların ortalaması; sınıflar üzerinden ortalama **mAP**. Tespitte bir tahmin, sınıfı doğru **ve** IoU ≥ 0.5 ise doğru → mAP@0.5 (VOC); COCO 0.50, 0.55, …, 0.95 eşiklerinde ortalar: AP@[.50:.95].
+
+**FPN (Lin ve ark. 2017):** omurganın aşağıdan-yukarı hiyerarşisini, yukarıdan-aşağı (2× büyütme) bir yolla ve 1×1 yanal bağlantılarla (toplama) birleştirir; her ölçekte anlamca güçlü haritalar. Bir RoI, $k=\lfloor k_0+\log_2(\sqrt{wh}/224)\rfloor$ seviyesinden öznitelik alır.

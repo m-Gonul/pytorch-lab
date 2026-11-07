@@ -1,0 +1,4 @@
+- `nms_loop(boxes, scores, thr)` — her adımda yalnız seçilen kutunun IoU'sunu hesaplayan açgözlü NMS.
+- `fast_nms(boxes, scores, thr)` — matris biçimi.
+- `batched_nms(boxes, scores, labels, thr)` — sınıf-duyarlı NMS'yi tek çağrıda: her sınıfın kutularını `etiket × (max koordinat + 1)` kadar kaydır (farklı sınıflar asla kesişmez), sonra `nms_loop`.
+- `bench(ns_)` → N ∈ {500, 2000, 5000} için süreler.

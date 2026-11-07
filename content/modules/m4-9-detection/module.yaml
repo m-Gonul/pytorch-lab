@@ -1,0 +1,129 @@
+id: m4-9-detection
+code: M4.9
+title: Nesne tespiti — IoU, NMS, YOLO, mAP, FPN
+phase: 4
+minutes: 420
+prereq: [m4-8-cnn-blocks]
+summary: >
+  Sınıflandırma + konum belirlemeden (kutu regresyonu) çok nesneli tespite:
+  IoU ölçütü, kayan pencere ve maksimum olmayanı bastırma (NMS), yoğun
+  katmanları konvolüsyona çevirip ağı tam konvolüsyonel (FCN) yapmak ve
+  tek geçişte ızgara tahmini, YOLO'nun hücre göreli koordinatları, k-means
+  ile bulunan çapa kutuları ve log-ölçekli boyut tahmini, precision/recall
+  eğrisinden 11 noktalı ve tüm noktalı AP, mAP@0.5 ve COCO'nun
+  AP@[.50:.95]'i, FPN'nin yukarıdan-aşağı yolu ve RoI'nin piramit
+  seviyesine atanması, Soft-NMS. Saf Python'da IoU/NMS/AP, NumPy'da
+  döngüsüz IoU matrisi, Fast NMS ve IoU-uzaklıklı k-means, PyTorch'ta
+  sentetik şekiller üzerinde sıfırdan küçük bir YOLO, sonda NMS
+  varyantlarının ve sınıf-duyarlı "ofset hilesi"nin ölçümü.
+goals:
+  - "[[iou]] ve [[nms]]; NMS'nin açgözlü ve matris (Fast NMS) biçimleri"
+  - "[[tam konvolüsyonel ağ]]: yoğun katman = çekirdeği girdi boyutunda konvolüsyon → tek geçişte kayan pencere"
+  - "YOLO kodlaması: hücre ofseti (sigmoid), [[çapa kutusu]] (k-means, 1 − IoU uzaklığı), log ölçek"
+  - "[[ortalama hassasiyet]]: 11 nokta, tüm noktalar, mAP@0.5, AP@[.50:.95]; [[öznitelik piramidi ağı]]"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 14", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Redmon ve ark. — You Only Look Once (CVPR 2016)", url: "https://arxiv.org/abs/1506.02640", license: "arXiv", use: link}
+  - {title: "Redmon & Farhadi — YOLO9000 (CVPR 2017) / YOLOv3 (2018)", url: "https://arxiv.org/abs/1612.08242", license: "arXiv", use: link}
+  - {title: "Lin ve ark. — Feature Pyramid Networks for Object Detection (CVPR 2017)", url: "https://arxiv.org/abs/1612.03144", license: "arXiv", use: link}
+  - {title: "Long, Shelhamer, Darrell — Fully Convolutional Networks for Semantic Segmentation (CVPR 2015)", url: "https://arxiv.org/abs/1411.4038", license: "arXiv", use: link}
+  - {title: "Bodla ve ark. — Soft-NMS (ICCV 2017)", url: "https://arxiv.org/abs/1704.04503", license: "arXiv", use: link}
+  - {title: "Bolya ve ark. — YOLACT (Fast NMS), ICCV 2019", url: "https://arxiv.org/abs/1904.02689", license: "arXiv", use: link}
+  - {title: "Everingham ve ark. — The PASCAL VOC Challenge (IJCV 2010)", url: "http://host.robots.ox.ac.uk/pascal/VOC/", license: "©", use: link}
+  - {title: "CS231n — Detection and Segmentation", url: "https://cs231n.stanford.edu/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "IoU ve NMS (kutular $(x_1,y_1,x_2,y_2)$)"
+      fields:
+        - {id: iou, label: "IoU((1, 1, 5, 5), (3, 2, 7, 6))", answer: 0.23076923076923078, tol: 1.0e-6}
+        - {id: kept, label: "NMS (eşik 0.5): (0,0,10,10) 0.9 · (1,1,11,11) 0.8 · (20,20,30,30) 0.7 · (8,8,18,18) 0.6 · (21,19,31,29) 0.5 — kaç kutu kalır?", answer: 3}
+    - title: "YOLO"
+      fields:
+        - {id: nout, label: "YOLOv3 tarzı çıktı: 13 × 13 ızgara, hücre başına 5 kutu (4 koordinat + nesnellik) + 20 sınıf → toplam sayı", answer: 7605}
+        - {id: cx, label: "416 × 416 görüntü, 13 × 13 ızgara, hücre (satır 4, sütun 7), $t_x=0$: kutu merkezinin x'i (piksel)", answer: 240}
+        - {id: area, label: "Çapa 100 piksel yüksek, 50 geniş; ağ $t_h=\\ln 1.5$, $t_w=\\ln 0.9$ tahmin ediyor: kutu alanı", answer: 6750}
+    - title: "AP — skora göre sıralı tespitler: D D Y D Y Y D Y (D = doğru), toplam 5 gerçek nesne"
+      fields:
+        - {id: ap11, label: "11 noktalı AP (VOC 2007)", answer: 0.6948051948051948, tol: 1.0e-6}
+        - {id: apall, label: "Tüm noktalı AP (VOC 2010+)", answer: 0.6642857142857143, tol: 1.0e-6}
+    - title: "FCN ve FPN"
+      fields:
+        - {id: grid, label: "224'te 7 × 7 darboğaz veren FCN'e 448 × 448 girdi; çıkış katmanı 7 × 7 valid konv.: çıkış ızgarası kenarı", answer: 8}
+        - {id: lvl, label: "FPN Denk. (1), $k_0=4$: 100 × 50'lik RoI hangi seviyeye ($P_k$, $k\\in[2,5]$)?", answer: 2}
+  verify: |
+    import math
+    def _iou(a, b):
+        iw = max(0, min(a[2], b[2]) - max(a[0], b[0])); ih = max(0, min(a[3], b[3]) - max(a[1], b[1]))
+        i = iw * ih
+        return i / ((a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i)
+    B = [(0, 0, 10, 10), (1, 1, 11, 11), (20, 20, 30, 30), (8, 8, 18, 18), (21, 19, 31, 29)]
+    keep = []
+    for i in range(5):
+        if all(_iou(B[i], B[j]) <= 0.5 for j in keep):
+            keep.append(i)
+    tp = [1, 1, 0, 1, 0, 0, 1, 0]
+    P, R, c = [], [], 0
+    for k, t in enumerate(tp):
+        c += t; P.append(c / (k + 1)); R.append(c / 5)
+    ap11 = sum(max([p for p, r in zip(P, R) if r >= k / 10] or [0]) for k in range(11)) / 11
+    env = [max(P[k:]) for k in range(len(P))]
+    apall = sum((R[k] - (R[k - 1] if k else 0)) * env[k] for k in range(len(P)))
+    answers = dict(iou=_iou((1, 1, 5, 5), (3, 2, 7, 6)), kept=len(keep), nout=13 * 13 * (5 * 5 + 20), cx=(7 + 0.5) * 32,
+                   area=100 * 1.5 * 50 * 0.9, ap11=ap11, apall=apall, grid=14 - 7 + 1,
+                   lvl=min(5, max(2, math.floor(4 + math.log2(math.sqrt(100 * 50) / 224)))))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Yoğun katmanı konvolüsyona çevir: FCN = kayan pencere", engine: browser}
+  - {id: x2, title: "FPN: yukarıdan-aşağı yol, yanal bağlantılar, RoI → seviye", engine: browser}
+  - {id: x3, title: "Kalabalık sahne: Soft-NMS ve AP@[.50:.95]", engine: browser}
+
+quiz:
+  - q: "YOLOv3 genişlik/yükseklik için neden $\\ln(w/w_a)$ tahmin eder, $w$'yi doğrudan değil?"
+    options:
+      - {t: "Ölçek çarpımsal: log uzayda aynı göreli hata aynı kayıp verir, çıktı her zaman pozitif ($w=w_ae^{t}$) ve çapa iyi bir başlangıç noktası olur", ok: true, why: "Géron'un 'karekök tahmini' fikrinin daha ilkeli hâli."}
+      - {t: "Logaritma hesabı hızlandırır", why: "Konu bu değil."}
+      - {t: "Negatif genişlikleri temsil etmek için", why: "Tam tersi: pozitifliği garanti eder."}
+  - q: "NMS'yi IoU eşiği 0.3'e indirirsen ne olur?"
+    options:
+      - {t: "Yinelenen kutular daha agresif silinir ama birbirine yakın gerçek nesneler (kalabalık) de bastırılır → recall düşer", ok: true, why: "Eşik, yinelenme/kalabalık dengesidir; Soft-NMS bu ikilemi skoru sürekli azaltarak yumuşatır."}
+      - {t: "Hiçbir etkisi olmaz", why: "Etkisi büyük."}
+      - {t: "Daha çok kutu kalır", why: "Daha az kalır."}
+  - q: "11 noktalı AP'de neden her recall düzeyinde 'en az bu recall'daki en yüksek precision' kullanılır?"
+    options:
+      - {t: "Daha yüksek recall'da daha yüksek precision varsa, düşük recall'da çalışmanın anlamı yoktur; zarf (envelope) PR eğrisinin zikzaklarını düzleştirir", ok: true, why: "Géron: '%10 recall'da %90, %20'de %96 ise %10'a bakmak yanıltır'."}
+      - {t: "Hesabı kolaylaştırmak için", why: "Asıl neden mantıklı çalışma noktası."}
+      - {t: "Precision her zaman artan olduğu için", why: "Değildir; zarf bu yüzden var."}
+
+homework:
+  - title: "Redmon ve ark. (2016): YOLOv1'i sıfırdan"
+    paper: "Redmon, Divvala, Girshick, Farhadi — You Only Look Once: Unified, Real-Time Object Detection (CVPR 2016)"
+    url: "https://arxiv.org/abs/1506.02640"
+    level: ileri
+    hours: 16
+    goal: |
+      Makaledeki 7 × 7 × (2·5 + 20) çıkışlı YOLOv1'i, kaybı Denk. (3)'teki gibi (λ_coord = 5, λ_noobj = 0.5, karekök genişlik/yükseklik, "sorumlu" kutu = en yüksek IoU) uygula; PASCAL VOC'un küçük bir alt kümesinde (ör. 3 sınıf) önceden eğitilmiş bir ResNet-18 omurgasıyla eğit, mAP@0.5'i d aşamasındaki ölçücüyle raporla. Sonra çapa kutulu (YOLOv2) hâline geçip farkı ölç.
+    steps:
+      - "d aşamasındaki encode/decode/yolo_loss'u v1 kodlamasına uyarla (çapa yok, hücre başına B kutu)."
+      - "Hata analizi: makale Şekil 4'teki gibi hataları konum / benzer sınıf / arka plan olarak sınıfla."
+    accept:
+      - "Eğitim kaybı düşer, doğrulama mAP@0.5 sıfırdan belirgin büyük."
+      - "Hata dağılımı tablosu; YOLOv1'in konum hatası baskın çıkmalı (makaleyle uyumlu)."
+  - title: "Lin ve ark. (2017): Öznitelik piramidi ağları"
+    paper: "Lin, Dollár, Girshick, He, Hariharan, Belongie — Feature Pyramid Networks for Object Detection (CVPR 2017)"
+    url: "https://arxiv.org/abs/1612.03144"
+    level: ileri
+    hours: 14
+    goal: |
+      d aşamasındaki tek ölçekli dedektörü, nesne boyutlarının 4–48 piksel arasında değiştiği bir sentetik veri setinde (64 → 128 tuval) dene; ardından x2'deki yukarıdan-aşağı yol ve yanal bağlantılarla P3–P5 çıkışlı bir FPN başı ekle, her seviyeye uygun çapaları ata. Makale Tablo 1'deki ablasyonun küçük sürümü: (a) yalnız en kaba seviye, (b) yukarıdan-aşağı yolsuz piramit (SSD tarzı), (c) yanal bağlantısız, (d) tam FPN — küçük/orta/büyük nesnelerde AP.
+    steps:
+      - "Ölçek başına AP için x3'teki ölçücüyü boyut aralıklarına göre filtrele."
+    accept:
+      - "Tam FPN küçük nesnelerde AP'yi belirgin artırır."
+      - "Yanal bağlantısız sürüm konumlandırmada (AP@0.75) geride kalır."
