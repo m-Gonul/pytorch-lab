@@ -1,0 +1,109 @@
+id: m10-5-reduction
+code: M10.5
+title: Paralel indirgeme ve histogram — ağaçlar, ayrışmasız eşleme, karıştırma, özelleştirme
+phase: 10
+minutes: 420
+prereq: [m10-4-cuda-memory]
+summary: >
+  İndirgeme: birleşmeli (gerekirse değişmeli) bir işleç ve birim elemanla bir
+  diziyi tek değere indirmek (toplam, max, argmax, çarpım). Sıralı O(N),
+  indirgeme ağacı O(log N) adım ve N − 1 iş; CUDA'da basit eşleme (adım
+  ikiye katlanır, sahip thread'ler dağınık → ayrışma) ile yakınsak eşleme
+  (adım yarıya iner, aktif thread'ler bitişik), paylaşımlı bellek, blok
+  hiyerarşisi + atomik birleştirme, thread kabalaştırma (coarsening), warp
+  karıştırma (`__shfl_xor_sync`). Histogram: global atomikler, paylaşımlı
+  bellekte özelleştirme, çakışma ve birleştirme. Kayan nokta toplamının
+  birleşmeli olmaması: sıralı, ikili (pairwise) ve Kahan toplamı. Saf
+  Python'da warp etkinliği sayımı, NumPy'da ağaç indirgemeleri, Triton'da
+  iki geçişli/atomik toplam, argmax ve histogram, C++'ta çoklu biriktirici ve
+  çoklu alt-histogram.
+goals:
+  - "İndirgeme ağacı: iş $N-1$, yol $\\lceil\\log_2N\\rceil$; birleşmeli işleç şart"
+  - "Yakınsak eşleme ile ayrışan warp sayısını azaltmak; kabalaştırma ile blok sayısını ve senkronizasyonu azaltmak"
+  - "[[özelleştirme]] (privatization): her blok/thread kendi kopyası, sonra birleştir"
+  - "Kayan nokta: sıralı toplam hatası O(Nε), ikili O(ε log N), Kahan O(ε)"
+sources:
+  - {title: "Harris — Optimizing Parallel Reduction in CUDA (NVIDIA)", url: "https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf", license: "©", use: link}
+  - {title: "Hwu, Kirk, El Hajj — Programming Massively Parallel Processors (4. baskı), Bölüm 9–10", url: "https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0", license: "©", use: link}
+  - {title: "Podlozhnyuk — Histogram calculation in CUDA (NVIDIA 2007)", url: "https://developer.download.nvidia.com/compute/cuda/1.1-Beta/x86_website/projects/histogram64/doc/histogram.pdf", license: "©", use: link}
+  - {title: "Higham — The Accuracy of Floating Point Summation (SIAM J. Sci. Comput. 1993)", url: "https://doi.org/10.1137/0914050", license: "©", use: link}
+  - {title: "NVIDIA — Using CUDA Warp-Level Primitives (Developer Blog)", url: "https://developer.nvidia.com/blog/using-cuda-warp-level-primitives/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "[3, 1, 7, 0, 4, 1, 6, 3] max-indirgemesi"
+      fields:
+        - {id: res, label: "Sonuç", answer: 7}
+        - {id: steps, label: "Ağaç adımı", answer: 3}
+        - {id: ops, label: "Toplam max işlemi", answer: 7}
+    - title: "256 thread'lik blok, 512 eleman (8 warp): tüm iterasyonlarda etkin warp toplamı"
+      fields:
+        - {id: ws, label: "Basit eşleme (adım 1, 2, …, 256; t mod adım = 0)", answer: 55}
+        - {id: wc, label: "Yakınsak eşleme (adım 256, 128, …, 1; t < adım)", answer: 20}
+    - title: "Hiyerarşi ve hassasiyet"
+      fields:
+        - {id: bl, label: "2²⁰ eleman, blok 1024 thread × 2 eleman: blok sayısı", answer: 512}
+        - {id: blc, label: "Kabalaştırma çarpanı 8 ile blok sayısı", answer: 64}
+        - {id: f32, label: "10⁸ adet 1.0'ın float32'de sıralı toplamı", answer: 16777216}
+  verify: |
+    def warps(mapping):
+        tot = 0
+        strides = [1 << k for k in range(9)] if mapping == "simple" else [256 >> k for k in range(9)]
+        for s in strides:
+            act = [t for t in range(256) if (t % s == 0 if mapping == "simple" else t < s)]
+            tot += len({t // 32 for t in act})
+        return tot
+    answers = dict(res=7, steps=3, ops=7, ws=warps("simple"), wc=warps("conv"), bl=2 ** 20 // 2048, blc=2 ** 20 // (2048 * 8), f32=2 ** 24)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Kayan nokta toplamı: sıralı, ikili, Kahan", engine: browser}
+  - {id: x2, title: "Histogramda atomik çakışma modeli", engine: browser}
+  - {id: x3, title: "Anahtara göre indirgeme (segmentli toplam)", engine: browser}
+
+quiz:
+  - q: "Paralel indirgemede işlecin hangi özelliği zorunludur?"
+    options:
+      - {t: "Birleşmelilik: (a ✦ b) ✦ c = a ✦ (b ✦ c), çünkü ağaç parantezlemeyi değiştirir. Değişmelilik yalnız eşleme elemanların sırasını da değiştiriyorsa gerekir", ok: true, why: "Matris çarpımı birleşmeli ama değişmeli değil: sırayı koruyan ağaç çalışır."}
+      - {t: "Değişmelilik", why: "Sıra korunursa gerekmez."}
+      - {t: "Tersinirlik", why: "Max'ın tersi yok."}
+  - q: "Yakınsak eşleme neden basit eşlemeden daha az ayrışma üretir?"
+    options:
+      - {t: "Aktif thread'ler bitişik (t < adım): adım ≥ 32 iken warp'lar ya tamamen aktif ya tamamen pasif; ayrışma yalnız son 5 iterasyonda tek warp'ta", ok: true, why: "Basit eşlemede aktif thread'ler her warp'a dağılır."}
+      - {t: "Daha az iterasyon yaptığı için", why: "İterasyon sayısı aynı."}
+      - {t: "Paylaşımlı bellek kullandığı için", why: "İkisi de kullanabilir."}
+  - q: "Histogramda paylaşımlı bellekte özelleştirme neyi azaltır?"
+    options:
+      - {t: "Global bellekteki atomik çakışmaları ve gecikmeyi: blok içi atomikler çip üstünde, globale blok başına yalnız kutu sayısı kadar atomik", ok: true, why: "Kutu sayısı küçükse kopyalar paylaşımlı belleğe sığar."}
+      - {t: "Toplam atomik sayısını sıfıra", why: "Blok içinde hâlâ atomik."}
+      - {t: "Okuma trafiğini", why: "Girdi yine bir kez okunur."}
+
+homework:
+  - title: "Harris: CUDA'da paralel indirgemeyi optimize etmek"
+    paper: "Harris — Optimizing Parallel Reduction in CUDA (NVIDIA)"
+    url: "https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf"
+    level: orta
+    hours: 8
+    goal: |
+      Sunumdaki yedi çekirdeği (aralıklı adresleme + ayrışan dal → bank çakışmalı aralıklı → sıralı adresleme → yüklemede ilk toplama → son warp açma → tam açma (şablon) → thread başına çok eleman) CUDA C++ ile yaz; 2²² int için GB/s ve her adımın hızlanmasını tabloya dök, b aşamasındaki warp sayımları ve M10.4'teki bank modeliyle açıkla. Son olarak `__shfl_down_sync` ile warp içi indirgemeyi ekle ve CUB `DeviceReduce::Sum` ile karşılaştır.
+    steps:
+      - "Son warp açmada `volatile` paylaşımlı işaretçinin neden gerektiğini (ve Volta sonrası neden `__syncwarp` gerektiğini) açıkla."
+    accept:
+      - "7. çekirdek tepe bant genişliğinin ≥ %70'i."
+      - "Her optimizasyonun etkisi tablo ve kısa açıklamayla."
+  - title: "Podlozhnyuk (2007): CUDA'da histogram"
+    paper: "Podlozhnyuk — Histogram calculation in CUDA (NVIDIA)"
+    url: "https://developer.download.nvidia.com/compute/cuda/1.1-Beta/x86_website/projects/histogram64/doc/histogram.pdf"
+    level: orta
+    hours: 8
+    goal: |
+      lena (ya da kendi) gri görüntün için 256 kutulu histogramı (a) global atomiklerle, (b) blok başına paylaşımlı bellek alt-histogramıyla, (c) warp başına alt-histogram + kabalaştırma ile yaz; tekdüze, doğal ve tek renkli (tüm pikseller aynı) görüntülerde zamanla. x2'deki çakışma modelinin öngörüsüyle karşılaştır; M10.3'teki çok thread'li C++ sürümüyle (Ex. 3) hızlanmayı raporla.
+    steps:
+      - "Kopya → hesap → geri kopya sürelerini ayrı ölç (cudaEvent)."
+    accept:
+      - "Tek renkli görüntüde (a) çok yavaşlar, (c) sağlam kalır."
