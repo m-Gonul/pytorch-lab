@@ -1,0 +1,102 @@
+id: m9-7-corners
+code: M9.7
+title: Köşe tespiti — Harris-Stephens, Shi-Tomasi, FAST
+phase: 9
+minutes: 400
+prereq: [m9-6-edges]
+summary: >
+  Kayan pencerenin kare fark toplamından Harris matrisine, özdeğerlerden
+  $R=\det M-k\,\mathrm{tr}^2M$ ölçüsüne. Notlardaki vaka çalışmasının
+  matrislerini elle ve saf Python'da birebir yeniden üretiyorsun; NumPy'da
+  `cv2.cornerHarris` ve `cv2.cornerMinEigenVal`'ı ölçek çarpanlarıyla
+  birlikte aynı sonuca getiriyorsun; PyTorch'ta Gauss ağırlıklı Harris ile
+  dönme ve ölçek altında tekrarlanabilirliği ölçüp Harris'in neden dönmeye
+  dayanıklı ama ölçeğe duyarlı olduğunu (ve SIFT'in neden gerektiğini)
+  görüyorsun; en sonda yüzlerce köşeyi aynı anda alt piksel hassasiyetine
+  taşıyan toplu bir iyileştirme yazıyorsun.
+goals:
+  - "[[Harris matrisi]]: $C(x,y)\\approx[x\\;y]\\,M\\,[x\\;y]^T$ ve özdeğerlerin anlamı"
+  - "$R$ ile özdeğer hesaplamadan düz / kenar / köşe ayrımı; $k$ ve $T$'nin etkisi"
+  - "Kutu ve Gauss ağırlık penceresi; dönme ve ölçek değişmezliği"
+  - "Alt piksel köşe konumu (Förstner): $q=(\\sum gg^T)^{-1}\\sum gg^Tp$"
+sources:
+  - {title: "Harris & Stephens — A Combined Corner and Edge Detector (Alvey 1988)", url: "https://doi.org/10.5244/C.2.23", license: "©", use: link}
+  - {title: "Shi & Tomasi — Good Features to Track (CVPR 1994)", url: "https://doi.org/10.1109/CVPR.1994.323794", license: "©", use: link}
+  - {title: "Rosten & Drummond — Machine learning for high-speed corner detection (ECCV 2006)", url: "https://doi.org/10.1007/11744023_34", license: "©", use: link}
+  - {title: "OpenCV — imgproc/src/corner.cpp, featureselect.cpp, features2d/src/fast.cpp", url: "https://github.com/opencv/opencv/tree/4.x/modules", license: "Apache-2.0", use: adapt}
+  - {title: "Gonzalez & Woods — Digital Image Processing, 4. baskı, Bölüm 11.5", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "Vaka çalışması ($G=255^2$): sol blok $M=\\begin{bmatrix}5G&-5G\\\\-5G&5G\\end{bmatrix}$"
+      fields:
+        - {id: l1, label: "$\\lambda_1/G$ (büyük)", answer: 10}
+        - {id: l2, label: "$\\lambda_2/G$", answer: 0}
+        - {id: rl, label: "$R/G^2$, $k=0.04$", answer: -4}
+    - title: "Sağ blok $M=\\begin{bmatrix}4G&-G\\\\-G&4G\\end{bmatrix}$"
+      fields:
+        - {id: r1, label: "$\\lambda_1/G$", answer: 5}
+        - {id: r2, label: "$\\lambda_2/G$", answer: 3}
+        - {id: rr, label: "$R/G^2$, $k=0.04$", answer: 12.44, tol: 0.001}
+    - title: "$k$'nin sınırı ve işaret"
+      fields:
+        - {id: kmax, label: "$\\lambda_1=\\lambda_2$ olan ideal köşede $R>0$ kalması için $k$'nin üst sınırı", answer: 0.25}
+        - {id: redge, label: "$\\lambda=(50,\\;0.1)$, $k=0.04$ için $R$", answer: -95.4004, tol: 0.0001}
+        - {id: npix, label: "Sol bloğun 3 × 3 iç bölgesinde $[-1,0,1]$ gradyanı sıfır olmayan piksel sayısı", answer: 5}
+  verify: |
+    import numpy as np
+    G = 255.0 ** 2
+    L = np.array([[5, -5], [-5, 5]]) * G
+    Rr = np.array([[4, -1], [-1, 4]]) * G
+    R = lambda M, k=0.04: np.linalg.det(M) - k * np.trace(M) ** 2
+    el, er = np.linalg.eigvalsh(L) / G, np.linalg.eigvalsh(Rr) / G
+    P = np.array([[0, 255, 255, 255, 255], [0, 0, 255, 255, 255], [0, 0, 0, 255, 255], [0, 0, 0, 0, 255], [0, 0, 0, 0, 0]], float)
+    fx = P[1:4, 2:5] - P[1:4, 0:3]; fy = P[2:5, 1:4] - P[0:3, 1:4]
+    answers = dict(l1=el[1], l2=abs(el[0]), rl=R(L) / G ** 2, r1=er[1], r2=er[0], rr=R(Rr) / G ** 2, kmax=0.25,
+                   redge=50 * 0.1 - 0.04 * 50.1 ** 2, npix=int(((fx != 0) | (fy != 0)).sum()))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Özdeğer haritaları, R ve k–T taraması", engine: browser}
+  - {id: x2, title: "FAST: 16 piksellik çember, 9'luk yay (cv2 ile birebir)", engine: browser}
+  - {id: x3, title: "Shi-Tomasi: cv2.goodFeaturesToTrack'i birebir yeniden yaz", engine: browser}
+
+quiz:
+  - q: "Harris matrisinin bir büyük, bir küçük özdeğeri varsa pencere neyin üzerindedir?"
+    options:
+      - {t: "Bir kenarın: yalnız tek yönde değişim var", ok: true, why: "R bu durumda büyük ve negatiftir."}
+      - {t: "Bir köşenin", why: "Köşede ikisi de büyüktür."}
+      - {t: "Düz bir bölgenin", why: "Düz bölgede ikisi de küçüktür."}
+  - q: "Harris neden dönmeye dayanıklı ama ölçeğe duyarlıdır?"
+    options:
+      - {t: "Özdeğerler dönmeyle değişmez; ama sabit boyutlu pencere, büyütülen bir köşeyi kenar gibi görebilir", ok: true, why: "Ölçek değişmezliği için pencere boyutunun ölçeğe göre seçilmesi gerekir (Harris-Laplace, SIFT)."}
+      - {t: "Gradyanlar dönmeyle değişmez", why: "Gradyan vektörü döner; özdeğerleri değişmez."}
+      - {t: "k sabiti ölçeğe bağlıdır", why: "k boyutsuzdur."}
+  - q: "k'yı küçültmek ne yapar?"
+    options:
+      - {t: "R'yi büyütür, daha çok köşe bulunur (daha hassas)", ok: true, why: "R = det − k·tr²; aynı T ile daha çok piksel eşiği geçer."}
+      - {t: "Daha az köşe bulunur", why: "Tersi."}
+      - {t: "Etkisi yoktur", why: "R doğrudan k'ya bağlı."}
+
+homework:
+  - title: "SuperPoint: kendinden denetimli köşe ve betimleyici"
+    paper: "DeTone, Malisiewicz, Rabinovich — SuperPoint: Self-Supervised Interest Point Detection and Description (CVPRW 2018)"
+    url: "https://arxiv.org/abs/1712.07629"
+    level: ileri
+    hours: 16
+    goal: |
+      Önce sentetik şekiller (üçgen, dörtgen, yıldız, damalı tahta, çizgiler) üzerinde köşe konumları bilinerek MagicPoint dedektörünü eğit; sonra homografik uyarlama (homographic adaptation) ile gerçek görüntülerde sözde etiket üretip SuperPoint'i (paylaşılan kodlayıcı, 65 kanallı "cell" çıkışı, betimleyici başı) eğit. HPatches'te Harris, Shi-Tomasi ve FAST ile tekrarlanabilirliği karşılaştır.
+    steps:
+      - "Sentetik şekil üretici ve köşe ısı haritası; 8 × 8 hücre başına 64 + 1 ('köşe yok') sınıflı softmax çıkışı."
+      - "Gürültü, bulanıklık, parlaklık artırmaları; Harris'in gürültüye karşı nasıl çöktüğünü ölç."
+      - "Homografik uyarlama: rastgele homografilerle çarpıtılmış kopyalarda tespit, geri çarpıtıp ortalama."
+      - "Betimleyici kaybı (hinge) ve eşleştirme ile homografi tahmini doğruluğu."
+    accept:
+      - "Sentetik test kümesinde σ = 0.2 gürültüde MagicPoint F1 > Harris F1 + 0.15."
+      - "HPatches tekrarlanabilirlik tablosu (aydınlatma ve bakış açısı alt kümeleri ayrı)."
+      - "Homografik uyarlama öncesi ve sonrası sözde etiketlerin görsel karşılaştırması."
