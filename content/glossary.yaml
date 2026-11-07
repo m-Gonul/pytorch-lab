@@ -104,3 +104,5 @@ terms:
   konvolüsyon teoremi: "Uzayda konvolüsyon, Fourier uzayında eleman eleman çarpmaya karşılık gelir (f*h ⇔ F·H); ayrık DFT'de bu dairesel konvolüsyondur."
   wiener süzgeci: "Bulanık ve gürültülü bir gözlemden ortalama kare hatayı en aza indiren doğrusal onarıcı: H*/(|H|² + Sη/Sf)."
   slic: "Simple Linear Iterative Clustering: renk + konum uzayında yalnız yerel pencerede çalışan k-means ile süper piksel üreten algoritma."
+  bilateral süzgeç: "Ağırlığı hem uzaysal yakınlığa hem de yoğunluk benzerliğine bağlı olan, kenarları koruyarak yumuşatan doğrusal olmayan süzgeç."
+  non-local means: "Her pikseli, arama penceresindeki tüm piksellerin yama benzerliğiyle ağırlıklandırılmış ortalamasıyla değiştiren gürültü giderme yöntemi."

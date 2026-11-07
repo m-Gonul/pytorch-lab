@@ -1,0 +1,102 @@
+id: m9-12-edge-preserving
+code: M9.12
+title: CLAHE, bilateral ve non-local means
+phase: 9
+minutes: 420
+prereq: [m9-2-intensity-histogram, m9-5-restoration]
+summary: >
+  Yerel kontrast ve kenar koruyan gürültü giderme: uyarlamalı histogram
+  eşitleme (AHE), kontrast sınırlama ve döşeme (tile) enterpolasyonu ile
+  CLAHE; uzaysal ve değer (range) çekirdeğinin çarpımı olan bilateral süzgeç;
+  benzer yamaları tüm arama penceresinden toplayan non-local means ve
+  "yöntem gürültüsü". Alıştırma 7, 8, 9'un hepsi: saf Python'da OpenCV'nin
+  kırpma–yeniden dağıtma kuralı ve bilateral; NumPy'da `cv2.createCLAHE`
+  ile piksel piksel aynı CLAHE; PyTorch'ta türevlenebilir bilateral ve
+  σ'ları gradyanla bulma; en sonda ofset döngüsü + kutu süzgeciyle hızlı
+  NLM.
+goals:
+  - "AHE'nin düz bölgelerde gürültüyü neden büyüttüğü; kırpma eşiğiyle CDF eğimini sınırlamak"
+  - "Döşeme başına LUT ve dört LUT'un bilineer karışımı; sınır ve köşe pikselleri"
+  - "[[bilateral süzgeç]]: $G_{\\sigma_s}(\\lVert p-q\\rVert)\\,G_{\\sigma_r}(|I_p-I_q|)$ ve parametrelerin anlamı"
+  - "[[non-local means]] ve yöntem gürültüsü (method noise)"
+sources:
+  - {title: "Zuiderveld — Contrast Limited Adaptive Histogram Equalization (Graphics Gems IV, 1994)", url: "https://doi.org/10.1016/B978-0-12-336156-1.50061-6", license: "©", use: link}
+  - {title: "Paris, Kornprobst, Tumblin, Durand — A Gentle Introduction to Bilateral Filtering and its Applications (SIGGRAPH kursu)", url: "https://people.csail.mit.edu/sparis/bf_course/", license: "©", use: link}
+  - {title: "Buades, Coll, Morel — A non-local algorithm for image denoising (CVPR 2005)", url: "https://doi.org/10.1109/CVPR.2005.38", license: "©", use: link}
+  - {title: "Buades, Coll, Morel — Non-Local Means Denoising (IPOL 2011)", url: "https://doi.org/10.5201/ipol.2011.bcm_nlm", license: "CC-BY-NC-SA", use: link}
+  - {title: "OpenCV — imgproc/src/clahe.cpp, bilateral_filter", url: "https://github.com/opencv/opencv/blob/4.x/modules/imgproc/src/clahe.cpp", license: "Apache-2.0", use: adapt}
+
+hand:
+  groups:
+    - title: "CLAHE (OpenCV kuralı)"
+      fields:
+        - {id: cl, label: "64 × 64 döşeme, clipLimit = 2.0: tamsayı kırpma eşiği $\\lfloor2\\cdot4096/256\\rfloor$", answer: 32}
+        - {id: b0, label: "8 bölmeli $[10,2,0,0,0,0,0,4]$, eşik 4: kırpma + yeniden dağıtma sonrası bölme 0", answer: 5}
+        - {id: b6, label: "Aynı, bölme 6", answer: 0}
+        - {id: lut2, label: "Aynı, $L=8$: LUT[2] = round(7 · cdf(2) / 16)", answer: 4}
+        - {id: xa, label: "Döşeme genişliği 32, $x=20$: sağdaki döşemenin ağırlığı $x/32-0.5-\\lfloor\\cdot\\rfloor$", answer: 0.125}
+    - title: "Ağırlıklar"
+      fields:
+        - {id: bw, label: "Bilateral: uzaklık 1, $\\sigma_s=2$; fark 20, $\\sigma_r=10$: $w$", answer: 0.119433, tol: 0.0001}
+        - {id: nw, label: "NLM: yama MSE'si 50, $h=10$: $e^{-d^2/h^2}$", answer: 0.606531, tol: 0.0001}
+  verify: |
+    import math
+    h = [10, 2, 0, 0, 0, 0, 0, 4]
+    clip = 4
+    ex = sum(max(v - clip, 0) for v in h)
+    h = [min(v, clip) for v in h]
+    batch, res = ex // 8, ex % 8
+    h = [v + batch for v in h]
+    step = max(8 // res, 1)
+    i = 0
+    while i < 8 and res > 0:
+        h[i] += 1; i += step; res -= 1
+    cdf = [sum(h[:k + 1]) for k in range(8)]
+    answers = dict(cl=int(2.0 * 4096 / 256), b0=h[0], b6=h[6], lut2=round(7 * cdf[2] / 16), xa=20 / 32 - 0.5,
+                   bw=math.exp(-1 / 8) * math.exp(-400 / 200), nw=math.exp(-0.5))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "HE, kayan pencereli AHE ve CLAHE: gürültü büyütme", engine: browser}
+  - {id: x2, title: "Renkli ve ortak (joint) bilateral", engine: browser}
+  - {id: x3, title: "Yöntem gürültüsü: hangi süzgeç görüntüye en az dokunur?", engine: browser}
+
+quiz:
+  - q: "CLAHE'de histogramı kırpmak neyi sınırlar?"
+    options:
+      - {t: "CDF'nin, yani dönüşüm fonksiyonunun eğimini; böylece düz bölgelerde kontrast (ve gürültü) aşırı büyümez", ok: true, why: "Kazanç histogram yüksekliğiyle orantılıdır; kırpma onu tavanlar."}
+      - {t: "Döşeme sayısını", why: "Döşeme ızgarası ayrı bir parametredir."}
+      - {t: "Çıkışın en büyük değerini", why: "Çıkış yine 0–255."}
+  - q: "Bilateral süzgecin σ_r'si sonsuza giderse ne olur?"
+    options:
+      - {t: "Değer ağırlığı hep 1 olur, süzgeç Gauss bulanıklaştırmaya döner", ok: true, why: "σ_r, 'kenar sayılacak en küçük genlik' ölçeğidir."}
+      - {t: "Görüntü değişmez", why: "Bu σ_s → 0 ya da σ_r → 0 durumudur."}
+      - {t: "Medyan süzgeci olur", why: "Ağırlıklı ortalama kalır."}
+  - q: "NLM'yi bilateral'den ayıran fikir nedir?"
+    options:
+      - {t: "Benzerliği tek piksel değeriyle değil, çevresindeki yamayla ölçer ve uzaklığı cezalandırmadan geniş bir pencerede arar", ok: true, why: "Tekrarlayan doku ve kenarlarda çok daha fazla 'benzer' örnek bulur."}
+      - {t: "Medyan kullanır", why: "Ağırlıklı ortalama kullanır."}
+      - {t: "Frekans uzayında çalışır", why: "Uzaysal bir yöntemdir."}
+
+homework:
+  - title: "HDRNet: derin bilateral öğrenme"
+    paper: "Gharbi, Chen, Barron, Hasinoff, Durand — Deep Bilateral Learning for Real-Time Image Enhancement (SIGGRAPH 2017)"
+    url: "https://arxiv.org/abs/1707.02880"
+    level: ileri
+    hours: 16
+    goal: |
+      Düşük çözünürlüklü bir CNN'in bilateral ızgara (bilateral grid) içinde yerel afin renk dönüşümleri tahmin ettiği, tam çözünürlüğe ise öğrenilen bir rehber (guide) haritasıyla "dilimleme" (slicing) yaparak geçtiği HDRNet'i uygula. MIT-Adobe FiveK'den bir alt kümeyle (ya da kendi ürettiğin bir hedefle: CLAHE + doygunluk artırma) eğit.
+    steps:
+      - "Bilateral ızgara: (x, y, yoğunluk) 3-B ızgara; trilineer dilimleme işlemini `grid_sample` (5-B) ile türevlenebilir yaz."
+      - "Düşük çözünürlük yolu: yerel ve küresel öznitelikler, ızgara başına 3 × 4 afin katsayı."
+      - "Tam çözünürlük yolu: piksel başına öğrenilen rehber $g(p)$; çıkış $A[x,y,g(p)]\\,[r,g,b,1]^T$."
+      - "Hedef olarak bu modüldeki CLAHE'yi (Lab'ın L kanalında) kullanıp ağın onu taklit etmesini dene; 4K görüntüde süre ölç."
+    accept:
+      - "Test PSNR ≥ 25 dB (kendi hedefin için) ve 1080p'de CPU'da bile < 100 ms çıkarım."
+      - "Rehber haritasının görselleştirmesi."
+      - "Izgara derinliği (8, 16) ve uzaysal çözünürlük (8, 16) ablasyonu."
