@@ -1,0 +1,116 @@
+id: m4-14-transformer-ed
+code: M4.14
+title: Encoder-decoder Transformer (Attention Is All You Need)
+phase: 4
+minutes: 400
+prereq: [m4-7-transformer, m4-13-seq2seq]
+summary: >
+  Vaswani ve ark. (2017)'nin özgün kodlayıcı–kod çözücü Transformer'ı: N
+  kodlayıcı katmanı (öz-attention + FFN, artık + Post-LN), N kod çözücü
+  katmanı (maskeli öz-attention, kodlayıcı çıktısına cross-attention,
+  FFN), sinüzoidal konum kodlaması ve göreli konum özelliği, √d ile
+  ölçeklenen paylaşılan embedding'ler, dolgu ve nedensel maskeler, etiket
+  yumuşatma ve Noam öğrenme oranı takvimi. Base modelin parametre sayımı
+  elle, NumPy'da maskeli cross-attention, PyTorch'ta nn.TransformerEncoder-
+  /DecoderLayer ile ağırlık düzeyinde aynı katmanlar ve tarih çevirisinde
+  eğitim (embedding başlatma ölçeğinin neden kritik olduğu dahil), sonda
+  kodlayıcı belleğini yeniden kullanan çözümleme. Ekler: RoPE, nedensel
+  maskenin paralel eğitimi mümkün kılması, maske ailesi ve çok katmanlı
+  erişim.
+goals:
+  - "[[sinüzoidal konum kodlaması]] ve $P_{p+k}=R_kP_p$ (göreli konum doğrusal dönüşümle)"
+  - "Üç attention türü: kodlayıcı öz-attention (dolgu maskesi), maskeli öz-attention, [[cross-attention]]"
+  - "Base Transformer parametre sayımı; [[etiket yumuşatma]]; [[noam takvimi]]"
+  - "Post-LN katmanları `nn.Transformer*Layer` ile birebir; embedding × √d tuzağı"
+sources:
+  - {title: "Vaswani ve ark. — Attention Is All You Need (NeurIPS 2017)", url: "https://arxiv.org/abs/1706.03762", license: "arXiv", use: link}
+  - {title: "Rush ve ark. — The Annotated Transformer", url: "https://nlp.seas.harvard.edu/annotated-transformer/", license: "MIT", use: link}
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 16", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Su ve ark. — RoFormer: Rotary Position Embedding (2021)", url: "https://arxiv.org/abs/2104.09864", license: "arXiv", use: link}
+  - {title: "Xiong ve ark. — On Layer Normalization in the Transformer Architecture (ICML 2020)", url: "https://arxiv.org/abs/2002.04745", license: "arXiv", use: link}
+  - {title: "Müller, Kornblith, Hinton — When Does Label Smoothing Help? (NeurIPS 2019)", url: "https://arxiv.org/abs/1906.02629", license: "arXiv", use: link}
+  - {title: "Beltagy, Peters, Cohan — Longformer (2020)", url: "https://arxiv.org/abs/2004.05150", license: "arXiv", use: link}
+  - {title: "d2l.ai — 11.6 Self-Attention and Positional Encoding, 11.7 Transformer", url: "https://d2l.ai/chapter_attention-mechanisms-and-transformers/transformer.html", license: "CC-BY-SA 4.0", use: link}
+
+hand:
+  groups:
+    - title: "Sinüzoidal konum kodlaması, d = 512: $P_{p,2i}=\\sin(p/10000^{2i/d})$, $P_{p,2i+1}=\\cos(\\cdot)$"
+      fields:
+        - {id: pe1, label: "$P_{1,0}$", answer: 0.8414709848078965, tol: 1.0e-6}
+        - {id: pe2, label: "$P_{2,1}$", answer: -0.4161468365471424, tol: 1.0e-6}
+        - {id: wl, label: "Boyut çifti (100, 101)'in dalga boyu (konum cinsinden)", answer: 37.969062003258976, tol: 1.0e-4}
+    - title: "Base Transformer: d = 512, h = 8, d_ff = 2048 (bias ve LN dahil)"
+      fields:
+        - {id: enc, label: "Bir kodlayıcı katmanının parametresi", answer: 3152384}
+        - {id: dec, label: "Bir kod çözücü katmanının parametresi", answer: 4204032}
+        - {id: tot, label: "N = 6, paylaşılan 37 000 token'lık embedding (çıktı katmanı dahil, bias yok): toplam", answer: 63082496}
+    - title: "Eğitim"
+      fields:
+        - {id: noam, label: "Noam: $d^{-0.5}\\min(s^{-0.5}, s\\,w^{-1.5})$, w = 4000 — tepe öğrenme oranı", answer: 0.0006987712429686843, tol: 1.0e-9}
+        - {id: lsq, label: "Etiket yumuşatma ε = 0.1, V = 5 (PyTorch tanımı): doğru sınıfın hedef olasılığı", answer: 0.92, tol: 1.0e-9}
+        - {id: lsh, label: "Aynı hedefle ulaşılabilecek en küçük çapraz entropi (nat)", answer: 0.3896729206581786, tol: 1.0e-6}
+        - {id: causal, label: "T = 4 nedensel maskede izin verilen (sorgu, anahtar) çifti", answer: 10}
+  verify: |
+    import math
+    d, ff = 512, 2048
+    mha = 4 * (d * d + d)
+    ffn = d * ff + ff + ff * d + d
+    enc = mha + ffn + 2 * 2 * d
+    dec = 2 * mha + ffn + 3 * 2 * d
+    q = [0.92] + [0.02] * 4
+    answers = dict(pe1=math.sin(1), pe2=math.cos(2), wl=2 * math.pi * 10000 ** (100 / 512), enc=enc, dec=dec, tot=6 * enc + 6 * dec + 37000 * d,
+                   noam=512 ** -0.5 * 4000 ** -0.5, lsq=1 - 0.1 + 0.1 / 5, lsh=-sum(x * math.log(x) for x in q), causal=10)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "RoPE: göreli konum, döndürme ile", engine: browser}
+  - {id: x2, title: "Nedensel maske = paralel öğretmen zorlaması", engine: browser}
+  - {id: x3, title: "Maske ailesi ve katmanlar boyunca erişim", engine: browser}
+
+quiz:
+  - q: "Konum kodlaması neden gerekli?"
+    options:
+      - {t: "Attention katmanları kelimelerin sırasına bakmaz, yalnız ilişkilerine; diğer katmanlar zamanca dağıtılmıştır. Konum bilgisi verilmezse cümle bir torba olur (permütasyona eşdeğerlik)", ok: true, why: "Géron: konum embedding'i her kelimenin embedding'ine eklenir."}
+      - {t: "Gradyanları stabilize etmek için", why: "Hayır."}
+      - {t: "Sözlüğü küçültmek için", why: "Hayır."}
+  - q: "Kod çözücünün üst (cross) attention katmanında Q, K, V nereden gelir?"
+    options:
+      - {t: "Q kod çözücüden, K ve V kodlayıcının son çıktısından; kodlayıcı çıktısı N kod çözücü katmanının hepsine verilir", ok: true, why: "Kod çözücü burada girdi cümlesindeki kelimelere bakar ('Queen' çevirirken 'Queen'e)."}
+      - {t: "Hepsi kod çözücüden", why: "Bu öz-attention."}
+      - {t: "Q kodlayıcıdan, K, V kod çözücüden", why: "Ters."}
+  - q: "Embedding'ler √d ile çarpılıyorsa başlatma ölçeği neden önemli?"
+    options:
+      - {t: "N(0, 1) başlatılmış embedding × √d, genliği 1 olan konum kodlamasını boğar; model konum bilgisini neredeyse göremez. Paylaşılan embedding N(0, 1/d) ile başlatılınca √d çarpanı onları O(1)'e taşır", ok: true, why: "d aşamasında aynı model yalnız bu farkla öğrenir ya da öğrenemez."}
+      - {t: "Önemli değil", why: "d aşamasında fark çok büyük."}
+      - {t: "Yalnız hızı etkiler", why: "Doğruluğu etkiler."}
+
+homework:
+  - title: "Vaswani ve ark. (2017): küçük bir çeviri modeli"
+    paper: "Vaswani ve ark. — Attention Is All You Need (NeurIPS 2017)"
+    url: "https://arxiv.org/abs/1706.03762"
+    level: ileri
+    hours: 20
+    goal: |
+      d aşamasındaki modeli Multi30k (de→en, ~30 bin cümle) ya da Tatoeba en–tr üzerinde BPE ile eğit: paylaşılan kaynak/hedef sözlük ve embedding–çıktı ağırlık bağlama, Noam takvimi, etiket yumuşatma 0.1, dropout 0.1, beam search (k = 4, α = 0.6, M4.13). Makale Tablo 3'ün küçük ablasyonunu yap: (A) head sayısı 1/4/8, (B) d_k küçültme, (D) dropout ve ε_ls = 0, (E) öğrenilmiş konum embedding'i — BLEU ile raporla. M4.13'teki RNN + attention modeliyle aynı veride karşılaştır.
+    steps:
+      - "Kontrol noktası ortalaması (son 5) ve çözümlemede uzunluk cezası."
+    accept:
+      - "Transformer, RNN + attention modelinden daha yüksek BLEU'ya daha kısa sürede ulaşır."
+      - "Etiket yumuşatma perpleksiteyi kötüleştirip BLEU'yu iyileştirir (makaledeki gözlem)."
+  - title: "Xiong ve ark. (2020): Post-LN vs Pre-LN"
+    paper: "Xiong ve ark. — On Layer Normalization in the Transformer Architecture (ICML 2020)"
+    url: "https://arxiv.org/abs/2002.04745"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin kuramsal sonucunu (Post-LN'de son katmanların gradyanı başlangıçta büyük → warm-up şart) deneyle göster: d aşamasındaki katmanların Pre-LN sürümünü yaz; 6 ve 12 katmanlı modellerde başlangıçta katman başına gradyan normlarını çiz (Şekil 3), warm-up'lı/warm-up'sız ve farklı tepe öğrenme oranlarında eğitim eğrilerini karşılaştır.
+    steps:
+      - "Pre-LN: $x+\\mathrm{Sublayer}(\\mathrm{LN}(x))$ ve en sonda ek bir LN."
+    accept:
+      - "Post-LN'de gradyan normu çıkışa doğru artar; Pre-LN'de yaklaşık sabittir."
+      - "Pre-LN warm-up olmadan eğitilebilir; Post-LN büyük öğrenme oranında warm-up'sız ıraksar."

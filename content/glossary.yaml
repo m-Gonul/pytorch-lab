@@ -171,3 +171,7 @@ terms:
   öğretmen zorlaması: "Teacher forcing: eğitimde kod çözücüye her adımda kendi önceki tahmini yerine gerçek önceki token'ı vermek; hızlı ve kararlı eğitir ama eğitim–çıkarım uyumsuzluğu (exposure bias) yaratır."
   beam search: "Çözümlemede k en olası kısmi diziyi tutup her adımda hepsini sözlük boyunca uzatarak en iyi k'yı seçen arama; açgözlü çözümlemenin geri dönülemez hatalarını azaltır."
   toplamsal attention: "Bahdanau attention: skor e = vᵀ tanh(W₁h_i + W₂s) — kodlayıcı çıktısı ile kod çözücü durumunun birleştirilip küçük bir ağdan geçirilmesi; çarpımsal (Luong) attention'da skor nokta çarpımdır."
+  sinüzoidal konum kodlaması: "Transformer'ın sabit konum vektörleri: P[p, 2i] = sin(p/10000^{2i/d}), P[p, 2i+1] = cos(·); her konuma benzersiz, keyfi uzunluğa uzanır ve P[p+k] = R_k P[p] (göreli konum doğrusal)."
+  cross-attention: "Sorguların bir diziden (kod çözücü), anahtar ve değerlerin başka bir diziden (kodlayıcı çıktısı) geldiği attention; kod çözücünün kaynak cümleye bakmasını sağlar."
+  etiket yumuşatma: "Label smoothing: one-hot hedefi (1 − ε)·onehot + ε/V ile değiştirmek; modeli aşırı güvenden alıkoyar, logit'leri sınırlı tutar."
+  noam takvimi: "Transformer öğrenme oranı takvimi: lr = d^{−1/2}·min(s^{−1/2}, s·w^{−3/2}) — w adım doğrusal ısınma, ardından 1/√s azalma."

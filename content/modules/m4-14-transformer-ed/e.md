@@ -1,0 +1,3 @@
+- `greedy_naive(model, x, T)` — her adımda `model(x, y)` (kodlayıcı her adımda yeniden çalışır).
+- `greedy_cached(model, x, T)` — kodlayıcıyı bir kez çalıştır, belleği yeniden kullan.
+- Ölçüm: iki yöntemin süresi ve çıktı eşitliği; T ve kaynak uzunluğu büyürken.
