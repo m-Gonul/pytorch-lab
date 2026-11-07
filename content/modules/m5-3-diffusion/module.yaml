@@ -1,0 +1,71 @@
+id: m5-3-diffusion
+code: M5.3
+title: Diffusion (DDPM) ve flow matching
+phase: 5
+minutes: 360
+prereq: [m5-1-vae]
+summary: >
+  Gürültü ekleyip geri almayı öğrenmek. İki adımlık bir ileri süreçte
+  $x_t$'yi ve geri adımın ortalamasını elle hesaplıyor, saf Python'da tek
+  boyutlu Gauss veri için kapalı formdaki "kâhin" gürültü tahmincisiyle DDPM
+  örnekleyicisi yazıyor, NumPy'da tüm örnekleri paralel yürüten DDPM ve
+  DDIM örnekleyicilerini kuruyor, PyTorch'ta bir gürültü tahmin ağı eğitip
+  8 Gauss'lu halkayı üretiyor ve en sonda flow matching ile aynı işi birkaç
+  Euler adımında yapıyorsun.
+goals:
+  - "Kapalı form $q(x_t\\mid x_0)$ ve $\\varepsilon$-tahmini eğitim amacını türetmek"
+  - "DDPM geri adımını ve DDIM'in deterministik adımını uygulamak"
+  - "Örnekleyiciyi eğitilmiş bir ağdan bağımsız, kapalı formdaki optimal tahminciyle doğrulamak"
+  - "[[flow matching]]: doğrusal yol, hız hedefi $x_1-x_0$ ve ODE ile örnekleme"
+sources:
+  - {title: "Ho, Jain, Abbeel — Denoising Diffusion Probabilistic Models", url: "https://arxiv.org/abs/2006.11239", license: "arXiv", use: link}
+  - {title: "Song, Meng, Ermon — Denoising Diffusion Implicit Models", url: "https://arxiv.org/abs/2010.02502", license: "arXiv", use: link}
+  - {title: "Lipman ve ark. — Flow Matching for Generative Modeling", url: "https://arxiv.org/abs/2210.02747", license: "arXiv", use: link}
+  - {title: "Liu, Gong, Liu — Rectified Flow", url: "https://arxiv.org/abs/2209.03003", license: "arXiv", use: link}
+  - {title: "fast.ai Part 2 — From Deep Learning Foundations to Stable Diffusion", url: "https://course.fast.ai/Lessons/part2.html", license: "course22p2 kodu Apache-2.0", use: adapt}
+  - {title: "Prince — Understanding Deep Learning, Bölüm 18 (Diffusion)", url: "https://udlbook.github.io/udlbook/", license: "kitap ©; notebook'lar MIT", use: link}
+  - {title: "MIT 6.S184 — Generative AI with Stochastic Differential Equations (flow matching notları)", url: "https://diffusion.csail.mit.edu/", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "$\\beta_1=0.1$, $\\beta_2=0.2$; $x_0=2$, $\\varepsilon=0.5$ (1'den başlayan $t$)"
+      fields:
+        - {id: ab2, label: "$\\bar\\alpha_2=(1-\\beta_1)(1-\\beta_2)$", answer: 0.72}
+        - {id: x2, label: "$x_2=\\sqrt{\\bar\\alpha_2}\\,x_0+\\sqrt{1-\\bar\\alpha_2}\\,\\varepsilon$", answer: 1.961632, tol: 0.0005}
+        - {id: x0h, label: "$\\hat x_0=(x_2-\\sqrt{1-\\bar\\alpha_2}\\,\\varepsilon)/\\sqrt{\\bar\\alpha_2}$", answer: 2, tol: 0.0005}
+    - title: "Geri adım (doğru $\\varepsilon$ ile): $\\mu=\\frac1{\\sqrt{\\alpha_2}}\\big(x_2-\\frac{\\beta_2}{\\sqrt{1-\\bar\\alpha_2}}\\varepsilon\\big)$"
+      fields:
+        - {id: mu, label: "$\\mu$", answer: 1.981884, tol: 0.0005}
+        - {id: var, label: "$\\tilde\\beta_2=\\frac{1-\\bar\\alpha_1}{1-\\bar\\alpha_2}\\beta_2$", answer: 0.071429, tol: 0.0005}
+        - {id: fmv, label: "Flow matching: $z=-1$, $x_1=3$, $t=0.25$ için $x_t=(1-t)z+tx_1$", answer: 0, hint: "Hız hedefi her $t$'de $x_1-z=4$"}
+  verify: |
+    import math
+    b1, b2, x0, e = 0.1, 0.2, 2.0, 0.5
+    ab1 = 1 - b1; ab2 = ab1 * (1 - b2)
+    x2 = math.sqrt(ab2) * x0 + math.sqrt(1 - ab2) * e
+    answers = dict(ab2=ab2, x2=x2, x0h=(x2 - math.sqrt(1 - ab2) * e) / math.sqrt(ab2),
+                   mu=(x2 - b2 / math.sqrt(1 - ab2) * e) / math.sqrt(1 - b2),
+                   var=(1 - ab1) / (1 - ab2) * b2, fmv=0.75 * -1 + 0.25 * 3)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "DDPM neden $x_0$ yerine eklenen gürültü $\\varepsilon$'u tahmin edecek şekilde eğitilir?"
+    options:
+      - {t: "İkisi birbirine $x_t$ üzerinden doğrusal olarak bağlı; ama $\\varepsilon$-tahmini tüm $t$'lerde benzer ölçekte bir hedef verir ve kayıp, ELBO'nun yeniden ağırlıklandırılmış hâline denk gelir", ok: true, why: "Ho ve ark. 'basitleştirilmiş' kaybın ($\\lVert\\varepsilon-\\varepsilon_\\theta\\rVert^2$) örnek kalitesini artırdığını gösterdi. $x_0$- ya da $v$-tahmini de kullanılır."}
+      - {t: "$x_0$ bilinmediği için", why: "Eğitimde $x_0$ biliniyor; $x_t$'yi ondan üretiyoruz."}
+      - {t: "Gürültü tahmini örneklemeyi deterministik yapar", why: "Determinizm DDIM'in güncelleme kuralından gelir."}
+  - q: "DDIM, aynı eğitilmiş ağla neden çok daha az adımda örnekleyebilir?"
+    options:
+      - {t: "Aynı marjinallere sahip deterministik (ODE benzeri) bir süreç tanımlar; adımları seyreltmek bir ODE'yi daha büyük adımlarla çözmek gibidir", ok: true, why: "Yeniden eğitim gerekmez: eğitim yalnız $q(x_t\\mid x_0)$ marjinallerine bağlı."}
+      - {t: "Farklı bir kayıpla eğitildiği için", why: "DDPM ile aynı ağı kullanır."}
+      - {t: "Gürültüyü daha büyük ekler", why: "η = 0'da hiç gürültü eklemez."}
+  - q: "Flow matching'te tek Euler adımıyla ($z\\to z+v(z,0)$) örnek üretmek neden genelde bulanık sonuç verir?"
+    options:
+      - {t: "$v(z,0)$, $z$ verildiğinde $x_1-z$'nin koşullu beklentisi; tek adım tüm olası hedeflerin ortalamasına gider", ok: true, why: "e aşamasında Gauss için bunu tam görüyorsun: tek adım her örneği ortalamaya taşır, varyans sıfıra iner. Yollar kesiştiği için çok adım gerekir (rectified flow bunları düzleştirmeye çalışır)."}
+      - {t: "Euler yöntemi kararsız olduğu için", why: "Kararlılık sorunu değil; ortalama alma etkisi."}
+      - {t: "Ağ yeterince eğitilmediği için", why: "Kâhin (optimal) hızla bile aynı sonuç çıkar."}
