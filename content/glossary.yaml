@@ -82,3 +82,7 @@ terms:
   epilogue füzyonu: "Bir çekirdeğin ana hesabından (ör. matmul) sonra gelen bias, aktivasyon, ölçekleme gibi elementwise işlemleri sonucu belleğe yazmadan aynı çekirdekte uygulamak."
   loss scaling: "Kaybı büyük bir sayıyla çarpıp gradyanları sonra aynı sayıya bölerek, düşük hassasiyette küçük gradyanların sıfıra alt taşmasını önleme tekniği."
   stochastic rounding: "Bir sayıyı iki komşu temsil edilebilir değerden birine, uzaklıklarıyla ters orantılı olasılıkla yuvarlama; beklenen değerde yansızdır."
+  all-reduce: "Tüm işçilerin tensörlerini toplayıp (ya da ortalayıp) sonucu her işçiye geri veren kolektif iletişim işlemi."
+  ZeRO: "Zero Redundancy Optimizer: optimizer durumunu (ZeRO-1), gradyanları (ZeRO-2) ve parametreleri (ZeRO-3, FSDP) işçilere bölerek veri paralel eğitimin bellek tekrarını kaldıran yöntem."
+  grup bazlı kuantizasyon: "Bir ağırlık satırını sabit boyutlu gruplara bölüp her gruba ayrı ölçek vererek aykırı değerlerin etkisini sınırlayan kuantizasyon (int4 LLM ağırlıklarında tipik)."
+  guard: "Derlenmiş ya da dışa aktarılmış bir grafın geçerli olduğu koşul (ör. batch = 4); çalışma anında koşul sağlanmazsa yeniden derleme ya da hata."

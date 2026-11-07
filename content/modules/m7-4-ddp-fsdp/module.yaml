@@ -1,0 +1,70 @@
+id: m7-4-ddp-fsdp
+code: M7.4
+title: "Dağıtık eğitim: DDP, all-reduce, ZeRO/FSDP"
+phase: 7
+minutes: 300
+prereq: [m6-4-memory]
+summary: >
+  Birden çok işçiyle eğitmek. İki işçinin all-reduce'unu, ring all-reduce'un
+  iletişim hacmini ve ZeRO-3 bellek payını elle hesaplıyor, saf Python'da
+  ring all-reduce'u adım adım simüle ediyor, NumPy'da veri paralel SGD'nin
+  tam batch gradyanına eşit olduğunu ve optimizer durumunu işçilere bölen
+  ZeRO-1 Adam'ın tek işçili Adam'la aynı sonucu verdiğini gösteriyor,
+  PyTorch'ta `gloo` ile iki CPU sürecinde DDP eğitiyor ve en sonda gerçek
+  kolektiflerle (all-reduce + all-gather) kendi ZeRO-1 optimizer'ını
+  yazıyorsun.
+goals:
+  - "Veri paralelliği: gradyan ortalaması = büyük batch gradyanı"
+  - "[[all-reduce]] ve ring algoritmasının bant genişliği maliyeti $2(N-1)/N$"
+  - "`torch.distributed`: süreç grubu, rank, world size, kolektifler; DDP"
+  - "[[ZeRO]] / FSDP: optimizer durumunu, gradyanları ve parametreleri işçilere bölmek"
+sources:
+  - {title: "PyTorch Tutorials — Getting Started with Distributed Data Parallel; Writing Distributed Applications", url: "https://docs.pytorch.org/tutorials/intermediate/ddp_tutorial.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "Li ve ark. — PyTorch Distributed: Experiences on Accelerating Data Parallel Training", url: "https://arxiv.org/abs/2006.15704", license: "arXiv", use: link}
+  - {title: "Rajbhandari ve ark. — ZeRO: Memory Optimizations Toward Training Trillion Parameter Models", url: "https://arxiv.org/abs/1910.02054", license: "arXiv", use: link}
+  - {title: "Zhao ve ark. — PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel", url: "https://arxiv.org/abs/2304.11277", license: "arXiv", use: link}
+  - {title: "Stanford CS336 — Assignment 2 (DDP, sharded optimizer)", url: "https://github.com/stanford-cs336/assignment2-systems", license: "MIT", use: adapt}
+  - {title: "Gibiansky — Bringing HPC Techniques to Deep Learning (ring all-reduce)", url: "https://andrew.gibiansky.com/blog/machine-learning/baidu-allreduce/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "İki işçi, gradyanlar $g_1=(1,3)$, $g_2=(3,5)$"
+      fields:
+        - {id: ar, label: "All-reduce (ortalama) sonrası 1. bileşen", answer: 2}
+        - {id: batch, label: "İşçi başına batch 32, 4 işçi: eşdeğer tek batch boyutu", answer: 128}
+    - title: "Ring all-reduce, $N=4$ işçi, 100 MB gradyan"
+      fields:
+        - {id: ring, label: "İşçi başına gönderilen veri (MB): $2(N-1)/N\\cdot100$", answer: 150}
+        - {id: steps, label: "Toplam adım sayısı (reduce-scatter + all-gather)", answer: 6, hint: "$2(N-1)$"}
+    - title: "1 milyar parametre, fp32 Adam (16 bayt/parametre), 8 GPU"
+      fields:
+        - {id: ddp, label: "DDP: GPU başına bayt", answer: 16000000000}
+        - {id: z3, label: "ZeRO-3 / FSDP (her şey bölünmüş): GPU başına bayt", answer: 2000000000}
+        - {id: z1, label: "ZeRO-1 (yalnız Adam durumu bölünmüş): GPU başına bayt", answer: 9000000000, hint: "$4+4+8/8$ bayt/parametre"}
+  verify: |
+    N, P = 4, 1e9
+    answers = dict(ar=(1 + 3) / 2, batch=32 * 4, ring=2 * (N - 1) / N * 100, steps=2 * (N - 1),
+                   ddp=16 * P, z3=16 * P / 8, z1=(4 + 4 + 8 / 8) * P)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Ring all-reduce'da işçi başına gönderilen veri işçi sayısı $N$ arttıkça ne olur?"
+    options:
+      - {t: "$2(N-1)/N\\cdot$ boyut: $N$ büyüdükçe $2\\times$'e yaklaşır, işçi sayısından neredeyse bağımsız", ok: true, why: "Bu yüzden ring (ve ağaç) algoritmaları ölçeklenir; gecikme ise adım sayısıyla ($2(N-1)$) artar."}
+      - {t: "$N$ ile doğrusal artar", why: "O, her işçinin herkese gönderdiği naif yöntem."}
+      - {t: "Azalır", why: "Toplam iş bölünür ama işçi başına hacim ~2× sabite gider."}
+  - q: "DDP, geri geçiş bitmeden all-reduce'a nasıl başlayabilir?"
+    options:
+      - {t: "Gradyanları kovalara (bucket) gruplar; bir kovadaki tüm gradyanlar hazır olunca (autograd hook'u) o kovanın all-reduce'unu başlatır, geri geçiş sürerken iletişim örtüşür", ok: true, why: "Kova boyutu (`bucket_cap_mb`) iletişim çağrısı sayısı ile örtüşme arasında bir denge."}
+      - {t: "Gradyanları tahmin eder", why: "Kesin gradyanlar; yalnız zamanlama örtüşür."}
+      - {t: "Başlayamaz; her zaman sonra yapar", why: "Örtüşme DDP'nin ana optimizasyonu."}
+  - q: "FSDP (ZeRO-3) ileri geçişte bir katmanı hesaplamak için ne yapar?"
+    options:
+      - {t: "O katmanın parametre parçalarını tüm işçilerden all-gather ile toplar, hesaplar, sonra tam kopyayı serbest bırakır", ok: true, why: "Bellek yerine iletişim harcar: parametreler kalıcı olarak yalnız $1/N$ boyutunda tutulur."}
+      - {t: "Her işçi farklı katmanları hesaplar", why: "O, pipeline paralelliği."}
+      - {t: "Parametreleri hiç toplamaz", why: "Hesap için tam katman ağırlığı gerekir."}
