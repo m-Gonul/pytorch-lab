@@ -1,0 +1,97 @@
+id: m11-1-markov
+code: M11.1
+title: Rastgele süreçler ve Markov zincirleri
+phase: 11
+minutes: 360
+prereq: [m0-4-probability, m5-5-rl]
+summary: >
+  Pekiştirmeli öğrenmenin olasılık zemini: rastgele değişken ve rastgele
+  süreç, birinci ve ikinci derece dağılımlar, ortalama / otokorelasyon /
+  otokovaryans, katı ve geniş anlamda durağanlık, Wiener süreci; ardından
+  durum geçişlerini modelleyen birinci dereceden durağan Markov zincirleri:
+  geçiş matrisi, n adımlık dağılım, durağan dağılım. Saf Python'da zincir ve
+  AR(1) simülasyonu; NumPy'da matris kuvvetleri, özvektörle durağan dağılım
+  ve topluluk istatistikleri; PyTorch'ta binlerce zinciri birden örnekleyip
+  geçiş matrisini en çok olabilirlikle hem sayarak hem gradyanla kestiriyorsun;
+  en sonda Wiener sürecinin özelliklerini (varyans, karesel değişim, yansıma
+  ilkesi) vektörel simülasyonla doğruluyorsun.
+goals:
+  - "Rastgele süreç = zamanın fonksiyonlarından oluşan bir aile; sabit $t$'de rastgele değişken"
+  - "Katı durağanlık, [[geniş anlamda durağanlık]] (WSS), topluluk ve zaman ortalaması (ergodiklik)"
+  - "Markov özelliği, [[geçiş matrisi]], $\\mathbf p_{t+1}=T\\mathbf p_t$, durağan dağılım $T\\boldsymbol\\pi=\\boldsymbol\\pi$"
+  - "Geçiş olasılıklarının en çok olabilirlik kestirimi"
+sources:
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 3", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+  - {title: "Papoulis & Pillai — Probability, Random Variables and Stochastic Processes (4. baskı)", url: "https://www.mheducation.com/", license: "©", use: link}
+  - {title: "Grinstead & Snell — Introduction to Probability, Bölüm 11 (Markov zincirleri)", url: "https://math.dartmouth.edu/~prob/prob/prob.pdf", license: "GFDL", use: adapt}
+  - {title: "Levin & Peres — Markov Chains and Mixing Times (2. baskı)", url: "https://pages.uoregon.edu/dlevin/MARKOV/", license: "ücretsiz PDF", use: link}
+
+hand:
+  groups:
+    - title: "İki zar"
+      fields:
+        - {id: p7, label: "Toplamın 7 olma olasılığı", answer: 0.166667, tol: 0.0001}
+        - {id: ex, label: "Toplamın beklenen değeri", answer: 7}
+    - title: "Zincir: $T=\\begin{bmatrix}0.9&0.5\\\\0.1&0.5\\end{bmatrix}$ (sütun $j$: $S_j$'den çıkış olasılıkları), $\\mathbf p_0=[1,0]^T$"
+      fields:
+        - {id: p2, label: "$\\mathbf p_2$'nin ilk bileşeni", answer: 0.86}
+        - {id: pi0, label: "Durağan dağılımda $\\pi_0$", answer: 0.833333, tol: 0.0001}
+    - title: "Süreçler"
+      fields:
+        - {id: ar, label: "AR(1) $x_t=0.8x_{t-1}+w_t$, $\\sigma_w^2=1$: durağan varyans", answer: 2.777778, tol: 0.0001}
+        - {id: ac, label: "Aynı sürecin 2 gecikmeli otokovaryansı", answer: 1.777778, tol: 0.0001}
+        - {id: w, label: "Standart Wiener süreci: $W(4)$'ün standart sapması", answer: 2}
+  verify: |
+    import numpy as np
+    s = [a + b for a in range(1, 7) for b in range(1, 7)]
+    T = np.array([[0.9, 0.5], [0.1, 0.5]])
+    p2 = T @ T @ np.array([1.0, 0])
+    w, V = np.linalg.eig(T)
+    pi = np.real(V[:, np.argmin(abs(w - 1))]); pi = pi / pi.sum()
+    v = 1 / (1 - 0.64)
+    answers = dict(p7=s.count(7) / 36, ex=sum(s) / 36, p2=p2[0], pi0=pi[0], ar=v, ac=0.64 * v, w=2.0)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Soğurucu zincirler: kumarbazın iflası ve ortalama ilk geçiş zamanları", engine: browser}
+  - {id: x2, title: "Durağanlık ve ergodiklik: topluluk ve zaman ortalaması", engine: browser}
+  - {id: x3, title: "Karakter düzeyinde Markov dil modeli (k. derece)", engine: browser}
+
+quiz:
+  - q: "Birinci dereceden Markov özelliği ne der?"
+    options:
+      - {t: "Gelecek, şimdiki durum verildiğinde geçmişten bağımsızdır: $P(s_t|s_{t-1},…,s_0)=P(s_t|s_{t-1})$", ok: true, why: "k. dereceden Markov sürecinde son k durum yeterlidir; durum tanımını genişleterek birinci dereceye indirgenir."}
+      - {t: "Geçiş olasılıkları zamanla değişmez", why: "Bu durağanlıktır (zamanla homojenlik)."}
+      - {t: "Tüm durumlar eşit olasılıklıdır", why: "Durağan dağılım düzgün olmak zorunda değildir."}
+  - q: "Geniş anlamda durağanlık (WSS) neyi gerektirir?"
+    options:
+      - {t: "Sabit ortalama ve yalnız zaman farkına bağlı otokovaryans (ve sonlu ikinci moment)", ok: true, why: "Katı durağanlık tüm sonlu boyutlu dağılımların kaymaya değişmezliğini ister; WSS yalnız ilk iki momenti."}
+      - {t: "Tüm momentlerin sabit olması", why: "Bu katı durağanlığa daha yakın."}
+      - {t: "Sürecin Gauss olması", why: "Gauss süreçlerde WSS katı durağanlığı gerektirir ama tersi değil."}
+  - q: "Sütun-stokastik $T$ için durağan dağılım nedir?"
+    options:
+      - {t: "$T$'nin özdeğeri 1 olan, bileşenleri toplamı 1'e normalize edilmiş özvektörü", ok: true, why: "$T\\pi=\\pi$; indirgenemez ve periyodik olmayan zincirde tektir ve her başlangıç ona yakınsar."}
+      - {t: "$T$'nin ilk sütunu", why: "O, $S_0$'dan bir adımlık dağılımdır."}
+      - {t: "$T^{-1}$'in satır toplamları", why: "İlgisiz."}
+
+homework:
+  - title: "PageRank: web grafiğinde durağan dağılım"
+    paper: "Page, Brin, Motwani, Winograd — The PageRank Citation Ranking: Bringing Order to the Web (Stanford, 1999)"
+    url: "http://ilpubs.stanford.edu:8090/422/"
+    level: orta
+    hours: 8
+    goal: |
+      Rastgele sörfçü modelini bir Markov zinciri olarak kur (sönümleme faktörü d = 0.85, sarkan düğümler için düzgün atlama), PageRank'i kuvvet yinelemesiyle hesapla; seyrek matrislerle (SciPy CSR) milyon kenarlı bir grafikte (ör. SNAP web-Google) çalıştır ve yakınsama hızının d'ye bağımlılığını ikinci özdeğerle ilişkilendir.
+    steps:
+      - "Seyrek, sütun-stokastik geçiş matrisi; sarkan düğüm düzeltmesi."
+      - "Kuvvet yinelemesi; L1 değişim < 1e-10'a kadar iterasyon sayısı."
+      - "d = 0.5, 0.85, 0.99 için iterasyon sayısı ve $|\\lambda_2|\\le d$ ilişkisi."
+      - "Kişiselleştirilmiş PageRank (atlama dağılımı bir düğüm kümesine yoğun)."
+    accept:
+      - "SNAP grafiğinde ilk 20 düğüm ve NetworkX `pagerank` ile 1e-6 içinde uyum."
+      - "d'ye karşı iterasyon grafiği ve teorik $\\log\\varepsilon/\\log d$ eğrisi."

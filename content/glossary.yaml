@@ -113,3 +113,5 @@ terms:
   adaboost: "Zayıf sınıflandırıcıları sırayla, önceki turların yanlış sınıfladığı örneklere daha çok ağırlık vererek eğitip ağırlıklı oyla birleştiren boosting algoritması."
   optik akış: "Ardışık iki karede her pikselin görünür hareketini veren (u, v) vektör alanı; parlaklık sabitliği varsayımına dayanır."
   vibe: "Visual Background Extractor: her piksel için geçmiş değerlerden rastgele örnekler tutan, rastgele ve komşulara yayılan güncellemeli parametresiz arka plan çıkarma yöntemi."
+  geniş anlamda durağanlık: "Wide-sense stationarity: ortalaması sabit, otokovaryansı yalnız iki zaman arasındaki farka bağlı olan rastgele süreç."
+  geçiş matrisi: "Markov zincirinde bir durumdan diğerine geçme olasılıklarını tutan matris; bu modülde sütun j, S_j'den çıkış dağılımıdır."
