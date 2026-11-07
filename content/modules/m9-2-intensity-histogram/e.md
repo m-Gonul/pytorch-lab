@@ -1,0 +1,1 @@
+`equalize_batch(imgs)` — `imgs: (B, H, W) uint8` tensör, OpenCV varyantı, **döngü yok**. Her görüntünün histogramını tek bir `bincount` ile al: piksel değerine görüntü indeksi × 256 ekle. CDF'ler `cumsum(dim=1)`, LUT'lar `gather`.

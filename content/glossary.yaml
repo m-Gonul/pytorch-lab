@@ -88,3 +88,7 @@ terms:
   guard: "Derlenmiş ya da dışa aktarılmış bir grafın geçerli olduğu koşul (ör. batch = 4); çalışma anında koşul sağlanmazsa yeniden derleme ya da hata."
   minGPT: "Karpathy'nin eğitim amaçlı, birkaç yüz satırlık GPT uygulaması; nanoGPT'nin öncülü. İçindeki 'adder' örneği toplamayı öğrenen küçük bir GPT."
   bilineer interpolasyon: "Bir noktanın değerini çevresindeki dört pikselden, iki eksende ardışık doğrusal interpolasyonla tahmin etme."
+  histogram eşitleme: "Piksel değerlerini birikimli dağılım fonksiyonu (CDF) ile yeniden eşleyerek çıkış histogramını düzgüne yaklaştıran ve kontrastı artıran nokta dönüşümü."
+  ayrılabilir filtre: "Rank-1 olan, yani bir sütun ve bir satır vektörünün dış çarpımı olarak yazılabilen 2-boyutlu çekirdek; iki 1-boyutlu filtreyle k² yerine 2k işlemle uygulanır."
+  integral görüntü: "Her konumda sol-üst dikdörtgenin piksel toplamını tutan tablo (summed-area table); herhangi bir dikdörtgenin toplamı dört aramayla bulunur."
+  unsharp masking: "Görüntüden bulanık kopyasını çıkararak ayrıntı maskesi elde edip bunu ağırlıklı olarak geri ekleyen keskinleştirme; kazanç 1'den büyükse highboost."

@@ -1,0 +1,96 @@
+id: m9-2-intensity-histogram
+code: M9.2
+title: Yoğunluk dönüşümleri ve histogram eşitleme
+phase: 9
+minutes: 270
+prereq: [m9-1-digital-image]
+summary: >
+  Tek piksel işlemleri: negatif, log, gamma, parçalı doğrusal germe ve en
+  önemlisi histogram eşitleme. 8 seviyeli klasik örnekte eşitleme dönüşümünü
+  elle çıkarıyor, saf Python'da derste anlatılan ve OpenCV'nin kullandığı iki
+  eşitleme formülünü yazıp OpenCV ile birebir karşılaştırıyor, NumPy'da tüm
+  dönüşümleri arama tablosu (LUT) olarak döngüsüz kuruyor, PyTorch'ta
+  türevlenebilir "yumuşak histogram" ile ton eğrisini gradient descent ile
+  öğreniyor ve en sonda yüzlerce görüntüyü tek bir `bincount` ile
+  eşitliyorsun.
+goals:
+  - "Nokta işlemlerini $s=T(r)$ arama tablosu olarak görmek; monotonluk koşulları"
+  - "[[histogram eşitleme]]: $T(r)=(L-1)\\,\\mathrm{CDF}(r)$ ve OpenCV'nin $\\mathrm{cdf}_{\\min}$ düzeltmeli varyantı"
+  - "Histogram eşleme (specification) ve yerel histogram istatistikleriyle iyileştirme"
+  - "Türevlenebilir histogram: ayrık sayımı Gauss çekirdekleriyle yumuşatmak"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 3.2–3.3", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "OpenCV — Histogram Equalization tutorial ve equalizeHist", url: "https://docs.opencv.org/4.x/d4/d1b/tutorial_histogram_equalization.html", license: "Apache-2.0", use: adapt}
+  - {title: "scikit-image — exposure modülü (equalize_hist, match_histograms)", url: "https://scikit-image.org/docs/stable/api/skimage.exposure.html", license: "BSD-3-Clause", use: adapt}
+
+hand:
+  groups:
+    - title: "3 bit ($L=8$), $64\\times64$ görüntü; histogram $n_k=(790,1023,850,656,329,245,122,81)$. Ders formülü $s_k=\\operatorname{round}\\big(7\\sum_{j\\le k}p_j\\big)$"
+      fields:
+        - {id: s0, label: "$s_0$", answer: 1}
+        - {id: s1, label: "$s_1$", answer: 3}
+        - {id: s3, label: "$s_3$", answer: 6}
+        - {id: n6, label: "Eşitlenmiş görüntüde 6 değerli piksel sayısı", answer: 985}
+    - title: "OpenCV varyantı $s_k=\\operatorname{round}\\big(7\\,\\frac{c_k-c_{\\min}}{MN-c_{\\min}}\\big)$, $c_k$ birikimli sayım"
+      fields:
+        - {id: o0, label: "$s_0$", answer: 0}
+        - {id: o1, label: "$s_1$", answer: 2, hint: "$7\\cdot1023/3306=2.17$"}
+    - title: "Nokta dönüşümleri, 8 bit"
+      fields:
+        - {id: gam, label: "Gamma $\\gamma=0.5$: $r=64$ → $255\\,(64/255)^{0.5}$", answer: 127.749755, tol: 0.01}
+        - {id: lg, label: "Log: $c=255/\\ln256$, $r=15$ → $c\\ln(1+r)$", answer: 127.5, tol: 0.01}
+  verify: |
+    import math
+    n = [790, 1023, 850, 656, 329, 245, 122, 81]
+    N = sum(n)
+    c = [sum(n[:k + 1]) for k in range(8)]
+    s = [round(7 * ck / N) for ck in c]
+    o = [round(7 * (ck - c[0]) / (N - c[0])) for ck in c]
+    answers = dict(s0=s[0], s1=s[1], s3=s[3], n6=sum(nk for nk, sk in zip(n, s) if sk == 6), o0=o[0], o1=o[1],
+                   gam=255 * (64 / 255) ** 0.5, lg=255 / math.log(256) * math.log(16))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Histogram eşleme (specification)", engine: browser}
+  - {id: x2, title: "Yerel histogram istatistikleriyle iyileştirme", engine: browser}
+  - {id: x3, title: "Kontrast germe ve yoğunluk dilimleme", engine: browser}
+
+quiz:
+  - q: "Ders formülü ile OpenCV'nin `equalizeHist`'i hangi görüntülerde farklı sonuç verir?"
+    options:
+      - {t: "En karanlık seviyede çok piksel olanlarda: ders formülü en düşük seviyeyi $\\operatorname{round}(255\\,c_{\\min}/MN)>0$'a eşler, OpenCV $c_{\\min}$'i çıkarıp çıkışı tam 0'dan başlatır", ok: true, why: "`camera`'da en düşük seviyedeki piksel sayısı küçük olduğundan iki formül aynı; `moon`'da farklı. Eşitlenmiş görüntü hep tam aralığı (0–255) kullanmalıysa OpenCV varyantı doğru tercih."}
+      - {t: "Her görüntüde farklı sonuç verir", why: "$c_{\\min}$ küçükse yuvarlama sonrası aynı LUT çıkar."}
+      - {t: "Yalnız renkli görüntülerde", why: "İkisi de tek kanallı."}
+  - q: "Ayrık histogram eşitleme neden tam düz bir histogram üretmez?"
+    options:
+      - {t: "Dönüşüm piksel değerlerini birleştirebilir ama bölemez: aynı seviyedeki tüm pikseller aynı çıkışa gider", ok: true, why: "Sürekli durumda çıkış düzgün dağılır; ayrık durumda yalnızca yaklaşık. 8 seviyeli örnekte 8 değil 5 farklı seviye çıktı."}
+      - {t: "Yuvarlama hatası yüzünden", why: "Yuvarlama katkı yapar ama temel sebep seviyelerin bölünememesi."}
+      - {t: "Üretir", why: "Yalnız sürekli limitte."}
+  - q: "Gamma $\\gamma<1$ ne yapar?"
+    options:
+      - {t: "Karanlık bölgeleri genişletir (açar), parlak bölgeleri sıkıştırır", ok: true, why: "$s=r^\\gamma$ eğrisi $\\gamma<1$'de köşegenin üstündedir; ekran gamma düzeltmesinde ve karanlık görüntülerde kullanılır."}
+      - {t: "Görüntüyü koyulaştırır", why: "O, $\\gamma>1$."}
+      - {t: "Kontrastı her yerde artırır", why: "Bir aralığı genişletmek diğerini sıkıştırmak demek."}
+
+homework:
+  - title: "Kendi tone-mapping hattın: HDR'den 8 bite"
+    paper: "Reinhard ve ark. — Photographic Tone Reproduction for Digital Images (SIGGRAPH 2002)"
+    url: "https://doi.org/10.1145/566654.566575"
+    level: orta
+    hours: 6
+    goal: |
+      Bu modülün nokta dönüşümlerini bir HDR görüntüyü (ör. `cv2.createMergeDebevec` ile birleştirilmiş çok pozlamalı seri ya da sentetik bir HDR sahne) 8 bite indiren bir hatta birleştir: log ortalama parlaklıkla ölçekleme, Reinhard global operatörü, gamma ve isteğe bağlı CLAHE (M9.12).
+    steps:
+      - "Log-ortalama parlaklık $\\bar L_w=\\exp(\\operatorname{mean}\\log(\\delta+L_w))$ ve anahtar değer $a$ ile ölçekleme yaz."
+      - "Global operatör $L_d=L(1+L/L_{white}^2)/(1+L)$; renk kanallarını parlaklık oranıyla koru."
+      - "Aynı sahneye basit histogram eşitleme ve gamma uygula; sonuçları yan yana göster."
+      - "`cv2.createTonemapReinhard` ile karşılaştır."
+    accept:
+      - "Çıkış 8 bit ve kırpılan piksel oranı %1'in altında."
+      - "Parlak ve karanlık bölgelerin ikisinde de ayrıntı görünüyor (her ikisinde yerel std > 5 gri seviye)."
+      - "OpenCV'nin Reinhard operatörüyle aynı parametrelerde ortalama mutlak fark < 10 gri seviye."
