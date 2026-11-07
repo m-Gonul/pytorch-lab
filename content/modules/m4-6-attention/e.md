@@ -2,4 +2,4 @@
 
 Dikkat: causal'da bir satırın bir bloktaki tüm skorları $-\infty$ olabilir, hatta o ana kadarki `m` de $-\infty$ olabilir; $-\infty-(-\infty)$ `nan` verir. `m_new` $-\infty$ ise çıkarılacak değer olarak 0 kullan.
 
-Kontrol sonucu ve gradyanı `F.scaled_dot_product_attention` ile karşılaştırır. CPU'da hız kazancı beklemiyoruz (o, GPU SRAM/HBM farkından gelir); kazanç bellekte: tam skor matrisi yerine `T × block`.
+Kontrol sonucu ve gradyanı `F.scaled_dot_product_attention` ile karşılaştırır. Asıl kazanç bellekte: tam skor matrisi yerine `T × block`. CPU'da da blok önbelleğe sığdığı için genelde hızlanır; GPU'da bu fikir SRAM/HBM farkından büyük hız getirir.
