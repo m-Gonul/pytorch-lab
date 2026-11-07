@@ -1,0 +1,2 @@
+- `svm_loss_torch(S, y, delta=1.0)` — skorlardan ortalama CS231n kaybı, **elle** (`F.multi_margin_loss` kullanma). Kontrol, sonucun `C * F.multi_margin_loss(S, y)` ile aynı olduğunu doğrular.
+- `train_linear_svm(X, y, C, steps=500, lr=0.1, wd=1e-3)` → `nn.Linear(d, C)`; kayıp senin `svm_loss_torch`'un, ceza `weight_decay` ile.

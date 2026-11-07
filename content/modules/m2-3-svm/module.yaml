@@ -1,0 +1,68 @@
+id: m2-3-svm
+code: M2.3
+title: "SVM: hinge loss ve margin"
+phase: 2
+minutes: 210
+prereq: [m1-4-logreg, m1-5-softmax]
+summary: >
+  Olasılık yerine margin. İkili ve çok sınıflı hinge kaybını elle hesaplıyor,
+  saf Python'da alt-gradyanla lineer SVM eğitiyor, CS231n'in vektörize çok
+  sınıflı SVM kaybını NumPy'da yazıyor, PyTorch'ta `multi_margin_loss` ile
+  karşılaştırıyor ve en sonda RBF kernel matrisiyle doğrusal olmayan bir
+  sınırı döngüsüz öğreniyorsun.
+goals:
+  - "[[hinge loss|Hinge kaybını]] $\\max(0,1-y\\,f(x))$ ve margin kavramını yorumlamak"
+  - "Türevlenemeyen noktalarda [[alt-gradyan]] kullanmak"
+  - "Çok sınıflı SVM kaybını ve gradyanını CS231n tarzı döngüsüz yazmak"
+  - "[[kernel trick|Kernel trick]] ile özellik uzayını açıkça kurmadan doğrusal olmayan sınıflandırma yapmak"
+sources:
+  - {title: "CS231n — Linear classification: Multiclass SVM loss", url: "https://cs231n.github.io/linear-classify/#svm", license: "MIT", use: adapt}
+  - {title: "CS231n Assignment 1 — svm_loss_naive / svm_loss_vectorized", url: "https://cs231n.github.io/assignments2025/assignment1/", license: "MIT", use: adapt}
+  - {title: "Stanford CS229 — Lecture notes: Support Vector Machines, kernels", url: "https://cs229.stanford.edu/main_notes.pdf", license: "doğrulanmadı", use: link}
+  - {title: "Shalev-Shwartz et al. — Pegasos: Primal Estimated sub-GrAdient SOlver for SVM", url: "https://home.ttic.edu/~nati/Publications/PegasosMPB.pdf", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "İkili: $w=[1,-1]$, $b=0$; $f(x)=w\\cdot x+b$, kayıp $\\max(0,1-yf(x))$"
+      fields:
+        - {id: m1, label: "$x=(2,1)$, $y=+1$: margin $yf(x)$", answer: 1, hint: "$2-1=1$"}
+        - {id: h1, label: "… hinge", answer: 0, hint: "margin tam 1: sınırda, kayıp 0"}
+        - {id: m3, label: "$x=(1,1)$, $y=+1$: margin", answer: 0, hint: "$1-1=0$"}
+        - {id: h3, label: "… hinge", answer: 1, hint: "$\\max(0,1-0)$"}
+        - {id: gw1, label: "… $\\partial\\ell/\\partial w_1$", answer: -1, hint: "aktifse $-y\\,x_1$"}
+    - title: "Çok sınıflı (CS231n): skorlar $s=[3.2,\\,5.1,\\,-1.7]$, doğru sınıf $y=0$, $\\Delta=1$"
+      fields:
+        - {id: l1, label: "$\\max(0,s_1-s_0+\\Delta)$", answer: 2.9, tol: 0.001, hint: "$5.1-3.2+1$"}
+        - {id: l2, label: "$\\max(0,s_2-s_0+\\Delta)$", answer: 0, tol: 0.001, hint: "$-1.7-3.2+1<0$"}
+        - {id: L, label: "toplam kayıp", answer: 2.9, tol: 0.001, hint: "doğru sınıf hariç toplam"}
+        - {id: nviol, label: "doğru sınıfın skor gradyanı $\\partial L/\\partial s_0$", answer: -1, hint: "ihlal eden sınıf sayısı × (−1)"}
+  verify: |
+    w = (1, -1)
+    f = lambda x: w[0] * x[0] + w[1] * x[1]
+    s = [3.2, 5.1, -1.7]
+    l = [max(0, s[j] - s[0] + 1) for j in (1, 2)]
+    answers = dict(m1=f((2, 1)), h1=max(0, 1 - f((2, 1))), m3=f((1, 1)), h3=max(0, 1 - f((1, 1))), gw1=-1 * 1,
+                   l1=round(l[0], 6), l2=l[1], L=round(sum(l), 6), nviol=-sum(v > 0 for v in l))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Doğru sınıflandırılmış ve margin'i 1'den büyük bir örnek kayba ve gradyana ne katar?"
+    options:
+      - {t: "Hiçbir şey: hinge 0, gradyan 0. Model artık o örnekle ilgilenmez", ok: true, why: "Karar sınırını yalnız margin içindeki ya da yanlış taraftaki örnekler (destek vektörleri) belirler. Cross-entropy ise her örneği sonsuza kadar biraz daha iter."}
+      - {t: "Küçük ama pozitif bir kayıp", why: "Cross-entropy'de öyle; hinge tam 0."}
+      - {t: "Negatif kayıp", why: "max(0, ·) negatif olamaz."}
+  - q: "RBF kernel $k(x,x')=e^{-\\gamma\\lVert x-x'\\rVert^2}$ hangi özellik uzayına karşılık gelir?"
+    options:
+      - {t: "Sonsuz boyutlu bir uzaya; ama yalnız iç çarpımlar gerektiği için o uzay hiç kurulmaz", ok: true, why: "Kernel trick: model $f(x)=\\sum_i\\alpha_ik(x_i,x)+b$ yalnız $n\\times n$ Gram matrisine ihtiyaç duyar."}
+      - {t: "2. dereceden polinom özelliklerine", why: "O $k(x,x')=(x\\cdot x'+c)^2$."}
+      - {t: "Orijinal uzayın kendisine", why: "O lineer kernel $x\\cdot x'$."}
+  - q: "`F.multi_margin_loss` ile CS231n SVM kaybı arasındaki fark?"
+    options:
+      - {t: "PyTorch toplamı sınıf sayısı $C$'ye böler; CS231n bölmez", ok: true, why: "PyTorch: $\\frac1C\\sum_{j\\ne y}\\max(0,\\Delta-s_y+s_j)$. Aynı minimizer, farklı ölçek; lr'yi buna göre ayarla."}
+      - {t: "PyTorch margin'i 0 alır", why: "Varsayılan `margin=1`."}
+      - {t: "Fark yok", why: "Bir $1/C$ çarpanı var; kontrol bunu sınar."}
