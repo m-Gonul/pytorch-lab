@@ -1,0 +1,73 @@
+id: m1-2-gd-variants
+code: M1.2
+title: Gradient descent varyantları
+phase: 1
+minutes: 210
+prereq: [m1-1-linreg]
+summary: >
+  Tam batch, stokastik ve mini-batch gradient descent ile momentum. Bir
+  kuadratikte ve üç noktalık regresyonda adımları elle atıyor, karıştırılmış
+  mini-batch'leri saf Python'da üretiyor, NumPy'da epoch/batch döngüsünü
+  kuruyor, PyTorch'ta `DataLoader` + `SGD(momentum)` ile aynı yörüngeyi
+  doğruluyor ve en sonda 48 farklı (lr, β) çiftini tek tensörle eğitiyorsun.
+goals:
+  - "Batch, [[sgd|SGD]] ve mini-batch gradyanlarının aynı beklenen değere sahip ama farklı gürültüde olduğunu göstermek"
+  - "Bir [[epoch]]'u karıştırılmış, örtüşmeyen mini-batch'lere bölmek"
+  - "[[momentum|Momentum]] güncellemesini $v\\leftarrow\\beta v+g$, $w\\leftarrow w-\\eta v$ olarak yazıp PyTorch'unkiyle eşleştirmek"
+  - "Kötü koşullu (ill-conditioned) bir problemde momentumun neden hızlandırdığını ölçmek"
+sources:
+  - {title: "Stanford CS229 — Lecture notes: LMS, batch vs stochastic gradient descent", url: "https://cs229.stanford.edu/main_notes.pdf", license: "doğrulanmadı", use: link}
+  - {title: "Dive into Deep Learning §12.4–12.6 SGD, Minibatch SGD, Momentum", url: "https://d2l.ai/chapter_optimization/index.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "Goh — Why Momentum Really Works (Distill)", url: "https://distill.pub/2017/momentum/", license: "CC BY 4.0", use: link}
+  - {title: "PyTorch — torch.optim.SGD (momentum formülü)", url: "https://docs.pytorch.org/docs/stable/generated/torch.optim.SGD.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "Kuadratik $L(w)=(w-3)^2$, $\\nabla L=2(w-3)$, $w_0=0$, $\\eta=0.25$. Düz GD"
+      fields:
+        - {id: g0, label: "$g_0=\\nabla L(w_0)$", answer: -6, hint: "$2(0-3)$"}
+        - {id: w1, label: "$w_1=w_0-\\eta g_0$", answer: 1.5, tol: 0.001, hint: "$0+0.25\\cdot6$"}
+        - {id: w2, label: "$w_2$", answer: 2.25, tol: 0.001, hint: "$g_1=2(1.5-3)=-3$"}
+    - title: "Momentum, $\\beta=0.5$: $v_t=\\beta v_{t-1}+g_t$, $w_{t+1}=w_t-\\eta v_t$, $v_{-1}=0$"
+      fields:
+        - {id: mv1, label: "$v_1$ (ikinci adımın hızı)", answer: -6, tol: 0.001, hint: "$v_0=-6$; $g_1=-3$; $0.5\\cdot(-6)+(-3)$"}
+        - {id: mw2, label: "$w_2$", answer: 3, tol: 0.001, hint: "$1.5-0.25\\cdot(-6)$ — tam minimuma iki adımda"}
+    - title: "Regresyon $x=[1,2,3]$, $y=[2,4,5]$, $w=b=0$, $\\eta=0.1$, MSE"
+      fields:
+        - {id: sgd_w, label: "SGD, yalnız 1. örnek: yeni $w$", answer: 0.4, tol: 0.001, hint: "$e=-2$, $\\partial_w=2ex=-4$"}
+        - {id: sgd_b, label: "… yeni $b$", answer: 0.4, tol: 0.001, hint: "$\\partial_b=2e=-4$"}
+        - {id: mb_gw, label: "Mini-batch {2., 3. örnek}: $\\partial L/\\partial w$", answer: -23, tol: 0.001, hint: "$\\frac22(-4\\cdot2-5\\cdot3)$"}
+        - {id: mb_gb, label: "… $\\partial L/\\partial b$", answer: -9, tol: 0.001, hint: "$\\frac22(-4-5)$"}
+        - {id: steps, label: "$n=1000$, batch 32: epoch başına adım", answer: 32, hint: "$\\lceil1000/32\\rceil$; son batch 8 örnekli"}
+  verify: |
+    import math
+    g = lambda w: 2 * (w - 3)
+    w1 = 0 - 0.25 * g(0); w2 = w1 - 0.25 * g(w1)
+    v0 = g(0); mw1 = 0 - 0.25 * v0; v1 = 0.5 * v0 + g(mw1); mw2 = mw1 - 0.25 * v1
+    e1 = 0 - 2
+    answers = dict(g0=g(0), w1=w1, w2=w2, mv1=v1, mw2=mw2,
+                   sgd_w=0 - 0.1 * 2 * e1 * 1, sgd_b=0 - 0.1 * 2 * e1,
+                   mb_gw=(2 / 2) * (-4 * 2 + -5 * 3), mb_gb=(2 / 2) * (-4 - 5), steps=math.ceil(1000 / 32))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Mini-batch gradyanı, tam batch gradyanının neyidir?"
+    options:
+      - {t: "Yansız bir tahmini: beklenen değeri aynı, varyansı batch boyutuyla ters orantılı", ok: true, why: "Örnekler rastgele seçildiğinde $\\mathbb E[g_B]=\\nabla L$, $\\text{Var}[g_B]\\approx\\sigma^2/B$. Bu gürültü keskin minimumlardan kaçmaya da yardım edebilir."}
+      - {t: "Her zaman daha küçük normlu bir versiyonu", why: "Norm herhangi bir yönde sapabilir; ilişki beklenen değer düzeyinde."}
+      - {t: "Yanlı bir tahmini; bu yüzden daha küçük lr gerekir", why: "Karıştırılmış örneklemede yansızdır; küçük lr'nin nedeni varyans."}
+  - q: "Kötü koşullu bir kuadratikte (bir yön dik, bir yön yassı) momentum neden yardım eder?"
+    options:
+      - {t: "Dik yöndeki salınımlar ardışık adımlarda zıt işaretli olduğu için birbirini sönümler; yassı yöndeki tutarlı gradyan birikir", ok: true, why: "Yassı yönde etkin adım $\\approx\\eta/(1-\\beta)$ olur; $\\beta=0.9$ ile 10 kat."}
+      - {t: "Gradyanı normalize eder", why: "O Adam/RMSProp'un işi (M3.4)."}
+      - {t: "Learning rate'i otomatik küçültür", why: "lr sabit; değişen, adımların yönü ve birikimi."}
+  - q: "Her epoch başında veriyi neden karıştırırız?"
+    options:
+      - {t: "Sabit sıra, ardışık batch'ler arasında korelasyon yaratır (ör. sınıfa göre sıralı veri); gradyan tahmini yanlı ve salınımlı olur", ok: true, why: "Sıralı veride model önce hep bir sınıfı, sonra diğerini görür ve her blokta bir öncekini unutur."}
+      - {t: "Hızlandırmak için", why: "Karıştırmanın küçük bir maliyeti var; amaç istatistiksel."}
+      - {t: "Gerekli değil, yalnız alışkanlık", why: "Sıralı verilerde belirgin şekilde kötü sonuç verir."}
