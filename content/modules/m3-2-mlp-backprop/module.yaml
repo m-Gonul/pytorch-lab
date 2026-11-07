@@ -1,0 +1,71 @@
+id: m3-2-mlp-backprop
+code: M3.2
+title: MLP ve matris formunda backprop
+phase: 3
+minutes: 240
+prereq: [m3-1-micrograd, m1-5-softmax]
+summary: >
+  İlk gerçek sinir ağı. 2-2-1'lik bir ağda ileri ve geri geçişi elle yapıyor,
+  saf Python'da katman katman forward/backward fonksiyonları yazıyor,
+  NumPy'da CS231n tarzı modüler katmanlarla spiral veriyi ayıran iki katmanlı
+  bir ağ eğitiyor, PyTorch'ta gradyanlarını autograd ile doğruluyor ve en
+  sonda `torch.func` ile 16 ağı tek ileri geçişte (model ensembling) koşturuyorsun.
+goals:
+  - "Lineer katmanın geri geçişini $dX=dY\\,W^\\top$, $dW=X^\\top dY$, $db=\\mathbf1^\\top dY$ olarak türetmek"
+  - "ReLU geri geçişini bir maske olarak uygulamak"
+  - "Modüler forward/backward (cache) tasarımını kurmak"
+  - "`stack_module_state` + `vmap(functional_call)` ile çok sayıda modeli tek çağrıda çalıştırmak"
+sources:
+  - {title: "CS231n — Neural Networks Part 1: Setting up the Architecture", url: "https://cs231n.github.io/neural-networks-1/", license: "MIT", use: adapt}
+  - {title: "CS231n Assignment 2 — Fully-connected nets (affine_forward/backward)", url: "https://cs231n.github.io/assignments2025/assignment2/", license: "MIT", use: adapt}
+  - {title: "Prince — Understanding Deep Learning, Bölüm 7 (Gradients and initialization)", url: "https://udlbook.github.io/udlbook/", license: "CC BY-NC-ND", use: link}
+  - {title: "PyTorch Tutorials — Model ensembling (torch.func)", url: "https://docs.pytorch.org/tutorials/intermediate/ensembling.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "Ağ: $z=W_1x$, $h=\\text{ReLU}(z)$, $\\hat y=w_2\\cdot h$, $L=\\tfrac12(\\hat y-y)^2$. $x=(1,2)$, $W_1=\\begin{bmatrix}1&2\\\\-1&1\\end{bmatrix}$, $w_2=(1,-2)$, $y=1$, bias yok"
+      fields:
+        - {id: z1, label: "$z_1$", answer: 5, hint: "$1\\cdot1+2\\cdot2$"}
+        - {id: z2, label: "$z_2$", answer: 1, hint: "$-1\\cdot1+1\\cdot2$"}
+        - {id: yhat, label: "$\\hat y$", answer: 3, hint: "$h=(5,1)$; $5-2$"}
+        - {id: L, label: "$L$", answer: 2, hint: "$\\tfrac12(3-1)^2$"}
+    - title: "Geri geçiş, $\\partial L/\\partial\\hat y=\\hat y-y=2$"
+      fields:
+        - {id: dw21, label: "$\\partial L/\\partial w_{2,1}$", answer: 10, hint: "$2\\cdot h_1$"}
+        - {id: dh2, label: "$\\partial L/\\partial h_2$", answer: -4, hint: "$2\\cdot w_{2,2}$"}
+        - {id: dW11, label: "$\\partial L/\\partial W_{1,11}$", answer: 2, hint: "$dz=dh\\odot[z>0]=(2,-4)$; $dW_1=dz\\,x^\\top$"}
+        - {id: dW22, label: "$\\partial L/\\partial W_{1,22}$", answer: -8, hint: "$-4\\cdot x_2$"}
+        - {id: dx1, label: "$\\partial L/\\partial x_1$", answer: 6, hint: "$W_1^\\top dz$: $1\\cdot2+(-1)(-4)$"}
+  verify: |
+    x = [1, 2]; W1 = [[1, 2], [-1, 1]]; w2 = [1, -2]; y = 1
+    z = [sum(W1[i][j] * x[j] for j in range(2)) for i in range(2)]
+    h = [max(0, v) for v in z]
+    yh = sum(a * b for a, b in zip(w2, h))
+    dy = yh - y
+    dh = [dy * w for w in w2]
+    dz = [g if v > 0 else 0 for g, v in zip(dh, z)]
+    answers = dict(z1=z[0], z2=z[1], yhat=yh, L=0.5 * dy ** 2, dw21=dy * h[0], dh2=dh[1],
+                   dW11=dz[0] * x[0], dW22=dz[1] * x[1], dx1=sum(W1[i][0] * dz[i] for i in range(2)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Lineer katmanın ağırlık gradyanı neden $dW=X^\\top dY$ ve shape'i neden $W$ ile aynı?"
+    options:
+      - {t: "$Y=XW$'de $W_{jk}$, her örnekte $Y_{ik}$'ye $X_{ij}$ katsayısıyla girer; örnekler üzerinden toplanınca $\\sum_iX_{ij}dY_{ik}=(X^\\top dY)_{jk}$", ok: true, why: "Shape kuralı en hızlı kontrol: $(D\\times N)(N\\times M)=(D\\times M)$, yani $W$'nin shape'i. M0.2'deki formülün batch hâli."}
+      - {t: "Yalnız tek örnek için doğrudur", why: "Batch toplamını matris çarpımı otomatik yapar."}
+      - {t: "$dW=dY\\,X^\\top$", why: "Shape tutmaz: $(N\\times M)(D\\times N)$ çarpılamaz."}
+  - q: "Tüm ağırlıkları sıfırla başlatmak neden çalışmaz?"
+    options:
+      - {t: "Simetri: aynı katmandaki tüm nöronlar aynı çıktıyı ve aynı gradyanı alır, eğitim boyunca aynı kalır", ok: true, why: "Rastgele başlatma simetriyi kırar. Ölçeğin nasıl seçileceği M3.5'in konusu."}
+      - {t: "Gradyan tanımsız olur", why: "Tanımlı; sorun hepsinin eşit olması."}
+      - {t: "Çalışır, yalnız yavaştır", why: "Gizli katman tek bir nörona eşdeğer kalır."}
+  - q: "`vmap(functional_call)` ile ensemble çalıştırmanın döngüye göre kazancı nereden gelir?"
+    options:
+      - {t: "E modelin ağırlıkları bir batch boyutuna dizilir; her katman E ayrı küçük matmul yerine tek bir batched matmul olur", ok: true, why: "Kernel çağrı sayısı E kat azalır. Küçük modellerde maliyetin çoğu çağrı başına sabit maliyettir (M0.2'deki ders)."}
+      - {t: "Modeller ağırlık paylaşır", why: "Paylaşmaz; her biri kendi parametrelerini taşır."}
+      - {t: "Gradyan hesaplamaz", why: "Kazanç ileri geçişte de var; vmap autograd ile de birleşir."}

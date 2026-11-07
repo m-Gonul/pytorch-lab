@@ -50,3 +50,5 @@ terms:
   özvektör: "Eigenvector: Cv = λv olan, matrisin yalnız ölçeklediği (yönünü değiştirmediği) sıfırdan farklı vektör; λ özdeğer."
   inertia: "k-means amacı: her noktanın kendi küme merkezine kare uzaklıklarının toplamı, Σ‖xᵢ − c_{zᵢ}‖²."
   responsibility: "GMM'de bir noktanın bir bileşenden gelme posterior olasılığı, r_ik = p(z = k | xᵢ); EM'in E adımında hesaplanan yumuşak atama."
+  unbroadcast: "Broadcasting'in geri geçişi: gelen gradyanı, ileri geçişte genişletilen eksenler üzerinden toplayarak girdinin shape'ine indirmek."
+  bias düzeltmesi: "Adam'da sıfırdan başlatılan hareketli ortalamaların ilk adımlardaki küçüklüğünü 1/(1 − βᵗ) ile çarparak telafi etmek."
