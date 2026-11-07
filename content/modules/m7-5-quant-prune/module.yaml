@@ -1,0 +1,76 @@
+id: m7-5-quant-prune
+code: M7.5
+title: Quantization ve pruning
+phase: 7
+minutes: 270
+prereq: [m7-3-amp]
+summary: >
+  Modeli küçültmek. Üç sayıyı simetrik ve afin int8'e elle çeviriyor,
+  büyüklüğe göre budamayı (magnitude pruning) elle yapıyor, saf Python'da
+  quantize/dequantize ve budama fonksiyonlarını yazıyor, NumPy'da int32
+  birikimli int8 matmul ile tensör başına ve kanal başına ölçeklerin hata
+  farkını ölçüyor, PyTorch'ta kendi int8 `QuantLinear` modülünü ve
+  `torch.nn.utils.prune` ile global budamayı uyguluyor ve en sonda
+  LLM'lerde kullanılan grup bazlı int4 ağırlık kuantizasyonunu, iki değeri
+  bir bayta paketleyerek vektörel yazıyorsun.
+goals:
+  - "Simetrik ve afin (zero-point'li) kuantizasyon; ölçek ve kırpma"
+  - "Tensör başına vs kanal başına vs [[grup bazlı kuantizasyon]]: aykırı değerlerin etkisi"
+  - "int8 × int8 → int32 birikim ve ölçeklerle geri dönüş"
+  - "Büyüklüğe göre budama, global vs katman başına; seyreklik"
+sources:
+  - {title: "Jacob ve ark. — Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference", url: "https://arxiv.org/abs/1712.05877", license: "arXiv", use: link}
+  - {title: "Dettmers ve ark. — LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale", url: "https://arxiv.org/abs/2208.07339", license: "arXiv", use: link}
+  - {title: "Frantar ve ark. — GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers", url: "https://arxiv.org/abs/2210.17323", license: "arXiv", use: link}
+  - {title: "Han, Mao, Dally — Deep Compression: Pruning, Trained Quantization and Huffman Coding", url: "https://arxiv.org/abs/1510.00149", license: "arXiv", use: link}
+  - {title: "PyTorch Tutorials — Pruning Tutorial", url: "https://docs.pytorch.org/tutorials/intermediate/pruning_tutorial.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "torchao — PyTorch native quantization and sparsity", url: "https://github.com/pytorch/ao", license: "BSD-3-Clause", use: link}
+
+hand:
+  groups:
+    - title: "Simetrik int8, $x=(0.5,\\ -1.2,\\ 2.54)$: $s=\\max|x|/127$, $q=\\operatorname{round}(x/s)$"
+      fields:
+        - {id: s, label: "$s$", answer: 0.02, tol: 0.00001}
+        - {id: q2, label: "$q_2$", answer: -60}
+        - {id: q3, label: "$q_3$", answer: 127}
+    - title: "Afin uint8, aralık $[-1,\\ 3]$: $s=(\\max-\\min)/255$, $z=\\operatorname{round}(-\\min/s)$"
+      fields:
+        - {id: zp, label: "Zero-point $z$", answer: 64}
+        - {id: deq, label: "$x=0.5$ için $\\hat x=(\\operatorname{round}(x/s)+z-z)\\cdot s$", answer: 0.501961, tol: 0.00001}
+    - title: "Büyüklüğe göre %50 budama: $w=(0.1,\\ -2,\\ 0.3,\\ 1.5)$"
+      fields:
+        - {id: nz, label: "Sıfır olmayan ağırlık sayısı", answer: 2}
+        - {id: w3, label: "Budama sonrası $w_3$", answer: 0}
+  verify: |
+    x = [0.5, -1.2, 2.54]
+    s = max(abs(v) for v in x) / 127
+    q = [round(v / s) for v in x]
+    sa = 4 / 255
+    z = round(1 / sa)
+    w = [0.1, -2, 0.3, 1.5]
+    keep = sorted(range(4), key=lambda i: -abs(w[i]))[:2]
+    wp = [w[i] if i in keep else 0 for i in range(4)]
+    answers = dict(s=s, q2=q[1], q3=q[2], zp=z, deq=(round(0.5 / sa) + z - z) * sa, nz=sum(v != 0 for v in wp), w3=wp[2])
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Bir ağırlık matrisinde tek bir çıkış kanalı diğerlerinden 100 kat büyükse tensör başına int8 ölçek neden kötüdür?"
+    options:
+      - {t: "Ölçek o kanala göre belirlenir; diğer kanalların değerleri birkaç kuantizasyon seviyesine (hatta 0'a) sıkışır", ok: true, why: "Kanal başına (ya da grup bazlı) ölçek her kanala kendi aralığını verir. c aşamasında hatayı ölçüyorsun."}
+      - {t: "int8 taşar", why: "Ölçek taşmayı engeller; sorun çözünürlük kaybı."}
+      - {t: "Fark etmez", why: "Aykırı değerler kuantizasyonun bilinen baş belası (LLM.int8())."}
+  - q: "int8 matmul'de çarpımlar neden int32'de biriktirilir?"
+    options:
+      - {t: "İki int8'in çarpımı 16 bite kadar çıkar; $K$ terimin toplamı 16 biti hızla aşar, int32 güvenli bir birikim aralığı verir", ok: true, why: "Sonuç sonra $s_x s_w$ ile fp32'ye ölçeklenir."}
+      - {t: "Donanım int8 toplamayı desteklemediği için", why: "Mesele taşma."}
+      - {t: "Hassasiyet için fp32 gerekir", why: "Tamsayı birikimi kesindir; yeter ki taşmasın."}
+  - q: "Yapısız (unstructured) %50 budama yoğun bir GPU matmul'ünü neden genelde hızlandırmaz?"
+    options:
+      - {t: "Sıfırlar düzensiz dağılmış; yoğun kernel onları da çarpar. Hız için yapılandırılmış seyreklik (ör. 2:4) ya da seyrek kernel'ler gerekir", ok: true, why: "Yapısız budama sıkıştırılmış depolamada boyut kazandırır; hız için donanımın anladığı bir desen gerekir."}
+      - {t: "Budanmış ağırlıklar yeniden büyür", why: "Maske sabitse büyümez."}
+      - {t: "Hızlandırır, iki kat", why: "Yoğun kernel FLOP'u değişmez."}
