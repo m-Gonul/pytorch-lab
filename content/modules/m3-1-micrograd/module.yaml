@@ -1,0 +1,77 @@
+id: m3-1-micrograd
+code: M3.1
+title: Skaler autograd (micrograd)
+phase: 3
+minutes: 240
+prereq: [m0-3-chain-rule]
+summary: >
+  PyTorch'un kalbindeki mekanizmayı kendin kuruyorsun. Karpathy'nin klasik
+  örneğinde geri geçişi elle yapıyor, saf Python'da `Value` sınıfıyla bir
+  autograd motoru yazıyor, aynı nöronu NumPy'da batch hâlinde elle türetiyor,
+  PyTorch'la birebir karşılaştırıyor ve en sonda örnek başına gradyanları
+  `vmap` ile döngüsüz hesaplıyorsun.
+goals:
+  - "Her işlemin kendi yerel türevini bildiği bir [[hesap grafiği]] veri yapısı kurmak"
+  - "Geri geçişi [[topolojik sıralama]]nın tersiyle yürütmek ve gradyanları `+=` ile biriktirmek"
+  - "Skaler motorun ($O(\\text{düğüm})$ Python çağrısı) ile tensor motorunun (tek kernel) farkını ölçmek"
+  - "[[per-sample gradient|Örnek başına gradyanı]] `torch.func.vmap(grad(...))` ile hesaplamak"
+sources:
+  - {title: "Karpathy — micrograd", url: "https://github.com/karpathy/micrograd", license: "MIT", use: adapt}
+  - {title: "Karpathy — Neural Networks: Zero to Hero, 1: The spelled-out intro to neural networks and backpropagation", url: "https://karpathy.ai/zero-to-hero.html", license: "kod MIT; video ©", use: adapt}
+  - {title: "CS231n — Backpropagation, Intuitions", url: "https://cs231n.github.io/optimization-2/", license: "MIT", use: adapt}
+  - {title: "MiniTorch — Module 1: Autodiff", url: "https://minitorch.github.io/", license: "lisans dosyası yok", use: link}
+  - {title: "PyTorch — torch.func: per-sample gradients", url: "https://docs.pytorch.org/tutorials/intermediate/per_sample_grads.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "Grafik: $e=a\\cdot b$, $d=e+c$, $L=d\\cdot f$; $a=2$, $b=-3$, $c=10$, $f=-2$. İleri geçiş"
+      fields:
+        - {id: e, label: "$e$", answer: -6, hint: "$2\\cdot(-3)$"}
+        - {id: d, label: "$d$", answer: 4, hint: "$-6+10$"}
+        - {id: L, label: "$L$", answer: -8, hint: "$4\\cdot(-2)$"}
+    - title: "Geri geçiş ($\\partial L/\\partial L=1$ ile başla)"
+      fields:
+        - {id: gd, label: "$\\partial L/\\partial d$", answer: -2, hint: "çarpım düğümü: diğer girdi, $f$"}
+        - {id: gf, label: "$\\partial L/\\partial f$", answer: 4, hint: "çarpım düğümü: diğer girdi, $d$"}
+        - {id: gc, label: "$\\partial L/\\partial c$", answer: -2, hint: "toplama düğümü gradyanı aynen geçirir"}
+        - {id: ge, label: "$\\partial L/\\partial e$", answer: -2, hint: "toplama düğümü"}
+        - {id: ga, label: "$\\partial L/\\partial a$", answer: 6, hint: "$\\partial L/\\partial e\\cdot b=-2\\cdot(-3)$"}
+        - {id: gb, label: "$\\partial L/\\partial b$", answer: -4, hint: "$\\partial L/\\partial e\\cdot a=-2\\cdot2$"}
+    - title: "Nöron: $n=x_1w_1+x_2w_2+b$, $o=\\tanh(n)$; $x=(2,0)$, $w=(-3,1)$, $b=6.8814$ (öyle seçildi ki $o=1/\\sqrt2$)"
+      fields:
+        - {id: n, label: "$n$ (3 ondalık)", answer: 0.8814, tol: 0.002, hint: "$2\\cdot(-3)+0\\cdot1+6.8814$"}
+        - {id: dodn, label: "$\\partial o/\\partial n=1-o^2$", answer: 0.5, tol: 0.001, hint: "$o^2=1/2$"}
+        - {id: dw1, label: "$\\partial o/\\partial w_1$", answer: 1.0, tol: 0.002, hint: "$0.5\\cdot x_1$"}
+        - {id: dw2, label: "$\\partial o/\\partial w_2$", answer: 0, tol: 0.002, hint: "$0.5\\cdot x_2$ — girdisi 0 olan ağırlık öğrenmez"}
+        - {id: dx1, label: "$\\partial o/\\partial x_1$", answer: -1.5, tol: 0.002, hint: "$0.5\\cdot w_1$"}
+  verify: |
+    import math
+    a, b, c, f = 2, -3, 10, -2
+    e = a * b; d = e + c; L = d * f
+    bb = 6.8813735870195432
+    n = 2 * -3 + 0 * 1 + bb; o = math.tanh(n); g = 1 - o * o
+    answers = dict(e=e, d=d, L=L, gd=f, gf=d, gc=f, ge=f, ga=f * b, gb=f * a,
+                   n=round(n, 4), dodn=round(g, 9), dw1=round(g * 2, 9), dw2=g * 0, dx1=round(g * -3, 9))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "`Value` sınıfında `self.grad = out.grad * other.data` yazmak (`+=` yerine) hangi durumda yanlış sonuç verir?"
+    options:
+      - {t: "Bir düğüm grafikte birden fazla kez kullanıldığında (ör. `b = a + a` ya da `a * a`)", ok: true, why: "İkinci kullanım birincinin gradyanının üzerine yazar. M0.3'te $y$'nin iki yolunu toplamak zorunda kaldığın durumun kodu bu."}
+      - {t: "Hiçbir zaman; sonuç aynıdır", why: "`b = a + a` için doğru $\\partial b/\\partial a=2$, `=` ile 1 çıkar."}
+      - {t: "Yalnız tanh düğümlerinde", why: "Sorun işlem türünden değil, düğümün paylaşılmasından kaynaklanır."}
+  - q: "Geri geçişte düğümler neden topolojik sıranın **tersiyle** işlenir?"
+    options:
+      - {t: "Bir düğümün `_backward`'ı çağrılmadan önce, o düğümü kullanan tüm düğümlerden gelen gradyan katkıları toplanmış olmalı", ok: true, why: "Ters topolojik sıra, her düğüme ulaşmadan önce onun tüm 'tüketicilerinin' işlendiğini garanti eder."}
+      - {t: "Bellekten tasarruf için", why: "Bellek yönetimi ayrı bir konu (M6.4); burada konu doğruluk."}
+      - {t: "Rastgele sıra da çalışır", why: "Bir düğüm, gradyanı henüz eksikken çocuklarına yanlış değer iletir."}
+  - q: "e aşamasındaki modelde örnek başına gradyanın kapalı formu $g_i=(1-o_i^2)\\,x_i$. O hâlde `vmap` neden gerekli?"
+    options:
+      - {t: "Gerekli değil bu model için; ama kapalı formu bilinmeyen keyfi bir ağda (ör. bir CNN) aynı satır çalışır", ok: true, why: "`vmap(grad(f))` modelden bağımsız bir dönüşüm; kapalı form türetmek her mimari için yeniden iş."}
+      - {t: "Kapalı form yanlış", why: "Kontrol tam bu formülle karşılaştırıyor."}
+      - {t: "`loss.backward()` örnek başına gradyan verir", why: "`backward` batch toplamının gradyanını verir; örnekler tek bir vektöre toplanmış olur."}

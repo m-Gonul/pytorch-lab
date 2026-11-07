@@ -1,0 +1,67 @@
+id: m0-1-dot
+code: M0.1
+title: Vektör, iç çarpım, norm
+phase: 0
+minutes: 120
+prereq: []
+summary: >
+  Lineer cebirin atomu olan iç çarpımı ve ondan türeyen norm ile kosinüs
+  benzerliğini 3 elemanlı vektörlerde elle, sonra döngüyle, NumPy'da bir
+  benzerlik matrisi olarak, PyTorch'ta gradyanıyla ve en sonda binlerce çift için
+  tek çağrıda hesaplıyorsun.
+goals:
+  - "$u\\cdot v=\\sum_i u_iv_i$, $\\lVert u\\rVert=\\sqrt{u\\cdot u}$ ve $\\cos\\theta=\\frac{u\\cdot v}{\\lVert u\\rVert\\lVert v\\rVert}$'yı elle hesaplayabilmek"
+  - "Satır normalizasyonu + matris çarpımıyla tüm çiftlerin kosinüs benzerliğini döngüsüz bulmak"
+  - "$\\partial\\cos\\theta/\\partial u$'yu türetip autograd ile doğrulamak"
+  - "`einsum` indis notasyonunu (`\"nd,nd->n\"`, `\"nd,md->nm\"`) okuyup yazabilmek"
+sources:
+  - {title: "MIT 18.06 Linear Algebra (Strang)", url: "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/", license: "CC BY-NC-SA 4.0", use: link}
+  - {title: "3Blue1Brown — Dot products and duality", url: "https://www.3blue1brown.com/lessons/dot-products", license: "©", use: link}
+  - {title: "Mathematics for Machine Learning, Bölüm 3 (Analytic Geometry)", url: "https://mml-book.github.io/", license: "© (PDF ücretsiz)", use: link}
+  - {title: "Dive into Deep Learning §2.3.10 Dot Products", url: "https://d2l.ai/chapter_preliminaries/linear-algebra.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+
+hand:
+  groups:
+    - title: "$u=[1,\\,2,\\,3]$, $v=[4,\\,-5,\\,6]$: eleman çarpımları ve iç çarpım"
+      fields:
+        - {id: p1, label: "$u_1v_1$", answer: 4, hint: "$1\\cdot4$"}
+        - {id: p2, label: "$u_2v_2$", answer: -10, hint: "$2\\cdot(-5)$ — işarete dikkat"}
+        - {id: p3, label: "$u_3v_3$", answer: 18, hint: "$3\\cdot6$"}
+        - {id: dot, label: "$u\\cdot v$", answer: 12, hint: "üç çarpımın toplamı"}
+    - title: "Normlar ve açı"
+      fields:
+        - {id: nu2, label: "$\\lVert u\\rVert^2 = u\\cdot u$", answer: 14, hint: "$1+4+9$"}
+        - {id: nv2, label: "$\\lVert v\\rVert^2$", answer: 77, hint: "$16+25+36$"}
+        - {id: nu, label: "$\\lVert u\\rVert$ (2 ondalık)", answer: 3.7417, tol: 0.006, hint: "$\\sqrt{14}$; $3.7^2=13.69$, $3.75^2=14.06$"}
+        - {id: cos, label: "$\\cos\\theta$ (3 ondalık)", answer: 0.36549, tol: 0.0012, hint: "$12/\\sqrt{14\\cdot77}=12/\\sqrt{1078}$, $\\sqrt{1078}\\approx32.83$"}
+        - {id: acute, label: "Açı dar mı? (dar: 1, geniş: 0)", answer: 1, hint: "$\\cos\\theta>0$ ise açı 90°'den küçüktür"}
+  verify: |
+    import math
+    u = [1, 2, 3]; v = [4, -5, 6]
+    d = sum(a * b for a, b in zip(u, v))
+    answers = dict(p1=u[0]*v[0], p2=u[1]*v[1], p3=u[2]*v[2], dot=d,
+                   nu2=sum(a*a for a in u), nv2=sum(b*b for b in v),
+                   nu=round(math.sqrt(14), 4), cos=round(d / math.sqrt(14 * 77), 5), acute=int(d > 0))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Kosinüs benzerliği neden embedding'leri karşılaştırmada iç çarpımdan daha sık kullanılır?"
+    options:
+      - {t: "Vektörlerin uzunluğundan bağımsızdır; yalnız yönü ölçer", ok: true, why: "$\\cos\\theta$ her iki vektörü birim uzunluğa ölçekler. Sık geçen kelimelerin büyük normlu embedding'leri ham iç çarpımı şişirir."}
+      - {t: "Hesaplaması daha ucuzdur", why: "Tersine: iç çarpıma ek olarak iki norm ve bir bölme gerekir."}
+      - {t: "Her zaman pozitiftir", why: "$[-1,1]$ aralığındadır; zıt yönlü vektörlerde negatiftir."}
+  - q: "`torch.einsum(\"nd,md->nm\", X, Y)` neyi hesaplar?"
+    options:
+      - {t: "`X @ Y.T` — her X satırının her Y satırıyla iç çarpımı", ok: true, why: "`d` iki girdide var, çıktıda yok → toplanır. `n` ve `m` çıktıda kalır."}
+      - {t: "Eleman eleman çarpım", why: "O `\"nd,nd->nd\"` olurdu; burada `d` çıktıda yok."}
+      - {t: "`X.T @ Y`", why: "Bu `(d, d)` shape'inde bir sonuç verirdi; çıktı indisleri `nm`."}
+  - q: "$f(u)=u\\cdot v$ ise $\\nabla_u f$ nedir?"
+    options:
+      - {t: "$v$", ok: true, why: "$\\partial(\\sum_i u_iv_i)/\\partial u_j = v_j$. Lineer bir fonksiyonun gradyanı katsayı vektörüdür."}
+      - {t: "$u$", why: "O $\\tfrac12\\lVert u\\rVert^2$'nin gradyanı olurdu."}
+      - {t: "$u\\cdot v$ (bir skaler)", why: "Bir skaler fonksiyonun $u$'ya göre gradyanı $u$ ile aynı shape'te bir vektördür."}

@@ -1,0 +1,72 @@
+name: Test, build ve GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Python bağımlılıkları (CPU torch)
+        run: |
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install numpy pandas pyyaml
+
+      - name: Node bağımlılıkları
+        run: npm ci
+
+      # Referans ilke: her model çözüm, sitedeki kontrollerden gerçek PyTorch ile geçmeli;
+      # her başlangıç iskeleti geçmemeli; el hesabı cevapları verify betiğiyle eşleşmeli.
+      - name: Modül testleri (çözümler gerçek torch ile)
+        run: python test/test_modules.py
+
+      - name: Notebook testleri (Colab sürümleri uçtan uca)
+        run: python test/test_notebooks.py
+
+      - name: Site yapı testleri
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

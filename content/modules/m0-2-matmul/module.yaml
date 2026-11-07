@@ -1,0 +1,80 @@
+id: m0-2-matmul
+code: M0.2
+title: Matris çarpımı, shape ve broadcasting
+phase: 0
+minutes: 150
+prereq: [m0-1-dot]
+summary: >
+  Her sinir ağı katmanının çekirdeği olan işlemi 2×2'de elle, sonra üç iç içe
+  döngüyle, NumPy'da, PyTorch'ta autograd ile ve en sonda yüzlerce matrisi tek
+  çağrıda çarparak kuruyorsun.
+goals:
+  - "$C_{ij}=\\sum_t A_{it}B_{tj}$ tanımını uygulayabilmek ve maliyetini ($n\\cdot k\\cdot m$ çarpma) sayabilmek"
+  - "Shape kuralını $(n\\times k)(k\\times m)=(n\\times m)$ hatasız kullanmak"
+  - "Broadcasting kurallarıyla döngüsüz satır/sütun işlemleri yazmak"
+  - "$L=\\sum (AB)$ için $\\partial L/\\partial A$ ve $\\partial L/\\partial B$'yi türetip autograd ile doğrulamak"
+  - "Batched matmul (`@`, `einsum`, `bmm`) ile döngüyü kaldırıp hızlanmayı ölçmek"
+sources:
+  - {title: "MIT 18.06 Linear Algebra (Strang) — Ders 3: Multiplication and inverse matrices", url: "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/", license: "CC BY-NC-SA 4.0", use: link}
+  - {title: "3Blue1Brown — Matrix multiplication as composition", url: "https://www.3blue1brown.com/lessons/matrix-multiplication", license: "©", use: link}
+  - {title: "Dive into Deep Learning §2.3 Linear Algebra", url: "https://d2l.ai/chapter_preliminaries/linear-algebra.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "CS231n Python/NumPy tutorial (broadcasting)", url: "https://cs231n.github.io/python-numpy-tutorial/", license: "MIT", use: adapt}
+  - {title: "NumPy — Broadcasting", url: "https://numpy.org/doc/stable/user/basics.broadcasting.html", license: "BSD-3", use: link}
+  - {title: "PyTorch — torch.einsum / torch.bmm", url: "https://docs.pytorch.org/docs/stable/generated/torch.einsum.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "$C = AB$ hücre hücre"
+      layout: matrix
+      rows: 2
+      cols: 2
+      fields:
+        - {id: c11, label: "$C_{11}$", answer: 19, hint: "1. satır · 1. sütun: $1\\cdot5 + 2\\cdot7$"}
+        - {id: c12, label: "$C_{12}$", answer: 22, hint: "1. satır · 2. sütun: $1\\cdot6 + 2\\cdot8$"}
+        - {id: c21, label: "$C_{21}$", answer: 43, hint: "2. satır · 1. sütun: $3\\cdot5 + 4\\cdot7$"}
+        - {id: c22, label: "$C_{22}$", answer: 50, hint: "2. satır · 2. sütun: $3\\cdot6 + 4\\cdot8$"}
+    - title: "Maliyet ve shape"
+      fields:
+        - {id: mults, label: "$C=AB$ için toplam skaler çarpma sayısı", answer: 8, hint: "4 hücre × hücre başına 2 çarpma"}
+        - {id: mults_big, label: "$(64\\times 64)(64\\times 64)$ için skaler çarpma sayısı", answer: 262144, hint: "$n\\cdot k\\cdot m = 64^3$"}
+        - {id: rows, label: "$(2\\times 3)(3\\times 4)$ sonucunun satır sayısı", answer: 2, hint: "dış boyutlar kalır: $(n\\times k)(k\\times m)\\to(n\\times m)$"}
+        - {id: cols, label: "… sütun sayısı", answer: 4, hint: "ikinci matrisin sütun sayısı"}
+    - title: "Broadcasting: $A + v$, $v=[10,\\;20]$"
+      layout: matrix
+      rows: 2
+      cols: 2
+      fields:
+        - {id: b11, label: "$(A+v)_{11}$", answer: 11, hint: "$v$ her satıra eklenir: $1+10$"}
+        - {id: b12, label: "$(A+v)_{12}$", answer: 22, hint: "$2+20$"}
+        - {id: b21, label: "$(A+v)_{21}$", answer: 13, hint: "2. satıra da aynı $v$: $3+10$"}
+        - {id: b22, label: "$(A+v)_{22}$", answer: 24, hint: "$4+20$"}
+  verify: |
+    A = [[1, 2], [3, 4]]; B = [[5, 6], [7, 8]]; v = [10, 20]
+    C = [[sum(A[i][t] * B[t][j] for t in range(2)) for j in range(2)] for i in range(2)]
+    answers = dict(c11=C[0][0], c12=C[0][1], c21=C[1][0], c22=C[1][1],
+                   mults=2 * 2 * 2, mults_big=64 ** 3, rows=2, cols=4,
+                   b11=A[0][0] + v[0], b12=A[0][1] + v[1], b21=A[1][0] + v[0], b22=A[1][1] + v[1])
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "`A.shape == (32, 128)` ve `W.shape == (64, 128)`. Bir lineer katmanın çıktısı `(32, 64)` olacaksa hangisi doğru?"
+    options:
+      - {t: "`A @ W`", why: "İç boyutlar 128 ile 64 uyuşmaz → hata."}
+      - {t: "`A @ W.T`", ok: true, why: "$(32\\times128)(128\\times64)=(32\\times64)$. `nn.Linear` ağırlığı tam olarak bu yüzden `(out, in)` saklanır ve `x @ W.T` hesaplanır."}
+      - {t: "`W @ A.T`", why: "Sonuç `(64, 32)` olur; transpoze edilmiş cevap."}
+      - {t: "`A * W`", why: "Eleman eleman çarpım; shape'ler broadcast bile edilemez."}
+  - q: "`X.shape == (5, 3)`, `m = X.mean(axis=0)`. `X - m` neden döngüsüz çalışır?"
+    options:
+      - {t: "`m` shape'i `(3,)`; sağdan hizalanınca `(5,3)` ile uyumlu ve 5 satıra kopyalanmış gibi davranır", ok: true, why: "Broadcasting kuralı: boyutlar sağdan eşleştirilir, eşit ya da 1 olanlar genişletilir. Bellekte kopya yapılmaz."}
+      - {t: "NumPy arka planda bir Python for döngüsü çalıştırır", why: "Döngü C seviyesinde, öğe başına Python yorumlayıcı maliyeti yok."}
+      - {t: "`m` shape'i `(5,)` olduğu için", why: "`axis=0` satırlar boyunca ortalama alır, sütun sayısı kadar (3) değer kalır."}
+  - q: "$L=\\sum_{ij}(AB)_{ij}$ ise $\\partial L/\\partial A$ nedir? ($A: n\\times k$, $B: k\\times m$)"
+    options:
+      - {t: "$B^\\top$", why: "Shape tutmaz: $\\partial L/\\partial A$, $A$ ile aynı shape'te ($n\\times k$) olmalı."}
+      - {t: "$\\mathbf{1}_{n\\times m}B^\\top$", ok: true, why: "Genel kural: $G=\\partial L/\\partial C$ ise $\\partial L/\\partial A = G B^\\top$. Burada $G$ tamamen 1."}
+      - {t: "$A^\\top\\mathbf{1}_{n\\times m}$", why: "Bu $\\partial L/\\partial B$'dir."}

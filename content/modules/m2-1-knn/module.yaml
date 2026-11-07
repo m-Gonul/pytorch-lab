@@ -1,0 +1,72 @@
+id: m2-1-knn
+code: M2.1
+title: k-NN ve mesafe matrisi vektörizasyonu
+phase: 2
+minutes: 180
+prereq: [m0-2-matmul]
+summary: >
+  Vektörizasyonun klasik okulu. Dört noktada mesafeleri ve oyları elle
+  hesaplıyor; mesafe matrisini önce iki döngüyle, sonra tek döngüyle, sonra
+  hiç döngüsüz (‖a‖² + ‖b‖² − 2a·b açılımı) yazıyor; PyTorch'ta `topk` ile
+  sınıflandırıyor ve en sonda 20 farklı k değerini tek sıralamayla
+  değerlendiriyorsun.
+goals:
+  - "[[k-nn|k-NN]] tahminini (mesafe → en yakın k → çoğunluk oyu) adım adım yapmak"
+  - "$\\lVert a-b\\rVert^2=\\lVert a\\rVert^2+\\lVert b\\rVert^2-2a\\cdot b$ açılımıyla [[mesafe matrisi|mesafe matrisini]] tek matris çarpımına indirgemek"
+  - "İki döngü → tek döngü → sıfır döngü dönüşümünde her adımda neyin [[broadcasting]]'e devredildiğini görmek"
+  - "Eşitlik (tie) kurallarını açıkça tanımlayıp tüm uygulamalarda tutarlı tutmak"
+  - "`cumsum` hilesiyle tüm k değerlerinin oylarını tek geçişte hesaplamak"
+sources:
+  - {title: "CS231n — Image Classification: Data-driven Approach, k-Nearest Neighbor", url: "https://cs231n.github.io/classification/", license: "MIT", use: adapt}
+  - {title: "CS231n Assignment 1 — kNN (compute_distances_two_loops / one_loop / no_loops)", url: "https://cs231n.github.io/assignments2025/assignment1/", license: "MIT", use: adapt}
+  - {title: "ISLP — Bölüm 2.2.3 K-Nearest Neighbors", url: "https://www.statlearning.com/", license: "doğrulanmadı", use: link}
+  - {title: "PyTorch — torch.cdist, torch.topk", url: "https://docs.pytorch.org/docs/stable/generated/torch.cdist.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "Eğitim: $P_1=(0,0)$ sınıf 0, $P_2=(1,3)$ sınıf 1, $P_3=(3,1)$ sınıf 0, $P_4=(4,4)$ sınıf 1. Sorgu $q=(1,2)$. Kare mesafeler $\\lVert q-P_i\\rVert^2$"
+      fields:
+        - {id: d1, label: "$d_1^2$", answer: 5, hint: "$(1-0)^2+(2-0)^2$"}
+        - {id: d2, label: "$d_2^2$", answer: 1, hint: "$(1-1)^2+(2-3)^2$"}
+        - {id: d3, label: "$d_3^2$", answer: 5, hint: "$(1-3)^2+(2-1)^2$"}
+        - {id: d4, label: "$d_4^2$", answer: 13, hint: "$(1-4)^2+(2-4)^2$"}
+    - title: "Oylama"
+      fields:
+        - {id: k1, label: "$k=1$ tahmini (sınıf)", answer: 1, hint: "en yakın tek komşu $P_2$"}
+        - {id: k3, label: "$k=3$ tahmini (sınıf)", answer: 0, hint: "en yakın üç: $P_2$ (1), $P_1$ (0), $P_3$ (0) — $k$ değişince karar değişti"}
+    - title: "Açılım: $\\lVert q-P_4\\rVert^2=\\lVert q\\rVert^2+\\lVert P_4\\rVert^2-2\\,q\\cdot P_4$"
+      fields:
+        - {id: qq, label: "$\\lVert q\\rVert^2$", answer: 5, hint: "$1+4$"}
+        - {id: pp, label: "$\\lVert P_4\\rVert^2$", answer: 32, hint: "$16+16$"}
+        - {id: qp, label: "$q\\cdot P_4$", answer: 12, hint: "$1\\cdot4+2\\cdot4$"}
+        - {id: dd, label: "$5+32-2\\cdot12$", answer: 13, hint: "$d_4^2$ ile aynı çıkmalı"}
+  verify: |
+    P = [(0, 0), (1, 3), (3, 1), (4, 4)]; lab = [0, 1, 0, 1]; q = (1, 2)
+    d = [(q[0] - a) ** 2 + (q[1] - b) ** 2 for a, b in P]
+    order = sorted(range(4), key=lambda j: (d[j], j))
+    vote = lambda k: max(sorted(set(lab)), key=lambda c: (sum(lab[j] == c for j in order[:k]), -c))
+    answers = dict(d1=d[0], d2=d[1], d3=d[2], d4=d[3], k1=vote(1), k3=vote(3),
+                   qq=q[0] ** 2 + q[1] ** 2, pp=32, qp=q[0] * 4 + q[1] * 4, dd=5 + 32 - 24)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "`((Xte[:, None, :] - Xtr[None, :, :]) ** 2).sum(-1)` de döngüsüzdür. Açılım yöntemine göre dezavantajı?"
+    options:
+      - {t: "(nte, ntr, d) boyutunda ara tensör oluşturur; bellek d kat büyür", ok: true, why: "5000 × 50000 × 3072 float32 ≈ 3 TB. Açılım yalnız (nte, ntr) çıktıyı ve bir matris çarpımını gerektirir; ayrıca BLAS'ı kullanır."}
+      - {t: "Sonucu yanlıştır", why: "Matematiksel olarak doğru; hatta açılımdan daha kesindir (iptal hatası yok)."}
+      - {t: "GPU'da çalışmaz", why: "Çalışır; sorun bellek ve hız."}
+  - q: "Açılım yönteminde neden `clamp(min=0)` gerekebilir?"
+    options:
+      - {t: "Kayan nokta iptali yüzünden çok yakın noktalarda $\\lVert a\\rVert^2+\\lVert b\\rVert^2-2a\\cdot b$ küçük negatif çıkabilir; sonra karekök NaN olur", ok: true, why: "Büyük iki sayının farkı alınırken anlamlı basamaklar kaybolur (catastrophic cancellation)."}
+      - {t: "Mesafeler doğası gereği negatif çıkar", why: "Gerçek kare mesafe her zaman ≥ 0; negatiflik tamamen sayısal."}
+      - {t: "Gerekmez", why: "Aynı noktayla kendisi arasında bile $10^{-6}$ mertebesinde negatif değerler görülebilir."}
+  - q: "k-NN'de eğitim maliyeti ve tahmin maliyeti nedir?"
+    options:
+      - {t: "Eğitim $O(1)$ (veriyi sakla), tahmin örnek başına $O(n\\,d)$", ok: true, why: "Bu yüzden büyük veri setlerinde yaklaşık en yakın komşu yapıları (KD-tree, HNSW, FAISS) kullanılır."}
+      - {t: "Eğitim $O(n^2)$, tahmin $O(1)$", why: "Tersine: k-NN tembel (lazy) bir öğrenicidir; tüm iş tahminde."}
+      - {t: "İkisi de $O(n\\log n)$", why: "Sıralama tahminde $O(n\\log n)$ ekleyebilir ama baskın terim mesafe hesabı."}

@@ -1,0 +1,99 @@
+# Müfredatın tek kaynağı. `id` bir content/modules/<id> klasörüyle eşleşiyorsa modül "hazır" sayılır.
+# src: content/sources.yaml anahtarları.
+phases:
+  - n: 0
+    title: Matematik ve araçlar
+    weeks: 2
+    blurb: Vektör, matris, türev ve olasılık; her şeyin üzerine kurulacağı dil.
+    modules:
+      - {id: m0-1-dot, code: M0.1, title: "Vektör, iç çarpım, norm", core: "3 elemanlı dot → döngü → np.dot → torch.dot → batched einsum", src: [mit1806, b3b1, mml, d2l]}
+      - {id: m0-2-matmul, code: M0.2, title: "Matris çarpımı, shape, broadcasting", core: "2×2 elle → 3 iç içe döngü → A @ B → autograd → bmm/einsum", src: [mit1806, d2l, cs231n]}
+      - {id: m0-3-chain-rule, code: M0.3, title: "Türev, gradyan, Jacobian, zincir kuralı", core: "hesap grafiği elle → sayısal türev → autograd → torch.func.jacrev", src: [mml, cs231n, micrograd]}
+      - {id: m0-4-probability, code: M0.4, title: "Olasılık ve MLE özeti", core: "3 zarlık MLE → döngü → NumPy → torch.distributions", src: [mml, murphy1]}
+      - {id: m0-5-tensor-tools, code: M0.5, title: "Tensor araçları ve benchmark disiplini", core: "stride elle → view/contiguous → torch.utils.benchmark", src: [pttut]}
+  - n: 1
+    title: "Klasik ML I: doğrusal modeller"
+    weeks: 3
+    blurb: Kayıp fonksiyonu, gradient descent ve olasılıksal sınıflandırma.
+    modules:
+      - {id: m1-1-linreg, code: M1.1, title: "Linear regression: kapalı form + gradient descent", core: "tek GD adımı elle → döngü → NumPy → nn.Linear → vmap lr taraması", src: [cs229, islp, d2l]}
+      - {id: m1-2-gd-variants, code: M1.2, title: "Gradient descent varyantları", core: "batch/SGD/mini-batch, momentum; 2 adım elle", src: [cs229, d2l]}
+      - {id: m1-3-regularization, code: M1.3, title: "Regularization: ridge ve lasso", core: "ridge kapalı formu 2×2'de elle", src: [islp, esl]}
+      - {id: m1-4-logreg, code: M1.4, title: "Logistic regression ve cross-entropy", core: "sigmoid/BCE gradyanı 3 örnekte elle → … → BCEWithLogits", src: [cs229, cs231n]}
+      - {id: m1-5-softmax, code: M1.5, title: "Softmax regression ve log-sum-exp", core: "3 sınıflı softmax elle → logsumexp ile kararlı hâl", src: [cs231n]}
+  - n: 2
+    title: "Klasik ML II"
+    weeks: 4
+    blurb: Mesafe, sayım, margin, ağaçlar ve gözetimsiz öğrenme.
+    modules:
+      - {id: m2-1-knn, code: M2.1, title: "k-NN ve mesafe matrisi vektörizasyonu", core: "iki döngü → tek döngü → sıfır döngü → torch.cdist", src: [cs231n]}
+      - {id: m2-2-naive-bayes, code: M2.2, title: "Naive Bayes", core: "4 satırlık tabloyu elle → pandas groupby → torch", src: [murphy1, cs229]}
+      - {id: m2-3-svm, code: M2.3, title: "SVM: hinge loss ve margin", core: "svm_loss naive → vectorized", src: [cs229, cs231n]}
+      - {id: m2-4-tree, code: M2.4, title: "Decision tree", core: "6 örnekte en iyi bölünmeyi elle → NumPy → sklearn", src: [islp, esl]}
+      - {id: m2-5-ensembles, code: M2.5, title: "Random forest ve gradient boosting", core: "3 adım boosting elle", src: [islp, esl]}
+      - {id: m2-6-pca, code: M2.6, title: "PCA ve SVD", core: "2×2 kovaryans özdeğerleri elle → power iteration → torch.linalg.svd", src: [mml, mit1806]}
+      - {id: m2-7-kmeans, code: M2.7, title: "k-means", core: "4 nokta 2 küme elle → cdist + argmin", src: [islp]}
+      - {id: m2-8-gmm-em, code: M2.8, title: "GMM ve EM", core: "1 EM iterasyonu elle → batched torch.distributions", src: [murphy1, bishop]}
+  - n: 3
+    title: "Sinir ağlarının çekirdeği: kendi autograd'ını yaz"
+    weeks: 4
+    blurb: Backprop'u önce skaler, sonra tensor düzeyinde sıfırdan kurmak.
+    modules:
+      - {id: m3-1-micrograd, code: M3.1, title: "Skaler autograd (micrograd)", core: "3 düğümlü grafik elle → Value sınıfı → torch ile eşitlik → per-sample grad", src: [micrograd, zth]}
+      - {id: m3-2-mlp-backprop, code: M3.2, title: "MLP ve matris formunda backprop", core: "2-2-1 ağ elle → modüler NumPy katmanlar → torch", src: [cs231n, udl]}
+      - {id: m3-3-tensor-autograd, code: M3.3, title: "Tensor autograd motoru (MiniTorch tarzı)", core: "broadcasting'li backward, unbroadcast", src: [minitorch]}
+      - {id: m3-4-optimizers, code: M3.4, title: "Optimizer'lar: SGD, momentum, Adam, AdamW", core: "Adam'ın 2 adımı elle → kendi Optimizer sınıfın", src: [d2l, cs231n]}
+      - {id: m3-5-init, code: M3.5, title: "Initialization ve aktivasyonlar", core: "Xavier/Kaiming varyans korunumu ölçümü", src: [zth, uva]}
+      - {id: m3-6-norm, code: M3.6, title: "BatchNorm, LayerNorm, RMSNorm", core: "BN backward'u 3 örnekte elle", src: [cs231n, cs336]}
+      - {id: m3-7-regularization-nn, code: M3.7, title: "Dropout, weight decay, early stopping", core: "inverted dropout maskesi elle", src: [cs231n, d2l]}
+  - n: 4
+    title: Mimariler
+    weeks: 6
+    blurb: Convolution'dan GPT'ye; her mimarinin çekirdek işlemi elle.
+    modules:
+      - {id: m4-1-conv, code: M4.1, title: "Convolution ve im2col", core: "3×3 * 2×2 elle → 6 iç içe döngü → im2col+matmul → F.conv2d", src: [cs231n, d2l]}
+      - {id: m4-2-cnn, code: M4.2, title: "CNN mimarileri (LeNet → ResNet)", core: "residual bloğun gradyan akışı", src: [d2l, uva]}
+      - {id: m4-3-rnn, code: M4.3, title: "RNN ve BPTT", core: "3 adımlık RNN elle", src: [cs231n, d2l, zth]}
+      - {id: m4-4-lstm-gru, code: M4.4, title: "LSTM ve GRU", core: "1 hücre adımı elle", src: [d2l]}
+      - {id: m4-5-embed-bpe, code: M4.5, title: "Embedding ve BPE tokenization", core: "BPE birleştirmeleri elle", src: [cs224n, cs336, zth]}
+      - {id: m4-6-attention, code: M4.6, title: "Attention", core: "3 token × d=2 attention elle → scaled_dot_product_attention", src: [d2l, uva, cs224n]}
+      - {id: m4-7-transformer, code: M4.7, title: "Transformer ve GPT", core: "nanoGPT'yi parça parça", src: [nanogpt, cs336]}
+  - n: 5
+    title: "Üretken modeller, GNN ve RL"
+    weeks: 5
+    blurb: Olasılıksal üretim, grafikte mesaj iletimi ve ödülden öğrenme.
+    modules:
+      - {id: m5-1-vae, code: M5.1, title: "Autoencoder ve VAE", core: "1-boyutlu Gauss KL elle", src: [udl, uva, cs236]}
+      - {id: m5-2-gan, code: M5.2, title: "GAN", core: "1-D GAN'da 1 adım elle", src: [udl, cs236]}
+      - {id: m5-3-diffusion, code: M5.3, title: "Diffusion (DDPM, flow matching'e giriş)", core: "q(x_t|x_0) elle → döngülü sampler → vektörize sampler", src: [udl, cs236, fastai2]}
+      - {id: m5-4-gnn, code: M5.4, title: "GNN: message passing", core: "3 düğümde ÂXW elle → scatter_add", src: [uva, cs224w]}
+      - {id: m5-5-rl, code: M5.5, title: "RL temelleri: value iteration, REINFORCE", core: "2 durumlu MDP elle → batched env", src: [sutton, cs336]}
+  - n: 6
+    title: "İleri PyTorch I: iç yapı"
+    weeks: 4
+    blurb: Autograd'ın içi, fonksiyonel dönüşümler, bellek ve derleyici.
+    modules:
+      - {id: m6-1-autograd-internals, code: M6.1, title: "Autograd internals", core: "grad_fn gezintisi, hooks, saved tensors", src: [ptdocs]}
+      - {id: m6-2-custom-function, code: M6.2, title: "Custom autograd.Function", core: "türev elle → Function → gradcheck", src: [pttut]}
+      - {id: m6-3-torch-func, code: M6.3, title: "torch.func: grad, vmap, jacrev, jvp", core: "per-sample grad elle → döngü → vmap(grad)", src: [ptdocs, uva]}
+      - {id: m6-4-memory, code: M6.4, title: "Bellek ve profiling", core: "aktivasyon belleği elle → memory_snapshot", src: [cs336]}
+      - {id: m6-5-compile, code: M6.5, title: "torch.compile, Dynamo, Inductor", core: "FX grafiğini elle → TORCH_LOGS", src: [ptdocs, gpumode]}
+  - n: 7
+    title: "İleri PyTorch II: kernel, ölçek, verim"
+    weeks: 5
+    gpu: true
+    blurb: CUDA ve Triton kernel'ları, karışık hassasiyet, dağıtık eğitim, sıkıştırma.
+    modules:
+      - {id: m7-1-cuda, code: M7.1, title: "GPU modeli ve CUDA extension", core: "4×4 tiled matmul kâğıtta → load_inline", src: [gpumode, minitorch]}
+      - {id: m7-2-triton, code: M7.2, title: "Triton kernel'ları", core: "vector-add → softmax → matmul", src: [triton, cs336]}
+      - {id: m7-3-amp, code: M7.3, title: "Mixed precision (AMP, bf16)", core: "fp16 taşmasını elle göster", src: [ptdocs, fastai2]}
+      - {id: m7-4-ddp-fsdp, code: M7.4, title: "DDP ve FSDP", core: "2 işçinin all-reduce'u elle → gloo/CPU → GPU", src: [cs336, pttut]}
+      - {id: m7-5-quant-prune, code: M7.5, title: "Quantization ve pruning", core: "3 sayıyı int8'e elle → torch.ao", src: [ptdocs]}
+      - {id: m7-6-export, code: M7.6, title: "Export ve deployment", core: "torch.export → ONNX Runtime Web", src: [ptdocs]}
+  - n: 8
+    title: Bitirme
+    weeks: 3
+    blurb: Her şeyi bir araya getiren iki proje.
+    modules:
+      - {id: m8-1-mini-llm, code: M8.1, title: "Mini-LLM: eğit, profil çıkar, hızlandır", core: "tüm fazların entegrasyonu", src: [cs336, nanogpt]}
+      - {id: m8-2-capstone, code: M8.2, title: "Seçmeli: U-Net segmentasyon ya da küçük diffusion", core: "araştırma alanına transfer", src: [uva, fastai2]}

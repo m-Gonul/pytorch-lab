@@ -1,0 +1,5 @@
+# CI ve yerel testler için (torch'u CPU index'inden kur: bkz. README)
+numpy>=1.26
+pandas>=2.1
+pyyaml>=6
+torch>=2.3

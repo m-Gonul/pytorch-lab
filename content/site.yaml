@@ -1,0 +1,7 @@
+title: pytorch-lab
+tagline: "Elle → döngü → NumPy → PyTorch → vektörize"
+repo: m-Gonul/pytorch-lab
+branch: main
+site_url: https://m-gonul.github.io/pytorch-lab/
+pyodide: "314.0.7"
+runner_port: 8765
