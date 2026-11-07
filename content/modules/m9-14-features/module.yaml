@@ -1,0 +1,125 @@
+id: m9-14-features
+code: M9.14
+title: Ölçekten bağımsız öznitelikler — SIFT, SURF, HOG
+phase: 9
+minutes: 480
+prereq: [m9-7-corners, m9-3-spatial-filtering]
+summary: >
+  Ölçek uzayı, oktavlar ve Gauss farkı (DoG); 3 × 3 × 3 uç noktalar, kontrast
+  ve kenar eleme; baskın yön ve 128 boyutlu SIFT betimleyicisi. SURF'ün
+  integral görüntü + kutu süzgeçli Hessian'ı ve Haar dalgacıklı 64 boyutlu
+  betimleyicisi. HOG: hücre histogramları, blok normalizasyonu (L2-Hys).
+  Saf Python'da tek bloklu HOG; NumPy'da `skimage.feature.hog` ile birebir
+  HOG ve SURF'ün Fast-Hessian yanıtı; PyTorch'ta DoG piramidi ve bulunan
+  ölçeğin bloba göre ölçeklendiğini gösteren deney; en sonda yüzlerce
+  anahtar noktanın dönmeden bağımsız betimleyicisini tek seferde çıkaran
+  vektörel kod.
+goals:
+  - "[[ölçek uzayı]] $L(x,y,\\sigma)=G(\\sigma)*f$, oktavlar, $k=2^{1/s}$, oktav başına $s+3$ görüntü"
+  - "DoG ≈ ölçek-normalize LoG; uç nokta, kontrast eşiği ve $\\mathrm{Tr}^2/\\mathrm{Det}<(r+1)^2/r$"
+  - "SURF: kutu süzgeçli Hessian $\\det\\approx D_{xx}D_{yy}-(0.9D_{xy})^2$, süzgeç büyütülerek ölçek uzayı"
+  - "HOG: 8 × 8 hücre, 9 yön, 2 × 2 blok, L2-Hys; 64 × 128 pencerede 3780 boyut"
+sources:
+  - {title: "Lowe — Distinctive Image Features from Scale-Invariant Keypoints (IJCV 2004)", url: "https://doi.org/10.1023/B:VISI.0000029664.99615.94", license: "©", use: link}
+  - {title: "Bay, Tuytelaars, Van Gool — SURF: Speeded Up Robust Features (ECCV 2006)", url: "https://doi.org/10.1007/11744023_32", license: "©", use: link}
+  - {title: "Dalal & Triggs — Histograms of Oriented Gradients for Human Detection (CVPR 2005)", url: "https://doi.org/10.1109/CVPR.2005.177", license: "©", use: link}
+  - {title: "Gonzalez & Woods — Digital Image Processing, 4. baskı, Bölüm 11.7", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "scikit-image — feature.hog", url: "https://scikit-image.org/docs/stable/api/skimage.feature.html#skimage.feature.hog", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "SIFT ölçek uzayı, $s=2$, $\\sigma_1=\\sqrt2/2$"
+      fields:
+        - {id: k, label: "$k=2^{1/s}$", answer: 1.414214, tol: 0.0001}
+        - {id: n, label: "Oktav başına Gauss görüntüsü ($s+3$)", answer: 5}
+        - {id: s3, label: "Oktavdaki 3. görüntünün σ'sı", answer: 1.414214, tol: 0.0001}
+        - {id: r, label: "Kenar eşiği $(r+1)^2/r$, $r=10$", answer: 12.1}
+        - {id: tr, label: "$D_{xx}=20$, $D_{yy}=2$, $D_{xy}=1$: $\\mathrm{Tr}^2/\\mathrm{Det}$ (≥ eşik → kenar, at)", answer: 12.41026, tol: 0.001}
+    - title: "SURF ve HOG"
+      fields:
+        - {id: det, label: "SURF: $D_{xx}=5$, $D_{yy}=4$, $D_{xy}=2$, $w=0.9$: $\\det$", answer: 16.76, tol: 0.0001}
+        - {id: sg, label: "SURF: 27 × 27 süzgecin karşılığı σ (9 × 9 ↔ 1.2)", answer: 3.6, tol: 0.0001}
+        - {id: hog, label: "HOG boyutu: 64 × 128 pencere, 8 × 8 hücre, 2 × 2 blok (adım 1 hücre), 9 yön", answer: 3780}
+        - {id: bin, label: "HOG: 100°'lik gradyanın bölmesi (9 bölme, 0–180°, 20°'lik)", answer: 5}
+  verify: |
+    import math
+    k = 2 ** 0.5
+    s1 = 2 ** 0.5 / 2
+    tr = (20 + 2) ** 2 / (20 * 2 - 1)
+    answers = dict(k=k, n=5, s3=s1 * k * k, r=11 ** 2 / 10, tr=tr, det=5 * 4 - (0.9 * 2) ** 2, sg=1.2 * 27 / 9,
+                   hog=(64 // 8 - 1) * (128 // 8 - 1) * 4 * 9, bin=100 // 20)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "U-SURF betimleyicisi: Haar dalgacıkları ve integral görüntü", engine: browser}
+  - {id: x2, title: "HOG + doğrusal SVM ile sınıflandırma", engine: browser}
+  - {id: x3, title: "OpenCV SIFT ve ORB ile eşleştirme, Lowe oran testi", engine: browser}
+
+quiz:
+  - q: "SIFT ölçek uzayında uç noktaları neden DoG'da arar?"
+    options:
+      - {t: "DoG, ölçek-normalize LoG'un ($\\sigma^2\\nabla^2G$) ucuz bir yaklaşığıdır ve zaten hesaplanmış Gauss görüntülerinin farkıdır", ok: true, why: "$G(k\\sigma)-G(\\sigma)\\approx(k-1)\\sigma^2\\nabla^2G$; ölçek normalizasyonu sayesinde farklı ölçeklerdeki yanıtlar karşılaştırılabilir."}
+      - {t: "DoG kenarları daha iyi bulduğu için", why: "Kenar yanıtları ayrıca elenir."}
+      - {t: "Gürültüyü sıfırladığı için", why: "Gürültüyü azaltır ama amaç ölçek seçimidir."}
+  - q: "SURF'ün hızının ana kaynağı nedir?"
+    options:
+      - {t: "İkinci türev Gauss çekirdeklerini kutu süzgeçlerle yaklaşıklayıp integral görüntüyle her boyutta sabit sürede hesaplamak", ok: true, why: "Ölçek uzayı görüntüyü küçültmek yerine süzgeci büyüterek kurulur."}
+      - {t: "Daha az anahtar nokta bulması", why: "Benzer sayıda bulur."}
+      - {t: "GPU kullanması", why: "Algoritmik bir hızlanmadır."}
+  - q: "HOG'da blok normalizasyonu ne sağlar?"
+    options:
+      - {t: "Yerel aydınlatma ve kontrast değişimlerine karşı dayanıklılık", ok: true, why: "Komşu hücrelerin histogramları birlikte normalize edilir; bir hücre birden fazla blokta farklı normalize edilerek tekrar görünür."}
+      - {t: "Dönme değişmezliği", why: "HOG büyük dönmelere değişmez değildir."}
+      - {t: "Boyut azaltma", why: "Bloklar örtüştüğü için boyut artar."}
+
+homework:
+  - title: "SURF'ü sıfırdan uygula"
+    paper: "Bay, Tuytelaars, Van Gool — SURF: Speeded Up Robust Features (ECCV 2006)"
+    url: "https://doi.org/10.1007/11744023_32"
+    level: ileri
+    hours: 14
+    goal: |
+      Bu modüldeki Fast-Hessian (c) ve U-SURF betimleyicisini (x1) tam SURF'e tamamla: 4 oktav × 4 ölçek, 3 × 3 × 3 non-maximum suppression, ölçek ve konum interpolasyonu (2. derece Taylor), 60°'lik kayan pencereyle baskın yön, döndürülmüş 64 boyutlu betimleyici ve Laplacian işaretiyle hızlı eşleştirme.
+    steps:
+      - "Oktav ve ölçekler: süzgeç boyutları 9, 15, 21, 27 / 15, 27, 39, 51 / … ve örnekleme adımları."
+      - "Interpolasyon: $\\hat x=-\\left(\\frac{\\partial^2H}{\\partial x^2}\\right)^{-1}\\frac{\\partial H}{\\partial x}$, sonlu farklarla."
+      - "Yön: 6s yarıçapında 4s'lik Haar yanıtları, σ = 2s Gauss ağırlığı, π/3'lük kayan pencere."
+      - "Oxford affine veri setinde (graf, wall, boat, bikes…) tekrarlanabilirlik ve eşleşme skoru; OpenCV SIFT ile karşılaştır."
+    accept:
+      - "Rotasyon (boat) ve ölçek dizilerinde SIFT'e yakın tekrarlanabilirlik (±10 puan)."
+      - "Saniyede işlenen piksel olarak SIFT'ten hızlı (aynı dilde, ör. NumPy/Torch sürümleri)."
+      - "Laplacian işareti ön elemesinin eşleştirme süresine etkisi."
+  - title: "Dalal–Triggs yaya dedektörü"
+    paper: "Dalal & Triggs — Histograms of Oriented Gradients for Human Detection (CVPR 2005)"
+    url: "https://doi.org/10.1109/CVPR.2005.177"
+    level: orta
+    hours: 12
+    goal: |
+      INRIA Person (ya da Penn-Fudan) verisinde 64 × 128 pencerelerden HOG + doğrusal SVM yaya dedektörü eğit; zor negatif madenciliği (hard negative mining), çok ölçekli kayan pencere ve non-maximum suppression (M4.9) ekle; makaledeki DET eğrisini (miss rate – FPPW) üret.
+    steps:
+      - "c aşamasındaki HOG'u kullan; makaledeki iyileştirmeleri ekle: üçgen (bilineer) oy dağıtımı ve blok Gauss penceresi (σ = 8)."
+      - "Doğrusal SVM (C = 0.01); negatiflerden rastgele 10 pencere / görüntü, sonra zor negatifler."
+      - "Görüntü piramidi (ölçek 1.05) ve kutu NMS."
+      - "Ablasyon: hücre boyutu (6, 8, 10), yön sayısı (6, 9, 18), işaretsiz / işaretli yön."
+    accept:
+      - "10⁻⁴ FPPW'de miss rate ≤ %20 (makale ≈ %11)."
+      - "Zor negatif madenciliğinin etkisini gösteren iki DET eğrisi."
+      - "`cv2.HOGDescriptor_getDefaultPeopleDetector` ile nitel karşılaştırma."
+  - title: "SIFT dedektör + betimleyici (uzantı)"
+    paper: "Lowe — Distinctive Image Features from Scale-Invariant Keypoints (IJCV 2004)"
+    url: "https://doi.org/10.1023/B:VISI.0000029664.99615.94"
+    level: ileri
+    hours: 12
+    goal: |
+      d (DoG piramidi) ve e (betimleyici) aşamalarını tam SIFT'e tamamla: başlangıçta 2× büyütme, alt piksel ve alt ölçek interpolasyonu, kontrast ve kenar eleme, 36 bölmeli yön histogramı (parabol uydurma, %80'in üstündeki ikinci tepeler için ek anahtar nokta), trilineer oy dağıtımı. `cv2.SIFT_create` ile anahtar nokta konumlarını ve eşleşme doğruluğunu karşılaştır.
+    steps:
+      - "Lowe'un parametreleri: σ = 1.6, s = 3, kontrast 0.03, r = 10."
+      - "Yön ve betimleyiciyi Gauss pencereli ve trilineer olarak yaz."
+    accept:
+      - "OpenCV SIFT anahtar noktalarının %70'inden fazlasıyla 1.5 piksel içinde örtüşme."
+      - "Döndürülmüş + ölçeklenmiş görüntü çiftinde OpenCV SIFT'e yakın doğru eşleşme oranı."
