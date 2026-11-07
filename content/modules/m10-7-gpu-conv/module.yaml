@@ -1,0 +1,101 @@
+id: m10-7-gpu-conv
+code: M10.7
+title: GPU'da 2B konvolüsyon ve matris çarpımı — karolar, halo, sabit bellek, im2col
+phase: 10
+minutes: 420
+prereq: [m10-6-scan, m10-3-cpu-parallel]
+summary: >
+  Paralel programlama alıştırmalarının GPU yarısı: uint8 görüntüde fp32
+  2B konvolüsyon (3×3 … 21×21) ve fp32 matris çarpımı. Konvolüsyonda girdi
+  karosu = çıktı karosu + (K − 1) halo; filtre sabit bellekte (warp aynı
+  katsayıyı okur: yayın), karo stratejileri ve veri yeniden kullanım oranı;
+  im2col ile GEMM'e dönüştürme, örtük GEMM, çok kanallı konvolüsyon, FFT ve
+  Winograd. Matmul'da paylaşımlı bellekli karolar (global okumalar T kat
+  azalır), sınır kontrolü, yazmaç karolaması/kabalaştırma ve aritmetik
+  yoğunluk, L2 için program sırası (gruplama). Saf Python'da halo'lu karo
+  simülasyonu ve okuma sayımı, NumPy'da im2col/çok kanallı/FFT konvolüsyon,
+  Triton'da karolu konvolüsyon ve gruplanmış matmul, sonda konvolüsyon
+  yöntemlerinin (doğrudan, unfold + matmul, FFT) çekirdek boyutuna göre
+  kesişimi.
+goals:
+  - "Halo: girdi karosu $(T+K-1)^2$, çıktı başına okuma $(T+K-1)^2/T^2$ vs $K^2$"
+  - "[[sabit bellek]] ve yayın; karo stratejileri (çıktı/ girdi boyutlu blok, halo'yu önbelleğe bırakmak)"
+  - "[[im2col]]: konvolüsyon = matris çarpımı; bellek bedeli $HW\\cdot C_{in}K^2$"
+  - "Karolu matmul: global okuma $2n^3\\to2n^3/T$, aritmetik yoğunluk ~$T/4$ FLOP/B (fp32)"
+sources:
+  - {title: "Hwu, Kirk, El Hajj — Programming Massively Parallel Processors (4. baskı), Bölüm 5 ve 7", url: "https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0", license: "©", use: link}
+  - {title: "Chetlur ve ark. — cuDNN: Efficient Primitives for Deep Learning (2014)", url: "https://arxiv.org/abs/1410.0759", license: "arXiv", use: link}
+  - {title: "Lavin & Gray — Fast Algorithms for Convolutional Neural Networks (CVPR 2016)", url: "https://arxiv.org/abs/1509.09308", license: "arXiv", use: link}
+  - {title: "Triton — Matrix Multiplication tutorial (L2 önbellek için gruplama)", url: "https://triton-lang.org/main/getting-started/tutorials/03-matrix-multiplication.html", license: "MIT", use: link}
+  - {title: "Boehm — How to Optimize a CUDA Matmul Kernel for cuBLAS-like Performance", url: "https://siboehm.com/articles/22/CUDA-MMM", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "Karolu konvolüsyon, çıktı karosu 16 × 16"
+      fields:
+        - {id: in5, label: "K = 5: girdi karosu eleman sayısı", answer: 400}
+        - {id: r5, label: "K = 5: doğrudan (K² okuma) / karolu (girdi karosu / 256) oranı", answer: 16}
+        - {id: r21, label: "K = 21 için aynı oran", answer: 87.11111111111111, tol: 1.0e-6}
+    - title: "Matmul ve im2col"
+      fields:
+        - {id: ai, label: "fp32 karo T = 32: bir faz için FLOP/bayt ($2T^3/(2T^2\\cdot4)$)", answer: 8}
+        - {id: im2col, label: "512 × 512 tek kanal, K = 21: im2col matrisinin boyutu (MiB, fp32)", answer: 441}
+        - {id: cmem, label: "64 KB sabit belleğe sığan en büyük kare fp32 filtre kenarı", answer: 128}
+  verify: |
+    import math
+    t = 16
+    answers = dict(in5=(t + 4) ** 2, r5=25 / ((t + 4) ** 2 / t ** 2), r21=441 / ((t + 20) ** 2 / t ** 2), ai=2 * 32 ** 3 / (2 * 32 ** 2 * 4),
+                   im2col=512 * 512 * 441 * 4 / 2 ** 20, cmem=int(math.isqrt(64 * 1024 // 4)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Winograd F(2, 3): 6 yerine 4 çarpma", engine: browser}
+  - {id: x2, title: "Yazmaç karolaması: blok şekli, yoğunluk ve kaynak sınırları", engine: browser}
+  - {id: x3, title: "Ayrılabilir konvolüsyon GPU'da: iki geçişin trafik hesabı", engine: browser}
+
+quiz:
+  - q: "Konvolüsyon filtresi neden sabit belleğe konur?"
+    options:
+      - {t: "Tüm thread'ler aynı anda aynı katsayıyı okur: sabit önbellek bunu tek erişimle bütün warp'a yayınlar; filtre küçük ve salt okunurdur", ok: true, why: "Thread'ler farklı adresler okursa sabit bellek sıralanır — o zaman uygun değildir."}
+      - {t: "Global bellekten büyük olduğu için", why: "64 KB ile sınırlı."}
+      - {t: "Yazılabilir olduğu için", why: "Çekirdekten salt okunur."}
+  - q: "im2col neden hızlıdır ve bedeli nedir?"
+    options:
+      - {t: "Konvolüsyonu yoğun bir GEMM'e çevirir (en iyi optimize edilmiş çekirdek); bedeli girdiyi K² kat çoğaltan ara matris (bellek ve trafik) — örtük GEMM bu matrisi oluşturmadan aynı indeksleri üretir", ok: true, why: "cuDNN'in temel fikri."}
+      - {t: "Daha az çarpma yaptığı için", why: "Aynı sayıda çarpma."}
+      - {t: "FFT kullandığı için", why: "FFT ayrı bir yöntem."}
+  - q: "Karolu matmul'da karo boyutu T'yi büyütmek neyi artırır, ne sınırlar?"
+    options:
+      - {t: "Aritmetik yoğunluğu (her yüklenen eleman T kez kullanılır); paylaşımlı bellek ve yazmaç bütçesi, dolayısıyla doluluk sınırlar", ok: true, why: "Pratikte blok başına 64–256 çıktı genişliği ve thread başına 4–8 × 4–8 yazmaç karosu."}
+      - {t: "Global bellek trafiğini", why: "Azaltır."}
+      - {t: "Toplam FLOP sayısını", why: "Değişmez."}
+
+homework:
+  - title: "Lavin & Gray (2016): Winograd ile hızlı konvolüsyon"
+    paper: "Lavin & Gray — Fast Algorithms for Convolutional Neural Networks (CVPR 2016)"
+    url: "https://arxiv.org/abs/1509.09308"
+    level: ileri
+    hours: 12
+    goal: |
+      x1'deki 1B F(2,3)'ü 2B F(2×2, 3×3) ve F(4×4, 3×3)'e genişlet: G, Bᵀ, Aᵀ dönüşüm matrislerini kullanarak 4×4 (6×6) giriş karolarında eleman bazlı çarpım, sonra (çok kanallıda) kanal toplamı = karo başına GEMM. PyTorch ile VGG'nin 3×3 katmanlarında `F.conv2d` ile doğruluk ve FLOP karşılaştırması yap; fp16'da F(4×4)'ün sayısal hatasını ölç.
+    steps:
+      - "Dönüşüm matrislerini makalenin Ek'inden ya da Cook–Toom inşasından türet."
+    accept:
+      - "F(2×2,3×3) çarpma sayısı 2.25× az; F(4×4,3×3) 4× az."
+      - "fp32'de göreli hata < 1e-5, fp16'da artışı raporlanmış."
+  - title: "Chetlur ve ark. (2014): cuDNN ve örtük GEMM"
+    paper: "Chetlur ve ark. — cuDNN: Efficient Primitives for Deep Learning (2014)"
+    url: "https://arxiv.org/abs/1410.0759"
+    level: ileri
+    hours: 14
+    goal: |
+      d aşamasındaki Triton matmul'u, girdi matrisinin satırlarını im2col indeksleriyle doğrudan görüntüden yükleyen bir **örtük GEMM** konvolüsyonuna dönüştür (N, C, H, W; çıkış kanalı = N boyutu). Ara im2col matrisi oluşturulmasın; doğruluğu `F.conv2d` ile, hızı (GPU'da) cuDNN ve açık im2col + matmul ile karşılaştır; makalenin Şekil 2–3'teki bellek/hız tartışmasını kendi ölçümlerinle tekrar et.
+    steps:
+      - "K-boyutu döngüsünde (c, u, v) üçlüsünü tek indeksten çöz."
+    accept:
+      - "Açık im2col'a göre bellek kullanımı K² kat az, hız aynı mertebede."
