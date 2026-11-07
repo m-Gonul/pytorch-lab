@@ -1,0 +1,67 @@
+id: m7-3-amp
+code: M7.3
+title: "Mixed precision: fp16, bf16, AMP"
+phase: 7
+minutes: 270
+prereq: [m6-4-memory]
+summary: >
+  Düşük hassasiyetle eğitmenin tuzakları. fp16 taşmasını, bf16'nın
+  hassasiyetini ve gradyan alt taşmasını elle hesaplıyor, saf Python'da
+  herhangi bir kayan nokta biçimine yuvarlama ve dinamik loss scaler yazıyor,
+  NumPy'da fp16 ağırlıklarla eğitimin neden takıldığını ve fp32 master
+  kopyanın bunu nasıl çözdüğünü görüyor, PyTorch'ta `torch.autocast` +
+  `GradScaler` ile eğitim adımı kuruyor ve en sonda saf bf16 eğitimde
+  stochastic rounding'i bit düzeyinde vektörel olarak uyguluyorsun.
+goals:
+  - "fp32, fp16, bf16: üs ve mantis bitlerinin aralık ve hassasiyete etkisi"
+  - "Taşma (overflow), alt taşma (underflow) ve küçük güncellemelerin kaybolması"
+  - "AMP'nin üç parçası: autocast, fp32 master ağırlıklar, [[loss scaling]]"
+  - "[[stochastic rounding]] ile yansız yuvarlama"
+sources:
+  - {title: "Micikevicius ve ark. — Mixed Precision Training", url: "https://arxiv.org/abs/1710.03740", license: "arXiv", use: link}
+  - {title: "PyTorch Docs — Automatic Mixed Precision (torch.amp)", url: "https://docs.pytorch.org/docs/stable/amp.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "Kalamkar ve ark. — A Study of BFLOAT16 for Deep Learning Training", url: "https://arxiv.org/abs/1905.12322", license: "arXiv", use: link}
+  - {title: "Gupta ve ark. — Deep Learning with Limited Numerical Precision (stochastic rounding)", url: "https://arxiv.org/abs/1502.02551", license: "arXiv", use: link}
+  - {title: "fast.ai Part 2 — Mixed precision ders notları", url: "https://course.fast.ai/Lessons/part2.html", license: "course22p2 kodu Apache-2.0", use: link}
+
+hand:
+  groups:
+    - title: "fp16: 5 bit üs, 10 bit mantis; bf16: 8 bit üs, 7 bit mantis"
+      fields:
+        - {id: f16max, label: "fp16'nın en büyük sonlu değeri", answer: 65504, hint: "$(2-2^{-10})\\cdot2^{15}$"}
+        - {id: of, label: "$300^2$ fp16'da taşar mı? (evet 1, hayır 0)", answer: 1}
+        - {id: eps16, label: "fp16'da 1'in hemen üstündeki sayı ile 1'in farkı", answer: 0.0009765625, tol: 0.000001}
+        - {id: eps16b, label: "bf16'da aynı fark", answer: 0.0078125}
+    - title: "Gradyanlar ve güncellemeler"
+      fields:
+        - {id: upd, label: "fp16 ağırlık $w=1$, güncelleme $10^{-4}$: $w+10^{-4}$ fp16'da kaç olur?", answer: 1, hint: "Yarım ulp $\\approx4.9\\cdot10^{-4}$"}
+        - {id: scale, label: "$10^{-8}$'lik bir gradyanı fp16'nın en küçük pozitif değerinin ($2^{-24}\\approx5.96\\cdot10^{-8}$) üstüne çıkaran en küçük 2'nin kuvveti ölçek", answer: 8}
+  verify: |
+    import numpy as np
+    answers = dict(f16max=float(np.finfo(np.float16).max), of=int(np.isinf(np.float16(300) * np.float16(300))),
+                   eps16=float(np.finfo(np.float16).eps), eps16b=2.0 ** -7,
+                   upd=float(np.float16(1) + np.float16(1e-4)),
+                   scale=next(2 ** k for k in range(20) if 1e-8 * 2 ** k > 2.0 ** -24))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "bf16 ile eğitimde neden genelde loss scaling gerekmez, fp16'da gerekir?"
+    options:
+      - {t: "bf16'nın üs aralığı fp32 ile aynı (8 bit): küçük gradyanlar alt taşmaz; fp16'nın 5 bitlik üssü $\\sim6\\cdot10^{-8}$'in altını sıfırlar", ok: true, why: "bf16'nın bedeli hassasiyet: 7 bit mantis, yani ~2-3 ondalık basamak."}
+      - {t: "bf16 daha hassas olduğu için", why: "Tersine: bf16'nın mantisi fp16'dan kısa."}
+      - {t: "bf16 donanımda daha hızlı olduğu için", why: "Hız ayrı mesele; sebep üs aralığı."}
+  - q: "AMP'de ağırlıkların fp32 \"master\" kopyası neden tutulur?"
+    options:
+      - {t: "Küçük güncellemeler ($lr\\cdot g\\ll$ ağırlığın ulp'si) düşük hassasiyette tamamen kaybolur; birikim fp32'de yapılmalı", ok: true, why: "c aşamasında fp16 ağırlıklı eğitimin tam bu yüzden takıldığını görüyorsun."}
+      - {t: "İleri geçişi fp32'de yapmak için", why: "İleri geçiş autocast ile düşük hassasiyette."}
+      - {t: "GPU belleğini azaltmak için", why: "Tersine, ek bellek."}
+  - q: "`GradScaler` bir adımda gradyanlarda `inf` bulursa ne yapar?"
+    options:
+      - {t: "O adımı atlar (optimizer.step çağrılmaz) ve ölçeği küçültür; sonra iyi adımlar boyunca ölçeği yeniden büyütür", ok: true, why: "Dinamik loss scaling: ölçek, taşmadan kalabilen en büyük değerin etrafında dolaşır."}
+      - {t: "inf değerleri sıfırlayıp devam eder", why: "Bozuk bir adım atmak yerine adımı atlar."}
+      - {t: "Eğitimi durdurur", why: "Kendiliğinden toparlar."}
