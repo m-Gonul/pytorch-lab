@@ -77,3 +77,8 @@ terms:
   activation checkpointing: "İleri geçişte yalnız bazı ara çıktıları saklayıp geri geçişte gerisini yeniden hesaplayarak aktivasyon belleğini azaltma tekniği."
   operatör füzyonu: "Birden çok işlemi tek bir kernel'de birleştirip ara sonuçları belleğe yazmadan hesaplama; bellek-bağımlı işlemlerde büyük hız kazancı sağlar."
   graph break: "torch.compile/Dynamo'nun bir kod parçasını grafa alamayıp normal Python'a döndüğü nokta; graf ikiye bölünür, optimizasyon fırsatı kaybolur."
+  tiling: "Veriyi hızlı belleğe (shared memory, önbellek) sığan bloklar hâlinde işleyerek her yüklenen elemanı birçok kez yeniden kullanma tekniği."
+  roofline: "Bir işlemin ulaşabileceği performansı min(tepe FLOP, bant genişliği × aritmetik yoğunluk) ile modelleyen grafik model."
+  epilogue füzyonu: "Bir çekirdeğin ana hesabından (ör. matmul) sonra gelen bias, aktivasyon, ölçekleme gibi elementwise işlemleri sonucu belleğe yazmadan aynı çekirdekte uygulamak."
+  loss scaling: "Kaybı büyük bir sayıyla çarpıp gradyanları sonra aynı sayıya bölerek, düşük hassasiyette küçük gradyanların sıfıra alt taşmasını önleme tekniği."
+  stochastic rounding: "Bir sayıyı iki komşu temsil edilebilir değerden birine, uzaklıklarıyla ters orantılı olasılıkla yuvarlama; beklenen değerde yansızdır."

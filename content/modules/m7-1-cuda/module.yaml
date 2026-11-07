@@ -1,0 +1,69 @@
+id: m7-1-cuda
+code: M7.1
+title: GPU programlama modeli ve C++/CUDA extension
+phase: 7
+minutes: 300
+prereq: [m6-5-compile]
+summary: >
+  GPU'nun nasıl düşündüğünü CPU'da öğrenmek. Grid/block/thread indekslerini
+  ve tiling'in global bellek okumalarını nasıl azalttığını elle hesaplıyor,
+  saf Python'da bir CUDA ızgarası simülatörü ve okuma sayan tiled matmul
+  yazıyor, NumPy'da roofline modeliyle işlemleri bellek- ya da hesap-bağımlı
+  diye sınıflandırıyor, `torch.utils.cpp_extension.load_inline` ile kendi
+  C++ operatörünü derleyip PyTorch'a bağlıyor (GPU varsa CUDA çekirdeğiyle)
+  ve en sonda döngü sırasının önbellek üzerindeki etkisini C++'ta ölçüyorsun.
+goals:
+  - "CUDA yürütme modeli: grid, block, thread; global indeks; sınır kontrolü"
+  - "[[tiling]] ile veri yeniden kullanımı: global okumalar $2n^3\\to2n^3/T$"
+  - "[[roofline]] modeli: aritmetik yoğunluk ve tepe noktası (ridge point)"
+  - "`load_inline` ile C++ (ve CUDA) extension yazmak, `TORCH_CHECK` ile girdileri doğrulamak"
+sources:
+  - {title: "GPU MODE — Lectures (CUDA, profiling, tiling)", url: "https://github.com/gpu-mode/lectures", license: "Apache-2.0", use: adapt}
+  - {title: "Hwu, Kirk, El Hajj — Programming Massively Parallel Processors (4. baskı)", url: "https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0", license: "©", use: link}
+  - {title: "PyTorch Tutorials — Custom C++ and CUDA Extensions", url: "https://docs.pytorch.org/tutorials/advanced/cpp_extension.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "Williams, Waterman, Patterson — Roofline: An Insightful Visual Performance Model", url: "https://dl.acm.org/doi/10.1145/1498765.1498785", license: "©", use: link}
+  - {title: "MiniTorch — Module 3: Efficiency (CUDA)", url: "https://minitorch.github.io/", license: "lisans dosyası yok", use: link}
+  - {title: "Simon Boehm — How to Optimize a CUDA Matmul Kernel", url: "https://siboehm.com/articles/22/CUDA-MMM", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "Vektör toplama, $N=1000$, `blockDim.x = 256`"
+      fields:
+        - {id: grid, label: "Gereken block sayısı", answer: 4, hint: "$\\lceil N/256\\rceil$"}
+        - {id: idle, label: "Boşta kalan (sınır kontrolüne takılan) thread", answer: 24}
+        - {id: idx, label: "`blockIdx.x = 2`, `threadIdx.x = 5` → global indeks", answer: 517}
+    - title: "$4\\times4$ matmul $C=AB$, global bellekten okunan eleman sayısı"
+      fields:
+        - {id: naive, label: "Naif: her $C_{ij}$ kendi satır/sütununu okur", answer: 128, hint: "$16\\cdot2\\cdot4$"}
+        - {id: tiled, label: "$2\\times2$ tile, shared memory ile", answer: 64, hint: "4 block × 2 k-adımı × (4 + 4)"}
+        - {id: ai, label: "fp32 matmul, $n=1024$, ideal aritmetik yoğunluk (FLOP/bayt, 3 matris bir kez taşınır)", answer: 170.666667, tol: 0.01, hint: "$2n^3/(3n^2\\cdot4)$"}
+  verify: |
+    import math
+    N, B = 1000, 256
+    g = math.ceil(N / B)
+    n, T = 4, 2
+    answers = dict(grid=g, idle=g * B - N, idx=2 * B + 5, naive=n * n * 2 * n, tiled=2 * T * T * (n // T) ** 3,
+                   ai=2 * 1024 ** 3 / (3 * 1024 ** 2 * 4))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Bir CUDA çekirdeğinde `if (i < n)` sınır kontrolü neden gerekir?"
+    options:
+      - {t: "Block sayısı yukarı yuvarlandığı için son block'ta $N$'yi aşan thread'ler olur; kontrol olmadan dizinin dışına yazarlar", ok: true, why: "Triton'da aynı işi `mask` yapar."}
+      - {t: "Thread'ler sırasız çalıştığı için", why: "Sıra değil, fazla thread meselesi."}
+      - {t: "Performans için", why: "Doğruluk için; dizi dışına erişim tanımsız davranış."}
+  - q: "A100'de fp32 için tepe noktası ≈ 19.5 TFLOP/s ÷ 1.55 TB/s ≈ 12.5 FLOP/bayt. Vektör toplama (1 FLOP / 12 bayt) için ne söylenebilir?"
+    options:
+      - {t: "Derin şekilde bellek-bağımlı: ulaşılabilir hız ≈ bant genişliği × 0.083 FLOP/bayt, tepenin %1'inden az", ok: true, why: "Bu yüzden elementwise işlemleri füzyonlamak (M6.5) ve matmul'ü tiling ile yüksek yoğunlukta çalıştırmak kritik."}
+      - {t: "Hesap-bağımlı", why: "Yoğunluk tepe noktasının çok altında."}
+      - {t: "Tepe FLOP'a ulaşır", why: "Bellek trafiği sınırlar."}
+  - q: "`load_inline` ile yazdığın C++ fonksiyonunda neden `TORCH_CHECK(x.is_contiguous())` yazarsın?"
+    options:
+      - {t: "Ham işaretçiyle `data_ptr<float>()[i*d+j]` indekslemesi satır-ana bitişik bellek varsayar; transpoze ya da dilimlenmiş bir görünüm yanlış elemanları okutur", ok: true, why: "Alternatif: `x.contiguous()` çağırmak ya da stride'larla indekslemek (`accessor`)."}
+      - {t: "PyTorch tüm extension'larda zorunlu tutar", why: "Zorunlu değil; varsayımı açık etmek için."}
+      - {t: "GPU'ya kopyalamak için", why: "Bellek düzeniyle ilgili, cihazla değil."}
