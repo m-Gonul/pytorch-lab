@@ -63,3 +63,8 @@ terms:
   online softmax: "Softmax'ı veri üzerinde tek geçişte, koşan maksimum ve paydayı her yeni blokla yeniden ölçekleyerek hesaplama; FlashAttention'ın temeli."
   weight tying: "Giriş embedding matrisini çıkış (logit) katmanının ağırlığı olarak da kullanmak; aynı tensör iki yerde, gradyanlar toplanır."
   kv-cache: "Otoregresif üretimde geçmiş token'ların attention key ve value'larını saklayıp her adımda yalnız yeni token'ı hesaplama tekniği."
+  reparametrization trick: "Rastgele örneği z = μ + σ·ε (ε ~ N(0, I)) diye yazarak örneklemeyi parametrelere göre türevlenebilir yapma hilesi."
+  iwae: "Importance Weighted Autoencoder sınırı: K örneğin önem ağırlıklarının log-ortalaması; K = 1'de ELBO, K büyüdükçe log p(x)'e yaklaşır."
+  non-saturating loss: "GAN üretecinin log(1 − D(G(z))) yerine −log D(G(z)) kaybını küçültmesi; ayırıcı eminken bile güçlü gradyan verir."
+  gradient penalty: "Ayırıcının girdiye göre gradyan normunu 1'e (WGAN-GP) ya da 0'a (R1) çeken düzenlileştirme terimi."
+  flow matching: "Gürültüden veriye giden yollar boyunca hız alanını regresyonla öğrenip örneklemeyi bir ODE çözerek yapan üretken modelleme yöntemi."

@@ -1,0 +1,1 @@
+$\sigma$ küçükken $-\log\sigma^2$ terimi KL'yi büyütür: kodlayıcının çok emin (dar) olması cezalandırılır. $\mu$ sıfırdan uzaklaştıkça da $\mu^2/2$ cezası gelir. İkisi birlikte gizil uzayı $\mathcal N(0,I)$ etrafında tutar; prior'dan örnekleyip decode edebilmenin sebebi bu.

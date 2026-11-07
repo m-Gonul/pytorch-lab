@@ -1,0 +1,68 @@
+id: m5-1-vae
+code: M5.1
+title: Autoencoder ve VAE
+phase: 5
+minutes: 300
+prereq: [m2-6-pca, m3-4-optimizers]
+summary: >
+  Üretken modellere ilk adım. İki Gauss arasındaki KL'yi ve reparametrization
+  gradyanlarını elle hesaplıyor, saf Python'da KL'nin kapalı formunu Monte
+  Carlo tahminiyle doğruluyor, NumPy'da doğrusal bir autoencoder'ı elle
+  türettiğin gradyanlarla eğitip PCA optimumuna indiğini görüyor, PyTorch'ta
+  bir VAE yazıyor ve en sonda K örnekli IWAE sınırını tek bir batch'li
+  hesapla, döngüsüz kuruyorsun.
+goals:
+  - "ELBO = yeniden yapılandırma − KL ayrışmasını ve [[reparametrization trick]]'i anlamak"
+  - "Gauss KL'nin kapalı formunu ve gradyanlarını türetmek"
+  - "Doğrusal autoencoder'ın PCA alt uzayını öğrendiğini deneyle görmek"
+  - "[[iwae]] sınırını log-mean-exp ile, K örneği batch boyutuna katlayarak hesaplamak"
+sources:
+  - {title: "Kingma & Welling — Auto-Encoding Variational Bayes", url: "https://arxiv.org/abs/1312.6114", license: "arXiv", use: link}
+  - {title: "Burda, Grosse, Salakhutdinov — Importance Weighted Autoencoders", url: "https://arxiv.org/abs/1509.00519", license: "arXiv", use: link}
+  - {title: "Prince — Understanding Deep Learning, Bölüm 17 (VAE)", url: "https://udlbook.github.io/udlbook/", license: "kitap ©; notebook'lar MIT", use: link}
+  - {title: "UvA Deep Learning Tutorials — Autoencoders", url: "https://uvadlc-notebooks.readthedocs.io/", license: "MIT", use: adapt}
+  - {title: "Stanford CS236 — Deep Generative Models", url: "https://deepgenerativemodels.github.io/", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "$q=\\mathcal N(\\mu,\\sigma^2)$, $p=\\mathcal N(0,1)$, $\\mu=1$, $\\sigma=0.5$"
+      fields:
+        - {id: kl, label: "$\\mathrm{KL}(q\\,\\|\\,p)=\\tfrac12(\\mu^2+\\sigma^2-1-\\log\\sigma^2)$", answer: 0.818147, tol: 0.0005}
+        - {id: dmu, label: "$\\partial\\mathrm{KL}/\\partial\\mu$", answer: 1}
+        - {id: dsig, label: "$\\partial\\mathrm{KL}/\\partial\\sigma$", answer: -1.5, hint: "$\\sigma-1/\\sigma$"}
+    - title: "Reparametrization: $z=\\mu+\\sigma\\varepsilon$, $\\varepsilon=0.4$"
+      fields:
+        - {id: z, label: "$z$", answer: 1.2}
+        - {id: dzds, label: "$\\partial z/\\partial\\sigma$", answer: 0.4}
+        - {id: dlv, label: "$\\log\\sigma^2$ parametrizasyonunda $\\partial\\mathrm{KL}/\\partial(\\log\\sigma^2)$", answer: -0.375, hint: "$\\tfrac12(\\sigma^2-1)$"}
+  verify: |
+    import math
+    mu, s, e = 1.0, 0.5, 0.4
+    kl = lambda m, sg: 0.5 * (m * m + sg * sg - 1 - math.log(sg * sg))
+    h = 1e-6
+    answers = dict(kl=kl(mu, s), dmu=(kl(mu + h, s) - kl(mu - h, s)) / (2 * h), dsig=(kl(mu, s + h) - kl(mu, s - h)) / (2 * h),
+                   z=mu + s * e, dzds=e,
+                   dlv=(kl(mu, math.exp(0.5 * (math.log(s * s) + h))) - kl(mu, math.exp(0.5 * (math.log(s * s) - h)))) / (2 * h))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Reparametrization trick neden gerekli?"
+    options:
+      - {t: "$z\\sim q_\\phi$ örneklemesi $\\phi$'ye göre türevlenemez; $z=\\mu+\\sigma\\varepsilon$ yazınca rastgelelik $\\varepsilon$'a taşınır ve gradyan $\\mu,\\sigma$'dan akar", ok: true, why: "Alternatif REINFORCE tahmincisi (M5.5) yansızdır ama çok daha yüksek varyanslıdır."}
+      - {t: "KL'yi kapalı formda hesaplamak için", why: "KL kapalı formu reparametrization'dan bağımsız."}
+      - {t: "Decoder'ı deterministik yapmak için", why: "Decoder'a dokunmaz; kodlayıcıdan gradyan akışı içindir."}
+  - q: "VAE eğitiminde KL terimi hemen sıfıra iniyor ve decoder $z$'yi yok sayıyor. Buna ne denir?"
+    options:
+      - {t: "Posterior collapse", ok: true, why: "Güçlü decoder'larda sık görülür; KL annealing (β'yı 0'dan 1'e çıkarma) ya da free-bits gibi çözümler var."}
+      - {t: "Mode collapse", why: "O, GAN'larda üretecin tek bir moda çökmesi."}
+      - {t: "Overfitting", why: "Ezberleme değil; gizil değişken kullanılmıyor."}
+  - q: "IWAE sınırı K arttıkça ne olur?"
+    options:
+      - {t: "$\\log p(x)$'e alttan monoton yaklaşır; K = 1'de ELBO'dur", ok: true, why: "Jensen boşluğu, ağırlıkların ortalaması alındıkça küçülür."}
+      - {t: "Varyansı artar", why: "Sınır sıkılaşır; tahmin edicinin varyansı da genelde düşer."}
+      - {t: "$\\log p(x)$'i aşar", why: "Beklentide hep alt sınırdır."}
