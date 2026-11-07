@@ -132,3 +132,5 @@ terms:
   deterministik politika gradyanı: "Sürekli eylemli deterministik politika μ_θ(s) için ∇J = E[∇_θ μ_θ(s) ∇_a Q(s, a)|_{a = μ_θ(s)}] (Silver ve ark. 2014); eleştirmenin eylem gradyanı aktörü yönlendirir."
   monte carlo ağaç araması: "MCTS: arama ağacını tekrar tekrar seçim (UCT/PUCT), genişletme, simülasyon (rastgele oyun ya da değer ağı) ve geri yayılımla büyütür; aramayı umut veren dallara yoğunlaştırır."
   elo derecelendirmesi: "Oyuncu gücü ölçeği: A'nın B'ye karşı beklenen skoru 1/(1 + 10^((R_B − R_A)/400)); 200 puan fark ≈ %76. Bradley–Terry modelinin logaritmik ölçeklenmiş hâlidir."
+  fisher bilgi matrisi: "F = E[∇log π ∇log πᵀ]: dağılımlar uzayının yerel metriği; KL(π_θ ‖ π_{θ+d}) ≈ ½ dᵀFd. Doğal gradyan F⁻¹g bu metrikte en dik yöndür."
+  gae: "Generalized Advantage Estimation: A_t = Σ_k (γλ)^k δ_{t+k}, δ_t = r_t + γV(s_{t+1}) − V(s_t); λ yanlılık–varyans ödünleşimini ayarlar (0: TD, 1: Monte Carlo)."
