@@ -1,0 +1,73 @@
+id: m4-2-cnn
+code: M4.2
+title: CNN mimarileri (LeNet → ResNet)
+phase: 4
+minutes: 270
+prereq: [m4-1-conv, m3-6-norm]
+summary: >
+  Katmanları üst üste koymanın kuralları. Receptive field'ı, çıktı boyutlarını
+  ve residual bağlantının gradyan akışına etkisini elle hesaplıyor, saf
+  Python'da bunları yazıyor, NumPy'da 20 katmanlık düz ve residual ağlarda
+  gradyan normlarını elle geri yayıyor, PyTorch'ta ResNet'in BasicBlock'unu ve
+  küçük bir ResNet'i kuruyor ve en sonda çıkarım için Conv+BatchNorm
+  birleştirmesini (fusion) yapıyorsun.
+goals:
+  - "Receptive field'ı katman katman $r\\leftarrow r+(k-1)\\cdot j$, $j\\leftarrow j\\cdot s$ ile hesaplamak"
+  - "İki 3×3 katmanın bir 5×5'in receptive field'ını daha az parametreyle verdiğini göstermek (VGG fikri)"
+  - "[[residual bağlantı|Residual bağlantının]] Jacobian'a birim matris ekleyerek gradyanın sönmesini nasıl engellediğini ölçmek"
+  - "ResNet BasicBlock'unu (projection shortcut dahil) yazmak"
+  - "Eval modunda BatchNorm'u önceki conv'a katlamak (inference fusion)"
+sources:
+  - {title: "He et al. — Deep Residual Learning for Image Recognition", url: "https://arxiv.org/abs/1512.03385", license: "arXiv", use: link}
+  - {title: "Dive into Deep Learning §8 Modern CNNs (LeNet, VGG, ResNet)", url: "https://d2l.ai/chapter_convolutional-modern/index.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "UvA DL Tutorial 5: Inception, ResNet and DenseNet", url: "https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial5/Inception_ResNet_DenseNet.html", license: "MIT", use: adapt}
+  - {title: "PyTorch Tutorials — Fusing Convolution and Batch Norm", url: "https://docs.pytorch.org/tutorials/intermediate/custom_function_conv_bn_tutorial.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "Gradyan akışı: 10 katman, her katmanın yerel türevi $a=0.1$"
+      fields:
+        - {id: plain, label: "Düz: $\\prod a$", answer: 1e-10, tol: 1e-12, hint: "$0.1^{10}$"}
+        - {id: res, label: "Residual $h+f(h)$: $\\prod(1+a)$", answer: 2.593742, tol: 0.001, hint: "$1.1^{10}$"}
+    - title: "Receptive field (stride 1)"
+      fields:
+        - {id: rf2, label: "İki 3×3 conv", answer: 5, hint: "her 3×3 kenara 1 piksel ekler: $3+2$"}
+        - {id: rf3, label: "Üç 3×3 conv", answer: 7}
+        - {id: ratio, label: "Üç 3×3 ($C\\to C$) / bir 7×7 parametre oranı (bias yok)", answer: 0.55102, tol: 0.001, hint: "$27C^2/49C^2$"}
+        - {id: rfs, label: "3×3 s1 → 3×3 s2 → 3×3 s1", answer: 9, hint: "$r$: 1→3→5, sonra jump 2 ile $5+2\\cdot2$"}
+    - title: "ResNet giriş katmanları, 224×224"
+      fields:
+        - {id: stem, label: "7×7, stride 2, pad 3 sonrası", answer: 112, hint: "$\\lfloor(224+6-7)/2\\rfloor+1$"}
+        - {id: pool, label: "ardından 3×3 max-pool, stride 2, pad 1", answer: 56}
+  verify: |
+    def rf(layers):
+        r, j = 1, 1
+        for k, s in layers:
+            r += (k - 1) * j; j *= s
+        return r
+    out = lambda H, k, s, p: (H + 2 * p - k) // s + 1
+    answers = dict(plain=0.1 ** 10, res=round(1.1 ** 10, 6), rf2=rf([(3, 1)] * 2), rf3=rf([(3, 1)] * 3), ratio=round(27 / 49, 6),
+                   rfs=rf([(3, 1), (3, 2), (3, 1)]), stem=out(224, 7, 2, 3), pool=out(out(224, 7, 2, 3), 3, 2, 1))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Residual bağlantı neden 1000 katmanlık ağları bile eğitilebilir kılar?"
+    options:
+      - {t: "$y=x+F(x)$'in Jacobian'ı $I+J_F$; gradyan her katmanda en az birim yoldan geçer ve çarpımlar sıfıra gitmez", ok: true, why: "Gradyan, katmanları atlayan bir 'otoyol' bulur. Ayrıca ağ başlangıçta $F\\approx0$ ile kimlik fonksiyonuna yakın davranır."}
+      - {t: "Parametre sayısını azaltır", why: "Shortcut parametresizdir (projection hariç); kazanç optimizasyonda."}
+      - {t: "Aktivasyonları normalize eder", why: "O BatchNorm'un işi."}
+  - q: "BasicBlock'ta projection shortcut (1×1 conv) ne zaman gerekir?"
+    options:
+      - {t: "Ana yolun çıktısı girdiyle aynı shape'te olmadığında: stride > 1 (uzamsal küçülme) ya da kanal sayısı değişince", ok: true, why: "Toplama için shape'ler eşit olmalı; 1×1 stride'lı conv hem kanalı hem çözünürlüğü eşler."}
+      - {t: "Her blokta", why: "Shape korunuyorsa kimlik shortcut kullanılır (parametresiz)."}
+      - {t: "Yalnız son blokta", why: "Her aşama geçişinin ilk bloğunda."}
+  - q: "Conv + BN birleştirmesi neden yalnız eval modunda geçerlidir?"
+    options:
+      - {t: "Eval'de BN sabit running istatistiklerle bir afin dönüşümdür ve conv'un ağırlık/bias'ına katlanabilir; eğitimde istatistik batch'e bağlıdır", ok: true, why: "Çıkarımda bir kernel ve bir bellek okuma/yazma turu kazanılır. ONNX/TensorRT gibi araçlar bunu otomatik yapar."}
+      - {t: "Eğitimde gradyan tanımsız olur", why: "Sorun gradyan değil, istatistiklerin sabit olmaması."}
+      - {t: "Her zaman geçerlidir", why: "Train modunda çıktılar farklı olur; kontrol eval'de karşılaştırıyor."}
