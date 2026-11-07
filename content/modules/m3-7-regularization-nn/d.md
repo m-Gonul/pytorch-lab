@@ -1,0 +1,2 @@
+- `MyDropout(p)` — `nn.Module`; `self.training` bayrağına göre davran (eğitim: `torch.rand_like(x) >= p` maskesi + ölçekleme; eval: kimlik).
+- `fit_early_stopping(model, Xtr, ytr, Xva, yva, patience=10, max_epochs=500, lr=1e-2)` → `(model, best_epoch, history)`; tam batch `Adam`, `cross_entropy`. Her epoch: bir eğitim adımı (`model.train()`), sonra doğrulama kaybı (`model.eval()` + `torch.no_grad()`). En iyi ağırlıkları `copy.deepcopy(model.state_dict())` ile sakla, sonunda `load_state_dict` ile geri yükle. `history` doğrulama kayıpları listesi.

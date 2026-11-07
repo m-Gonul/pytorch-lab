@@ -1,0 +1,3 @@
+- `dropout_np(X, p, rng)` → `(Y, mask)`; `mask = rng.random(X.shape) >= p`.
+- `mc_predict(W1, b1, W2, b2, X, p, T, rng)` → `(mean, std)`, her biri `(N, C)`. İki katmanlı ağ, dropout gizli katmanda: tüm $T$ maskeyi **tek** çağrıda çek, `rng.random((T, N, H)) >= p`; gizli aktivasyonlar `(T, N, H)`, olasılıklar softmax ile `(T, N, C)`. **Döngü yok.**
+- `class EarlyStopper` — `__init__(self, patience, min_delta=0.0)`; `step(self, val_loss)` → durulacaksa `True`; özellikler `best`, `best_epoch` (0-tabanlı, `step` çağrı sayısına göre).

@@ -1,0 +1,75 @@
+id: m3-7-regularization-nn
+code: M3.7
+title: Dropout, weight decay, early stopping
+phase: 3
+minutes: 180
+prereq: [m3-2-mlp-backprop, m3-4-optimizers]
+summary: >
+  Sinir ağlarında aşırı uyumla savaşın üç standart aracı. Inverted dropout'u
+  ve early stopping kararını elle uyguluyor, saf Python'da dropout'un ileri/
+  geri geçişini yazıyor, NumPy'da MC dropout ile belirsizlik tahminini tek
+  tensörde yapıyor, PyTorch'ta `train()/eval()` davranışını taşıyan kendi
+  Dropout modülünü ve en iyi ağırlıkları geri yükleyen bir eğitim döngüsü
+  kuruyor ve en sonda T stokastik geçişi tek bir batched hesapla yapıyorsun.
+goals:
+  - "Inverted dropout'ta neden $1/(1-p)$ ile ölçeklendiğini (beklenen değeri korumak) göstermek"
+  - "`model.train()` / `model.eval()` farkını ve dropout'un geri geçişinin maske ile çarpım olduğunu uygulamak"
+  - "Early stopping'i `patience` ile tanımlayıp en iyi `state_dict`'i geri yüklemek"
+  - "MC dropout ile tahmin belirsizliği (ortalama, std, entropi) üretmek"
+sources:
+  - {title: "Srivastava et al. — Dropout: A Simple Way to Prevent Neural Networks from Overfitting", url: "https://jmlr.org/papers/v15/srivastava14a.html", license: "©", use: link}
+  - {title: "CS231n — Neural Networks Part 2: Regularization (inverted dropout)", url: "https://cs231n.github.io/neural-networks-2/#reg", license: "MIT", use: adapt}
+  - {title: "Gal & Ghahramani — Dropout as a Bayesian Approximation (MC dropout)", url: "https://arxiv.org/abs/1506.02142", license: "arXiv", use: link}
+  - {title: "Dive into Deep Learning §5.6 Dropout", url: "https://d2l.ai/chapter_multilayer-perceptrons/dropout.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+
+hand:
+  groups:
+    - title: "Inverted dropout, düşürme olasılığı $p=0.5$, $x=[2,4,6,8]$, maske $m=[1,0,1,1]$: $y=x\\odot m/(1-p)$"
+      fields:
+        - {id: o1, label: "$y_1$", answer: 4, hint: "$2\\cdot1/0.5$"}
+        - {id: o2, label: "$y_2$", answer: 0}
+        - {id: o4, label: "$y_4$", answer: 16}
+        - {id: ex, label: "$\\mathbb E[y_1]$ (maske rastgele)", answer: 2, hint: "$(1-p)\\cdot\\frac{x_1}{1-p}+p\\cdot0$"}
+        - {id: test, label: "Test zamanı $y_1$", answer: 2, hint: "eval'de dropout kimlik fonksiyonu"}
+    - title: "Weight decay ve early stopping"
+      fields:
+        - {id: wd, label: "Ayrık decay: $w=1$, $\\eta=0.1$, $\\lambda=0.01$ → $w(1-\\eta\\lambda)$", answer: 0.999, tol: 0.00001}
+        - {id: best, label: "Doğrulama kayıpları $[0.9,0.7,0.6,0.62,0.65,0.61]$, patience 2: en iyi epoch (0-tabanlı)", answer: 2}
+        - {id: stop, label: "… durdurulan epoch", answer: 4, hint: "epoch 3 ve 4 iyileştirmedi; 2. iyileşmeyen epoch'ta dur"}
+  verify: |
+    x = [2, 4, 6, 8]; m = [1, 0, 1, 1]; p = 0.5
+    y = [a * b / (1 - p) for a, b in zip(x, m)]
+    v = [0.9, 0.7, 0.6, 0.62, 0.65, 0.61]
+    best, bad, stop = 0, 0, len(v) - 1
+    for i in range(1, len(v)):
+        if v[i] < v[best]:
+            best, bad = i, 0
+        else:
+            bad += 1
+            if bad >= 2:
+                stop = i
+                break
+    answers = dict(o1=y[0], o2=y[1], o4=y[3], ex=x[0], test=x[0], wd=1 * (1 - 0.1 * 0.01), best=best, stop=stop)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Eğitimde dropout uygulayıp `model.eval()` çağırmayı unutursan ne olur?"
+    options:
+      - {t: "Test tahminleri rastgele olur ve her çağrıda değişir; doğruluk düşer", ok: true, why: "BatchNorm da aynı bayrağa bakar: eval'de running istatistik kullanır. `eval()` bu yüzden kritik; `torch.no_grad()` ise ayrı bir şey (gradyan kaydını kapatır)."}
+      - {t: "Hiçbir şey; inverted dropout zaten ölçekli", why: "Ölçek beklenen değeri korur ama tek bir geçiş yine de rastgele."}
+      - {t: "Hata verir", why: "Sessizce yanlış çalışır; en tehlikeli tür."}
+  - q: "Dropout bir modelin içinde neyi taklit eder?"
+    options:
+      - {t: "Ağırlık paylaşan üstel sayıda alt-ağdan oluşan bir topluluğu (ensemble); test zamanı ölçekleme bu topluluğun ortalamasına yaklaşır", ok: true, why: "Her eğitim adımı farklı bir alt-ağı eğitir. MC dropout ise test zamanında bu alt-ağlardan örnekleyip belirsizlik tahmini yapar."}
+      - {t: "L1 cezasını", why: "Lineer modelde L2'ye benzer bir etkisi gösterilebilir; asıl yorum topluluk."}
+      - {t: "Learning rate azalmasını", why: "İlgisiz."}
+  - q: "Early stopping'de neden son epoch'un değil en iyi epoch'un ağırlıklarını döndürürüz?"
+    options:
+      - {t: "Durma kararı `patience` kadar kötüleşmeden sonra verilir; son ağırlıklar zaten aşırı uyumun başladığı noktadan sonradır", ok: true, why: "Bu yüzden en iyi `state_dict`'in kopyası (deepcopy) saklanır; referans saklamak yetmez, ağırlıklar yerinde değişir."}
+      - {t: "Son ağırlıklar her zaman daha kötüdür", why: "Daha kötü olmak zorunda değil ama doğrulama hatasına göre en iyisi değil."}
+      - {t: "Farketmez", why: "patience = 10 ile 10 epoch'luk aşırı uyum fark eder."}
