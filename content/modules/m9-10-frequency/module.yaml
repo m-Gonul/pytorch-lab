@@ -1,0 +1,99 @@
+id: m9-10-frequency
+code: M9.10
+title: Frekans uzayı — DFT, filtreler ve ters süzgeçleme
+phase: 9
+minutes: 420
+prereq: [m9-3-spatial-filtering, m9-5-restoration]
+summary: >
+  Doğrusal dönüşümler ve dönüşüm çiftleri, ayrılabilir ve simetrik
+  çekirdekler, LTI sistemlerin özfonksiyonu olarak karmaşık üsteller,
+  konvolüsyon teoremi ve sarmalanma (wraparound). Elle küçük DFT'ler ve
+  dairesel konvolüsyon; saf Python'da DFT ve Cooley-Tukey FFT; NumPy'da
+  Gonzalez'in dolgulu frekans filtreleme hattı, ideal / Butterworth / Gauss
+  süzgeçleri ve FFT ile doğrusal konvolüsyon; PyTorch'ta bulanık ve
+  gürültülü görüntülerden frekans başına kazancı öğrenip Wiener süzgecine
+  ulaşıyorsun; en sonda `F.conv2d` ile aynı sonucu veren FFT tabanlı
+  konvolüsyonu yazıp büyük çekirdeklerde ne zaman kazandığını ölçüyorsun.
+goals:
+  - "DFT çifti, ayrılabilirlik, merkezleme ve spektrum / faz"
+  - "[[konvolüsyon teoremi]] ve neden sıfır dolgu ($P\\ge A+B-1$) gerektiği"
+  - "Alçak / yüksek geçiren süzgeçler ve ideal süzgecin halkalanması (ringing)"
+  - "Ters süzgeç ve [[Wiener süzgeci]]: neden ters süzgeç gürültüyü patlatır"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 4 ve 5.7–5.8", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "Cooley & Tukey — An algorithm for the machine calculation of complex Fourier series (1965)", url: "https://doi.org/10.1090/S0025-5718-1965-0178586-1", license: "©", use: link}
+  - {title: "PyTorch — torch.fft", url: "https://pytorch.org/docs/stable/fft.html", license: "BSD-3", use: adapt}
+  - {title: "Szeliski — Computer Vision: Algorithms and Applications, 2. baskı, 3.4", url: "https://szeliski.org/Book/", license: "ücretsiz PDF", use: link}
+
+hand:
+  groups:
+    - title: "DFT, $f=[1,2,3,4]$, $F(u)=\\sum_x f(x)e^{-j2\\pi ux/4}$"
+      fields:
+        - {id: f0, label: "$F(0)$", answer: 10}
+        - {id: f1r, label: "$\\mathrm{Re}\\,F(1)$", answer: -2}
+        - {id: f1i, label: "$\\mathrm{Im}\\,F(1)$", answer: 2}
+        - {id: f2, label: "$F(2)$", answer: -2}
+    - title: "Konvolüsyon ve dolgu"
+      fields:
+        - {id: cc, label: "Dairesel $[1,2,0,0]\\circledast[1,1,0,0]$'nin 2. elemanı (indis 1)", answer: 3}
+        - {id: wrap, label: "Dairesel $[1,0,0,2]\\circledast[1,1,0,0]$'nin 1. elemanı (indis 0) — sarmalanma", answer: 3}
+        - {id: pad, label: "256 × 256 görüntü, 31 × 31 çekirdek: sarmalanmasız en küçük $P$", answer: 286}
+    - title: "Süzgeç kazançları"
+      fields:
+        - {id: bw, label: "Butterworth, $D=D_0$", answer: 0.5}
+        - {id: gs, label: "Gauss, $D=D_0$", answer: 0.606531, tol: 0.0001}
+        - {id: inv, label: "Ters süzgeç kazancı, $H=0.1$", answer: 10}
+        - {id: wn, label: "Wiener kazancı $\\frac{H^*}{|H|^2+K}$, $H=0.1$, $K=0.01$", answer: 5}
+  verify: |
+    import numpy as np
+    F = np.fft.fft([1, 2, 3, 4])
+    cc = np.real(np.fft.ifft(np.fft.fft([1, 2, 0, 0]) * np.fft.fft([1, 1, 0, 0])))
+    wr = np.real(np.fft.ifft(np.fft.fft([1, 0, 0, 2]) * np.fft.fft([1, 1, 0, 0])))
+    answers = dict(f0=F[0].real, f1r=F[1].real, f1i=F[1].imag, f2=F[2].real, cc=round(cc[1]), wrap=round(wr[0]), pad=256 + 31 - 1,
+                   bw=1 / (1 + 1), gs=np.exp(-0.5), inv=1 / 0.1, wn=0.1 / (0.01 + 0.01))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Spektrum ve faz: hangisi yapıyı taşır? Öteleme teoremi", engine: browser}
+  - {id: x2, title: "Periyodik gürültü ve çentik (notch) süzgeçleri", engine: browser}
+  - {id: x3, title: "DCT ve enerji yoğunlaştırma (JPEG'in temeli)", engine: browser}
+
+quiz:
+  - q: "FFT ile konvolüsyon yaparken neden sıfır dolgu gerekir?"
+    options:
+      - {t: "DFT çarpımı dairesel konvolüsyondur; dolgu olmadan bir uçtaki değerler öbür uca sarmalanır", ok: true, why: "Uzunlukları A ve B olan dizilerde P ≥ A + B − 1 yeterlidir."}
+      - {t: "FFT yalnız 2'nin kuvvetlerinde çalıştığı için", why: "Modern FFT'ler her uzunlukta çalışır; dolgu sarmalanma içindir."}
+      - {t: "Faz bilgisini korumak için", why: "Faz dolgusuz da korunur."}
+  - q: "İdeal alçak geçiren süzgeç neden halkalanma (ringing) üretir?"
+    options:
+      - {t: "Frekanstaki keskin kesim, uzayda yavaş sönen sinc biçimli bir dürtü yanıtına karşılık gelir", ok: true, why: "Gauss süzgecin dürtü yanıtı da Gauss'tur, negatif lobu yoktur, halkalanma olmaz."}
+      - {t: "Yüksek frekansları güçlendirdiği için", why: "Onları keser."}
+      - {t: "Dolgu yapılmadığı için", why: "Dolgu sarmalanmayı önler, halkalanmayı değil."}
+  - q: "Bulanıklaştırma süzgecinin H'si sıfıra yakın olduğu frekanslarda ters süzgeç ne yapar?"
+    options:
+      - {t: "Gürültüyü 1/|H| kadar büyütür; Wiener K terimiyle bu kazancı sınırlar", ok: true, why: "Wiener, sinyal/gürültü oranının düşük olduğu frekansları bastırır."}
+      - {t: "O frekansları sıfırlar", why: "Tersine, devasa kazanç verir."}
+      - {t: "Etkisi yoktur", why: "Gürültüsüz durumda bile sayısal olarak kararsızdır."}
+
+homework:
+  - title: "Global Filter Network: frekans uzayında öğrenilen küresel süzgeçler"
+    paper: "Rao, Zhao, Zhu, Lu, Zhou — Global Filter Networks for Image Classification (NeurIPS 2021)"
+    url: "https://arxiv.org/abs/2107.00645"
+    level: ileri
+    hours: 12
+    goal: |
+      ViT'teki öz-dikkat katmanını, yama ızgarası üzerinde 2-B FFT → öğrenilen karmaşık süzgeçle eleman eleman çarpım → ters FFT işlemiyle değiştiren GFNet bloğunu uygula. CIFAR-10'da aynı derinlik ve genişlikteki küçük bir ViT ile doğruluk, parametre ve FLOP karşılaştır; öğrenilen süzgeçleri görselleştir.
+    steps:
+      - "Bu modüldeki d aşamasının frekans başına öğrenilen kazancını kanal başına karmaşık süzgece genelleştir (`torch.fft.rfft2`)."
+      - "Blok: LN → global filter → LN → MLP, artık bağlantılarla; yama gömme M4.15'teki gibi."
+      - "Görüntü çözünürlüğü değişince süzgeci enterpolasyonla yeniden boyutlandır."
+      - "Karmaşıklık: öz-dikkat $O(N^2)$, global filter $O(N\\log N)$; N ile süre ölçümü."
+    accept:
+      - "CIFAR-10'da GFNet ve ViT doğrulukları ±2 puan içinde; GFNet FLOP'ları daha düşük."
+      - "Token sayısı 64 → 1024 için süre grafiği."
+      - "Öğrenilen süzgeçlerin genlik spektrumları: sığ katmanlarda yüksek frekans ağırlıklı mı?"
