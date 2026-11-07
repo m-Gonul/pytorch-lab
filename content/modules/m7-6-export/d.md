@@ -1,0 +1,5 @@
+- `export_dynamic(model, example)` → `ExportedProgram`; batch boyutu dinamik: `dynamic_shapes={"x": {0: Dim("batch", min=1, max=1024)}}` (anahtar, `forward`'un argüman adı).
+- `op_names(ep)` → `call_function` düğümlerinin hedeflerinin dize hâlleri.
+- `save_load(ep)` → `torch.export.save` ile `io.BytesIO`'ya yaz, `torch.export.load` ile geri oku.
+- `CondModel` — `forward(x)`: `torch.cond(x.sum() > 0, lambda x: x * 2, lambda x: -x, (x,))`.
+- `BadModel` — aynı mantık, Python `if` ile (kontrol export'un hata verdiğini doğrular).

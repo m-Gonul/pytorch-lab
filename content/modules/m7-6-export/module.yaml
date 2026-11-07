@@ -1,0 +1,66 @@
+id: m7-6-export
+code: M7.6
+title: Export ve deployment
+phase: 7
+minutes: 240
+prereq: [m6-5-compile]
+summary: >
+  Modeli Python'dan çıkarıp çalıştırılabilir bir grafa dönüştürmek. Boyut ve
+  verim hesaplarını ve tracing'in kontrol akışını nasıl "dondurduğunu" elle
+  görüyor, saf Python'da modeli JSON'a yazıp yorumlayan bir mini çalışma
+  zamanı ve kayıt tabanlı bir izleyici yazıyor, NumPy'da ONNX benzeri düğüm
+  listesini çalıştıran, sabit katlayan ve sembolik batch ile şekil çıkaran
+  bir çalışma zamanı kuruyor, `torch.export` ile dinamik şekilli ve
+  `torch.cond`'lu modeller dışa aktarıyor ve en sonda AOTInductor ile
+  modeli Python'suz çalışabilen derlenmiş bir pakete dönüştürüyorsun.
+goals:
+  - "Tracing ile export'un farkı: veriye bağlı kontrol akışı ve [[guard]]'lar"
+  - "Dinamik şekiller (`Dim`) ve `torch.cond`"
+  - "Graf düzeyinde geçişler: sabit katlama, şekil çıkarımı"
+  - "Dağıtım biçimleri: ExportedProgram (.pt2), ONNX, AOTInductor paketi"
+sources:
+  - {title: "PyTorch Docs — torch.export", url: "https://docs.pytorch.org/docs/stable/export.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "PyTorch Docs — AOTInductor", url: "https://docs.pytorch.org/docs/stable/torch.compiler_aot_inductor.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "PyTorch Docs — torch.cond", url: "https://docs.pytorch.org/docs/stable/cond.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "ONNX — Intermediate Representation spec", url: "https://onnx.ai/onnx/repo-docs/IR.html", license: "Apache-2.0", use: link}
+  - {title: "ONNX Runtime Web", url: "https://onnxruntime.ai/docs/tutorials/web/", license: "MIT", use: link}
+
+hand:
+  groups:
+    - title: "10 milyon parametreli model"
+      fields:
+        - {id: s32, label: "fp32 dosya boyutu (bayt)", answer: 40000000}
+        - {id: s8, label: "int8 ağırlıklarla (bayt, ölçekleri yok say)", answer: 10000000}
+    - title: "Batch 1: 5 ms, batch 8: 20 ms"
+      fields:
+        - {id: t1, label: "Batch 1 verimi (örnek/s)", answer: 200}
+        - {id: t8, label: "Batch 8 verimi (örnek/s)", answer: 400}
+    - title: "$f(x)=2x$ eğer $\\sum x>0$, değilse $-x$. Kayıt tabanlı izleyici $x=(1,2)$ ile izliyor"
+      fields:
+        - {id: baked, label: "Kaydedilen graf $x=(-1,-1)$ ile çalışınca çıktının toplamı", answer: -4, hint: "İzleme yalnız alınan dalı kaydeder"}
+        - {id: right, label: "Doğru $\\sum f(x)$", answer: 2}
+  verify: |
+    answers = dict(s32=4 * 10 ** 7, s8=10 ** 7, t1=1 / 0.005, t8=8 / 0.020, baked=2 * (-1 - 1), right=1 + 1)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "`torch.export`, `if x.sum() > 0:` içeren bir modeli neden reddeder?"
+    options:
+      - {t: "Dalın yönü verinin değerine bağlı; tek bir statik graf iki dalı birden temsil edemez. Sessizce bir dalı dondurmak yerine hata verir", ok: true, why: "Çözüm `torch.cond`: iki dal da grafa girer, seçim çalışma anında yapılır. Eski `torch.jit.trace` ise uyarıyla dalı dondururdu."}
+      - {t: "`sum` desteklenmediği için", why: "Sorun veriye bağlı kontrol akışı."}
+      - {t: "Yalnız GPU'da hata verir", why: "Cihazdan bağımsız."}
+  - q: "Örnek girdi batch 4 ile export edilmiş bir program batch 7 ile çağrılınca hata veriyor. Neden?"
+    options:
+      - {t: "Varsayılan olarak şekiller statik özelleştirilir ve bir guard ($\\text{batch}=4$) eklenir; dinamik olması için `dynamic_shapes` ile `Dim` verilmeli", ok: true, why: "Dinamik boyutlar sembolik tamsayılarla izlenir; min/max aralığı da verilebilir."}
+      - {t: "Batch 7 asal olduğu için", why: "Guard her farklı değerde tetiklenir."}
+      - {t: "Model yeniden eğitilmeli", why: "Ağırlıklarla ilgisi yok."}
+  - q: "AOTInductor paketinin `torch.compile`'dan farkı nedir?"
+    options:
+      - {t: "Derleme önceden (ahead-of-time) yapılır ve sonuç Python yorumlayıcısı olmadan C++'tan yüklenebilen bir paket olur; çalışma anında JIT derleme yok", ok: true, why: "Sunucu ve gömülü dağıtımlarda soğuk başlatma ve Python bağımlılığı ortadan kalkar."}
+      - {t: "Daha hızlı kernel'ler üretir", why: "Aynı Inductor arka ucu; fark derlemenin zamanı ve paket biçimi."}
+      - {t: "Yalnız mobil içindir", why: "Sunucuda da kullanılır."}
