@@ -1,0 +1,3 @@
+- `per_sample_grads(model, x, y)` — `{ad: (B, …)}` sözlüğü. `params = {k: v.detach() for k, v in model.named_parameters()}`, tek örneklik kayıp `functional_call(model, params, (x[None],))` ile, sonra `vmap(grad(loss_one), in_dims=(None, 0, 0))`.
+- `jacobians(f, x)` → `(jacrev(f)(x), jacfwd(f)(x))`.
+- `hvp(f, x, v)` — `jvp(grad(f), (x,), (v,))[1]`.
