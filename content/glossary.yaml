@@ -117,3 +117,4 @@ terms:
   geçiş matrisi: "Markov zincirinde bir durumdan diğerine geçme olasılıklarını tutan matris; bu modülde sütun j, S_j'den çıkış dağılımıdır."
   bellman denklemi: "Bir durumun değerini anlık ödül ile sonraki durumların indirimli beklenen değeri cinsinden yazan özyinelemeli denklem; en iyi değerde eylemler üzerinde max alınır."
   politika iyileştirme teoremi: "Bir politikanın Q değerlerine göre açgözlü seçilen yeni politikanın her durumda en az eski politika kadar değerli olduğunu söyleyen sonuç."
+  td hatası: "Temporal-difference hatası δ = r + γV(s') − V(s): tek adımlık önyüklemeli hedef ile şimdiki kestirim arasındaki fark."

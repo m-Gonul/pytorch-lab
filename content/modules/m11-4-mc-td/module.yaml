@@ -1,0 +1,90 @@
+id: m11-4-mc-td
+code: M11.4
+title: Modelden bağımsız değerlendirme — Monte Carlo ve TD
+phase: 11
+minutes: 380
+prereq: [m11-3-policy-iteration]
+summary: >
+  Geçiş ve ödül modeli bilinmiyorsa değer, oynayarak kestirilir. Monte
+  Carlo: bölüm sonuna kadar oyna, getiriyi ortala (yansız, yüksek varyans);
+  zamansal fark (TD): bir adım oyna, $r+\gamma V(s')$'ye doğru güncelle
+  (yanlı, düşük varyans). Öğrenme oranı koşulları, toplu (batch) MC ve TD'nin
+  farklı cevaplara yakınsaması, n adımlı getiriler ve uygunluk izleriyle
+  TD(λ). Saf Python'da 5 durumlu rastgele yürüyüşte MC ve TD; NumPy'da
+  toplu güncelleme ve Sutton'ın A–B örneği; PyTorch'ta ileri bakışlı
+  λ-getirisi ile geriye bakışlı izlerin çevrimdışı eşdeğerliği; en sonda
+  1000 bağımsız deneyi aynı anda yürüten vektörel TD.
+goals:
+  - "MC hedefi $G_t$, TD hedefi $r+\\gamma V(s')$, [[TD hatası]] $\\delta=r+\\gamma V(s')-V(s)$"
+  - "Artımlı ortalama ve Robbins–Monro: $\\sum\\alpha=\\infty$, $\\sum\\alpha^2<\\infty$"
+  - "Toplu MC eğitim hatasını, toplu TD en çok olabilirlikli Markov modelinin değerini bulur"
+  - "n adımlı TD, λ-getirisi, uygunluk izleri"
+sources:
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 5–7 ve 12", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+  - {title: "Sutton — Learning to Predict by the Methods of Temporal Differences (Machine Learning 1988)", url: "https://doi.org/10.1007/BF00115009", license: "©", use: link}
+  - {title: "Robbins & Monro — A Stochastic Approximation Method (Ann. Math. Stat. 1951)", url: "https://doi.org/10.1214/aoms/1177729586", license: "©", use: link}
+  - {title: "Poupart — CS885 Reinforcement Learning, Ders 4", url: "https://cs.uwaterloo.ca/~ppoupart/teaching/cs885-spring20/", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "Güncellemeler"
+      fields:
+        - {id: inc, label: "Artımlı ortalama: $V=0.5$ (3 örnekten), yeni $G=1$, $\\alpha=1/4$", answer: 0.625}
+        - {id: mc, label: "Sabit α MC: $V=0.5$, $G=1$, $\\alpha=0.1$", answer: 0.55}
+        - {id: td, label: "TD(0): $V(s)=0.5$, $r=0$, $V(s')=0.7$, $\\gamma=1$, $\\alpha=0.1$", answer: 0.52}
+        - {id: dlt, label: "Aynı adımın TD hatası δ", answer: 0.2}
+    - title: "Sutton Örnek 6.4: bölümler A,0,B,0 · 6 × (B,1) · 1 × (B,0)"
+      fields:
+        - {id: vb, label: "$V(B)$ (ikisi de)", answer: 0.75}
+        - {id: amc, label: "Toplu MC'nin $V(A)$'sı", answer: 0}
+        - {id: atd, label: "Toplu TD'nin $V(A)$'sı", answer: 0.75}
+    - title: "5 durumlu rastgele yürüyüş (A…E, sağ uç +1)"
+      fields:
+        - {id: rc, label: "C'nin gerçek değeri", answer: 0.5}
+  verify: |
+    answers = dict(inc=0.5 + (1 - 0.5) / 4, mc=0.5 + 0.1 * (1 - 0.5), td=0.5 + 0.1 * (0 + 0.7 - 0.5), dlt=0.2,
+                   vb=6 / 8, amc=0.0, atd=6 / 8, rc=3 / 6)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Blackjack: Monte Carlo ile politika değerlendirme", engine: browser}
+  - {id: x2, title: "Öğrenme oranı koşulları deneyi", engine: browser}
+  - {id: x3, title: "n adımlı TD: 19 durumlu yürüyüşte n ve α", engine: browser}
+
+quiz:
+  - q: "TD hedefi neden yanlıdır?"
+    options:
+      - {t: "Gerçek getiri yerine kendi (henüz yanlış) kestirimimiz V(s')'yi kullanır: önyükleme (bootstrapping)", ok: true, why: "Karşılığında tek adımlık rastgelelik içerdiği için varyansı düşüktür."}
+      - {t: "İndirim faktörü kullandığı için", why: "MC de indirim kullanır."}
+      - {t: "Öğrenme oranı sabit olduğu için", why: "Yanlılık hedefin kendisinden gelir."}
+  - q: "Toplu (batch) MC ve TD aynı veride neden farklı V(A) bulur?"
+    options:
+      - {t: "MC gözlenen getirilerin ortalamasını (eğitim kare hatasını en aza indirir), TD ise veriye en uygun Markov modelinin değerini (kesinlik eşdeğerliği) bulur", ok: true, why: "A'dan hep B'ye geçildiği için TD, V(A) = V(B) der."}
+      - {t: "TD daha az bölüm kullandığı için", why: "Aynı veri."}
+      - {t: "MC yakınsamadığı için", why: "İkisi de yakınsar."}
+  - q: "λ = 1 ile TD(λ) neye karşılık gelir?"
+    options:
+      - {t: "Monte Carlo (çevrimdışı, bölüm sonunda güncellemede tam eşdeğer)", ok: true, why: "λ = 0 tek adımlı TD'dir."}
+      - {t: "Değer yinelemesine", why: "Model gerektirmez."}
+      - {t: "Q-öğrenmeye", why: "Bu değerlendirme yöntemidir."}
+
+homework:
+  - title: "Sutton (1988): TD yöntemleriyle tahmin"
+    paper: "Sutton — Learning to Predict by the Methods of Temporal Differences (Machine Learning 1988)"
+    url: "https://doi.org/10.1007/BF00115009"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin rastgele yürüyüş deneylerini (Şekil 3, 4, 5) yeniden üret: 100 eğitim kümesi × 10 dizi, (1) tekrarlı sunum (batch, yakınsayana dek) altında λ'ya karşı RMS hata, (2) tek sunum altında farklı α ve λ için hata. Doğrusal fonksiyon yaklaştırıcı (birim vektör öznitelikleri) ile Widrow–Hoff kuralının TD(1) olduğunu göster.
+    steps:
+      - "Bu modüldeki d aşamasının iz uygulamasını kullan; ağırlıkları dizi sonunda güncelle."
+      - "Tekrarlı sunumda ağırlık değişimi < 1e-3 olana dek tekrar."
+      - "En iyi α ile λ ∈ {0, 0.1, …, 1} eğrisi."
+    accept:
+      - "Şekil 3: hata λ arttıkça artar (λ = 0 en iyi, ≈ 0.19), λ = 1 ≈ 0.25."
+      - "Şekil 4/5'in nitel biçimi: ara λ (≈ 0.3) tek sunumda en iyi."
