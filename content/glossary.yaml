@@ -112,3 +112,4 @@ terms:
   ransac: "Random Sample Consensus: minimal rastgele örneklerden model kurup en çok veri noktasıyla uyuşanı seçen, aykırı değerlere dayanıklı kestirim yöntemi."
   adaboost: "Zayıf sınıflandırıcıları sırayla, önceki turların yanlış sınıfladığı örneklere daha çok ağırlık vererek eğitip ağırlıklı oyla birleştiren boosting algoritması."
   optik akış: "Ardışık iki karede her pikselin görünür hareketini veren (u, v) vektör alanı; parlaklık sabitliği varsayımına dayanır."
+  vibe: "Visual Background Extractor: her piksel için geçmiş değerlerden rastgele örnekler tutan, rastgele ve komşulara yayılan güncellemeli parametresiz arka plan çıkarma yöntemi."

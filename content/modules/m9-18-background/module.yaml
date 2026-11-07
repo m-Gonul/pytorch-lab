@@ -1,0 +1,100 @@
+id: m9-18-background
+code: M9.18
+title: Arka plan çıkarma — fark, hareketli ortalama, GMM, ViBe
+phase: 9
+minutes: 400
+prereq: [m9-17-motion, m9-8-morphology]
+summary: >
+  Her pikseli ön plan ya da arka plan olarak sınıflamak: kare farkı,
+  üstel hareketli ortalama, piksel başına Gauss karışımı (Stauffer–Grimson)
+  ve parametresiz, rastgele güncellemeli ViBe. Saf Python'da ViBe
+  sınıflandırması ve hareketli ortalama; NumPy'da tüm görüntü için ViBe
+  (komşulardan başlatma, hafızasız rastgele yer değiştirme, uzamsal
+  yayılım); PyTorch'ta piksel başına K Gauss'luk karışım modeli ve OpenCV
+  MOG2 ile karşılaştırma; en sonda üstel ortalamanın doğrusal bir özyineleme
+  olduğunu fark edip zaman döngüsü olmadan, parçalı taramayla hesaplıyorsun.
+goals:
+  - "Arka plan modeli: geçmiş değerlerin istatistiği; seçici ve seçici olmayan güncelleme"
+  - "Stauffer–Grimson: piksel başına K Gauss, eşleşme $|x-\\mu|<2.5\\sigma$, arka plan = en ağır / en dar bileşenler"
+  - "[[ViBe]]: $N$ örnek, yarıçap $R$, $\\#_{min}$; olasılıksal ve uzamsal yayılımlı güncelleme; hayalet sönümlemesi"
+  - "Doğrusal özyineleme = paralel tarama (M10.6'ya köprü)"
+sources:
+  - {title: "Barnich & Van Droogenbroeck — ViBe: A Universal Background Subtraction Algorithm for Video Sequences (IEEE TIP 2011)", url: "https://doi.org/10.1109/TIP.2010.2101613", license: "©", use: link}
+  - {title: "Stauffer & Grimson — Adaptive background mixture models for real-time tracking (CVPR 1999)", url: "https://doi.org/10.1109/CVPR.1999.784637", license: "©", use: link}
+  - {title: "Zivkovic — Improved adaptive Gaussian mixture model for background subtraction (ICPR 2004) — OpenCV MOG2", url: "https://doi.org/10.1109/ICPR.2004.1333992", license: "©", use: link}
+  - {title: "Van Droogenbroeck & Paquot — Background subtraction: Experiments and improvements for ViBe (CVPRW 2012)", url: "https://doi.org/10.1109/CVPRW.2012.6238924", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "ViBe: örnekler $[100,130,95,180,140]$, piksel 110, $R=20$ ($|v-s|<R$), $\\#_{min}=2$"
+      fields:
+        - {id: cnt, label: "Yarıçap içindeki örnek sayısı", answer: 2}
+        - {id: bg, label: "Arka plan mı? (evet 1, hayır 0)", answer: 1}
+        - {id: surv, label: "$N=20$, $\\phi=16$: bir örneğin 100 kare sonra hâlâ modelde olma olasılığı $((N-1)/N)^{dt/\\phi}$", answer: 0.725726, tol: 0.0001}
+    - title: "Diğer modeller"
+      fields:
+        - {id: ema, label: "Hareketli ortalama $\\alpha=0.05$: $B=100$, $I=200$ → yeni $B$", answer: 105}
+        - {id: gm, label: "GMM: $\\mu=100$, $\\sigma=10$, $x=120$: $|x-\\mu|/\\sigma$", answer: 2}
+        - {id: tf, label: "Üç kare farkı, $T=30$: $I_{t-1}=50$, $I_t=120$, $I_{t+1}=60$ → ön plan mı? (1/0)", answer: 1}
+  verify: |
+    s = [100, 130, 95, 180, 140]
+    cnt = sum(abs(110 - v) < 20 for v in s)
+    answers = dict(cnt=cnt, bg=int(cnt >= 2), surv=(19 / 20) ** (100 / 16), ema=0.95 * 100 + 0.05 * 200, gm=abs(120 - 100) / 10,
+                   tf=int(abs(120 - 50) > 30 and abs(60 - 120) > 30))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Kare farkı, morfolojik temizlik ve blob kutuları", engine: browser}
+  - {id: x2, title: "ViBe'de hayalet sönümlemesi ve φ'nin etkisi", engine: browser}
+  - {id: x3, title: "Gölge tespiti (HSV'de parlaklık oranı)", engine: browser}
+
+quiz:
+  - q: "ViBe bir pikselin modelini güncellerken neden en eski örneği değil rastgele bir örneği değiştirir?"
+    options:
+      - {t: "Örneklerin ömrü üstel dağılır; model hem yakın hem uzak geçmişi az bellekle temsil eder (hafızasız güncelleme)", ok: true, why: "Bir örneğin t kare sonra hâlâ bulunma olasılığı üstel azalır."}
+      - {t: "En eskisini bulmak pahalı olduğu için", why: "Asıl sebep zaman penceresini yumuşak ve uzun tutmak."}
+      - {t: "Gürültüyü artırmak için", why: "Aksine sağlamlık sağlar."}
+  - q: "ViBe'nin uzamsal yayılımı (komşunun modelini güncellemek) ne işe yarar?"
+    options:
+      - {t: "Arka plan değerlerini komşulara yayarak hayaletleri (yanlışlıkla ön plan sayılan, aslında açığa çıkmış arka plan) zamanla emer ve kamera titreşimine dayanıklılık verir", ok: true, why: "Ön plan pikselleri güncellenmez ama kenarlarından içeri arka plan değerleri sızar."}
+      - {t: "Ön plan nesnelerini büyütür", why: "Ön plan güncellenmez."}
+      - {t: "Hesabı hızlandırır", why: "Ek bir güncellemedir."}
+  - q: "Stauffer–Grimson'da bir bileşenin arka plan sayılması neye bağlıdır?"
+    options:
+      - {t: "w/σ sıralamasında ilk sırada olup birikimli ağırlığı T eşiğini doldurmasına: sık görülen ve kararlı (dar) bileşenler arka plandır", ok: true, why: "Geçici nesneler küçük ağırlık ve geniş varyansla başlar."}
+      - {t: "Ortalamasının küçük olmasına", why: "Parlaklıkla ilgisi yok."}
+      - {t: "İlk karede görülmüş olmasına", why: "Model zamanla uyarlanır."}
+
+homework:
+  - title: "ViBe'yi CDnet 2014'te değerlendir"
+    paper: "Barnich & Van Droogenbroeck — ViBe: A Universal Background Subtraction Algorithm for Video Sequences (IEEE TIP 2011)"
+    url: "https://doi.org/10.1109/TIP.2010.2101613"
+    level: orta
+    hours: 12
+    goal: |
+      c aşamasındaki ViBe'yi renkli videolara (RGB'de L1 uzaklık) ve tam makale sürümüne genişlet; CDnet 2014'ün baseline, dynamicBackground, cameraJitter, shadow ve intermittentObjectMotion kategorilerinde F-ölçüsü hesapla ve OpenCV MOG2 ile KNN'i karşılaştır. "Experiments and improvements" makalesindeki iyileştirmelerden en az ikisini (ör. güncelleme maskesi ile yayılımı ayırmak, uyarlamalı R) ekle.
+    steps:
+      - "CDnet'in ROI ve 'unknown' piksellerini dışlayan değerlendirme betiği (Re, Pr, F, PWC)."
+      - "φ, N, R, #min için parametre taraması; kategori bazında en iyi F."
+      - "Medyan süzgeç + morfolojik kapama son işleme."
+    accept:
+      - "Beş kategoride F-ölçüsü tablosu (ViBe, ViBe+iyileştirmeler, MOG2, KNN)."
+      - "cameraJitter'da uzamsal yayılım kapalı/açık ablasyonu."
+  - title: "RT-SBS: anlamsal bilgiyle gerçek zamanlı arka plan çıkarma"
+    paper: "Cioppa, Braham, Van Droogenbroeck — Real-Time Semantic Background Subtraction (ICIP 2020)"
+    url: "https://arxiv.org/abs/2002.04993"
+    level: ileri
+    hours: 14
+    goal: |
+      Her karede değil, her k karede bir çalışan hafif bir anlamsal bölütleme ağının (ör. önceden eğitilmiş DeepLab/LR-ASPP; M4.10) ön plan olasılığını ViBe maskesiyle birleştiren karar kurallarını uygula; aradaki karelerde anlamsal bilgiyi ViBe'nin değişim bilgisiyle "taşı". CDnet'te ViBe ve her kare anlamsal sürümle F-ölçüsü / FPS karşılaştır.
+    steps:
+      - "Anlamsal ön plan olasılığı: insan, araç gibi sınıfların olasılık toplamı; arka plan anlamsal modeli."
+      - "Karar kuralları: iki eşikle (τ_BG, τ_FG) arka plan/ön plan zorlama, aksi halde ViBe."
+      - "Anlamsal ağın çalışmadığı karelerde son kararların piksel başına yeniden kullanımı."
+    accept:
+      - "k = 1, 2, 5 için F ve FPS tablosu; anlamsal bilginin hayalet ve gölge hatalarını azalttığını gösteren örnekler."
