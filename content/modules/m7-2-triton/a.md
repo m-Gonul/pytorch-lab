@@ -1,0 +1,1 @@
+Son program $3\cdot256=768$'den başlar; $1000-768=232$ eleman geçerli. Softmax'ta maskelenen sütunlara $-\infty$ konursa `max` etkilenmez, `exp` 0 verir ve toplam bozulmaz. 0 konsaydı, tüm değerleri negatif olan bir satırda max yanlış çıkardı.

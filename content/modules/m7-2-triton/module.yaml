@@ -1,0 +1,66 @@
+id: m7-2-triton
+code: M7.2
+title: Triton kernel'ları
+phase: 7
+minutes: 300
+prereq: [m7-1-cuda]
+summary: >
+  Python'da GPU çekirdeği yazmak. Program/blok ayrıştırmasını ve maskeleri
+  elle hesaplıyor, saf Python'da Triton'un "blok programı" modelini
+  maskeli yükleme/saklama ile taklit ediyor, NumPy'da tiled matmul'ü
+  program-başı bir fonksiyon olarak kuruyor, Triton'da vektör toplama ve
+  satır softmax'ı yazıyor ve en sonda füzyonlu ReLU epilogue'lu bir matmul
+  çekirdeği yazıyorsun. GPU yoksa çekirdekler Triton yorumlayıcısıyla
+  CPU'da çalışır.
+goals:
+  - "Triton'un blok-seviyesi programlama modeli: `program_id`, `arange`, maske"
+  - "Maskeli `load`/`store` ve `other=` ile kenar bloklarını doğru işlemek"
+  - "Satır softmax'ını tek programda (SRAM'de) yapmak: tek okuma, tek yazma"
+  - "Tiled matmul ve [[epilogue füzyonu]]"
+sources:
+  - {title: "Triton — Tutorials (vector add, fused softmax, matrix multiplication)", url: "https://triton-lang.org/main/getting-started/tutorials/", license: "MIT", use: adapt}
+  - {title: "Tillet, Kung, Cox — Triton: An Intermediate Language and Compiler for Tiled Neural Network Computations", url: "https://www.eecs.harvard.edu/~htk/publication/2019-mapl-tillet-kung-cox.pdf", license: "©", use: link}
+  - {title: "Stanford CS336 — Assignment 2 (Triton FlashAttention-2)", url: "https://github.com/stanford-cs336/assignment2-systems", license: "MIT", use: adapt}
+  - {title: "GPU MODE — Lecture 14: Practitioners Guide to Triton", url: "https://github.com/gpu-mode/lectures", license: "Apache-2.0", use: adapt}
+
+hand:
+  groups:
+    - title: "Vektör toplama, $N=1000$, `BLOCK = 256`"
+      fields:
+        - {id: progs, label: "Program sayısı (grid)", answer: 4}
+        - {id: valid, label: "Son programda maskesi doğru olan eleman", answer: 232}
+    - title: "Satır softmax'ı, $64\\times100$ matris, program başına bir satır"
+      fields:
+        - {id: block, label: "`BLOCK` (2'nin kuvveti, ≥ sütun sayısı)", answer: 128}
+        - {id: pad, label: "Maskelenen konumlara `other=` ile ne yüklenmeli? (sayı olarak, $-\\infty$ için −1 yaz)", answer: -1, hint: "max ve exp'i bozmamalı: $e^{-\\infty}=0$"}
+    - title: "Matmul $C_{70\\times40}=A_{70\\times50}B_{50\\times40}$, `BM = BN = BK = 16`"
+      fields:
+        - {id: grid, label: "Program sayısı", answer: 15, hint: "$\\lceil70/16\\rceil\\cdot\\lceil40/16\\rceil$"}
+        - {id: ksteps, label: "Program başına K-döngüsü adımı", answer: 4}
+  verify: |
+    import math
+    answers = dict(progs=math.ceil(1000 / 256), valid=1000 - 3 * 256, block=128, pad=-1,
+                   grid=math.ceil(70 / 16) * math.ceil(40 / 16), ksteps=math.ceil(50 / 16))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "CUDA'da thread başına bir eleman yazarsın; Triton'da bir program neyi işler?"
+    options:
+      - {t: "Bir **blok** eleman (`tl.arange(0, BLOCK)`): vektör işlemleri yazarsın, thread'lere dağıtım, shared memory ve senkronizasyonu derleyici yapar", ok: true, why: "Bu yüzden Triton çekirdekleri kısa; karşılığında thread düzeyinde ince kontrol azalır."}
+      - {t: "Tek eleman", why: "O, CUDA modeli."}
+      - {t: "Bütün tensörü", why: "Grid'deki her program bir parçayı işler."}
+  - q: "Fused softmax çekirdeği neden `torch.softmax`'ın naif (exp, sum, böl ayrı kernel) sürümünden hızlıdır?"
+    options:
+      - {t: "Satır bir kez okunur, bir kez yazılır; max, exp, toplam ve bölme SRAM/register'da yapılır", ok: true, why: "Naif sürüm satırı birkaç kez HBM'den okuyup yazar; işlem bellek-bağımlı olduğundan bayt sayısı süreyi belirler."}
+      - {t: "Daha az FLOP yapar", why: "FLOP aynı; fark bellek trafiği."}
+      - {t: "Yaklaşık exp kullanır", why: "Kesin sonuç verir."}
+  - q: "Matmul çekirdeğinde ReLU'yu ayrı bir kernel yerine `tl.store`'dan önce uygulamak neyi kazandırır?"
+    options:
+      - {t: "$C$'nin HBM'e yazılıp ReLU için tekrar okunmasını önler: bir tam okuma + yazma tasarrufu", ok: true, why: "Epilogue füzyonu (bias, aktivasyon, ölçekleme) cuBLASLt ve Inductor'ın da yaptığı şey."}
+      - {t: "Matmul'ün FLOP'unu azaltır", why: "Matmul aynı; tasarruf epilogue'un bellek trafiğinde."}
+      - {t: "Hiçbir şey; derleyici zaten birleştirir", why: "Ayrı kernel'ler arasında füzyon ancak bir derleyici (Inductor) yaparsa olur."}
