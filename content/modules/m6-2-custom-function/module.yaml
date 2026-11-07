@@ -1,0 +1,64 @@
+id: m6-2-custom-function
+code: M6.2
+title: Özel autograd.Function
+phase: 6
+minutes: 210
+prereq: [m6-1-autograd-internals]
+summary: >
+  Kendi türevini sen yazdığın işlemler. Straight-through estimator, gradient
+  reversal ve log-sum-exp'in gradyanlarını elle hesaplıyor, saf Python'da
+  minik bir Function protokolü ve sonlu farklarla gradcheck yazıyor,
+  NumPy'da softmax + cross-entropy'yi yalnız olasılıkları saklayan tek bir
+  birleşik işlem olarak kuruyor, PyTorch'ta `torch.autograd.Function` ile
+  aynı işlemleri `gradcheck`'ten geçiriyor ve en sonda yalnız girdisini
+  saklayan, bellek dostu bir SiLU yazıyorsun.
+goals:
+  - "`forward(ctx, …)` / `backward(ctx, grad)` sözleşmesini ve `ctx.save_for_backward`'ı kullanmak"
+  - "Kasıtlı olarak \"yanlış\" gradyanlar: [[straight-through estimator]] ve gradient reversal"
+  - "Özel türevi `gradcheck` ile (float64'te) doğrulamak"
+  - "Saklananı azaltıp geri geçişte yeniden hesaplayarak bellek kazanmak"
+sources:
+  - {title: "PyTorch Docs — Extending torch.autograd", url: "https://docs.pytorch.org/docs/stable/notes/extending.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "PyTorch Tutorials — Double Backward with Custom Functions / Fusing Convolution and Batch Norm", url: "https://docs.pytorch.org/tutorials/intermediate/custom_function_double_backward_tutorial.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "Bengio, Léonard, Courville — Estimating or Propagating Gradients Through Stochastic Neurons (STE)", url: "https://arxiv.org/abs/1308.3432", license: "arXiv", use: link}
+  - {title: "Ganin & Lempitsky — Unsupervised Domain Adaptation by Backpropagation (gradient reversal)", url: "https://arxiv.org/abs/1409.7495", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "$x=(0.3,\\ 1.7)$, $w=(2,\\ 3)$, $L=\\sum_i\\operatorname{round}(x_i)\\,w_i$"
+      fields:
+        - {id: L, label: "$L$", answer: 6}
+        - {id: true0, label: "Gerçek $\\partial L/\\partial x_1$", answer: 0, hint: "round parçalı sabit"}
+        - {id: ste0, label: "STE ile $\\partial L/\\partial x_1$ (geri geçişte round = özdeşlik)", answer: 2}
+        - {id: gr0, label: "Gradient reversal ($\\lambda=0.5$), $L=\\sum\\operatorname{GR}(x_i)w_i$: $\\partial L/\\partial x_1$", answer: -1}
+    - title: "$\\operatorname{lse}(x)=\\log\\sum_ie^{x_i}$, $x=(1,\\ 2)$"
+      fields:
+        - {id: lse, label: "$\\operatorname{lse}(x)$", answer: 2.313262, tol: 0.0005}
+        - {id: g2, label: "$\\partial\\operatorname{lse}/\\partial x_2=e^{x_2-\\operatorname{lse}}$", answer: 0.731059, tol: 0.0005}
+  verify: |
+    import math
+    lse = math.log(math.exp(1) + math.exp(2))
+    answers = dict(L=0 * 2 + 2 * 3, true0=0, ste0=2, gr0=-0.5 * 2, lse=lse, g2=math.exp(2 - lse))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "`gradcheck` neden float64 tensörlerle çalıştırılır?"
+    options:
+      - {t: "Sonlu farklar $\\epsilon\\approx10^{-6}$ ile hesaplanır; float32'de yuvarlama hatası $\\sim10^{-7}/\\epsilon$ mertebesinde kalır ve doğru türevi bile reddettirir", ok: true, why: "float64'te makine epsilonu $\\sim10^{-16}$; fark hatası ile kesme hatası dengelenebilir."}
+      - {t: "Özel Function'lar yalnız float64 destekler", why: "Her dtype'ı desteklerler; mesele sayısal türevin doğruluğu."}
+      - {t: "Daha hızlı olduğu için", why: "Daha yavaş."}
+  - q: "Straight-through estimator `gradcheck`'ten geçer mi?"
+    options:
+      - {t: "Hayır, ve geçmemeli: gradyanı bilerek gerçek türevden (0) farklı tanımlıyoruz", ok: true, why: "STE bir tahmincidir (quantization-aware training, VQ-VAE), türev değil. b aşamasında bunu açıkça görüyorsun."}
+      - {t: "Evet, çünkü özdeşlik türevlenebilir", why: "İleri geçiş round; sayısal türev neredeyse her yerde 0."}
+      - {t: "Yalnız float64'te geçer", why: "Hassasiyet sorunu değil."}
+  - q: "`backward` içinde bir girdinin gradyanı için `None` döndürmek ne anlama gelir?"
+    options:
+      - {t: "O girdi türevlenebilir değil (ör. bir sabit λ ya da tamsayı indeks); autograd ona gradyan akıtmaz", ok: true, why: "`backward`, `forward`'ın aldığı her girdi için (ctx hariç) bir değer döndürmelidir."}
+      - {t: "Gradyanı sıfır yap", why: "Sıfır tensörü döndürmekten farklı: hiç gradyan yok."}
+      - {t: "Hata", why: "Türevlenemeyen girdiler için beklenen dönüş."}
