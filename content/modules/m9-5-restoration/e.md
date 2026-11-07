@@ -1,0 +1,1 @@
+`adaptive_median_vec(img, smax=7)` — `img: (H, W)` uint8 tensör. Döngüsüz fikir: her pencere boyutu ($3,5,7$) için $z_{min}, z_{med}, z_{max}$'ı `unfold` ile **hepsini birden** hesapla; sonra küçükten büyüğe "ilk Seviye A'yı geçen boyut"u maskelerle seç. Pencere boyutları üzerinde sabit uzunluklu bir `for` (3 tekrar) serbest; piksel döngüsü yok. Kenarlar kopyalama.

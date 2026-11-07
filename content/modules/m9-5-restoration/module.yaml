@@ -1,0 +1,99 @@
+id: m9-5-restoration
+code: M9.5
+title: Gürültü modelleri ve restorasyon
+phase: 9
+minutes: 360
+prereq: [m9-3-spatial-filtering]
+summary: >
+  Bozulma modeli $g=f+\eta$ ve gürültüyü temizleyen filtreler. Median, merkez
+  ağırlıklı median, uyarlamalı ortalama ve uyarlamalı median kararlarını elle
+  veriyor; saf Python'da median ve uyarlamalı median'ı yazıp OpenCV'nin
+  `medianBlur`'u ile birebir eşleştiriyor, NumPy'da kayan pencerelerle tüm
+  sıra istatistiği filtrelerini ve uyarlamalı ortalama filtreyi döngüsüz
+  kuruyor, PSNR'ı OpenCV ile aynı hesaplıyor, PyTorch'ta küçük bir artık
+  (residual) CNN gürültü gidericiyi eğitip klasik filtreleri PSNR'da geçiyor ve
+  en sonda uyarlamalı median'ı üç pencere boyutunu birden hesaplayıp maskeyle
+  seçerek vektörleştiriyorsun.
+goals:
+  - "Gürültü olasılık yoğunlukları: Gauss, Rayleigh, Erlang, üstel, düzgün, tuz-biber; parametre kestirimi"
+  - "Ortalama filtreler (aritmetik, geometrik, harmonik, kontraharmonik) ve [[median filtre]]"
+  - "Uyarlamalı filtreler: yerel varyansa göre ortalama, pencere büyüten median"
+  - "[[PSNR]] ve sınırları: her zaman görsel kaliteyle uyuşmaz"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 5.1–5.3", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "OpenCV — medianBlur, PSNR", url: "https://docs.opencv.org/4.x/d4/d86/group__imgproc__filter.html", license: "Apache-2.0", use: adapt}
+  - {title: "Hwang & Haddad — Adaptive median filters: new algorithms and results (IEEE TIP 1995)", url: "https://doi.org/10.1109/83.370679", license: "©", use: link}
+  - {title: "Zhang ve ark. — Beyond a Gaussian Denoiser: Residual Learning of Deep CNN for Image Denoising (DnCNN)", url: "https://arxiv.org/abs/1608.03981", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "3 × 3 pencere $\\{10, 12, 11, 255, 13, 0, 12, 11, 14\\}$ (merkez 13)"
+      fields:
+        - {id: mean, label: "Aritmetik ortalama (tamsayıya yuvarla)", answer: 38}
+        - {id: med, label: "Median", answer: 12}
+        - {id: cwm, label: "Merkez 3 kez sayılınca median (11 eleman)", answer: 12}
+    - title: "Uyarlamalı median: $z_{min}=0$, $z_{max}=255$, $z_{med}=12$, $z_{xy}=255$"
+      fields:
+        - {id: lvlA, label: "Seviye A geçilir mi? ($z_{min}<z_{med}<z_{max}$; evet 1, hayır 0)", answer: 1}
+        - {id: amout, label: "Çıkış (Seviye B)", answer: 12}
+    - title: "Uyarlamalı ortalama $\\hat f=g-\\frac{\\sigma_\\eta^2}{\\sigma_S^2}(g-m_S)$, $[0,1]$ ölçeğinde"
+      fields:
+        - {id: am1, label: "$g=0.6$, $m_S=0.5$, $\\sigma_\\eta^2=0.01$, $\\sigma_S^2=0.04$", answer: 0.575}
+        - {id: am2, label: "Aynı, ama $\\sigma_S^2=0.005<\\sigma_\\eta^2$ (oran 1'e kırpılır)", answer: 0.5}
+    - title: "PSNR ve diğer"
+      fields:
+        - {id: psnr, label: "8 bit, MSE = 100: PSNR (dB)", answer: 28.1308, tol: 0.001}
+        - {id: geo, label: "Geometrik ortalama $\\{1, 4, 16\\}$", answer: 4}
+  verify: |
+    import math, statistics
+    w = [10, 12, 11, 255, 13, 0, 12, 11, 14]
+    ratio = lambda ne, ss: min(ne / ss, 1.0)
+    answers = dict(mean=round(sum(w) / 9), med=statistics.median(w), cwm=statistics.median(w + [13, 13]),
+                   lvlA=int(0 < 12 < 255), amout=12, am1=0.6 - ratio(0.01, 0.04) * (0.6 - 0.5),
+                   am2=0.6 - ratio(0.01, 0.005) * (0.6 - 0.5), psnr=10 * math.log10(255 ** 2 / 100), geo=(1 * 4 * 16) ** (1 / 3))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Gürültü modelleri: üretme ve düz bir bölgeden parametre kestirimi", engine: browser}
+  - {id: x2, title: "Ortalama filtre ailesi: geometrik, harmonik, kontraharmonik", engine: browser}
+  - {id: x3, title: "PSNR deneyi: filtreler, gürültü seviyeleri ve PSNR'ı 'kandırmak'", engine: browser}
+
+quiz:
+  - q: "Tuz-biber gürültüsünde median, aynı boyuttaki kutu filtresinden neden çok daha iyidir?"
+    options:
+      - {t: "Uç değerler (0, 255) sıralamada kenara gider ve median'ı etkilemez; ortalama ise onları komşulara yayar", ok: true, why: "Median doğrusal olmayan bir sıra istatistiği filtresidir; kenarları da daha iyi korur."}
+      - {t: "Median daha büyük pencere kullanır", why: "Aynı pencere."}
+      - {t: "Kutu filtresi tuz gürültüsünü artırır", why: "Artırmaz; yayar."}
+  - q: "Uyarlamalı median filtre gürültü yoğunluğu arttığında neden standart median'dan iyidir?"
+    options:
+      - {t: "Medyanın kendisi bir dürtüyse (z_min ya da z_max'a eşit) pencereyi büyütür; dürtü olmayan pikselleri ise hiç değiştirmez", ok: true, why: "İki avantaj: yoğun gürültüde doğru değeri bulur, gürültüsüz ayrıntıyı bulanıklaştırmaz."}
+      - {t: "Her zaman 7 × 7 pencere kullandığı için", why: "Gerektikçe büyür."}
+      - {t: "Ortalama da aldığı için", why: "Ortalama almaz."}
+  - q: "Görüntüyü 15 gri seviye aydınlatmak PSNR'ı nasıl etkiler?"
+    options:
+      - {t: "Görsel olarak neredeyse aynı olmasına rağmen MSE = 225 → PSNR ≈ 24.6 dB'ye düşer", ok: true, why: "PSNR yapıyı değil piksel farklarını ölçer; SSIM (M9.13) ortalama kaymasına çok daha az duyarlıdır."}
+      - {t: "Değişmez", why: "Her piksel 15 farklı."}
+      - {t: "Artar", why: "Hata arttıkça PSNR azalır."}
+
+homework:
+  - title: "DnCNN: residual öğrenmeyle derin gürültü giderici"
+    paper: "Zhang, Zuo, Chen, Meng, Zhang — Beyond a Gaussian Denoiser: Residual Learning of Deep CNN for Image Denoising (IEEE TIP 2017)"
+    url: "https://arxiv.org/abs/1608.03981"
+    level: orta
+    hours: 10
+    goal: |
+      17 katmanlı DnCNN'i (conv + BN + ReLU, gürültüyü tahmin eden residual çıkış) sıfırdan uygula; BSD400 benzeri bir eğitim kümesinde (yoksa scikit-image ve kendi çektiğin fotoğraflardan 40×40 yamalar) σ = 25 için eğit ve BSD68/Set12 tarzı bir test setinde klasik filtrelerle (Gauss, median, bilateral, NLM — M9.12) karşılaştır.
+    steps:
+      - "Yama çıkarımı ve veri artırma (8 yönlü dönüş/yansıma)."
+      - "DnCNN-S mimarisi: ilk katman conv+ReLU, orta 15 katman conv+BN+ReLU, son katman conv; kayıp $\\frac12\\lVert R(y)-(y-x)\\rVert^2$."
+      - "Kör (σ ∈ [0, 55]) sürümü de eğit (DnCNN-B) ve sabit σ ile karşılaştır."
+      - "Her yöntem için PSNR ve SSIM tablosu ve görsel karşılaştırma."
+    accept:
+      - "σ = 25'te test PSNR'ı Gauss bulanıklaştırmadan en az 3 dB, NLM'den en az 0.5 dB yüksek."
+      - "Residual (gürültü tahmini) ve doğrudan (temiz görüntü tahmini) çıkış karşılaştırması raporlanmış."
+      - "BN'li ve BN'siz eğitim eğrileri karşılaştırılmış."
