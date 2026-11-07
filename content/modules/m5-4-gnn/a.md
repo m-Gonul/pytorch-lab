@@ -1,0 +1,1 @@
+Öz-döngü olmadan düğüm kendi özelliğini unutur; normalizasyon olmadan yüksek dereceli düğümlerin değerleri her katmanda büyür. $1/\sqrt{\tilde d_i\tilde d_j}$ ikisini dengeleyen simetrik seçim; $\hat A$'nın özdeğerleri $(-1,1]$ aralığında kalır.

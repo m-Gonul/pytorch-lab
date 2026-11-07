@@ -68,3 +68,5 @@ terms:
   non-saturating loss: "GAN üretecinin log(1 − D(G(z))) yerine −log D(G(z)) kaybını küçültmesi; ayırıcı eminken bile güçlü gradyan verir."
   gradient penalty: "Ayırıcının girdiye göre gradyan normunu 1'e (WGAN-GP) ya da 0'a (R1) çeken düzenlileştirme terimi."
   flow matching: "Gürültüden veriye giden yollar boyunca hız alanını regresyonla öğrenip örneklemeyi bir ODE çözerek yapan üretken modelleme yöntemi."
+  message passing: "GNN'lerin genel şeması: her düğüm komşularından mesaj toplar, permütasyon-değişmez bir fonksiyonla birleştirir ve kendi temsilini günceller."
+  policy gradient: "Politikanın parametrelerini beklenen getirinin gradyanıyla güncelleyen yöntem ailesi; gradyan ∇log π(a|s) ile getirinin çarpımının beklentisi olarak tahmin edilir."

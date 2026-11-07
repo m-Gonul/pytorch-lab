@@ -1,0 +1,69 @@
+id: m5-4-gnn
+code: M5.4
+title: "GNN: message passing"
+phase: 5
+minutes: 270
+prereq: [m3-2-mlp-backprop]
+summary: >
+  Graf üzerinde öğrenme. 3 düğümlü bir yolda normalize komşuluk matrisini
+  ve bir GCN katmanını elle hesaplıyor, saf Python'da kenar kenar mesaj
+  geçişi yazıyor, NumPy'da aynı işi yoğun matrisle ve scatter-add ile
+  döngüsüz yapıyor, PyTorch'ta `index_add_` ile bir GCN kurup az etiketli
+  bir topluluk grafında MLP'yi açık ara geçtiğini görüyor ve en sonda
+  yüzlerce küçük grafı tek bir dev grafa birleştirip (PyG tarzı batching)
+  graf düzeyinde sınıflandırmayı döngüsüz yapıyorsun.
+goals:
+  - "[[message passing]] şemasını (mesaj → topla → güncelle) ve GCN'in $\\hat A XW$ özel hâlini bilmek"
+  - "Simetrik normalizasyon $D^{-1/2}(A+I)D^{-1/2}$'yi ve neden gerektiğini anlamak"
+  - "Seyrek grafı `edge_index` ile tutup yayılımı scatter-add olarak yazmak"
+  - "Değişken boyutlu grafları blok-köşegen tek grafta birleştirmek ve segment havuzlaması yapmak"
+sources:
+  - {title: "Kipf & Welling — Semi-Supervised Classification with Graph Convolutional Networks", url: "https://arxiv.org/abs/1609.02907", license: "arXiv", use: link}
+  - {title: "Gilmer ve ark. — Neural Message Passing for Quantum Chemistry", url: "https://arxiv.org/abs/1704.01212", license: "arXiv", use: link}
+  - {title: "UvA Deep Learning Tutorials — Graph Neural Networks", url: "https://uvadlc-notebooks.readthedocs.io/", license: "MIT", use: adapt}
+  - {title: "Stanford CS224W — Machine Learning with Graphs", url: "https://web.stanford.edu/class/cs224w/", license: "doğrulanmadı", use: link}
+  - {title: "PyTorch Geometric — Creating Message Passing Networks", url: "https://pytorch-geometric.readthedocs.io/", license: "MIT", use: link}
+
+hand:
+  groups:
+    - title: "Yol grafı 1 – 2 – 3, öz-döngülerle: $\\tilde A=A+I$, dereceler $\\tilde d=(2,3,2)$, $\\hat A=\\tilde D^{-1/2}\\tilde A\\tilde D^{-1/2}$"
+      fields:
+        - {id: a11, label: "$\\hat A_{11}$", answer: 0.5}
+        - {id: a12, label: "$\\hat A_{12}$", answer: 0.408248, tol: 0.0005, hint: "$1/\\sqrt{2\\cdot3}$"}
+        - {id: a22, label: "$\\hat A_{22}$", answer: 0.333333, tol: 0.0005}
+        - {id: a13, label: "$\\hat A_{13}$", answer: 0}
+    - title: "Özellikler $X=(1,2,3)^\\top$, $W=1$: $H=\\hat AXW$"
+      fields:
+        - {id: h1, label: "$H_1$", answer: 1.316497, tol: 0.0005}
+        - {id: h2, label: "$H_2$", answer: 2.29966, tol: 0.0005}
+        - {id: mean2, label: "Yalnız komşu ortalaması (öz-döngüsüz): düğüm 2", answer: 2}
+  verify: |
+    import numpy as np
+    A = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]], float) + np.eye(3)
+    d = A.sum(1)
+    Ah = A / np.sqrt(d[:, None] * d[None, :])
+    H = Ah @ np.array([1.0, 2, 3])
+    answers = dict(a11=Ah[0, 0], a12=Ah[0, 1], a22=Ah[1, 1], a13=Ah[0, 2], h1=H[0], h2=H[1], mean2=2.0)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "GCN katmanlarını çok derin üst üste koyunca (ör. 30 katman) ne olur?"
+    options:
+      - {t: "Over-smoothing: her katman komşu ortalaması aldığı için bağlı bileşendeki düğüm temsilleri birbirine yakınsar", ok: true, why: "$\\hat A^k X$, $k$ büyüdükçe $\\hat A$'nın baskın özvektörüne yakınsar. Residual bağlantılar, normalizasyon ve sınırlı derinlik yaygın çözümler."}
+      - {t: "Gradyan patlaması kaçınılmazdır", why: "Asıl sorun temsillerin ayırt edilemez hâle gelmesi."}
+      - {t: "Hiçbir şey; derinlik hep iyidir", why: "Pratikte 2–4 katman tipik."}
+  - q: "Mesaj geçişinde komşulardan gelen mesajları birleştirmek için neden toplam/ortalama/max gibi permütasyon-değişmez fonksiyonlar kullanılır?"
+    options:
+      - {t: "Düğümün komşularının doğal bir sırası yok; çıktı, komşuların sıralanışına bağlı olmamalı", ok: true, why: "Sonuç: GNN'ler düğüm yeniden numaralandırmasına göre eşdeğişkendir (equivariant). Kontrol c aşamasında bunu sınıyor."}
+      - {t: "Daha hızlı oldukları için", why: "Gerekçe simetri."}
+      - {t: "Geri yayılım için türevlenebilir olmaları gerektiği için", why: "Max bile (alt-gradyanla) kullanılıyor; ölçüt değişmezlik."}
+  - q: "PyG tarzı batching'de farklı boyutlu 100 grafı tek bir grafta birleştirmek neden doğru sonucu verir?"
+    options:
+      - {t: "Grafların arasında kenar yok: birleşik komşuluk matrisi blok-köşegen, mesajlar graf sınırını geçmez", ok: true, why: "Kenar indekslerine düğüm ofseti eklemek yeterli; `batch` vektörü havuzlama için hangi düğümün hangi grafa ait olduğunu tutar."}
+      - {t: "Grafları aynı boyuta pad'lediği için", why: "Pad'leme yok; düğümler art arda eklenir."}
+      - {t: "Yaklaşık bir sonuç verir", why: "Grafı tek tek işlemekle birebir aynı; e aşamasında karşılaştırıyorsun."}
