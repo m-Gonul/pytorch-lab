@@ -123,3 +123,6 @@ terms:
   ε-açgözlü: "ε olasılıkla rastgele, 1 − ε olasılıkla en yüksek Q değerli eylemi seçen keşif politikası."
   ölümcül üçlü: "Deadly triad: fonksiyon yaklaştırma, önyükleme (bootstrapping) ve politika dışı eğitim bir araya geldiğinde değer kestirimleri ıraksayabilir; ikisi tek başına güvenlidir."
   deneyim tekrarı: "Experience replay: geçişleri (s, a, r, s') bir tamponda saklayıp rastgele mini-batch'lerle tekrar öğrenmek; korelasyonu kırar ve veriyi yeniden kullanır."
+  pişmanlık: "Regret: en iyi kolu hep oynasaydık alacağımız beklenen ödül ile gerçekte seçtiklerimizin beklenen ödülü arasındaki toplam fark."
+  eşlenik önsel: "Conjugate prior: olabilirlikle çarpılınca sonsalı yine aynı aileden çıkan önsel (Beta–Bernoulli, Normal–Normal); güncelleme parametre toplamasına iner."
+  thompson örneklemesi: "Her kolun ortalama ödülü için sonsaldan örnek çekip en büyük örneğe sahip kolu oynamak; seçim olasılığı kolun en iyi olma sonsal olasılığına eşittir."

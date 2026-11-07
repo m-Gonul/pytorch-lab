@@ -1,0 +1,102 @@
+id: m11-7-bandits
+code: M11.7
+title: Çok kollu haydutlar — pişmanlık, UCB, Thompson örneklemesi
+phase: 11
+minutes: 400
+prereq: [m11-5-sarsa-q]
+summary: >
+  Tek durumlu RL: geçiş yok, yalnız rastgele ödül fonksiyonu öğrenilir —
+  keşif–sömürü ikileminin en saf hâli (klinik deneyler, reklam yerleştirme,
+  web kişiselleştirme). Pişmanlık (regret) tanımı, sabit ε'un doğrusal ve
+  $\varepsilon_t\propto1/t$'nin logaritmik pişmanlığı, iyimserlik ilkesi,
+  Hoeffding eşitsizliğinden UCB1, Bayesçi haydutlar ve Beta–Bernoulli
+  eşleniği ile Thompson örneklemesi (k örnekli sürüm), gradyan haydut ve
+  Lai–Robbins alt sınırı. Saf Python'da beş algoritma, NumPy'da Sutton'ın
+  10 kollu test yatağı, PyTorch'ta Thompson'da örnek sayısı k'nın etkisi ve
+  binlerce deneyin paralel simülasyonu.
+goals:
+  - "[[pişmanlık]] $\\mathrm{Loss}_n=\\sum_t(r^*-R(a_t))$; doğrusal ve logaritmik pişmanlık"
+  - "Hoeffding: $P(|\\tilde R-R|\\ge c)\\le2e^{-2nc^2}$ → UCB1 $\\tilde R(a)+\\sqrt{2\\ln n/n_a}$"
+  - "[[eşlenik önsel]]: Beta önsel + Bernoulli olabilirlik → Beta sonsal; [[Thompson örneklemesi]]"
+  - "Gradyan haydut: softmax tercihleri ve taban çizgisi"
+sources:
+  - {title: "Auer, Cesa-Bianchi, Fischer — Finite-time Analysis of the Multiarmed Bandit Problem (Machine Learning 2002)", url: "https://doi.org/10.1023/A:1013689704352", license: "©", use: link}
+  - {title: "Chapelle & Li — An Empirical Evaluation of Thompson Sampling (NeurIPS 2011)", url: "https://papers.nips.cc/paper/2011/hash/e53a0a2978c28872a4505bdb51db06dc-Abstract.html", license: "©", use: link}
+  - {title: "Lai & Robbins — Asymptotically Efficient Adaptive Allocation Rules (Adv. Appl. Math. 1985)", url: "https://doi.org/10.1016/0196-8858(85)90002-8", license: "©", use: link}
+  - {title: "Lattimore & Szepesvári — Bandit Algorithms (Cambridge 2020)", url: "https://tor-lattimore.com/downloads/book/book.pdf", license: "ücretsiz PDF", use: link}
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 2", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+
+hand:
+  groups:
+    - title: "Pişmanlık: kollar 0.9, 0.8, 0.5; sırasıyla 50, 30, 20 kez çekildi"
+      fields:
+        - {id: reg, label: "Beklenen kümülatif pişmanlık", answer: 11}
+        - {id: eps, label: "Sabit ε = 0.1, büyük t'de adım başı pişmanlık (rastgele seçim 3 koldan)", answer: 0.016666666666666666, tol: 1.0e-9}
+        - {id: har, label: "$\\sum_{t=1}^{100}1/t$ (≈ ln 100 + 0.5772)", answer: 5.187377517639621, tol: 1.0e-6}
+    - title: "Hoeffding ve UCB1"
+      fields:
+        - {id: hoe, label: "$n=100$, $c=0.1$: $2e^{-2nc^2}$", answer: 0.2706705664732254, tol: 1.0e-6}
+        - {id: ucb, label: "UCB1: ortalama 0.6, $n=100$, $n_a=10$", answer: 1.5597051061, tol: 1.0e-6}
+    - title: "Beta–Bernoulli: önsel Beta(1,1), 3 yazı 1 tura"
+      fields:
+        - {id: ba, label: "Sonsal α", answer: 4}
+        - {id: bm, label: "Sonsal ortalama", answer: 0.6666666666666666, tol: 1.0e-9}
+  verify: |
+    import math
+    answers = dict(reg=30 * 0.1 + 20 * 0.4, eps=0.1 * (0 + 0.1 + 0.4) / 3, har=sum(1 / t for t in range(1, 101)),
+                   hoe=2 * math.exp(-2 * 100 * 0.01), ucb=0.6 + math.sqrt(2 * math.log(100) / 10), ba=4, bm=4 / 6)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Hoeffding sınırı ne kadar sıkı?", engine: browser}
+  - {id: x2, title: "Durağan olmayan haydut: örnek ortalaması vs sabit α", engine: browser}
+  - {id: x3, title: "Reklam yerleştirme ve Bayesçi A/B testi", engine: browser}
+
+quiz:
+  - q: "Sabit ε ile ε-açgözlü neden doğrusal pişmanlık verir?"
+    options:
+      - {t: "Büyük t'de bile her adımda ε olasılıkla rastgele kol çekilir; adım başı beklenen pişmanlık sabit kalır", ok: true, why: "ε_t ∝ 1/t ile Σ1/t ≈ ln n: logaritmik."}
+      - {t: "Ortalamalar yakınsamadığı için", why: "Yakınsar; sorun keşfin hiç azalmaması."}
+      - {t: "Logaritmik verir", why: "Hayır."}
+  - q: "UCB'nin $\\sqrt{2\\ln n/n_a}$ terimi neden her kolun sonsuz kez denenmesini sağlar?"
+    options:
+      - {t: "Hiç çekilmeyen kolun n_a'sı sabitken ln n büyür; sınır sonunda en iyi kolunkini aşar", ok: true, why: "Bu yüzden iyimser strateji en iyi kola yakınsar."}
+      - {t: "Rastgele seçim yaptığı için", why: "UCB deterministiktir."}
+      - {t: "n_a azaldığı için", why: "Sayaçlar azalmaz."}
+  - q: "Thompson örneklemesinde k (örnek sayısı) büyüdükçe ne olur?"
+    options:
+      - {t: "R̂ sonsal ortalamaya yaklaşır, rastgelelik ve dolayısıyla keşif azalır; k → ∞ sonsal ortalamaya göre açgözlü olur", ok: true, why: "Pratikte k = 1."}
+      - {t: "Keşif artar", why: "Tersine."}
+      - {t: "Etkisi yoktur", why: "Keşfi doğrudan ayarlar."}
+
+homework:
+  - title: "Auer ve ark. (2002): UCB1'in sonlu zaman analizi"
+    paper: "Auer, Cesa-Bianchi, Fischer — Finite-time Analysis of the Multiarmed Bandit Problem"
+    url: "https://doi.org/10.1023/A:1013689704352"
+    level: orta
+    hours: 8
+    goal: |
+      UCB1, UCB1-Tuned, UCB2 ve ε_n-greedy'yi (ε_n = min(1, cK/(d²n))) makalenin Bernoulli deney düzenekleriyle (Tablo 1: 1–14 numaralı dağılımlar) karşılaştır; Teorem 1'deki pişmanlık üst sınırını $8\sum_{i:\Delta_i>0}\ln n/\Delta_i+(1+\pi^2/3)\sum\Delta_i$ deneysel pişmanlıkla aynı grafikte çiz.
+    steps:
+      - "e aşamasındaki vektörel simülasyonu genişlet (100 deney × 100 000 adım)."
+      - "Log-x ekseninde pişmanlık."
+    accept:
+      - "UCB1 sınırın altında kalır; sınır gevşektir (≈ 5–10 kat)."
+      - "UCB1-Tuned çoğu düzenekte en iyisidir (makale Şekil 2–5 nitel)."
+  - title: "Chapelle & Li (2011): Thompson örneklemesinin deneysel değerlendirmesi"
+    paper: "Chapelle & Li — An Empirical Evaluation of Thompson Sampling (NeurIPS 2011)"
+    url: "https://papers.nips.cc/paper/2011/hash/e53a0a2978c28872a4505bdb51db06dc-Abstract.html"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin Bölüm 3 simülasyonunu yeniden üret: K ∈ {10, 100}, en iyi kol 0.5, diğerleri 0.5 − ε (ε ∈ {0.02, 0.1}), 10⁷ adıma kadar; Thompson, UCB ve Lai–Robbins asimptotik alt sınırını karşılaştır. Gecikmeli geri bildirim deneyini (Tablo 1) ve sonsal yapay olarak "sıkıştırma"nın (α ile ölçekleme) etkisini de dene.
+    steps:
+      - "Beta örneklemesini vektörel yap; 10⁷ adım için yığın halinde ilerle."
+    accept:
+      - "Thompson eğrisinin eğimi Lai–Robbins sınırına yaklaşır, UCB'den düşük kalır."
+      - "Gecikmede Thompson UCB'den daha az etkilenir."
