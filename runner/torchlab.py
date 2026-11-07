@@ -4,6 +4,8 @@
 #   "numpy>=1.26",
 #   "pandas>=2.1",
 #   "torch>=2.3",
+#   "ninja>=1.11",
+#   "triton>=3.0; sys_platform == 'linux' and platform_machine == 'x86_64'",
 # ]
 # ///
 """pytorch-lab yerel motoru.

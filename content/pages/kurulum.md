@@ -39,6 +39,12 @@ uv run runner/torchlab.py --port 9000 --timeout 600 --site http://localhost:8000
 
 Safari, `https` bir sayfadan `http://127.0.0.1` adresine isteği engelleyebilir; Chrome, Edge ve Firefox'ta sorun yok.
 
+### Faz 6–7 için ek araçlar
+
+- **C++ derleyicisi** (M7.1 `load_inline`, M6.5 `torch.compile` CPU arka ucu): Linux'ta `g++`, macOS'ta Xcode Command Line Tools (`xcode-select --install`), Windows'ta Visual Studio Build Tools. `ninja` motorun ortamına otomatik kurulur.
+- **Triton** (M7.2): yalnız Linux x86-64'te paket olarak var; motor orada otomatik kurar. GPU yoksa çekirdekler `TRITON_INTERPRET=1` yorumlayıcı modunda CPU'da çalışır (yavaş ama doğru). macOS ve Windows'ta M7.2'nin PyTorch aşamaları için Colab'ı kullan.
+- **Çok süreçli işler** (M7.4 DDP/FSDP): CPU'da `gloo` arka ucuyla iki süreç başlatılır; ek kurulum gerekmez.
+
 ## Colab
 
 Her modül sayfasının başında **Colab'da aç** bağlantısı var. Notebook'ta her aşama bir `%%writefile` hücresi (senin kodun) ve bir kontrol hücresidir; kontroller aynı `labcheck.py` ile çalışır. GPU gerektiren Faz 7 modülleri için Colab'da *Runtime → Change runtime type → GPU* seç.

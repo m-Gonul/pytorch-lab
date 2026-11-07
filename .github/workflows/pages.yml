@@ -35,7 +35,7 @@ jobs:
       - name: Python bağımlılıkları (CPU torch)
         run: |
           pip install --index-url https://download.pytorch.org/whl/cpu torch
-          pip install numpy pandas pyyaml
+          pip install numpy pandas pyyaml ninja triton
 
       - name: Node bağımlılıkları
         run: npm ci

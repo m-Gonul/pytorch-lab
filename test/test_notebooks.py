@@ -57,17 +57,33 @@ def run(nb_path: Path) -> list[str]:
 
 
 def main():
+    # Her notebook ayrı bir süreçte: Colab'da da her notebook kendi çekirdeğinde çalışır
+    # (ör. torch.compile'ın import ettiği triton, sonraki notebook'un TRITON_INTERPRET ayarını bozmasın).
+    import subprocess
     nbs = sorted((ROOT / "notebooks").glob("*.ipynb"))
+    only = [a for a in sys.argv[1:] if not a.startswith("-")]
+    if only:
+        nbs = [p for p in nbs if p.stem in only]
     bad = 0
     for p in nbs:
-        errs = run(p)
-        print(("✓ " if not errs else "✗ ") + p.name)
-        for e in errs:
-            print("    " + e.replace("\n", "\n    "))
-        bad += bool(errs)
+        r = subprocess.run([sys.executable, __file__, "--one", str(p)], capture_output=True, text=True, encoding="utf-8")
+        ok = r.returncode == 0
+        print(("✓ " if ok else "✗ ") + p.name)
+        if not ok:
+            print("    " + (r.stdout + r.stderr)[-3000:].replace("\n", "\n    "))
+        bad += not ok
     print(f"\n{len(nbs) - bad}/{len(nbs)} notebook temiz")
     return 1 if bad or not nbs else 0
 
 
+def one(path: str) -> int:
+    errs = run(Path(path))
+    for e in errs:
+        print(e)
+    return 1 if errs else 0
+
+
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "--one":
+        sys.exit(one(sys.argv[2]))
     sys.exit(main())
