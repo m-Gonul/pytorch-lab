@@ -58,9 +58,16 @@ def check_module(d: Path) -> list[str]:
     if extra:
         errs.append(f"a: verify fazladan değer üretiyor: {sorted(extra)}")
 
-    # --- (b–e) kod aşamaları
-    for s in STAGES:
-        if s not in (meta.get("stages") or {}):
+    # --- (b–e) kod aşamaları + ek alıştırmalar (x1, x2, …)
+    extras = [x["id"] for x in (meta.get("extras") or [])]
+    if len(set(extras)) != len(extras):
+        errs.append(f"extras: tekrar eden kimlik {extras}")
+    for h in meta.get("homework") or []:
+        for k in ("title", "paper", "url", "goal", "steps", "accept"):
+            if not h.get(k):
+                errs.append(f"homework '{h.get('title')}': {k} eksik")
+    for s in list(STAGES) + extras:
+        if len(s) == 1 and s not in (meta.get("stages") or {}):
             errs.append(f"{s}: module.yaml stages içinde yok")
             continue
         for fn in (f"{s}.md", f"{s}.py", f"{s}.sol.py", f"{s}.check.py"):

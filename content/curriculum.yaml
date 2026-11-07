@@ -46,6 +46,8 @@ phases:
       - {id: m3-5-init, code: M3.5, title: "Initialization ve aktivasyonlar", core: "Xavier/Kaiming varyans korunumu ölçümü", src: [zth, uva]}
       - {id: m3-6-norm, code: M3.6, title: "BatchNorm, LayerNorm, RMSNorm", core: "BN backward'u 3 örnekte elle", src: [cs231n, cs336]}
       - {id: m3-7-regularization-nn, code: M3.7, title: "Dropout, weight decay, early stopping", core: "inverted dropout maskesi elle", src: [cs231n, d2l]}
+      - {id: m3-8-perceptron, code: M3.8, title: "Perceptron, TLU ve evrensel yaklaşım", core: "perceptron kuralı elle → MLP derinliğiyle fonksiyon yaklaşımı → double descent", src: [geron, d2l, goodfellow]}
+      - {id: m3-9-training-practice, code: M3.9, title: "Eğitim pratiği: transfer, ön-eğitim, sızıntı, kapasite", core: "katman dondurma, yardımcı görev, derinlik/genişlik deneyi, veri sızıntısı", src: [geron, d2l, cs231n]}
   - n: 4
     title: Mimariler
     weeks: 6
@@ -58,6 +60,15 @@ phases:
       - {id: m4-5-embed-bpe, code: M4.5, title: "Embedding ve BPE tokenization", core: "BPE birleştirmeleri elle", src: [cs224n, cs336, zth]}
       - {id: m4-6-attention, code: M4.6, title: "Attention", core: "3 token × d=2 attention elle → scaled_dot_product_attention", src: [d2l, uva, cs224n]}
       - {id: m4-7-transformer, code: M4.7, title: "Transformer ve GPT", core: "nanoGPT'yi parça parça", src: [nanogpt, cs336]}
+      - {id: m4-8-cnn-blocks, code: M4.8, title: "Modern CNN blokları: Inception, separable, SE, LRN", core: "parametre/FLOP sayımı elle → FC vs CNN verimliliği → blokları sıfırdan", src: [cs231n, d2l, geron]}
+      - {id: m4-9-detection, code: M4.9, title: "Nesne tespiti: IoU, NMS, YOLO, mAP, FPN", core: "IoU/NMS elle → vektörel NMS → YOLO kodlama ve kayıp → mAP", src: [cs231n, d2l, p-fpn]}
+      - {id: m4-10-segmentation, code: M4.10, title: "Segmentasyon: FCN, transposed conv, U-Net", core: "transposed conv elle → scatter → U-Net", src: [cs231n, d2l, geron]}
+      - {id: m4-11-timeseries, code: M4.11, title: "Zaman serisi: ARMA/ARIMA'dan RNN ve WaveNet'e", core: "AR(2) elle → Yule-Walker → 5 RNN tahmin modeli → dilated causal conv", src: [geron, d2l]}
+      - {id: m4-12-word2vec, code: M4.12, title: "Kelime gömmeleri: one-hot, OOV, word2vec", core: "skip-gram negatif örnekleme elle → NumPy SGD → nn.Embedding", src: [cs224n, d2l, geron]}
+      - {id: m4-13-seq2seq, code: M4.13, title: "Seq2seq, Bahdanau attention ve beam search", core: "beam search elle → encoder-decoder RNN → toplamsal attention", src: [cs224n, d2l, geron]}
+      - {id: m4-14-transformer-ed, code: M4.14, title: "Encoder-decoder Transformer (Attention Is All You Need)", core: "sinüzoidal PE elle → cross-attention, maskeler → label smoothing, Noam", src: [p-transformer, d2l, cs224n]}
+      - {id: m4-15-vit, code: M4.15, title: "Vision Transformer (ViT)", core: "patch sayısı elle → unfold = conv → CLS + konum → eğitim", src: [p-vit, d2l, uva]}
+      - {id: m4-16-pretrained-lm, code: M4.16, title: "Önceden eğitilmiş LM'ler: ELMo, BERT, BART, GPT, RLHF", core: "MLM maskesi elle → BERT → reward model, DPO", src: [cs224n, hfcourse, d2l]}
   - n: 5
     title: "Üretken modeller, GNN ve RL"
     weeks: 5
@@ -68,6 +79,9 @@ phases:
       - {id: m5-3-diffusion, code: M5.3, title: "Diffusion (DDPM, flow matching'e giriş)", core: "q(x_t|x_0) elle → döngülü sampler → vektörize sampler", src: [udl, cs236, fastai2]}
       - {id: m5-4-gnn, code: M5.4, title: "GNN: message passing", core: "3 düğümde ÂXW elle → scatter_add", src: [uva, cs224w]}
       - {id: m5-5-rl, code: M5.5, title: "RL temelleri: value iteration, REINFORCE", core: "2 durumlu MDP elle → batched env", src: [sutton, cs336]}
+      - {id: m5-6-autoencoders, code: M5.6, title: "Autoencoder ailesi", core: "bağlı ağırlık, katmanlı ön-eğitim, denoising, sparse (KL), conv AE", src: [geron, d2l, uva]}
+      - {id: m5-7-gan-advanced, code: M5.7, title: "GAN II: DCGAN, FID/IS, StyleGAN", core: "Fréchet mesafesi elle → matris karekökü → AdaIN ve mapping network", src: [geron, cs236, uva]}
+      - {id: m5-8-diffusion-guidance, code: M5.8, title: "Diffusion II: koşullu, guidance, latent diffusion", core: "CFG karışımı elle → classifier guidance → latent uzayda difüzyon", src: [fastai2, cs236, d2l]}
   - n: 6
     title: "İleri PyTorch I: iç yapı"
     weeks: 4
@@ -97,3 +111,55 @@ phases:
     modules:
       - {id: m8-1-mini-llm, code: M8.1, title: "Mini-LLM: eğit, profil çıkar, hızlandır", core: "tüm fazların entegrasyonu", src: [cs336, nanogpt]}
       - {id: m8-2-capstone, code: M8.2, title: "Seçmeli: U-Net segmentasyon ya da küçük diffusion", core: "araştırma alanına transfer", src: [uva, fastai2]}
+  - n: 9
+    title: Görüntü işleme ve klasik bilgisayarlı görü
+    weeks: 8
+    blurb: Pikselden özniteliğe; her algoritma OpenCV'nin çıktısıyla birebir karşılaştırılır.
+    modules:
+      - {id: m9-1-digital-image, code: M9.1, title: "Dijital görüntü: örnekleme, interpolasyon, geometri", core: "bilineer elle → döngü → NumPy = cv2.resize → grid_sample ile kayıt", src: [gonzalez, opencvdocs, szeliski]}
+      - {id: m9-2-intensity-histogram, code: M9.2, title: "Yoğunluk dönüşümleri ve histogram eşitleme", core: "4 seviyeli HE elle → iki HE varyantı, cv2 ile birebir", src: [gonzalez, opencvdocs]}
+      - {id: m9-3-spatial-filtering, code: M9.3, title: "Uzamsal filtreleme: konvolüsyon, separable, integral görüntü", core: "3×3 korelasyon elle → box/Gauss → separable → O(1) integral box", src: [gonzalez, opencvdocs, szeliski]}
+      - {id: m9-4-sharpening, code: M9.4, title: "Türevler ve keskinleştirme", core: "Laplasyen elle → unsharp/highboost → Sobel büyüklüğü", src: [gonzalez, opencvdocs]}
+      - {id: m9-5-restoration, code: M9.5, title: "Gürültü modelleri ve restorasyon", core: "median elle → CW median → adaptive mean/median → PSNR", src: [gonzalez, opencvdocs]}
+      - {id: m9-6-edges, code: M9.6, title: "Kenar algılama: Kirsch, Marr-Hildreth, Canny", core: "gradyan yönü elle → LoG sıfır geçişleri → Canny NMS + histerezis", src: [gonzalez, opencvdocs, szeliski]}
+      - {id: m9-7-corners, code: M9.7, title: "Köşe algılama: Harris-Stephens", core: "yapı tensörü elle → R yanıtı → cv2.cornerHarris ile eşleşme", src: [gonzalez, opencvdocs, szeliski]}
+      - {id: m9-8-morphology, code: M9.8, title: "Morfolojik görüntü işleme", core: "erozyon/dilatasyon elle → açma/kapama, hit-or-miss → gri seviye morfoloji", src: [gonzalez, opencvdocs, skimage]}
+      - {id: m9-9-color, code: M9.9, title: "Renkli görüntü işleme", core: "RGB→HSI elle → renk uzayları → renk dilimleme, renk gradyanı", src: [gonzalez, opencvdocs]}
+      - {id: m9-10-frequency, code: M9.10, title: "Frekans alanı: Fourier, konvolüsyon teoremi, filtreler", core: "4 noktalı DFT elle → FFT ile konvolüsyon → ideal/Butterworth/Gauss", src: [gonzalez, szeliski]}
+      - {id: m9-11-segmentation, code: M9.11, title: "Segmentasyon: eşikleme, k-means, GMM, SLIC", core: "Otsu elle → k-means renk → SLIC süperpiksel", src: [gonzalez, opencvdocs, skimage]}
+      - {id: m9-12-edge-preserving, code: M9.12, title: "CLAHE, bilateral filtre ve non-local means", core: "kırpılmış histogram elle → CLAHE → bilateral → NLM, method noise", src: [gonzalez, opencvdocs, szeliski]}
+      - {id: m9-13-quality, code: M9.13, title: "Görüntü kalitesi: MSE, PSNR, SSIM", core: "SSIM bileşenleri elle → eşit MSE farklı SSIM", src: [p-ssim, skimage]}
+      - {id: m9-14-features, code: M9.14, title: "Yerel öznitelikler: SIFT, SURF, HOG", core: "DoG elle → ölçek uzayı → Fast-Hessian → HOG tanımlayıcısı", src: [p-sift, p-surf, p-hog]}
+      - {id: m9-15-matching, code: M9.15, title: "Eşleme, RANSAC, homografi ve takip", core: "DLT elle → RANSAC → panorama → NCC ve DCF takipçisi", src: [szeliski, opencvdocs]}
+      - {id: m9-16-viola-jones, code: M9.16, title: "Viola-Jones: Haar öznitelikleri, AdaBoost, kaskad", core: "Haar yanıtı integral görüntüyle elle → AdaBoost → kaskad", src: [p-viola, opencvdocs]}
+      - {id: m9-17-motion, code: M9.17, title: "Hareket: blok eşleme, Lucas-Kanade, FRUC, stabilizasyon", core: "2×2 LK sistemi elle → piramit LK → ara kare → yörünge yumuşatma", src: [szeliski, opencvdocs]}
+      - {id: m9-18-background, code: M9.18, title: "Arka plan çıkarma: kare farkı, MOG, ViBe", core: "ViBe güncellemesi elle → vektörel ViBe", src: [p-vibe, opencvdocs]}
+  - n: 10
+    title: Paralel programlama ve GPU
+    weeks: 5
+    blurb: Thread'ler, senkronizasyon ve CUDA'nın paralel desenleri; GPU yoksa CPU'da ve Triton yorumlayıcısında.
+    modules:
+      - {id: m10-1-parallel-models, code: M10.1, title: "Paralel mimariler, performans yasaları ve desenler", core: "Amdahl/Gustafson elle → PCAM → map-reduce, fork-join", src: [mattson, pmpp]}
+      - {id: m10-2-threads-sync, code: M10.2, title: "Thread'ler ve senkronizasyon", core: "yarış koşulu elle → atomic vs mutex vs özel histogram (C++)", src: [cppconc, pmpp]}
+      - {id: m10-3-cpu-parallel, code: M10.3, title: "CPU'da paralel çekirdekler: integral görüntü, konvolüsyon, matmul", core: "blok prefix elle → std::thread ile ölçekleme", src: [cppconc, pmpp]}
+      - {id: m10-4-cuda-memory, code: M10.4, title: "CUDA bellek modeli: coalescing, bank conflict, divergence", core: "warp erişim deseni elle → transaction sayacı → Triton", src: [pmpp, cudaguide, gpumode]}
+      - {id: m10-5-reduction, code: M10.5, title: "Paralel reduction ve histogram", core: "indirgeme ağacı elle → divergence'sız eşleme → warp shuffle → Triton", src: [pmpp, gpumode, triton]}
+      - {id: m10-6-scan, code: M10.6, title: "Paralel scan: Kogge-Stone, Brent-Kung", core: "8 elemanlı scan elle → iş verimliliği → hiyerarşik scan, integral görüntü", src: [pmpp, gpumode]}
+      - {id: m10-7-gpu-conv, code: M10.7, title: "GPU'da 2D konvolüsyon ve matmul", core: "halo boyutu elle → sabit bellek + tile → Triton konvolüsyon", src: [pmpp, triton]}
+  - n: 11
+    title: Pekiştirmeli öğrenme
+    weeks: 7
+    blurb: Markov süreçlerinden AlphaZero'ya; her algoritma küçük, tam çözülebilir ortamlarda doğrulanır.
+    modules:
+      - {id: m11-1-markov, code: M11.1, title: "Rastgele süreçler ve Markov zincirleri", core: "geçiş matrisi elle → durağan dağılım → soğurucu zincir", src: [sutton, puterman]}
+      - {id: m11-2-mdp-vi, code: M11.2, title: "MDP, Bellman ve value iteration", core: "sonlu ufuklu DP elle → büzülme sınırları", src: [sutton, puterman, silver]}
+      - {id: m11-3-policy-iteration, code: M11.3, title: "Policy iteration ve modified PI", core: "PI adımı elle → doğrusal sistem → karmaşıklık", src: [sutton, puterman]}
+      - {id: m11-4-mc-td, code: M11.4, title: "Model-free tahmin: Monte Carlo ve TD", core: "TD(0) güncellemesi elle → random walk'ta MC vs TD", src: [sutton, silver]}
+      - {id: m11-5-sarsa-q, code: M11.5, title: "Model-free kontrol: SARSA, Q-learning, keşif", core: "Q güncellemesi elle → cliff walking", src: [sutton, silver]}
+      - {id: m11-6-dqn, code: M11.6, title: "Fonksiyon yaklaşımı ve DQN", core: "yarı-gradyan Q elle → replay + hedef ağ → CartPole", src: [p-dqn, sutton, cs285]}
+      - {id: m11-7-bandits, code: M11.7, title: "Çok kollu bandit: regret, UCB, Thompson", core: "UCB indeksi elle → regret eğrileri", src: [lattimore, sutton]}
+      - {id: m11-8-contextual-bandits, code: M11.8, title: "Bağlamsal bandit: Bayesçi doğrusal regresyon, LinUCB", core: "posterior güncellemesi elle → LinUCB, doğrusal Thompson", src: [lattimore]}
+      - {id: m11-9-actor-critic, code: M11.9, title: "Actor-critic, A2C ve DPG", core: "avantaj elle → A2C → deterministik policy gradient", src: [sutton, spinup, cs285]}
+      - {id: m11-10-planning, code: M11.10, title: "Model tabanlı RL: Dyna-Q ve MCTS", core: "UCT seçimi elle → Dyna-Q → MCTS", src: [sutton, silver]}
+      - {id: m11-11-alphazero, code: M11.11, title: "AlphaGo'dan AlphaZero'ya", core: "PUCT elle → policy-value ağı + MCTS ile kendi kendine oyun", src: [p-alphago, p-alphagozero]}
+      - {id: m11-12-trust-region, code: M11.12, title: "Trust region yöntemleri ve PPO", core: "trust region alt problemi elle → TRPO sezgisi → PPO-clip", src: [cs285, spinup]}

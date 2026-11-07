@@ -36,6 +36,8 @@ def run(nb_path: Path) -> list[str]:
                     body = "\n".join(lines[1:])
                     if name.startswith("stage_"):
                         body = (mod / f"{name[6]}.sol.py").read_text(encoding="utf-8")
+                    elif name.startswith("extra_"):
+                        body = (mod / f"{name[6:].split('.')[0]}.sol.py").read_text(encoding="utf-8")
                     Path(name).write_text(body, encoding="utf-8")
                     continue
                 code = "\n".join(("_r = " + l) if l.startswith("labcheck.run_file(") else l for l in lines)

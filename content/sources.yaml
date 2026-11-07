@@ -47,3 +47,33 @@ groups:
       - {key: d2ltr, title: "Derin Öğrenmeye Dalış (d2l Türkçe)", url: "https://tr.d2l.ai/", license: "d2l lisansını izler", use: adapt}
       - {key: cmp784, title: "Hacettepe CMP784 — Deep Learning (Erkut Erdem)", url: "https://web.cs.hacettepe.edu.tr/~erkut/cmp784.f22/", license: "belirtilmemiş", use: link}
       - {key: comp541, title: "Koç Comp541 — Deep Learning (Deniz Yuret) / Knet.jl", url: "https://github.com/denizyuret/Knet.jl", license: "Knet.jl MIT", use: link}
+  - title: Görüntü işleme, paralel programlama, RL (Faz 9–11)
+    items:
+      - {key: gonzalez, title: "Gonzalez & Woods — Digital Image Processing (4. baskı)", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+      - {key: szeliski, title: "Szeliski — Computer Vision: Algorithms and Applications (2. baskı)", url: "https://szeliski.org/Book/", license: "© (PDF ücretsiz)", use: link}
+      - {key: opencvdocs, title: "OpenCV — Documentation ve Python tutorial'ları", url: "https://docs.opencv.org/4.x/", license: "Apache-2.0", use: adapt}
+      - {key: skimage, title: "scikit-image — User guide ve gallery", url: "https://scikit-image.org/docs/stable/", license: "BSD-3-Clause", use: adapt}
+      - {key: pmpp, title: "Hwu, Kirk, El Hajj — Programming Massively Parallel Processors (4. baskı)", url: "https://shop.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0", license: "©", use: link}
+      - {key: cudaguide, title: "NVIDIA — CUDA C++ Programming Guide ve Best Practices Guide", url: "https://docs.nvidia.com/cuda/cuda-c-programming-guide/", license: "© NVIDIA", use: link}
+      - {key: mattson, title: "Mattson, Sanders, Massingill — Patterns for Parallel Programming", url: "https://www.oreilly.com/library/view/patterns-for-parallel/0321228111/", license: "©", use: link}
+      - {key: cppconc, title: "Williams — C++ Concurrency in Action (2. baskı) / cppreference thread & atomic", url: "https://en.cppreference.com/w/cpp/thread", license: "cppreference CC BY-SA 3.0", use: link}
+      - {key: silver, title: "David Silver — UCL Course on RL", url: "https://www.davidsilver.uk/teaching/", license: "doğrulanmadı", use: link, verified: false}
+      - {key: cs285, title: "UC Berkeley CS285 — Deep Reinforcement Learning", url: "https://rail.eecs.berkeley.edu/deeprlcourse/", license: "doğrulanmadı", use: link, verified: false}
+      - {key: spinup, title: "OpenAI Spinning Up in Deep RL", url: "https://spinningup.openai.com/", license: "MIT", use: adapt}
+      - {key: lattimore, title: "Lattimore & Szepesvári — Bandit Algorithms", url: "https://tor-lattimore.com/downloads/book/book.pdf", license: "© (PDF ücretsiz)", use: link}
+      - {key: puterman, title: "Puterman — Markov Decision Processes", url: "https://onlinelibrary.wiley.com/doi/book/10.1002/9780470316887", license: "©", use: link}
+      - {key: geron, title: "Géron — Hands-On Machine Learning (3. baskı) ve kod deposu", url: "https://github.com/ageron/handson-ml3", license: "kod Apache-2.0; kitap ©", use: link}
+  - title: Makaleler (ödevler)
+    items:
+      - {key: p-viola, title: "Viola & Jones — Rapid Object Detection using a Boosted Cascade of Simple Features (CVPR 2001)", url: "https://doi.org/10.1109/CVPR.2001.990517", license: "©", use: link}
+      - {key: p-hog, title: "Dalal & Triggs — Histograms of Oriented Gradients for Human Detection (CVPR 2005)", url: "https://doi.org/10.1109/CVPR.2005.177", license: "©", use: link}
+      - {key: p-surf, title: "Bay, Tuytelaars, Van Gool — SURF: Speeded Up Robust Features (ECCV 2006)", url: "https://doi.org/10.1007/11744023_32", license: "©", use: link}
+      - {key: p-sift, title: "Lowe — Distinctive Image Features from Scale-Invariant Keypoints (IJCV 2004)", url: "https://doi.org/10.1023/B:VISI.0000029664.99615.94", license: "©", use: link}
+      - {key: p-vibe, title: "Barnich & Van Droogenbroeck — ViBe: A Powerful Random Technique to Estimate the Background in Video Sequences (ICASSP 2009)", url: "https://doi.org/10.1109/ICASSP.2009.4959741", license: "©", use: link}
+      - {key: p-ssim, title: "Wang, Bovik, Sheikh, Simoncelli — Image Quality Assessment: From Error Visibility to Structural Similarity (IEEE TIP 2004)", url: "https://doi.org/10.1109/TIP.2003.819861", license: "©", use: link}
+      - {key: p-fpn, title: "Lin ve ark. — Feature Pyramid Networks for Object Detection", url: "https://arxiv.org/abs/1612.03144", license: "arXiv", use: link}
+      - {key: p-vit, title: "Dosovitskiy ve ark. — An Image is Worth 16x16 Words (ViT)", url: "https://arxiv.org/abs/2010.11929", license: "arXiv", use: link}
+      - {key: p-transformer, title: "Vaswani ve ark. — Attention Is All You Need", url: "https://arxiv.org/abs/1706.03762", license: "arXiv", use: link}
+      - {key: p-dqn, title: "Mnih ve ark. — Playing Atari with Deep Reinforcement Learning", url: "https://arxiv.org/abs/1312.5602", license: "arXiv", use: link}
+      - {key: p-alphago, title: "Silver ve ark. — Mastering the game of Go with deep neural networks and tree search (Nature 2016)", url: "https://doi.org/10.1038/nature16961", license: "©", use: link}
+      - {key: p-alphagozero, title: "Silver ve ark. — Mastering the game of Go without human knowledge (Nature 2017)", url: "https://doi.org/10.1038/nature24270", license: "©", use: link}

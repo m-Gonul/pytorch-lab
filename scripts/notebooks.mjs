@@ -23,7 +23,8 @@ export function buildNotebook(id) {
   const m = YAML.parse(read(join(d, "module.yaml")));
   const f = (n) => (existsSync(join(d, n)) ? read(join(d, n)) : "");
   const page = `${site.site_url}${id}.html`;
-  const checks = Object.fromEntries("bcde".split("").map((s) => [s, f(`${s}.check.py`)]));
+  const extras = m.extras || [];
+  const checks = Object.fromEntries(["b", "c", "d", "e", ...extras.map((x) => x.id)].map((s) => [s, f(`${s}.check.py`)]));
   const cells = [];
   cells.push(md(`# ${m.code} · ${m.title}\n\n${m.summary.trim()}\n\nEtkileşimli sürüm: [${page}](${page})\n\n**Nasıl çalışılır:** her aşamada önce \`%%writefile\` hücresindeki kodu düzenleyip çalıştır (dosyaya yazar), sonra altındaki **Kontrol** hücresini çalıştır. Kontroller sitedekiyle birebir aynı. GPU gerekmez; Faz 7 modülleri hariç.`));
   cells.push(code(`#@title Kurulum: kontrol kütüphanesi (çalıştır, düzenleme)\n%%writefile labcheck.py\n${labcheck}`, { cellView: "form" }));
@@ -41,7 +42,18 @@ export function buildNotebook(id) {
     cells.push(code(`%%writefile stage_${s}.py\n${f(`${s}.py`)}`));
     cells.push(code(`# Kontrol (${i + 2}): kodunu çalıştırır ve sitedeki testleri uygular\nlabcheck.run_file("stage_${s}.py", CHECKS["${s}"])`));
   }
+  if (extras.length) {
+    cells.push(md(`## Ek alıştırmalar\n\nBeş aşamanın dışındaki pratikler; her biri kendi kontrolüyle.`));
+    for (const [i, x] of extras.entries()) {
+      cells.push(md(`### E${i + 1} · ${x.title}${x.engine === "torch" ? " (PyTorch)" : ""}\n\n${f(`${x.id}.md`)}`));
+      cells.push(code(`%%writefile extra_${x.id}.py\n${f(`${x.id}.py`)}`));
+      cells.push(code(`# Kontrol (E${i + 1})\nlabcheck.run_file("extra_${x.id}.py", CHECKS["${x.id}"])`));
+    }
+  }
   if (m.md?.outro || existsSync(join(d, "outro.md"))) cells.push(md(f("outro.md")));
+  for (const h of m.homework || []) {
+    cells.push(md(`## Makale ödevi: ${h.title}\n\n[${h.paper}](${h.url})\n\n${h.goal}\n\n**Adımlar**\n\n${h.steps.map((x, i) => `${i + 1}. ${x}`).join("\n")}\n\n**Kabul ölçütleri**\n\n${h.accept.map((x) => `- ${x}`).join("\n")}`));
+  }
   cells.push(md(`## Kaynaklar\n\n${m.sources.map((s) => `- [${s.title}](${s.url}) — ${s.license}`).join("\n")}`));
   return {
     cells,

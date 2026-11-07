@@ -38,6 +38,15 @@ for (const id of readdirSync(modDir)) {
   for (const s of "abcde") m.md[s] = f(`${s}.md`);
   m.files = {};
   for (const s of "bcde") m.files[s] = { start: f(`${s}.py`), sol: f(`${s}.sol.py`), check: f(`${s}.check.py`) };
+  m.extras = m.extras || [];
+  for (const x of m.extras) {
+    if (!/^x\d+$/.test(x.id)) throw new Error(`${id}: ek alıştırma kimliği x<sayı> olmalı: ${x.id}`);
+    m.md[x.id] = f(`${x.id}.md`);
+    m.files[x.id] = { start: f(`${x.id}.py`), sol: f(`${x.id}.sol.py`), check: f(`${x.id}.check.py`) };
+    for (const [k, v] of Object.entries(m.files[x.id])) if (!v) throw new Error(`${id}/${x.id}: ${k} dosyası yok`);
+    m.stages[x.id] = { engine: x.engine || "browser" };
+  }
+  m.homework = m.homework || [];
   modules[id] = m;
 }
 
@@ -89,7 +98,7 @@ ${extraHead}</head>
   <a class="brand" href="index.html" aria-label="${esc(site.title)} ana sayfa"><img src="img/icon.svg" alt="" width="26" height="26"><span>${esc(site.title)}</span></a>
   <button class="nav-toggle" aria-expanded="false" aria-controls="side">Müfredat</button>
   <nav class="top-links" aria-label="Site">
-    <a href="mufredat.html">Müfredat</a><a href="kurulum.html">Motorlar</a><a href="kaynaklar.html">Kaynaklar</a><a href="sozluk.html">Sözlük</a>
+    <a href="mufredat.html">Müfredat</a><a href="odevler.html">Ödevler</a><a href="kurulum.html">Motorlar</a><a href="kaynaklar.html">Kaynaklar</a><a href="sozluk.html">Sözlük</a>
   </nav>
   <button class="engine-pill" id="engine-pill" type="button" title="Kod çalıştırma motorlarının durumu">Motorlar</button>
   <button class="theme-toggle" type="button" aria-label="Tema değiştir"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/></svg></button>
@@ -140,6 +149,7 @@ function handHTML(m) {
 function codeboxHTML(m, s) {
   const st = m.stages[s];
   const lines = m.files[s].start.split("\n").length;
+  const label = /^x/.test(s) ? `Ek alıştırma ${s.slice(1)}` : `Aşama ${s}`;
   return `<div class="codebox" data-stage="${s}" data-engine="${st.engine}">
   <div class="cb-bar">
     <span class="cb-engine" data-role="engine"></span>
@@ -149,9 +159,36 @@ function codeboxHTML(m, s) {
     <button class="btn ghost" data-act="reset" type="button">Sıfırla</button>
     <button class="btn ghost" data-act="solution" type="button">Çözüm</button>
   </div>
-  <textarea class="cb-code" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(Math.max(lines + 1, 8), 34)}" aria-label="Aşama ${s} kodu">${esc(m.files[s].start)}</textarea>
+  <textarea class="cb-code" spellcheck="false" autocapitalize="off" autocomplete="off" rows="${Math.min(Math.max(lines + 1, 8), 34)}" aria-label="${label} kodu">${esc(m.files[s].start)}</textarea>
   <div class="cb-out" aria-live="polite"></div>
 </div>`;
+}
+
+function extrasHTML(m) {
+  if (!m.extras.length) return "";
+  const items = m.extras.map((x, i) => `<section class="stage extra" id="${x.id}" data-stage="${x.id}">
+<h3><span class="stage-n x">E${i + 1}</span> ${md.inline(x.title)}<span class="stage-engine" data-engine-badge="${m.stages[x.id].engine}"></span></h3>
+<div class="prose">${md.block(m.md[x.id] || "")}</div>
+${codeboxHTML(m, x.id)}
+</section>`).join("\n");
+  return `<section class="extras" id="ek"><h2>Ek alıştırmalar</h2><p class="muted">Beş aşamanın dışındaki pratikler: konunun ders notlarında geçen ama ana akışa sığmayan her parçası burada, kendi kontrolüyle. Sıra önemli değil.</p>${items}</section>`;
+}
+
+function homeworkItemHTML(h, withModule = null) {
+  const steps = (h.steps || []).map((x) => `<li>${md.inline(x)}</li>`).join("");
+  const acc = (h.accept || []).map((x) => `<li>${md.inline(x)}</li>`).join("");
+  return `<article class="hw">
+<h3>${md.inline(h.title)}${withModule ? ` <small><a href="${withModule.id}.html">${esc(withModule.code)}</a></small>` : ""}</h3>
+<p class="hw-paper"><a href="${esc(h.url)}" rel="noopener" target="_blank">${md.inline(h.paper)}</a>${h.level ? ` · <span class="hw-level">${esc(h.level)}</span>` : ""}${h.hours ? ` · ≈${h.hours} saat` : ""}</p>
+<div class="prose">${md.block(h.goal || "")}</div>
+${steps ? `<h4>Adımlar</h4><ol class="hw-steps">${steps}</ol>` : ""}
+${acc ? `<h4>Kabul ölçütleri</h4><ul class="hw-accept">${acc}</ul>` : ""}
+</article>`;
+}
+
+function homeworkHTML(m) {
+  if (!m.homework.length) return "";
+  return `<section class="homework" id="odev"><h2>Makale ödevleri</h2><p class="muted">İsteğe bağlı, kapsamlı ödevler: bir makaleyi baştan uygulamak. Otomatik kontrol yok; kabul ölçütleri sayısal ve kendin doğrulayabileceğin şekilde yazıldı.</p>${m.homework.map((h) => homeworkItemHTML(h)).join("")}</section>`;
 }
 
 function quizHTML(m) {
@@ -170,7 +207,9 @@ function modulePage(id) {
     if (!x) throw new Error(`${id}: bilinmeyen önkoşul ${p}`);
     return modules[p] ? `<a href="${p}.html">${esc(x.code)} ${esc(x.title)}</a>` : `<span>${esc(x.code)} ${esc(x.title)}</span>`;
   });
-  const rail = `<ol class="rail" aria-label="Aşamalar">${STAGES.map((s, i) => `<li><a href="#${s.k}" data-rail="${s.k}"><span class="rail-n">${i + 1}</span><span class="rail-name">${s.name}</span></a></li>`).join("")}</ol>`;
+  const railExtra = (m.extras.length ? `<li><a href="#ek" data-rail="ek"><span class="rail-n">+${m.extras.length}</span><span class="rail-name">Ek</span></a></li>` : "")
+    + (m.homework.length ? `<li><a href="#odev" data-rail="odev"><span class="rail-n">✎</span><span class="rail-name">Ödev</span></a></li>` : "");
+  const rail = `<ol class="rail" aria-label="Aşamalar">${STAGES.map((s, i) => `<li><a href="#${s.k}" data-rail="${s.k}"><span class="rail-n">${i + 1}</span><span class="rail-name">${s.name}</span></a></li>`).join("")}${railExtra}</ol>`;
   const stageSec = STAGES.map((s, i) => {
     const eng = s.k === "a" ? "" : `<span class="stage-engine" data-engine-badge="${m.stages[s.k].engine}"></span>`;
     return `<section class="stage" id="${s.k}" data-stage="${s.k}">
@@ -195,12 +234,15 @@ ${s.k === "a" ? handHTML(m) : codeboxHTML(m, s.k)}
 <div class="rail-wrap">${rail}</div>
 <section class="intro prose">${md.block(m.md.intro)}</section>
 ${stageSec}
+${extrasHTML(m)}
 ${m.md.outro ? `<section class="outro prose">${md.block(m.md.outro)}</section>` : ""}
 ${quizHTML(m)}
+${homeworkHTML(m)}
 <section class="mod-sources"><h2>Kaynaklar</h2>${sourceList(m.sources)}</section>
 <nav class="pager">${prev ? `<a class="prev" href="${prev.id}.html"><small>Önceki</small>${esc(prev.code)} ${esc(prev.title)}</a>` : "<span></span>"}${next ? `<a class="next" href="${next.id}.html"><small>Sonraki</small>${esc(next.code)} ${esc(next.title)}</a>` : "<span></span>"}</nav>
 </article>`;
-  const data = { id, stages: Object.fromEntries("bcde".split("").map((s) => [s, { engine: m.stages[s].engine, start: m.files[s].start, sol: m.files[s].sol, check: m.files[s].check }])) };
+  const keys = ["b", "c", "d", "e", ...m.extras.map((x) => x.id)];
+  const data = { id, stages: Object.fromEntries(keys.map((s) => [s, { engine: m.stages[s].engine, start: m.files[s].start, sol: m.files[s].sol, check: m.files[s].check }])) };
   return page({ title: `${m.code} ${m.title}`, body, active: id, data, bodyClass: "page-module" });
 }
 
@@ -253,6 +295,16 @@ function sourcesPage() {
   return page({ title: "Kaynaklar", body });
 }
 
+function homeworkPage() {
+  let n = 0;
+  const sec = curriculum.phases.map((p) => {
+    const items = p.modules.filter((x) => modules[x.id]?.homework.length).flatMap((x) => modules[x.id].homework.map((h) => { n++; return homeworkItemHTML(h, x); }));
+    return items.length ? `<section class="hw-phase"><h2><span class="ph-num">${p.n}</span> ${esc(p.title)}</h2>${items.join("")}</section>` : "";
+  }).join("");
+  const body = `<header class="page-head"><h1>Makale ödevleri</h1><p class="lede">${n} ödev. Her biri bir makaleyi (ya da klasik bir algoritmayı) sıfırdan uygulatır; ilgili modülü bitirdikten sonra yapılması için yazıldı. Kabul ölçütleri sayısal: sonucu kendin ölçüp karşılaştırabilirsin.</p></header>${sec}`;
+  return page({ title: "Makale ödevleri", body: termify(body) });
+}
+
 function glossaryPage() {
   const rows = Object.entries(yaml(C("glossary.yaml")).terms).sort((a, b) => a[0].localeCompare(b[0], "tr")).map(([k, v]) => `<div class="gl-row" id="t-${esc(k.replace(/\s+/g, "-"))}"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
   return page({ title: "Sözlük", body: `<header class="page-head"><h1>Sözlük</h1><p class="lede">Metinde altı noktalı çizili terimlerin üzerine gelince (ya da dokununca) bu tanımlar açılır. Teknik terimler İngilizce bırakıldı; ilk kullanımda burada açıklanır.</p></header><dl class="glossary">${rows}</dl>` });
@@ -276,6 +328,7 @@ const pages = {
   "mufredat.html": curriculumPage(),
   "kaynaklar.html": sourcesPage(),
   "sozluk.html": glossaryPage(),
+  "odevler.html": homeworkPage(),
   "kurulum.html": markdownPage("kurulum.md", "Motorlar ve kurulum"),
 };
 for (const r of ready) pages[`${r.id}.html`] = modulePage(r.id);

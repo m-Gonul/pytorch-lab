@@ -362,3 +362,17 @@ pre.code { background: var(--code-bg); border: 1px solid var(--line); border-rad
   .stage-engine { margin-left: 0; width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ---- ek alıştırmalar ve makale ödevleri ---- */
+.extras { border-top: 2px solid var(--line); margin-top: 44px; }
+.stage.extra { border-top: 1px dashed var(--line); margin-top: 26px; }
+.stage.extra h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin-top: 20px; }
+.stage-n.x { background: var(--ink-3); font-size: 0.8rem; width: 2.2em; height: 2.2em; }
+.homework { border-top: 2px solid var(--line); margin-top: 44px; }
+.hw { border: 1px solid var(--line); border-radius: 8px; padding: 6px 18px 14px; margin: 18px 0; background: var(--paper); }
+.hw h3 { margin: 12px 0 2px; }
+.hw h3 small { font-weight: 500; font-size: 0.8rem; margin-left: 6px; }
+.hw-paper { margin: 0 0 8px; color: var(--ink-3); font-size: 0.92rem; }
+.hw h4 { margin: 14px 0 4px; font-size: 0.95rem; }
+.hw-steps li, .hw-accept li { margin: 3px 0; }
+.hw-phase h2 { display: flex; align-items: center; gap: 10px; }

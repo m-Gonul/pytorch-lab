@@ -5,6 +5,10 @@
 #   "pandas>=2.1",
 #   "torch>=2.3",
 #   "ninja>=1.11",
+#   "scipy>=1.11",
+#   "scikit-learn>=1.4",
+#   "scikit-image>=0.22",
+#   "opencv-python-headless>=4.8",
 #   "triton>=3.0; sys_platform == 'linux' and platform_machine == 'x86_64'",
 # ]
 # ///

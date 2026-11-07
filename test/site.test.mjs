@@ -32,12 +32,17 @@ test("modül sayfaları 5 aşama, el hesabı ve 4 kod kutusu taşıyor", () => {
   for (const m of modules) {
     const html = readFileSync(join(dist, `${m}.html`), "utf8");
     for (const s of "abcde") assert.match(html, new RegExp(`<section class="stage" id="${s}"`), `${m}: aşama ${s}`);
-    assert.equal((html.match(/class="codebox"/g) || []).length, 4, `${m}: kod kutusu sayısı`);
+    const nx = (html.match(/<section class="stage extra"/g) || []).length;
+    assert.equal((html.match(/class="codebox"/g) || []).length, 4 + nx, `${m}: kod kutusu sayısı`);
     assert.ok((html.match(/class="hf"/g) || []).length >= 4, `${m}: el hesabı alanları`);
     const data = JSON.parse(html.match(/<script type="application\/json" id="page-data">(.*?)<\/script>/s)[1]);
     assert.equal(data.id, m);
     for (const s of "bcde") for (const k of ["start", "sol", "check"]) assert.ok(data.stages[s][k]?.length > 20, `${m}/${s}.${k} boş`);
   }
+});
+
+test("ödevler sayfası var", () => {
+  assert.ok(pages.includes("odevler.html"));
 });
 
 test("KaTeX hatası yok", () => {
