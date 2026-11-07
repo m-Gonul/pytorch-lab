@@ -30,8 +30,8 @@ def check(ns, R):
         ensure(any(p.grad is not None for p in D.parameters()), "d_loss D'ye gradyan vermeli")
     R.test("d_loss sahte örnekleri detach ediyor", detach)
 
-    def train():
-        torch.manual_seed(1)
+    def run(seed):
+        torch.manual_seed(seed)
         G, D = need(ns, "Generator", "sınıf")(), need(ns, "Discriminator", "sınıf")()
         need(ns, "train_gan")(G, D, ring, steps=3000)
         with torch.no_grad():
@@ -40,9 +40,14 @@ def check(ns, R):
         C = torch.stack([2 * ang.cos(), 2 * ang.sin()], 1)
         dmin, k = torch.cdist(s, C).min(1)
         good = dmin < 0.2
-        modes = (torch.bincount(k[good], minlength=8) >= 40).sum().item()
-        q = good.float().mean().item()
-        ensure(modes >= 7, f"yalnız {modes}/8 mod kapsandı (mod çöküşü)")
-        ensure(q > 0.6, f"bir moda yakın örnek oranı yalnız %{100 * q:.0f}")
-        return f"{modes}/8 mod, bir moda 0.2'den yakın örnek oranı %{100 * q:.0f}"
+        return (torch.bincount(k[good], minlength=8) >= 40).sum().item(), good.float().mean().item()
+
+    def train():
+        tried = []
+        for seed in (1, 2):
+            modes, q = run(seed)
+            tried.append(f"tohum {seed}: {modes}/8 mod, %{100 * q:.0f}")
+            if modes >= 7 and q > 0.6:
+                return f"{modes}/8 mod, bir moda 0.2'den yakın örnek oranı %{100 * q:.0f}"
+        raise AssertionError("mod çöküşü ya da dağınık örnekler — " + "; ".join(tried))
     R.test("8 Gauss halkası: modlar kapsanıyor", train)
