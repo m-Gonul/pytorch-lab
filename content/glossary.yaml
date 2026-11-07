@@ -118,3 +118,6 @@ terms:
   bellman denklemi: "Bir durumun değerini anlık ödül ile sonraki durumların indirimli beklenen değeri cinsinden yazan özyinelemeli denklem; en iyi değerde eylemler üzerinde max alınır."
   politika iyileştirme teoremi: "Bir politikanın Q değerlerine göre açgözlü seçilen yeni politikanın her durumda en az eski politika kadar değerli olduğunu söyleyen sonuç."
   td hatası: "Temporal-difference hatası δ = r + γV(s') − V(s): tek adımlık önyüklemeli hedef ile şimdiki kestirim arasındaki fark."
+  politika dışı öğrenme: "Off-policy: veri bir davranış politikasıyla (ör. ε-açgözlü) toplanırken başka bir hedef politikanın (ör. açgözlü) değeri öğrenilir. Q-öğrenme politika dışıdır; SARSA politika üstüdür."
+  maksimizasyon yanlılığı: "Gürültülü kestirimlerin maksimumu gerçek maksimumu sistematik olarak aşar: E[max Q̂] ≥ max E[Q̂]. Q-öğrenmenin hedefindeki max bu yanlılığı yayar; çift Q-öğrenme seçme ve değerlendirmeyi ayırarak giderir."
+  ε-açgözlü: "ε olasılıkla rastgele, 1 − ε olasılıkla en yüksek Q değerli eylemi seçen keşif politikası."
