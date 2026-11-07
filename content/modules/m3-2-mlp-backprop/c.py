@@ -25,7 +25,7 @@ def two_layer_loss(X, y, params, reg=0.0):
     ...
 
 
-def train(X, y, H, C, lr=1.0, steps=5000, reg=1e-3, seed=0):
+def train(X, y, H, C, lr=1.0, steps=5000, reg=1e-4, seed=0):
     ...
 
 

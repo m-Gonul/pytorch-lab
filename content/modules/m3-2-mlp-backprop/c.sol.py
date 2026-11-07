@@ -40,7 +40,7 @@ def two_layer_loss(X, y, params, reg=0.0):
     return loss, {"W1": dW1 + 2 * reg * params["W1"], "b1": db1, "W2": dW2 + 2 * reg * params["W2"], "b2": db2}
 
 
-def train(X, y, H, C, lr=1.0, steps=5000, reg=1e-3, seed=0):
+def train(X, y, H, C, lr=1.0, steps=5000, reg=1e-4, seed=0):
     rng = np.random.default_rng(seed)
     D = X.shape[1]
     p = {"W1": 0.01 * rng.standard_normal((D, H)), "b1": np.zeros(H), "W2": 0.01 * rng.standard_normal((H, C)), "b2": np.zeros(C)}
