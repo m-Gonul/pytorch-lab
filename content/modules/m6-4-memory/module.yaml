@@ -1,0 +1,64 @@
+id: m6-4-memory
+code: M6.4
+title: "Bellek: aktivasyonlar, checkpointing, gradient accumulation"
+phase: 6
+minutes: 240
+prereq: [m6-1-autograd-internals]
+summary: >
+  Eğitimde bellek nereye gidiyor? Parametre, gradyan, Adam durumu ve
+  aktivasyon belleğini elle sayıyor, saf Python'da activation
+  checkpointing'in tepe belleğini ve yeniden hesaplama maliyetini
+  simüle ediyor, NumPy'da checkpoint'li bir geri geçişi kendin yazıp tam
+  geri geçişle aynı gradyanı verdiğini doğruluyor, PyTorch'ta
+  `torch.utils.checkpoint` ile saklanan belleği ölçüyor ve en sonda gradient
+  accumulation'ın büyük batch'le birebir aynı adımı attığını gösteriyorsun.
+goals:
+  - "Eğitim belleğinin dört kalemi: parametre, gradyan, optimizer durumu, aktivasyon"
+  - "[[activation checkpointing]]: bellek ile yeniden hesaplama arasındaki $\\sqrt n$ dengesi"
+  - "Gradient accumulation'da kaybı doğru ölçeklemek ve BatchNorm istisnası"
+sources:
+  - {title: "Chen ve ark. — Training Deep Nets with Sublinear Memory Cost", url: "https://arxiv.org/abs/1604.06174", license: "arXiv", use: link}
+  - {title: "PyTorch Docs — torch.utils.checkpoint", url: "https://docs.pytorch.org/docs/stable/checkpoint.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "Rajbhandari ve ark. — ZeRO: Memory Optimizations Toward Training Trillion Parameter Models", url: "https://arxiv.org/abs/1910.02054", license: "arXiv", use: link}
+  - {title: "Stanford CS336 — Lecture: Resource accounting", url: "https://stanford-cs336.github.io/", license: "doğrulanmadı", use: link}
+  - {title: "Hugging Face — The Ultra-Scale Playbook", url: "https://huggingface.co/spaces/nanotron/ultrascale-playbook", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "GPT-2 small, 124,439,808 parametre, fp32 Adam: ağırlık + gradyan + iki moment"
+      fields:
+        - {id: adam, label: "Toplam bayt (aktivasyonsuz)", answer: 1991036928, hint: "Parametre başına $4\\cdot4=16$ bayt"}
+    - title: "16 katmanlı zincir, her katman çıktısı 1 birim. Her $k=4$ katmanda bir çıktıyı sakla (segment sonu)"
+      fields:
+        - {id: nock, label: "Checkpoint'siz: geri geçiş başında saklı çıktı sayısı", answer: 16}
+        - {id: peak, label: "Checkpoint'li tepe: son segment işlenirken (4 segment sonu + 3 yeniden hesaplanan)", answer: 7}
+        - {id: rec, label: "Toplam yeniden hesaplanan katman", answer: 12, hint: "Her segmentte son katman hariç $k-1$"}
+        - {id: bytes, label: "B = 64, genişlik 256, fp32: bir katman çıktısı kaç bayt?", answer: 65536}
+  verify: |
+    n, k = 16, 4
+    segs = [list(range(s, min(s + k, n))) for s in range(0, n, k)]
+    peak = max(j + 1 + len(sg) - 1 for j, sg in enumerate(segs))
+    answers = dict(adam=124439808 * 16, nock=n, peak=peak, rec=sum(len(sg) - 1 for sg in segs), bytes=64 * 256 * 4)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Gradient accumulation (4 mikro-batch × 16) ne zaman 64'lük tek batch'le birebir aynı gradyanı vermez?"
+    options:
+      - {t: "Model BatchNorm içeriyorsa: istatistikler 16 örnek üzerinden hesaplanır, 64 değil", ok: true, why: "Örnekler arası etkileşim olan her katman (BatchNorm, batch içi kontrastif kayıplar) eşdeğerliği bozar. LayerNorm/RMSNorm örnek başıdır."}
+      - {t: "Hiçbir zaman; her zaman aynıdır", why: "Örnekleri birbirine bağlayan katmanlar istisna."}
+      - {t: "Dropout varsa", why: "Dropout örnek başıdır; aynı maskelerle birebir aynı."}
+  - q: "$n$ katmanlı zincirde checkpoint aralığı $k\\approx\\sqrt n$ seçilince tepe aktivasyon belleği yaklaşık nedir?"
+    options:
+      - {t: "$O(\\sqrt n)$, karşılığında bir ekstra ileri geçiş kadar hesap", ok: true, why: "$n/k$ segment sonu + $k$ yeniden hesaplanan; toplam $n/k+k$, minimumu $k=\\sqrt n$'de $2\\sqrt n$ (Chen ve ark. 2016)."}
+      - {t: "$O(1)$", why: "Bu, her şeyi yeniden hesaplamak ($O(n^2)$ hesap) demek."}
+      - {t: "$O(n)$, hesap değişmez", why: "Checkpointing belleği alt-doğrusal yapar."}
+  - q: "Mixed precision (bf16 ağırlık/gradyan + fp32 master kopya + fp32 Adam) parametre başına kaç bayt tutar?"
+    options:
+      - {t: "$2+2+4+4+4=16$: fp32 Adam ile aynı; kazanç aktivasyonlarda ve hızda", ok: true, why: "Parametre belleğini düşürmek için ZeRO (optimizer durumunu GPU'lara bölmek) ya da 8-bit optimizer'lar gerekir."}
+      - {t: "8", why: "fp32 master ve iki moment unutuldu."}
+      - {t: "4", why: "Yalnız bf16 ağırlık + gradyan sayıldı."}

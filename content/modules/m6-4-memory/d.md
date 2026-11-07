@@ -1,0 +1,4 @@
+- `param_bytes(model)` — parametrelerin bayt toplamı.
+- `optimizer_state_bytes(opt)` — `opt.state` içindeki tüm tensörlerin bayt toplamı (Adam'da `exp_avg`, `exp_avg_sq` ve `step`).
+- `saved_bytes(fn)` → `(çıktı, bayt)`: `fn()` sırasında saklanan tensörlerin baytı (`saved_tensors_hooks`).
+- `run_checkpointed(blocks, x, k)` — `blocks` (`nn.ModuleList`) her $k$ blokta bir segment, her segment `torch.utils.checkpoint.checkpoint(…, use_reentrant=False)` ile.
