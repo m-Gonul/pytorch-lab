@@ -103,3 +103,4 @@ terms:
   di zenzo gradyanı: "Çok kanallı (renkli) bir görüntüde en hızlı değişim yönünü ve büyüklüğünü, kanal türevlerinin iç çarpımlarından (gxx, gyy, gxy) oluşan 2 × 2 matrisin en büyük özdeğeriyle veren vektör gradyanı."
   konvolüsyon teoremi: "Uzayda konvolüsyon, Fourier uzayında eleman eleman çarpmaya karşılık gelir (f*h ⇔ F·H); ayrık DFT'de bu dairesel konvolüsyondur."
   wiener süzgeci: "Bulanık ve gürültülü bir gözlemden ortalama kare hatayı en aza indiren doğrusal onarıcı: H*/(|H|² + Sη/Sf)."
+  slic: "Simple Linear Iterative Clustering: renk + konum uzayında yalnız yerel pencerede çalışan k-means ile süper piksel üreten algoritma."

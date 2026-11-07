@@ -1,0 +1,104 @@
+id: m9-11-segmentation
+code: M9.11
+title: Bölütleme — nokta/çizgi, k-means, GMM, SLIC süper pikseller
+phase: 9
+minutes: 420
+prereq: [m9-9-color]
+summary: >
+  Her piksele bir etiket: Laplacian ile tekil nokta ve yönlü çizgi tespiti,
+  kümelemeyle bölge bölütleme (k-means, Gauss karışım modeli ve EM) ve
+  SLIC süper pikselleri. Elle bir k-means koşusu, SLIC uzaklığı ve EM
+  sorumluluğu; saf Python'da k-means'i scikit-learn ile birebir; NumPy'da
+  vektörel k-means ve renk nicemleme; PyTorch'ta tam kovaryanslı EM'i
+  scikit-learn'ün `GaussianMixture`'ı ile aynı sayılara getiriyorsun; en
+  sonda SLIC'i tensör işlemleriyle yazıp pencereli döngü sürümüyle piksel
+  piksel aynı etiketleri üretiyorsun. Ek alıştırmalar Otsu ve uyarlamalı
+  eşikleme, süper piksel + k-means (alıştırma 6.1) ve bölge büyütme.
+goals:
+  - "Tekil nokta: $|R|\\ge T$; çizgi: Laplacian'ın yalnız pozitif kısmı ve 4 yönlü çekirdek"
+  - "k-means: NP-zor amaç, Lloyd sezgiseli, başlangıca bağımlılık"
+  - "GMM ve EM: kovaryansla eliptik kümeler, yumuşak atama"
+  - "[[SLIC]]: 5-B $[L,a,b,x,y]$ uzayında yerel k-means, $D=\\sqrt{(d_c/c)^2+(d_s/s)^2}$"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, 4. baskı, Bölüm 10.2, 10.3, 10.5", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "Achanta ve ark. — SLIC Superpixels Compared to State-of-the-Art Superpixel Methods (TPAMI 2012)", url: "https://doi.org/10.1109/TPAMI.2012.120", license: "©", use: link}
+  - {title: "scikit-learn — KMeans, GaussianMixture", url: "https://scikit-learn.org/stable/modules/clustering.html", license: "BSD-3", use: adapt}
+  - {title: "Otsu — A Threshold Selection Method from Gray-Level Histograms (1979)", url: "https://doi.org/10.1109/TSMC.1979.4310076", license: "©", use: link}
+  - {title: "scikit-image — segmentation.slic", url: "https://scikit-image.org/docs/stable/api/skimage.segmentation.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "Nokta ve çizgi"
+      fields:
+        - {id: pt, label: "Sıfırlar ortasında 10: $\\begin{bmatrix}1&1&1\\\\1&-8&1\\\\1&1&1\\end{bmatrix}$ ile $|R|$", answer: 80}
+        - {id: ln, label: "Orta satırı 1 olan 3 × 3 yamada yatay çekirdek $\\begin{bmatrix}-1&-1&-1\\\\2&2&2\\\\-1&-1&-1\\end{bmatrix}$ yanıtı", answer: 6}
+    - title: "k-means, 1-B veri $\\{1,2,3,10,11,12\\}$, başlangıç $m_1=1$, $m_2=2$"
+      fields:
+        - {id: k1, label: "1. iterasyondan sonra $m_2$", answer: 7.6}
+        - {id: kf1, label: "Yakınsamada $m_1$", answer: 2}
+        - {id: kf2, label: "Yakınsamada $m_2$", answer: 11}
+    - title: "SLIC ve GMM"
+      fields:
+        - {id: s, label: "600 × 480 görüntü, 100 süper piksel: ızgara aralığı $s=\\sqrt{n_{tp}/n_{sp}}$", answer: 53.6656, tol: 0.001}
+        - {id: D, label: "$d_c=20$, $c=10$, $d_s=30$, $s=50$: $D$", answer: 2.08806, tol: 0.0001}
+        - {id: r, label: "1-B GMM, eşit ağırlık, $\\sigma=1$, ortalamalar 0 ve 4: $x=1$'in 1. bileşene sorumluluğu", answer: 0.982014, tol: 0.0001}
+  verify: |
+    import math
+    z = [1, 2, 3, 10, 11, 12]
+    m = [1.0, 2.0]
+    hist = []
+    while True:
+        lab = [0 if abs(v - m[0]) <= abs(v - m[1]) else 1 for v in z]
+        new = [sum(v for v, l in zip(z, lab) if l == k) / lab.count(k) for k in (0, 1)]
+        hist.append(new)
+        if new == m:
+            break
+        m = new
+    answers = dict(pt=abs(-8 * 10), ln=2 * 3, k1=hist[0][1], kf1=m[0], kf2=m[1], s=math.sqrt(600 * 480 / 100),
+                   D=math.sqrt((20 / 10) ** 2 + (30 / 50) ** 2), r=1 / (1 + math.exp(-0.5 * 9 + 0.5 * 1)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Eşikleme: Otsu ve uyarlamalı ortalama (cv2 ile birebir)", engine: browser}
+  - {id: x2, title: "Süper piksel + k-means bölütleme (alıştırma 6.1)", engine: browser}
+  - {id: x3, title: "Tohumlu bölge büyütme", engine: browser}
+
+quiz:
+  - q: "Çizgi tespitinde Laplacian'ın mutlak değeri yerine yalnız pozitif kısmı neden kullanılır?"
+    options:
+      - {t: "Mutlak değer pozitif ve negatif tepeleri birlikte alıp çizgiyi iki kat kalın gösterir", ok: true, why: "Pozitif kısım (parlak çizgi için) ince bir yanıt verir."}
+      - {t: "Negatif değerler gürültüdür", why: "Çizginin yanlarındaki gerçek yanıttır."}
+      - {t: "Laplacian negatif değer üretmez", why: "Üretir."}
+  - q: "k-means'in sonucu neden başlangıca bağlıdır?"
+    options:
+      - {t: "Lloyd algoritması amaç fonksiyonunu yalnız yerel olarak azaltır; global en iyiyi bulmak NP-zordur", ok: true, why: "Farklı başlangıçlarla birçok kez çalıştırıp en düşük maliyeti seçmek yaygındır (n_init)."}
+      - {t: "Algoritma yakınsamaz", why: "Her adımda maliyet azalır, sonlu sayıda bölüntü olduğu için yakınsar."}
+      - {t: "Uzaklık ölçüsü rastgeledir", why: "Öklid uzaklığı sabittir."}
+  - q: "SLIC'te c (renk normalizasyonu) küçültülürse ne olur?"
+    options:
+      - {t: "Renk uzaklığı ağır basar; süper pikseller sınırlara daha iyi yapışır ama şekilleri düzensizleşir", ok: true, why: "c büyüdükçe uzamsal terim baskınlaşır ve süper pikseller kompakt karelere yaklaşır."}
+      - {t: "Süper piksel sayısı azalır", why: "Sayıyı s belirler."}
+      - {t: "Algoritma daha hızlı olur", why: "Karmaşıklık değişmez."}
+
+homework:
+  - title: "Superpixel Sampling Networks: türevlenebilir SLIC"
+    paper: "Jampani, Sun, Liu, Yang, Kautz — Superpixel Sampling Networks (ECCV 2018)"
+    url: "https://arxiv.org/abs/1807.10174"
+    level: ileri
+    hours: 14
+    goal: |
+      Bu modülde yazdığın SLIC'in sert atamasını, piksel–süper piksel benzerliklerinin softmax'ıyla (yumuşak atama) değiştirerek türevlenebilir hale getir; bir CNN'in ürettiği özniteliklerle uçtan uca eğit (SSN). BSDS500'de sınır yakalama (boundary recall) ve yetersiz bölütleme hatasını (undersegmentation error) SLIC ile karşılaştır.
+    steps:
+      - "Yumuşak atama $Q_{pi}=e^{-\\lVert F_p-S_i\\rVert^2}$ (yalnız çevredeki 9 süper piksel), merkez güncelleme $S_i=\\frac{\\sum_pQ_{pi}F_p}{\\sum_pQ_{pi}}$."
+      - "Öznitelik ağı: birkaç konvolüsyon + konum özniteliği (ölçekli x, y)."
+      - "Kayıp: etiketlerin süper piksellere izdüşümü ve geri izdüşümü üzerinden yeniden kurma + kompaktlık."
+      - "Görev özel: segmentasyon etiketleri yerine optik akış ya da derinlik ile eğitme denemesi."
+    accept:
+      - "Aynı süper piksel sayısında SSN'nin sınır yakalaması SLIC'ten yüksek (grafik: sayı 100–1000)."
+      - "Yumuşak atamanın sıcaklığı (ölçek) için ablasyon."
+      - "Bu modüldeki e aşamasının sert SLIC'iyle SSN'nin çıkarım süresi karşılaştırması."

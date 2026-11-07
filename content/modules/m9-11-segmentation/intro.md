@@ -1,0 +1,9 @@
+**Bölütleme:** görüntüyü anlamlı bölgelere ayırmak, yani her piksele bir etiket vermek. İki aile: **süreksizlik** (nokta, çizgi, kenar — M9.6) ve **benzerlik** (eşikleme, kümeleme, bölge büyütme, süper pikseller).
+
+**Tekil nokta:** $|R(x,y)|\ge T$, $R$ = Laplacian yanıtı (8-komşulu çekirdek). **Çizgi:** Laplacian ince bir çizgide pozitif tepe ve iki yanında negatif tepeler verir; mutlak değer çizgiyi kalınlaştırır, bu yüzden **yalnız pozitif** kısım eşiklenir. Yön için dört çekirdek (yatay, dikey, iki çapraz); hangisinin $|Z_k|$'si en büyükse piksel o yöndeki çizgiyle "daha çok ilişkili"dir.
+
+**k-means:** $\arg\min_C\sum_{i=1}^k\sum_{z\in C_i}\lVert z-m_i\rVert^2$ NP-zor; standart (Lloyd) algoritma: (1) başlangıç ortalamaları, (2) her örneği en yakın ortalamaya ata, (3) ortalamaları güncelle, (4) değişim $\le T$ olana dek tekrarla. Yakınsar ama global en iyiyi garanti etmez; sonuç başlangıca bağlıdır.
+
+**GMM:** her küme bir Gauss $\mathcal N(\mu_k,\Sigma_k)$, karışım ağırlıkları $\pi_k$. **EM:** E adımı sorumluluklar $r_{nk}=\frac{\pi_k\mathcal N(z_n|\mu_k,\Sigma_k)}{\sum_j\pi_j\mathcal N(z_n|\mu_j,\Sigma_j)}$; M adımı $N_k=\sum_nr_{nk}$, $\pi_k=N_k/N$, $\mu_k=\frac1{N_k}\sum_nr_{nk}z_n$, $\Sigma_k=\frac1{N_k}\sum_nr_{nk}(z_n-\mu_k)(z_n-\mu_k)^T$. k-means, $\Sigma=\sigma^2I$ ve $\sigma\to0$ sınırıdır.
+
+**[[SLIC]] (Achanta 2012):** $n_{sp}$ süper piksel için ızgara aralığı $s=\sqrt{n_{tp}/n_{sp}}$. (1) merkezleri ızgaraya koy ve $3\times3$ komşulukta en düşük gradyana kaydır, (2) her merkez yalnız çevresindeki $2s\times2s$ bölgedeki piksellere uzaklık hesaplar, $D_i(p)<d(p)$ ise etiketi günceller, (3) merkezleri ortalamalarla güncelle, (4) yakınsayana dek, (5) her bölgeyi ortalama rengiyle boya. Renk ve konum ölçekleri farklı olduğu için **normalize**: $D=\sqrt{(d_c/c)^2+(d_s/s)^2}$; küçük $c$ sınırlara yapışkan, büyük $c$ kompakt süper pikseller.
