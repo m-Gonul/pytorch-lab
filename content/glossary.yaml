@@ -58,3 +58,8 @@ terms:
   receptive field: "Bir çıktı nöronunun girdide 'gördüğü' bölgenin boyutu; katman katman r ← r + (k − 1)·j ile büyür, j o ana kadarki toplam stride."
   residual bağlantı: "Skip connection: bir bloğun çıktısına girdisini eklemek, y = x + F(x). Jacobian'a birim matris ekler, gradyanın sönmesini engeller."
   associative scan: "Birleşmeli bir işlemin tüm önek (prefix) sonuçlarını O(log T) paralel adımda hesaplamak; doğrusal rekürsiyonlar ve SSM'ler (Mamba) bunu kullanır."
+  bpe: "Byte-pair encoding: en sık komşu sembol çiftini tekrar tekrar birleştirerek alt-kelime sözlüğü kuran tokenization algoritması."
+  causal maske: "Attention'da her konumun yalnız kendisini ve öncekileri görmesini sağlayan maske; gelecek konumların skorları softmax'tan önce −∞ yapılır."
+  online softmax: "Softmax'ı veri üzerinde tek geçişte, koşan maksimum ve paydayı her yeni blokla yeniden ölçekleyerek hesaplama; FlashAttention'ın temeli."
+  weight tying: "Giriş embedding matrisini çıkış (logit) katmanının ağırlığı olarak da kullanmak; aynı tensör iki yerde, gradyanlar toplanır."
+  kv-cache: "Otoregresif üretimde geçmiş token'ların attention key ve value'larını saklayıp her adımda yalnız yeni token'ı hesaplama tekniği."
