@@ -1,0 +1,103 @@
+id: m11-8-contextual-bandits
+code: M11.8
+title: Bağlamsal haydutlar — Bayesçi doğrusal regresyon, LinUCB, Thompson
+phase: 11
+minutes: 420
+prereq: [m11-7-bandits]
+summary: >
+  Durumlu haydutlar: her adımda bir bağlam (kullanıcı özellikleri) gelir,
+  eylemlerin de öznitelikleri vardır (reklam konusu, anahtar kelimeler);
+  geçiş yoktur, ardışık durumlar bağımsızdır. Ortalama ödül regresyonla
+  yaklaşılır; Bayesçi doğrusal regresyonun kapalı form sonsalı ve öngörü
+  dağılımı UCB'ye ve Thompson örneklemesine belirsizlik verir. Sherman–Morrison
+  ile $O(d^2)$ güncelleme, ayrık ve ortak (x_s, x_a) öznitelikler, doğrusal
+  olmayan ödüller için sinir ağı + Bayesçi son katman (NeuralLinear), kayıtlı
+  veriden politika değerlendirme (IPS, SNIPS, DR, tekrar oynatma).
+goals:
+  - "Bayesçi doğrusal regresyon: $\\Sigma=(\\sigma^{-2}X^\\top X+\\lambda^{-2}I)^{-1}$, $\\mu=\\sigma^{-2}\\Sigma X^\\top r$; öngörü $N(x^\\top\\mu,\\,x^\\top\\Sigma x+\\sigma^2)$"
+  - "LinUCB: $x^\\top\\mu+c\\sqrt{x^\\top\\Sigma x}$, $c=1+\\sqrt{\\ln(2/\\delta)/2}$; doğrusal Thompson: $w\\sim N(\\mu,\\Sigma)$"
+  - "[[Sherman–Morrison]] ile rank-1 ters güncelleme"
+  - "[[politika dışı değerlendirme]]: IPS yansız ama varyanslı, DM yanlı, DR ikisinin iyisi"
+sources:
+  - {title: "Li, Chu, Langford, Schapire — A Contextual-Bandit Approach to Personalized News Article Recommendation (WWW 2010)", url: "https://arxiv.org/abs/1003.0146", license: "arXiv", use: link}
+  - {title: "Agrawal & Goyal — Thompson Sampling for Contextual Bandits with Linear Payoffs (ICML 2013)", url: "https://arxiv.org/abs/1209.3352", license: "arXiv", use: link}
+  - {title: "Riquelme, Tucker, Snoek — Deep Bayesian Bandits Showdown (ICLR 2018)", url: "https://arxiv.org/abs/1802.09127", license: "arXiv", use: link}
+  - {title: "Li, Chu, Langford, Wang — Unbiased Offline Evaluation of Contextual-bandit-based News Article Recommendation Algorithms (WSDM 2011)", url: "https://arxiv.org/abs/1003.5956", license: "arXiv", use: link}
+  - {title: "Dudík, Langford, Li — Doubly Robust Policy Evaluation and Learning (ICML 2011)", url: "https://arxiv.org/abs/1103.4601", license: "arXiv", use: link}
+  - {title: "Bastani, Bayati, Khosravi — Mostly Exploration-Free Algorithms for Contextual Bandits (Management Science 2021)", url: "https://arxiv.org/abs/1704.09011", license: "arXiv", use: link}
+  - {title: "Microsoft Research Blog — Real-world interactive learning at cusp of enabling new class of applications (2017)", url: "https://www.microsoft.com/en-us/research/blog/real-world-interactive-learning-cusp-enabling-new-class-applications/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "1-B Bayesçi regresyon: önsel N(0, λ² = 1), σ² = 1, tek gözlem x = 2, r = 3"
+      fields:
+        - {id: sg, label: "Sonsal varyans Σ", answer: 0.2}
+        - {id: mu, label: "Sonsal ortalama μ", answer: 1.2}
+        - {id: pv, label: "x = 1'de yeni r'nin öngörü varyansı (gürültü dahil)", answer: 1.2}
+    - title: "LinUCB, δ = 0.05"
+      fields:
+        - {id: c, label: "$c=1+\\sqrt{\\ln(2/\\delta)/2}$", answer: 2.3581015157406195, tol: 1.0e-6}
+        - {id: ub, label: "x = 1'de üst sınır $x\\mu+c\\sqrt{x\\Sigma x}$", answer: 2.254575057408263, tol: 1.0e-6}
+    - title: "Sherman–Morrison: $A^{-1}=I_2$, $x=(1,1)$"
+      fields:
+        - {id: sm1, label: "$(A+xx^\\top)^{-1}_{11}$", answer: 0.6666666666666666, tol: 1.0e-9}
+        - {id: sm2, label: "$(A+xx^\\top)^{-1}_{12}$", answer: -0.3333333333333333, tol: 1.0e-9}
+  verify: |
+    import math
+    c = 1 + math.sqrt(math.log(2 / 0.05) / 2)
+    answers = dict(sg=1 / (4 + 1), mu=0.2 * 2 * 3, pv=0.2 + 1, c=c, ub=1.2 + c * math.sqrt(0.2), sm1=1 - 1 / 3, sm2=-1 / 3)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Sherman–Morrison: O(d³)'ten O(d²)'ye", engine: browser}
+  - {id: x2, title: "Açgözlü yeter mi? Bağlam çeşitliliği", engine: browser}
+  - {id: x3, title: "Tekrar oynatma ile çevrimdışı değerlendirme (Li ve ark. 2011)", engine: browser}
+
+quiz:
+  - q: "Bağlamsal haydutu tam RL probleminden ayıran nedir?"
+    options:
+      - {t: "Eylemler gelecekteki durumu etkilemez: bağlamlar bağımsız gelir, geçiş fonksiyonu yoktur", ok: true, why: "Bu yüzden her adım tek adımlık bir karar problemidir."}
+      - {t: "Ödüller sürekli olabilir", why: "Haydutta da olabilir."}
+      - {t: "Keşif gerekmez", why: "Gerekir; regresyon belirsizliği keşfi yönlendirir."}
+  - q: "IPS kestiricisinin yansız olması için ne gerekir?"
+    options:
+      - {t: "Kayıt politikasının olasılıkları biliniyor ve değerlendirilen politikanın seçebileceği her eylem için pozitif olmalı", ok: true, why: "Destek (support) koşulu; küçük olasılıklar varyansı patlatır."}
+      - {t: "Ödül modelinin doğru olması", why: "O DM'nin koşulu; DR ikisinden biri yeterli olunca yansızdır."}
+      - {t: "Kayıt politikasının deterministik olması", why: "Deterministikse diğer eylemler hiç gözlenmez."}
+  - q: "Doğrusal Thompson, XOR biçimli bir ödülde neden başarısız olur?"
+    options:
+      - {t: "Model yanlış belirtilmiş: hiçbir w, işaret çarpımına bağlı ödülü doğrusal olarak ifade edemez; belirsizlik daralır ama yanlış modele", ok: true, why: "NeuralLinear öznitelikleri öğrenir, belirsizliği son katmanda tutar."}
+      - {t: "Yeterince keşfetmediği için", why: "Daha çok keşif yanlış modeli düzeltmez."}
+      - {t: "Sonsal hesaplanamadığı için", why: "Kapalı form."}
+
+homework:
+  - title: "Li ve ark. (2010): LinUCB ile haber önerisi"
+    paper: "Li, Chu, Langford, Schapire — A Contextual-Bandit Approach to Personalized News Article Recommendation (WWW 2010)"
+    url: "https://arxiv.org/abs/1003.0146"
+    level: orta
+    hours: 10
+    goal: |
+      Algoritma 1 (ayrık LinUCB) ve Algoritma 2'yi (hibrit: paylaşılan + makaleye özel parametreler) uygula. Yahoo! R6 verisi (Webscope, başvuru gerektirir) ya da Open Bandit Dataset (Saito ve ark. 2020) üzerinde x3'teki tekrar oynatma yöntemiyle değerlendir; ε-greedy, UCB1 ve rastgele ile karşılaştır, α'yı tara.
+    steps:
+      - "b aşamasındaki Sherman–Morrison güncellemesini NumPy'a taşı."
+      - "Öğrenme ve dağıtım (deployment) aşamalarını ayır (makale Bölüm 5.2)."
+    accept:
+      - "LinUCB'nin göreli CTR'si bağlamsız yöntemlerden %10–%15 daha yüksek (makale Tablo 2 nitel)."
+      - "Tekrar oynatmada kabul edilen olay sayısı ≈ toplam / K."
+  - title: "Riquelme ve ark. (2018): Derin Bayesçi haydutlar karşılaştırması"
+    paper: "Riquelme, Tucker, Snoek — Deep Bayesian Bandits Showdown (ICLR 2018)"
+    url: "https://arxiv.org/abs/1802.09127"
+    level: ileri
+    hours: 12
+    goal: |
+      Wheel bandit (δ ∈ {0.5, 0.7, 0.9, 0.95, 0.99}) ve en az iki gerçek veri kümesi (Mushroom, Statlog) üzerinde LinTS, NeuralLinear (d aşaması), dropout ve bootstrap ile Thompson'ı karşılaştır. Makalenin "sonsal belirsizliğin kalitesi ile kümülatif pişmanlık" bulgusunu tartış.
+    steps:
+      - "Ödülleri ölçekle; NeuralLinear'ı her t_f adımda yeniden eğit."
+      - "Her yöntem için 10 tohum, normalize pişmanlık."
+    accept:
+      - "δ büyüdükçe doğrusal yöntemler bozulur, NeuralLinear en sağlam yöntemlerdendir (makale Tablo 2–3 nitel)."

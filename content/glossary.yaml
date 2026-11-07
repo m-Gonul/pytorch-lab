@@ -126,3 +126,5 @@ terms:
   pişmanlık: "Regret: en iyi kolu hep oynasaydık alacağımız beklenen ödül ile gerçekte seçtiklerimizin beklenen ödülü arasındaki toplam fark."
   eşlenik önsel: "Conjugate prior: olabilirlikle çarpılınca sonsalı yine aynı aileden çıkan önsel (Beta–Bernoulli, Normal–Normal); güncelleme parametre toplamasına iner."
   thompson örneklemesi: "Her kolun ortalama ödülü için sonsaldan örnek çekip en büyük örneğe sahip kolu oynamak; seçim olasılığı kolun en iyi olma sonsal olasılığına eşittir."
+  sherman–morrison: "(A + uvᵀ)⁻¹ = A⁻¹ − A⁻¹uvᵀA⁻¹ / (1 + vᵀA⁻¹u): rank-1 güncellemeden sonra ters matrisi O(d²)'de hesaplar."
+  politika dışı değerlendirme: "Off-policy evaluation: bir politikanın değerini, başka bir politikayla toplanmış kayıtlardan (bağlam, eylem, ödül, eylem olasılığı) kestirmek; IPS, DM, DR, tekrar oynatma."
