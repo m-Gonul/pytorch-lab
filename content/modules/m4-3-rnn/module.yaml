@@ -1,0 +1,71 @@
+id: m4-3-rnn
+code: M4.3
+title: RNN ve BPTT
+phase: 4
+minutes: 270
+prereq: [m3-2-mlp-backprop]
+summary: >
+  Zaman içinde paylaşılan ağırlıklar. Skaler bir RNN'i üç adım ileri ve geri
+  (backpropagation through time) elle çalıştırıyor, saf Python'da vektör RNN'in
+  BPTT'sini yazıyor, NumPy'da CS231n'in `rnn_forward/backward`'ını kuruyor,
+  PyTorch'ta `nn.RNN` ile aynı sayıları veren kendi RNN'ini yazıp gradyanın
+  zamanda nasıl söndüğünü ölçüyor ve en sonda doğrusal bir rekürsiyonu
+  paralel scan ile $O(\log T)$ adımda hesaplıyorsun.
+goals:
+  - "RNN'i zamanda açılmış (unrolled) bir hesap grafiği olarak görüp BPTT'yi uygulamak"
+  - "Paylaşılan ağırlığın gradyanının zaman adımları üzerinden toplandığını göstermek"
+  - "$\\prod_t W_h^\\top\\text{diag}(1-h_t^2)$ çarpımının neden sönen/patlayan gradyan ürettiğini ölçmek"
+  - "Doğrusal rekürsiyon $h_t=a_th_{t-1}+b_t$'yi [[associative scan]] ile paralel hesaplamak (S4/Mamba'nın temeli)"
+sources:
+  - {title: "CS231n Assignment 3 — RNN captioning (rnn_step_forward/backward)", url: "https://cs231n.github.io/assignments2025/assignment3/", license: "MIT", use: adapt}
+  - {title: "Dive into Deep Learning §9 Recurrent Neural Networks, §9.7 BPTT", url: "https://d2l.ai/chapter_recurrent-neural-networks/bptt.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "Pascanu, Mikolov, Bengio — On the difficulty of training RNNs", url: "https://arxiv.org/abs/1211.5063", license: "arXiv", use: link}
+  - {title: "Blelloch — Prefix Sums and Their Applications", url: "https://www.cs.cmu.edu/~guyb/papers/Ble93.pdf", license: "©", use: link}
+  - {title: "Gu & Dao — Mamba: Linear-Time Sequence Modeling with Selective State Spaces", url: "https://arxiv.org/abs/2312.00752", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "Skaler RNN $h_t=\\tanh(w\\,h_{t-1}+u\\,x_t)$, $w=0.5$, $u=1$, $h_0=0$, $x=[1,0,0]$, kayıp $L=h_3$"
+      fields:
+        - {id: h1, label: "$h_1$", answer: 0.761594, tol: 0.002, hint: "$\\tanh(1)$"}
+        - {id: h2, label: "$h_2$", answer: 0.363399, tol: 0.002, hint: "$\\tanh(0.5\\cdot0.7616)$"}
+        - {id: h3, label: "$h_3$", answer: 0.179726, tol: 0.002, hint: "$\\tanh(0.5\\cdot0.3634)$"}
+    - title: "BPTT: $\\frac{\\partial h_t}{\\partial h_{t-1}}=w(1-h_t^2)$"
+      fields:
+        - {id: dh2, label: "$\\partial L/\\partial h_2$", answer: 0.483849, tol: 0.002, hint: "$0.5(1-h_3^2)$"}
+        - {id: dh1, label: "$\\partial L/\\partial h_1$", answer: 0.209976, tol: 0.002, hint: "$0.4838\\cdot0.5(1-h_2^2)$ — her adımda yarıdan az kalıyor"}
+        - {id: du, label: "$\\partial L/\\partial u$", answer: 0.088185, tol: 0.002, hint: "yalnız $x_1\\ne0$: $\\frac{\\partial L}{\\partial h_1}(1-h_1^2)\\,x_1$"}
+  verify: |
+    import math
+    w, u, x = 0.5, 1.0, [1.0, 0.0, 0.0]
+    h = [0.0]
+    for xt in x:
+        h.append(math.tanh(w * h[-1] + u * xt))
+    dh = {3: 1.0}
+    for t in (3, 2):
+        dh[t - 1] = dh[t] * w * (1 - h[t] ** 2)
+    du = sum(dh[t] * (1 - h[t] ** 2) * x[t - 1] for t in (1, 2, 3))
+    answers = dict(h1=round(h[1], 6), h2=round(h[2], 6), h3=round(h[3], 6), dh2=round(dh[2], 6), dh1=round(dh[1], 6), du=round(du, 6))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Bir RNN'de $W_h$'nin gradyanı neden zaman adımları üzerinden **toplanır**?"
+    options:
+      - {t: "Aynı $W_h$ her adımda kullanılır; açılmış grafikte $T$ kez görünen paylaşılan bir düğümdür ve zincir kuralı katkıları toplar", ok: true, why: "M0.3'teki \"iki yol → topla\" kuralının $T$ yollu hâli; CNN'de konumlar üzerinden paylaşılan çekirdekle aynı."}
+      - {t: "Her adımın kendi $W_h$'si vardır", why: "Ağırlık paylaşımı RNN'in tanımı."}
+      - {t: "Yalnız son adımın gradyanı kullanılır", why: "O yalnız son adımdan gelen yolu sayar; eksik olur."}
+  - q: "Gradient clipping hangi soruna çözümdür?"
+    options:
+      - {t: "Patlayan gradyanlar: $\\lVert W_h\\rVert>1$ iken uzun dizilerde gradyan üstel büyür; norm bir eşiği aşınca ölçeklenir", ok: true, why: "`torch.nn.utils.clip_grad_norm_`. Sönen gradyanı çözmez; o mimari bir sorun (LSTM/GRU, M4.4)."}
+      - {t: "Sönen gradyanlar", why: "Küçük gradyanı kırpmak onu büyütmez."}
+      - {t: "Aşırı uyum", why: "Regularization değil, optimizasyon kararlılığı aracı."}
+  - q: "Doğrusal rekürsiyon $h_t=a_th_{t-1}+b_t$ neden paralel hesaplanabilir ama $h_t=\\tanh(Wh_{t-1}+x_t)$ hesaplanamaz?"
+    options:
+      - {t: "Doğrusal adımlar $(a,b)$ çiftlerinin birleşmeli (associative) bir işlemle bileşimidir: $(a_2,b_2)\\circ(a_1,b_1)=(a_2a_1,\\,a_2b_1+b_2)$. tanh bu yapıyı bozar", ok: true, why: "Birleşmeli işlemler için prefix scan $O(\\log T)$ derinlikte yapılır. S4, Mamba, linear attention bu fikre dayanır."}
+      - {t: "tanh pahalı olduğu için", why: "Maliyet değil; bileşimin birleşmeli olmaması."}
+      - {t: "İkisi de paralelleştirilemez", why: "Doğrusal olan scan ile paralelleşir; e aşamasında yapıyorsun."}
