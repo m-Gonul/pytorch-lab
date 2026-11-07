@@ -1,0 +1,72 @@
+id: m4-6-attention
+code: M4.6
+title: Attention ve multi-head attention
+phase: 4
+minutes: 300
+prereq: [m4-5-embed-bpe, m1-5-softmax]
+summary: >
+  Scaled dot-product attention'ı 3 token'lık bir örnekte elle hesaplıyor, saf
+  Python'da maskeli tek-head attention yazıyor, NumPy'da batch'li multi-head
+  attention'ı döngüsüz kuruyor, PyTorch'ta `nn.MultiheadAttention` ile birebir
+  aynı sonucu veren bir modül yazıyor ve en sonda FlashAttention'ın çekirdek
+  fikri olan online softmax ile T×T skor matrisini hiç oluşturmadan attention
+  hesaplıyorsun.
+goals:
+  - "$\\operatorname{softmax}(QK^\\top/\\sqrt{d_k})V$'yi satır satır yorumlamak: her sorgu, değerlerin ağırlıklı ortalaması"
+  - "[[causal maske]] ile geleceği görmeyi engellemek ve bunun neden $-\\infty$ ile yapıldığını bilmek"
+  - "Multi-head'i reshape + transpose ile tek bir batch'li matmul'e indirmek"
+  - "[[online softmax]] ile bellek O(T²)'den O(T·blok)'a: FlashAttention'ın matematiği"
+sources:
+  - {title: "Vaswani ve ark. — Attention Is All You Need", url: "https://arxiv.org/abs/1706.03762", license: "arXiv", use: link}
+  - {title: "Karpathy — nanoGPT / Zero to Hero: Let's build GPT", url: "https://github.com/karpathy/nanoGPT", license: "MIT", use: adapt}
+  - {title: "Dao ve ark. — FlashAttention", url: "https://arxiv.org/abs/2205.14135", license: "arXiv", use: link}
+  - {title: "Milakov & Gimelshein — Online normalizer calculation for softmax", url: "https://arxiv.org/abs/1805.02867", license: "arXiv", use: link}
+  - {title: "UvA Deep Learning Tutorials — Transformers and Multi-Head Attention", url: "https://uvadlc-notebooks.readthedocs.io/", license: "MIT", use: adapt}
+  - {title: "Stanford CS336 — Assignment 1/2 (attention, FlashAttention-2 Triton)", url: "https://github.com/stanford-cs336", license: "MIT", use: adapt}
+
+hand:
+  groups:
+    - title: "$Q=K=\\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix}$, $V=\\begin{bmatrix}1&2\\\\3&4\\\\5&6\\end{bmatrix}$, $d_k=2$. Skor $S=QK^\\top/\\sqrt2$"
+      fields:
+        - {id: s13, label: "$S_{1,3}$", answer: 0.707107, tol: 0.0005}
+        - {id: s12, label: "$S_{1,2}$", answer: 0}
+        - {id: w11, label: "1. satır softmax: $A_{1,1}$", answer: 0.401112, tol: 0.0005, hint: "$e^{0.7071}=2.0281$; payda $2\\cdot2.0281+1$"}
+        - {id: o11, label: "Çıktı $(AV)_{1,1}$", answer: 3, tol: 0.0005, hint: "Ağırlıklar simetrik: 1. ve 3. değer satırının ortası"}
+    - title: "Causal maske: $j>i$ için $S_{ij}=-\\infty$"
+      fields:
+        - {id: c11, label: "Causal çıktı $(AV)_{1,1}$", answer: 1, hint: "1. sorgu yalnız kendini görür"}
+        - {id: c22w, label: "Causal $A_{2,2}$", answer: 0.669762, tol: 0.0005, hint: "softmax([0, 0.7071])"}
+        - {id: c21, label: "Causal çıktı $(AV)_{2,1}$", answer: 2.339524, tol: 0.001}
+  verify: |
+    import numpy as np
+    Q = K = np.array([[1.0, 0], [0, 1], [1, 1]]); V = np.array([[1.0, 2], [3, 4], [5, 6]])
+    S = Q @ K.T / np.sqrt(2)
+    def sm(x):
+        e = np.exp(x - x.max(1, keepdims=True)); return e / e.sum(1, keepdims=True)
+    A = sm(S); O = A @ V
+    Sc = np.where(np.triu(np.ones((3, 3)), 1) > 0, -np.inf, S)
+    Ac = sm(Sc); Oc = Ac @ V
+    answers = dict(s13=S[0, 2], s12=S[0, 1], w11=A[0, 0], o11=O[0, 0], c11=Oc[0, 0], c22w=Ac[1, 1], c21=Oc[1, 0])
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Skorlar neden $\\sqrt{d_k}$'ye bölünür?"
+    options:
+      - {t: "Bileşenleri birim varyanslı q, k için $q\\cdot k$'nın varyansı $d_k$'dir; ölçeklenmezse softmax doyar ve gradyan neredeyse sıfır olur", ok: true, why: "Bölme varyansı 1'e çeker; softmax'ın girdisi makul aralıkta kalır."}
+      - {t: "Sayısal taşmayı önlemek için", why: "Taşmayı max çıkarma hilesi önler; ölçek gradyan akışı için."}
+      - {t: "Head sayısına göre normalize etmek için", why: "Ölçek, head başına boyut $d_k$'ye bağlı."}
+  - q: "Causal maske neden softmax'tan **önce** $-\\infty$ ile uygulanır, sonra 0 ile çarpılarak değil?"
+    options:
+      - {t: "$e^{-\\infty}=0$ olduğundan maskelenen konumlar paydaya da girmez; sonradan sıfırlamak satırların toplamını 1'den küçük bırakır", ok: true, why: "Sonradan sıfırlarsan yeniden normalize etmen gerekir; önce $-\\infty$ bunu bedavaya yapar."}
+      - {t: "İkisi aynı sonucu verir", why: "Sonradan sıfırlamada payda gelecek token'ları hâlâ içerir."}
+      - {t: "Gradyan hesabı için gereklidir", why: "Mesele normalizasyon."}
+  - q: "FlashAttention neden standart attention'dan hızlıdır, oysa FLOP sayısı aynı (hatta biraz fazla)?"
+    options:
+      - {t: "T×T skor matrisini HBM'e yazıp okumaz; blokları SRAM'de tutar ve online softmax ile birleştirir: darboğaz bellek trafiği", ok: true, why: "Attention bellek-bağımlı bir işlem; IO azalınca hız gelir. Geri geçişte de skorları saklamak yerine yeniden hesaplar."}
+      - {t: "Yaklaşık (approximate) attention hesaplar", why: "Kesin sonuç verir; e aşamasında `F.scaled_dot_product_attention` ile birebir karşılaştırıyorsun."}
+      - {t: "Daha az head kullanır", why: "Head yapısı değişmez."}
