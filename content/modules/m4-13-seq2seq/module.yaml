@@ -1,0 +1,108 @@
+id: m4-13-seq2seq
+code: M4.13
+title: Seq2seq, Bahdanau attention ve beam search
+phase: 4
+minutes: 400
+prereq: [m4-4-lstm-gru, m4-6-attention]
+summary: >
+  Sinirsel makine çevirisinin (NMT) kodlayıcı–kod çözücü mimarisi: tüm
+  kaynak cümleyi tek bir vektöre sıkıştıran RNN, öğretmen zorlaması
+  (teacher forcing), EOS, dolgu ve maskeleme, uzunluğa göre kovalama,
+  büyük çıktı sözlüğü için örneklenmiş softmax, zamanlanmış örnekleme ve
+  çift yönlü RNN'ler. Açgözlü çözümlemenin hatası ve beam search (uzunluk
+  normalizasyonuyla), Bahdanau (toplamsal) ve Luong (çarpımsal) attention.
+  Saf Python'da beam search, NumPy'da maskeli toplamsal/çarpımsal attention
+  ve maskeli kayıp, PyTorch'ta tarih biçimi çevirisinde attention'sız ve
+  attention'lı seq2seq ile hizalama haritası, sonda toplu (batched) beam
+  search. Ekler: BLEU, kovalama, örneklenmiş softmax'ın yanlılığı.
+goals:
+  - "Kodlayıcı–kod çözücü, [[öğretmen zorlaması]], EOS / dolgu maskeleme, çift yönlü kodlayıcı"
+  - "[[beam search]]: açgözlünün geri dönemeyen hatası, k aday, uzunluk normalizasyonu"
+  - "[[toplamsal attention]] (Bahdanau) ve çarpımsal (Luong): skor, softmax, bağlam vektörü"
+  - "Darboğaz vektörü sorununu ölçmek: attention'sız vs attention'lı doğruluk"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 16", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Sutskever, Vinyals, Le — Sequence to Sequence Learning with Neural Networks (NeurIPS 2014)", url: "https://arxiv.org/abs/1409.3215", license: "arXiv", use: link}
+  - {title: "Bahdanau, Cho, Bengio — Neural Machine Translation by Jointly Learning to Align and Translate (ICLR 2015)", url: "https://arxiv.org/abs/1409.0473", license: "arXiv", use: link}
+  - {title: "Luong, Pham, Manning — Effective Approaches to Attention-based NMT (EMNLP 2015)", url: "https://arxiv.org/abs/1508.04025", license: "arXiv", use: link}
+  - {title: "Bengio ve ark. — Scheduled Sampling for Sequence Prediction with RNNs (NeurIPS 2015)", url: "https://arxiv.org/abs/1506.03099", license: "arXiv", use: link}
+  - {title: "Jean ve ark. — On Using Very Large Target Vocabulary for NMT (ACL 2015)", url: "https://arxiv.org/abs/1412.2007", license: "arXiv", use: link}
+  - {title: "Papineni ve ark. — BLEU (ACL 2002)", url: "https://aclanthology.org/P02-1040/", license: "©", use: link}
+  - {title: "Stanford CS224n — Lecture 7: Machine Translation, Seq2Seq, Attention", url: "https://web.stanford.edu/class/cs224n/", license: "©", use: link}
+  - {title: "d2l.ai — 10.7 Seq2Seq, 10.8 Beam Search, 11.4 Bahdanau Attention", url: "https://d2l.ai/chapter_attention-mechanisms-and-transformers/bahdanau-attention.html", license: "CC-BY-SA 4.0", use: link}
+
+hand:
+  groups:
+    - title: "Beam search"
+      fields:
+        - {id: howare, label: "P(How) = 0.75, P(are | How) = 0.32: P(\"How are\")", answer: 0.24, tol: 1.0e-9}
+        - {id: cand, label: "Beam genişliği 3, sözlük 10 000: bir adımda değerlendirilen aday sayısı", answer: 30000}
+        - {id: greedy, label: "Ağaç: P(A) = 0.6, P(B) = 0.4; A'dan sonra x 0.4, y 0.3, z 0.3; B'den sonra x 0.9. Açgözlü iki kelimelik dizinin olasılığı", answer: 0.24, tol: 1.0e-9}
+        - {id: beam, label: "Aynı ağaç, k = 2 beam search sonucu", answer: 0.36, tol: 1.0e-9}
+        - {id: norm, label: "Uzunluk normalizasyonu (α = 1): 4 token'lık, olasılığı 0.2 olan hipotezin skoru $\\log p/L$", answer: -0.40235947810852507, tol: 1.0e-6}
+    - title: "Attention"
+      fields:
+        - {id: alpha1, label: "Luong (nokta çarpım): $s=[1,0]$, kodlayıcı çıktıları $[1,0]$, $[0,1]$, $[1,1]$ → $\\alpha_1$", answer: 0.42231879825151096, tol: 1.0e-6}
+        - {id: ctx, label: "Aynı örnek: bağlam vektörünün ilk bileşeni", answer: 0.8446375965030219, tol: 1.0e-6}
+        - {id: n2, label: "50 kelimelik girdi, 50 kelimelik çıktı: hesaplanan attention ağırlığı sayısı", answer: 2500}
+        - {id: bi, label: "Çift yönlü GRU, her yön 128 birim: birleştirilmiş durum boyutu", answer: 256}
+  verify: |
+    import math
+    e = math.e
+    answers = dict(howare=0.75 * 0.32, cand=3 * 10000, greedy=0.6 * 0.4, beam=0.4 * 0.9, norm=math.log(0.2) / 4,
+                   alpha1=e / (2 * e + 1), ctx=2 * e / (2 * e + 1), n2=2500, bi=256)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "BLEU: değiştirilmiş n-gram kesinliği ve kısalık cezası", engine: browser}
+  - {id: x2, title: "Kovalama: dolgu israfını ölçmek", engine: browser}
+  - {id: x3, title: "Örneklenmiş softmax ve log Q düzeltmesi", engine: browser}
+
+quiz:
+  - q: "Açgözlü çözümleme neden yetersiz kalabilir?"
+    options:
+      - {t: "Her adımda en olası kelimeyi seçer ve geri dönemez: erken bir yanlış ('How will…') sonraki tüm adımları kilitler; dizinin toplam olasılığı en büyük olmayabilir", ok: true, why: "Beam search k hipotezi açık tutarak düzeltme şansı verir."}
+      - {t: "Çok yavaş olduğu için", why: "En hızlı yöntemdir."}
+      - {t: "Olasılıkları normalize etmediği için", why: "Konu bu değil."}
+  - q: "Attention'sız seq2seq'in temel darboğazı nedir?"
+    options:
+      - {t: "Tüm kaynak cümle kodlayıcının son gizli durumuna sıkıştırılır; uzun cümlelerde bilgi kaybolur. Attention kod çözücünün her adımda tüm kodlayıcı çıktılarına bakmasını sağlar", ok: true, why: "d aşamasında aynı eğitimde doğruluk farkı bunu gösterir."}
+      - {t: "Embedding boyutunun küçük olması", why: "İkincil."}
+      - {t: "Öğretmen zorlaması", why: "Eğitim tekniği; darboğaz değil."}
+  - q: "Örneklenmiş softmax neden çıkarımda (inference) kullanılamaz?"
+    options:
+      - {t: "Normalizasyonu doğru kelime + birkaç rastgele kelime üzerinden yapar; doğru kelimeyi bilmeyi gerektirir ve tüm sözlük üzerinde olasılık vermez", ok: true, why: "Çıkarımda tam softmax (ya da en az argmax) gerekir."}
+      - {t: "Çok yavaş olduğu için", why: "Hızlıdır."}
+      - {t: "Gradyan hesaplayamadığı için", why: "Eğitimde zaten gradyan için kullanılır."}
+
+homework:
+  - title: "Bahdanau, Cho, Bengio (2015): hizalamayı birlikte öğrenmek"
+    paper: "Bahdanau, Cho, Bengio — Neural Machine Translation by Jointly Learning to Align and Translate (ICLR 2015)"
+    url: "https://arxiv.org/abs/1409.0473"
+    level: ileri
+    hours: 16
+    goal: |
+      d aşamasındaki modeli gerçek bir paralel derleme (ör. Tatoeba İngilizce–Türkçe, ~100 bin cümle, BPE ile — M4.5) taşı: çift yönlü GRU kodlayıcı, toplamsal attention, maxout'lu çıktı (Bölüm A.2.2). RNNencdec ve RNNsearch'ü cümle uzunluğuna göre BLEU ile karşılaştır (makale Şekil 2: attention'sız modelin uzun cümlelerde çöküşü) ve birkaç cümle için hizalama haritası çiz (Şekil 3).
+    steps:
+      - "BLEU için x1'deki uygulamanı kullan (korpus düzeyi)."
+      - "Uzunluk kovaları: 0–10, 10–20, 20–30, 30+ kelime."
+    accept:
+      - "Uzunluk arttıkça attention'sız modelin BLEU'su attention'lıdan hızla düşer."
+      - "Hizalama haritaları kelime sırası farklarını (Türkçe SOV) yansıtır."
+  - title: "Bengio ve ark. (2015): zamanlanmış örnekleme"
+    paper: "Bengio, Vinyals, Jaitly, Shazeer — Scheduled Sampling for Sequence Prediction with Recurrent Neural Networks (NeurIPS 2015)"
+    url: "https://arxiv.org/abs/1506.03099"
+    level: orta
+    hours: 8
+    goal: |
+      Öğretmen zorlamasının "maruz kalma yanlılığını" (exposure bias) ölç: tarih çevirisinde kod çözücüye eğitimde gerçek önceki token yerine ε_i olasılıkla kendi tahminini ver; makaledeki doğrusal, üstel ve ters sigmoid azalma takvimlerini karşılaştır. Girdiye gürültü eklenmiş (yazım hatalı ay adları) bir test setinde tam eşleşme doğruluğunu ve hatanın ilk görüldüğü adımdan sonraki hata yayılımını raporla.
+    steps:
+      - "Ters sigmoid: $\\epsilon_i=k/(k+\\exp(i/k))$."
+    accept:
+      - "Zamanlanmış örnekleme gürültülü testte hata yayılımını azaltır."
+      - "Takvimlerin karşılaştırma tablosu ve eğitim eğrileri."

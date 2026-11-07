@@ -168,3 +168,6 @@ terms:
   oov kovası: "Out-of-vocabulary bucket: eğitimde görülmemiş kategori/kelimelerin karma (hash) ile atandığı birkaç yer tutucu indeks; sözlüğü sabit tutarken bilinmeyenleri temsil eder."
   skip-gram: "word2vec'in merkez kelimeden pencere içindeki bağlam kelimelerini tahmin eden biçimi; tersi (bağlamdan merkezi tahmin) CBOW'dur."
   negatif örnekleme: "Negative sampling: V sınıflı softmax yerine gerçek (kelime, bağlam) çiftini k adet gürültü çiftinden ayıran ikili lojistik kayıp; gürültü dağılımı ∝ sayı^{3/4}."
+  öğretmen zorlaması: "Teacher forcing: eğitimde kod çözücüye her adımda kendi önceki tahmini yerine gerçek önceki token'ı vermek; hızlı ve kararlı eğitir ama eğitim–çıkarım uyumsuzluğu (exposure bias) yaratır."
+  beam search: "Çözümlemede k en olası kısmi diziyi tutup her adımda hepsini sözlük boyunca uzatarak en iyi k'yı seçen arama; açgözlü çözümlemenin geri dönülemez hatalarını azaltır."
+  toplamsal attention: "Bahdanau attention: skor e = vᵀ tanh(W₁h_i + W₂s) — kodlayıcı çıktısı ile kod çözücü durumunun birleştirilip küçük bir ağdan geçirilmesi; çarpımsal (Luong) attention'da skor nokta çarpımdır."
