@@ -1,0 +1,68 @@
+id: m4-7-transformer
+code: M4.7
+title: Transformer ve GPT
+phase: 4
+minutes: 360
+prereq: [m4-6-attention, m3-6-norm]
+summary: >
+  Attention'ı LayerNorm, MLP ve residual bağlantılarla bir Transformer
+  bloğuna, blokları da bir GPT'ye dönüştürüyorsun. GPT-2 small'ın 124M
+  parametresini elle sayıyor, saf Python'da temperature/top-k örnekleme
+  yazıyor, NumPy'da küçük bir GPT'nin ileri geçişini kuruyor, PyTorch'ta
+  nanoGPT tarzı bir model yazıp ezberletiyor ve en sonda KV-cache ile
+  üretimi yeniden hesaplamaya kıyasla hızlandırıyorsun.
+goals:
+  - "Pre-LN Transformer bloğunu ve GPT'nin parametre sayısını ($12d^2+13d$ blok başına) çıkarmak"
+  - "[[weight tying]]: giriş embedding'i ile çıkış katmanının aynı matris olması"
+  - "Temperature ve top-k örneklemenin dağılımı nasıl değiştirdiğini hesaplamak"
+  - "[[kv-cache]] ile otoregresif üretimde her adımı O(T²) yerine O(T) işe indirmek"
+sources:
+  - {title: "Karpathy — nanoGPT ve Zero to Hero: Let's build GPT / Let's reproduce GPT-2", url: "https://github.com/karpathy/nanoGPT", license: "MIT", use: adapt}
+  - {title: "Radford ve ark. — Language Models are Unsupervised Multitask Learners (GPT-2)", url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf", license: "OpenAI", use: link}
+  - {title: "Stanford CS336 — Assignment 1 (Transformer LM from scratch)", url: "https://github.com/stanford-cs336/assignment1-basics", license: "MIT", use: adapt}
+  - {title: "Harvard NLP — The Annotated Transformer", url: "https://nlp.seas.harvard.edu/annotated-transformer/", license: "MIT", use: adapt}
+  - {title: "Holtzman ve ark. — The Curious Case of Neural Text Degeneration (sampling)", url: "https://arxiv.org/abs/1904.09751", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "Blok: LN₁ (γ, β), qkv Linear d→3d, proj d→d, LN₂, MLP d→4d→d; tüm Linear'larda bias var"
+      fields:
+        - {id: blk4, label: "$d=4$ için blok parametresi", answer: 244, hint: "$12d^2+13d$"}
+        - {id: blk768, label: "$d=768$ için blok parametresi", answer: 7087872}
+        - {id: gpt2, label: "GPT-2 small: $V=50257$, $T=1024$, $d=768$, 12 blok, son LN, çıkış = wte (tied)", answer: 124439808, hint: "$Vd+Td+12(12d^2+13d)+2d$"}
+    - title: "Logit'ler $[2, 1, 0]$"
+      fields:
+        - {id: p1, label: "$T=1$: $p(\\text{token}_1)$", answer: 0.665241, tol: 0.0005}
+        - {id: topk, label: "top-k = 2: $p(\\text{token}_1)$", answer: 0.731059, tol: 0.0005, hint: "3. token atılır, kalanlar yeniden normalize"}
+        - {id: temp, label: "temperature 0.5: $p(\\text{token}_1)$", answer: 0.866813, tol: 0.0005, hint: "logit'leri 0.5'e böl: [4, 2, 0]"}
+  verify: |
+    import math
+    blk = lambda d: 12 * d * d + 13 * d
+    V, T, d = 50257, 1024, 768
+    def sm(z):
+        e = [math.exp(x - max(z)) for x in z]; return [x / sum(e) for x in e]
+    answers = dict(blk4=blk(4), blk768=blk(768), gpt2=V * d + T * d + 12 * blk(d) + 2 * d,
+                   p1=sm([2, 1, 0])[0], topk=sm([2, 1])[0], temp=sm([4, 2, 0])[0])
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Pre-LN (`x + attn(LN(x))`) neden orijinal Post-LN'den (`LN(x + attn(x))`) daha kolay eğitilir?"
+    options:
+      - {t: "Residual yol normalize edilmeden baştan sona akar; gradyan derin ağda doğrudan girişe ulaşır, warmup'a daha az bağımlıdır", ok: true, why: "GPT-2 ve sonrası Pre-LN kullanır ve en sona bir LN (`ln_f`) ekler."}
+      - {t: "Daha az parametre kullanır", why: "Parametre sayısı aynı (son LN hariç)."}
+      - {t: "Attention'ı hızlandırır", why: "Hız değil, optimizasyon kararlılığı."}
+  - q: "Temperature 0'a yaklaşınca örnekleme neye dönüşür?"
+    options:
+      - {t: "Greedy (argmax) seçim", ok: true, why: "Logit'ler $1/T$ ile büyür; softmax en büyük logit'e tek-nokta dağılımına yakınsar."}
+      - {t: "Düzgün (uniform) dağılım", why: "O, $T\\to\\infty$ limiti."}
+      - {t: "Top-k = 2", why: "Top-k ayrı bir kesme kuralı."}
+  - q: "KV-cache yalnızca key ve value'yu saklar, query'yi değil. Neden?"
+    options:
+      - {t: "Yeni token yalnız kendi query'siyle geçmişin tüm key/value'larına bakar; eski query'ler bir daha hiç kullanılmaz (causal)", ok: true, why: "Eski konumların çıktıları da değişmez; bu yüzden onları yeniden hesaplamak tamamen boşa iş."}
+      - {t: "Query'ler çok büyük", why: "Boyutları key'lerle aynı."}
+      - {t: "Query'ler de saklanabilir, fark etmez", why: "Saklamak yalnız bellek harcar; kullanılmazlar."}
