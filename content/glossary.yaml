@@ -121,3 +121,5 @@ terms:
   politika dışı öğrenme: "Off-policy: veri bir davranış politikasıyla (ör. ε-açgözlü) toplanırken başka bir hedef politikanın (ör. açgözlü) değeri öğrenilir. Q-öğrenme politika dışıdır; SARSA politika üstüdür."
   maksimizasyon yanlılığı: "Gürültülü kestirimlerin maksimumu gerçek maksimumu sistematik olarak aşar: E[max Q̂] ≥ max E[Q̂]. Q-öğrenmenin hedefindeki max bu yanlılığı yayar; çift Q-öğrenme seçme ve değerlendirmeyi ayırarak giderir."
   ε-açgözlü: "ε olasılıkla rastgele, 1 − ε olasılıkla en yüksek Q değerli eylemi seçen keşif politikası."
+  ölümcül üçlü: "Deadly triad: fonksiyon yaklaştırma, önyükleme (bootstrapping) ve politika dışı eğitim bir araya geldiğinde değer kestirimleri ıraksayabilir; ikisi tek başına güvenlidir."
+  deneyim tekrarı: "Experience replay: geçişleri (s, a, r, s') bir tamponda saklayıp rastgele mini-batch'lerle tekrar öğrenmek; korelasyonu kırar ve veriyi yeniden kullanır."

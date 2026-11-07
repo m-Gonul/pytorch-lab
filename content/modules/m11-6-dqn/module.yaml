@@ -1,0 +1,107 @@
+id: m11-6-dqn
+code: M11.6
+title: Fonksiyon yaklaştırma ve derin Q-ağları (DQN)
+phase: 11
+minutes: 460
+prereq: [m11-5-sarsa-q]
+summary: >
+  Tablo sığmayınca (Go'da ~3^361 durum, Atari'de 210×160×3 piksel) değer
+  bir fonksiyonla yaklaşık hesaplanır: $Q_w(s,a)$. Yarı-gradyan güncelleme,
+  hedefin de w'ye bağlı olması sorunu, durum toplama, karo kodlama,
+  "ölümcül üçlü" (yaklaştırma + önyükleme + politika dışı) ve Baird karşı
+  örneği; DQN'nin iki hilesi deneyim tekrarı ve hedef ağ, Huber kaybı, çift
+  DQN hedefi, Atari ön işleme. Saf Python'da 1000 durumlu yürüyüş, NumPy'da
+  Baird ıraksaması ve TDC, PyTorch'ta CartPole'u çözen DQN, sonda binlerce
+  doğrusal politikayı paralel değerlendiren rastgele arama.
+goals:
+  - "Yarı-gradyan TD: $w\\leftarrow w+\\alpha[r+\\gamma\\hat v(s',w)-\\hat v(s,w)]\\nabla\\hat v(s,w)$ — hedefin gradyanı alınmaz"
+  - "[[ölümcül üçlü]]: üçü bir aradayken ıraksama mümkündür"
+  - "[[deneyim tekrarı]] ve hedef ağ neden kararlılık sağlar"
+  - "DQN hedefi $r+\\gamma\\max_{a'}Q_{\\bar w}(s',a')$, çift DQN hedefi $r+\\gamma Q_{\\bar w}(s',\\arg\\max_{a'}Q_w(s',a'))$"
+sources:
+  - {title: "Mnih ve ark. — Playing Atari with Deep Reinforcement Learning (arXiv:1312.5602, 2013)", url: "https://arxiv.org/abs/1312.5602", license: "arXiv", use: link}
+  - {title: "Mnih ve ark. — Human-level control through deep reinforcement learning (Nature 2015)", url: "https://doi.org/10.1038/nature14236", license: "©", use: link}
+  - {title: "van Hasselt, Guez, Silver — Deep Reinforcement Learning with Double Q-learning (AAAI 2016)", url: "https://arxiv.org/abs/1509.06461", license: "arXiv", use: link}
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 9–11", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+  - {title: "Baird — Residual Algorithms: Reinforcement Learning with Function Approximation (ICML 1995)", url: "https://doi.org/10.1016/B978-1-55860-377-6.50013-X", license: "©", use: link}
+  - {title: "Mania, Guy, Recht — Simple random search provides a competitive approach to RL (NeurIPS 2018)", url: "https://arxiv.org/abs/1803.07055", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "Doğrusal Q: $x=(1,2)$, $w=(0.5,0.5)$, hedef 3, $\\alpha=0.1$"
+      fields:
+        - {id: w1, label: "Güncelleme sonrası $w_1$", answer: 0.65}
+        - {id: w2, label: "Güncelleme sonrası $w_2$", answer: 0.8}
+    - title: "Kayıp"
+      fields:
+        - {id: mse, label: "$\\tfrac12e^2$ kaybının $e=3$'teki türevi", answer: 3}
+        - {id: hub, label: "Huber (δ = 1) kaybının $e=3$'teki türevi", answer: 1}
+    - title: "DQN ağı (Nature): girdi 84×84×4"
+      fields:
+        - {id: c1, label: "Conv 8×8, adım 4, 32 kanal → kenar", answer: 20}
+        - {id: c3, label: "Ardından 4×4/2 (64) ve 3×3/1 (64): düzleştirilmiş boyut", answer: 3136}
+    - title: "Baird: $w=(1,1,1,1,1,1,10,1)$"
+      fields:
+        - {id: b1, label: "$\\hat v(s_1)=2w_1+w_8$", answer: 3}
+        - {id: b7, label: "$\\hat v(s_7)=w_7+2w_8$", answer: 12}
+  verify: |
+    c1 = (84 - 8) // 4 + 1
+    c2 = (c1 - 4) // 2 + 1
+    c3 = (c2 - 3) // 1 + 1
+    answers = dict(w1=0.5 + 0.1 * (3 - 1.5) * 1, w2=0.5 + 0.1 * (3 - 1.5) * 2, mse=3, hub=1, c1=c1, c3=c3 * c3 * 64, b1=3, b7=12)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Dağ arabası: karo kodlama ile yarı-gradyan SARSA", engine: browser}
+  - {id: x2, title: "Atari ön işleme: maksimum, gri ton, küçültme, kırpma, kare yığını", engine: browser}
+  - {id: x3, title: "Ölümcül üçlünün en küçük örneği: w → 2w", engine: browser}
+
+quiz:
+  - q: "DQN'de hedef ağ neden kullanılır?"
+    options:
+      - {t: "Hedef $r+\\gamma\\max Q$ de w'ye bağlı; her güncelleme hedefi de kaydırır. Hedefi C adım dondurmak problemi denetimli regresyona yaklaştırır.", ok: true, why: "Hareketli hedef geri besleme döngüsü yaratır."}
+      - {t: "Hesabı hızlandırmak için", why: "Ek ileri geçiş gerektirir."}
+      - {t: "Keşfi artırmak için", why: "Keşif ε-açgözlüden gelir."}
+  - q: "Deneyim tekrarı neden politika dışı bir algoritma (Q-öğrenme) gerektirir?"
+    options:
+      - {t: "Tampondaki geçişler eski politikalarla toplanmıştır; SARSA gibi politika üstü bir hedef yanlış olur", ok: true, why: "Q-öğrenmenin max hedefi davranış politikasından bağımsızdır."}
+      - {t: "Tampon çok büyük olduğu için", why: "Boyutla ilgisi yok."}
+      - {t: "Gerektirmez", why: "Mnih ve ark. bunu açıkça not eder."}
+  - q: "Baird örneğinde yarı-gradyan TD neden ıraksar?"
+    options:
+      - {t: "Güncellemeler davranış dağılımıyla (düzgün) ağırlıklanır ama hedef politika başka bir dağılım üretir: yaklaştırma + önyükleme + politika dışı", ok: true, why: "Politika üstü dağılımda aynı güncelleme kararlıdır."}
+      - {t: "Öğrenme oranı çok büyük", why: "Her α > 0 için ıraksar."}
+      - {t: "Öznitelikler doğrusal bağımlı", why: "Gerçek değer (0) temsil edilebilir; sorun dağılım."}
+
+homework:
+  - title: "Mnih ve ark. (2013): Atari için DQN"
+    paper: "Mnih ve ark. — Playing Atari with Deep Reinforcement Learning (arXiv:1312.5602)"
+    url: "https://arxiv.org/abs/1312.5602"
+    level: ileri
+    hours: 20
+    goal: |
+      Makaledeki DQN'yi uygula ve Pong ile Breakout'ta (Gymnasium + ALE) eğit: ön işleme (x2), 4 kare yığını, ağ (16 adet 8×8/4, 32 adet 4×4/2, 256 tam bağlı), RMSProp, mini-batch 32, ε 1'den 0.1'e ilk 1 M karede doğrusal, tampon 1 M, kare atlama k = 4, ödül kırpma. Nature (2015) sürümüne (hedef ağ, 3 conv) ve çift DQN hedefine geç ve farkı ölç.
+    steps:
+      - "Bu modülün d aşamasındaki Replay, td_target ve soft_update'i kullan; tamponu uint8 kareler olarak sakla (bellek!)."
+      - "Ortalama Q değerini sabit bir durum kümesinde izle (makale Şekil 2)."
+      - "Pong'da ≥ +18 ortalama skor; Breakout'ta eğitim eğrisi."
+    accept:
+      - "Pong: 2–5 M kare içinde öğrenme eğrisi −21'den pozitife."
+      - "Tutulan durumlardaki ortalama max Q düzgün artar (makalenin gözlemi)."
+      - "Çift DQN, Q değerlerinin aşırı kestirimini azaltır (van Hasselt 2016 Şekil 3 nitel)."
+  - title: "van Hasselt ve ark. (2016): Çift DQN"
+    paper: "van Hasselt, Guez, Silver — Deep Reinforcement Learning with Double Q-learning (AAAI 2016)"
+    url: "https://arxiv.org/abs/1509.06461"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin Bölüm 3 deneyini yeniden üret: gerçek $Q_*(s,a)=V_*(s)$ (ör. $\sin s$) ve her eylem için ayrı polinom yaklaştırıcı (derece 6), birkaç örnek noktadan uydurulmuş; $\max_aQ_t(s,a)$ ile $V_*$ arasındaki fark ve çift kestirimci. Ardından d aşamasındaki DQN'yi double=False/True ile CartPole'da 5 tohumla çalıştır ve tutulan durumlardaki Q ortalamasını gerçek getiriyle karşılaştır.
+    steps:
+      - "NumPy ile polinom uydurma; eylem sayısı 2, 10 ve 100."
+    accept:
+      - "Eylem sayısı arttıkça tek kestirimcinin yanlılığı artar, çift kestirimci yanlılığı küçük tutar (makale Şekil 2)."
