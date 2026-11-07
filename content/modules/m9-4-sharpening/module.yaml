@@ -1,0 +1,96 @@
+id: m9-4-sharpening
+code: M9.4
+title: Türevler ve keskinleştirme
+phase: 9
+minutes: 270
+prereq: [m9-3-spatial-filtering]
+summary: >
+  Yüksek geçiren filtreler: birinci ve ikinci türevin kenar, rampa, ince çizgi
+  ve nokta üzerindeki davranışını 1-boyutlu bir profilde elle hesaplıyor; saf
+  Python'da Laplasyen ve Sobel'i OpenCV'nin kenar kuralıyla yazıp birebir
+  karşılaştırıyor, NumPy'da Laplasyen keskinleştirme, unsharp masking,
+  highboost ve gradyan büyüklüğünü kuruyor, PyTorch'ta türevlenebilir bir
+  unsharp mask'in $\sigma$ ve kazancını hedef çıktıdan gradient descent ile
+  geri buluyor ve en sonda bir görüntü yığını için gradyan alanı ve yönelim
+  histogramlarını tek geçişte hesaplıyorsun.
+goals:
+  - "Birinci türev (kalın kenar, rampada sabit) ile ikinci türev (çift kenar, sıfır geçişi, ince ayrıntıya duyarlı) farkı"
+  - "Laplasyen ile keskinleştirme $g=f+c\\,\\nabla^2f$ ve işaret kuralı"
+  - "[[unsharp masking]] ve highboost filtreleme"
+  - "Roberts, Prewitt, Sobel gradyan operatörleri; $|\\nabla f|$ için $L_2$ ve $L_1$ yaklaşımları"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 3.6–3.7", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "OpenCV — Sobel Derivatives, Laplace Operator tutorial'ları", url: "https://docs.opencv.org/4.x/d2/d2c/tutorial_sobel_derivatives.html", license: "Apache-2.0", use: adapt}
+  - {title: "Szeliski — Computer Vision: Algorithms and Applications, Bölüm 3.2.3", url: "https://szeliski.org/Book/", license: "© (PDF ücretsiz)", use: link}
+
+hand:
+  groups:
+    - title: "1-boyutlu profil $f=(5,5,4,3,2,1,0,0,0,6,0,0)$; $f'(x)=f(x+1)-f(x)$, $f''(x)=f(x+1)+f(x-1)-2f(x)$"
+      fields:
+        - {id: d1ramp, label: "Rampa içinde $f'(3)$", answer: -1}
+        - {id: d2ramp, label: "Rampa içinde $f''(3)$", answer: 0}
+        - {id: d2start, label: "Rampa başında $f''(1)$", answer: -1}
+        - {id: d2line, label: "İnce çizgide $f''(9)$", answer: -12, hint: "$0+0-2\\cdot6$"}
+    - title: "Parça $\\begin{bmatrix}10&10&10\\\\10&50&10\\\\10&10&10\\end{bmatrix}$, merkez"
+      fields:
+        - {id: lap4, label: "4-komşulu Laplasyen", answer: -160}
+        - {id: sharp, label: "Keskinleştirilmiş $g=f-\\nabla^2f$", answer: 210}
+        - {id: sobx, label: "Sobel $g_x$ ($[-1,0,1]$ satırlar, $[1,2,1]$ ağırlık) bu parçada", answer: 0}
+    - title: "Unsharp masking: $f=100$, bulanık $\\bar f=80$"
+      fields:
+        - {id: us, label: "$k=1$: $f+k(f-\\bar f)$", answer: 120}
+        - {id: hb, label: "Highboost $k=2.5$", answer: 150}
+  verify: |
+    f = [5, 5, 4, 3, 2, 1, 0, 0, 0, 6, 0, 0]
+    d1 = lambda x: f[x + 1] - f[x]
+    d2 = lambda x: f[x + 1] + f[x - 1] - 2 * f[x]
+    P = [[10, 10, 10], [10, 50, 10], [10, 10, 10]]
+    lap = P[0][1] + P[1][0] + P[1][2] + P[2][1] - 4 * P[1][1]
+    answers = dict(d1ramp=d1(3), d2ramp=d2(3), d2start=d2(1), d2line=d2(9), lap4=lap, sharp=P[1][1] - lap, sobx=0,
+                   us=100 + 1 * (100 - 80), hb=100 + 2.5 * (100 - 80))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Roberts, Prewitt, Sobel ve Scharr: çapraz kenarlar ve yön doğruluğu", engine: browser}
+  - {id: x2, title: "Yöntemleri birleştirmek: Laplasyen + yumuşatılmış Sobel maskesi + gamma", engine: browser}
+  - {id: x3, title: "OpenCV'nin `Laplacian(ksize=3)` çekirdeği ve Laplasyen görüntüsünü ölçekleme", engine: browser}
+
+quiz:
+  - q: "Keskinleştirmede ikinci türev neden birinci türevden daha sık tercih edilir?"
+    options:
+      - {t: "İnce ayrıntılara (nokta, ince çizgi) çok daha güçlü yanıt verir ve rampalarda sıfırdır; kenarda çift yanıtla kenarı iki taraftan vurgular", ok: true, why: "Bedeli gürültüye duyarlılık; bu yüzden pratikte önce yumuşatılır (LoG, M9.6) ya da birinci türevle birleştirilir (x2)."}
+      - {t: "Hesaplaması daha ucuz olduğu için", why: "İkisi de küçük çekirdekler."}
+      - {t: "Gürültüye daha az duyarlı olduğu için", why: "Tersine, daha duyarlı."}
+  - q: "$g=f+c\\nabla^2f$ formülünde $c$'nin işareti neye göre seçilir?"
+    options:
+      - {t: "Laplasyen çekirdeğinin merkez katsayısının işaretine: merkez negatifse $c=-1$, pozitifse $c=+1$", ok: true, why: "Amaç, ayrıntıyı orijinale *eklemek*; yanlış işaret görüntüyü bulanıklaştırır."}
+      - {t: "Her zaman $c=+1$", why: "Merkezi negatif (standart) çekirdekte bu, ayrıntıyı çıkarır."}
+      - {t: "Görüntünün parlaklığına göre", why: "Çekirdeğin işaret kuralına bağlı."}
+  - q: "Sobel'in Prewitt'ten farkı nedir?"
+    options:
+      - {t: "Merkez satıra/sütuna 2 ağırlık verir: türevle birlikte dik yönde $[1,2,1]$ yumuşatma yapar, gürültüye daha dayanıklıdır", ok: true, why: "İkisi de ayrılabilir: türev $[-1,0,1]$ ⊗ yumuşatma ($[1,1,1]$ Prewitt, $[1,2,1]$ Sobel)."}
+      - {t: "Sobel ikinci türevdir", why: "İkisi de birinci türev."}
+      - {t: "Prewitt çapraz yönleri ölçer", why: "O, Roberts."}
+
+homework:
+  - title: "Kenar korumalı keskinleştirme: Laplasyen piramidiyle yerel kontrast"
+    paper: "Paris, Hasinoff, Kautz — Local Laplacian Filters: Edge-aware Image Processing with a Laplacian Pyramid (SIGGRAPH 2011)"
+    url: "https://doi.org/10.1145/1964921.1964963"
+    level: ileri
+    hours: 10
+    goal: |
+      Unsharp masking büyük kontrastlı kenarlarda hale (halo) üretir. Gauss/Laplasyen piramidini kur, ardından Local Laplacian Filter'ın basitleştirilmiş (az sayıda referans seviyeli) hızlı sürümünü uygula ve ayrıntı artırmayı halo olmadan yap.
+    steps:
+      - "`cv2.pyrDown`/`cv2.pyrUp` kullanmadan Gauss ve Laplasyen piramidi yaz; yeniden kurulumun orijinali verdiğini doğrula."
+      - "Uzaklığa bağlı bir yeniden eşleme fonksiyonu $r(i)$ ile her referans seviyesi için dönüştürülmüş görüntünün Laplasyen piramidini hesapla (hızlı yaklaşım: 8–16 seviye)."
+      - "Her piramit katsayısını, Gauss piramidindeki yerel değere göre iki komşu referans seviyesi arasında interpolasyonla seç."
+      - "Unsharp masking ile aynı ayrıntı artışında halo genişliğini bir kenar profili üzerinde karşılaştır."
+    accept:
+      - "Piramit yeniden kurulum hatası $<10^{-5}$ (float)."
+      - "Basamak kenar profilinde aşma (overshoot) unsharp masking'in en fazla yarısı."
+      - "512 × 512 gri görüntüde süre < 2 s (NumPy, vektörel)."
