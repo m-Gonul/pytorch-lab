@@ -1,0 +1,101 @@
+id: m10-3-cpu-parallel
+code: M10.3
+title: CPU'da paralel çekirdekler — integral dizi/görüntü, 2B konvolüsyon, matris çarpımı
+phase: 10
+minutes: 420
+prereq: [m10-2-threads-sync]
+summary: >
+  Paralel programlama alıştırmalarının CPU yarısı: tek ve çok thread'li
+  integral dizi (iki geçişli blok taraması), integral görüntü (önce satırlar,
+  sonra sütunlar), uint8 girişli/fp32 hesaplı 3×3…21×21 2B konvolüsyon (satır
+  bantları ve kenar "halo"su) ve fp32 matris çarpımı (satır blokları, devrik
+  B, karo/blok). Her birinde iş bölme (geometrik ayrıştırma), bağımlılıkların
+  nasıl kırıldığı ve thread sayısı ile problem boyunun hızlanmaya etkisi.
+  Saf Python'da bantlı/bloklu algoritmalar, NumPy'da vektörel karşılıkları ve
+  ayrılabilir filtre, C++ `std::thread` ile gerçek uygulamalar, sonda
+  PyTorch'un kendi çekirdekleriyle karşılaştırma ve küçük problemlerde thread
+  ek yükü.
+goals:
+  - "Ardışık bağımlılığı kırmak: blok içi tarama + blok toplamlarının taraması + ofset ekleme"
+  - "2B ayrıştırma: satır bantları, halo genişliği $\\lfloor k/2\\rfloor$, sınır koşulu"
+  - "Matmul'da bellek erişim deseni: ijk vs ikj vs devrik B vs karo; [[aritmetik yoğunluk]]"
+  - "Hızlanmanın problem boyuna bağımlılığı: thread oluşturma ek yükü ve önbellek"
+sources:
+  - {title: "Crow — Summed-Area Tables for Texture Mapping (SIGGRAPH 1984)", url: "https://doi.org/10.1145/964965.808600", license: "©", use: link}
+  - {title: "Viola & Jones — Rapid Object Detection using a Boosted Cascade of Simple Features (CVPR 2001)", url: "https://doi.org/10.1109/CVPR.2001.990517", license: "©", use: link}
+  - {title: "Goto & van de Geijn — Anatomy of High-Performance Matrix Multiplication (ACM TOMS 2008)", url: "https://doi.org/10.1145/1356052.1356053", license: "©", use: link}
+  - {title: "Barlas — Multicore and GPU Programming (2. baskı), Bölüm 3–4", url: "https://www.elsevier.com/books/multicore-and-gpu-programming/barlas/978-0-12-814120-5", license: "©", use: link}
+  - {title: "Hwu, Kirk, El Hajj — Programming Massively Parallel Processors (4. baskı), Bölüm 7 ve 11", url: "https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "İki geçişli blok taraması: [1, 2, …, 8], 4 thread"
+      fields:
+        - {id: bs3, label: "3. bloğun (5, 6) toplamı", answer: 11}
+        - {id: off3, label: "3. bloğa eklenecek ofset (önceki blokların toplamı)", answer: 10}
+        - {id: ii, label: "[[1, 2], [3, 4]] görüntüsünün integral değeri I(1, 1)", answer: 10}
+    - title: "Konvolüsyon, 512 × 512, 21 × 21 filtre"
+      fields:
+        - {id: mac, label: "Çarp-topla sayısı", answer: 115605504}
+        - {id: sep, label: "Ayrılabilir (21 + 21) sürümle oran", answer: 10.5}
+        - {id: halo, label: "Bir satır bandının ek okuduğu (halo) satır sayısı (üst + alt)", answer: 20}
+    - title: "Matmul"
+      fields:
+        - {id: flop, label: "n = 1024 fp32 matmul FLOP sayısı (2n³)", answer: 2147483648}
+  verify: |
+    answers = dict(bs3=5 + 6, off3=1 + 2 + 3 + 4, ii=10, mac=512 * 512 * 21 * 21, sep=21 * 21 / 42, halo=2 * (21 // 2), flop=2 * 1024 ** 3)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Ayrılabilir filtreler ve SVD ile düşük ranklı yaklaşım", engine: browser}
+  - {id: x2, title: "Önbellek simülatörü: matmul döngü sıraları ve karolar", engine: browser}
+  - {id: x3, title: "İntegral görüntüyle her boyutta O(1) kutu filtresi", engine: browser}
+
+quiz:
+  - q: "Integral dizinin (önek toplamı) her elemanı bir öncekine bağlıyken nasıl paralelleşir?"
+    options:
+      - {t: "Diziyi p bloğa böl, her blokta yerel tarama (paralel), blok toplamlarını tara (p eleman, sıralı), her bloğa ofseti ekle (paralel)", ok: true, why: "İş ~2n, yol ~2n/p + p."}
+      - {t: "Paralelleşemez", why: "Toplama birleşmeli olduğu için paralelleşir (M10.6)."}
+      - {t: "Her thread farklı bir elemandan başlayıp sona kadar toplar", why: "O(n²) iş."}
+  - q: "21×21 konvolüsyonu satır bantlarına bölünce her thread'in girdisi neden bandından büyüktür?"
+    options:
+      - {t: "Bandın üst/alt kenarındaki çıktılar komşu bantların 10'ar satırına ihtiyaç duyar (halo); bunlar salt okunur, yarış yok", ok: true, why: "Dağıtık bellekte halo değiş tokuşu iletişim maliyetidir."}
+      - {t: "Yanlış paylaşım yüzünden", why: "Okumalar için sorun değil."}
+      - {t: "Sıfır dolgu için", why: "Dolgu yalnız görüntü kenarında."}
+  - q: "Naif ijk matmul'da B'ye erişim neden yavaştır (satır-öncelikli bellek)?"
+    options:
+      - {t: "İç döngü B'nin bir sütununda yürür: her erişim n eleman ileride, her biri ayrı önbellek satırı; ikj ya da devrik B ardışık erişim sağlar", ok: true, why: "Karo (blok) çarpımı ayrıca önbellekte yeniden kullanımı artırır."}
+      - {t: "B'ye yazıldığı için", why: "B yalnız okunur."}
+      - {t: "Thread'ler B'yi paylaştığı için", why: "Salt okuma paylaşımı serbest."}
+
+homework:
+  - title: "Goto & van de Geijn (2008): Yüksek başarımlı matris çarpımının anatomisi"
+    paper: "Goto & van de Geijn — Anatomy of High-Performance Matrix Multiplication (ACM TOMS 2008)"
+    url: "https://doi.org/10.1145/1356052.1356053"
+    level: ileri
+    hours: 16
+    goal: |
+      d aşamasındaki matmul'u makalenin katmanlı yapısına dönüştür: B'yi L2'ye sığan $k_c\times n_c$ panellere, A'yı L2'de $m_c\times k_c$ bloklara paketle, en içte $m_r\times n_r$ (ör. 6×16) yazmaç-mikroçekirdeği AVX2 intrinsics (`_mm256_fmadd_ps`) ile yaz; thread'leri $n_c$ ya da $m_c$ döngüsünde paralelleştir. `torch.matmul` (MKL/OpenBLAS) ile GFLOP/s karşılaştır ve makinenin tepe değerine oranını hesapla.
+    steps:
+      - "Önbellek boyutlarını `lscpu` ile öğren; m_c, k_c, n_c'yi makalenin kurallarına göre seç."
+      - "Paketlemenin süresini ayrıca ölç."
+    accept:
+      - "Tek thread'de tepe değerin ≥ %60'ı."
+      - "Çok thread'de BLAS'ın ≥ %50'si."
+  - title: "Crow (1984): Toplam alan tabloları"
+    paper: "Crow — Summed-Area Tables for Texture Mapping (SIGGRAPH 1984)"
+    url: "https://doi.org/10.1145/964965.808600"
+    level: orta
+    hours: 6
+    goal: |
+      Integral görüntüyü (toplam alan tablosu) d aşamasındaki paralel C++ ile hesapla; ardından makaledeki gibi değişken boyutlu kutu filtresiyle "doku" bulanıklaştırma (her pikselde farklı pencere) uygula. int32 taşma sınırını (8 bit görüntü için en büyük güvenli boyut) hesapla, fp32 integral görüntünün hassasiyet kaybını büyük görüntülerde ölç ve Viola–Jones'taki kaydırılmış (ortalaması çıkarılmış) çözümle karşılaştır.
+    steps:
+      - "Pencere boyutu konuma göre değişsin (ör. odak bulanıklığı)."
+    accept:
+      - "Değişken pencereli filtre doğrudan toplamla aynı (int64)."
+      - "fp32 integral görüntüde 4096² sonrası hata ölçülür ve açıklanır."

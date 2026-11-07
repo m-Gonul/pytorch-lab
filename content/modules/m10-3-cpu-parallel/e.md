@@ -1,0 +1,2 @@
+- `compare(ext, threads)` (ext: d aşamasının derlenmiş eklentisi, kontrol verir) → sözlük: her çekirdek için (kendi C++ sürümümüz tek thread, çok thread, PyTorch karşılığı) süreler. PyTorch: `torch.cumsum`, iki `cumsum`, `F.conv2d` (float32), `torch.matmul`.
+- `size_sweep(ext, sizes, threads)` — integral görüntüde kenar uzunluğuna göre hızlanma (100×100'den büyük görüntülere).
