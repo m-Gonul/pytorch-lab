@@ -1,0 +1,106 @@
+id: m10-1-parallel-models
+code: M10.1
+title: Paralel mimariler, hızlanma yasaları ve paralel program tasarımı
+phase: 10
+minutes: 380
+prereq: [m7-1-cuda]
+summary: >
+  Saat frekansı ~2005'te 2–4 GHz'de takılınca performansın tek yolu
+  paralellik oldu: çok çekirdekli CPU'lar ve GPGPU. Flynn sınıflaması (SISD,
+  SIMD, MISD, MIMD; paylaşımlı/dağıtık bellek, NUMA, efendi–işçi), heterojen
+  mimariler (Cell BE, Kepler SMX, APU), Amdahl ve Gustafson yasaları,
+  verimlilik ve Karp–Flatt ölçüsü, iş–yol (work–span) modeli ve Brent
+  teoremi. Tasarım: Foster'ın PCAM'i (bölümleme, iletişim, birleştirme,
+  eşleme), ayrıştırma desenleri (görev paralelliği, böl ve yönet, geometrik,
+  özyinelemeli veri, boru hattı, olay tabanlı) ve program yapısı desenleri
+  (SPMD, MPMD, efendi–işçi, fork–join, döngü paralelliği). Saf Python'da
+  liste zamanlama ve boru hattı simülasyonu, NumPy'da kritik yol ve
+  Amdahl uydurma, C++ `std::thread` ile Mandelbrot'ta statik, döngüsel ve
+  dinamik yük dağıtımı.
+goals:
+  - "[[Amdahl yasası]] $S=1/((1-f)+f/N)$ ve [[Gustafson yasası]] $S=(1-f)+fN$; güçlü ve zayıf ölçekleme"
+  - "İş $W$, yol $S_\\infty$, paralellik $W/S_\\infty$; Brent: $T_p\\le W/p+S_\\infty$"
+  - "[[PCAM]]: görevleri bul, iletişimi say, birleştir, işlemcilere dengeli eşle"
+  - "Yük dengeleme: blok, döngüsel ve dinamik (atomik sayaç) dağıtım"
+sources:
+  - {title: "Barlas — Multicore and GPU Programming: An Integrated Approach (2. baskı), Bölüm 1–2", url: "https://www.elsevier.com/books/multicore-and-gpu-programming/barlas/978-0-12-814120-5", license: "©", use: link}
+  - {title: "Foster — Designing and Building Parallel Programs (1995, çevrimiçi)", url: "https://www.mcs.anl.gov/~itf/dbpp/", license: "ücretsiz çevrimiçi", use: link}
+  - {title: "Amdahl — Validity of the single processor approach to achieving large scale computing capabilities (AFIPS 1967)", url: "https://doi.org/10.1145/1465482.1465560", license: "©", use: link}
+  - {title: "Gustafson — Reevaluating Amdahl's Law (CACM 1988)", url: "https://doi.org/10.1145/42411.42415", license: "©", use: link}
+  - {title: "Mattson, Sanders, Massingill — Patterns for Parallel Programming (2004)", url: "https://www.oreilly.com/library/view/patterns-for-parallel/0321228111/", license: "©", use: link}
+  - {title: "Blumofe & Leiserson — Scheduling Multithreaded Computations by Work Stealing (JACM 1999)", url: "https://doi.org/10.1145/324133.324234", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "Yasalar: paralelleşebilir oran f = 0.9, N = 8"
+      fields:
+        - {id: am, label: "Amdahl hızlanması", answer: 4.705882352941177, tol: 1.0e-6}
+        - {id: lim, label: "N → ∞ sınırı", answer: 10}
+        - {id: gu, label: "Gustafson (ölçeklenmiş) hızlanması", answer: 7.3}
+        - {id: ef, label: "Amdahl verimliliği S/N", answer: 0.5882352941176471, tol: 1.0e-6}
+        - {id: kf, label: "Karp–Flatt: ölçülen S = 4.70588, p = 8 → seri oran e", answer: 0.1, tol: 1.0e-4}
+    - title: "Boru hattı ve indirgeme"
+      fields:
+        - {id: pipe, label: "Aşama süreleri (2, 3, 5, 2, 3), 100 öğe: toplam süre", answer: 510}
+        - {id: wk, label: "1024 sayının ağaç toplamı: iş (toplama sayısı)", answer: 1023}
+        - {id: sp, label: "Aynı ağacın yolu (adım sayısı)", answer: 10}
+  verify: |
+    f, N = 0.9, 8
+    S = 1 / ((1 - f) + f / N)
+    answers = dict(am=S, lim=1 / (1 - f), gu=(1 - f) + f * N, ef=S / N, kf=(1 / 4.70588 - 1 / 8) / (1 - 1 / 8),
+                   pipe=sum([2, 3, 5, 2, 3]) + 99 * 5, wk=1023, sp=10)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Böl ve yönet: merge sort bağımlılık grafiği", engine: browser}
+  - {id: x2, title: "Dengesiz boru hattı ve aşama çoğaltma", engine: browser}
+  - {id: x3, title: "Olay tabanlı ayrıştırma: ayrık olay simülasyonu", engine: browser}
+
+quiz:
+  - q: "Amdahl ve Gustafson neden farklı sonuçlara varır?"
+    options:
+      - {t: "Amdahl problem boyunu sabit tutar (güçlü ölçekleme); Gustafson işlemci sayısıyla problemi büyütür ve seri kısmın süresini sabit sayar (zayıf ölçekleme)", ok: true, why: "İkisi de doğru; soruları farklı."}
+      - {t: "Gustafson iletişim maliyetini sayar", why: "İkisi de saymaz."}
+      - {t: "Amdahl yanlıştır", why: "Sabit boyutta doğrudur."}
+  - q: "PCAM'in bölümleme adımında neden işlemci sayısından 1–2 mertebe fazla görev hedeflenir?"
+    options:
+      - {t: "Sonraki adımlarda (birleştirme, eşleme) yük dengeleme ve iletişimi azaltma için esneklik bırakmak", ok: true, why: "Görevler sonra gruplanır; grup sayısı yine işlemciden fazla tutulur."}
+      - {t: "Her görev ayrı thread olsun diye", why: "Thread başına görev pahalıdır."}
+      - {t: "İletişimi artırmak için", why: "Tersine."}
+  - q: "Mandelbrot satırlarını thread'lere ardışık bloklar hâlinde dağıtmak neden kötü olabilir?"
+    options:
+      - {t: "Satırların maliyeti çok farklı (kümenin içi maxit iterasyon); bir thread pahalı satırları toplarken diğerleri boşta kalır", ok: true, why: "Döngüsel ya da dinamik dağıtım işi dengeler."}
+      - {t: "Önbellek kaçırmaları", why: "Asıl sorun yük dengesizliği."}
+      - {t: "Yarış koşulu", why: "Satırlar bağımsız."}
+
+homework:
+  - title: "Gustafson (1988): Amdahl yasasını yeniden değerlendirmek"
+    paper: "Gustafson — Reevaluating Amdahl's Law (CACM 1988)"
+    url: "https://doi.org/10.1145/42411.42415"
+    level: başlangıç
+    hours: 4
+    goal: |
+      d aşamasındaki C++ Mandelbrot'u (ya da M10.3'teki konvolüsyonu) kullanarak kendi makinende (i) sabit boyutta 1..p thread ile güçlü ölçekleme, (ii) thread sayısıyla orantılı büyüyen problemle zayıf ölçekleme ölç. c aşamasındaki Amdahl uydurmasıyla seri oranı kestir; Gustafson'un ölçeklenmiş hızlanma eğrisini çiz ve makaledeki 1024 işlemcili sonuçlarla nitel karşılaştır.
+    steps:
+      - "Her ölçümü 5 kez tekrarla, ortancayı al; ısınma (warm-up) çalıştırması ekle."
+      - "Hiper-iş parçacığı (SMT) olan çekirdeklerde eğrinin kırılmasını yorumla."
+    accept:
+      - "Güçlü ölçeklemede hızlanma Amdahl eğrisine, zayıf ölçeklemede Gustafson doğrusuna yakın."
+  - title: "Blumofe & Leiserson (1999): İş çalma ile zamanlama"
+    paper: "Blumofe & Leiserson — Scheduling Multithreaded Computations by Work Stealing (JACM 1999)"
+    url: "https://doi.org/10.1145/324133.324234"
+    level: ileri
+    hours: 12
+    goal: |
+      C++'ta thread başına çift uçlu kuyruk (deque) ile iş çalan bir zamanlayıcı yaz: sahibi alttan push/pop, hırsızlar üstten çalar. Paralel merge sort ve Fibonacci (fork–join) ile merkezi tek kuyruklu havuza karşı ölç; makaledeki $T_p\le T_1/p+O(T_\infty)$ sınırını b aşamasındaki iş–yol hesabıyla karşılaştır.
+    steps:
+      - "Önce mutex korumalı deque, sonra (isteğe bağlı) Chase–Lev kilitsiz deque."
+      - "Görev ayrıntı düzeyini (cutoff) tara."
+    accept:
+      - "Küçük görevlerde merkezi kuyruk çekişmeden yavaşlar, iş çalma ölçeklenir."
+      - "Çalma sayısı p·T∞ mertebesinde."

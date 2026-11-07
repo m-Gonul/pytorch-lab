@@ -1,0 +1,3 @@
+- `mandel_torch(H, W, maxit)` — PyTorch vektörel (maske ile; döngü yalnız iterasyonlar).
+- `scaling(ext, H, W, maxit, threads)` → `(süreler, hızlanmalar)`; dinamik mod, her biri 3 tekrarın en iyisi.
+- `fit_amdahl(p, T)` — c'deki gibi (NumPy).
