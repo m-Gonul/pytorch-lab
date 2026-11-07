@@ -110,3 +110,4 @@ terms:
   ölçek uzayı: "Bir görüntünün giderek artan σ'lı Gauss süzgeçleriyle yumuşatılmış hallerinden oluşan tek parametreli aile; öznitelikleri bilinmeyen ölçekte aramak için kullanılır."
   homografi: "Düzlemsel bir sahnenin ya da yalnız dönen bir kameranın iki görüntüsü arasındaki 3 × 3 projektif dönüşüm (8 serbestlik)."
   ransac: "Random Sample Consensus: minimal rastgele örneklerden model kurup en çok veri noktasıyla uyuşanı seçen, aykırı değerlere dayanıklı kestirim yöntemi."
+  adaboost: "Zayıf sınıflandırıcıları sırayla, önceki turların yanlış sınıfladığı örneklere daha çok ağırlık vererek eğitip ağırlıklı oyla birleştiren boosting algoritması."

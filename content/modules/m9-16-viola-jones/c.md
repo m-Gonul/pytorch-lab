@@ -1,0 +1,5 @@
+NumPy, **döngü yok** (öznitelik tanımlarını diziye çevirme hariç).
+
+- `rect_table(coords, kinds)` → `(R, S)`: `R (K, 4, 4)` her özniteliğin en fazla 4 dikdörtgeni `[r0, c0, r1+1, c1+1]` (eksikler 0), `S (K, 4)` işaretler (eksikler 0). Bu yardımcı için döngü serbest.
+- `haar_matrix(X, R, S)` — `X (N, H, W)` → `(N, K)`: integral görüntüler `(N, H+1, W+1)`, dört köşe `I[:, r1, c1] − I[:, r0, c1] − I[:, r1, c0] + I[:, r0, c0]` gelişmiş indekslemeyle `(N, K, 4)`, işaretlerle topla.
+- `best_stump(f, y, w)` — tek öznitelik için en iyi eşik: değerleri sırala, `cumsum` ile "eşiğin altı yüz" ve "eşiğin altı yüz değil" hatalarını **tüm eşikler için** hesapla, en küçüğü. `(err, thr, pol)`: tahmin `pol·f ≤ pol·thr` ise yüz (1). Bölünme yalnız farklı iki değer arasında olabilir: **eşit değerler** varsa her değerin yalnız son konumu geçerlidir (yoksa aynı değerli örneklerin bir kısmı yanlış tarafa sayılır). Eşik olarak ardışık iki farklı değerin **ortasını** döndür (en sondaki için son değer + 1): böylece iki polarite de aynı bölünmeyi verir.
