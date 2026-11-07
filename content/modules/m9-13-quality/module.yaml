@@ -1,0 +1,111 @@
+id: m9-13-quality
+code: M9.13
+title: Görüntü kalite ölçütleri — MSE, PSNR, SSIM, MS-SSIM
+phase: 9
+minutes: 360
+prereq: [m9-5-restoration]
+summary: >
+  Öznel ve nesnel kalite; tam referanslı, indirgenmiş referanslı ve
+  referanssız ölçütler. MSE/PSNR'ın neden yanıltıcı olduğunu (aynı MSE'de
+  çok farklı görünen görüntüler) ve SSIM'in parlaklık, kontrast, yapı
+  ayrıştırmasını elle ve saf Python'da kuruyorsun; NumPy'da
+  `skimage.metrics.structural_similarity` ile birebir SSIM ve Wang'ın
+  "eşit MSE" figürünü üretiyorsun; PyTorch'ta türevlenebilir SSIM ile MSE
+  küresi üzerinde SSIM'i en büyük ve en küçük yapan görüntüleri arıyorsun;
+  en sonda toplu (batch) MS-SSIM'i vektörel yazıyorsun.
+goals:
+  - "MSE ve PSNR: basit, türevlenebilir ama yapıdan habersiz"
+  - "[[SSIM]] = parlaklık × kontrast × yapı; sınırlılık, simetri, tek en büyük"
+  - "Yerel pencereli SSIM haritası ve ortalama; Gauss penceresi, kovaryans normalizasyonu"
+  - "MS-SSIM ve referanssız ölçütlerin fikri"
+sources:
+  - {title: "Wang, Bovik, Sheikh, Simoncelli — Image Quality Assessment: From Error Visibility to Structural Similarity (IEEE TIP 2004)", url: "https://doi.org/10.1109/TIP.2003.819861", license: "©", use: link}
+  - {title: "Wang, Simoncelli, Bovik — Multiscale structural similarity for image quality assessment (Asilomar 2003)", url: "https://doi.org/10.1109/ACSSC.2003.1292216", license: "©", use: link}
+  - {title: "scikit-image — metrics.structural_similarity", url: "https://scikit-image.org/docs/stable/api/skimage.metrics.html", license: "BSD-3", use: adapt}
+  - {title: "Immerkær — Fast Noise Variance Estimation (CVIU 1996)", url: "https://doi.org/10.1006/cviu.1996.0060", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "MSE ve PSNR: $x=[10,20,30,40]$, $y=[12,18,30,44]$"
+      fields:
+        - {id: mse, label: "MSE", answer: 6}
+        - {id: psnr, label: "PSNR (dB, 8 bit)", answer: 40.3493, tol: 0.001}
+    - title: "SSIM (tek pencere, yansız σ, $K_1=0.01$, $K_2=0.03$, $L=255$): $x=[1,2,3,4]$, $y=[2,3,4,5]$"
+      fields:
+        - {id: c1, label: "$C_1=(K_1L)^2$", answer: 6.5025, tol: 0.0001}
+        - {id: l, label: "Parlaklık $l(x,y)$", answer: 0.960004, tol: 0.0001}
+        - {id: s, label: "Yapı $s(x,y)=\\sigma_{xy}/(\\sigma_x\\sigma_y)$", answer: 1}
+        - {id: ssim, label: "SSIM ($C_3=C_2/2$)", answer: 0.960004, tol: 0.0001}
+        - {id: sneg, label: "$y=[4,3,2,1]$ için yapı terimi $s$", answer: -1}
+  verify: |
+    import math
+    import numpy as np
+    x, y = np.array([10, 20, 30, 40.]), np.array([12, 18, 30, 44.])
+    mse = ((x - y) ** 2).mean()
+    a, b = np.array([1, 2, 3, 4.]), np.array([2, 3, 4, 5.])
+    C1, C2 = (0.01 * 255) ** 2, (0.03 * 255) ** 2
+    mx, my = a.mean(), b.mean(); vx, vy = a.var(ddof=1), b.var(ddof=1); cxy = ((a - mx) * (b - my)).sum() / 3
+    l = (2 * mx * my + C1) / (mx ** 2 + my ** 2 + C1)
+    ss = l * (2 * cxy + C2) / (vx + vy + C2)
+    r = np.array([4, 3, 2, 1.])
+    answers = dict(mse=mse, psnr=10 * math.log10(255 ** 2 / mse), c1=C1, l=l, s=cxy / math.sqrt(vx * vy), ssim=ss,
+                   sneg=(((a - mx) * (r - r.mean())).sum() / 3) / math.sqrt(vx * r.var(ddof=1)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "SSIM seçenekleri: düzgün pencere, örnek kovaryansı, tam harita", engine: browser}
+  - {id: x2, title: "Renkli görüntüde PSNR ve SSIM: Y kanalı ve kenar kırpma", engine: browser}
+  - {id: x3, title: "Referanssız ölçütler: gürültü ve bulanıklık kestirimi", engine: browser}
+
+quiz:
+  - q: "Aynı MSE'ye sahip iki bozulmadan hangisi genelde daha yüksek SSIM alır?"
+    options:
+      - {t: "Görüntüyü 15 gri seviye aydınlatmak (ortalama kayması)", ok: true, why: "Yapı ve kontrast korunur, yalnız parlaklık terimi biraz düşer; SSIM ≈ 0.99."}
+      - {t: "JPEG bloklanması", why: "Yapı bozulur; SSIM ≈ 0.7."}
+      - {t: "Bulanıklaştırma", why: "Kontrast ve yapı kaybı; SSIM düşük."}
+  - q: "SSIM'deki C₁ ve C₂ sabitleri ne işe yarar?"
+    options:
+      - {t: "Payda sıfıra yaklaştığında (karanlık ya da düz bölgeler) kararsızlığı önler", ok: true, why: "C = (K·L)², K ≪ 1."}
+      - {t: "Sonucu 0–100 aralığına ölçekler", why: "SSIM ≤ 1."}
+      - {t: "Renk kanallarını ağırlıklandırır", why: "Gri seviye tanım."}
+  - q: "Yapı terimi s(x, y) neden parlaklık ve kontrast değişimlerinden etkilenmez?"
+    options:
+      - {t: "Ortalaması çıkarılmış ve standart sapmaya bölünmüş sinyaller arasındaki korelasyondur", ok: true, why: "Üç bileşen görece bağımsızdır."}
+      - {t: "Yalnız kenar piksellerinde hesaplanır", why: "Tüm penceredeki piksellerden hesaplanır."}
+      - {t: "Logaritmik ölçek kullanır", why: "Korelasyon katsayısıdır."}
+
+homework:
+  - title: "SSIM makalesini yeniden üret"
+    paper: "Wang, Bovik, Sheikh, Simoncelli — Image Quality Assessment: From Error Visibility to Structural Similarity (IEEE TIP 2004)"
+    url: "https://doi.org/10.1109/TIP.2003.819861"
+    level: orta
+    hours: 10
+    goal: |
+      Makaledeki üç ana deneyi yeniden üret: (1) eşit MSE'li bozulmalar figürü (bu modülün c aşaması), (2) SSIM haritaları (JPEG ve gürültü için), (3) LIVE (ya da TID2013/KADID-10k) veritabanında öznel puanlarla (MOS/DMOS) korelasyon: PSNR, SSIM ve MS-SSIM için Pearson (lojistik regresyon sonrası), Spearman (SROCC) ve aykırılık oranı.
+    steps:
+      - "Veritabanını indir; referans–bozuk çiftleri ve DMOS değerlerini oku."
+      - "Makaledeki 5 parametreli lojistik fonksiyonu SciPy `curve_fit` ile uydur, ardından Pearson ve RMSE."
+      - "Pencere boyutu (8 × 8 düzgün vs 11 × 11 Gauss) ve alt örnekleme (makale: görüntü ≈ 256 piksele indirilir) etkisini ablasyonla göster."
+      - "Bu modülün d aşamasındaki 'MSE küresinde en iyi / en kötü SSIM' görüntülerini makaledeki tartışmayla birlikte yorumla."
+    accept:
+      - "Korelasyon tablosu: SSIM'in SROCC'si PSNR'ınkinden belirgin yüksek (LIVE'da ~0.95'e karşı ~0.88)."
+      - "Saçılım grafikleri (öznel puan – nesnel skor) ve uydurulan eğriler."
+      - "Alt örneklemenin SROCC'ye etkisi raporlanmış."
+  - title: "LPIPS: derin özniteliklerle algısal benzerlik (uzantı)"
+    paper: "Zhang, Isola, Efros, Shechtman, Wang — The Unreasonable Effectiveness of Deep Features as a Perceptual Metric (CVPR 2018)"
+    url: "https://arxiv.org/abs/1801.03924"
+    level: ileri
+    hours: 10
+    goal: |
+      Önceden eğitilmiş bir CNN'in (AlexNet ya da VGG) katman özniteliklerini kanal bazında normalize edip doğrusal ağırlıklarla birleştiren LPIPS'i uygula; BAPPS 2AFC verisinde ağırlıkları eğit ve SSIM ile karşılaştır.
+    steps:
+      - "Öznitelik çıkarımı, birim normalize, kanal ağırlıkları $w_l$, uzamsal ortalama."
+      - "2AFC kaybı: hangi bozulmuş yamanın referansa daha yakın olduğu (insan oyu)."
+      - "SSIM, MS-SSIM, PSNR ve LPIPS için 2AFC doğruluğu tablosu."
+    accept:
+      - "BAPPS doğrulamada LPIPS 2AFC skoru SSIM'den en az 5 puan yüksek."

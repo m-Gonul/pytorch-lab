@@ -1,0 +1,1 @@
+$l=\frac{2(2.5)(3.5)+6.5025}{2.5^2+3.5^2+6.5025}=\frac{24.0025}{25.0025}=0.96$. $y=x+1$ olduğu için $\sigma_x=\sigma_y=\sigma_{xy}$, kontrast–yapı çarpanı tam 1: SSIM yalnız parlaklık farkından düşer.
