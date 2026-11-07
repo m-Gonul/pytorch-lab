@@ -1,0 +1,62 @@
+id: m3-5-init
+code: M3.5
+title: Initialization ve aktivasyonlar
+phase: 3
+minutes: 210
+prereq: [m3-2-mlp-backprop]
+summary: >
+  Derin bir ağın ilk adımda bile eğitilebilir olması doğru başlatmaya bağlı.
+  Varyansın katmanlar boyunca nasıl çarpıldığını elle hesaplıyor, saf Python'da
+  altı aktivasyonu ve türevlerini yazıyor, NumPy'da 30 katmanlık ağda
+  aktivasyon istatistiklerini izliyor, PyTorch'ta `nn.init` ve hook'larla
+  katman katman ileri/geri istatistik topluyor ve en sonda kritik başlatma
+  ölçeğini 64 ölçeği birden simüle ederek buluyorsun.
+goals:
+  - "$\\operatorname{Var}(z)=n_{\\text{in}}\\operatorname{Var}(w)\\,\\mathbb E[x^2]$ ilişkisinden [[xavier init|Xavier]] ve [[kaiming init|Kaiming]] ölçeklerini türetmek"
+  - "ReLU'nun ikinci momenti yarıya indirdiğini ve bu yüzden Kaiming'de 2 çarpanı olduğunu göstermek"
+  - "Sigmoid/tanh doymasının gradyanları nasıl söndürdüğünü ölçmek"
+  - "Forward ve tensor hook'larıyla katman başına aktivasyon/gradyan istatistiği toplamak"
+sources:
+  - {title: "Glorot & Bengio — Understanding the difficulty of training deep feedforward neural networks", url: "https://proceedings.mlr.press/v9/glorot10a.html", license: "©", use: link}
+  - {title: "He et al. — Delving Deep into Rectifiers (Kaiming init)", url: "https://arxiv.org/abs/1502.01852", license: "arXiv", use: link}
+  - {title: "Karpathy — Zero to Hero 4: Activations & Gradients, BatchNorm", url: "https://karpathy.ai/zero-to-hero.html", license: "kod MIT; video ©", use: adapt}
+  - {title: "UvA DL Tutorial 3–4: Activation Functions, Optimization and Initialization", url: "https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial4/Optimization_and_Initialization.html", license: "MIT", use: adapt}
+
+hand:
+  groups:
+    - title: "Lineer katman $z=\\sum_{j=1}^{n}w_jx_j$; $w_j,x_j$ bağımsız, ortalaması 0, $\\operatorname{Var}(x_j)=1$, $n=100$"
+      fields:
+        - {id: v1, label: "$\\operatorname{Var}(w)=1$ ise $\\operatorname{Var}(z)$", answer: 100, hint: "$n\\cdot\\operatorname{Var}(w)\\cdot\\operatorname{Var}(x)$"}
+        - {id: xav, label: "Xavier $\\operatorname{Var}(w)=\\frac{2}{n_{in}+n_{out}}$, $n_{in}=n_{out}=100$", answer: 0.01, tol: 0.0001, hint: "$2/200$"}
+        - {id: kai, label: "Kaiming (ReLU) $\\operatorname{Var}(w)=\\frac{2}{n_{in}}$", answer: 0.02, tol: 0.0001, hint: "ReLU ikinci momenti yarıya indirir; 2 ile telafi"}
+    - title: "Derinlik"
+      fields:
+        - {id: m2, label: "$z\\sim\\mathcal N(0,2)$ ise $\\mathbb E[\\text{ReLU}(z)^2]$", answer: 1, tol: 0.001, hint: "simetriden negatif yarı 0: $\\tfrac12\\cdot2$"}
+        - {id: dec, label: "Xavier + ReLU, 10 katman sonra ikinci moment çarpanı", answer: 0.000977, tol: 0.00002, hint: "her katmanda $\\times\\tfrac12$: $2^{-10}$"}
+        - {id: sig, label: "$\\sigma'(0)$", answer: 0.25, tol: 0.0001, hint: "$\\sigma(0)(1-\\sigma(0))$"}
+        - {id: sig10, label: "10 sigmoid katmanı boyunca $\\sigma'$ çarpımı (en iyi durum)", answer: 9.5367e-7, tol: 1e-8, hint: "$0.25^{10}$: vanishing gradient"}
+  verify: |
+    answers = dict(v1=100, xav=2 / 200, kai=2 / 100, m2=1, dec=round(2 ** -10, 6), sig=0.25, sig10=round(0.25 ** 10, 11))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Kaiming başlatmasındaki 2 çarpanı nereden gelir?"
+    options:
+      - {t: "Sıfır ortalamalı simetrik $z$ için $\\mathbb E[\\text{ReLU}(z)^2]=\\frac12\\operatorname{Var}(z)$; varyansı korumak için ağırlık varyansı 2 katına çıkarılır", ok: true, why: "$\\operatorname{Var}(z_{l+1})=n\\operatorname{Var}(w)\\cdot\\frac12\\operatorname{Var}(z_l)$; $=\\operatorname{Var}(z_l)$ için $\\operatorname{Var}(w)=2/n$."}
+      - {t: "İki katman olduğu için", why: "Katman sayısından bağımsız; ReLU'nun yarım doğrultmasından."}
+      - {t: "Gradyan için ayrı bir düzeltme", why: "fan_in modu ileri geçişi korur; fan_out modu geri geçişi."}
+  - q: "Hook'larla ölçtüğün son katman gradyan std'si ilk katmanınkinden $10^{6}$ kat küçükse ne olur?"
+    options:
+      - {t: "İlk katmanlar pratikte öğrenmez (vanishing gradient); başlatma, aktivasyon, normalization ya da residual bağlantı gerekir", ok: true, why: "M3.6 (normalization) ve M4.2 (residual) bu sorunun iki standart çözümü."}
+      - {t: "Learning rate'i büyütmek yeterlidir", why: "Son katmanlar ıraksar; sorun katmanlar arası oran."}
+      - {t: "Sorun yok, Adam düzeltir", why: "Adam ölçeği kısmen telafi eder ama doymuş aktivasyonların sıfır gradyanını kurtaramaz."}
+  - q: "GELU ve SiLU, ReLU'ya göre neden transformer'larda yaygın?"
+    options:
+      - {t: "Pürüzsüz ve negatif bölgede küçük gradyan geçirirler; ölü nöron sorunu azalır ve optimizasyon yüzeyi daha düzgündür", ok: true, why: "Sıfırda türevleri süreklidir. Bedeli biraz daha pahalı hesaplama."}
+      - {t: "Doyarlar, bu yüzden kararlıdırlar", why: "Pozitif tarafta doymazlar (sigmoid/tanh'ın tersine)."}
+      - {t: "Varyansı otomatik korurlar", why: "Başlatma hâlâ gereklidir."}
