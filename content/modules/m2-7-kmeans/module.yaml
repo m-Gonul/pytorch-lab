@@ -1,0 +1,73 @@
+id: m2-7-kmeans
+code: M2.7
+title: k-means
+phase: 2
+minutes: 180
+prereq: [m2-1-knn]
+summary: >
+  En basit kümeleme. Dört noktada iki Lloyd iterasyonunu elle yapıyor, saf
+  Python'da atama/güncelleme döngüsünü yazıyor, NumPy'da one-hot matris
+  çarpımıyla merkezleri döngüsüz güncelliyor ve k-means++ başlatmasını
+  kuruyor, PyTorch'ta Lloyd adımının aslında inertia'nın gradyanını sıfırlayan
+  bir Newton adımı olduğunu autograd ile gösteriyor ve en sonda R rastgele
+  başlatmayı tek tensörde koşturuyorsun.
+goals:
+  - "Lloyd algoritmasını (ata → güncelle) ve [[inertia]] amacını yazmak"
+  - "Merkez güncellemesini one-hot atama matrisiyle $C=\\text{diag}(n_k)^{-1}A^\\top X$ olarak döngüsüz yapmak"
+  - "Boş küme ve eşitlik durumlarını açıkça ele almak"
+  - "k-means++ ile başlatmanın neden daha iyi yerel minimumlar verdiğini görmek"
+  - "Birden çok rastgele başlatmayı bir batch boyutu olarak paralel koşturmak"
+sources:
+  - {title: "ISLP — §12.4.1 K-Means Clustering", url: "https://www.statlearning.com/", license: "doğrulanmadı", use: link}
+  - {title: "Arthur & Vassilvitskii — k-means++: The Advantages of Careful Seeding", url: "https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf", license: "©", use: link}
+  - {title: "Stanford CS229 — Notes: The k-means clustering algorithm", url: "https://cs229.stanford.edu/main_notes.pdf", license: "doğrulanmadı", use: link}
+  - {title: "PyTorch — Tensor.index_add_, torch.cdist", url: "https://docs.pytorch.org/docs/stable/generated/torch.Tensor.index_add_.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "Noktalar $(0,0),(1,0),(4,4),(5,4)$; başlangıç merkezleri $c_1=(0,0)$, $c_2=(1,0)$. 1. iterasyon"
+      fields:
+        - {id: a3, label: "$(4,4)$'ün kümesi (1 ya da 2)", answer: 2, hint: "$\\lVert\\cdot\\rVert^2$: $c_1$'e 32, $c_2$'ye 25"}
+        - {id: c2x, label: "güncellenmiş $c_2$'nin x'i", answer: 3.333333, tol: 0.002, hint: "$c_2$ kümesi: $(1,0),(4,4),(5,4)$; ortalama"}
+        - {id: c2y, label: "güncellenmiş $c_2$'nin y'si", answer: 2.666667, tol: 0.002, hint: "$(0+4+4)/3$"}
+    - title: "2. iterasyon"
+      fields:
+        - {id: a2, label: "$(1,0)$'ın yeni kümesi", answer: 1, hint: "$c_1$'e 1, $c_2$'ye $\\approx12.6$"}
+        - {id: c1x, label: "güncellenmiş $c_1$'in x'i", answer: 0.5, tol: 0.001, hint: "$(0+1)/2$"}
+        - {id: inertia, label: "inertia $\\sum_i\\lVert x_i-c_{z_i}\\rVert^2$", answer: 1, tol: 0.001, hint: "her nokta merkezinden 0.5 uzakta: $4\\cdot0.25$"}
+  verify: |
+    P = [(0, 0), (1, 0), (4, 4), (5, 4)]; C = [(0.0, 0.0), (1.0, 0.0)]
+    d2 = lambda p, c: (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2
+    hist = []
+    for _ in range(2):
+        lab = [min(range(2), key=lambda k: (d2(p, C[k]), k)) for p in P]
+        hist.append(lab)
+        C = [tuple(sum(p[j] for p, l in zip(P, lab) if l == k) / lab.count(k) for j in range(2)) for k in range(2)]
+        if len(hist) == 1:
+            c2_after1 = C[1]
+    inertia = sum(d2(p, C[l]) for p, l in zip(P, hist[-1]))
+    answers = dict(a3=hist[0][2] + 1, c2x=round(c2_after1[0], 6), c2y=round(c2_after1[1], 6),
+                   a2=hist[1][1] + 1, c1x=C[0][0], inertia=inertia)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Lloyd algoritması neden her iterasyonda inertia'yı artırmaz?"
+    options:
+      - {t: "Atama adımı merkezler sabitken, güncelleme adımı atamalar sabitken inertia'yı minimize eder; iki blok koordinat inişi", ok: true, why: "Sonlu sayıda atama olduğu için sonlu adımda durur; ama bulunan bir yerel minimumdur, global değil."}
+      - {t: "Gradient descent kullandığı için", why: "Lloyd kapalı form adımlar atar; gradyan kullanmaz (d aşamasında bağlantıyı kuruyoruz)."}
+      - {t: "Artırabilir", why: "Kanıtlanabilir şekilde monoton azalmayandır."}
+  - q: "k-means++ başlatması ne yapar?"
+    options:
+      - {t: "İlk merkezi rastgele, sonrakileri mevcut merkezlere kare uzaklıkla orantılı olasılıkla seçer; merkezler veriye yayılır", ok: true, why: "Beklenen inertia optimumun $O(\\log k)$ katıyla sınırlıdır. Tamamen rastgele başlatmada iki merkez aynı kümeye düşebilir."}
+      - {t: "Merkezleri ızgara üzerine yerleştirir", why: "Veriye bağlı bir örnekleme; ızgara değil."}
+      - {t: "En uzak noktaları deterministik seçer", why: "O farthest-point; aykırı değerlere duyarlı. k-means++ olasılıksal."}
+  - q: "k-means hangi küme şekillerinde başarısız olur?"
+    options:
+      - {t: "Küresel olmayan (uzamış, iç içe, farklı yoğunluklu) kümelerde; kare Öklid uzaklığı her kümeyi eşit varyanslı bir küre gibi görür", ok: true, why: "GMM (M2.8) farklı kovaryanslara izin vererek bunu genelleştirir."}
+      - {t: "Yalnız yüksek boyutta", why: "Boyuttan bağımsız bir şekil varsayımı sorunu."}
+      - {t: "Hiçbirinde", why: "İç içe çemberler klasik başarısızlık örneğidir."}

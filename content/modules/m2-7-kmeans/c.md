@@ -1,0 +1,2 @@
+- `kmeans_np(X, C0, iters)` → `(C, labels, inertia)`. Atama: mesafe açılımı + `argmin(1)`. Güncelleme: `A = np.eye(k)[labels]`, `sums = A.T @ X`, `counts = A.sum(0)`; boş kümede eski merkez (`np.where`). Yalnız iterasyon döngüsü.
+- `kmeanspp(X, k, rng)` → `(k, d)` başlangıç merkezleri. Rastgele çağrıların sırası tam olarak: önce `rng.integers(n)`, sonra her yeni merkez için `rng.choice(n, p=D2 / D2.sum())`; $D^2$ her noktanın mevcut merkezlere en küçük kare uzaklığı. Merkezler üzerinde tek döngü serbest.
