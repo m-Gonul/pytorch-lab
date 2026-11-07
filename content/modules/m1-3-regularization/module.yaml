@@ -1,0 +1,80 @@
+id: m1-3-regularization
+code: M1.3
+title: "Regularization: ridge ve lasso"
+phase: 1
+minutes: 210
+prereq: [m1-1-linreg, m1-2-gd-variants]
+summary: >
+  Ağırlıkları küçük tutmanın iki yolu. 2×2'lik bir ridge sistemini elle çözüp
+  soft-threshold'u uyguluyor, saf Python'da coordinate descent ile lasso
+  yazıyor, NumPy'da tüm regularization yolunu tek SVD'den çıkarıyor,
+  PyTorch'ta `weight_decay`'in L2 cezasıyla ilişkisini kuruyor ve en sonda
+  k-fold cross-validation'ı λ'lar üzerinde döngüsüz yapıyorsun.
+goals:
+  - "Ridge kapalı formunu $(X^\\top X+\\lambda I)w=X^\\top y$ olarak türetip uygulamak; bias'ın neden cezalandırılmadığını açıklamak"
+  - "Lasso'nun [[soft-threshold]] adımıyla nasıl tam sıfır katsayı ürettiğini göstermek"
+  - "Ridge yolunu $w(\\lambda)=V\\,\\text{diag}\\!\\big(\\tfrac{s}{s^2+\\lambda}\\big)U^\\top y$ ile tüm λ'lar için tek SVD'den hesaplamak"
+  - "SGD'nin `weight_decay` parametresinin hangi L2 katsayısına karşılık geldiğini bulmak"
+  - "[[cross-validation|Cross-validation]] ile λ seçmek"
+sources:
+  - {title: "ISLP — Bölüm 6.2 Shrinkage Methods (ridge, lasso)", url: "https://www.statlearning.com/", license: "doğrulanmadı", use: link}
+  - {title: "Elements of Statistical Learning — Bölüm 3.4", url: "https://hastie.su.domains/ElemStatLearn/", license: "doğrulanmadı", use: link}
+  - {title: "Dive into Deep Learning §3.7 Weight Decay", url: "https://d2l.ai/chapter_linear-regression/weight-decay.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "Friedman, Hastie, Tibshirani — Regularization Paths via Coordinate Descent (glmnet)", url: "https://www.jstatsoft.org/article/view/v033i01", license: "CC BY 3.0", use: link}
+
+hand:
+  groups:
+    - title: "$X=\\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix}$, $y=[1,2,3]$, bias yok. Önce $X^\\top X$ ve $X^\\top y$"
+      layout: matrix
+      rows: 2
+      cols: 2
+      fields:
+        - {id: a11, label: "$(X^\\top X)_{11}$", answer: 2, hint: "1. sütunun kendisiyle iç çarpımı: $1+0+1$"}
+        - {id: a12, label: "$(X^\\top X)_{12}$", answer: 1, hint: "1. ve 2. sütun: $0+0+1$"}
+        - {id: xy1, label: "$(X^\\top y)_1$", answer: 4, hint: "$1+0+3$"}
+        - {id: xy2, label: "$(X^\\top y)_2$", answer: 5, hint: "$0+2+3$"}
+    - title: "Çözümler: OLS ($\\lambda=0$) ve ridge ($\\lambda=1$); $2\\times2$ ters: $\\frac1{ad-bc}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$"
+      fields:
+        - {id: o1, label: "OLS $w_1$", answer: 1, tol: 0.001, hint: "$\\frac13(2\\cdot4-1\\cdot5)$"}
+        - {id: o2, label: "OLS $w_2$", answer: 2, tol: 0.001, hint: "$\\frac13(-1\\cdot4+2\\cdot5)$"}
+        - {id: r1, label: "Ridge $w_1$", answer: 0.875, tol: 0.002, hint: "$X^\\top X+I=\\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$, det 8: $\\frac18(3\\cdot4-5)$"}
+        - {id: r2, label: "Ridge $w_2$", answer: 1.375, tol: 0.002, hint: "$\\frac18(-4+3\\cdot5)$"}
+    - title: "Soft-threshold $S(z,t)=\\text{sign}(z)\\max(|z|-t,0)$, $t=0.5$"
+      fields:
+        - {id: s1, label: "$S(1.5,\\,0.5)$", answer: 1, tol: 0.001, hint: "$1.5-0.5$"}
+        - {id: s2, label: "$S(-0.3,\\,0.5)$", answer: 0, tol: 0.001, hint: "$|z|<t$ → tam sıfır"}
+        - {id: s3, label: "$S(-2,\\,0.5)$", answer: -1.5, tol: 0.001, hint: "işaret korunur, büyüklük $t$ kadar küçülür"}
+  verify: |
+    X = [[1, 0], [0, 1], [1, 1]]; y = [1, 2, 3]
+    A = [[sum(X[k][i] * X[k][j] for k in range(3)) for j in range(2)] for i in range(2)]
+    c = [sum(X[k][i] * y[k] for k in range(3)) for i in range(2)]
+    def solve(A, c):
+        (a, b), (cc, d) = A; det = a * d - b * cc
+        return (d * c[0] - b * c[1]) / det, (-cc * c[0] + a * c[1]) / det
+    o = solve(A, c); r = solve([[A[0][0] + 1, A[0][1]], [A[1][0], A[1][1] + 1]], c)
+    S = lambda z, t: (1 if z > 0 else -1) * max(abs(z) - t, 0)
+    answers = dict(a11=A[0][0], a12=A[0][1], xy1=c[0], xy2=c[1], o1=o[0], o2=o[1], r1=r[0], r2=r[1],
+                   s1=S(1.5, 0.5), s2=S(-0.3, 0.5), s3=S(-2, 0.5))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Lasso tam sıfır katsayı üretirken ridge neden üretmez?"
+    options:
+      - {t: "L1 cezasının 0'da köşesi var (türevi $[-\\lambda,\\lambda]$ aralığında); küçük gradyanlar bu aralığa düşünce optimum tam 0'da kalır. L2'nin 0'daki türevi 0, katsayı yalnız küçülür", ok: true, why: "Coordinate descent'te bu, soft-threshold'un $|z|<t$ için 0 döndürmesi olarak görünür. Geometrik olarak: L1 topu köşeli, kayıp elipsleri köşeye değer."}
+      - {t: "Lasso daha büyük λ kullanır", why: "Aynı λ ile de davranış farkı var; konu cezanın şekli."}
+      - {t: "Ridge'in kapalı formu sıfırı temsil edemez", why: "Edebilir; ama $(X^\\top X+\\lambda I)^{-1}X^\\top y$ genel durumda hiçbir bileşeni tam sıfır yapmaz."}
+  - q: "Ridge'de özellikleri neden standardize ederiz?"
+    options:
+      - {t: "Ceza $\\lambda\\lVert w\\rVert^2$ tüm katsayılara aynı ağırlığı verir; birimi büyük (ör. milimetre) bir özelliğin katsayısı zaten küçük olduğu için daha az cezalanır", ok: true, why: "Ölçek değişince çözüm değişir: ridge ölçeğe göre değişmez değildir. OLS ise değişmezdir."}
+      - {t: "Matris tersinin var olması için", why: "$\\lambda>0$ ile $X^\\top X+\\lambda I$ zaten her zaman terslenebilir."}
+      - {t: "Hız için", why: "Konu sonucun anlamı, hız değil."}
+  - q: "`SGD(weight_decay=wd)` hangi cezaya denk gelir?"
+    options:
+      - {t: "$\\frac{wd}{2}\\lVert w\\rVert^2$; çünkü gradyana $wd\\cdot w$ ekler", ok: true, why: "$\\nabla\\frac{wd}{2}\\lVert w\\rVert^2=wd\\cdot w$. Kayıpta $\\lambda\\lVert w\\rVert^2$ kullanıyorsan $wd=2\\lambda$. Adam'da ise eşdeğerlik bozulur; AdamW bunu düzeltir (M3.4)."}
+      - {t: "$wd\\cdot\\lVert w\\rVert^2$", why: "Gradyanı $2wd\\cdot w$ olurdu; PyTorch yalnız $wd\\cdot w$ ekler."}
+      - {t: "$wd\\cdot\\lVert w\\rVert_1$", why: "L1 cezası için ayrı bir parametre yok; elle eklenir."}
