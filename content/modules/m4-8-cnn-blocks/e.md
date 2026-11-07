@@ -1,0 +1,1 @@
+- `time_blocks(C, H, reps=5)` → sözlük: standart 3×3 konv., derinlemesine ayrılabilir, grup (g = 8) ve 1×1 konvolüsyonun MAC sayısı, süresi ve elde edilen GMAC/s'si (`C → C` kanal, `H × H`, batch 8, CPU).

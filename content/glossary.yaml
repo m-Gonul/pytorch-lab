@@ -150,3 +150,5 @@ terms:
   perceptron: "Rosenblatt'ın eşik birimli doğrusal sınıflandırıcısı; hatalı her örnekte w ← w + η(y − ŷ)x kuralıyla öğrenir, doğrusal ayrılabilir veride sonlu adımda yakınsar."
   transfer öğrenme: "Bir görevde eğitilmiş ağın (genellikle alt) katmanlarını başka bir görevde yeniden kullanmak: dondurup yeni başlığı eğitmek, sonra küçük öğrenme oranıyla ince ayar."
   veri sızıntısı: "Modelin eğitimde, dağıtım anında erişemeyeceği bilgiyi (test istatistikleri, aynı grubun kopyaları, gelecekten değerler, hedefin sonucu) görmesi; skorları gerçek dışı şişirir."
+  darboğaz: "Bottleneck: pahalı bir katmandan önce 1×1 konvolüsyonla kanal sayısını azaltıp (gerekirse sonra yeniden artırarak) hesabı düşürme düzeni (Inception, ResNet)."
+  derinlemesine ayrılabilir konvolüsyon: "Depthwise separable convolution: her kanalı ayrı K×K filtreyle süzüp (derinlemesine) ardından 1×1 konvolüsyonla kanalları karıştırmak; standart konvolüsyona göre ~K² kat az hesap (Xception, MobileNet)."

@@ -1,0 +1,109 @@
+id: m4-8-cnn-blocks
+code: M4.8
+title: Modern CNN blokları — Inception, ayrılabilir konvolüsyon, SE, grup konvolüsyonu, LRN
+phase: 4
+minutes: 380
+prereq: [m4-2-cnn]
+summary: >
+  Tam bağlı ağlar ile CNN'lerin verimlilik karşılaştırması (ders alıştırması
+  5: eşit parametreli FC ve CNN) ve LeNet'ten EfficientNet'e kadar CNN
+  bloklarının arkasındaki hesap: AlexNet'in yerel tepki normalizasyonu
+  (LRN), GoogLeNet'in Inception modülü ve 1×1 "darboğaz" konvolüsyonları,
+  Xception/MobileNet'in derinlemesine ayrılabilir konvolüsyonu, ResNeXt'in
+  grup konvolüsyonu, SENet'in sıkıştır-uyar (squeeze-and-excitation) kanal
+  dikkati, küresel ortalama havuzlama ve sınıf aktivasyon haritaları,
+  MobileNetV2'nin ters artık bloğu ve EfficientNet'in bileşik ölçeklemesi.
+  Saf Python'da parametre/FLOP sayaçları, NumPy'da blokların vektörel
+  uygulamaları ve eşdeğerlikleri, PyTorch'ta modüller ve kaydırılmış
+  rakamlarda FC vs CNN, sonda FLOP ile gerçek sürenin neden ayrıştığı.
+goals:
+  - "Parametre ve FLOP sayımı: conv $K^2C_{in}C_{out}$, derinlemesine $K^2C$, noktasal $C_{in}C_{out}$"
+  - "[[darboğaz]] 1×1 konvolüsyonla hesap azaltma (Inception); [[derinlemesine ayrılabilir konvolüsyon]]"
+  - "Grup konvolüsyonu (g grup) ve SE ile kanal yeniden ağırlıklandırma"
+  - "Ağırlık paylaşımı ve yerellik: aynı parametreyle FC'den daha iyi genelleme"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 14", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Szegedy ve ark. — Going Deeper with Convolutions (CVPR 2015)", url: "https://arxiv.org/abs/1409.4842", license: "arXiv", use: link}
+  - {title: "Chollet — Xception: Deep Learning with Depthwise Separable Convolutions (CVPR 2017)", url: "https://arxiv.org/abs/1610.02357", license: "arXiv", use: link}
+  - {title: "Hu, Shen, Sun — Squeeze-and-Excitation Networks (CVPR 2018)", url: "https://arxiv.org/abs/1709.01507", license: "arXiv", use: link}
+  - {title: "Krizhevsky, Sutskever, Hinton — ImageNet Classification with Deep CNNs (NeurIPS 2012)", url: "https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html", license: "©", use: link}
+  - {title: "Xie ve ark. — Aggregated Residual Transformations (ResNeXt, CVPR 2017)", url: "https://arxiv.org/abs/1611.05431", license: "arXiv", use: link}
+  - {title: "Sandler ve ark. — MobileNetV2: Inverted Residuals and Linear Bottlenecks (CVPR 2018)", url: "https://arxiv.org/abs/1801.04381", license: "arXiv", use: link}
+  - {title: "Tan & Le — EfficientNet: Rethinking Model Scaling for CNNs (ICML 2019)", url: "https://arxiv.org/abs/1905.11946", license: "arXiv", use: link}
+  - {title: "Zhou ve ark. — Learning Deep Features for Discriminative Localization (CAM, CVPR 2016)", url: "https://arxiv.org/abs/1512.04150", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "Ders alıştırması 5 (Fashion-MNIST 28×28): eğitilebilir parametre"
+      fields:
+        - {id: cnn2, label: "CNN: 7×7×16 → havuz → 3×3×32 → havuz → 3×3×64 → havuz → FC 64 → 10 (same dolgu)", answer: 61514}
+        - {id: fc3, label: "FC: 784 → 74 → 50 → 10", answer: 62350}
+    - title: "Bloklar (bias yok)"
+      fields:
+        - {id: inc, label: "5×5 konv. 192 → 32 kanal: parametre", answer: 153600}
+        - {id: incb, label: "Önce 1×1 ile 192 → 16, sonra 5×5 16 → 32: parametre", answer: 15872}
+        - {id: sep, label: "3×3 konv. 128 → 256: standart / derinlemesine ayrılabilir oranı", answer: 8.69433962264151, tol: 1.0e-6}
+        - {id: se, label: "SE, C = 256, r = 16: parametre (bias'lar dahil)", answer: 8464}
+    - title: "LRN (AlexNet): $b=a/(k+\\alpha\\sum a^2)^\\beta$"
+      fields:
+        - {id: lrn, label: "a = 2, komşu kanallarda Σa² = 8, k = 2, α = 10⁻⁴, β = 0.75", answer: 1.1888504776892002, tol: 1.0e-6}
+  verify: |
+    conv = lambda k, ci, co: k * k * ci * co + co
+    cnn2 = conv(7, 1, 16) + conv(3, 16, 32) + conv(3, 32, 64) + 3 * 3 * 64 * 64 + 64 + 64 * 10 + 10
+    fc3 = 784 * 74 + 74 + 74 * 50 + 50 + 50 * 10 + 10
+    answers = dict(cnn2=cnn2, fc3=fc3, inc=5 * 5 * 192 * 32, incb=192 * 16 + 5 * 5 * 16 * 32,
+                   sep=(3 * 3 * 128 * 256) / (3 * 3 * 128 + 128 * 256), se=256 * 16 + 16 + 16 * 256 + 256, lrn=2 / (2 + 1e-4 * 8) ** 0.75)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Küresel ortalama havuzlama ve sınıf aktivasyon haritası (CAM)", engine: browser}
+  - {id: x2, title: "MobileNetV2 ters artık bloğu: genişleme oranının bedeli", engine: browser}
+  - {id: x3, title: "EfficientNet bileşik ölçekleme", engine: browser}
+
+quiz:
+  - q: "Ders alıştırması 5'te ~62 bin parametreli CNN, aynı parametreli FC ağdan neden daha iyi?"
+    options:
+      - {t: "Konvolüsyon yerellik ve ağırlık paylaşımı önseli taşır: aynı desen her konumda aynı filtreyle tanınır (kaydırma eşdeğerliği), parametreler konuma göre çoğalmaz", ok: true, why: "FC aynı rakamı her konum için ayrı ayrı öğrenmek zorunda."}
+      - {t: "CNN daha çok parametreye sahip", why: "Eşit."}
+      - {t: "CNN daha hızlı eğitildiği için", why: "Daha yavaş bile olabilir."}
+  - q: "Inception'daki 1×1 konvolüsyonların asıl işlevi nedir?"
+    options:
+      - {t: "Pahalı 3×3/5×5 konvolüsyonlardan önce kanal sayısını azaltan darboğaz: hesabı ve parametreleri ~10 kat düşürür (ayrıca kanallar arası doğrusalsızlık ekler)", ok: true, why: "'Network in Network' fikrinin uygulaması."}
+      - {t: "Uzamsal çözünürlüğü azaltmak", why: "1×1 uzamsal boyutu değiştirmez."}
+      - {t: "Receptive field'ı büyütmek", why: "Büyütmez."}
+  - q: "Derinlemesine ayrılabilir konvolüsyon FLOP'u ~8–9 kat azaltır ama CPU/GPU'da süre aynı oranda düşmeyebilir. Neden?"
+    options:
+      - {t: "Derinlemesine kısım kanal başına küçük bir işlem: aritmetik yoğunluğu düşük, bellek-bağımlı; donanım tam kullanılamaz", ok: true, why: "Roofline (M7.1): FLOP değil, hangi tavana çarptığın önemli."}
+      - {t: "Daha çok parametre içerdiği için", why: "Daha az içerir."}
+      - {t: "Doğrusal olmadığı için", why: "İkisi de doğrusal."}
+
+homework:
+  - title: "Chollet (2017): Xception"
+    paper: "Chollet — Xception: Deep Learning with Depthwise Separable Convolutions (CVPR 2017)"
+    url: "https://arxiv.org/abs/1610.02357"
+    level: orta
+    hours: 10
+    goal: |
+      Makalenin "Inception modülü = düzenli konvolüsyon ile derinlemesine ayrılabilir konvolüsyon arasındaki bir spektrum" savını deneyle sına: CIFAR-10'da aynı derinlik/genişlikte (a) standart konvolüsyonlu, (b) segment sayısı 1, 2, 4, 8 olan Inception-benzeri (grup konvolüsyonu ile), (c) tam derinlemesine ayrılabilir bloklar kur; parametre/FLOP/doğruluk tablosu çıkar. Makaledeki "ara doğrusalsızlık yok" bulgusunu (Şekil 10) de test et.
+    steps:
+      - "d aşamasındaki DepthwiseSeparable ve grup konvolüsyonu modüllerini kullan."
+    accept:
+      - "Ayrılabilir sürüm, benzer doğrulukta belirgin daha az parametre."
+      - "Derinlemesine ve noktasal arasında ReLU olmaması daha iyi ya da eşit."
+  - title: "Hu ve ark. (2018): Sıkıştır-uyar ağları"
+    paper: "Hu, Shen, Sun — Squeeze-and-Excitation Networks (CVPR 2018)"
+    url: "https://arxiv.org/abs/1709.01507"
+    level: orta
+    hours: 8
+    goal: |
+      Küçük bir ResNet'e (M4.2) SE blokları ekle, r ∈ {4, 8, 16, 32} için parametre artışı ve CIFAR-10 doğruluğunu ölç; makalenin Şekil 6'sındaki gibi farklı sınıflarda farklı katmanlardaki uyarım (excitation) dağılımlarını çiz ve derin katmanların sınıfa özgü hâle geldiğini göster.
+    steps:
+      - "Uyarım vektörlerini hook ile topla; sınıf başına ortalamasını al."
+    accept:
+      - "SE, %1'den az ek parametreyle doğruluğu artırır ya da korur."
+      - "Son katmanlarda sınıflar arası uyarım farkı ilk katmanlardan büyük."
