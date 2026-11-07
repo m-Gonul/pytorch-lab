@@ -1,0 +1,118 @@
+id: m9-6-edges
+code: M9.6
+title: Kenar tespiti — Kirsch, Marr-Hildreth, Canny
+phase: 9
+minutes: 420
+prereq: [m9-4-sharpening]
+summary: >
+  Kenar modelleri (basamak, rampa, çatı), gürültünün türevleri nasıl bozduğu,
+  gradyan operatörleri ve pusula (Kirsch) çekirdekleri; Laplacian of Gaussian
+  ile sıfır geçişleri (Marr-Hildreth) ve Canny'nin dört adımı. Elle Sobel,
+  yön nicemleme, çekirdek boyutu ve histerezis; saf Python'da non-maxima
+  suppression, histerezis ve sıfır geçişleri; NumPy'da `cv2.Canny` ile
+  piksel piksel aynı Canny; PyTorch'ta gürültülü basamaklardan öğrenilen
+  1-B filtrenin Gauss türevine dönüştüğünü (Canny'nin optimallik sonucu)
+  görüyor; en sonda tüm toplu işi GPU'ya uygun tensör işlemleriyle yapan
+  ve yine `cv2.Canny` ile birebir aynı sonuç veren bir Canny yazıyorsun.
+goals:
+  - "Birinci türevin büyüklüğü kenarın varlığını, ikinci türevin işareti kenarın hangi tarafında olduğunu söyler"
+  - "[[LoG]] ve [[sıfır geçişi]]: ölçeğe ayarlanabilir, yönden bağımsız kenar"
+  - "Canny: Gauss + gradyan + [[non-maxima suppression]] + [[histerezis eşikleme]]"
+  - "OpenCV Canny'nin tamsayı aritmetiğiyle yön nicemlemesini birebir tekrar üretmek"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 10.2", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "Canny — A Computational Approach to Edge Detection (IEEE PAMI 1986)", url: "https://doi.org/10.1109/TPAMI.1986.4767851", license: "©", use: link}
+  - {title: "Marr & Hildreth — Theory of Edge Detection (Proc. R. Soc. B 1980)", url: "https://doi.org/10.1098/rspb.1980.0020", license: "©", use: link}
+  - {title: "OpenCV — imgproc/src/canny.cpp", url: "https://github.com/opencv/opencv/blob/4.x/modules/imgproc/src/canny.cpp", license: "Apache-2.0", use: adapt}
+  - {title: "scikit-image — hough_line", url: "https://scikit-image.org/docs/stable/api/skimage.transform.html#skimage.transform.hough_line", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "Sobel (OpenCV yönü: x sağa, y aşağı), yama $\\begin{bmatrix}0&0&50\\\\0&50&100\\\\50&100&100\\end{bmatrix}$, merkezde"
+      fields:
+        - {id: gx, label: "$g_x$", answer: 300}
+        - {id: gy, label: "$g_y$", answer: 300}
+        - {id: m2, label: "$M=\\sqrt{g_x^2+g_y^2}$", answer: 424.264, tol: 0.001}
+        - {id: m1, label: "$|g_x|+|g_y|$ (OpenCV varsayılanı)", answer: 600}
+    - title: "Canny yön nicemleme: normal açısını 0, 45, 90, 135'ten birine ata"
+      fields:
+        - {id: q100, label: "$\\alpha=100°$", answer: 90}
+        - {id: q160, label: "$\\alpha=160°$", answer: 0}
+        - {id: q30, label: "$\\alpha=-30°$ (yani 150°)", answer: 135}
+    - title: "Ölçek"
+      fields:
+        - {id: n14, label: "$\\sigma=1.4$ için Gauss çekirdek boyutu $n$ (en küçük tek $\\ge\\lceil6\\sigma\\rceil$)", answer: 9}
+        - {id: n2, label: "$\\sigma=2$ için $n$", answer: 13}
+        - {id: zc, label: "$\\sigma=2$ LoG'un sıfır geçiş çemberinin yarıçapı", answer: 2.828427, tol: 0.001}
+    - title: "Histerezis ve Kirsch"
+      fields:
+        - {id: hys, label: "NMS sonrası satır $[0, 40, 120, 60, 0, 70, 0]$, $T_L=50$, $T_H=100$, 8-komşuluk: kaç kenar pikseli kalır?", answer: 2}
+        - {id: kir, label: "Kirsch K çekirdeği $\\begin{bmatrix}5&5&5\\\\-3&0&-3\\\\-3&-3&-3\\end{bmatrix}$'nin üstü 100, altı 0 olan basamaktaki yanıtı", answer: 1500}
+  verify: |
+    import math
+    P = [[0, 0, 50], [0, 50, 100], [50, 100, 100]]
+    KX = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]
+    KY = [[-1, -2, -1], [0, 0, 0], [1, 2, 1]]
+    gx = sum(P[i][j] * KX[i][j] for i in range(3) for j in range(3))
+    gy = sum(P[i][j] * KY[i][j] for i in range(3) for j in range(3))
+    q = lambda a: [0, 45, 90, 135, 0][int(((a % 180) + 22.5) // 45)]
+    odd = lambda s: math.ceil(6 * s) + (1 - math.ceil(6 * s) % 2)
+    row, lo, hi = [0, 40, 120, 60, 0, 70, 0], 50, 100
+    keep = {i for i, v in enumerate(row) if v >= hi}
+    changed = True
+    while changed:
+        changed = False
+        for i, v in enumerate(row):
+            if lo <= v < hi and i not in keep and ({i - 1, i + 1} & keep):
+                keep.add(i); changed = True
+    K = [[5, 5, 5], [-3, 0, -3], [-3, -3, -3]]
+    S = [[100] * 3, [0] * 3, [0] * 3]
+    answers = dict(gx=gx, gy=gy, m2=math.hypot(gx, gy), m1=abs(gx) + abs(gy), q100=q(100), q160=q(160), q30=q(-30),
+                   n14=odd(1.4), n2=odd(2.0), zc=math.sqrt(2) * 2, hys=len(keep),
+                   kir=sum(K[i][j] * S[i][j] for i in range(3) for j in range(3)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Kirsch pusula çekirdekleri: 8 yön, en güçlü yanıt", engine: browser}
+  - {id: x2, title: "Hough dönüşümü: kenarlardan doğrulara", engine: browser}
+  - {id: x3, title: "Gürültü türevleri ve LoG çekirdeğinin iki yolu", engine: browser}
+
+quiz:
+  - q: "Canny neden tek eşik yerine iki eşik (histerezis) kullanır?"
+    options:
+      - {t: "Güçlü kenarlara bağlı zayıf pikselleri tutup yalnız başına kalan zayıf yanıtları atarak hem kopuklukları hem sahte kenarları azaltmak için", ok: true, why: "Tek eşik düşükse sahte kenar, yüksekse kopuk kenar verir; bağlantı bilgisi ikisini birden azaltır."}
+      - {t: "İki farklı yönü ayırmak için", why: "Yön NMS'te kullanılır."}
+      - {t: "Gürültüyü yumuşatmak için", why: "Yumuşatma ilk adımdaki Gauss'un işidir."}
+  - q: "Laplacian of Gaussian'ın Sobel'e göre avantajı nedir?"
+    options:
+      - {t: "Yönden bağımsızdır (izotropik) ve σ ile istenen ölçeğe ayarlanabilir", ok: true, why: "Marr ve Hildreth'in iki şartı: türev operatörü olmak ve ölçeğe ayarlanabilmek."}
+      - {t: "Gürültüye hiç duyarlı değildir", why: "İkinci türev gürültüyü daha çok büyütür; Gauss bu yüzden var."}
+      - {t: "Kenar yönünü de verir", why: "Laplacian skalerdir, yön vermez."}
+  - q: "Non-maxima suppression ne yapar?"
+    options:
+      - {t: "Gradyan yönü boyunca iki komşusundan küçük olan büyüklükleri sıfırlayarak kalın kenar sırtlarını inceltir", ok: true, why: "Canny'nin 'tek kenar noktası yanıtı' hedefine hizmet eder."}
+      - {t: "Kenar boyunca komşularla karşılaştırır", why: "Kenara dik, yani gradyan yönünde karşılaştırılır."}
+      - {t: "Zayıf kenarları siler", why: "Bu histerezisin işidir."}
+
+homework:
+  - title: "HED: derin denetimli bütünsel kenar tespiti"
+    paper: "Xie & Tu — Holistically-Nested Edge Detection (ICCV 2015)"
+    url: "https://arxiv.org/abs/1504.06375"
+    level: ileri
+    hours: 14
+    goal: |
+      VGG16 omurgasının beş aşamasından yan çıkışlar (side outputs) alan, her birine sınıf dengeli ikili çapraz entropi uygulayan ve öğrenilen ağırlıklarla birleştiren HED'i uygula; BSDS500 üzerinde eğitip ODS/OIS F-ölçüsünü Canny ile karşılaştır.
+    steps:
+      - "BSDS500'ü indir; çoklu insan etiketini ortalayıp eşiğe göre ikili etiket üret."
+      - "Yan çıkışlar: 1 × 1 konvolüsyon + transposed conv ile tam çözünürlüğe getir; sınıf dengeli kayıp $\\beta=|Y_-|/|Y|$."
+      - "Birleşim katmanı (fuse) ve derin denetim (deep supervision) kayıplarını topla."
+      - "Değerlendirme: tahmini NMS ile incelt (bu modüldeki NMS'i yeniden kullan), toleranslı eşleştirmeyle ODS ve OIS hesapla."
+    accept:
+      - "BSDS500 testinde ODS ≥ 0.75 (makale 0.782); Canny satırı da tabloda."
+      - "Derin denetim kapalıyken ve açıkken eğitim eğrileri karşılaştırılmış."
+      - "Yan çıkışların görselleri: sığ katmanların ince, derin katmanların kaba kenarlar verdiği gösterilmiş."
