@@ -1,0 +1,75 @@
+id: m3-6-norm
+code: M3.6
+title: BatchNorm, LayerNorm, RMSNorm
+phase: 3
+minutes: 240
+prereq: [m3-5-init]
+summary: >
+  Aktivasyonları her adımda yeniden ölçeklemek. Üç örnekte BatchNorm'un ileri
+  ve (meşhur) geri geçişini elle hesaplıyor, saf Python'da yazıyor, NumPy'da
+  CS231n'in train/test modlu BatchNorm'unu ve LayerNorm'unu kuruyor,
+  PyTorch'ta `nn.BatchNorm1d` ve `nn.RMSNorm` ile bit düzeyinde eşleşen kendi
+  modüllerini yazıyor ve en sonda BN/LN/IN/GN'yi tek bir "hangi eksenlerde
+  normalize?" fonksiyonuna indiriyorsun.
+goals:
+  - "BatchNorm'un ileri geçişini ve sadeleşmiş geri geçiş formülünü türetmek"
+  - "Eğitimde batch istatistiği, değerlendirmede running istatistik kullanımını ve PyTorch'un momentum/unbiased varyans konvansiyonunu uygulamak"
+  - "BN, LayerNorm, InstanceNorm, GroupNorm ve RMSNorm'un yalnız istatistik alınan eksenlerde farklılaştığını görmek"
+  - "`register_buffer` ile öğrenilmeyen durum tutmak"
+sources:
+  - {title: "Ioffe & Szegedy — Batch Normalization", url: "https://arxiv.org/abs/1502.03167", license: "arXiv", use: link}
+  - {title: "CS231n Assignment 2 — BatchNorm / LayerNorm (forward, backward, backward_alt)", url: "https://cs231n.github.io/assignments2025/assignment2/", license: "MIT", use: adapt}
+  - {title: "Ba, Kiros, Hinton — Layer Normalization; Zhang & Sennrich — RMSNorm", url: "https://arxiv.org/abs/1910.07467", license: "arXiv", use: link}
+  - {title: "Wu & He — Group Normalization", url: "https://arxiv.org/abs/1803.08494", license: "arXiv", use: link}
+  - {title: "Stanford CS336 — Lecture 3: Architectures (pre-norm, RMSNorm)", url: "https://stanford-cs336.github.io/", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "BatchNorm, tek özellik, batch $x=[1,2,3]$, $\\epsilon=0$, $\\gamma=2$, $\\beta=1$"
+      fields:
+        - {id: mu, label: "$\\mu$", answer: 2}
+        - {id: var, label: "$\\sigma^2$ (MLE, $\\frac1N$)", answer: 0.666667, tol: 0.001, hint: "$(1+0+1)/3$"}
+        - {id: xh1, label: "$\\hat x_1=(x_1-\\mu)/\\sigma$", answer: -1.224745, tol: 0.002, hint: "$-1/0.8165$"}
+        - {id: y1, label: "$y_1=\\gamma\\hat x_1+\\beta$", answer: -1.449490, tol: 0.003}
+    - title: "Geri geçiş, $\\partial L/\\partial y=[1,0,0]$: $dx=\\frac{1}{N\\sigma}\\big(N\\,d\\hat x-\\sum d\\hat x-\\hat x\\sum d\\hat x\\,\\hat x\\big)$, $d\\hat x=\\gamma\\,dy$"
+      fields:
+        - {id: dx1, label: "$\\partial L/\\partial x_1$", answer: 0.408248, tol: 0.002, hint: "$\\frac{1}{3\\cdot0.8165}(6-2-(-1.2247)(-2.4495))$"}
+        - {id: dx2, label: "$\\partial L/\\partial x_2$", answer: -0.816497, tol: 0.002, hint: "$\\hat x_2=0$: $\\frac{1}{2.4495}(0-2-0)$"}
+        - {id: dg, label: "$\\partial L/\\partial\\gamma=\\sum dy\\,\\hat x$", answer: -1.224745, tol: 0.002}
+    - title: "RMSNorm: $x=[3,4]$, $g=1$, $\\epsilon=0$: $y=x/\\sqrt{\\text{mean}(x^2)}$"
+      fields:
+        - {id: rms1, label: "$y_1$", answer: 0.848528, tol: 0.002, hint: "$\\sqrt{(9+16)/2}=3.5355$"}
+  verify: |
+    import math
+    x = [1, 2, 3]; N = 3; g, b = 2, 1
+    mu = sum(x) / N; var = sum((v - mu) ** 2 for v in x) / N; s = math.sqrt(var)
+    xh = [(v - mu) / s for v in x]
+    dy = [1, 0, 0]; dxh = [g * d for d in dy]
+    S1, S2 = sum(dxh), sum(a * c for a, c in zip(dxh, xh))
+    dx = [(N * a - S1 - c * S2) / (N * s) for a, c in zip(dxh, xh)]
+    answers = dict(mu=mu, var=round(var, 6), xh1=round(xh[0], 6), y1=round(g * xh[0] + b, 6),
+                   dx1=round(dx[0], 6), dx2=round(dx[1], 6), dg=round(sum(a * c for a, c in zip(dy, xh)), 6),
+                   rms1=round(3 / math.sqrt(12.5), 6))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "BatchNorm geri geçişinde neden ekstra terimler ($-\\sum d\\hat x$ ve $-\\hat x\\sum d\\hat x\\hat x$) var?"
+    options:
+      - {t: "$\\mu$ ve $\\sigma$ batch'in tüm örneklerine bağlı; bir örneği değiştirmek tüm $\\hat x$'leri değiştirir. Bu terimler o dolaylı yolları taşır", ok: true, why: "Sonuç: $\\sum_i dx_i=0$ ve $\\sum_i dx_i\\hat x_i=0$. Gradyan, normalizasyonun yok ettiği iki yönden (kaydırma, ölçek) arındırılır."}
+      - {t: "Sayısal kararlılık için", why: "Matematiksel olarak gerekli; zincir kuralının çok yollu hâli (M0.3)."}
+      - {t: "Yalnız $\\gamma\\ne1$ iken gerekli", why: "Her durumda gerekli."}
+  - q: "Transformer'lar neden BatchNorm değil LayerNorm/RMSNorm kullanır?"
+    options:
+      - {t: "LN istatistiği her token'ın kendi özelliklerinden alır: batch boyutundan, dizi uzunluğundan ve train/eval farkından bağımsızdır", ok: true, why: "Değişken uzunluklu diziler ve küçük batch'lerde BN istatistikleri gürültülü ve dolgu (padding) ile kirli olur."}
+      - {t: "BN türevlenemez", why: "Türevlenebilir; b ve c aşamalarında geri geçişini yazdın."}
+      - {t: "LN daha çok parametre öğrenir", why: "İkisinin de $\\gamma,\\beta$ sayısı özellik sayısı kadar."}
+  - q: "`nn.BatchNorm1d(momentum=0.1)` running_mean'i nasıl günceller?"
+    options:
+      - {t: "$\\text{running}\\leftarrow0.9\\cdot\\text{running}+0.1\\cdot\\mu_B$; running_var için batch'in **yansız** ($\\frac1{N-1}$) varyansı kullanılır", ok: true, why: "Normalize ederken ise yanlı ($\\frac1N$) varyans kullanılır. CS231n'in momentum'u bunun tersi tanımlıdır (0.9 = eski değerin ağırlığı); d aşamasında bu farka dikkat."}
+      - {t: "$\\text{running}\\leftarrow0.1\\cdot\\text{running}+0.9\\cdot\\mu_B$", why: "PyTorch'ta momentum yeni gözlemin ağırlığıdır."}
+      - {t: "Tüm batch'lerin aritmetik ortalaması", why: "O `momentum=None` durumudur (kümülatif ortalama)."}
