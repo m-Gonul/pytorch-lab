@@ -1,0 +1,107 @@
+id: m9-17-motion
+code: M9.17
+title: Video ve hareket — blok eşleme, optik akış, FRUC, stabilizasyon
+phase: 9
+minutes: 480
+prereq: [m9-15-matching]
+summary: >
+  Videoyu zaman ekseniyle birlikte işlemek: hareket tespiti ve hareket
+  kestirimi, açıklık (aperture), örtme ve paralaks sorunları; blok eşleme
+  (SAD) ve hareket telafili kestirim, Lucas–Kanade optik akışı ve piramit
+  sürümü, ileri–geri tutarlılık; zamansal gürültü giderme, kare hızı artırma
+  (FRUC) ve video stabilizasyonu. Saf Python'da tam arama blok eşleme;
+  NumPy'da tüm blokları ve kaydırmaları tek seferde arayan blok eşleme ve
+  tek seviyeli LK; PyTorch'ta piramitli yoğun LK, ileri–geri kontrol ve
+  hareket telafili ara kare üretimi; en sonda çevrimdışı stabilizasyonu
+  kamerayı yumuşatıp tüm kareleri tek `grid_sample` çağrısıyla düzelterek
+  yazıyorsun.
+goals:
+  - "Hareket tespiti ve kestirimi; optik akışın kötü konumlanmışlığı (açıklık, örtme, paralaks)"
+  - "Blok eşleme: SAD/MAD/SSD, arama penceresi, hareket telafili kestirim"
+  - "[[optik akış]]: parlaklık sabitliği $I_xu+I_yv+I_t=0$, Lucas–Kanade en küçük kareleri, piramit"
+  - "FRUC (tekrar, ortalama, hareket telafili) ve stabilizasyon (yörünge kestir → yumuşat → düzelt)"
+sources:
+  - {title: "Lucas & Kanade — An Iterative Image Registration Technique with an Application to Stereo Vision (IJCAI 1981)", url: "https://www.ijcai.org/Proceedings/81-2/Papers/017.pdf", license: "©", use: link}
+  - {title: "Bouguet — Pyramidal Implementation of the Lucas Kanade Feature Tracker (Intel, 2001)", url: "https://web.stanford.edu/class/cs231m/references/pyr-lucas-kanade-feature-tracker-bouget.pdf", license: "©", use: link}
+  - {title: "Horn & Schunck — Determining Optical Flow (AI 1981)", url: "https://doi.org/10.1016/0004-3702(81)90024-2", license: "©", use: link}
+  - {title: "Tekalp — Digital Video Processing, 2. baskı (blok eşleme, hareket telafisi)", url: "https://www.pearson.com/", license: "©", use: link}
+  - {title: "OpenCV — calcOpticalFlowPyrLK, estimateAffinePartial2D", url: "https://docs.opencv.org/4.x/dc/d6b/group__video__track.html", license: "Apache-2.0", use: adapt}
+
+hand:
+  groups:
+    - title: "Lucas–Kanade: $\\sum I_x^2=10$, $\\sum I_xI_y=0$, $\\sum I_y^2=5$, $\\sum I_xI_t=-20$, $\\sum I_yI_t=5$"
+      fields:
+        - {id: u, label: "$u$", answer: 2}
+        - {id: v, label: "$v$", answer: -1}
+    - title: "Blok eşleme ve video"
+      fields:
+        - {id: cand, label: "16 × 16 blok, arama ±7: aday sayısı", answer: 225}
+        - {id: ops, label: "Tam aramada blok başına mutlak fark sayısı", answer: 57600}
+        - {id: w0, label: "Kareler 0 ve 1 arasında $t=0.25$'te ağırlıklı ortalama: kare 0'ın ağırlığı", answer: 0.75}
+        - {id: tn, label: "σ = 10 gürültü, 4 hareketsiz kare ortalaması: kalan σ", answer: 5}
+        - {id: fb, label: "İleri (3, −2), geri (−2.6, 2.1): $\\lVert f+b\\rVert$", answer: 0.412311, tol: 0.0001}
+  verify: |
+    import math
+    import numpy as np
+    A = np.array([[10, 0], [0, 5.]])
+    u, v = np.linalg.solve(A, -np.array([-20, 5.]))
+    answers = dict(u=u, v=v, cand=15 * 15, ops=225 * 256, w0=0.75, tn=10 / math.sqrt(4), fb=math.hypot(3 - 2.6, -2 + 2.1))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Zamansal gürültü giderme: düz ortalama, hareket kapılı ortalama", engine: browser}
+  - {id: x2, title: "Horn–Schunck: küresel düzgünlükle optik akış", engine: browser}
+  - {id: x3, title: "Blok tabanlı FRUC ve örtüşen blok telafisi", engine: browser}
+
+quiz:
+  - q: "Açıklık (aperture) problemi nedir?"
+    options:
+      - {t: "Küçük bir pencereden düz bir kenara bakınca yalnız kenara dik hareket bileşeni ölçülebilir; kenar boyunca hareket görünmez", ok: true, why: "LK'de $A^TA$ tekil olur: tek yönde gradyan var."}
+      - {t: "Kamera açıklığının çok küçük olması", why: "Optik değil, geometrik bir belirsizlik."}
+      - {t: "Hızlı hareketin bulanıklık yaratması", why: "Bu hareket bulanıklığı."}
+  - q: "Piramitli LK büyük hareketleri neden yakalayabilir?"
+    options:
+      - {t: "Kaba seviyede hareket birkaç pikselden küçüktür; orada bulunan akış ikiyle çarpılıp ince seviyede başlangıç olarak düzeltilir", ok: true, why: "Doğrusallaştırma yalnız küçük kaymalar için geçerlidir."}
+      - {t: "Daha büyük pencere kullandığı için", why: "Pencere boyutu her seviyede aynıdır."}
+      - {t: "Parlaklık sabitliği gerektirmediği için", why: "Hâlâ gerektirir."}
+  - q: "Kare ortalamasıyla FRUC neden 'hayalet' (ghosting) üretir?"
+    options:
+      - {t: "Hareket eden nesne iki konumda yarı saydam görünür; hareket telafisi nesneyi ara konuma taşıyarak bunu önler", ok: true, why: "Hareket telafili FRUC = akış kestirimi + çarpıtma + birleştirme."}
+      - {t: "Gürültüyü artırdığı için", why: "Ortalama gürültüyü azaltır."}
+      - {t: "Renk uzayı yüzünden", why: "Gri seviyede de olur."}
+
+homework:
+  - title: "RIFE: gerçek zamanlı ara akış kestirimiyle kare enterpolasyonu"
+    paper: "Huang, Zhang, Heng, Shi, Zhou — Real-Time Intermediate Flow Estimation for Video Frame Interpolation (ECCV 2022)"
+    url: "https://arxiv.org/abs/2011.06294"
+    level: ileri
+    hours: 16
+    goal: |
+      d aşamasındaki "akış kestir → yarıya böl → çarpıt → harmanla" hattını, ara akışları ($F_{t\to0}$, $F_{t\to1}$) ve birleştirme maskesini doğrudan tahmin eden kaba-ince IFNet ile değiştir; ayrıcalıklı öğretmen (privileged distillation: eğitimde ara kareyi gören öğretmen blok) ile eğit. Vimeo-90K triplet (ya da kendi kısa video kliplerin) üzerinde PSNR/SSIM (M9.13) karşılaştır.
+    steps:
+      - "IFNet: 3 ölçekli blok, her biri önceki akışı ve çarpıtılmış kareleri alıp akış artığı + maske üretir."
+      - "Kayıplar: yeniden kurma (Laplacian piramidi L1), öğretmen damıtma, akış damıtma."
+      - "Taban çizgileri: kare tekrarı, ortalama, d aşamasındaki LK tabanlı MC-FRUC."
+      - "Keyfi $t$ için zaman girdisi; 720p'de süre ölçümü."
+    accept:
+      - "Vimeo-90K test (ya da kendi kümen) PSNR tablosu: RIFE > LK-MC > ortalama."
+      - "Öğretmen damıtmanın kapalı/açık ablasyonu."
+      - "Hızlı hareket ve örtme içeren örneklerde görsel karşılaştırma."
+  - title: "RAFT: derin optik akış (uzantı)"
+    paper: "Teed & Deng — RAFT: Recurrent All-Pairs Field Transforms for Optical Flow (ECCV 2020)"
+    url: "https://arxiv.org/abs/2003.12039"
+    level: ileri
+    hours: 16
+    goal: |
+      Tüm piksel çiftleri için 4-B korelasyon hacmi, çok ölçekli korelasyon havuzlama ve akışı GRU ile yinelemeli iyileştiren RAFT'ın küçük sürümünü (RAFT-S) uygula; FlyingChairs'te eğit, Sintel'de bu modüldeki piramitli LK ve Horn–Schunck ile uç nokta hatasını (EPE) karşılaştır.
+    steps:
+      - "Öznitelik ve bağlam kodlayıcıları, 1/8 çözünürlük."
+      - "Korelasyon hacmi $C=\\langle g(I_0), g(I_1)\\rangle$ ve 4 seviyeli havuzlama, yarıçap 3 bakış."
+      - "ConvGRU güncelleme, dışbükey üst örnekleme (convex upsampling)."
+    accept:
+      - "Sintel clean EPE: RAFT-S < piramitli LK; iterasyon sayısına karşı EPE grafiği."

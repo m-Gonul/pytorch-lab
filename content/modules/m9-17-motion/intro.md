@@ -1,0 +1,13 @@
+**Video** zamanla değişen bir görüntüdür: $f(x,y,t)$. Tek kareli yöntemler kareleri bağımsız işler; çok kareli yöntemler komşu kareleri de kullanır ve hareket bilgisi sayesinde genelde çok daha iyidir. Hareket iki biçimde kullanılır: **tespit** (bu piksel hareket ediyor mu? ucuz) ve **kestirim** (hareket vektörü ne? pahalı ama "video işlemenin kutsal kâsesi").
+
+**Kötü konumlanmışlık:** 2-B hareket 3-B hareketin izdüşümüdür ve tek başına belirlenemez: **açıklık** (düz kenarda yalnız dik bileşen), **örtme** (bir karede görünen bölge diğerinde yok), **paralaks** (derinliğe bağlı farklı hareket). Düzenlileştirme gerekir.
+
+**Blok eşleme:** kareyi bloklara böl, her blok için önceki karede $\pm R$ arama penceresinde maliyeti (SAD, MAD, SSD, MSE) en küçük kaydırmayı bul. Tüm video kodlayıcılarının kalbidir; hareket telafili kestirimde blok, bulunan vektörle önceki kareden kopyalanır.
+
+**Optik akış:** parlaklık sabitliği $I(x+u,y+v,t+1)=I(x,y,t)$ → $I_xu+I_yv+I_t=0$: bir denklem, iki bilinmeyen. **Lucas–Kanade:** akış küçük bir pencerede sabit → $A\mathbf d=-\mathbf b$, $A=[I_x\ I_y]$, en küçük kareler $\begin{bmatrix}\sum I_x^2&\sum I_xI_y\\\sum I_xI_y&\sum I_y^2\end{bmatrix}\begin{bmatrix}u\\v\end{bmatrix}=-\begin{bmatrix}\sum I_xI_t\\\sum I_yI_t\end{bmatrix}$. $A^TA$ iyi koşullu olmalı (Harris matrisi! M9.7). Büyük hareket için **piramit** (Bouguet): kabadan inceye, her seviyede akışı ikiyle çarpıp başlangıç al. **Horn–Schunck:** tüm görüntüde $\iint(I_xu+I_yv+I_t)^2+\alpha^2(|\nabla u|^2+|\nabla v|^2)$. Güvenilirlik: **ileri–geri tutarlılık** $f_{01}(x)+f_{10}(x+f_{01}(x))\approx0$.
+
+**Zamansal gürültü giderme:** aynı konumdaki pikselleri karelerde ortala (hareket varsa hayalet); hareket tespit edilen pikselleri dışarıda bırak; en iyisi hareketi telafi edip benzerliğe göre ağırlıklandır.
+
+**FRUC (kare hızı artırma):** tekrar (yapay ama artefaktsız), ortalama (hayalet), blok hareket telafili, yoğun akış telafili, derin ağlar (RIFE). Telafili FRUC: akış → çarpıtma → birleştirme.
+
+**Stabilizasyon:** (1) kamera yörüngesini kareler arası dönüşümlerden kestir (öznitelik takibi + benzerlik dönüşümü), (2) istenmeyen (yüksek frekanslı) hareketi yörüngeyi yumuşatarak ayır, (3) her kareyi farkla düzelt; kenarlarda kırpma gerekir.
