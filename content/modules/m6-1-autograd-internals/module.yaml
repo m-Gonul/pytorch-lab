@@ -1,0 +1,68 @@
+id: m6-1-autograd-internals
+code: M6.1
+title: Autograd internals
+phase: 6
+minutes: 240
+prereq: [m3-3-tensor-autograd]
+summary: >
+  `loss.backward()` çağrınca perde arkasında ne oluyor? Hook'lu bir hesap
+  grafında gradyanları elle izliyor, saf Python'da bir grafı topolojik
+  sıralayıp yalnız yapraklara gradyan biriktiren bir motor yazıyor,
+  NumPy'da PyTorch'un "version counter" mekanizmasını kurup hangi in-place
+  işlemlerin geri geçişi bozduğunu görüyor, PyTorch'ta `grad_fn`
+  grafını geziyor, saklanan tensörleri sayıyor, tensor hook'u yazıyor ve en
+  sonda saklanan aktivasyonları bf16'ya sıkıştırarak belleği yarıya
+  indiriyorsun.
+goals:
+  - "Dinamik hesap grafını (`grad_fn`, `next_functions`, `AccumulateGrad`) okumak"
+  - "Geri geçiş için hangi tensörlerin saklandığını ([[saved tensors]]) ve bellek maliyetini bilmek"
+  - "[[version counter]] ile in-place işlemlerin ne zaman hata verdiğini anlamak"
+  - "Tensor hook'ları ve `saved_tensors_hooks` ile autograd'a müdahale etmek"
+sources:
+  - {title: "PyTorch Docs — Autograd mechanics", url: "https://docs.pytorch.org/docs/stable/notes/autograd.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "PyTorch Tutorials — Hooks for autograd saved tensors", url: "https://docs.pytorch.org/tutorials/intermediate/autograd_saved_tensors_hooks_tutorial.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "Edward Z. Yang — PyTorch internals", url: "http://blog.ezyang.com/2019/05/pytorch-internals/", license: "©", use: link}
+  - {title: "Paszke ve ark. — Automatic differentiation in PyTorch", url: "https://openreview.net/forum?id=BJJsrmfCZ", license: "OpenReview", use: link}
+
+hand:
+  groups:
+    - title: "$a=2$, $b=3$: $c=ab$, $d=c+a$, $L=d^2$"
+      fields:
+        - {id: da, label: "$\\partial L/\\partial a$", answer: 64, hint: "$\\partial L/\\partial d=16$; $a$ iki yoldan: $16b+16$"}
+        - {id: db, label: "$\\partial L/\\partial b$", answer: 32}
+        - {id: dah, label: "$c$'ye gradyanı 2 ile çarpan hook varken $\\partial L/\\partial a$", answer: 112, hint: "Hook yalnız $c$ üzerinden geçen yolu etkiler: $2\\cdot16\\cdot3+16$"}
+        - {id: dbh, label: "Hook varken $\\partial L/\\partial b$", answer: 64}
+        - {id: acc, label: "Hook'suz, `zero_grad` olmadan iki kez `backward`: `a.grad`", answer: 128, hint: "Gradyanlar birikir"}
+    - title: "Saklanan tensörler: `torch.tanh(a @ W)`, `a` (64, 128), `W` (128, 128), fp32"
+      fields:
+        - {id: nsave, label: "Kaç tensör saklanır? (matmul iki girdisini, tanh çıktısını saklar)", answer: 3}
+        - {id: bytes, label: "Toplam bayt", answer: 131072, hint: "$4\\,(64\\cdot128+128\\cdot128+64\\cdot128)$"}
+  verify: |
+    a, b = 2.0, 3.0
+    c = a * b; d = c + a
+    gd = 2 * d
+    answers = dict(da=gd * b + gd, db=gd * a, dah=2 * gd * b + gd, dbh=2 * gd * a, acc=2 * (gd * b + gd),
+                   nsave=3, bytes=4 * (64 * 128 + 128 * 128 + 64 * 128))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "`y = x.exp(); y.add_(1); y.sum().backward()` neden hata verir, `y = x * w; y.add_(1); …` neden vermez?"
+    options:
+      - {t: "`exp`'in türevi çıktısının kendisi olduğu için çıktıyı saklar ve in-place değişince version counter uyuşmaz; `mul` girdilerini saklar, çıktısını değil", ok: true, why: "Kural: bir tensörü in-place değiştirmek, onu **saklamış** bir düğüm varsa hatadır. Hangi düğümün neyi sakladığı formüle bağlı."}
+      - {t: "`add_` her zaman hata verir", why: "Saklanmamış tensörlerde in-place işlem serbest."}
+      - {t: "`exp` türevlenemez", why: "Türevi var; sorun saklanan değerin bozulması."}
+  - q: "Ara bir tensörün `.grad`'ı neden varsayılan olarak `None`'dır?"
+    options:
+      - {t: "Yalnız yaprak tensörler (`AccumulateGrad` düğümü olanlar) `.grad` biriktirir; ara gradyanlar bellek için tutulmaz, istenirse `retain_grad()` ya da hook kullanılır", ok: true, why: "Ara gradyanlar geri geçiş sırasında akar ve atılır."}
+      - {t: "Ara tensörlerin gradyanı hesaplanmaz", why: "Hesaplanır (zincir kuralı gerektirir), yalnız saklanmaz."}
+      - {t: "`requires_grad=False` oldukları için", why: "Yaprak olmayan ara tensörler `requires_grad=True`'dur."}
+  - q: "`saved_tensors_hooks` ile saklanan aktivasyonları bf16'ya çevirmek neyi değiş tokuş eder?"
+    options:
+      - {t: "Aktivasyon belleği yarıya iner, karşılığında geri geçişte kullanılan değerler yuvarlanır ve gradyanlar biraz yaklaşık olur", ok: true, why: "İleri geçiş tam hassasiyette kalır; yalnız geri geçişin girdisi sıkışır. Aynı mekanizmayla aktivasyonlar CPU'ya ya da diske de taşınabilir."}
+      - {t: "İleri geçişin sonucunu bf16'ya düşürür", why: "İleri geçiş değişmez; pack yalnız saklanan kopyayı etkiler."}
+      - {t: "Hiçbir şey; bf16 kayıpsızdır", why: "bf16'nın mantisi 7 bit; yuvarlama hatası var."}

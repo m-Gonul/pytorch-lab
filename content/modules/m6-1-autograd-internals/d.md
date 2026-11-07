@@ -1,0 +1,3 @@
+- `graph_nodes(t)` → `t.grad_fn`'den erişilebilen tüm düğümler (tekrarsız, `None` hariç); her düğüm `next_functions`'taki düğümlerden **önce** gelir.
+- `saved_stats(fn, *args)` → `(sayı, bayt)`: `fn(*args)` çalışırken saklanan tensörler. `torch.autograd.graph.saved_tensors_hooks(pack, unpack)`: `pack` her saklanan tensör için çağrılır.
+- `clip_grad_hook(t, max_norm)` — `t.register_hook` ile, `t`'ye gelen gradyanın normu `max_norm`'u aşarsa ölçekleyip küçült; handle'ı döndür.
