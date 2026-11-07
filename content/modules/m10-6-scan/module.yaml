@@ -1,0 +1,112 @@
+id: m10-6-scan
+code: M10.6
+title: Paralel tarama (önek toplamı) — Kogge–Stone, Brent–Kung, hiyerarşik tarama ve uygulamaları
+phase: 10
+minutes: 420
+prereq: [m10-5-reduction]
+summary: >
+  Tarama, sıralı görünen hesapları paralelleştirmenin genel aracıdır: her
+  çıktı, girdinin o konuma kadarki indirgemesidir. Kapsayıcı/dışlayıcı
+  tarama, sıralı O(n) algoritma, her çıktıyı ayrı hesaplayan "naif" paralel
+  sürüm (O(n²) iş), Kogge–Stone (log n adım, n log n iş, yazma-sonrası-okuma
+  tehlikesi ve çift tampon), iş verimli Brent–Kung (yukarı ve aşağı süpürme),
+  büyük diziler için hiyerarşik (blok) tarama. Uygulamalar: akış sıkıştırma
+  (stream compaction), taban (radix) sıralama, sayma sıralaması, segmentli
+  tarama, integral görüntü ve doğrusal özyinelemeler ($x_t=a_tx_{t-1}+b_t$:
+  durum uzayı modellerinin paralel taraması). Saf Python'da adım/iş sayan
+  algoritmalar ve yarış tehlikesi, NumPy'da vektörel KS/BK, sıkıştırma ve
+  taban sıralaması, Triton'da hiyerarşik tarama ve `tl.associative_scan` ile
+  doğrusal özyineleme, sonda log-derinlikli taramayla döngü ve kümülatif
+  çarpım yöntemlerinin hız/kararlılık karşılaştırması.
+goals:
+  - "Kogge–Stone: $\\log_2n$ adım, $n\\log_2n-(n-1)$ toplama; çift tamponla WAR tehlikesini önleme"
+  - "Brent–Kung: $2\\log_2n-1$ adım, $2n-2-\\log_2n$ toplama (iş verimli)"
+  - "Hiyerarşik tarama: blok taramaları + blok toplamlarının taraması + ofset"
+  - "Birleşmeli işleç üzerinde tarama: afin dönüşümlerin bileşkesi ile doğrusal özyineleme"
+sources:
+  - {title: "Hwu, Kirk, El Hajj — Programming Massively Parallel Processors (4. baskı), Bölüm 11", url: "https://www.elsevier.com/books/programming-massively-parallel-processors/hwu/978-0-323-91231-0", license: "©", use: link}
+  - {title: "Blelloch — Prefix Sums and Their Applications (CMU-CS-90-190)", url: "https://www.cs.cmu.edu/~guyb/papers/Ble93.pdf", license: "©", use: link}
+  - {title: "Harris, Sengupta, Owens — Parallel Prefix Sum (Scan) with CUDA (GPU Gems 3, Bölüm 39)", url: "https://developer.nvidia.com/gpugems/gpugems3/part-vi-gpu-computing/chapter-39-parallel-prefix-sum-scan-cuda", license: "©", use: link}
+  - {title: "Kogge & Stone — A Parallel Algorithm for the Efficient Solution of a General Class of Recurrence Equations (IEEE TC 1973)", url: "https://doi.org/10.1109/TC.1973.5009159", license: "©", use: link}
+  - {title: "Brent & Kung — A Regular Layout for Parallel Adders (IEEE TC 1982)", url: "https://doi.org/10.1109/TC.1982.1675982", license: "©", use: link}
+  - {title: "Merrill & Garland — Single-pass Parallel Prefix Scan with Decoupled Look-back (NVIDIA 2016)", url: "https://research.nvidia.com/publication/2016-03_single-pass-parallel-prefix-scan-decoupled-look-back", license: "©", use: link}
+  - {title: "Martin & Cundy — Parallelizing Linear Recurrent Neural Nets Over Sequence Length (ICLR 2018)", url: "https://arxiv.org/abs/1709.04057", license: "arXiv", use: link}
+
+hand:
+  groups:
+    - title: "x = [3, 1, 7, 0, 4, 1, 6, 3]"
+      fields:
+        - {id: last, label: "Kapsayıcı taramanın son elemanı", answer: 25}
+        - {id: inc3, label: "Kapsayıcı tarama, indeks 3", answer: 11}
+        - {id: exc4, label: "Dışlayıcı tarama, indeks 4", answer: 11}
+    - title: "n = 8 için iş ve adım"
+      fields:
+        - {id: naive, label: "Her çıktıyı ayrı toplayan naif paralel: toplama sayısı", answer: 28}
+        - {id: kso, label: "Kogge–Stone toplama sayısı", answer: 17}
+        - {id: kss, label: "Kogge–Stone adım", answer: 3}
+        - {id: bko, label: "Brent–Kung toplama sayısı", answer: 11}
+        - {id: bks, label: "Brent–Kung adım", answer: 5}
+    - title: "Hiyerarşi"
+      fields:
+        - {id: sec, label: "2²⁰ eleman, 1024'lük bölümler: blok toplamı dizisinin uzunluğu", answer: 1024}
+  verify: |
+    import math
+    x = [3, 1, 7, 0, 4, 1, 6, 3]
+    inc = [sum(x[:i + 1]) for i in range(8)]
+    exc = [0] + inc[:-1]
+    n, L = 8, 3
+    answers = dict(last=inc[-1], inc3=inc[3], exc4=exc[4], naive=sum(range(8)), kso=sum(n - 2 ** k for k in range(L)), kss=L,
+                   bko=2 * n - 2 - L, bks=2 * L - 1, sec=2 ** 20 // 1024)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Segmentli tarama: işleç üzerinde (bayrak, değer) çiftleri", engine: browser}
+  - {id: x2, title: "En büyük toplamlı alt dizi: önek toplamı + önek minimumu", engine: browser}
+  - {id: x3, title: "Sayma sıralaması: histogram + dışlayıcı tarama + dağıtım", engine: browser}
+
+quiz:
+  - q: "Kogge–Stone'u yerinde (tek dizi) yazınca neden yanlış sonuç çıkabilir?"
+    options:
+      - {t: "Thread i, x[i − s]'yi okumadan önce thread i − s onu güncellemiş olabilir (yazma-sonrası-okuma tehlikesi); çift tampon ya da okuma–senkronizasyon–yazma ayrımı gerekir", ok: true, why: "Sonuç thread zamanlamasına bağlı: çalıştırmadan çalıştırmaya değişebilir."}
+      - {t: "Toplama birleşmeli olmadığı için", why: "Tamsayıda birleşmeli."}
+      - {t: "Adım sayısı yetmediği için", why: "Adım sayısı doğru."}
+  - q: "Brent–Kung neden 'iş verimli' sayılır?"
+    options:
+      - {t: "Toplam işlem ~2n: sıralı algoritmanın sabit katı; Kogge–Stone n log n yapar ve kaynak kısıtlıyken yavaşlar", ok: true, why: "Bedeli yaklaşık iki kat adım."}
+      - {t: "Daha az adım attığı için", why: "Daha çok adım atar."}
+      - {t: "Paylaşımlı bellek gerektirmediği için", why: "İkisi de kullanır."}
+  - q: "x_t = a_t·x_{t−1} + b_t neden taranabilir?"
+    options:
+      - {t: "Her adım bir afin dönüşümdür f_t(x) = a_t x + b_t; afin dönüşümlerin bileşkesi birleşmeli ve yine afindir: (a₂, b₂)∘(a₁, b₁) = (a₂a₁, a₂b₁ + b₂)", ok: true, why: "Mamba/S4 gibi durum uzayı modelleri ve doğrusal RNN'ler bu yüzden O(log L) derinlikte eğitilir."}
+      - {t: "Değişmeli olduğu için", why: "Bileşke değişmeli değildir; sıra korunur."}
+      - {t: "Taranamaz", why: "Taranabilir."}
+
+homework:
+  - title: "Merrill & Garland (2016): Tek geçişli tarama ve ayrık geri bakış"
+    paper: "Merrill & Garland — Single-pass Parallel Prefix Scan with Decoupled Look-back (NVIDIA 2016)"
+    url: "https://research.nvidia.com/publication/2016-03_single-pass-parallel-prefix-scan-decoupled-look-back"
+    level: ileri
+    hours: 16
+    goal: |
+      Hiyerarşik taramanın üç çekirdeğini (blok tarama, blok toplamı tarama, ofset ekleme) tek bir çekirdekte birleştir: her blok yerel toplamını "toplam hazır" bayrağıyla yayınlar, önceki blokların durumlarına geri bakarak dışlayıcı önekini bulur. CUDA'da (Colab) uygula; 2·n bellek trafiği hedefini (bir okuma, bir yazma) ve CUB `DeviceScan::InclusiveSum` ile hızı karşılaştır. Bellek sıralaması için gereken `__threadfence` ve volatile/atomik okumaları açıkla.
+    steps:
+      - "Önce 'zincirleme tarama' (her blok bir öncekini bekler), sonra geri bakışlı sürüm."
+    accept:
+      - "Doğru sonuç (2²⁸ elemana kadar) ve bellek kopyasının ≥ %80'i bant genişliği."
+  - title: "Martin & Cundy (2018): Doğrusal RNN'leri dizi uzunluğu boyunca paralelleştirmek"
+    paper: "Martin & Cundy — Parallelizing Linear Recurrent Neural Nets Over Sequence Length (ICLR 2018)"
+    url: "https://arxiv.org/abs/1709.04057"
+    level: orta
+    hours: 10
+    goal: |
+      d aşamasındaki `tl.associative_scan` doğrusal özyinelemesini vektör/köşegen durumlu bir doğrusal RNN katmanına (h_t = λ_t ⊙ h_{t−1} + x_t) dönüştür, geri yayılımını da tarama ile (ters yönde) yaz (`torch.autograd.Function`). Uzun dizilerde (L = 4096–65 536) sıralı döngü ile hız ve doğruluk karşılaştır; makaledeki GILR-LSTM'yi küçük bir dil modelinde dene.
+    steps:
+      - "Geri geçiş: dL/dh_t = dL/dy_t + λ_{t+1} ⊙ dL/dh_{t+1} — ters taramadır."
+    accept:
+      - "Gradyanlar sonlu farklarla ve sıralı sürümle (float64) uyumlu."
+      - "L = 16 384'te GPU'da sıralıdan ≥ 10× hızlı."
