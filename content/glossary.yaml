@@ -115,3 +115,4 @@ terms:
   vibe: "Visual Background Extractor: her piksel için geçmiş değerlerden rastgele örnekler tutan, rastgele ve komşulara yayılan güncellemeli parametresiz arka plan çıkarma yöntemi."
   geniş anlamda durağanlık: "Wide-sense stationarity: ortalaması sabit, otokovaryansı yalnız iki zaman arasındaki farka bağlı olan rastgele süreç."
   geçiş matrisi: "Markov zincirinde bir durumdan diğerine geçme olasılıklarını tutan matris; bu modülde sütun j, S_j'den çıkış dağılımıdır."
+  bellman denklemi: "Bir durumun değerini anlık ödül ile sonraki durumların indirimli beklenen değeri cinsinden yazan özyinelemeli denklem; en iyi değerde eylemler üzerinde max alınır."

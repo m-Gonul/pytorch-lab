@@ -1,0 +1,3 @@
+- `batched_vi(P, R, gamma, iters)` — `P (B, A, S, S)`, `R (B, S, A)`: B MDP aynı anda; `iters` adım; `(V (B, S), diffs (iters, B))` (her adımın sonsuz norm farkı).
+- `contraction_ratio(P, R, gamma, n=1000, seed=0)` — rastgele $V,U$ çiftleri için $\lVert H^*V-H^*U\rVert_\infty/\lVert V-U\rVert_\infty$ (tek MDP, `(n,)` tensör).
+- `soft_v_star(P, R, gamma, iters)` — `R` `requires_grad` ile türevlenebilir VI (aynı Bellman, `max` ile): autograd ile $\partial V^*(s_0)/\partial R(s,a)$ = **indirimli ziyaret ölçüsü** $d^{\pi^*}(s,a)=\sum_t\gamma^tP(s_t=s,a_t=a\,|\,s_0)$. Kontrol bunu kapalı formla karşılaştırır.

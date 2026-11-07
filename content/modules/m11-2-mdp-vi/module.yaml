@@ -1,0 +1,99 @@
+id: m11-2-mdp-vi
+code: M11.2
+title: MDP, değer yinelemesi ve yakınsama sınırları
+phase: 11
+minutes: 380
+prereq: [m11-1-markov]
+summary: >
+  Markov karar süreci: durumlar, eylemler, geçiş modeli, ödül, indirim,
+  ufuk. Sonlu ufukta geriye doğru dinamik programlama ve zamana bağlı
+  (durağan olmayan) en iyi politika; sonsuz ufukta Bellman optimallik
+  operatörünün γ-büzülme olduğu, sabit noktası ve "n adım sonra ne kadar
+  uzaktayım?" sınırı. Notlardaki perakende stok örneğini elle ve saf
+  Python'da tam çözüyorsun; NumPy'da einsum'lu Bellman operatörü, durma
+  kuralı ve sınırın rastgele MDP'lerde sağlandığını; PyTorch'ta yığın
+  halinde yüzlerce MDP ve autograd ile $\partial V^*/\partial R$'nin indirimli
+  ziyaret ölçüsü olduğunu; en sonda büyük bir stok MDP'sini vektörel
+  çözüyorsun.
+goals:
+  - "MDP $(S,A,P,R,\\gamma,h)$, politika, beklenen fayda; [[Bellman denklemi]]"
+  - "Sonlu ufukta durağan olmayan, sonsuz ufukta durağan en iyi politika"
+  - "$H^*$ büzülmesi: $\\lVert H^*V-H^*U\\rVert_\\infty\\le\\gamma\\lVert V-U\\rVert_\\infty$ ve $\\lVert V^*-V_n\\rVert_\\infty\\le\\frac{\\gamma}{1-\\gamma}\\lVert V_n-V_{n-1}\\rVert_\\infty$"
+  - "Politika değerlendirme: $V=(I-\\gamma T_\\pi)^{-1}R_\\pi$"
+sources:
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 3–4", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+  - {title: "Puterman — Markov Decision Processes (Wiley 1994), Bölüm 4 ve 6", url: "https://doi.org/10.1002/9780470316887", license: "©", use: link}
+  - {title: "Poupart — CS885 Reinforcement Learning (Waterloo), Ders 2–3", url: "https://cs.uwaterloo.ca/~ppoupart/teaching/cs885-spring20/", license: "doğrulanmadı", use: link}
+  - {title: "Bertsekas — Dynamic Programming and Optimal Control, Cilt 2", url: "http://www.athenasc.com/dpbook.html", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "Perakende stok (notlar), $h=5$, $\\gamma=1$: son gün değerleri $V_5=[0,-4,-8,-12]$"
+      fields:
+        - {id: v4s0, label: "$V_4(S_0)=R(S_0)+V_5(S_1)$", answer: -9}
+        - {id: v4s1, label: "$V_4(S_1)$ (en iyi eylemle)", answer: -1.8}
+        - {id: v4s3, label: "$V_4(S_3)$", answer: -10.8}
+        - {id: v3s1, label: "$V_3(S_1)$", answer: -4.96}
+        - {id: a3s1, label: "$t=3$'te $S_1$ için en iyi eylem (yüksek fiyat 1, indirim 2)", answer: 1}
+    - title: "Sınırlar, $\\gamma=0.9$"
+      fields:
+        - {id: bd, label: "$\\lVert V_n-V_{n-1}\\rVert_\\infty=0.01$ ise $\\lVert V^*-V_n\\rVert_\\infty$ üst sınırı", answer: 0.09}
+        - {id: geo, label: "Her adımda ödül 1 (sonsuz ufuk): $V$", answer: 10}
+  verify: |
+    R = [-5, -1, -1, -2]
+    V5 = [0, -4, -8, -12]
+    def step(V):
+        out, pol = [R[0] + V[1]], [0]
+        for k in (1, 2, 3):
+            a1 = R[k] + 0.3 * V[k - 1] + 0.7 * V[k]
+            a2 = R[k] + 0.8 * V[k - 1] + 0.2 * V[k]
+            out.append(max(a1, a2)); pol.append(1 if a1 > a2 else 2)
+        return out, pol
+    V4, _ = step(V5)
+    V3, p3 = step(V4)
+    answers = dict(v4s0=V4[0], v4s1=V4[1], v4s3=V4[3], v3s1=V3[1], a3s1=p3[1], bd=0.9 / 0.1 * 0.01, geo=1 / (1 - 0.9))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Robot süpürge MDP'sini kur ve çöz", engine: browser}
+  - {id: x2, title: "Ufuk ve indirim: politika ne zaman değişir?", engine: browser}
+  - {id: x3, title: "Büzülme yalnız sonsuz normda: L2'de karşı örnek", engine: browser}
+
+quiz:
+  - q: "Sonlu ufuklu bir MDP'de en iyi politika neden zamana bağlıdır?"
+    options:
+      - {t: "Kalan süre değiştikçe bir eylemin uzun vadeli getirisi değişir; ör. son günde stoklu kalmanın cezası farklıdır", ok: true, why: "Sonsuz ufukta her adımda kalan süre aynı (sonsuz) olduğu için politika durağandır."}
+      - {t: "Geçiş olasılıkları zamanla değiştiği için", why: "Model durağan varsayıldı."}
+      - {t: "İndirim faktörü yüzünden", why: "γ = 1 iken de olur."}
+  - q: "Bellman optimallik operatörü neden sabit noktaya yakınsar?"
+    options:
+      - {t: "Sonsuz normda γ-büzülmedir; Banach sabit nokta teoremiyle tek sabit nokta vardır ve her başlangıçtan yakınsanır", ok: true, why: "Hata her adımda en az γ katına iner."}
+      - {t: "Monoton artan olduğu için", why: "Monotonluk tek başına sınırsız artışı engellemez."}
+      - {t: "Doğrusal olduğu için", why: "max içerdiği için doğrusal değildir; politika değerlendirme operatörü doğrusaldır."}
+  - q: "‖V_n − V_{n−1}‖∞ = ε gözlendi. V*'a uzaklık için ne söylenebilir?"
+    options:
+      - {t: "‖V* − V_n‖∞ ≤ γε/(1−γ)", ok: true, why: "Kalan tüm tek adım farkları geometrik dizi oluşturur."}
+      - {t: "‖V* − V_n‖∞ ≤ ε", why: "γ → 1'de çok iyimser."}
+      - {t: "Hiçbir şey", why: "Büzülme sayesinde açık sınır var."}
+
+homework:
+  - title: "Value Iteration Networks"
+    paper: "Tamar, Wu, Thomas, Levine, Abbeel — Value Iteration Networks (NeurIPS 2016)"
+    url: "https://arxiv.org/abs/1602.02867"
+    level: ileri
+    hours: 12
+    goal: |
+      Değer yinelemesini bir CNN katmanı olarak yaz: ödül haritası ve değer haritası kanalları üzerinde 3 × 3 konvolüsyon ($\\bar Q$), kanal boyunca max ($V$), K kez tekrar; ızgara dünyasında harita görüntüsünden ödülü öğrenen ve VI modülünü uçtan uca eğiten VIN'i uygula. Rastgele engel haritalarında yol bulma başarısını sıradan bir CNN politika ağıyla, eğitimde görülmeyen büyük haritalarda karşılaştır.
+    steps:
+      - "Veri: rastgele engelli 16 × 16 ve 28 × 28 haritalar, hedef ve en kısa yol eylemleri (BFS)."
+      - "VI modülü: $\\bar Q=W_r*R+W_v*V$, $V=\\max_a\\bar Q$; K = 20 (16 × 16), K = 36 (28 × 28)."
+      - "Dikkat (attention): ajanın konumundaki $\\bar Q$ vektörünü seç, eylem sınıflandırması."
+      - "Bu modülün d aşamasındaki türevlenebilir VI ile bağlantıyı tartış."
+    accept:
+      - "28 × 28'de VIN başarı oranı ≥ %85, düz CNN'den en az 15 puan yüksek."
+      - "K'ya karşı başarı grafiği; K < harita çapı olduğunda başarının düştüğü gösterilmiş."
