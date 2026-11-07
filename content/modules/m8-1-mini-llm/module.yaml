@@ -1,0 +1,77 @@
+id: m8-1-mini-llm
+code: M8.1
+title: "Mini-LLM: eğit, profil çıkar, hızlandır"
+phase: 8
+minutes: 420
+prereq: [m4-7-transformer, m6-5-compile, m7-3-amp]
+summary: >
+  Önceki fazların hepsini tek bir projede birleştiriyorsun: iki basamaklı
+  toplamayı sıfırdan öğrenen küçük bir GPT. Hesap bütçesini (Chinchilla,
+  6ND FLOP) ve öğrenme oranı programını elle çıkarıyor, saf Python'da veri
+  biçimini ve programı yazıyor, NumPy'da veri kümesini string üretmeden,
+  tamamen vektörel kuruyor ve taban kayıpları hesaplıyor, PyTorch'ta
+  warmup + cosine, gradyan kırpma ve maskeli kayıpla eğitip %95+ doğruluğa
+  ulaşıyor ve en sonda profiler ile darboğazı bulup head döngüsünü tek bir
+  batch'li işleme indiriyorsun.
+goals:
+  - "Bir eğitim koşusunu bütçelemek: parametre, token, FLOP, süre"
+  - "Eğitim döngüsünün parçaları: warmup + cosine, AdamW, gradyan kırpma, maskeli kayıp, değerlendirme"
+  - "Görev biçiminin öğrenilebilirliğe etkisi: ters çevrilmiş cevap basamakları"
+  - "`torch.profiler` ile darboğaz bulmak ve vektörleştirerek gidermek"
+sources:
+  - {title: "Karpathy — nanoGPT ve minGPT (adder örneği)", url: "https://github.com/karpathy/minGPT", license: "MIT", use: adapt}
+  - {title: "Stanford CS336 — Language Modeling from Scratch (Assignment 1)", url: "https://github.com/stanford-cs336/assignment1-basics", license: "MIT", use: adapt}
+  - {title: "Hoffmann ve ark. — Training Compute-Optimal Large Language Models (Chinchilla)", url: "https://arxiv.org/abs/2203.15556", license: "arXiv", use: link}
+  - {title: "Kaplan ve ark. — Scaling Laws for Neural Language Models", url: "https://arxiv.org/abs/2001.08361", license: "arXiv", use: link}
+  - {title: "Lee ve ark. — Teaching Arithmetic to Small Transformers (ters çevrilmiş çıktı)", url: "https://arxiv.org/abs/2307.03381", license: "arXiv", use: link}
+  - {title: "PyTorch Tutorials — Profiling your PyTorch Module", url: "https://docs.pytorch.org/tutorials/beginner/profiler.html", license: "BSD-3-Clause", use: adapt}
+
+hand:
+  groups:
+    - title: "Bütçe: $N=10^7$ parametre"
+      fields:
+        - {id: chin, label: "Chinchilla-optimal token sayısı ($\\approx20N$)", answer: 200000000}
+        - {id: flops, label: "Eğitim FLOP'u $\\approx6ND$", answer: 1.2e16, tol: 1e10}
+        - {id: secs, label: "100 TFLOP/s tepe, %40 MFU ile süre (s)", answer: 300}
+    - title: "Warmup 100 adım, toplam 1100, $\\eta_{\\max}=10^{-3}$, $\\eta_{\\min}=10^{-4}$, cosine"
+      fields:
+        - {id: lr50, label: "Adım 49'da $\\eta$ (doğrusal warmup: $\\eta_{\\max}(t+1)/W$)", answer: 0.0005, tol: 0.0000001}
+        - {id: lr600, label: "Adım 600'de $\\eta=\\eta_{\\min}+\\tfrac12(\\eta_{\\max}-\\eta_{\\min})(1+\\cos\\pi p)$", answer: 0.00055, tol: 0.0000001, hint: "$p=(600-100)/1000$"}
+    - title: "Biçim: `07+45=250⏎` (cevap 052 ters çevrilmiş), 10 karakter"
+      fields:
+        - {id: ans, label: "`38+67=` için ters çevrilmiş 3 basamaklı cevap (sayı olarak)", answer: 501, hint: "105 → \"501\""}
+        - {id: tok, label: "Batch 128: adım başına girdi token'ı (satır başına 9)", answer: 1152}
+  verify: |
+    import math
+    N = 1e7
+    D = 20 * N
+    def lr(t, W=100, T=1100, mx=1e-3, mn=1e-4):
+        if t < W:
+            return mx * (t + 1) / W
+        p = (t - W) / (T - W)
+        return mn + 0.5 * (mx - mn) * (1 + math.cos(math.pi * p))
+    answers = dict(chin=D, flops=6 * N * D, secs=6 * N * D / (100e12 * 0.4), lr50=lr(49), lr600=lr(600),
+                   ans=int(str(38 + 67).zfill(3)[::-1]), tok=128 * 9)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Toplamanın cevabını neden ters çevrilmiş basamaklarla (birler önce) üretmek öğrenmeyi kolaylaştırır?"
+    options:
+      - {t: "Otoregresif model soldan sağa üretir; birler basamağı önce gelirse eldeyi (carry) hesaplamak için gereken bilgi o ana kadar üretilmiş olur", ok: true, why: "Normal sırada en anlamlı basamak, henüz hesaplanmamış eldelere bağlı. Görev biçimi, mimariyle uyumlu olmalı."}
+      - {t: "Token sayısını azaltır", why: "Uzunluk aynı."}
+      - {t: "Sözlüğü küçültür", why: "Sözlük aynı."}
+  - q: "Kaybı yalnız cevap basamaklarında hesaplamak neden mantıklı?"
+    options:
+      - {t: "Operand basamakları rastgele: onları tahmin etmek indirgenemez bir kayıp ($\\log10$) ekler ve gradyanı öğrenilebilir kısımdan saptırır", ok: true, why: "Talimat ayarlamasında (instruction tuning) da kayıp genelde yalnız cevap token'larında hesaplanır."}
+      - {t: "Daha hızlı olduğu için", why: "İleri geçiş aynı; mesele sinyal."}
+      - {t: "Aşırı uyumu önlemek için", why: "Asıl sebep gürültülü hedefler."}
+  - q: "Learning rate warmup neden kullanılır?"
+    options:
+      - {t: "Başlangıçta Adam'ın ikinci moment tahmini gürültülü ve gradyanlar büyük; küçük adımlarla başlamak erken patlamaları ve kararsızlığı önler", ok: true, why: "Transformer eğitiminde warmup + cosine (ya da WSD) standart."}
+      - {t: "Eğitimi hızlandırmak için", why: "Başlangıçta adımlar küçük; amaç kararlılık."}
+      - {t: "Ezberlemeyi önlemek için", why: "Düzenlileştirme amaçlı değil."}

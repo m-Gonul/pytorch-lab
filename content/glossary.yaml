@@ -86,3 +86,4 @@ terms:
   ZeRO: "Zero Redundancy Optimizer: optimizer durumunu (ZeRO-1), gradyanları (ZeRO-2) ve parametreleri (ZeRO-3, FSDP) işçilere bölerek veri paralel eğitimin bellek tekrarını kaldıran yöntem."
   grup bazlı kuantizasyon: "Bir ağırlık satırını sabit boyutlu gruplara bölüp her gruba ayrı ölçek vererek aykırı değerlerin etkisini sınırlayan kuantizasyon (int4 LLM ağırlıklarında tipik)."
   guard: "Derlenmiş ya da dışa aktarılmış bir grafın geçerli olduğu koşul (ör. batch = 4); çalışma anında koşul sağlanmazsa yeniden derleme ya da hata."
+  minGPT: "Karpathy'nin eğitim amaçlı, birkaç yüz satırlık GPT uygulaması; nanoGPT'nin öncülü. İçindeki 'adder' örneği toplamayı öğrenen küçük bir GPT."
