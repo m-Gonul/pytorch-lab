@@ -89,12 +89,18 @@ def main(argv):
     mods = sorted(p for p in MODULES.iterdir() if (p / "module.yaml").exists())
     if argv:
         mods = [m for m in mods if m.name in argv]
+    # Her modül ayrı bir süreçte: sitedeki motor ve Colab da her çalıştırmayı temiz bir süreçte yapar
+    # (ör. torch.compile'ın import ettiği triton, Triton modülünün TRITON_INTERPRET ayarını bozmasın).
+    import json
+    import subprocess
     failed = 0
     for d in mods:
-        try:
-            errs = check_module(d)
-        except Exception as e:  # YAML/verify hatası
-            errs = [f"{type(e).__name__}: {e}".splitlines()[0][:400]]
+        r = subprocess.run([sys.executable, __file__, "--one", d.name], capture_output=True, text=True, encoding="utf-8")
+        marker = r.stdout.rfind("\x1eERRS")
+        if marker >= 0:
+            errs = json.loads(r.stdout[marker + 5:])
+        else:
+            errs = [f"süreç çöktü (çıkış {r.returncode}): {(r.stdout + r.stderr)[-400:]}"]
         print(("✓ " if not errs else "✗ ") + d.name)
         for e in errs:
             print("    ", e)
@@ -103,5 +109,17 @@ def main(argv):
     return 1 if failed else 0
 
 
+def one(name: str) -> int:
+    import json
+    try:
+        errs = check_module(MODULES / name)
+    except Exception as e:  # YAML/verify hatası
+        errs = [f"{type(e).__name__}: {e}".splitlines()[0][:400]]
+    sys.stdout.write("\x1eERRS" + json.dumps(errs, ensure_ascii=False) + "\n")
+    return 0
+
+
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "--one":
+        sys.exit(one(sys.argv[2]))
     sys.exit(main(sys.argv[1:]))
