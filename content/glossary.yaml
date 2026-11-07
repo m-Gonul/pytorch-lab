@@ -161,3 +161,7 @@ terms:
   transposed convolution: "Konvolüsyonun 'transpozu': her girdi pikseli çekirdeği kendi değeriyle ölçekleyip çıktıya saçar; adım s ile çıktıyı büyütür. Eşdeğer olarak sıfır ekleme + normal konvolüsyon, konvolüsyon matrisinin transpozu ya da konvolüsyonun girdiye göre gradyanı."
   u-net: "Kodlayıcı-kod çözücü segmentasyon ağı (Ronneberger ve ark. 2015): kodlayıcının her ölçekteki haritası kod çözücüdeki aynı ölçeğe kopyalanıp birleştirilir; ince ayrıntı korunur."
   genişletilmiş konvolüsyon: "Dilated (atrous) convolution: çekirdek elemanları arasında d − 1 boşluk bırakan konvolüsyon; parametre ve çözünürlük kaybı olmadan receptive field'ı büyütür."
+  durağanlık: "Stationarity: sürecin istatistiklerinin zamanda kaydırmayla değişmemesi. Katı anlamda tüm ortak dağılımlar, geniş anlamda (WSS) yalnız ortalama ve otokovaryans (yalnız zaman farkına bağlı) sabittir."
+  arima: "Autoregressive integrated moving average: seriyi d kez farklayıp (trendleri silip) ARMA(p, q) uygulayan, tahmine farkları geri ekleyen model (Box & Jenkins 1970); mevsimsel sürümü SARIMA."
+  yule–walker denklemleri: "AR(p) katsayıları ile otokorelasyonlar arasındaki doğrusal ilişki ρ_k = Σ φ_i ρ_{k−i}; örnek otokorelasyonlardan AR katsayılarını tahmin etmeye ya da tersine kullanılır."
+  nedensel konvolüsyon: "Causal convolution: çıkışın t anında yalnız t ve öncesindeki girdilere bağlı olduğu, solda (k − 1)d dolgulu 1B konvolüsyon; WaveNet'in yapı taşı."

@@ -1,0 +1,3 @@
+- `CausalConv1d(cin, cout, k, d=1)` — solda $(k-1)d$ dolgu.
+- `WaveNet(c=16, dilations=(1,2,4,8)*2, out=8)` — giriş nedensel konv. (k = 2), her blokta kapılı aktivasyon $\tanh(W_f*x)\odot\sigma(W_g*x)$, 1×1 artık ve atlama; atlamaların toplamı → ReLU → 1×1 → ReLU → 1×1. Girdi `(N, T, 1)`, çıkış `(N, T, out)`.
+- Kontroller: nedensellik (Jacobian), receptive field (gradyan desteği), dizi→dizi eğitimi ve GRU ile uzun dizi süre karşılaştırması.

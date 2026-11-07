@@ -1,0 +1,108 @@
+id: m4-11-timeseries
+code: M4.11
+title: Zaman serisi — ARMA/ARIMA'dan RNN ve WaveNet'e
+phase: 4
+minutes: 400
+prereq: [m4-4-lstm-gru]
+summary: >
+  Rastgele süreç ve zaman serisi, katı ve geniş anlamda durağanlık, ARMA
+  (otoregresif + hareketli ortalama), fark alma ve ARIMA, mevsimsel
+  SARIMA; Yule–Walker denklemleri, otokorelasyon ve kısmi otokorelasyon ile
+  model belirleme, en küçük kareler AR tahmini. Ardından ders alıştırması
+  6'nın beş modeli: tek nöronlu doğrusal model, tek rekürent nöron, üç
+  katmanlı RNN, 8 adımı birden tahmin eden dizi→vektör ve her adımda
+  tahmin eden dizi→dizi (nedensel) RNN; naif tahmin ve yinelemeli tahmin
+  karşılaştırmaları. Son olarak nedensel genişletilmiş konvolüsyonlarla
+  WaveNet, ergodiklik ve uyarlamalı (LMS) filtreler.
+goals:
+  - "[[durağanlık]] (katı / geniş anlamda) ve fark alma; ARMA → [[arima]] → SARIMA"
+  - "[[yule–walker denklemleri]]: AR katsayılarından otokorelasyona ve geri"
+  - "Ders alıştırması 6: naif temel çizgi, doğrusal model, RNN'ler, çok adımlı tahminin üç yolu"
+  - "[[nedensel konvolüsyon]] ve WaveNet: receptive field $1+\\sum(k-1)d$"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 15", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Box, Jenkins, Reinsel, Ljung — Time Series Analysis: Forecasting and Control", url: "https://www.wiley.com/en-us/Time+Series+Analysis%3A+Forecasting+and+Control%2C+5th+Edition-p-9781118675021", license: "©", use: link}
+  - {title: "Hyndman & Athanasopoulos — Forecasting: Principles and Practice (3. baskı)", url: "https://otexts.com/fpp3/", license: "CC BY-NC-ND", use: link}
+  - {title: "van den Oord ve ark. — WaveNet: A Generative Model for Raw Audio (2016)", url: "https://arxiv.org/abs/1609.03499", license: "arXiv", use: link}
+  - {title: "Oreshkin ve ark. — N-BEATS (ICLR 2020)", url: "https://arxiv.org/abs/1905.10437", license: "arXiv", use: link}
+  - {title: "Haykin — Adaptive Filter Theory (LMS / NLMS)", url: "https://www.pearson.com/en-us/subject-catalog/p/adaptive-filter-theory/P200000003275", license: "©", use: link}
+  - {title: "d2l.ai — 9.1 Working with Sequences (otoregresif modeller)", url: "https://d2l.ai/chapter_recurrent-neural-networks/sequence.html", license: "CC-BY-SA 4.0", use: link}
+
+hand:
+  groups:
+    - title: "ARMA / ARIMA tahminleri"
+      fields:
+        - {id: ar2, label: "AR(2): $\\hat y_t=0.6y_{t-1}+0.3y_{t-2}$, $y_{t-1}=2$, $y_{t-2}=1$", answer: 1.5, tol: 1.0e-9}
+        - {id: arma, label: "ARMA(1,1): $\\alpha=0.5$, $\\theta=0.4$, $y_{t-1}=2$, $\\epsilon_{t-1}=0.5$", answer: 1.2, tol: 1.0e-9}
+        - {id: arima, label: "[3, 5, 7, 9, 11] serisinde d = 1 ARIMA, farklanmış seri sabit tahmin ediliyor: sonraki değer", answer: 13}
+    - title: "Yule–Walker, AR(2) $\\phi=(0.6, 0.3)$ ve AR(1)"
+      fields:
+        - {id: rho1, label: "$\\rho_1$", answer: 0.8571428571428571, tol: 1.0e-6}
+        - {id: rho2, label: "$\\rho_2$", answer: 0.8142857142857143, tol: 1.0e-6}
+        - {id: var1, label: "AR(1) $\\phi=0.8$, $\\sigma^2=1$: durağan varyans", answer: 2.7777777777777777, tol: 1.0e-6}
+    - title: "Ders alıştırması 6 (Keras sayımı: SimpleRNN tek bias) ve WaveNet"
+      fields:
+        - {id: m3, label: "Model 3: RNN 16 → RNN 16 → RNN 1, tek değişkenli girdi", answer: 834}
+        - {id: m4, label: "Model 4: RNN 16 → RNN 16 → yoğun 8", answer: 952}
+        - {id: rf, label: "WaveNet: k = 2, genişletmeler 1, 2, …, 512 iki kez yığılmış: receptive field", answer: 2047}
+  verify: |
+    rho1 = 0.6 / (1 - 0.3)
+    rnn = lambda i, h: i * h + h * h + h
+    answers = dict(ar2=0.6 * 2 + 0.3 * 1, arma=0.5 * 2 + 0.4 * 0.5, arima=11 + 2, rho1=rho1, rho2=0.6 * rho1 + 0.3,
+                   var1=1 / (1 - 0.64), m3=rnn(1, 16) + rnn(16, 16) + rnn(16, 1), m4=rnn(1, 16) + rnn(16, 16) + 16 * 8 + 8,
+                   rf=1 + 2 * sum(2 ** i for i in range(10)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Mevsimsellik: mevsimsel naif tahmin ve SARIMA-benzeri model", engine: browser}
+  - {id: x2, title: "Durağanlık ve ergodiklik: topluluk ortalaması vs zaman ortalaması", engine: browser}
+  - {id: x3, title: "Durağan olmayan seriler için uyarlamalı filtre (NLMS)", engine: browser}
+
+quiz:
+  - q: "Naif tahmin (son değeri tekrarla) neden mutlaka raporlanmalı?"
+    options:
+      - {t: "Şaşırtıcı derecede güçlü olabilir: ondan kötü bir model (ör. tek rekürent nöron) değersizdir; bir modelin iyi olup olmadığı ancak temel çizgiye göre anlaşılır", ok: true, why: "d aşamasında tek nöronlu RNN naif tahmini bile geçemiyor."}
+      - {t: "En iyi modeldir", why: "Değildir; ölçüt noktasıdır."}
+      - {t: "Eğitim hızlandırır", why: "Konu bu değil."}
+  - q: "Dizi→dizi modelinde hedefler girdilerle örtüşüyor (zaman adımı 0'da 1–8 tahmin ediliyor). Bu hile mi?"
+    options:
+      - {t: "Hayır: model nedenseldir, her adımda yalnız geçmişi görür; ek hedefler her adımda kayıp terimi ve daha zengin gradyan sağlar", ok: true, why: "Géron: 'causal model' — gelecek bilgisi sızmaz."}
+      - {t: "Evet, test hatası yanıltıcı olur", why: "Değerlendirme yalnız son adımdaki çıktıyla yapılır."}
+      - {t: "Yalnız çift yönlü RNN ile hile olur", why: "Doğru — ama o zaman model nedensel olmaz; burada tek yönlü."}
+  - q: "Seriyi iki kez farkladığında hangi trendler yok olur?"
+    options:
+      - {t: "En fazla ikinci dereceden polinom trendler (fark alma türevin yaklaşığıdır)", ok: true, why: "[1, 4, 9, 16, 25, 36] → [3, 5, 7, 9, 11] → [2, 2, 2, 2]."}
+      - {t: "Yalnız sabit ofset", why: "Bu sıfırıncı derece; birinci fark bile doğrusalı yok eder."}
+      - {t: "Mevsimsellik", why: "Bunun için mevsimsel fark ($y_t-y_{t-s}$) gerekir."}
+
+homework:
+  - title: "van den Oord ve ark. (2016): WaveNet"
+    paper: "van den Oord ve ark. — WaveNet: A Generative Model for Raw Audio (2016)"
+    url: "https://arxiv.org/abs/1609.03499"
+    level: ileri
+    hours: 14
+    goal: |
+      e aşamasındaki WaveNet'i otoregresif üretici modele çevir: μ-law kodlaması (256 seviye, Denk. 1) ve softmax çıktı (Bölüm 2.2), kapılı aktivasyon, artık + atlama bağlantıları; küçük bir ses veri setinde (ör. tek konuşmacının birkaç dakikası ya da sentetik nota dizileri) eğit, örnekleme hızını ölç ve önbellekli hızlı üretimi (Paine ve ark. 2016'daki "fast WaveNet" kuyrukları) uygulayıp yavaş üretimle karşılaştır.
+    steps:
+      - "μ-law: $f(x)=\\mathrm{sign}(x)\\ln(1+\\mu|x|)/\\ln(1+\\mu)$."
+      - "Hızlı üretim: her katman için son d adımı tutan dairesel tampon."
+    accept:
+      - "Üretilen ses/dizi eğitim verisinin istatistiklerini taşır (spektrum veya nota dağılımı)."
+      - "Önbellekli üretim yavaşıyla bire bir aynı örnekleri verir ve katman sayısıyla doğrusal hızlanır."
+  - title: "Oreshkin ve ark. (2020): N-BEATS"
+    paper: "Oreshkin, Carpov, Chapados, Bengio — N-BEATS: Neural basis expansion analysis for interpretable time series forecasting (ICLR 2020)"
+    url: "https://arxiv.org/abs/1905.10437"
+    level: orta
+    hours: 12
+    goal: |
+      Geri/ileri artık (backcast/forecast) yığınlı N-BEATS'in hem genel hem yorumlanabilir (trend: polinom tabanı, mevsimsellik: Fourier tabanı) sürümünü uygula; x1'deki mevsimsel sentetik serilerde ve ders alıştırması 6 verisinde SARIMA-benzeri modelle, d aşamasındaki dizi→dizi RNN'le ve e'deki WaveNet'le sMAPE / MASE üzerinden karşılaştır.
+    steps:
+      - "MASE paydası: mevsimsel naif tahminin eğitim içi ortalama mutlak hatası."
+    accept:
+      - "Yorumlanabilir sürümün trend ve mevsim yığınları ayrık bileşenleri ayırır (çizimle)."
+      - "N-BEATS mevsimsel veride naif ve SARIMA-benzeri modeli geçer."
