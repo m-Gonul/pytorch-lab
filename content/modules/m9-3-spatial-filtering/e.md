@@ -1,0 +1,1 @@
+`box_cumsum(x, k)` — `x: (B, H, W)`, sıfır doldurmalı `k × k` ortalama, iki eksende `cumsum` ile (çekirdek boyutundan bağımsız maliyet), **döngü yok**. Kontrol `F.avg_pool2d(…, stride=1, padding=k//2, count_include_pad=True)` ile karşılaştırır ve dört yöntemin süresini $k$'ye göre tablolar.

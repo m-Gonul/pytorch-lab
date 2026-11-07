@@ -1,0 +1,97 @@
+id: m9-3-spatial-filtering
+code: M9.3
+title: "Uzamsal filtreleme: konvolüsyon, separable, integral görüntü"
+phase: 9
+minutes: 330
+prereq: [m9-1-digital-image, m4-1-conv]
+summary: >
+  Komşuluk işlemlerinin temeli: korelasyon ile konvolüsyonun farkını, ayrılabilir
+  çekirdeklerin işlem kazancını ve integral görüntüyle sabit maliyetli kutu
+  filtresini elle hesaplıyor; saf Python'da keyfi boyutlu korelasyon ve
+  konvolüsyonu yazıp `cv2.filter2D` ile birebir karşılaştırıyor, NumPy'da
+  ayrılabilir kutu filtresi, `cv2.integral` ile aynı integral görüntü, dört
+  aramalı kutu filtresi ve Gauss bulanıklaştırmayı kuruyor, PyTorch'ta kenar
+  doldurma modlarını OpenCV'ninkilerle eşleştirip bilinmeyen bir çekirdeği
+  girdi–çıktı çiftinden geri buluyor ve en sonda dört yöntemin hızını çekirdek
+  boyutuna göre ölçüyorsun.
+goals:
+  - "Korelasyon ve konvolüsyon (çekirdek çevirme), dürtü yanıtı, kenar doldurma türleri"
+  - "[[ayrılabilir filtre]]: $k^2$ yerine $2k$ işlem; ayrılabilirliği SVD ile sınamak"
+  - "[[integral görüntü]] ile her kutu toplamı 4 aramada; ara toplamların bit genişliği"
+  - "Kutu ve Gauss alçak geçiren filtreler; OpenCV'nin otomatik $\\sigma$ kuralı"
+sources:
+  - {title: "Gonzalez & Woods — Digital Image Processing, Bölüm 3.4–3.5", url: "https://www.imageprocessingplace.com/", license: "©", use: link}
+  - {title: "OpenCV — Image Filtering (filter2D, blur, boxFilter, GaussianBlur, integral, copyMakeBorder)", url: "https://docs.opencv.org/4.x/d4/d86/group__imgproc__filter.html", license: "Apache-2.0", use: adapt}
+  - {title: "Crow — Summed-area tables for texture mapping (SIGGRAPH 1984)", url: "https://doi.org/10.1145/964965.808600", license: "©", use: link}
+  - {title: "Szeliski — Computer Vision: Algorithms and Applications, Bölüm 3.2", url: "https://szeliski.org/Book/", license: "© (PDF ücretsiz)", use: link}
+
+hand:
+  groups:
+    - title: "Görüntü parçası $\\begin{bmatrix}1&2&3\\\\4&5&6\\\\7&8&9\\end{bmatrix}$, merkez pikselde"
+      fields:
+        - {id: corr, label: "Korelasyon, $w=\\begin{bmatrix}1&0&0\\\\0&0&0\\\\0&0&0\\end{bmatrix}$", answer: 1}
+        - {id: conv, label: "Konvolüsyon, aynı $w$ (çekirdek 180° döner)", answer: 9}
+        - {id: lap, label: "Korelasyon, $w=\\begin{bmatrix}0&1&0\\\\1&-4&1\\\\0&1&0\\end{bmatrix}$", answer: 0}
+    - title: "Ayrılabilirlik ve işlem sayısı (piksel başına)"
+      fields:
+        - {id: mul9, label: "$\\begin{bmatrix}1&2&1\\\\2&4&2\\\\1&2&1\\end{bmatrix}$ doğrudan: çarpma", answer: 9}
+        - {id: mul6, label: "Aynı çekirdek $[1,2,1]^\\top[1,2,1]$ olarak ayrılmış: çarpma", answer: 6}
+        - {id: add5, label: "5 × 5 kutu, doğrudan toplam: toplama", answer: 24}
+        - {id: addi, label: "5 × 5 kutu, integral görüntüyle: toplama/çıkarma", answer: 3}
+    - title: "Integral görüntü ve Gauss"
+      fields:
+        - {id: ii, label: "$I=\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$ için $A(1,1)=\\sum_{r\\le1,c\\le1}I$", answer: 10}
+        - {id: sig, label: "OpenCV otomatik $\\sigma$, `ksize = 7`: $0.3\\,((k-1)/2-1)+0.8$", answer: 1.4}
+        - {id: bits, label: "1024 × 1024 8 bitlik görüntünün integralini taşmadan tutacak en az bit", answer: 28, hint: "$255\\cdot2^{20}<2^{28}$"}
+  verify: |
+    import math
+    P = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    answers = dict(corr=P[0][0], conv=P[2][2], lap=P[0][1] + P[1][0] + P[1][2] + P[2][1] - 4 * P[1][1],
+                   mul9=9, mul6=6, add5=24, addi=3, ii=1 + 2 + 3 + 4, sig=0.3 * ((7 - 1) * 0.5 - 1) + 0.8,
+                   bits=math.ceil(math.log2(255 * 1024 * 1024 + 1)))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Kenar doldurma modları = cv2.copyMakeBorder", engine: browser}
+  - {id: x2, title: "Ayrılabilirlik testi: SVD ile rank-1 ayrıştırma", engine: browser}
+  - {id: x3, title: "Kayan pencereli kutu filtresi: piksel başına O(1), integral görüntüsüz", engine: browser}
+
+quiz:
+  - q: "Simetrik bir çekirdekte (Gauss, kutu) korelasyon ile konvolüsyon neden aynı sonucu verir?"
+    options:
+      - {t: "Konvolüsyon çekirdeği 180° çevirir; simetrik çekirdek çevrilince kendisine eşittir", ok: true, why: "Fark, Sobel gibi asimetrik çekirdeklerde (işaret değişir) ve dürtü yanıtında (konvolüsyon çekirdeği aynen kopyalar) ortaya çıkar. CNN'lerin `conv2d`'si aslında korelasyondur."}
+      - {t: "Konvolüsyon değişmeli olduğu için", why: "Değişmelilik başka bir özellik."}
+      - {t: "Aynı sonucu vermez", why: "Simetrik çekirdekte verir."}
+  - q: "Integral görüntüyle kutu filtresinin dezavantajı nedir?"
+    options:
+      - {t: "Birikimli toplamlar büyür: 8 bit giriş için 32 bitlik (ya da daha geniş) tamsayılar ve fazladan bellek gerekir", ok: true, why: "Kazanç, çekirdek boyutundan bağımsız sabit maliyet. Kayan pencereli toplam (x3) aynı O(1)'i daha az bellekle verir ama ardışıktır."}
+      - {t: "Sonuç yaklaşıktır", why: "Tamsayılarla kesindir."}
+      - {t: "Yalnız kare çekirdeklerde çalışır", why: "Her dikdörtgen 4 aramayla toplanır."}
+  - q: "Kutu filtresi neden görüntüde 'blok' gibi hatalar bırakırken Gauss bırakmaz?"
+    options:
+      - {t: "Kutunun frekans yanıtı (sinc) yüksek frekanslarda yan loblar taşır ve işaret değiştirir; Gauss'un frekans yanıtı da Gauss'tur, düzgünce azalır", ok: true, why: "Yönlü kenarlar ve noktalar kutu filtresiyle kare izler bırakır; Gauss her yönde izotropik ve monotondur."}
+      - {t: "Kutu filtresi doğrusal değildir", why: "İkisi de doğrusal."}
+      - {t: "Gauss daha büyük olduğu için", why: "Boyut değil biçim."}
+
+homework:
+  - title: "Recursive (IIR) Gauss: çekirdek boyutundan bağımsız bulanıklaştırma"
+    paper: "Young & van Vliet — Recursive implementation of the Gaussian filter (Signal Processing 1995)"
+    url: "https://doi.org/10.1016/0165-1684(95)00020-E"
+    level: ileri
+    hours: 8
+    goal: |
+      Gauss bulanıklaştırmayı her eksende ileri-geri üçüncü dereceden bir özyinelemeli (IIR) filtreyle uygula: maliyet $\sigma$'dan bağımsız. Doğrudan (FIR) separable Gauss ve tekrarlı kutu filtresiyle (3 kez kutu ≈ Gauss) doğruluk ve hızı karşılaştır.
+    steps:
+      - "Young–van Vliet katsayılarını ($q$, $b_0..b_3$, $B$) $\\sigma$'dan hesapla."
+      - "Her satırı soldan sağa (nedensel) sonra sağdan sola (anti-nedensel) filtrele; sınır koşullarını tekrarlı başlangıçla kur."
+      - "Aynısını sütunlara uygula. `cv2.GaussianBlur` (büyük `ksize`) ile hatayı ölç."
+      - "$\\sigma\\in\\{1,4,16,64\\}$ için üç yöntemin süresini ve maksimum hatasını tablola."
+    accept:
+      - "$\\sigma\\ge2$ için iç bölgede `cv2.GaussianBlur` ile en büyük fark < 1 gri seviye (8 bit)."
+      - "Süre $\\sigma=4$ ile $\\sigma=64$ arasında %20'den fazla değişmiyor."
+      - "Üç kutu filtresi yaklaşımı için hata ve süre raporlanmış."
