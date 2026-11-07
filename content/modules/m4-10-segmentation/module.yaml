@@ -1,0 +1,120 @@
+id: m4-10-segmentation
+code: M4.10
+title: Segmentasyon — FCN, transposed convolution, U-Net
+phase: 4
+minutes: 400
+prereq: [m4-9-detection]
+summary: >
+  Her pikseli sınıflandırmak: anlamsal (semantic) ve örnek (instance)
+  segmentasyon. CNN'in toplam adımı (32) çözünürlüğü yok eder; FCN bunu
+  bir yukarı örnekleme katmanıyla geri kazanır. Transposed convolution'un
+  dört eşdeğer görünümü: girdiyi çekirdekle "saçma" (scatter), sıfır
+  ekleyip normal konvolüsyon (kesirli adım), konvolüsyon matrisinin
+  transpozu ve konvolüsyonun girdiye göre gradyanı. Bilineer çekirdekle
+  başlatma, FCN-32s → FCN-8s atlama bağlantıları, U-Net'in kodlayıcı-kod
+  çözücüsü ve kopyalama bağlantıları, valid konvolüsyonlu 572 → 388
+  geometrisi, IoU/Dice/mIoU, dama tahtası (checkerboard) artefaktı,
+  alt-piksel konvolüsyonu (PixelShuffle), genişletilmiş (dilated)
+  konvolüsyon ve bağlantılı bileşenlerle örnek ayırma.
+goals:
+  - "[[transposed convolution]]: çıkış boyutu $(H-1)s-2p+k$; scatter = sıfır ekleme + konv. = $C^\\top$ = $\\partial\\,\\mathrm{conv}/\\partial x$"
+  - "FCN-32s/8s ve bilineer başlatma; [[u-net]] kopyalama bağlantıları"
+  - "Segmentasyon ölçütleri: piksel doğruluğu, IoU, mIoU, Dice; kenar doğruluğu"
+  - "Yukarı örnekleme artefaktları; PixelShuffle; [[genişletilmiş konvolüsyon]]"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 14", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Long, Shelhamer, Darrell — Fully Convolutional Networks for Semantic Segmentation (CVPR 2015)", url: "https://arxiv.org/abs/1411.4038", license: "arXiv", use: link}
+  - {title: "Ronneberger, Fischer, Brox — U-Net (MICCAI 2015)", url: "https://arxiv.org/abs/1505.04597", license: "arXiv", use: link}
+  - {title: "Dumoulin & Visin — A guide to convolution arithmetic for deep learning", url: "https://arxiv.org/abs/1603.07285", license: "arXiv", use: link}
+  - {title: "Odena, Dumoulin, Olah — Deconvolution and Checkerboard Artifacts (Distill 2016)", url: "https://distill.pub/2016/deconv-checkerboard/", license: "CC-BY 4.0", use: link}
+  - {title: "Shi ve ark. — Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel CNN (CVPR 2016)", url: "https://arxiv.org/abs/1609.05158", license: "arXiv", use: link}
+  - {title: "Yu & Koltun — Multi-Scale Context Aggregation by Dilated Convolutions (ICLR 2016)", url: "https://arxiv.org/abs/1511.07122", license: "arXiv", use: link}
+  - {title: "Wang ve ark. — Understanding Convolution for Semantic Segmentation (HDC, WACV 2018)", url: "https://arxiv.org/abs/1702.08502", license: "arXiv", use: link}
+  - {title: "d2l.ai — 14.10 Transposed Convolution, 14.11 FCN", url: "https://d2l.ai/chapter_computer-vision/transposed-conv.html", license: "CC-BY-SA 4.0", use: link}
+
+hand:
+  groups:
+    - title: "Transposed convolution"
+      fields:
+        - {id: osz, label: "Girdi 7 × 7, k = 4, s = 2, p = 1: çıkış kenarı", answer: 14}
+        - {id: o4, label: "1B: x = [1, 2, 3], w = [1, 2, 1], s = 2, p = 0 → çıkışın 4. indeksi (0'dan)", answer: 5}
+        - {id: zl, label: "Aynı işlem 'sıfır ekle + normal konv.' olarak: sıfır eklenip dolgulanmış girdinin uzunluğu", answer: 9}
+        - {id: cb, label: "2B, k = 3, s = 2: iç bölgede bir çıkış pikseline katkı yapan girdi sayısının en büyüğü / en küçüğü", answer: 4}
+        - {id: bil, label: "2× bilineer yukarı örnekleme çekirdeği (k = 4) merkezdeki ağırlık", answer: 0.5625, tol: 1.0e-9}
+    - title: "U-Net ve ölçütler"
+      fields:
+        - {id: unet, label: "Özgün U-Net (valid 3×3 konv. ×2 her seviyede, 4 havuz, 2×2 yukarı konv.): 572 × 572 girdi → çıkış kenarı", answer: 388}
+        - {id: iou, label: "Tahmin 6 piksel, gerçek 5 piksel, kesişim 4: IoU", answer: 0.5714285714285714, tol: 1.0e-6}
+        - {id: dice, label: "Aynı örnek: Dice", answer: 0.7272727272727273, tol: 1.0e-6}
+  verify: |
+    o = [0] * 7
+    for i, xv in enumerate([1, 2, 3]):
+        for u, wv in enumerate([1, 2, 1]):
+            o[2 * i + u] += xv * wv
+    cnt = [0] * 21
+    for i in range(10):
+        for u in range(3):
+            cnt[2 * i + u] += 1
+    inner = cnt[4:16]
+    h = 572
+    for _ in range(4):
+        h = (h - 4) // 2
+    h -= 4
+    for _ in range(4):
+        h = h * 2 - 4
+    answers = dict(osz=(7 - 1) * 2 - 2 + 4, o4=o[4], zl=(3 - 1) * 2 + 1 + 2 * (3 - 1), cb=max(inner) ** 2 // min(inner) ** 2,
+                   bil=0.75 * 0.75, unet=h, iou=4 / 7, dice=2 * 4 / (6 + 5))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Alt-piksel konvolüsyonu (PixelShuffle) = transposed conv", engine: browser}
+  - {id: x2, title: "Genişletilmiş (dilated) konvolüsyon ve ızgaralanma", engine: browser}
+  - {id: x3, title: "Anlamsaldan örneğe: bağlantılı bileşenler", engine: browser}
+
+quiz:
+  - q: "Transposed convolution'da adım (stride) 2 ne anlama gelir?"
+    options:
+      - {t: "Girdinin ne kadar 'gerileceği': elemanlar arasına s − 1 sıfır eklenip normal konvolüsyon yapılır; adım büyüdükçe çıkış büyür (kesirli adım 1/s)", ok: true, why: "Géron: konvolüsyonun tersine, stride çıktıyı büyütür."}
+      - {t: "Filtrenin iki piksel atlaması: çıkış yarıya iner", why: "Bu normal konvolüsyon."}
+      - {t: "Çekirdeğin iki kez uygulanması", why: "Hayır."}
+  - q: "U-Net'in kopyalama (skip) bağlantıları hangi sorunu çözer?"
+    options:
+      - {t: "Kodlayıcının havuzlamalarla kaybettiği ince uzamsal ayrıntıyı (kenarlar) kod çözücüye doğrudan taşır; kod çözücü 'ne' bilgisini derin katmandan, 'nerede' bilgisini sığ katmandan alır", ok: true, why: "d aşamasında kenar doğruluğu farkı tam bunu ölçer."}
+      - {t: "Gradyan patlamasını", why: "Asıl amaç çözünürlük."}
+      - {t: "Parametre sayısını azaltmayı", why: "Birleştirme parametreyi artırır."}
+  - q: "k = 3, s = 2'lik transposed convolution neden dama tahtası artefaktı üretir?"
+    options:
+      - {t: "Çekirdek boyutu adıma bölünmediği için çıkış pikselleri eşit olmayan sayıda katkı alır (1, 2, 4): düzensiz örtüşme", ok: true, why: "Odena ve ark.: k'yı s'nin katı seç ya da 'yeniden boyutlandır + konv.' kullan."}
+      - {t: "Bilineer başlatma yapılmadığı için", why: "Başlatma yapısal örtüşmeyi değiştirmez."}
+      - {t: "ReLU'dan dolayı", why: "Doğrusal katmanın kendisinde."}
+
+homework:
+  - title: "Long, Shelhamer, Darrell (2015): FCN-32s/16s/8s"
+    paper: "Long, Shelhamer, Darrell — Fully Convolutional Networks for Semantic Segmentation (CVPR 2015)"
+    url: "https://arxiv.org/abs/1411.4038"
+    level: orta
+    hours: 12
+    goal: |
+      Önceden eğitilmiş bir VGG-16'nın yoğun katmanlarını konvolüsyona çevir (fc6 → 7 × 7 konv., fc7 → 1 × 1; ağırlıkları yeniden şekillendirerek, M4.9 x1), PASCAL VOC 2012'nin küçük bir alt kümesinde FCN-32s, ardından 16s ve 8s'i makaledeki aşamalı ince ayar düzeninde eğit; Tablo 2'deki gibi piksel doğruluğu, ortalama doğruluk, mIoU ve frekans ağırlıklı IoU raporla. Yukarı örnekleme katmanlarını bilineer başlat; donuk bilineer ile öğrenilebiliri karşılaştır.
+    steps:
+      - "c aşamasındaki bilinear_kernel ve confusion/miou'yu kullan."
+    accept:
+      - "FCN-8s, FCN-32s'ten mIoU'da belirgin iyi."
+      - "Öğrenilebilir yukarı örnekleme ile donuk bilineer arasındaki fark küçük (makaleyle uyumlu)."
+  - title: "Ronneberger ve ark. (2015): U-Net ve ağırlık haritası"
+    paper: "Ronneberger, Fischer, Brox — U-Net: Convolutional Networks for Biomedical Image Segmentation (MICCAI 2015)"
+    url: "https://arxiv.org/abs/1505.04597"
+    level: orta
+    hours: 12
+    goal: |
+      Valid konvolüsyonlu özgün U-Net'i (572 → 388) ve döşemeli (overlap-tile) çıkarımı uygula; sentetik "birbirine değen hücreler" veri setinde (x3'teki gibi) makaledeki Denk. (2) ağırlık haritasıyla — $w(x)=w_c(x)+w_0\,e^{-(d_1+d_2)^2/2\sigma^2}$, $w_0=10$, $\sigma\approx5$ — ve onsuz eğit. Ayırma çizgilerinin doğru öğrenildiğini örnek sayısı (bağlantılı bileşen) üzerinden ölç; elastik deformasyon artırmasını ekle.
+    steps:
+      - "$d_1$, $d_2$: her piksel için en yakın ve ikinci en yakın hücrenin sınırına uzaklık."
+    accept:
+      - "Ağırlık haritasıyla değen hücreler ayrı örnekler olarak çıkar; onsuz birleşir."
+      - "Döşemeli çıkarım, tek parça çıkarımla kenarlarda aynı sonucu verir."

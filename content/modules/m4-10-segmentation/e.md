@@ -1,0 +1,2 @@
+- `upsamplers(C)` → sözlük (her biri `C → C`, ×2): `"tconv k3 s2"` (`output_padding=1`), `"tconv k4 s2"` (`padding=1`), `"nearest + conv3"`, `"bilinear + conv3"`, `"PixelShuffle"` (1×1 konv. C → 4C + `nn.PixelShuffle(2)`).
+- `structural_artifact(m)` — tüm ağırlıklar eşit (1/eleman sayısı), bias 0, girdi sabit 1 iken iç bölgedeki çıkışın (en büyük − en küçük) / ortalama oranı.

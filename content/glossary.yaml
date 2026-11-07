@@ -158,3 +158,6 @@ terms:
   çapa kutusu: "Anchor box: tespit ağının kutuları göre tahmin ettiği önceden belirlenmiş (w, h) prototipleri; YOLOv2+ bunları eğitim kutularına 1 − IoU uzaklıklı k-means ile bulur."
   ortalama hassasiyet: "Average precision (AP): precision–recall eğrisinin zarfının altındaki alan (ya da 11 recall düzeyindeki ortalaması); sınıflar üzerinden ortalaması mAP, IoU eşikleri üzerinden ortalaması COCO AP@[.50:.95]."
   öznitelik piramidi ağı: "Feature Pyramid Network (FPN): omurganın çok ölçekli haritalarını yukarıdan-aşağı bir yol ve yanal bağlantılarla birleştirip her ölçekte anlamca güçlü öznitelikler üreten yapı (Lin ve ark. 2017)."
+  transposed convolution: "Konvolüsyonun 'transpozu': her girdi pikseli çekirdeği kendi değeriyle ölçekleyip çıktıya saçar; adım s ile çıktıyı büyütür. Eşdeğer olarak sıfır ekleme + normal konvolüsyon, konvolüsyon matrisinin transpozu ya da konvolüsyonun girdiye göre gradyanı."
+  u-net: "Kodlayıcı-kod çözücü segmentasyon ağı (Ronneberger ve ark. 2015): kodlayıcının her ölçekteki haritası kod çözücüdeki aynı ölçeğe kopyalanıp birleştirilir; ince ayrıntı korunur."
+  genişletilmiş konvolüsyon: "Dilated (atrous) convolution: çekirdek elemanları arasında d − 1 boşluk bırakan konvolüsyon; parametre ve çözünürlük kaybı olmadan receptive field'ı büyütür."
