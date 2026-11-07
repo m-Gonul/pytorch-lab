@@ -1,0 +1,64 @@
+id: m6-5-compile
+code: M6.5
+title: "torch.compile, FX ve operatör füzyonu"
+phase: 6
+minutes: 270
+prereq: [m6-1-autograd-internals]
+summary: >
+  Derleyicinin gözünden PyTorch. Füzyonun bellek trafiğini nasıl azalttığını
+  elle hesaplıyor, saf Python'da torch.fx benzeri bir izleyici (tracer) ile
+  bir fonksiyonu grafa çevirip CSE ve ölü kod eleme geçişleri yazıyor,
+  NumPy'da elementwise işlemleri füzyon gruplarına ayırıp taşınan baytı
+  modelliyor, PyTorch'ta FX ile Conv + BatchNorm katlama yapıyor ve en sonda
+  `torch.compile` ile graph break'leri bulup gideriyor, füzyonun kazancını
+  ölçüyorsun.
+goals:
+  - "Elementwise işlemlerin bellek-bağımlı olduğunu ve [[operatör füzyonu]]nun bayt trafiğini azalttığını görmek"
+  - "Tracing ile graf yakalama: Proxy nesneleri, düğümler, graf geçişleri (CSE, DCE)"
+  - "torch.fx ile model dönüşümü: eval modunda BatchNorm'u konvolüsyona katlamak"
+  - "Dynamo'nun [[graph break]] nedenlerini bulmak ve veriye bağlı Python akışını tensör işlemine çevirmek"
+sources:
+  - {title: "Ansel ve ark. — PyTorch 2: Faster Machine Learning Through Dynamic Python Bytecode Transformation and Graph Compilation", url: "https://pytorch.org/assets/pytorch2-2.pdf", license: "©", use: link}
+  - {title: "PyTorch Docs — torch.fx", url: "https://docs.pytorch.org/docs/stable/fx.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "PyTorch Tutorials — (beta) Building a Convolution/Batch Norm fuser in FX", url: "https://docs.pytorch.org/tutorials/intermediate/fx_conv_bn_fuser.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "PyTorch Tutorials — Introduction to torch.compile", url: "https://docs.pytorch.org/tutorials/intermediate/torch_compile_tutorial.html", license: "BSD-3-Clause", use: adapt}
+  - {title: "Horace He — Making Deep Learning Go Brrrr From First Principles", url: "https://horace.io/brrr_intro.html", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "$y=\\operatorname{gelu}(x\\cdot a+b)$, $x$: $10^6$ fp32 eleman, $a,b$ skaler (bellek trafiğine katkısı yok)"
+      fields:
+        - {id: unf, label: "Füzyonsuz (mul, add, gelu ayrı kernel): okunan + yazılan bayt", answer: 24000000, hint: "Her kernel $N$ okur, $N$ yazar: $3\\cdot2\\cdot4N$"}
+        - {id: fus, label: "Tek füzyonlu kernel: bayt", answer: 8000000}
+        - {id: ratio, label: "Bellek-bağımlı işlemde beklenen hız kazancı üst sınırı", answer: 3}
+    - title: "Conv + BN katlama: tek kanal, $w=2$, $b=1$; BN: $\\mu=3$, $\\sigma^2=4$, $\\gamma=0.5$, $\\beta=1$, $\\epsilon=0$"
+      fields:
+        - {id: wf, label: "Katlanmış ağırlık $w'=w\\gamma/\\sqrt{\\sigma^2+\\epsilon}$", answer: 0.5}
+        - {id: bf, label: "Katlanmış bias $b'=(b-\\mu)\\gamma/\\sqrt{\\sigma^2+\\epsilon}+\\beta$", answer: 0.5}
+  verify: |
+    N = 10 ** 6
+    s = 0.5 / 2
+    answers = dict(unf=3 * 2 * 4 * N, fus=2 * 4 * N, ratio=3, wf=2 * s, bf=(1 - 3) * s + 1)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Elementwise işlemleri birleştirmek (fusion) neden hızlandırır, oysa FLOP sayısı aynı kalır?"
+    options:
+      - {t: "Bu işlemler bellek-bağımlı: süre FLOP'tan değil, HBM'den okunan/yazılan bayttan gelir; füzyon ara sonuçları belleğe yazmadan register'da tutar", ok: true, why: "Modern GPU'larda hesap gücü bellek bant genişliğinden çok daha hızlı büyüdü; aritmetik yoğunluğu düşük işlemler bant genişliğiyle sınırlı."}
+      - {t: "Derleyici işlemleri paralel yapar", why: "Kernel'ler zaten paralel; kazanç bellek trafiğinden."}
+      - {t: "Daha düşük hassasiyete geçer", why: "Varsayılan füzyon dtype'ı değiştirmez."}
+  - q: "`if x.sum().item() > 0:` satırı neden graph break yaratır?"
+    options:
+      - {t: "Dalın yönü tensörün **değerine** bağlı; Dynamo izleme sırasında değeri bilmez, Python'a geri dönmek zorunda kalır", ok: true, why: "Çözüm: `torch.where` ya da `torch.cond` ile kontrol akışını tensör işlemine çevirmek; şekle bağlı koşullar ise sorun değil (guard'lanır)."}
+      - {t: "`.sum()` desteklenmediği için", why: "sum sorun değil; `.item()` ve veriye bağlı `if`."}
+      - {t: "Tüm `if` ifadeleri graph break yaratır", why: "Şekle ya da sabitlere bağlı `if`'ler izlenir."}
+  - q: "Conv + BatchNorm katlama neden yalnız eval modunda geçerlidir?"
+    options:
+      - {t: "Eval'da BN sabit (running) istatistiklerle doğrusal bir afin dönüşüm; eğitimde batch istatistikleri her adımda değişir", ok: true, why: "Katlama, çıkarımda bir kernel ve bir bellek geçişi tasarrufu sağlar."}
+      - {t: "Eğitimde gradyan hesaplanamadığı için", why: "Mesele istatistiklerin sabit olması."}
+      - {t: "Her iki modda da geçerlidir", why: "Eğitimde batch'e bağlı normalizasyon katlanamaz."}
