@@ -1,0 +1,66 @@
+id: m3-3-tensor-autograd
+code: M3.3
+title: Tensor autograd motoru (MiniTorch tarzı)
+phase: 3
+minutes: 300
+prereq: [m3-1-micrograd, m3-2-mlp-backprop]
+summary: >
+  micrograd'ın skalerlerini tensörlere büyütüyorsun. Broadcasting'li bir
+  işlemin gradyanını elle "geri toplamayı" (unbroadcast) öğreniyor, kuralları
+  saf Python'da yazıyor, NumPy üzerinde gerçek bir `Tensor` sınıfıyla autograd
+  motoru kurup onunla softmax regression eğitiyor, PyTorch'ta autograd
+  kullanmadan aynı gradyanları elle türetiyor ve en sonda forward-mode ile
+  reverse-mode Jacobian'ın hangisinin ne zaman kazandığını ölçüyorsun.
+goals:
+  - "Broadcasting'in geri geçişinin bir toplama olduğunu ([[unbroadcast]]) göstermek ve kuralını yazmak"
+  - "Matmul, toplam, eleman eleman işlemler ve indirgeme (sum/mean) için tensör düzeyinde backward kuralları kurmak"
+  - "Kendi motorunla gerçek bir model eğitip sayısal gradyanla doğrulamak"
+  - "VJP (reverse) ve JVP (forward) modlarını ve maliyetlerinin girdi/çıktı boyutuna bağlılığını açıklamak"
+sources:
+  - {title: "MiniTorch — Module 1 (Autodiff) ve Module 2 (Tensors)", url: "https://minitorch.github.io/", license: "lisans dosyası yok", use: link}
+  - {title: "Karpathy — micrograd", url: "https://github.com/karpathy/micrograd", license: "MIT", use: adapt}
+  - {title: "CS231n — Derivatives, Backpropagation, and Vectorization (notlar)", url: "https://cs231n.stanford.edu/handouts/derivatives.pdf", license: "©", use: link}
+  - {title: "PyTorch — torch.func: jvp, vjp, jacfwd, jacrev", url: "https://docs.pytorch.org/docs/stable/func.api.html", license: "BSD-3", use: adapt}
+
+hand:
+  groups:
+    - title: "$a=\\begin{bmatrix}1&2&3\\\\4&5&6\\end{bmatrix}$ $(2\\times3)$, $b=[1,1,1]$ $(3,)$, $L=\\sum(a\\odot b)$"
+      fields:
+        - {id: db1, label: "$\\partial L/\\partial b_1$", answer: 5, hint: "$b$ iki satıra yayıldı; katkılar toplanır: $1+4$"}
+        - {id: db3, label: "$\\partial L/\\partial b_3$", answer: 9, hint: "$3+6$"}
+        - {id: da, label: "$\\partial L/\\partial a_{23}$", answer: 1, hint: "$b_3$"}
+    - title: "$L=\\sum(a+c)$, $c$ shape'i $(2,1)$"
+      fields:
+        - {id: dc, label: "$\\partial L/\\partial c_1$", answer: 3, hint: "$c_1$ üç sütuna yayıldı"}
+    - title: "$L=\\sum(AB)$, $A$ $(2\\times3)$, $B=\\begin{bmatrix}1&2\\\\3&4\\\\5&6\\end{bmatrix}$"
+      fields:
+        - {id: dA11, label: "$\\partial L/\\partial A_{11}$", answer: 3, hint: "$dA=\\mathbf 1B^\\top$: $B$'nin 1. satır toplamı"}
+        - {id: dA13, label: "$\\partial L/\\partial A_{13}$", answer: 11, hint: "3. satır toplamı"}
+        - {id: rows, label: "$dA$'nın satır sayısı", answer: 2, hint: "her zaman $A$ ile aynı shape"}
+  verify: |
+    a = [[1, 2, 3], [4, 5, 6]]; B = [[1, 2], [3, 4], [5, 6]]
+    answers = dict(db1=a[0][0] + a[1][0], db3=a[0][2] + a[1][2], da=1, dc=3,
+                   dA11=sum(B[0]), dA13=sum(B[2]), rows=2)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Bir işlemin ileri geçişinde broadcasting varsa geri geçişte ne yapılmalı?"
+    options:
+      - {t: "Gelen gradyan, girdinin shape'ine dönene kadar genişletilmiş eksenler üzerinden toplanmalı", ok: true, why: "İleri geçişte kopyalanan (yayılan) değer çıktının birden çok elemanını etkiledi; zincir kuralı bu katkıları toplar. Bu, M0.3'teki \"iki yol → topla\" kuralının tensör hâli."}
+      - {t: "Gradyanın ortalaması alınmalı", why: "Ortalama değil toplam; ortalama $1/k$ yanlış ölçek verir."}
+      - {t: "Hiçbir şey; shape'ler zaten uyar", why: "Uymaz: $(2,3)$ gradyan $(3,)$ parametreye atanamaz."}
+  - q: "$f:\\mathbb R^{n}\\to\\mathbb R^{m}$'nin tam Jacobian'ı için hangisi daha ucuz?"
+    options:
+      - {t: "$n\\ll m$ ise forward-mode ($n$ JVP), $n\\gg m$ ise reverse-mode ($m$ VJP)", ok: true, why: "Her JVP bir sütun, her VJP bir satır verir. Kayıp fonksiyonu $m=1$: backprop bu yüzden reverse-mode."}
+      - {t: "Her zaman reverse-mode", why: "Az girdi, çok çıktı durumunda forward-mode kazanır; e aşamasında ölçüyorsun."}
+      - {t: "İkisi her zaman eşit", why: "Maliyetler girdi/çıktı boyutuyla ölçeklenir."}
+  - q: "Motorunda `x * x` için gradyan neden $2x$ çıkmalı ve hangi hata bunu bozar?"
+    options:
+      - {t: "`x` aynı düğüme iki kez girer; backward'da `grad = ...` (üzerine yazma) kullanılırsa $x$ çıkar, `grad += ...` gerekir", ok: true, why: "M3.1'deki kural tensörlerde de geçerli. Kontrol bu durumu test ediyor."}
+      - {t: "pow kullanılmadığı için", why: "Çarpım kuralı yeterli; sorun birikim."}
+      - {t: "Bozmaz", why: "Paylaşılan düğümde birikim olmadan yanlış çıkar."}
