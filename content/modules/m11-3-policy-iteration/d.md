@@ -1,0 +1,4 @@
+**Jack'in araba kiralama problemi** (Sutton Örnek 4.2): iki şube, en çok 20'şer araba; kiralama talebi Poisson(3) ve Poisson(4), iadeler Poisson(3) ve Poisson(2); kiralama başı 10 \$; gece en fazla 5 araba taşınabilir, araba başı 2 \$; γ = 0.9. Sıra: taşı (21'e kırp) → talepler (en fazla eldeki kadar kiralanır) → iadeler (20'de kırp).
+
+- `location(lam_req, lam_ret, N=20)` → `(T (N+1, N+1), r (N+1,))`: taşımadan sonra $n$ araba varken ertesi sabahki sayının dağılımı ve beklenen kira geliri. Kuyruk olasılıkları sona eklenir (talep ≥ n, iade ≥ N).
+- `jack_pi(gamma=0.9)` → `(V (21, 21), pi (21, 21), iters)`: eylem $a\in[-5,5]$ (pozitif: 1. şubeden 2.'ye), uygulanabilirlik $a\le n_1$, $-a\le n_2$. Değerlendirme doğrudan çözüm (441 × 441; ortak geçiş ayrılabilir: `T1[m1][:, :, :, None] * T2[m2][:, :, None, :]`), iyileştirme tüm eylemler için `einsum`. Politika değişmeyince dur.

@@ -1,0 +1,105 @@
+id: m11-3-policy-iteration
+code: M11.3
+title: Politika yinelemesi ve değiştirilmiş politika yinelemesi
+phase: 11
+minutes: 360
+prereq: [m11-2-mdp-vi]
+summary: >
+  Değeri değil politikayı doğrudan iyileştirmek: değerlendir → açgözlü
+  iyileştir döngüsü, her adımda değerin monoton artması, sonlu sayıda
+  adımda yakınsama ve ikisinin arasındaki değiştirilmiş politika yinelemesi
+  (k değerlendirme taraması). Elle iki durumlu bir PI; saf Python'da
+  Sutton'ın 4 × 4 ızgara dünyası ve rastgele politikanın ünlü değerleri;
+  NumPy'da VI, PI ve MPI'nin iterasyon / yedekleme (backup) muhasebesi;
+  PyTorch'ta Jack'in araba kiralama problemini Poisson geçişleriyle tam
+  çözüp kitaptaki politika haritasını yeniden üretiyorsun; en sonda büyük
+  MDP'lerde politika değerlendirmesi için doğrudan çözüm ile yinelemeli
+  çözümü karşılaştırıyorsun.
+goals:
+  - "PI: $V^{\\pi_n}$ değerlendir, $\\pi_{n+1}(s)=\\arg\\max_a[R+\\gamma\\sum PV^{\\pi_n}]$"
+  - "[[politika iyileştirme teoremi]]: $V^{\\pi_{n+1}}\\ge V^{\\pi_n}$; sonlu politika sayısı → sonlu adım"
+  - "Değiştirilmiş PI: k = 1 değer yinelemesi, k = ∞ politika yinelemesi"
+  - "Hesap muhasebesi: iterasyon sayısı × iterasyon maliyeti"
+sources:
+  - {title: "Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 4", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0", use: link}
+  - {title: "Puterman & Shin — Modified Policy Iteration Algorithms for Discounted MDPs (Management Science 1978)", url: "https://doi.org/10.1287/mnsc.24.11.1127", license: "©", use: link}
+  - {title: "Howard — Dynamic Programming and Markov Processes (MIT Press 1960)", url: "https://mitpress.mit.edu/", license: "©", use: link}
+  - {title: "Poupart — CS885 Reinforcement Learning, Ders 3", url: "https://cs.uwaterloo.ca/~ppoupart/teaching/cs885-spring20/", license: "doğrulanmadı", use: link}
+
+hand:
+  groups:
+    - title: "İki durum, $\\gamma=0.5$: $s_0$ kal → 0, $s_0$; git → 1, $s_1$. $s_1$ kal → 2, $s_1$; git → 0, $s_0$. Başlangıç $\\pi_0$ = (kal, kal)"
+      fields:
+        - {id: v00, label: "$V^{\\pi_0}(s_0)$", answer: 0}
+        - {id: v01, label: "$V^{\\pi_0}(s_1)$", answer: 4}
+        - {id: q0, label: "İyileştirmede $Q(s_0,\\text{git})$", answer: 3}
+        - {id: v10, label: "$\\pi_1$ = (git, kal) için $V(s_0)$", answer: 3}
+        - {id: it, label: "Politika değişmeyene dek kaç iyileştirme adımı (değişmediğini doğrulayan dahil)?", answer: 2}
+    - title: "4 × 4 ızgara dünyası (Sutton Örnek 4.1), rastgele politika, $\\gamma=1$, adım −1"
+      fields:
+        - {id: g1, label: "Köşe terminale komşu durum 1'in değeri", answer: -14}
+  verify: |
+    import numpy as np
+    def ev(pi):
+        P = np.zeros((2, 2)); R = np.zeros(2)
+        for s, a in enumerate(pi):
+            nxt = {(0, 0): (0, 0), (0, 1): (1, 1), (1, 0): (1, 2), (1, 1): (0, 0)}[(s, a)]
+            P[s, nxt[0]] = 1; R[s] = nxt[1]
+        return np.linalg.solve(np.eye(2) - 0.5 * P, R)
+    V0 = ev((0, 0))
+    V1 = ev((1, 0))
+    S = 16
+    P = np.zeros((S, S)); R = -np.ones(S)
+    for s in range(1, 15):
+        r, c = divmod(s, 4)
+        for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            rr, cc = min(max(r + dr, 0), 3), min(max(c + dc, 0), 3)
+            P[s, rr * 4 + cc] += 0.25
+    R[0] = R[15] = 0
+    V = np.zeros(S); idx = list(range(1, 15))
+    V[idx] = np.linalg.solve(np.eye(14) - P[np.ix_(idx, idx)], R[idx])
+    answers = dict(v00=V0[0], v01=V0[1], q0=1 + 0.5 * V0[1], v10=V1[0], it=2, g1=V[1])
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "PI'nin adım sayısı durum sayısıyla nasıl büyür?", engine: browser}
+  - {id: x2, title: "Politika iyileştirme teoremini sayısal doğrula", engine: browser}
+  - {id: x3, title: "Kumarbaz problemi (Sutton Örnek 4.3)", engine: browser}
+
+quiz:
+  - q: "Politika yinelemesi neden sonlu adımda durur?"
+    options:
+      - {t: "Her adımda değer kesin artar ya da politika sabitlenir; deterministik politika sayısı |A|^|S| ile sonludur ve hiçbiri iki kez ziyaret edilmez", ok: true, why: "Monotonluk döngüyü engeller."}
+      - {t: "Değer yinelemesiyle aynı hızda yakınsadığı için", why: "VI asimptotik yakınsar; PI sonlu adımda kesin durur."}
+      - {t: "γ < 1 olduğu için", why: "Sonluluk politika sayısından gelir."}
+  - q: "Değiştirilmiş politika yinelemesinde k = 1 ne demektir?"
+    options:
+      - {t: "Her iyileştirmeden önce tek bir değerlendirme taraması: değer yinelemesinin kendisi", ok: true, why: "k → ∞ tam değerlendirmeli PI'dir."}
+      - {t: "Tek bir durumun güncellenmesi", why: "Bu asenkron güncellemedir."}
+      - {t: "Tek bir politika iyileştirmesi", why: "k değerlendirme taraması sayısıdır."}
+  - q: "PI genelde VI'dan çok daha az iterasyon yapar. Neden her zaman daha hızlı değildir?"
+    options:
+      - {t: "Her PI iterasyonu bir doğrusal sistem çözümü (O(S³)) ya da çok sayıda tarama gerektirir", ok: true, why: "MPI ikisinin arasında bir denge kurar."}
+      - {t: "PI optimal politikayı bulamayabilir", why: "Bulur."}
+      - {t: "PI'nin her adımı VI'nınkinden ucuzdur", why: "Tersine."}
+
+homework:
+  - title: "Politika yinelemesinin karmaşıklığı"
+    paper: "Ye — The Simplex and Policy-Iteration Methods Are Strongly Polynomial for the Markov Decision Problem with a Fixed Discount Rate (Math. of OR 2011)"
+    url: "https://doi.org/10.1287/moor.1110.0516"
+    level: ileri
+    hours: 10
+    goal: |
+      Sabit γ için politika yinelemesinin (Howard) en fazla $O\\big(\\frac{|S||A|}{1-\\gamma}\\log\\frac{|S|}{1-\\gamma}\\big)$ iterasyonda bittiğini gösteren sonucu incele; MDP'yi doğrusal programa çevir, PI'yi simpleks yöntemiyle ilişkilendir ve deneyle kontrol et.
+    steps:
+      - "MDP'nin birincil LP'si: $\\min\\sum_s V(s)$ s.t. $V(s)\\ge R(s,a)+\\gamma\\sum P V$ — `scipy.optimize.linprog` ile çöz, VI ile karşılaştır."
+      - "İkili LP: ziyaret ölçüleri $x(s,a)$; PI'nin bir iyileştirme adımının simpleks pivotlarına karşılığı."
+      - "Rastgele ve kötü durum (Melekopoglou–Condon tipi) MDP'lerde |S|, γ'ya karşı iterasyon grafikleri."
+    accept:
+      - "LP, VI ve PI aynı V*'ı verir (1e-8)."
+      - "γ → 1 iken iterasyon sayısının 1/(1−γ) ile büyüdüğü bir aile gösterilmiş."
