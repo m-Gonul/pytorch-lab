@@ -1,0 +1,71 @@
+id: m1-5-softmax
+code: M1.5
+title: Softmax regression ve log-sum-exp
+phase: 1
+minutes: 210
+prereq: [m1-4-logreg]
+summary: >
+  Çok sınıflı sınıflandırmanın standart kafası. Üç logit'te softmax,
+  cross-entropy ve gradyanı elle hesaplıyor; taşmayan log-sum-exp yazıyor;
+  CS231n'in klasik vektörize softmax kaybını NumPy'da kuruyor; PyTorch'ta
+  `F.cross_entropy`'yi kendin yeniden yazıyor ve en sonda softmax
+  Jacobian'larını ve confusion matrix'i döngüsüz üretiyorsun.
+goals:
+  - "[[softmax]] ve kategorik [[cross-entropy]]'yi tanımlayıp gradyanın $p-\\text{onehot}(y)$ olduğunu türetmek"
+  - "[[log-sum-exp]] hilesiyle $z=[1000,999,998]$ gibi logit'lerde taşmayan bir uygulama yazmak"
+  - "Softmax kaybını ve gradyanını $(n,K)$ matrislerle tek ifadede hesaplamak"
+  - "Softmax Jacobian'ını $\\text{diag}(p)-pp^\\top$ olarak batch hâlinde kurmak"
+sources:
+  - {title: "CS231n — Linear classification: Softmax classifier", url: "https://cs231n.github.io/linear-classify/#softmax", license: "MIT", use: adapt}
+  - {title: "CS231n Assignment 1 — softmax_loss_naive / softmax_loss_vectorized", url: "https://cs231n.github.io/assignments2025/assignment1/", license: "MIT", use: adapt}
+  - {title: "Dive into Deep Learning §4.1 Softmax Regression", url: "https://d2l.ai/chapter_linear-classification/softmax-regression.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
+  - {title: "PyTorch — F.cross_entropy, torch.logsumexp", url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.cross_entropy.html", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "Logit'ler $z=[2,1,0]$, doğru sınıf $y=0$. Tablo: $e^2\\approx7.389$, $e^1\\approx2.718$"
+      fields:
+        - {id: Z, label: "$\\sum_k e^{z_k}$", answer: 11.107, tol: 0.003, hint: "$7.389+2.718+1$"}
+        - {id: p0, label: "$p_0$", answer: 0.665241, tol: 0.002, hint: "$7.389/11.107$"}
+        - {id: p1, label: "$p_1$", answer: 0.244728, tol: 0.002, hint: "$2.718/11.107$"}
+        - {id: p2, label: "$p_2$", answer: 0.090031, tol: 0.002, hint: "$1/11.107$"}
+    - title: "Kayıp ve gradyan"
+      fields:
+        - {id: lse, label: "$\\text{LSE}(z)=\\ln\\sum_k e^{z_k}$", answer: 2.407606, tol: 0.003, hint: "$\\ln 11.107$; $\\ln 11\\approx2.398$"}
+        - {id: ce, label: "$\\ell=\\text{LSE}(z)-z_y$", answer: 0.407606, tol: 0.003, hint: "$2.4076-2$"}
+        - {id: g0, label: "$\\partial\\ell/\\partial z_0=p_0-1$", answer: -0.334759, tol: 0.002, hint: "doğru sınıfın logit'i yükselmek ister"}
+        - {id: g2, label: "$\\partial\\ell/\\partial z_2=p_2$", answer: 0.090031, tol: 0.002, hint: "yanlış sınıflar kendi olasılıkları kadar itilir"}
+    - title: "Kararlılık: $z'=[1000,999,998]$"
+      fields:
+        - {id: shift, label: "$\\max z'$ çıkarılınca logit'ler: ilk eleman", answer: 0, hint: "$1000-1000$; sonuç $[0,-1,-2]$"}
+        - {id: pp0, label: "$p'_0$", answer: 0.665241, tol: 0.002, hint: "softmax kaydırmaya karşı değişmez: $z$ ile aynı"}
+  verify: |
+    import math
+    z = [2, 1, 0]
+    e = [math.exp(v) for v in z]; S = sum(e); p = [v / S for v in e]
+    answers = dict(Z=round(S, 3), p0=round(p[0], 6), p1=round(p[1], 6), p2=round(p[2], 6),
+                   lse=round(math.log(S), 6), ce=round(math.log(S) - 2, 6), g0=round(p[0] - 1, 6), g2=round(p[2], 6),
+                   shift=0, pp0=round(p[0], 6))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "Softmax neden logit'lere sabit eklemeye karşı değişmez ve bu neden işe yarar?"
+    options:
+      - {t: "$e^{z_k+c}=e^c e^{z_k}$; $e^c$ pay ve paydada sadeleşir. $c=-\\max z$ seçince en büyük üs $e^0=1$ olur, taşma olmaz", ok: true, why: "Aynı hile log-sum-exp'te: $\\text{LSE}(z)=m+\\ln\\sum e^{z_k-m}$."}
+      - {t: "Softmax lineer bir fonksiyondur", why: "Lineer değil; değişmezlik yalnız toplamsal kaydırmaya karşı."}
+      - {t: "Logit'ler her zaman pozitiftir", why: "Logit'ler herhangi bir gerçek sayı olabilir."}
+  - q: "$K=2$ için softmax regression neye indirgenir?"
+    options:
+      - {t: "Logistic regression'a: $p_1=\\sigma(z_1-z_0)$", ok: true, why: "$\\frac{e^{z_1}}{e^{z_0}+e^{z_1}}=\\frac{1}{1+e^{-(z_1-z_0)}}$. İki ağırlık vektöründen yalnız farkları önemlidir; bu fazlalık parametrizasyondur."}
+      - {t: "İki bağımsız logistic regression'a", why: "O one-vs-rest (M1.4); softmax olasılıkları birbirine bağlar."}
+      - {t: "Linear regression'a", why: "Çıktı bir olasılık; kayıp MSE değil cross-entropy."}
+  - q: "`nn.CrossEntropyLoss` hangi girdiyi bekler?"
+    options:
+      - {t: "Ham logit'ler (softmax uygulanmamış) ve sınıf indeksleri", ok: true, why: "İçeride `log_softmax` + NLL yapar. Önce softmax uygulayıp verirsen softmax iki kez uygulanır ve gradyanlar sönükleşir."}
+      - {t: "Softmax olasılıkları ve one-hot etiketler", why: "Olasılıkları vermek yaygın bir hata; logit verilmeli."}
+      - {t: "log-olasılıklar", why: "O `nn.NLLLoss`'un girdisi."}
