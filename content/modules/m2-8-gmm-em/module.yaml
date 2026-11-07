@@ -1,0 +1,66 @@
+id: m2-8-gmm-em
+code: M2.8
+title: GMM ve EM
+phase: 2
+minutes: 240
+prereq: [m2-7-kmeans, m0-4-probability]
+summary: >
+  Yumuşak kümeleme ve gizli değişkenli modellerin genel algoritması. Üç
+  noktada bir E ve M adımını elle atıyor, saf Python'da 1-boyutlu EM'i
+  yazıyor, NumPy'da tam kovaryanslı GMM'yi einsum ile döngüsüz kuruyor,
+  PyTorch'ta aynı modeli `MixtureSameFamily` ile gradyanla eğitip EM ile
+  karşılaştırıyor ve en sonda R başlatmalı EM'i tek tensörde koşturuyorsun.
+goals:
+  - "Gauss karışım modelini ve [[responsibility]] kavramını tanımlamak"
+  - "E adımını (posterior) ve M adımını (ağırlıklı MLE) türetip uygulamak"
+  - "Log-likelihood'un EM iterasyonlarında azalmadığını gözlemek"
+  - "Tam kovaryanslı log-yoğunlukları $(n,K)$ matrisine einsum ve slogdet ile tek seferde hesaplamak"
+  - "Aynı modeli EM yerine doğrudan gradyanla optimize etmenin artı ve eksilerini görmek"
+sources:
+  - {title: "Stanford CS229 — Notes: Mixtures of Gaussians and the EM algorithm", url: "https://cs229.stanford.edu/main_notes.pdf", license: "doğrulanmadı", use: link}
+  - {title: "Bishop & Bishop — Deep Learning: Foundations and Concepts, Bölüm 15 (Discrete Latent Variables)", url: "https://www.bishopbook.com/", license: "doğrulanmadı", use: link}
+  - {title: "Murphy — PML1 §8.7 Bound optimization (EM)", url: "https://probml.github.io/pml-book/book1.html", license: "CC BY-NC-ND", use: link}
+  - {title: "PyTorch — torch.distributions.MixtureSameFamily", url: "https://docs.pytorch.org/docs/stable/distributions.html#mixturesamefamily", license: "BSD-3", use: link}
+
+hand:
+  groups:
+    - title: "$x=[1,2,4]$; iki bileşen $\\mu=(1,4)$, $\\sigma^2=(1,1)$, $\\pi=(0.5,0.5)$. E adımı: $r_{i1}=\\frac{\\pi_1\\mathcal N(x_i\\mid\\mu_1)}{\\sum_k\\pi_k\\mathcal N(x_i\\mid\\mu_k)}$"
+      fields:
+        - {id: r11, label: "$r_{11}$ ($x=1$)", answer: 0.989013, tol: 0.002, hint: "$\\frac{e^0}{e^0+e^{-4.5}}$; $e^{-4.5}\\approx0.0111$"}
+        - {id: r21, label: "$r_{21}$ ($x=2$)", answer: 0.817574, tol: 0.002, hint: "$\\frac{e^{-0.5}}{e^{-0.5}+e^{-2}}=\\frac{0.6065}{0.6065+0.1353}$"}
+        - {id: r31, label: "$r_{31}$ ($x=4$)", answer: 0.010987, tol: 0.002, hint: "$\\frac{e^{-4.5}}{e^{-4.5}+1}$"}
+    - title: "M adımı (bileşen 1)"
+      fields:
+        - {id: N1, label: "$N_1=\\sum_i r_{i1}$", answer: 1.817574, tol: 0.003, hint: "$0.989+0.8176+0.011$"}
+        - {id: pi1, label: "$\\pi_1=N_1/n$", answer: 0.605858, tol: 0.002, hint: "$1.8176/3$"}
+        - {id: mu1, label: "$\\mu_1=\\frac1{N_1}\\sum_i r_{i1}x_i$", answer: 1.467978, tol: 0.003, hint: "$(0.989\\cdot1+0.8176\\cdot2+0.011\\cdot4)/1.8176$"}
+  verify: |
+    import math
+    x = [1, 2, 4]; mu = (1, 4)
+    r = [math.exp(-(v - mu[0]) ** 2 / 2) / (math.exp(-(v - mu[0]) ** 2 / 2) + math.exp(-(v - mu[1]) ** 2 / 2)) for v in x]
+    N1 = sum(r)
+    answers = dict(r11=round(r[0], 6), r21=round(r[1], 6), r31=round(r[2], 6), N1=round(N1, 6),
+                   pi1=round(N1 / 3, 6), mu1=round(sum(a * b for a, b in zip(r, x)) / N1, 6))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+quiz:
+  - q: "k-means, GMM'nin hangi özel durumudur?"
+    options:
+      - {t: "Tüm bileşenlerin kovaryansı $\\sigma^2I$ ve $\\sigma\\to0$ iken: responsibility'ler 0/1 olur (sert atama) ve M adımı ortalamaya iner", ok: true, why: "EM'in E adımı yumuşak atama, k-means'in atama adımı sert atama."}
+      - {t: "$K=1$ iken", why: "O tek bir Gauss uydurmaktır."}
+      - {t: "Hiçbir zaman", why: "Klasik bir limit ilişkisidir."}
+  - q: "EM neden log-likelihood'u hiç düşürmez?"
+    options:
+      - {t: "E adımı log-likelihood'a değen bir alt sınır (ELBO) kurar, M adımı bu sınırı maksimize eder; sınır her noktada likelihood'un altında", ok: true, why: "$\\ell(\\theta)\\ge\\mathcal L(q,\\theta)$ ve E adımında eşitlik. M adımı $\\mathcal L$'yi artırınca $\\ell$ en az o kadar artar. VAE'lerde (M5.1) aynı ELBO karşımıza çıkacak."}
+      - {t: "Gradient descent'in özel bir hâli olduğu için", why: "Bağlantı var ama monotonluğun nedeni alt sınır yapısı."}
+      - {t: "Düşürebilir", why: "Sayısal hatalar dışında düşürmez; kontrol bunu test ediyor."}
+  - q: "GMM log-likelihood'unda neden tekillikler (singularities) oluşabilir?"
+    options:
+      - {t: "Bir bileşen tek bir noktaya çöker: $\\mu_k=x_i$, $\\sigma_k\\to0$ iken o noktanın yoğunluğu sonsuza gider", ok: true, why: "Likelihood sınırsızdır. Pratik çözüm kovaryansa küçük bir $\\epsilon I$ eklemek (reg)."}
+      - {t: "Bileşen sayısı çok küçük olunca", why: "Tekillik bir bileşenin çökmesiyle ilgili; K'dan bağımsız."}
+      - {t: "Oluşmaz", why: "Klasik bir patoloji; bu modülde `reg` parametresinin nedeni."}
