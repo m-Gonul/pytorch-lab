@@ -1,0 +1,113 @@
+id: m4-16-pretrained-lm
+code: M4.16
+title: Önceden eğitilmiş LM'ler — ELMo, BERT, BART, GPT, RLHF ve DPO
+phase: 4
+minutes: 400
+prereq: [m4-14-transformer-ed, m4-12-word2vec]
+summary: >
+  Sabit gömmelerden (word2vec) bağlamsal gömmelere: ELMo'nun çift yönlü
+  LSTM dil modeli ve katman karışımı, GPT-1'in yalnız kod çözücülü ön eğitimi
+  ve tek doğrusal katmanla ince ayarı, BERT'in maskeli dil modeli (15%;
+  80/10/10) ve sonraki cümle tahmini, BART'ın gürültü giderici
+  kodlayıcı–kod çözücüsü, GPT-2/3'ün ölçek ve sıfır/az örnekli kullanımı,
+  InstructGPT/ChatGPT'nin insan geri bildirimiyle pekiştirmeli öğrenmesi
+  (ödül modeli, KL cezalı ödül) ve DPO. Saf Python'da MLM maskesi ve BERT
+  parametre sayımı, NumPy'da toplu maskeleme, ELMo karışımı, dizi log
+  olasılıkları ve Bradley–Terry ödül modeli, PyTorch'ta sentetik bir dilde
+  MLM ön eğitimi → az etiketle ince ayar, sonda DPO'nun analitik optimum
+  politikaya yakınsaması. Ekler: best-of-n'in KL'si, BART gürültüleri, ELECTRA.
+goals:
+  - "[[bağlamsal gömme]]: ELMo (biLSTM), GPT (kod çözücü), BERT (kodlayıcı), BART (kodlayıcı–kod çözücü)"
+  - "[[maskeli dil modeli]]: %15 seçim, 80/10/10 kuralı; ön eğitim + ince ayar vs sıfırdan"
+  - "RLHF: [[bradley–terry modeli|Bradley–Terry]] ödül modeli, KL cezalı ödül"
+  - "[[dpo]]: kapalı form optimum $\\pi^*\\propto\\pi_{ref}e^{r/\\beta}$ ve kayıp"
+sources:
+  - {title: "Peters ve ark. — Deep contextualized word representations (ELMo, NAACL 2018)", url: "https://arxiv.org/abs/1802.05365", license: "arXiv", use: link}
+  - {title: "Radford ve ark. — Improving Language Understanding by Generative Pre-Training (GPT-1, 2018)", url: "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf", license: "©", use: link}
+  - {title: "Devlin ve ark. — BERT (NAACL 2019)", url: "https://arxiv.org/abs/1810.04805", license: "arXiv", use: link}
+  - {title: "Lewis ve ark. — BART (ACL 2020)", url: "https://arxiv.org/abs/1910.13461", license: "arXiv", use: link}
+  - {title: "Brown ve ark. — Language Models are Few-Shot Learners (GPT-3, NeurIPS 2020)", url: "https://arxiv.org/abs/2005.14165", license: "arXiv", use: link}
+  - {title: "Ouyang ve ark. — Training language models to follow instructions with human feedback (InstructGPT, 2022)", url: "https://arxiv.org/abs/2203.02155", license: "arXiv", use: link}
+  - {title: "Rafailov ve ark. — Direct Preference Optimization (NeurIPS 2023)", url: "https://arxiv.org/abs/2305.18290", license: "arXiv", use: link}
+  - {title: "Clark ve ark. — ELECTRA (ICLR 2020)", url: "https://arxiv.org/abs/2003.10555", license: "arXiv", use: link}
+  - {title: "Hugging Face LLM Course — Transformer models, fine-tuning", url: "https://huggingface.co/learn/llm-course", license: "Apache-2.0", use: link}
+  - {title: "Stanford CS224n — Pretraining; Post-training (RLHF, DPO)", url: "https://web.stanford.edu/class/cs224n/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "BERT"
+      fields:
+        - {id: sel, label: "512 token'lık dizide MLM için seçilen token sayısının beklentisi", answer: 76.8, tol: 1.0e-9}
+        - {id: rnd, label: "Bunlardan rastgele token'la değiştirilenlerin beklentisi", answer: 7.68, tol: 1.0e-9}
+        - {id: bert, label: "BERT-base parametresi: V = 30 522, 512 konum, 2 segment, d = 768, 12 katman, FFN 3072, pooler dahil (MLM başı hariç)", answer: 109482240}
+    - title: "GPT ölçeği ($\\approx12Ld^2$)"
+      fields:
+        - {id: gpt2, label: "GPT-2: L = 48, d = 1600", answer: 1474560000}
+        - {id: gpt3, label: "GPT-3: L = 96, d = 12 288", answer: 173946175488}
+    - title: "RLHF ve DPO"
+      fields:
+        - {id: bt, label: "Ödül modeli: $r(y_w)=2$, $r(y_l)=0.5$ → $-\\log\\sigma(r_w-r_l)$", answer: 0.20141327798275246, tol: 1.0e-6}
+        - {id: kl, label: "KL cezalı ödül $r-\\beta\\log(\\pi/\\pi_{ref})$: r = 1, β = 0.1, log oran 2", answer: 0.8, tol: 1.0e-9}
+        - {id: dpo, label: "DPO, β = 0.1: $\\log\\frac{\\pi_\\theta}{\\pi_{ref}}(y_w)=2$, $(y_l)=-1$ → kayıp", answer: 0.5543552444685271, tol: 1.0e-6}
+  verify: |
+    import math
+    sig = lambda x: 1 / (1 + math.exp(-x))
+    d = 768
+    layer = 4 * (d * d + d) + 2 * d * 3072 + 3072 + d + 4 * d
+    emb = (30522 + 512 + 2) * d + 2 * d
+    answers = dict(sel=512 * 0.15, rnd=512 * 0.15 * 0.1, bert=emb + 12 * layer + d * d + d, gpt2=12 * 48 * 1600 ** 2, gpt3=12 * 96 * 12288 ** 2,
+                   bt=-math.log(sig(1.5)), kl=1 - 0.1 * 2, dpo=-math.log(sig(0.1 * (2 - (-1)))))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Best-of-n örnekleme ve KL bütçesi", engine: browser}
+  - {id: x2, title: "BART'ın gürültü fonksiyonları", engine: browser}
+  - {id: x3, title: "ELECTRA: değiştirilmiş token tespiti", engine: browser}
+
+quiz:
+  - q: "BERT neden seçilen token'ların hepsini [MASK] yapmaz (80/10/10)?"
+    options:
+      - {t: "[MASK] ince ayarda ve çıkarımda hiç görülmez; ön eğitim–ince ayar uyumsuzluğunu azaltmak ve modelin her token'ın temsilini anlamlı tutması için bazen rastgele ya da aynı token bırakılır", ok: true, why: "Model hangi token'ın bozulduğunu bilemez; her konumda bağlamdan tahmin yapmak zorunda kalır."}
+      - {t: "Hesap tasarrufu için", why: "Maliyet aynı."}
+      - {t: "Sözlüğü genişletmek için", why: "Hayır."}
+  - q: "GPT-1 ile BERT'in temel mimari farkı nedir?"
+    options:
+      - {t: "GPT yalnız kod çözücü (nedensel maske, soldan sağa LM); BERT yalnız kodlayıcı (çift yönlü attention, MLM). BART ikisini kodlayıcı–kod çözücüde birleştirir", ok: true, why: "Ders slaytındaki üçlü şema."}
+      - {t: "BERT LSTM kullanır", why: "Bu ELMo."}
+      - {t: "GPT çift yönlüdür", why: "Nedenseldir."}
+  - q: "DPO RLHF'in hangi adımlarını ortadan kaldırır?"
+    options:
+      - {t: "Ayrı bir ödül modeli eğitmeyi ve PPO ile örnekleme tabanlı RL döngüsünü: KL cezalı ödül maksimizasyonunun kapalı form optimumu, ödülü politika/referans log oranıyla ifade eder ve tercih verisinde doğrudan sınıflandırma kaybı olur", ok: true, why: "Rafailov ve ark. 2023; e aşamasında optimuma yakınsama gözlenir."}
+      - {t: "Tercih verisini", why: "DPO da tercih verisi kullanır."}
+      - {t: "Referans modeli", why: "Referans model kayıpta yer alır."}
+
+homework:
+  - title: "Devlin ve ark. (2019): küçük bir BERT"
+    paper: "Devlin, Chang, Lee, Toutanova — BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (NAACL 2019)"
+    url: "https://arxiv.org/abs/1810.04805"
+    level: ileri
+    hours: 18
+    goal: |
+      d aşamasındaki kodlayıcıyı WikiText-103'ün bir alt kümesinde (BPE, M4.5) MLM + NSP ile ön eğit (L = 4, d = 256); SST-2 ve MRPC'de (GLUE) ince ayar yap. Makale Tablo 5'in küçük ablasyonu: (a) NSP'siz, (b) yalnız soldan sağa LM (GPT tarzı, nedensel maske), (c) 80/10/10 yerine %100 [MASK] (Tablo 8). Ayrıca öznitelik tabanlı kullanımı (dondurulmuş katmanların ağırlıklı toplamı, ELMo tarzı) ince ayarla karşılaştır.
+    steps:
+      - "Ön eğitim adım sayısını sabit tut; ablasyonları aynı bütçeyle eğit."
+    accept:
+      - "Çift yönlü MLM, soldan sağa LM'den GLUE'da iyi."
+      - "%100 [MASK] özellikle öznitelik tabanlı kullanımda geride kalır."
+  - title: "Rafailov ve ark. (2023): DPO'yu küçük bir LM'de"
+    paper: "Rafailov, Sharma, Mitchell, Ermon, Manning, Finn — Direct Preference Optimization: Your Language Model is Secretly a Reward Model (NeurIPS 2023)"
+    url: "https://arxiv.org/abs/2305.18290"
+    level: ileri
+    hours: 14
+    goal: |
+      Makale Bölüm 6.1'in "kontrollü duygu üretimi" deneyini küçük ölçekte tekrarla: GPT-2 small'ı (ya da M8.1'deki mini-LLM'i) IMDb film yorumu önekleriyle referans politika olarak kullan; bir duygu sınıflandırıcısını "gerçek ödül" say, tercih çiftlerini ondan üret. DPO ile PPO-RLHF'i (ödül modeli + KL cezalı PPO, M11.12) ödül–KL sınırında (Şekil 2 sol) karşılaştır; β ve tercih verisi miktarını değiştir.
+    steps:
+      - "KL'yi tamamlama düzeyinde $\\sum_t\\log\\pi_\\theta/\\pi_{ref}$ ile tahmin et."
+    accept:
+      - "DPO aynı KL'de PPO'dan yüksek ya da eşit ödül verir."
+      - "β küçüldükçe ödül ve KL birlikte artar (sınır eğrisi)."

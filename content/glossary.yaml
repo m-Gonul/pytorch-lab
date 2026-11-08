@@ -177,3 +177,7 @@ terms:
   noam takvimi: "Transformer öğrenme oranı takvimi: lr = d^{−1/2}·min(s^{−1/2}, s·w^{−3/2}) — w adım doğrusal ısınma, ardından 1/√s azalma."
   yama embedding'i: "Patch embedding: görüntüyü P × P'lik örtüşmeyen yamalara bölüp her yamayı aynı doğrusal izdüşümle D boyutlu token'a çevirmek; çekirdeği ve adımı P olan konvolüsyona eşdeğer (ViT)."
   endüktif yanlılık: "Inductive bias: modelin mimarisine gömülü, veriden önce gelen varsayımlar (CNN'de yerellik ve kaydırma eşdeğerliği gibi); az veride genellemeyi kolaylaştırır, çok veride esnekliği kısıtlayabilir."
+  bağlamsal gömme: "Contextualized embedding: bir kelimenin vektörünün içinde geçtiği cümleye göre değiştiği temsil (ELMo, GPT, BERT); sabit word2vec vektörlerinin çok anlamlılık sorununu çözer."
+  maskeli dil modeli: "Masked language modeling: token'ların ~%15'ini seçip (80% [MASK], 10% rastgele, 10% aynı) bağlamın iki yanından orijinallerini tahmin ettiren ön eğitim amacı (BERT)."
+  bradley–terry modeli: "İkili tercihler için olasılık modeli: P(a ≻ b) = σ(r(a) − r(b)); RLHF'te insan karşılaştırmalarından ödül modeli eğitmek için kullanılır."
+  dpo: "Direct Preference Optimization: KL cezalı ödül maksimizasyonunun kapalı form çözümünü kullanıp ödül modeli ve RL olmadan tercih çiftleri üzerinde −log σ(β[log π/π_ref (y_w) − log π/π_ref (y_l)]) kaybını en küçükleyen hizalama yöntemi."
