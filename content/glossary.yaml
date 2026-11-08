@@ -184,3 +184,6 @@ terms:
   bağlı ağırlıklar: "Tied weights: simetrik autoencoder'da kod çözücü katmanının ağırlığını kodlayıcıdaki karşılığının transpozu olarak almak (W_{N−L+1} = W_Lᵀ); parametreleri yarıya indirir."
   gürültü giderici autoencoder: "Denoising autoencoder: girdiye Gauss ya da maskeleme gürültüsü eklenip temiz girdinin geri istendiği AE; aşırı tam kodla bile özdeşliği kopyalayamaz, veri yapısını öğrenir."
   seyrek autoencoder: "Sparse autoencoder: kod katmanında aynı anda az nöronun aktif olmasını L1 ya da KL(ρ‖ρ̂) cezasıyla zorlayan AE; her nöron seçici bir özniteliğe karşılık gelir."
+  mod çöküşü: "Mode collapse: GAN üreticisinin çıktılarının çeşitliliğini yitirip verinin birkaç moduna (sınıfına) sıkışması; ayırıcıyla birlikte modlar arasında çevrime girebilir."
+  fid: "Fréchet Inception Distance: gerçek ve üretilen görüntülerin önceden eğitilmiş bir ağdaki öznitelikleri Gauss kabul edilerek ‖μ_r − μ_g‖² + tr(Σ_r + Σ_g − 2(Σ_rΣ_g)^{1/2}) ile ölçülen uzaklık; düşük daha iyi, hem kaliteyi hem çeşitliliği yansıtır."
+  adain: "Adaptive Instance Normalization: öznitelik haritasını kanal başına kendi ortalama/std'siyle normalize edip dışarıdan verilen stil ölçek ve kaymasını uygulamak: y_s(x − μ)/σ + y_b (StyleGAN, stil aktarımı)."

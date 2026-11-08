@@ -1,0 +1,107 @@
+id: m5-7-gan-advanced
+code: M5.7
+title: GAN II — DCGAN, FID/IS, progresif büyütme, StyleGAN
+phase: 5
+minutes: 380
+prereq: [m5-2-gan, m4-10-segmentation]
+summary: >
+  GAN'ları pratikte eğitmek ve değerlendirmek: Nash dengesi, mod çöküşü ve
+  çevrimler, deneyim tekrarı ve mini-batch ayrımı, doymayan üretici kaybı;
+  DCGAN kuralları (havuz yerine adımlı/transposed konvolüsyon, BN,
+  ReLU/tanh, LeakyReLU); ne zaman durmalı — Inception Score ve Fréchet
+  Inception Distance (Gauss varsayımı, matris karekökü); ProGAN'ın
+  progresif büyütmesi (yumuşak geçiş), mini-batch standart sapma katmanı,
+  piksel normalizasyonu ve eşitlenmiş öğrenme oranı; StyleGAN'ın eşleme
+  ağı, AdaIN, gürültü enjeksiyonu, stil karıştırma ve kırpma (truncation)
+  hilesi. NumPy'da FID'i sıfırdan, PyTorch'ta rakamlar üzerinde DCGAN ve
+  sınıflandırıcı öznitelikleriyle FID/kapsama, sonda StyleGAN blokları ve
+  StyleGAN2'nin demodülasyonu. Ekler: IS'in kandırılması, FID'in örneklem
+  yanlılığı, ProGAN hileleri.
+goals:
+  - "DCGAN mimari kuralları; [[mod çöküşü]] ve önlemleri"
+  - "[[fid]]: $\\|\\mu_r-\\mu_g\\|^2+\\mathrm{tr}(\\Sigma_r+\\Sigma_g-2(\\Sigma_r\\Sigma_g)^{1/2})$; IS = $\\exp\\mathbb E\\,\\mathrm{KL}(p(y|x)\\Vert p(y))$"
+  - "[[adain]]: $y_s\\frac{x-\\mu(x)}{\\sigma(x)}+y_b$; eşleme ağı, stil karıştırma, kırpma"
+  - "ProGAN: yumuşak geçiş, mini-batch std, piksel normu, eşitlenmiş öğrenme oranı"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 17", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Radford, Metz, Chintala — Unsupervised Representation Learning with DCGANs (ICLR 2016)", url: "https://arxiv.org/abs/1511.06434", license: "arXiv", use: link}
+  - {title: "Salimans ve ark. — Improved Techniques for Training GANs (NeurIPS 2016)", url: "https://arxiv.org/abs/1606.03498", license: "arXiv", use: link}
+  - {title: "Heusel ve ark. — GANs Trained by a Two Time-Scale Update Rule (FID, NeurIPS 2017)", url: "https://arxiv.org/abs/1706.08500", license: "arXiv", use: link}
+  - {title: "Karras ve ark. — Progressive Growing of GANs (ICLR 2018)", url: "https://arxiv.org/abs/1710.10196", license: "arXiv", use: link}
+  - {title: "Karras, Laine, Aila — A Style-Based Generator Architecture for GANs (CVPR 2019)", url: "https://arxiv.org/abs/1812.04948", license: "arXiv", use: link}
+  - {title: "Karras ve ark. — Analyzing and Improving the Image Quality of StyleGAN (CVPR 2020)", url: "https://arxiv.org/abs/1912.04958", license: "arXiv", use: link}
+  - {title: "Chong & Forsyth — Effectively Unbiased FID and Inception Score (CVPR 2020)", url: "https://arxiv.org/abs/1911.07023", license: "arXiv", use: link}
+  - {title: "Stanford CS236 — Deep Generative Models: GAN değerlendirmesi", url: "https://deepgenerativemodels.github.io/", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "FID ve IS"
+      fields:
+        - {id: fid1, label: "1B: gerçek N(0, 1), üretilen N(1, 2²) → Fréchet uzaklığı", answer: 2}
+        - {id: fid2, label: "2B: $\\mu_r-\\mu_g=(1,0)$, $\\Sigma_r=I$, $\\Sigma_g=\\mathrm{diag}(4,9)$", answer: 6}
+        - {id: iscore, label: "IS: örneklerin yarısında p(y|x) = (0.9, 0.1), yarısında (0.1, 0.9)", answer: 1.4449348111684153, tol: 1.0e-6}
+    - title: "StyleGAN ve ProGAN"
+      fields:
+        - {id: adain, label: "AdaIN: kanal değerleri 1, 2, 3, 4 (popülasyon std), stil $y_s=2$, $y_b=1$ → 4'ün çıktısı", answer: 3.6832815729997477, tol: 1.0e-6}
+        - {id: trunc, label: "Kırpma: $\\bar w=0$, ψ = 0.7, w = 2 → $\\bar w+\\psi(w-\\bar w)$", answer: 1.4, tol: 1.0e-9}
+        - {id: fade, label: "Yumuşak geçiş α = 0.3: büyütülmüş eski çıktı 2, yeni katman 4 → $(1-\\alpha)\\,\\text{eski}+\\alpha\\,\\text{yeni}$", answer: 2.6, tol: 1.0e-9}
+        - {id: up, label: "DCGAN üretici: 4 × 4 → ConvTranspose(k = 4, s = 2, p = 1) → kenar", answer: 8}
+  verify: |
+    import math
+    kl = 0.9 * math.log(0.9 / 0.5) + 0.1 * math.log(0.1 / 0.5)
+    answers = dict(fid1=1 + 1 + 4 - 2 * 1 * 2, fid2=1 + (1 + 4 - 2 * 2) + (1 + 9 - 2 * 3), iscore=math.exp(kl),
+                   adain=2 * (4 - 2.5) / math.sqrt(1.25) + 1, trunc=0.7 * 2, fade=0.7 * 2 + 0.3 * 4, up=(4 - 1) * 2 - 2 + 4)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "IS'i kandırmak, FID'i kandıramamak", engine: browser}
+  - {id: x2, title: "FID'in örneklem yanlılığı ve FID∞", engine: browser}
+  - {id: x3, title: "ProGAN hileleri: yumuşak geçiş, mini-batch std, piksel normu, eşitlenmiş öğrenme oranı", engine: browser}
+
+quiz:
+  - q: "Mod çöküşü nasıl gelişir?"
+    options:
+      - {t: "Üretici bir sınıfta (ör. ayakkabı) daha ikna edici olursa onu daha çok üretir, diğerlerini unutur; ayırıcı da yalnız onu görür ve diğer sınıfları ayırmayı unutur; ayırıcı yakaladığında üretici başka sınıfa kayar — sınıflar arasında çevrim", ok: true, why: "Géron'un anlatımı. Deneyim tekrarı ve mini-batch ayrımı bunu hafifletir."}
+      - {t: "Öğrenme oranı çok küçük olduğunda", why: "Neden bu değil."}
+      - {t: "Ayırıcı çok zayıf olduğunda", why: "Tek başına açıklamaz."}
+  - q: "FID neden Inception Score'dan daha güvenilir kabul edilir?"
+    options:
+      - {t: "Gerçek veri istatistikleriyle karşılaştırır: hem kalite hem çeşitlilik (sınıf içi dahil) Gauss ortalaması ve kovaryansına yansır; IS gerçek veriye hiç bakmaz ve sınıf başına tek mükemmel görüntüyle maksimize edilebilir", ok: true, why: "x1'de gösterilir."}
+      - {t: "Daha hızlı hesaplandığı için", why: "Matris karekökü gerektirir."}
+      - {t: "Olabilirlik verdiği için", why: "İkisi de olabilirlik vermez."}
+  - q: "StyleGAN'da eşleme ağının (z → w) amacı nedir?"
+    options:
+      - {t: "Gauss z uzayı eğitim verisinin özellik olasılıklarına uymak zorunda olduğundan bükülür; öğrenilen w uzayı daha ayrık (disentangled) olabilir, böylece AdaIN ile her ölçekte stil kontrolü doğrusal hale gelir", ok: true, why: "Karras ve ark. 2019, Şekil 6."}
+      - {t: "Gürültü üretmek için", why: "Gürültü ayrıca enjekte edilir."}
+      - {t: "Ayırıcıyı beslemek için", why: "Hayır."}
+
+homework:
+  - title: "Radford ve ark. (2016): DCGAN ve gizli uzay aritmetiği"
+    paper: "Radford, Metz, Chintala — Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks (ICLR 2016)"
+    url: "https://arxiv.org/abs/1511.06434"
+    level: orta
+    hours: 10
+    goal: |
+      d aşamasındaki DCGAN'ı CelebA'nın 64 × 64 bir alt kümesinde (ya da Fashion-MNIST'te) eğit; makalenin Şekil 7'sindeki vektör aritmetiğini (gülümseyen kadın − nötr kadın + nötr erkek) her kavram için 3 örneğin z ortalamasıyla yap. Ayırıcının öznitelikleri üzerinde doğrusal SVM ile denetimsiz temsil kalitesini ölç (Tablo 1). Eğitim boyunca FID'i çiz ve kuralların ablasyonunu yap: BN'siz, havuzlu, ReLU'lu ayırıcı.
+    steps:
+      - "FID için c aşamasındaki fid'i, öznitelik çıkarıcı olarak önceden eğitilmiş bir sınıflandırıcıyı kullan."
+    accept:
+      - "Vektör aritmetiği anlamlı görüntüler üretir."
+      - "Kurallardan sapan varyantlar daha kararsız ve daha yüksek FID'li."
+  - title: "Karras ve ark. (2019): mini StyleGAN"
+    paper: "Karras, Laine, Aila — A Style-Based Generator Architecture for Generative Adversarial Networks (CVPR 2019)"
+    url: "https://arxiv.org/abs/1812.04948"
+    level: ileri
+    hours: 18
+    goal: |
+      e aşamasındaki blokları birleştirerek 32 × 32 bir stil tabanlı üretici kur (sabit 4 × 4 girdi, eşleme ağı, AdaIN, gürültü), ProGAN ayırıcısıyla eğit. Makaledeki analizleri tekrarla: stil karıştırma (kaba/orta/ince katmanlarda kaynak B'den stil, Şekil 3), gürültünün etkisi (Şekil 4–5), kırpma ψ'ye göre FID–çeşitlilik ödünleşimi ve algısal yol uzunluğu (PPL, Bölüm 4.1) ile z ve w uzaylarının karşılaştırması.
+    steps:
+      - "PPL: ε = 10⁻⁴ adımlı interpolasyonda ardışık görüntüler arasındaki öznitelik uzaklığı."
+    accept:
+      - "Kaba katmanlarda karıştırma pozu/şekli, ince katmanlarda rengi/dokuyu değiştirir."
+      - "w uzayında PPL, z uzayındakinden düşük."
