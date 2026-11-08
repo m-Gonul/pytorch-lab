@@ -208,3 +208,29 @@ whatif:
     a: "Türevlenebilir (L2-SVM) olur ve ihlalleri daha sert cezalandırır; aykırı değerlere daha duyarlıdır."
   - q: "Veri tam ayrılabilir ve C → ∞?"
     a: "Sert marj SVM; tek bir aykırı nokta sınırı tamamen değiştirebilir. Ayrılamazsa çözüm yoktur."
+
+labs:
+  - id: l1
+    lab: svm2d
+    title: "Çekirdek SVM: C, γ ve destek vektörleri"
+    goal: |
+      Gerçek bir dual çözücü (koordinat yükselişi). Arka plan karar fonksiyonu $f(x)$ (koyu = $-1$ tarafı), kırmızı noktalar sınır $f=0$, gri noktalar marjlar $f=\pm1$, mor halkalar destek vektörleri ($\alpha_i>0$).
+    predict:
+      q: "İki ay verisi, RBF çekirdek. γ'yı 1'den 50'ye çıkarırsan eğitim ve test doğruluğu nasıl değişir?"
+      options:
+        - {t: "Eğitim doğruluğu ~%100'e çıkar, test doğruluğu düşer; destek vektörü sayısı artar", ok: true, why: "Dar tümsekler her noktanın etrafını ayrı sarar: aşırı uyum. Neredeyse her nokta destek vektörü olur."}
+        - {t: "İkisi de artar", why: "Eğitim artar; test, sınır gürültüye uyduğu için düşer."}
+        - {t: "Değişmez", why: "γ RBF'nin genişliğini belirler; sınırın biçimini doğrudan değiştirir."}
+    presets:
+      - {name: "Doğrusal çekirdek, ay", params: {data: 1, ker: 0, C: 1}, note: "Düz sınır ayları ayıramaz."}
+      - {name: "RBF, iyi ayar", params: {data: 1, ker: 2, C: 1, g: 1}, note: "Pürüzsüz eğri sınır, az destek vektörü."}
+      - {name: "RBF, γ çok büyük", params: {data: 1, ker: 2, C: 10, g: 40, noise: 0.25}, note: "Adalar: eğitim mükemmel, test kötü."}
+      - {name: "C çok küçük", params: {data: 0, ker: 0, C: 0.01, noise: 0.3}, note: "Geniş marj, neredeyse tüm noktalar destek vektörü (α = C): sınır ortalamaya göre konur."}
+      - {name: "Halkalar, polinom", params: {data: 2, ker: 1, C: 1}, note: "Kübik polinom çekirdeği halkayı ayırabilir (x₁² + x₂² terimi var)."}
+      - {name: "XOR, doğrusal", params: {data: 3, ker: 0, C: 1}, note: "En iyi doğrusal ayırıcı bile ~%75'te kalır."}
+    questions:
+      - q: "Destek vektörü olmayan bir eğitim noktasını silsen sınır değişir mi?"
+        a: "Hayır: onun α'sı 0, f(x) = Σ αᵢyᵢk(xᵢ, x) içinde terimi yok. Destek vektörlerinden birini silmek ise genelde sınırı değiştirir."
+      - q: "C büyüdükçe destek vektörü sayısı neden genelde azalır?"
+        a: "Marj daralır, daha az nokta marjın içine düşer; ihlaller pahalı olduğu için model onları dışarı iter."
+    limits: "Bias, çekirdeğe +1 eklenerek emilir (dual'deki Σαᵢyᵢ = 0 kısıtı kalkar); bu, b'ye küçük bir L2 cezası koymaya denktir. Polinom çekirdeği sayısal ölçek için 10'a bölünmüştür. Eğitim en fazla 60 tur."
