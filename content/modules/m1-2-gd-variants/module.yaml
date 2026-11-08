@@ -103,7 +103,7 @@ labs:
       - {name: "Tek adımda çözüm", params: {lr: 0.5}, note: "η = 1/a: Newton adımı. Çok boyutta her yön için ayrı 1/a gerektiği için tek η ile mümkün değil."}
       - {name: "Salınım", params: {lr: 0.9}, note: "1 < ηa < 2: x her adımda işaret değiştirir ama küçülür."}
       - {name: "Iraksama", params: {lr: 1.05}, note: "ηa = 2.1: |1 − ηa| = 1.1 > 1."}
-      - {name: "Aynı η, iki eğrilik", params: {lr: 0.3, a: 1, B: {a: 6}}, note: "Çok boyutlu bir problemin iki yönü gibi düşün: η = 0.3, a = 6'lık yönde ıraksar (ηa = 1.8 hâlâ < 2, salınır), a = 1 yönünde yavaştır. Koşul sayısının bedeli."}
+      - {name: "Aynı η, iki eğrilik", params: {lr: 0.3, a: 1, B: {a: 6}}, note: "Çok boyutlu bir problemin iki yönü gibi düşün: η = 0.3 ile a = 6'lık yön ıraksama sınırına yakındır ve şiddetle salınır (ηa = 1.8 < 2), a = 1 yönü ise yavaş ilerler (ηa = 0.3). Koşul sayısının bedeli."}
     questions:
       - q: "Kayıp log ölçekte neden düz bir çizgi?"
         a: "$f(x_t)=\\tfrac a2(1-\\eta a)^{2t}x_0^2$; logaritması t'nin doğrusal fonksiyonu, eğimi $2\\ln|1-\\eta a|$."
@@ -113,6 +113,51 @@ labs:
         a: "Deney bunu geçersiz sayar: $1-\\eta a>1$, adım yokuş yukarıdır (gradyan çıkışı)."
     limits: "Tek boyutlu, gürültüsüz kuadratik. Gerçek kayıplarda eğrilik konuma göre değişir; mini-batch gürültüsü ayrıca bir taban oluşturur (bkz. M3.4 deneyi)."
 
+  - id: l2
+    lab: sgdnoise
+    title: "Batch, mini-batch, SGD: aynı epoch bütçesinde kim nereye varır?"
+    goal: |
+      200 örneklik bir regresyon ($y=2x-1+\varepsilon$). Her epoch'ta veri karıştırılır ve $B$'lik parçalarla adım atılır. Sol grafik $(w,b)$ düzleminde yolları gösterir: turuncu mini-batch, mavi noktalı tam batch GD (epoch başına tek adım). Sağ grafik her epoch sonunda kaybın optimumdan farkı.
+    predict:
+      q: "10 epoch, η = 0.05. B = 10 mu, tam batch (B = 200) mı daha düşük kayba ulaşır?"
+      options:
+        - {t: "B = 10: aynı hesapla 20 kat fazla adım atar; gürültü bu ölçekte ilerlemeyi engellemez", ok: true, why: "Tam batch yalnız 10 adım atar. Mini-batch 200 adım atar; kaybı gürültü tabanına kadar indirir."}
+        - {t: "Tam batch: gradyanı kesin", why: "Kesin ama adım sayısı çok az; aynı epoch'ta çok daha geride kalır."}
+        - {t: "İkisi aynı yere varır", why: "Epoch başına adım sayıları farklı."}
+    presets:
+      - {name: "Saf SGD", params: {B: 1, lr: 0.02, epochs: 10, sched: 0}, note: "Epoch başına 200 adım; yol optimumun çevresinde titrer (gürültü topu)."}
+      - {name: "SGD + azalan η", params: {B: 1, lr: 0.02, epochs: 30, sched: 1}, note: "Adımlar küçüldükçe top daralır."}
+      - {name: "Büyük η, küçük B", params: {B: 2, lr: 0.08, epochs: 10, sched: 0}, note: "Top büyük: sabit η'da son kayıp yüksek kalır."}
+      - {name: "Tam batch", params: {B: 200, lr: 0.08, epochs: 30, sched: 0}, note: "Gürültü yok; iki yol çakışır. Epoch başına yalnız 1 adım."}
+    questions:
+      - q: "B'yi 1'den 4'e çıkarıp η'yı sabit tutunca son çeyrekteki ortalama uzaklık kabaca ne kadar değişmeli?"
+        a: "Gürültü topunun std'si ∝ √(η/B): yarıya inmeli. Tabloda 'son çeyrekte optimuma ortalama uzaklık'ı karşılaştır (tohum gürültüsü nedeniyle tam değil)."
+      - q: "Tam batch'te η'yı 0.2'ye çıkarınca ne olur, mini-batch'te B = 1 iken?"
+        a: "Tam batch'te λ_max ≈ 10 civarı, sınır ~0.19: ıraksamaya çok yakın. B = 1'de tek örnek gradyanının eğriliği daha da büyük olabilir (x² ≤ 9): SGD daha erken patlar. Küçük batch daha küçük η ister."
+    limits: "Tek öznitelikli doğrusal regresyon; kayıp kuadratik. Derin ağlarda kayıp yüzeyi dışbükey değildir ve gürültünün yapısı (anizotropik) daha karmaşıktır. Yol en fazla 1500 noktayla çizilir."
+  - id: l3
+    lab: optim2d
+    title: "Momentum, kötü koşullu bir vadide"
+    goal: |
+      $f(\theta)=\tfrac12\theta^\top H\theta$, $H$'nin özdeğerleri 1 ve $1/\kappa$, vadi verilen açıyla döndürülmüş. Yöntemi değiştir (bu modülde SGD, Momentum, Nesterov ilgili; RMSProp ve Adam M3.4'te), $\beta$'yı ve koşul sayısını oyna.
+    predict:
+      q: "κ = 100, η = 0.5 iken momentum β = 0.8 ile SGD'ye (β = 0) göre 100 adımda ne kadar ilerler?"
+      options:
+        - {t: "Çok daha fazla: yatık yönde etkili adım η/(1 − β), yani η'nın 5 katı; dik yöndeki salınımlar sönümlenir", ok: true, why: "Kuadratikte momentum etkili koşul sayısını ~√κ'ya düşürür."}
+        - {t: "Daha az: momentum salınım ekler", why: "β çok büyükse (ör. 0.99) uzun salınımlar olur; 0.8 burada iyi bir değer."}
+        - {t: "Aynı", why: "Yatık yönde gradyanlar hep aynı işaretli; birikirler."}
+    presets:
+      - {name: "SGD, κ = 100", params: {m: 0, lr: 0.5, kappa: 100, rot: 30, noise: 0, T: 100}, note: "Yatık yönde her adım hatanın yalnız %0.5'ini siler."}
+      - {name: "Momentum, κ = 100", params: {m: 1, lr: 0.5, beta: 0.8, kappa: 100, rot: 30, noise: 0, T: 100}, note: "Aynı η, yol vadi boyunca hızlanır."}
+      - {name: "Momentum çok büyük", params: {m: 1, lr: 0.5, beta: 0.98, kappa: 100, rot: 30, noise: 0, T: 100}, note: "Az sönüm: minimumun etrafında uzun salınımlar."}
+      - {name: "Nesterov", params: {m: 2, lr: 0.5, beta: 0.8, kappa: 100, rot: 30, noise: 0, T: 100}, note: "İleri bakış: salınım daha erken frenlenir."}
+      - {name: "Gürültülü momentum", params: {m: 1, lr: 0.5, beta: 0.8, kappa: 100, rot: 30, noise: 1, T: 100}, note: "Momentum gürültüyü de biriktirir: hızlanma kısmen kaybolur."}
+    questions:
+      - q: "κ = 1 (çember konturlar) iken momentum avantaj sağlar mı?"
+        a: "Hayır, hatta η = 1/λ ile GD tek adımda çözer; momentum aşar ve salınır. Momentumun faydası kötü koşullu problemlerdedir."
+      - q: "Nesterov ile ağır top arasındaki fark ne zaman belirginleşir?"
+        a: "β büyük ve η sınıra yakınken: ağır top minimumu aşıp salınırken Nesterov ileri bakış gradyanıyla erken düzeltir."
+    limits: "İki boyutlu kesin kuadratik; gürültü her adımda eklenen bağımsız Gauss'tur. Gerçek ağlarda eğrilik ve gürültü konuma göre değişir."
 practice:
   - id: p1
     type: çözülmüş
