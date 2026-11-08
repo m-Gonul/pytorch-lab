@@ -197,3 +197,29 @@ whatif:
     a: "Çok: kökteki bölünme değişirse bütün ağaç değişir (yüksek varyans). Bagging ve rastgele orman bu yüzden doğar (M2.5)."
   - q: "Hedef sürekli olsaydı?"
     a: "Kirlilik yerine varyans (MSE) azalması kullanılır; yaprak tahmini ortalamadır."
+
+labs:
+  - id: l1
+    lab: tree2d
+    title: "Karar ağacı: derinlik, yaprak boyu ve eksene paralel bölgeler"
+    goal: |
+      CART'ın gerçek bir uygulaması (açgözlü, orta nokta eşikleri). Arka plan her yapraktaki sınıf-1 oranı (açık = 1'e yakın), gri çizgiler yaprakların dikdörtgen sınırları. Sağda eğitim ve test doğruluğu derinliğe göre; yatay çizgi etiket gürültüsünün izin verdiği en yüksek doğruluk.
+    predict:
+      q: "Eğik doğru sınırlı veride derinliği 2'den 12'ye çıkarırsan sınır nasıl görünür, test doğruluğu ne olur?"
+      options:
+        - {t: "Merdiven basamakları incelir; test doğruluğu önce artar, sonra (gürültü ezberlenince) düşer", ok: true, why: "Eksene paralel bölünmelerle eğik bir doğru ancak merdivenle yaklaşılır; çok derin ağaç gürültülü örneklere ada açar."}
+        - {t: "Ağaç eğik bir doğru çizer", why: "CART'ın her bölünmesi tek bir öznitelik üzerinden: hep eksene paralel."}
+        - {t: "Test doğruluğu sürekli artar", why: "Eğitim doğruluğu sürekli artar; test, varyans yüzünden bir noktadan sonra düşer."}
+    presets:
+      - {name: "Sığ ağaç", params: {data: 0, depth: 2, minLeaf: 1}, note: "Kaba merdiven: yüksek yanlılık."}
+      - {name: "Derin ağaç", params: {data: 0, depth: 12, minLeaf: 1, noise: 0.1}, note: "Gürültülü noktaların etrafında küçük kutular: eğitim %100, test düşer."}
+      - {name: "Yaprak boyu sınırı", params: {data: 0, depth: 12, minLeaf: 15, noise: 0.1}, note: "Her yaprakta en az 15 örnek: aynı derinlikte bile adalar kaybolur."}
+      - {name: "XOR", params: {data: 1, depth: 2, minLeaf: 1, noise: 0.05}, note: "İlk bölünme neredeyse kazançsız; açgözlü seçim zorlanır ama derinlik 2 yetebilir."}
+      - {name: "Ağacın kolay problemi", params: {data: 3, depth: 2, minLeaf: 1, noise: 0}, note: "Eksene paralel köşe: iki bölünme yeter."}
+      - {name: "Hata ölçütü", params: {data: 2, depth: 6, minLeaf: 1, crit: 2, noise: 0.05}, note: "Sınıflandırma hatası birçok bölünmeye 0 kazanç verir; ağaç erken durabilir. Gini'ye geçip karşılaştır."}
+    questions:
+      - q: "Tohumu değiştirince derin ağacın bölgeleri ne kadar değişiyor? Sığ ağacınkiler?"
+        a: "Derin ağaç çok değişir (yüksek varyans: veriye çok bağlı); sığ ağaç az değişir. Topluluk yöntemleri (M2.5) bu varyansı ortalama alarak düşürür."
+      - q: "Öznitelikleri 1000 ile çarpsan ağaç değişir mi?"
+        a: "Hayır: eşikler de 1000 ile çarpılır, sıralama aynı kalır. Ağaçlar tekdüze dönüşümlere değişmezdir; ölçekleme gerekmez."
+    limits: "İki öznitelik, ikili sınıflandırma, budama yok (yalnız önceden durdurma). Test 1000 yeni örnekle. Eşit kazançta ilk bulunan bölünme seçilir."
