@@ -210,3 +210,49 @@ whatif:
     a: "Tüm kelime olasılıkları düzgüne yaklaşır; veri neredeyse yok sayılır ve sınıflandırma önsele indirgenir."
   - q: "İki öznitelik birbirinin tam kopyası olsaydı?"
     a: "Kanıt iki kez sayılır: log-oran o özniteliğin katkısının iki katı olur. Sınıflandırma değişebilir, kalibrasyon kesin bozulur."
+
+labs:
+  - id: l1
+    lab: gnb2d
+    title: "Gaussian NB: naif varsayım bozulunca ne olur?"
+    goal: |
+      İki sınıflı 2B Gauss verisi. Turuncu noktalar GNB'nin karar sınırı, yeşil noktalar gerçek dağılımı bilen en iyi (Bayes) sınır. Sınıf içi korelasyon ρ, naif varsayımın ne kadar yanlış olduğunu ayarlar. Sağda NB ile lojistik regresyonun öğrenme eğrileri.
+    predict:
+      q: "ρ = 0.8, varyanslar eşit. GNB'nin olasılıkları gerçek posterior'a göre nasıldır?"
+      options:
+        - {t: "Aşırı uçlarda: x₁ ve x₂ aynı kanıtı taşıyor, NB onu iki kez sayıyor", ok: true, why: "Bağımlı öznitelikleri bağımsız saymak log-olabilirlik oranlarını toplar; ortak kısım çift sayılır, posterior 0/1'e itilir."}
+        - {t: "Gerçek posterior'la aynı", why: "Yalnız ρ = 0'da (varsayım doğruysa) ve parametreler doğru kestirilmişse."}
+        - {t: "0.5'e daha yakın (çekingen)", why: "Ters yönde: çift sayım güveni artırır."}
+    presets:
+      - {name: "Varsayım doğru", params: {rho: 0, vr: 1, shared: 0, sep: 2, n: 100}, note: "ρ = 0: GNB sınırı gerçek Bayes sınırına çok yakın."}
+      - {name: "Güçlü korelasyon", params: {rho: 0.85, vr: 1, shared: 0, sep: 2, n: 200}, note: "Sınır döner, kalibrasyon farkı büyür."}
+      - {name: "Farklı varyanslar", params: {rho: 0, vr: 2, shared: 0, sep: 2, n: 200}, note: "Gerçek sınır kuadratik (eğri); GNB de eğri sınır çizebilir."}
+      - {name: "Ortak varyans", params: {rho: 0, vr: 2, shared: 1, sep: 2, n: 200}, note: "Ortak varyans varsayımı: GNB sınırı düz bir doğru (lojistik regresyonla aynı biçim) — ama gerçek sınır eğri."}
+      - {name: "Az veri", params: {rho: 0.6, vr: 1, shared: 0, sep: 1.5, n: 12}, note: "Öğrenme eğrisinin sol ucuna bak: az veride NB genelde LR'den iyi."}
+    questions:
+      - q: "Öğrenme eğrileri neden çoğu zaman kesişir?"
+        a: "NB'nin parametreleri ayrı ayrı sayıldığı için çok az veriyle oturur (düşük varyans), ama varsayım yanlışsa asimptotik olarak yanlıdır. LR daha yavaş oturur (birlikte optimizasyon), ama doğru sınırı bulmaya daha esnektir."
+      - q: "ρ = −0.85 yapınca sınır hangi yöne döner? Neden?"
+        a: "Korelasyon işareti, çift sayılan kanıtın hangi doğrultuda olduğunu belirler; gerçek Bayes sınırı kovaryans elipsinin yönüne göre döner, NB bunu göremez."
+    limits: "İki sınıf, iki öznitelik, Gauss veri. Öğrenme eğrisi küçük bir benzetimdir (6 tekrar, 2000 test örneği); LR tam batch GD ile 300 adım ve çok küçük bir L2 cezasıyla eğitilir."
+  - id: l2
+    lab: nbvslr
+    title: "Üretken mi ayırt edici mi? NB ve lojistik regresyonun öğrenme eğrileri"
+    goal: |
+      d öznitelikli ikili sınıflandırma; özniteliklerin yarısı ±δ sinyal taşır, diğer yarısı yalnız gürültü. İki model de doğrusal sınır çizer: Gaussian NB (ortak varyans, sayarak) ve lojistik regresyon (GD ile). Eğriler eğitim boyuna göre test hatasıdır.
+    predict:
+      q: "ρ = 0.6 (ortak gürültü faktörü). n = 256'da hangisi daha düşük hatada olur?"
+      options:
+        - {t: "Lojistik regresyon — bilgisiz öznitelikleri ortak gürültüyü çıkarmak için kullanabilir", ok: true, why: "En iyi doğrusal sınıflandırıcı Σ⁻¹Δμ yönündedir; bilgisiz özniteliklere negatif ağırlık verir. NB onlara 0 verir."}
+        - {t: "NB — her zaman daha hızlı öğrenir", why: "Daha hızlı yakınsar ama yanlış bir şeye: varsayım bozukken asimptotik hatası yüksektir."}
+        - {t: "Eşit", why: "ρ = 0'da yakın olabilirler; ρ > 0'da fark açılır."}
+    presets:
+      - {name: "Varsayım doğru, yüksek boyut", params: {d: 50, delta: 0.3, rho: 0}, note: "n ≈ d bölgesinde NB daha hızlı iner."}
+      - {name: "Ortak gürültü", params: {d: 20, delta: 0.25, rho: 0.6}, note: "LR, n büyüdükçe NB'yi açıkça geçer; NB'nin eğrisi bir tabanda kalır."}
+      - {name: "Güçlü ortak gürültü", params: {d: 10, delta: 0.3, rho: 0.8}, note: "NB'nin hatası n arttıkça bile düşmüyor: varsayımın yanlılığı."}
+    questions:
+      - q: "NB'nin hatası neden çok veride bile belli bir değerin altına inmiyor (ρ > 0)?"
+        a: "Kestirdiği parametreler doğru (sınıf ortalamaları, varyanslar) ama model yanlış: koşullu bağımsızlık varsayımı ortak gürültüyü modelleyemez. Veri arttıkça varyans gider, yanlılık kalır."
+      - q: "ρ = 0'da bile LR neden sonunda NB'ye yetişir?"
+        a: "Varsayım doğruyken iki model aynı en iyi sınırı hedefler; LR'nin daha yavaş yakınsaması yalnız varyanstan kaynaklanır ve n büyüdükçe kapanır."
+    limits: "Benzetim: 1000 test örneği, her n için 4 tekrar; LR tam batch GD (300 adım, η = 0.5, λ = 10⁻³) — tam yakınsamış olmayabilir. Öznitelikler eşit varyanslı Gauss."
