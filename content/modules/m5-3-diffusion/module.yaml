@@ -69,3 +69,33 @@ quiz:
       - {t: "$v(z,0)$, $z$ verildiğinde $x_1-z$'nin koşullu beklentisi; tek adım tüm olası hedeflerin ortalamasına gider", ok: true, why: "e aşamasında Gauss için bunu tam görüyorsun: tek adım her örneği ortalamaya taşır, varyans sıfıra iner. Yollar kesiştiği için çok adım gerekir (rectified flow bunları düzleştirmeye çalışır)."}
       - {t: "Euler yöntemi kararsız olduğu için", why: "Kararlılık sorunu değil; ortalama alma etkisi."}
       - {t: "Ağ yeterince eğitilmediği için", why: "Kâhin (optimal) hızla bile aynı sonuç çıkar."}
+
+extras:
+  - {id: x1, title: "İleri süreç: √(1 − β) ölçeklemesi, varyansın 1'e yakınsaması, SNR", engine: browser}
+  - {id: x2, title: "Geri adımın kapalı formu q(x_(t−1) | x_t, x₀): Monte Carlo doğrulama", engine: browser}
+
+homework:
+  - title: "Ho, Jain, Abbeel (2020): DDPM"
+    paper: "Ho, Jain, Abbeel — Denoising Diffusion Probabilistic Models (NeurIPS 2020)"
+    url: "https://arxiv.org/abs/2006.11239"
+    level: ileri
+    hours: 16
+    goal: |
+      Küçük bir U-Net (zaman embedding'i, artık bloklar, 16×16'da self-attention) ile MNIST ya da CIFAR-10'da DDPM eğit (T = 1000, doğrusal β, ε-tahmini, basitleştirilmiş kayıp L_simple). Makale Tablo 2'nin ablasyonunu küçük ölçekte yap: ε- vs μ̃-tahmini, sabit σ² = β vs β̃ (x2), L_simple vs ağırlıklı VLB; FID'i (M5.7) raporla. Şekil 6'daki "aşamalı üretim" görselini (x̂₀'ın t'ye göre değişimi) üret.
+    steps:
+      - "EMA'lı ağırlıklarla örnekle (makale: 0.9999)."
+    accept:
+      - "ε-tahmini + L_simple en iyi FID."
+      - "Büyük t'de x̂₀ kaba yapıyı, küçük t'de ayrıntıyı belirler."
+  - title: "Song, Meng, Ermon (2021): DDIM"
+    paper: "Song, Meng, Ermon — Denoising Diffusion Implicit Models (ICLR 2021)"
+    url: "https://arxiv.org/abs/2010.02502"
+    level: orta
+    hours: 8
+    goal: |
+      Yukarıdaki eğitilmiş DDPM'i yeniden eğitmeden DDIM ile örnekle: adım sayısı S ∈ {10, 20, 50, 100, 1000} ve η ∈ {0, 0.5, 1} için FID tablosu (makale Tablo 1). η = 0'da aynı x_T'den farklı S ile üretilen görüntülerin tutarlılığını ve gizli uzayda interpolasyonu (Şekil 6, slerp — M5.1 x3) göster.
+    steps:
+      - "Alt dizi seçimi: doğrusal ve karesel aralıklı τ."
+    accept:
+      - "η = 0, az adımda DDPM'den çok daha iyi FID."
+      - "Aynı x_T farklı S'lerde benzer üst düzey yapı üretir."

@@ -69,3 +69,34 @@ quiz:
       - {t: "Doğrusal adımlar $(a,b)$ çiftlerinin birleşmeli (associative) bir işlemle bileşimidir: $(a_2,b_2)\\circ(a_1,b_1)=(a_2a_1,\\,a_2b_1+b_2)$. tanh bu yapıyı bozar", ok: true, why: "Birleşmeli işlemler için prefix scan $O(\\log T)$ derinlikte yapılır. S4, Mamba, linear attention bu fikre dayanır."}
       - {t: "tanh pahalı olduğu için", why: "Maliyet değil; bileşimin birleşmeli olmaması."}
       - {t: "İkisi de paralelleştirilemez", why: "Doğrusal olan scan ile paralelleşir; e aşamasında yapıyorsun."}
+
+extras:
+  - {id: x1, title: "Katman normalizasyonlu RNN", engine: browser}
+  - {id: x2, title: "Kesilmiş BPTT'nin yanlılığı", engine: browser}
+  - {id: x3, title: "Patlayan gradyanlar: kayıp yüzeyindeki duvar ve kırpma", engine: browser}
+
+homework:
+  - title: "Pascanu, Mikolov, Bengio (2013): RNN eğitmenin zorluğu"
+    paper: "Pascanu, Mikolov, Bengio — On the difficulty of training recurrent neural networks (ICML 2013)"
+    url: "https://arxiv.org/abs/1211.5063"
+    level: orta
+    hours: 10
+    goal: |
+      Makalenin sentetik "patolojik" görevlerinden ikisini (toplama problemi ve zamansal sıra problemi, Hochreiter & Schmidhuber 1997) T ∈ {50, 100, 200} için kur; düz tanh RNN'i (a) yalın SGD, (b) norm kırpma, (c) kırpma + makalenin kaybolan gradyan düzenleyicisi Ω (Denk. 9) ile eğit ve başarı oranlarını (Şekil 7) raporla. x3'teki duvar analizini 2 boyutlu gizli durumla tekrarlayıp kayıp yüzeyini çiz.
+    steps:
+      - "Ω'nun gradyanını yaklaşık hesapla: ∂h_{k+1}/∂h_k'yı sabit sayarak (makalenin önerisi)."
+    accept:
+      - "Kırpmasız eğitim uzun T'de ıraksar ya da takılır; kırpma kararlılık sağlar."
+      - "Ω, uzun T'de başarı oranını artırır."
+  - title: "Ba, Kiros, Hinton (2016): Layer Normalization"
+    paper: "Ba, Kiros, Hinton — Layer Normalization (2016)"
+    url: "https://arxiv.org/abs/1607.06450"
+    level: orta
+    hours: 8
+    goal: |
+      x1'deki LN-RNN'i PyTorch'ta bir GRU/LSTM hücresine taşı (makale Ek A: her kapının ön-aktivasyonunu ayrı normalize et) ve karakter düzeyinde dil modellemesinde (Shakespeare, ~1 MB) LN'li ve LN'siz modellerin doğrulama kaybını adım sayısına göre karşılaştır. Makale Bölüm 5'teki yeniden ölçekleme değişmezliği tablosunu (Tablo 1) küçük deneylerle doğrula: ağırlık matrisini ve girdiyi ölçeklemek LN çıktısını değiştirir mi?
+    steps:
+      - "Uzun dizilerde (T = 200) gradyan normlarının zamana göre dağılımını çiz."
+    accept:
+      - "LN'li model daha hızlı ve daha kararlı yakınsar."
+      - "Değişmezlik tablosu deneylerle uyumlu."

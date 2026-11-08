@@ -1,0 +1,6 @@
+def params(cell, d, h, torch_style=True):
+    ...
+
+
+def stack_params(cell, d, sizes):
+    ...

@@ -66,3 +66,34 @@ quiz:
       - {t: "$\\log p(x)$'e alttan monoton yaklaşır; K = 1'de ELBO'dur", ok: true, why: "Jensen boşluğu, ağırlıkların ortalaması alındıkça küçülür."}
       - {t: "Varyansı artar", why: "Sınır sıkılaşır; tahmin edicinin varyansı da genelde düşer."}
       - {t: "$\\log p(x)$'i aşar", why: "Beklentide hep alt sınırdır."}
+
+extras:
+  - {id: x1, title: "Gizli kayıp (γ = log σ²) ve ELBO boşluğu", engine: browser}
+  - {id: x2, title: "β-VAE ve posterior çöküşü: doğrusal VAE'nin kapalı form optimumu", engine: browser}
+  - {id: x3, title: "Gizli uzayda interpolasyon: lerp vs slerp", engine: browser}
+
+homework:
+  - title: "Kingma & Welling (2014): Auto-Encoding Variational Bayes"
+    paper: "Kingma & Welling — Auto-Encoding Variational Bayes (ICLR 2014)"
+    url: "https://arxiv.org/abs/1312.6114"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin Şekil 2 deneyini tekrarla: MNIST/Frey Face'te gizli boyut N_z ∈ {3, 5, 10, 20} için d aşamasındaki VAE'yi eğitip ELBO'yu (alt sınır) eğitim örneği sayısına göre çiz; Şekil 4'teki 2B gizli uzay manifoldunu (ızgara üzerinde kod çözme) üret. Önemli örneklemeli tahminci (M5.1 e: IWAE) ile log p(x) tahminini ELBO ile karşılaştır.
+    steps:
+      - "Izgarayı Gauss önselin ters CDF'iyle oluştur (makalenin önerisi)."
+    accept:
+      - "Daha büyük N_z aşırı uyum göstermeden ELBO'yu iyileştirir (makaleyle uyumlu)."
+      - "2B manifold rakamlar arasında yumuşak geçişler gösterir."
+  - title: "Higgins ve ark. (2017): β-VAE"
+    paper: "Higgins ve ark. — β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework (ICLR 2017)"
+    url: "https://openreview.net/forum?id=Sy2fzU9gl"
+    level: orta
+    hours: 10
+    goal: |
+      dSprites veri setinde (şekil, ölçek, açı, x, y) β ∈ {1, 4, 16} ile konvolüsyonel VAE eğit; her gizli boyutu tek tek gezerek (latent traversal, Şekil 7) hangi üretici faktörü kodladığını göster ve x2'deki gibi aktif boyut sayısını (KL > 0.01 nat) β'ya göre raporla. Makalenin ayrıklık (disentanglement) ölçütünü basitleştirilmiş biçimde uygula.
+    steps:
+      - "KL ısınması (β'yı 0'dan hedefe doğrusal) ile ve onsuz çöken boyut sayısını karşılaştır."
+    accept:
+      - "β arttıkça daha az ama daha yorumlanabilir aktif boyut."
+      - "Yeniden yapılandırma kalitesi–ayrıklık ödünleşimi tablosu."

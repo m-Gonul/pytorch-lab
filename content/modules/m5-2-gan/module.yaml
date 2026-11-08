@@ -72,3 +72,33 @@ quiz:
       - {t: "Dengedeki Jacobian'ın özdeğerleri saf sanal: akış dönme hareketi yapar; açık Euler adımı her turda yarıçapı büyütür", ok: true, why: "R1 cezası özdeğerlere negatif reel kısım ekler ve yakınsatır."}
       - {t: "Öğrenme oranı fazla büyük", why: "Her pozitif adım boyunda yarıçap büyür; küçültmek yalnız yavaşlatır."}
       - {t: "Kayıp konveks olmadığı için", why: "Mesele konvekslik değil, oyunun dönme bileşeni."}
+
+extras:
+  - {id: x1, title: "Mini-batch ayrımı (Salimans ve ark. 2016)", engine: browser}
+  - {id: x2, title: "Deneyim tekrarı tamponu", engine: browser}
+
+homework:
+  - title: "Goodfellow ve ark. (2014): ilk GAN"
+    paper: "Goodfellow ve ark. — Generative Adversarial Nets (NeurIPS 2014)"
+    url: "https://arxiv.org/abs/1406.2661"
+    level: orta
+    hours: 8
+    goal: |
+      Makale Şekil 1'deki 1B örneği tekrarla: veri N(4, 0.5²), üretici gürültüyü doğrusal olmayan bir MLP ile eşler; eğitim boyunca p_g, p_data ve D'yi aynı eksende çiz ve D'nin 1/2'ye düzleştiğini göster. Algoritma 1'deki k (ayırıcı adım sayısı) ∈ {1, 5} ve doymuş/doymamış üretici kaybını karşılaştır; Parzen pencereli log-olabilirlik tahminini (Tablo 1) MNIST'te küçük bir GAN için hesapla ve sınırlılıklarını tartış.
+    steps:
+      - "Parzen bant genişliğini doğrulama kümesinde seç."
+    accept:
+      - "1B'de p_g veriye yakınsar, D ≈ 0.5."
+      - "Doymuş kayıpla eğitimin başlangıçta takıldığı gözlemlenir."
+  - title: "Salimans ve ark. (2016): GAN eğitimi için iyileştirilmiş teknikler"
+    paper: "Salimans, Goodfellow, Zaremba, Cheung, Radford, Chen — Improved Techniques for Training GANs (NeurIPS 2016)"
+    url: "https://arxiv.org/abs/1606.03498"
+    level: ileri
+    hours: 12
+    goal: |
+      M5.2 d aşamasındaki 8 Gauss halkası GAN'ına makalenin tekniklerini sırayla ekle: öznitelik eşleme (Denk. 4), mini-batch ayrımı (x1), tarihsel ortalama (θ'yı geçmiş ortalamasına yakın tutan ceza), tek taraflı etiket yumuşatma (gerçek etiketi 0.9) ve sanal batch normalizasyonu. Her tekniğin kapsanan mod sayısına ve eğitim kararlılığına etkisini 10 tohum üzerinden raporla.
+    steps:
+      - "Kapsanan mod: her moda en az %1 örnek düşüyorsa sayılır."
+    accept:
+      - "Mini-batch ayrımı mod sayısını belirgin artırır."
+      - "Tekniklerin birleşimi tohumlar arası varyansı azaltır."

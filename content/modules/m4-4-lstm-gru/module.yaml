@@ -67,3 +67,34 @@ quiz:
       - {t: "Kısa diziler bitince dolgu (padding) adımları durumu değiştirmemeli; aksi hâlde son gizli durum dolguyla kirlenir", ok: true, why: "`pack_padded_sequence` ya da $h\\leftarrow m\\,h_{\\text{yeni}}+(1-m)\\,h$ maskesi. e aşamasında ikincisini yazıyorsun."}
       - {t: "Dolgu değerleri NaN olduğu için", why: "Dolgu genelde 0; sorun durumun güncellenmesi."}
       - {t: "Gerekli değil", why: "Son durum yanlış olur; kontrol bunu test ediyor."}
+
+extras:
+  - {id: x1, title: "Peephole LSTM ve bağlı giriş–unutma kapısı (CIFG)", engine: browser}
+  - {id: x2, title: "Unutma kapısı bias'ı ve chrono başlatma", engine: browser}
+  - {id: x3, title: "Hücre varyantlarının parametre sayıları", engine: browser}
+
+homework:
+  - title: "Greff ve ark. (2017): LSTM — bir arama uzayı yolculuğu"
+    paper: "Greff, Srivastava, Koutník, Steunebrink, Schmidhuber — LSTM: A Search Space Odyssey (IEEE TNNLS 2017)"
+    url: "https://arxiv.org/abs/1503.04069"
+    level: orta
+    hours: 12
+    goal: |
+      Makalenin sekiz varyantından altısını (standart, giriş kapısız, unutma kapısız, çıkış kapısız, peephole'suz, CIFG) PyTorch'ta tek bir yapılandırılabilir hücreyle yaz; karakter düzeyinde dil modellemesi (Shakespeare) ve x2'deki gibi bir "toplama problemi" üzerinde aynı hiperparametre bütçesiyle rastgele arama yap. Makale Şekil 3'ün küçük sürümü: varyant başına test hatası dağılımı; unutma kapısının ve çıkış aktivasyonunun kaldırılmasının en zararlı olduğunu doğrula.
+    steps:
+      - "Hiperparametre önemini fANOVA yerine basit bir doğrusal model + etkileşim terimleriyle tahmin et."
+    accept:
+      - "Unutma kapısız varyant uzun bağımlılık görevinde belirgin kötü."
+      - "CIFG ve peephole'suz varyantlar standarda yakın."
+  - title: "Cho ve ark. (2014): GRU ve kodlayıcı–kod çözücü"
+    paper: "Cho, van Merriënboer, Gulcehre, Bahdanau, Bougares, Schwenk, Bengio — Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation (EMNLP 2014)"
+    url: "https://arxiv.org/abs/1406.1078"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin "gizli birim" (GRU) tanımını sıfırdan yaz ve M4.13'teki tarih çevirisi görevinde attention'sız kodlayıcı–kod çözücüde LSTM ile karşılaştır (eşit parametre bütçesi, x3). Makale Şekil 4'teki gibi, eğitilmiş kodlayıcının son gizli durumlarını (cümle temsilleri) PCA ile 2B'ye indirip benzer tarih biçimlerinin kümelendiğini göster; sıfırlama kapısı r'nin hangi girdi karakterlerinde kapandığını incele.
+    steps:
+      - "r ve z kapılarının zamana göre ortalama değerlerini ısı haritası olarak çiz."
+    accept:
+      - "GRU, eşit bütçede LSTM'e yakın doğruluk."
+      - "Temsiller biçime/aya göre anlamlı kümeler oluşturur."

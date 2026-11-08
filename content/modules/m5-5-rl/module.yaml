@@ -71,3 +71,29 @@ quiz:
       - {t: "Gradyan $\\mathbb E_{\\tau\\sim\\pi_\\theta}$ altında tanımlı; eski politikayla toplanan veri, önem ağırlığı olmadan yanlı gradyan verir", ok: true, why: "PPO önem oranını kırparak eski veriyi birkaç adım daha kullanmaya izin verir."}
       - {t: "Q-değeri kullanmadıkları için", why: "Mesele örnekleme dağılımı."}
       - {t: "Ortam deterministik olmak zorunda olduğu için", why: "Stokastik ortamlarda da çalışır."}
+
+homework:
+  - title: "Williams (1992): REINFORCE"
+    paper: "Williams — Simple Statistical Gradient-Following Algorithms for Connectionist Reinforcement Learning (Machine Learning 1992)"
+    url: "https://link.springer.com/article/10.1007/BF00992696"
+    level: orta
+    hours: 6
+    goal: |
+      d aşamasındaki REINFORCE'u CartPole'a (gymnasium ya da kendi fizik simülasyonun) taşı; makaledeki "takviye taban çizgisi" (reinforcement baseline) seçeneklerini karşılaştır: taban yok, getirilerin hareketli ortalaması, öğrenilen durum değeri V(s) (M11.9'a köprü). Gradyan tahmincisinin varyansını aynı politikada 100 bölümden tahmin edip tabana göre tablola; taban çizgisinin yansızlığı koruduğunu (beklenen gradyan değişmez) deneyle göster.
+    steps:
+      - "Getirileri bölüm içinde ileriye dönük (reward-to-go) hesaplamanın varyansa etkisini de ölç."
+    accept:
+      - "Taban çizgisi varyansı belirgin azaltır, ortalama gradyanı değiştirmez."
+      - "CartPole 500 adıma ulaşır."
+  - title: "Sutton, McAllester, Singh, Mansour (2000): politika gradyanı teoremi"
+    paper: "Sutton, McAllester, Singh, Mansour — Policy Gradient Methods for Reinforcement Learning with Function Approximation (NeurIPS 2000)"
+    url: "https://papers.nips.cc/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html"
+    level: orta
+    hours: 6
+    goal: |
+      c aşamasındaki tablo MDP'de (geçişler ve ödüller bilinirken) politika gradyanı teoremini sayısal olarak doğrula: $\nabla J=\sum_sd^\pi(s)\sum_a\nabla\pi(a|s)Q^\pi(s,a)$'yı kapalı formda (durum ziyaret dağılımını doğrusal sistemle çözerek) hesapla, sonlu farklarla karşılaştır. Teorem 2'nin "uyumlu fonksiyon yaklaşımı" koşulunu sağlayan doğrusal bir Q yaklaşımıyla gradyanın hâlâ yansız olduğunu göster.
+    steps:
+      - "Softmax politika, durum başına tablo parametreleri."
+    accept:
+      - "Kapalı form gradyan = sonlu farklar (10⁻⁶ içinde)."
+      - "Uyumlu yaklaşım yansız, uyumsuz bir yaklaşım yanlı."

@@ -67,3 +67,29 @@ quiz:
       - {t: "Ham işaretçiyle `data_ptr<float>()[i*d+j]` indekslemesi satır-ana bitişik bellek varsayar; transpoze ya da dilimlenmiş bir görünüm yanlış elemanları okutur", ok: true, why: "Alternatif: `x.contiguous()` çağırmak ya da stride'larla indekslemek (`accessor`)."}
       - {t: "PyTorch tüm extension'larda zorunlu tutar", why: "Zorunlu değil; varsayımı açık etmek için."}
       - {t: "GPU'ya kopyalamak için", why: "Bellek düzeniyle ilgili, cihazla değil."}
+
+homework:
+  - title: "Williams, Waterman, Patterson (2009): Roofline modeli"
+    paper: "Williams, Waterman, Patterson — Roofline: An Insightful Visual Performance Model for Multicore Architectures (CACM 2009)"
+    url: "https://dl.acm.org/doi/10.1145/1498765.1498785"
+    level: orta
+    hours: 6
+    goal: |
+      Kendi makinenin (CPU ve varsa GPU) roofline'ını çıkar: STREAM benzeri bir triad çekirdeğiyle tepe bant genişliğini, yoğun matmul ile tepe FLOP/s'yi ölç. Makale Şekil 2'deki gibi çiz ve c aşamasındaki işlemleri (vektör toplama, softmax, matmul, konvolüsyon) ölçülen aritmetik yoğunluk ve elde edilen performansla noktalar halinde yerleştir; hangilerinin tavanların altında kaldığını ve nedenini (önbellek, vektörleştirme, paralellik) açıkla.
+    steps:
+      - "Bant genişliği için dizi boyutunu son düzey önbellekten büyük seç."
+    accept:
+      - "Ölçülen tavanlar donanım özelliklerinin makul bir yüzdesinde."
+      - "Her işlem için 'hangi tavan' gerekçesi."
+  - title: "Volkov & Demmel (2008): GPU'da yoğun lineer cebir"
+    paper: "Volkov & Demmel — Benchmarking GPUs to Tune Dense Linear Algebra (SC 2008)"
+    url: "https://dl.acm.org/doi/10.5555/1413370.1413402"
+    level: ileri
+    hours: 12
+    goal: |
+      b aşamasındaki tiled matmul simülatörünü bir CUDA (ya da Triton, M7.2) çekirdeğine çevir; paylaşımlı bellek tiling'i, kayıt (register) bloklaması ve thread başına birden çok çıktı ile adım adım hızlan; her adımda global bellek trafiğini (simülatörün okuma sayacıyla) ve ölçülen GFLOP/s'yi karşılaştır. Makalenin "daha az thread, daha çok iş" gözlemini doluluk (occupancy) ölçerek test et.
+    steps:
+      - "GPU yoksa Triton'u TRITON_INTERPRET=1 ile CPU'da doğrula, performansı Colab'da ölç."
+    accept:
+      - "Her optimizasyon adımında ölçülen hızlanma ve trafik azalması tablosu."
+      - "Düşük doluluk + yüksek ILP'nin yüksek doluluktan hızlı olabildiği bir örnek."
