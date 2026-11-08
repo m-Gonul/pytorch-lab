@@ -70,7 +70,7 @@ export function plot(P, opt = {}) {
   }
   // eksenler ve ızgara
   if (!P.img) {
-    for (const t of ticks(x0, x1, opt.xt || 6)) g += `<line class="grid" x1="${sx(t)}" x2="${sx(t)}" y1="${T}" y2="${T + ih}"/><text class="tk" x="${sx(t)}" y="${T + ih + 15}" text-anchor="middle">${fmt(t, 3)}</text>`;
+    for (const [t, lb] of P.xticks || ticks(x0, x1, opt.xt || 6).map((t) => [t, fmt(t, 3)])) g += `<line class="grid" x1="${sx(t)}" x2="${sx(t)}" y1="${T}" y2="${T + ih}"/><text class="tk" x="${sx(t)}" y="${T + ih + 15}" text-anchor="middle">${esc(lb)}</text>`;
     const yt = P.ylog ? (() => { const a = []; for (let e = Math.floor(Y0); e <= Math.ceil(Y1); e++) if (e >= Y0 - 1e-9 && e <= Y1 + 1e-9) a.push(10 ** e); return a.length >= 2 ? a : [y0, y1]; })() : ticks(y0, y1, 5);
     for (const t of yt) g += `<line class="grid" x1="${L}" x2="${L + iw}" y1="${sy(t)}" y2="${sy(t)}"/><text class="tk" x="${L - 6}" y="${sy(t) + 4}" text-anchor="end">${fmt(t, 3)}</text>`;
     g += `<rect class="frame" x="${L}" y="${T}" width="${iw}" height="${ih}"/>`;

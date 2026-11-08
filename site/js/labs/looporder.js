@@ -41,7 +41,7 @@ export default {
         res[o] = best;
       }
       const flops = 2 * n ** 3;
-      out.innerHTML = `<div class="lab-plots">${plot({ title: `n = ${n}: süre (ms, küçük daha iyi)`, xlabel: "döngü sırası: 1 ijk · 2 ikj · 3 jki · 4 Bᵀ", ylabel: "ms", yzero: true, series: [{ name: "süre", x: [1, 2, 3, 4], y: ORDERS.map((o) => res[o]), kind: "bar" }] })}</div>`;
+      out.innerHTML = `<div class="lab-plots">${plot({ title: `n = ${n}: süre (ms, küçük daha iyi)`, xlabel: "döngü sırası", ylabel: "ms", yzero: true, xlim: [0.4, 4.6], xticks: ORDERS.map((o, i) => [i + 1, o]), series: [{ name: "süre", x: [1, 2, 3, 4], y: ORDERS.map((o) => res[o]), kind: "bar" }] })}</div>`;
       stats.innerHTML = `<table class="lab-tbl"><thead><tr><th>sıra</th><th>iç döngünün bellek erişimi</th><th>süre</th><th>GFLOP/s</th><th>en hızlıya göre</th></tr></thead><tbody>${ORDERS.map((o) => `<tr><td>${o}</td><td>${ACCESS[o]}</td><td>${fmt(res[o], 3)} ms</td><td>${fmt(flops / res[o] / 1e6, 3)}</td><td>${fmt(res[o] / Math.min(...Object.values(res)), 3)}×</td></tr>`).join("")}</tbody></table>`;
       note.innerHTML = `<p>Dört sıra da <b>aynı</b> ${fmt(flops, 3)} kayan nokta işlemini yapar; fark yalnız belleğe erişim sırasıdır. Bellek önbellek satırları (64 bayt = 8 float64) hâlinde okunur: ardışık erişim bir satırı tamamen kullanır, n adım atlayarak erişim her eleman için yeni bir satır getirir. n büyüdükçe matrisler önbelleğe sığmaz ve fark büyür. NumPy/PyTorch'un BLAS kütüphaneleri ayrıca <b>bloklama</b> (önbelleğe sığan alt matrisler), SIMD ve çok çekirdek kullanır: aynı çarpım yüzlerce kat daha hızlıdır (e aşamasında ölçeceksin).</p>`;
       stt.textContent = "Bitti — tekrar ölçebilir ya da n'yi değiştirebilirsin.";

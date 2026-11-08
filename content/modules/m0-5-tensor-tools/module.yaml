@@ -176,3 +176,51 @@ pitfalls:
 whatif:
   - q: "Bir eksenin stride'ı 0 olursa?"
     a: "O eksen boyunca aynı veri tekrarlanır: yayın (broadcast) ve `expand` bunu bellek kullanmadan yapar; yazmak tehlikelidir."
+
+labs:
+  - id: l1
+    lab: strideviz
+    title: "Storage ve görünüm: stride'lar belleği nasıl okur?"
+    goal: |
+      Üstteki şerit 24 elemanlık düz bellektir (`torch.arange(24)`); mavi hücreler seçili görünümün kullandığı adreslerdir, mor ve "×k" işaretli olanlar birden çok konumdan okunur. Alttaki ızgara görünümün kendisidir: her hücrede okuduğu adres yazar. Bir hücreye gel (ya da Tab ile odaklan) — adres formülü ve storage'daki yeri vurgulanır. Shape, stride ve offset kutularını değiştirerek kendi `as_strided` görünümünü kur.
+    predict:
+      q: "x shape (4, 6), stride (6, 1). x[1:3, ::2] görünümünün stride'ı ve offset'i nedir?"
+      options:
+        - {t: "stride (6, 2), offset 6", ok: true, why: "Satır adımı değişmedi (6); sütunda her 2. eleman → 2·1 = 2. Başlangıç satırı 1 → offset 1·6 = 6."}
+        - {t: "stride (6, 1), offset 0 — dilim kopya yapar", why: "Basit dilimleme hep görünümdür; kopya yalnız gelişmiş indekslemede."}
+        - {t: "stride (12, 2), offset 6", why: "Satır dilimi 1:3 adımsız (adım 1): satır stride'ı aynı kalır."}
+    presets:
+      - {name: "Bitişik", params: {view: 0}, note: "Her hücre bir kez, sırayla kullanılıyor."}
+      - {name: "Transpoz", params: {view: 1}, note: "Aynı 24 hücre, farklı okuma sırası: 0, 6, 12, 18, 1, 7, …"}
+      - {name: "Yayın", params: {view: 5}, note: "İlk 6 hücre üçer kez okunuyor (stride 0)."}
+      - {name: "Çakışan pencereler", params: {view: 7}, note: "Hareketli ortalama / im2col için kopyasız pencere matrisi."}
+      - {name: "Bellek dışı", params: {n0: 4, n1: 6, s0: 6, s1: 1, off: 6}, note: "Offset 6 ile 24 eleman isteyince son satır storage'ın dışına taşıyor: as_strided bunu engellemez."}
+    questions:
+      - q: "Transpoz görünümünde `view(24)` neden mümkün değil, ama `reshape(24)` çalışıyor?"
+        a: "Satır-öncelikli okuma sırası 0, 6, 12, 18, 1, 7, … adreslerini gerektirir; bu sabit tek bir stride ile üretilemez. view hata verir, reshape kopyalar."
+      - q: "Yayın görünümünde bir hücreye 1 eklersen (yerinde) ne olurdu?"
+        a: "Üç farklı indis aynı adrese işaret ettiği için hangi değerin sonuç olacağı tanımsızdır; PyTorch bu yüzden expand edilmiş tensörlerde çoğu yerinde işlemi reddeder ('unsupported operation: more than one element of the written-to tensor refers to a single memory location')."
+    limits: "Storage 24 elemanla sınırlı; en fazla 3 eksen. Gerçek tensörlerde stride'lar eleman cinsindendir (PyTorch); NumPy'da bayt cinsinden olur."
+  - id: l2
+    lab: benchnoise
+    title: "Zaman ölçümünün istatistiği: hangi özet doğruyu söyler?"
+    goal: |
+      Bu bir **benzetim**dir: gerçek süresi T olan bir işlemi defalarca ölçtüğünü varsayar ve gerçek ölçümlerdeki etkileri ekler — ısınma turları, sağa çarpık gürültü, ara sıra kesintiler, GPU'da senkronizasyonsuz ölçüm. Sol grafik bir deneyin tek tek ölçümlerini, sağ grafik 200 bağımsız deneyde dört özetin hatasını gösterir.
+    predict:
+      q: "%5 kesinti olasılığı ve 3 ısınma turu varken, 30 ölçümün ortalaması mı medyanı mı gerçek T'ye daha yakındır?"
+      options:
+        - {t: "Medyan — birkaç çok yavaş ölçüm ortalamayı yukarı çeker, medyanı neredeyse hiç etkilemez", ok: true, why: "Ortalamanın kırılma noktası 0'dır (tek bir aykırı değer onu istediği kadar kaydırır); medyanınki %50."}
+        - {t: "Ortalama — tüm veriyi kullanır", why: "Gürültü simetrik ve hafif kuyruklu olsaydı ortalama daha verimli olurdu; burada gürültü yalnız ekliyor."}
+        - {t: "Fark etmez", why: "Sağdaki çubuk grafiğe bak: aykırı değerlerle ortalamanın hatası belirgin büyük."}
+    presets:
+      - {name: "Temiz ölçüm", params: {T: 5, runs: 30, warm: 0, noise: 0.03, spike: 0, skip: 0, sync: 0}, note: "Az gürültü, aykırı yok: dört özet de iyi."}
+      - {name: "Isınma atılmadı", params: {T: 5, runs: 10, warm: 5, noise: 0.05, spike: 0, skip: 0, sync: 0}, note: "İlk ölçümler çok yavaş; az tekrarla ortalama ve hatta medyan yanlı."}
+      - {name: "Isınma atıldı", params: {T: 5, runs: 10, warm: 5, noise: 0.05, spike: 0, skip: 5, sync: 0}, note: "İlk 5 tur atıldı: sorun çözüldü."}
+      - {name: "Gürültülü makine", params: {T: 5, runs: 50, warm: 2, noise: 0.15, spike: 0.15, skip: 2, sync: 0}, note: "Ortalama belirgin yukarıda; medyan ve kırpılmış ortalama dayanıklı."}
+      - {name: "GPU, senkronizasyon yok", params: {T: 5, runs: 30, warm: 2, noise: 0.05, spike: 0, skip: 2, sync: 1}, note: "Ölçülen ~0.012 ms: işlem 400 kat hızlı görünür. Hiçbir istatistik bunu düzeltemez — ölçüm yöntemi yanlış."}
+    questions:
+      - q: "'En küçük' özet neden bazı ayarlarda T'nin altına iner, bazılarında çok iyidir?"
+        a: "Bu benzetimde gürültü log-normal ve çarpımsal: bazı ölçümler T'den biraz kısa çıkabilir; en küçüğü, tekrar arttıkça T'nin altına kayar (iyimser yan). Gerçek donanımda gürültü çoğunlukla yalnız eklediği için min sık kullanılan bir özettir (ör. timeit); ama dağılım hakkında bilgi vermez."
+      - q: "Tekrar sayısını 10'dan 300'e çıkarınca hangi özetin yayılımı en çok azalır?"
+        a: "Hepsinin yayılımı ~1/√n ile azalır (MLT, M0.4); ortalamanın yanı (aykırılar) ise tekrarla kaybolmaz. Medyan hem yanı küçük hem yayılımı azalan özettir."
+    limits: "Gürültü modeli basitleştirilmiştir (log-normal + nadir kesinti + üstel ısınma); gerçek sistemlerde ısı kısması (thermal throttling), önbellek etkileri ve ölçümler arası bağımlılık da vardır. GPU senkronizasyonsuz süre sabit bir başlatma maliyetiyle modellenmiştir."
