@@ -665,3 +665,15 @@ svg.jm { width: 100%; height: auto; user-select: none; -webkit-user-select: none
 .jm-gp { fill: var(--c-p); }
 .jm-ax { font-size: 12px; fill: var(--ink-2); }
 .jm-read .mg-m { font-family: var(--mono); }
+/* M0.4 Bayes ızgarası */
+.bg-ctrls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 16px; }
+.bg-row { display: flex; align-items: center; gap: 6px; } .bg-row input[type=range] { flex: 1; min-width: 0; }
+.bg-num { width: 5.5em; }
+.bg-sec { grid-column: 1 / -1; }
+.bg-wrap { margin: 10px 0; } svg.bg { width: 100%; height: auto; display: block; }
+.bg-tp { fill: var(--c-b); } .bg-fn { fill: var(--c-b); fill-opacity: 0.35; } .bg-fp { fill: var(--c-a); } .bg-tn { fill: var(--ink-3); fill-opacity: 0.25; }
+.bg-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; }
+.bg-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.bg-legend i.bg-tp { background: var(--c-b); } .bg-legend i.bg-fn { background: var(--c-b); opacity: 0.35; } .bg-legend i.bg-fp { background: var(--c-a); } .bg-legend i.bg-tn { background: var(--ink-3); opacity: 0.25; }
+.lesson-body table { display: block; max-width: 100%; overflow-x: auto; }
+.lab-p .bg-row input.bg-num { width: 5.5em; flex: none; } .lab-p .bg-row input[type="range"] { flex: 1 1 auto; width: auto; }

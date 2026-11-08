@@ -176,3 +176,96 @@ pitfalls:
 whatif:
   - q: "Gözlemler bağımsız değilse (zaman serisi)?"
     a: "Olabilirlik çarpana ayrılmaz; koşullu çarpım $\\prod p(x_t|x_{<t})$ kullanılır — dil modellerinin kaybı tam olarak budur."
+
+labs:
+  - id: l1
+    lab: bayesgrid
+    title: "Bayes kuralı 1000 kişide: pozitif test ne anlama gelir?"
+    goal: |
+      Her kare bir kişi. Turuncu tonlar hastaları, mavi ve gri sağlıklıları gösterir; koyu turuncu ve mavi kareler testi pozitif çıkanlardır. Pozitiflerin içinde gerçekten hasta olanların oranı $P(H\mid+)$'dır: hem sayarak hem Bayes formülüyle hesaplanır. Sürgülerin yanındaki kutulara kesin değer (yüzde) yazabilirsin.
+    predict:
+      q: "Yaygınlık %1, duyarlılık %90, özgüllük %95. Testi pozitif çıkan biri yaklaşık hangi olasılıkla hastadır?"
+      options:
+        - {t: "%15 civarı", ok: true, why: "1000 kişide 9 doğru pozitif ve ~50 yanlış pozitif: 9/59 ≈ %15. Nadir hastalıkta sağlıklıların küçük hata oranı bile hastalardan çok pozitif üretir."}
+        - {t: "%90", why: "%90, P(+ | H)'dir (duyarlılık). Sorulan ters koşul P(H | +)."}
+        - {t: "%95", why: "%95 özgüllüktür: sağlıklıların negatif çıkma oranı."}
+    presets:
+      - {name: "Nadir hastalık", params: {prev: 0.01, sens: 0.9, spec: 0.95, second: false}, note: "Ders metnindeki örnek: P(H | +) ≈ %15."}
+      - {name: "İkinci test", params: {prev: 0.01, sens: 0.9, spec: 0.95, second: true}, note: "İlk testin sonsalı (%15) ikinci testin önseli olur: iki pozitif sonrası ≈ %77. (Testlerin hastalık durumu verildiğinde bağımsız olduğu varsayımıyla.)"}
+      - {name: "Yaygın hastalık", params: {prev: 0.3, sens: 0.9, spec: 0.95, second: false}, note: "Aynı test, önsel %30: P(H | +) ≈ %89. Testin anlamı nüfusa bağlıdır."}
+      - {name: "Çok iyi özgüllük", params: {prev: 0.01, sens: 0.9, spec: 0.999, second: false}, note: "Yanlış pozitifler 50'den 1'e iner: P(H | +) ≈ %90. Nadir olayları tespit etmede özgüllük belirleyicidir."}
+    questions:
+      - q: "Duyarlılığı %90'dan %99'a çıkarmak mı, özgüllüğü %95'ten %99'a çıkarmak mı $P(H\\mid+)$'yı (önsel %1) daha çok artırır? Önce tahmin et, sonra dene."
+        a: "Özgüllük: yanlış pozitifler 50'den 10'a iner, P(H | +) ≈ %48. Duyarlılık artışı doğru pozitifi 9'dan 10'a çıkarır, P ≈ %17. Nadir sınıfta yanlış pozitif oranı baskındır."
+      - q: "Makine öğrenmesinde bunun karşılığı nedir?"
+        a: "Dengesiz sınıflarda yüksek doğruluk (accuracy) yanıltıcıdır; kesinlik (precision) = P(gerçek pozitif | tahmin pozitif) tam olarak bu sonsaldır ve taban oranına bağlıdır."
+    limits: "Izgara 1000 kişiyle sayılar yuvarlanır (çok nadir hastalıkta 0–1 hasta). İkinci test hastalık durumu verildiğinde birinciyle bağımsız varsayılır; gerçekte aynı kişide hatalar ilişkili olabilir."
+  - id: l2
+    lab: distsample
+    title: "Dağılımdan örnek çek: histogram, PMF/PDF ve büyük sayılar yasası"
+    goal: |
+      Bir dağılım ve parametrelerini seç; N örnek çekilir. Soldaki grafik örneklemin göreli frekansını (ayrık) ya da yoğunluk histogramını (sürekli) teorik eğriyle karşılaştırır. Sağdaki grafik ilk n örneğin ortalamasının gerçek ortalamaya nasıl yaklaştığını gösterir. "Yeni tohum" aynı ayarla başka bir örneklem çeker.
+    predict:
+      q: "N'yi 100'den 10 000'e çıkarırsan örneklem ortalamasının gerçek ortalamadan tipik sapması kaç kat küçülür?"
+      options:
+        - {t: "10 kat", ok: true, why: "Standart hata σ/√N: N 100 kat artınca √100 = 10 kat azalır."}
+        - {t: "100 kat", why: "Hata N ile değil √N ile azalır."}
+        - {t: "Değişmez", why: "Büyük sayılar yasası: ortalama gerçek değere yakınsar."}
+    presets:
+      - {name: "Az örnek", params: {dist: 2, mu: 0, sigma: 1, N: 20}, note: "20 örnekle histogram çok pürüzlü; birkaç tohum dene."}
+      - {name: "Çok örnek", params: {dist: 2, mu: 0, sigma: 1, N: 20000}, note: "Histogram PDF'yi neredeyse tam izler."}
+      - {name: "Yoğunluk > 1", params: {dist: 2, mu: 0, sigma: 0.2, N: 5000}, note: "σ = 0.2: tepe yoğunluk ≈ 2. Olasılık değil yoğunluk; alan yine 1."}
+      - {name: "Binom", params: {dist: 1, p: 0.3, m: 20, N: 2000}, note: "20 Bernoulli(0.3)'ün toplamı: ortalama 6, varyans 4.2; şekil şimdiden çana benziyor (MLT)."}
+      - {name: "Üstel, çarpık", params: {dist: 3, lam: 1, N: 300}, note: "Ortalama 1 ama örneklerin çoğu ortalamanın altında; uzun sağ kuyruk koşan ortalamayı arada bir yukarı sıçratır."}
+    questions:
+      - q: "Tabloda 1/N ve 1/(N−1) varyansları N = 5'te ve N = 20 000'de ne kadar farklı?"
+        a: "Oranları N/(N−1): N = 5'te %25 fark, N = 20 000'de ihmal edilebilir. Bessel düzeltmesi yalnız küçük örneklemde önemlidir."
+      - q: "Koşan ortalama neden bazen bandın dışına çıkıyor?"
+        a: "Bant yaklaşık %95 aralığıdır (±2σ/√n): zamanın ~%5'inde dışarıda olması beklenir. Ayrıca her nokta öncekilere bağlı olduğu için dışarı çıkınca bir süre orada kalabilir."
+    limits: "Örnekler tohumlu sözde-rastgele üreteçle çekilir (Gauss için Box–Muller). Sürekli dağılımlarda histogram yalnız gösterilen aralığı kapsar; dışarıda kalan örnekler sayılmaz (Gauss'ta ±4σ dışı ≈ %0.006)."
+  - id: l3
+    lab: clt
+    title: "Merkezi limit teoremi: ortalamaların dağılımı"
+    goal: |
+      Seçilen temel dağılımdan n örnek çekilip ortalaması alınır; bu R kez tekrarlanır ve R ortalamanın histogramı çizilir. Turuncu eğri MLT'nin öngörüsüdür: $\mathcal N(\mu,\sigma^2/n)$. Sağ grafik ortalamanın yayılımının n ile nasıl küçüldüğünü gösterir.
+    predict:
+      q: "Üstel dağılım (çok çarpık) için n = 1'de histogram nasıl görünür, n = 50'de nasıl?"
+      options:
+        - {t: "n = 1'de temel dağılımın kendisi (çarpık); n = 50'de çana çok yakın ve dar", ok: true, why: "n = 1'de 'ortalama' tek örnektir. n büyüdükçe çarpıklık ~1/√n ile söner, genişlik σ/√n ile daralır."}
+        - {t: "Her n'de çan eğrisi", why: "MLT asimptotiktir: küçük n'de temel dağılımın şekli görünür."}
+        - {t: "n büyüdükçe üstel dağılıma daha çok benzer", why: "Tersi: ortalamalar çarpıklığı kaybeder."}
+    presets:
+      - {name: "n = 1", params: {base: 1, n: 1, R: 4000}, note: "Temel dağılımın kendisi."}
+      - {name: "n = 30", params: {base: 1, n: 30, R: 4000}, note: "Çarpıklık hâlâ hafifçe görünür ama çan belirgin."}
+      - {name: "Bernoulli, n = 10", params: {base: 2, n: 10, R: 4000}, note: "Ortalama yalnız 0, 0.1, …, 1 değerlerini alabilir: ayrık ve çarpık. Çok çarpık dağılımlarda MLT yavaş işler."}
+      - {name: "İki tepeli", params: {base: 3, n: 2, R: 4000}, note: "n = 2'de üç tepe (−2, 0, 2); n'yi artırınca tek bir çana kaynaşırlar."}
+      - {name: "Cauchy", params: {base: 4, n: 100, R: 4000}, note: "Varyans yok: 100 örneğin ortalaması yine aynı Cauchy dağılımı. MLT'nin koşulu bozuldu."}
+    questions:
+      - q: "Sağdaki grafikte log ölçekte eğim neden −1/2?"
+        a: "Standart hata σ·n^(−1/2): log(SE) = log σ − ½ log n. Yatay eksen log₂ n, dikey log ölçek; eğim −½ (logaritma tabanları farklı olsa da doğru düzdür)."
+      - q: "SGD bağlamında n neye karşılık gelir?"
+        a: "Mini-batch boyutu: batch gradyanı, örnek gradyanlarının ortalamasıdır; gürültüsü 1/√B ile azalır ve büyük B'de yaklaşık Gauss'tur."
+    limits: "Sağ grafik her n için ayrı 300 tekrarlı küçük bir benzetimdir (gürültülü). Cauchy için yayılım çeyrekler arası genişlikle ölçülür, çünkü standart sapma tanımsızdır."
+  - id: l4
+    lab: likelihood
+    title: "Olabilirlik eğrisi, MLE ve MAP"
+    goal: |
+      n atışta k tura gözlediğini varsay. Mavi eğri $L(p)=p^k(1-p)^{n-k}$, tepesine bölünmüş. Alt grafik log-olabilirlik ve incelenen p'deki teğeti: eğim MLE'de sıfırdır. Önsel gücü a > 1 ise turuncu kesikli sonsal ve MAP çizilir.
+    predict:
+      q: "k/n = 0.7 sabit kalacak şekilde n = 10'dan n = 100'e geçersen olabilirlik eğrisi nasıl değişir?"
+      options:
+        - {t: "Tepe yine 0.7'de, ama eğri yaklaşık √10 ≈ 3 kat daralır", ok: true, why: "Genişlik ~√(p(1−p)/n): n 10 kat artınca genişlik √10 kat azalır. Daha çok veri, daha kesin tahmin."}
+        - {t: "Tepe 0.7'den uzaklaşır", why: "MLE k/n'dir; oran aynıysa tepe aynı yerde."}
+        - {t: "Hiç değişmez", why: "Log-olabilirlik n ile ölçeklenir; eğrilik artar."}
+    presets:
+      - {name: "7 / 10", params: {n: 10, k: 7, a: 1, probe: 0.5}, note: "MLE 0.7; p = 0.5'te eğim pozitif: p'yi artırmak olabilirliği artırır."}
+      - {name: "70 / 100", params: {n: 100, k: 70, a: 1, probe: 0.5}, note: "Aynı oran, çok daha dar eğri."}
+      - {name: "3 / 3 (aşırı güven)", params: {n: 3, k: 3, a: 1, probe: 0.9}, note: "MLE = 1: yazı imkânsız sayılıyor. Uyarıyı oku."}
+      - {name: "3 / 3 + önsel", params: {n: 3, k: 3, a: 2, probe: 0.9}, note: "Beta(2, 2): her yana bir sahte gözlem. MAP = 4/5 = 0.8."}
+      - {name: "Çok veri, güçlü önsel", params: {n: 200, k: 150, a: 10, probe: 0.75}, note: "a = 10 güçlü bir önsel, ama 200 gözlem karşısında MAP (0.73) MLE'ye (0.75) çok yakın."}
+    questions:
+      - q: "MLE'de ℓ'nin eğimi neden 0? İkinci türevin işareti ne söyler?"
+        a: "İç noktadaki maksimumda türev 0'dır (dℓ/dp = k/p − (n−k)/(1−p) = 0 ⇒ p = k/n). ℓ'' < 0 olduğu için bu bir maksimumdur; |ℓ''| ne kadar büyükse tepe o kadar sivri (Fisher bilgisi)."
+      - q: "L(p) değerleri neden çok küçük (n = 100'de ~10⁻²⁷)?"
+        a: "Her biri < 1 olan 100 olasılığın çarpımı. Daha büyük n'de float64'ün altına iner: bu yüzden log-olabilirlikle çalışılır."
+    limits: "Tek parametreli Bernoulli modeli; önsel simetrik Beta(a, a) ile sınırlı (a ≥ 1). Standart hata, büyük n varsayımlı yaklaşık formüldür; k = 0 ya da n'de 0 verir (yanıltıcı)."
