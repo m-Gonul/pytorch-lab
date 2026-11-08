@@ -69,3 +69,29 @@ quiz:
       - {t: "Her ağaç fonksiyonu küçük bir adımla değiştirir; bu bir regularization etkisidir (shrinkage) ve aşırı uyuma daha geç girer", ok: true, why: "Friedman'ın gözlemi: $\\eta\\le0.1$ hemen her zaman test hatasını iyileştirir, karşılığında daha çok tur gerekir."}
       - {t: "Küçük η daha hızlı yakınsar", why: "Daha yavaş yakınsar; daha çok tur gerekir."}
       - {t: "Fark yoktur", why: "Belirgin bir fark vardır."}
+
+homework:
+  - title: "Breiman (2001): rastgele ormanlar"
+    paper: "Breiman — Random Forests (Machine Learning 2001)"
+    url: "https://link.springer.com/article/10.1023/A:1010933404324"
+    level: orta
+    hours: 8
+    goal: |
+      Rastgele ormanı M2.4'teki ağacınla kur (bootstrap + düğüm başına m rastgele öznitelik). Makalenin kuramsal ilişkisini ölç: genelleme hatası üst sınırı ρ̄(1 − s²)/s² (ağaçlar arası ortalama korelasyon ρ̄ ve güç s); m'yi değiştirerek ρ̄ ve s'yi out-of-bag tahminlerle hesapla (Bölüm 2.3). OOB hatasının test hatasını izlediğini ve permütasyon önemini (Bölüm 10) göster.
+    steps:
+      - "Korelasyonu ağaçların marj fonksiyonları üzerinden hesapla."
+    accept:
+      - "m arttıkça ρ̄ ve s birlikte artar; en iyi m ödünleşimde."
+      - "OOB hatası test hatasına yakın."
+  - title: "Friedman (2001): gradyan artırma makinesi"
+    paper: "Friedman — Greedy Function Approximation: A Gradient Boosting Machine (Annals of Statistics 2001)"
+    url: "https://projecteuclid.org/journals/annals-of-statistics/volume-29/issue-5/Greedy-function-approximation-A-gradient-boosting-machine/10.1214/aos/1013203451.full"
+    level: orta
+    hours: 8
+    goal: |
+      Gradyan artırmayı (Algoritma 1) kayıp fonksiyonundan bağımsız yaz; kare, mutlak (LAD) ve Huber kayıpları için sözde kalıntıları ve yaprak değerlerini (Bölüm 4) uygula. Aykırı değerli bir regresyon probleminde üç kaybı karşılaştır; küçültme (ν, Bölüm 5) ve alt örneklemenin (stokastik artırma) test hatasına etkisini çiz.
+    steps:
+      - "Ağaç derinliği J ∈ {2, 4, 8} ile etkileşim düzeyini değiştir."
+    accept:
+      - "Huber/LAD aykırı değerlerde kareden iyi."
+      - "Küçük ν daha çok ağaçla daha iyi test hatası."

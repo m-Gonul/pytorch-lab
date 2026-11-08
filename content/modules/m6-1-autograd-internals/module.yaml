@@ -66,3 +66,17 @@ quiz:
       - {t: "Aktivasyon belleği yarıya iner, karşılığında geri geçişte kullanılan değerler yuvarlanır ve gradyanlar biraz yaklaşık olur", ok: true, why: "İleri geçiş tam hassasiyette kalır; yalnız geri geçişin girdisi sıkışır. Aynı mekanizmayla aktivasyonlar CPU'ya ya da diske de taşınabilir."}
       - {t: "İleri geçişin sonucunu bf16'ya düşürür", why: "İleri geçiş değişmez; pack yalnız saklanan kopyayı etkiler."}
       - {t: "Hiçbir şey; bf16 kayıpsızdır", why: "bf16'nın mantisi 7 bit; yuvarlama hatası var."}
+
+homework:
+  - title: "Maclaurin, Duvenaud, Adams (2015): tersinir öğrenmeyle hiperparametre optimizasyonu"
+    paper: "Maclaurin, Duvenaud, Adams — Gradient-based Hyperparameter Optimization through Reversible Learning (ICML 2015)"
+    url: "https://arxiv.org/abs/1502.03492"
+    level: ileri
+    hours: 12
+    goal: |
+      Tüm eğitim sürecinin (T adım SGD + momentum) doğrulama kaybına göre öğrenme oranı ve başlatma ölçeğinin gradyanını hesapla: önce saf autograd ile tüm iteratları saklayarak (bellek O(T)), sonra makalenin tersinir öğrenmesiyle (Algoritma 2: momentumlu SGD'yi geriye çalıştır, kaybolan bitleri sabit noktalı aritmetikle sakla). İki yöntemin hipergradyanlarını karşılaştır ve küçük bir ağda öğrenme oranı takvimini hipergradyanla optimize et (Şekil 2).
+    steps:
+      - "İlk sürümde create_graph=True ile adım adım grafiği koru."
+    accept:
+      - "İki yöntemin hipergradyanları uyumlu."
+      - "Öğrenilmiş takvim grafiği ve bellek karşılaştırması."

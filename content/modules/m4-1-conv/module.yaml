@@ -68,3 +68,17 @@ quiz:
       - {t: "Bellek: her girdi pikseli $K_h K_w$ pencerede kopyalanır; 3×3 çekirdekte 9 kat", ok: true, why: "Karşılığında işlem BLAS matmul'una iner. cuDNN gibi kütüphaneler implicit GEMM, Winograd ve FFT gibi alternatifler de kullanır."}
       - {t: "Yanlış sonuç verir", why: "Birebir aynı sonucu verir."}
       - {t: "Yalnız stride 1'de çalışır", why: "Her stride ve padding'de çalışır."}
+
+homework:
+  - title: "Mathieu, Henaff, LeCun (2014): FFT ile hızlı CNN eğitimi"
+    paper: "Mathieu, Henaff, LeCun — Fast Training of Convolutional Networks through FFTs (ICLR 2014)"
+    url: "https://arxiv.org/abs/1312.5851"
+    level: orta
+    hours: 8
+    goal: |
+      Konvolüsyonu FFT ile hesapla: girdiyi ve çekirdeği sıfır dolgulayıp frekans uzayında çarp, ters dönüşüm al; çapraz korelasyon için çekirdeği çevir. Doğrudan, im2col ve FFT yöntemlerini çekirdek boyutu k ∈ {3, 7, 15, 31} ve görüntü boyutuna göre karşılaştır; makalenin maliyet analizini (Bölüm 3: FFT'lerin girdi/çekirdek/çıktı için yeniden kullanımı) ileri ve geri geçişin üç konvolüsyonu üzerinde uygula. Kesişim noktasını M10.7'deki sonuçla karşılaştır.
+    steps:
+      - "Dairesel konvolüsyonun 'valid' kısmını doğru kırp."
+    accept:
+      - "Üç yöntem aynı sonucu verir."
+      - "Büyük k'da FFT'nin üstün olduğu kesişim noktası."

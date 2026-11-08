@@ -77,3 +77,17 @@ quiz:
       - {t: "Sayısal: 2000 (her koordinat için ±h); reverse-mode: ~1 ileri + 1 geri geçiş", ok: true, why: "Backprop'un bütün değeri bu: maliyet parametre sayısından bağımsız, ileri geçişin sabit katı."}
       - {t: "İkisi de 1000", why: "Reverse-mode tek bir geri geçişle tüm kısmi türevleri verir."}
       - {t: "Sayısal: 2, reverse-mode: 1000", why: "Tersine; reverse-mode $m=1$ çıktı için en ucuz moddur. Forward-mode ise girdi başına bir geçiş ister."}
+
+homework:
+  - title: "Baydin ve ark. (2018): makine öğrenmesinde otomatik türev"
+    paper: "Baydin, Pearlmutter, Radul, Siskind — Automatic Differentiation in Machine Learning: a Survey (JMLR 2018)"
+    url: "https://arxiv.org/abs/1502.05767"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin Tablo 2–3'teki ileri ve geri mod izlerini kendi kodunla üret: ikili sayılar (dual numbers) ile ileri mod ve bir kayıt bandı (tape) ile geri mod yaz; $f(x_1,x_2)=\ln x_1+x_1x_2-\sin x_2$ örneğinde ara değerleri makaleyle karşılaştır. n girdi, m çıktı için Jacobian'ı ileri modda n, geri modda m geçişle hesaplayıp maliyet ödünleşimini (Bölüm 3.1–3.2) n ≫ m ve n ≪ m durumlarında ölç.
+    steps:
+      - "Dual sayı sınıfında +, ×, sin, exp, log için operatör aşırı yüklemesi."
+    accept:
+      - "İzler makaledeki tablolarla birebir."
+      - "Jacobian maliyet tablosu: ileri mod ∝ n, geri mod ∝ m."

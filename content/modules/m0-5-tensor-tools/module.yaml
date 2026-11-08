@@ -68,3 +68,17 @@ quiz:
       - {t: "CUDA asenkron: süre, kernel bitmeden ölçülür; `torch.cuda.synchronize()` gerekir", ok: true, why: "Python çağrıyı kuyruğa atıp hemen döner. `torch.utils.benchmark.Timer` senkronizasyonu kendisi yapar."}
       - {t: "perf_counter yeterince hassas değildir", why: "Nanosaniye çözünürlüğü var; sorun asenkronluk."}
       - {t: "GPU işlemleri ölçülemez", why: "Ölçülebilir; senkronizasyon ya da CUDA event'leriyle."}
+
+homework:
+  - title: "Harris ve ark. (2020): NumPy ile dizi programlama"
+    paper: "Harris ve ark. — Array programming with NumPy (Nature 2020)"
+    url: "https://arxiv.org/abs/2006.10256"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin Şekil 1'deki kavramları (şekil, adımlar/strides, görünüm, yayma) sıfırdan küçük bir dizi sınıfıyla yeniden kur: düz bir Python listesi + shape + strides + offset; transpose, reshape (kopyasız mümkünse), dilimleme ve iki dizi arasında yayma kurallarıyla eleman bazlı toplamayı yaz. Sonuçları np.lib.stride_tricks.as_strided ile karşılaştır; hangi reshape'lerin kopya gerektirdiğini strides üzerinden açıkla.
+    steps:
+      - "Yayma: sağdan hizala, boyut 1 olanlar genişler, diğer uyumsuzluk hata."
+    accept:
+      - "Kendi dizinin sonuçları NumPy ile aynı."
+      - "Kopya gerektiren reshape örneklerinin strides gerekçesi."

@@ -72,3 +72,17 @@ quiz:
       - {t: "K kaybın toplamında her $W_{:,k}$ sütunu yalnız kendi kaybına girer; parametreler paylaşılmaz", ok: true, why: "M1.1'deki lr taramasıyla aynı yapı: ayrık parametreler + toplam kayıp = bağımsız gradyanlar."}
       - {t: "Aynı sonucu vermez; softmax gerekir", why: "Softmax (M1.5) sınıfları birbirine bağlar ve farklı bir model olur; OvR'de bağ yok."}
       - {t: "Yalnız K = 2 için aynıdır", why: "Her K için geçerli."}
+
+homework:
+  - title: "Lin, Weng, Keerthi (2008): lojistik regresyon için güven bölgesi Newton"
+    paper: "Lin, Weng, Keerthi — Trust Region Newton Method for Large-Scale Logistic Regression (JMLR 2008)"
+    url: "https://www.jmlr.org/papers/v9/lin08b.html"
+    level: ileri
+    hours: 8
+    goal: |
+      L2 düzenlemeli lojistik regresyonu (a) gradyan inişi, (b) tam Newton / IRLS, (c) makalenin güven bölgesli Newton'u (iç döngüde eşlenik gradyanla Hessian-vektör çarpımı, Hessian'ı hiç oluşturmadan) ile çöz. Yüksek boyutlu seyrek bir veri setinde (ör. 20 Newsgroups'un TF-IDF'i) yinelenme ve süre karşılaştırması yap; Hessian-vektör çarpımının $X^\top(D(Xv))$ biçimiyle O(nnz) olduğunu göster.
+    steps:
+      - "Eşlenik gradyan iç döngüsünü güven bölgesi sınırında kes (Steihaug)."
+    accept:
+      - "TRON, yüksek boyutta GD ve tam Newton'dan hızlı yakınsar."
+      - "Hessian'sız Hv doğruluğu sonlu farkla doğrulanmış."

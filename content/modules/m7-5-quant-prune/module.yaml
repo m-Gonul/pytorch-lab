@@ -74,3 +74,29 @@ quiz:
       - {t: "Sıfırlar düzensiz dağılmış; yoğun kernel onları da çarpar. Hız için yapılandırılmış seyreklik (ör. 2:4) ya da seyrek kernel'ler gerekir", ok: true, why: "Yapısız budama sıkıştırılmış depolamada boyut kazandırır; hız için donanımın anladığı bir desen gerekir."}
       - {t: "Budanmış ağırlıklar yeniden büyür", why: "Maske sabitse büyümez."}
       - {t: "Hızlandırır, iki kat", why: "Yoğun kernel FLOP'u değişmez."}
+
+homework:
+  - title: "Jacob ve ark. (2018): yalnız tamsayı çıkarım için nicemleme"
+    paper: "Jacob ve ark. — Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference (CVPR 2018)"
+    url: "https://arxiv.org/abs/1712.05877"
+    level: ileri
+    hours: 10
+    goal: |
+      Makalenin afin nicemleme şemasını (Denk. 1: r = S(q − Z)) ve yalnız tamsayı matris çarpımını (Bölüm 2.2: M = S₁S₂/S₃'ü sabit noktalı çarpan + kaydırmayla) NumPy'da yaz; int8 bir doğrusal katmanın çıktısını float referansla karşılaştır. Sahte nicemlemeli eğitimi (QAT, Bölüm 3; düz geçiş tahmincisi) küçük bir CNN'de uygulayıp eğitim sonrası nicemlemeyle (PTQ) doğruluk farkını raporla; BN katlamayı (M3.6 x2) dahil et.
+    steps:
+      - "Kanal başına ve tensör başına ölçek karşılaştırması."
+    accept:
+      - "Tamsayı çarpım float referansa nicemleme hatası içinde eşit."
+      - "QAT, PTQ'dan yüksek doğruluk (özellikle küçük modellerde)."
+  - title: "Frankle & Carbin (2019): piyango bileti hipotezi"
+    paper: "Frankle & Carbin — The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks (ICLR 2019)"
+    url: "https://arxiv.org/abs/1803.03635"
+    level: orta
+    hours: 8
+    goal: |
+      Yinelemeli büyüklük budamasıyla (her turda %20) 'kazanan biletleri' bul: budanmış ağı orijinal başlatmaya geri sar ve yeniden eğit; rastgele yeniden başlatmayla karşılaştır (makale Şekil 3). MNIST'te LeNet-300-100 ile seyreklik oranına göre test doğruluğu ve erken durdurma iterasyonu eğrilerini çiz.
+    steps:
+      - "torch.nn.utils.prune ile maskeler; başlangıç ağırlıklarını sakla."
+    accept:
+      - "Kazanan biletler %10–20 yoğunlukta orijinal doğruluğa ulaşır."
+      - "Rastgele yeniden başlatma aynı seyreklikte belirgin kötü."

@@ -78,3 +78,17 @@ quiz:
       - {t: "$B^\\top$", why: "Shape tutmaz: $\\partial L/\\partial A$, $A$ ile aynı shape'te ($n\\times k$) olmalı."}
       - {t: "$\\mathbf{1}_{n\\times m}B^\\top$", ok: true, why: "Genel kural: $G=\\partial L/\\partial C$ ise $\\partial L/\\partial A = G B^\\top$. Burada $G$ tamamen 1."}
       - {t: "$A^\\top\\mathbf{1}_{n\\times m}$", why: "Bu $\\partial L/\\partial B$'dir."}
+
+homework:
+  - title: "Strassen (1969): Gauss eliminasyonu optimal değil"
+    paper: "Strassen — Gaussian Elimination is not Optimal (Numerische Mathematik 1969)"
+    url: "https://link.springer.com/article/10.1007/BF02165411"
+    level: orta
+    hours: 6
+    goal: |
+      Strassen'in 7 çarpımlı 2 × 2 blok formülünü özyinelemeli yaz (NumPy blokları); bir eşik altında np.matmul'a geç. n = 2⁶…2¹¹ için süreyi ve çarpma sayısını (n^2.807 vs n³) ölç, en iyi eşiği bul; float32/float64'te sonucun hata büyümesini klasik çarpımla karşılaştır (Strassen'in daha az kararlı olduğunu göster).
+    steps:
+      - "İki kuvveti olmayan boyutları sıfır dolgu ile ele al."
+    accept:
+      - "Eşik üstünde Strassen'in daha hızlı olduğu bir n (ya da olmadığına dair ölçüm)."
+      - "Hata tablosu: Strassen hatası n ile daha hızlı büyür."

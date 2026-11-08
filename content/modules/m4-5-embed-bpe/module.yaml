@@ -89,3 +89,17 @@ quiz:
       - {t: "Her önceki token için bağımsız bir logit vektörü öğrenir; bu tam olarak koşullu kategorik dağılımın MLE'sidir ve onu sayım zaten kapalı formda verir", ok: true, why: "Zero to Hero'daki ders: aynı model, iki optimizasyon yolu. Fark ancak bağlam uzayınca (n-gram → MLP → Transformer) sinir ağları lehine açılır."}
       - {t: "Gradient descent yerel minimumda takılır", why: "Problem konvekstir; global minimum = sayım MLE'si."}
       - {t: "İner; daha iyi bir model", why: "Eğitim verisinde MLE'den daha düşük NLL mümkün değil."}
+
+homework:
+  - title: "Kudo & Richardson (2018): SentencePiece ve unigram LM tokenizasyonu"
+    paper: "Kudo & Richardson — SentencePiece: A simple and language independent subword tokenizer and detokenizer for Neural Text Processing (EMNLP 2018); Kudo — Subword Regularization (ACL 2018)"
+    url: "https://arxiv.org/abs/1808.06226"
+    level: ileri
+    hours: 10
+    goal: |
+      BPE'nin (M4.5) yanına unigram dil modeli tokenizasyonunu yaz (Kudo 2018): büyük bir aday sözlükle başla, EM ile alt kelime olasılıklarını öğren, Viterbi ile en olası bölütlemeyi bul ve kaybı en az artıran adayları budayarak sözlüğü küçült. Türkçe bir metin üzerinde BPE ile karşılaştır: kelime başına token sayısı, morfem sınırlarıyla uyum; alt kelime düzenlileştirmesini (birden çok bölütlemeden örnekleme) göster.
+    steps:
+      - "Boşlukları ▁ ile kodlayıp dil bağımsız ön işlem (SentencePiece)."
+    accept:
+      - "Unigram bölütlemeleri morfem sınırlarına BPE'den daha yakın."
+      - "Örneklenen bölütleme çeşitliliği gösterimi."

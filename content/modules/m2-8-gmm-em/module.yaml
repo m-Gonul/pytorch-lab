@@ -64,3 +64,17 @@ quiz:
       - {t: "Bir bileşen tek bir noktaya çöker: $\\mu_k=x_i$, $\\sigma_k\\to0$ iken o noktanın yoğunluğu sonsuza gider", ok: true, why: "Likelihood sınırsızdır. Pratik çözüm kovaryansa küçük bir $\\epsilon I$ eklemek (reg)."}
       - {t: "Bileşen sayısı çok küçük olunca", why: "Tekillik bir bileşenin çökmesiyle ilgili; K'dan bağımsız."}
       - {t: "Oluşmaz", why: "Klasik bir patoloji; bu modülde `reg` parametresinin nedeni."}
+
+homework:
+  - title: "Dempster, Laird, Rubin (1977): EM algoritması"
+    paper: "Dempster, Laird, Rubin — Maximum Likelihood from Incomplete Data via the EM Algorithm (JRSS-B 1977)"
+    url: "https://www.jstor.org/stable/2984875"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin monoton artış teoremini (Teorem 1) Gauss karışımında her yinelemede log-olabilirliği kaydederek doğrula; eksik veri yorumuyla eksik değerli çok değişkenli normal tahminini (makalenin Bölüm 4.1.3 örneği) EM ile yaz. Yakınsama hızının eksik bilgi oranına bağlı olduğunu (Bölüm 3) iki bileşen ayrılığı değişirken yinelenme sayısını ölçerek göster.
+    steps:
+      - "Eksik veri: rastgele %20 bileşeni gizle, E-adımında koşullu beklentileri kullan."
+    accept:
+      - "Log-olabilirlik hiçbir yinelemede azalmaz."
+      - "Bileşenler yaklaştıkça EM yavaşlar."

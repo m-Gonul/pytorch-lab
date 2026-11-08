@@ -70,3 +70,17 @@ quiz:
       - {t: "Eğitim $O(1)$ (veriyi sakla), tahmin örnek başına $O(n\\,d)$", ok: true, why: "Bu yüzden büyük veri setlerinde yaklaşık en yakın komşu yapıları (KD-tree, HNSW, FAISS) kullanılır."}
       - {t: "Eğitim $O(n^2)$, tahmin $O(1)$", why: "Tersine: k-NN tembel (lazy) bir öğrenicidir; tüm iş tahminde."}
       - {t: "İkisi de $O(n\\log n)$", why: "Sıralama tahminde $O(n\\log n)$ ekleyebilir ama baskın terim mesafe hesabı."}
+
+homework:
+  - title: "Cover & Hart (1967): en yakın komşu sınıflandırması"
+    paper: "Cover & Hart — Nearest Neighbor Pattern Classification (IEEE Trans. Information Theory 1967)"
+    url: "https://ieeexplore.ieee.org/document/1053964"
+    level: orta
+    hours: 5
+    goal: |
+      Makalenin ana sonucunu deneyle doğrula: Bayes hatası R* bilinen sentetik problemlerde (iki Gauss, örtüşme ayarlı) 1-NN'in asimptotik hatasının R* ≤ R ≤ 2R*(1 − R*) aralığında kaldığını, örnek sayısı n = 10²…10⁵ için göster. k-NN'de k ve n birlikte büyürken (k → ∞, k/n → 0) hatanın R*'a yaklaştığını çiz; boyut arttıkça yakınsamanın yavaşladığını (boyut laneti) ölç.
+    steps:
+      - "R*'ı iki Gauss için kapalı form ya da büyük Monte Carlo ile hesapla."
+    accept:
+      - "Ölçülen 1-NN hataları Cover–Hart sınırları içinde."
+      - "k-NN hatasının R*'a yaklaşma grafiği ve boyut etkisi."

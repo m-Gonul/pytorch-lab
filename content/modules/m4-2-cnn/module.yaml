@@ -71,3 +71,29 @@ quiz:
       - {t: "Eval'de BN sabit running istatistiklerle bir afin dönüşümdür ve conv'un ağırlık/bias'ına katlanabilir; eğitimde istatistik batch'e bağlıdır", ok: true, why: "Çıkarımda bir kernel ve bir bellek okuma/yazma turu kazanılır. ONNX/TensorRT gibi araçlar bunu otomatik yapar."}
       - {t: "Eğitimde gradyan tanımsız olur", why: "Sorun gradyan değil, istatistiklerin sabit olmaması."}
       - {t: "Her zaman geçerlidir", why: "Train modunda çıktılar farklı olur; kontrol eval'de karşılaştırıyor."}
+
+homework:
+  - title: "He ve ark. (2016): derin artık öğrenme (ResNet)"
+    paper: "He, Zhang, Ren, Sun — Deep Residual Learning for Image Recognition (CVPR 2016)"
+    url: "https://arxiv.org/abs/1512.03385"
+    level: orta
+    hours: 10
+    goal: |
+      Makalenin Şekil 6 deneyini CIFAR-10'da tekrarla: 20, 32, 56 katmanlı 'düz' ağlar ve aynı derinlikte ResNet'ler (Bölüm 4.2 mimarisi: 3 aşama, 16/32/64 kanal). Düz ağlarda derinlik arttıkça eğitim hatasının da arttığını (bozulma problemi) ve artık bağlantıların bunu çözdüğünü göster. Kestirme türleri A (sıfır dolgu) ve B (izdüşüm) karşılaştırması ve katman yanıtlarının std'si (Şekil 7) ekle.
+    steps:
+      - "Aynı öğrenme oranı takvimi: 0.1, 32k ve 48k adımda 10'a böl (ya da ölçekli sürümü)."
+    accept:
+      - "Düz-56'nın eğitim hatası düz-20'den yüksek; ResNet-56 düşük."
+      - "Artık bloklarda yanıt std'leri daha küçük."
+  - title: "LeCun ve ark. (1998): LeNet-5"
+    paper: "LeCun, Bottou, Bengio, Haffner — Gradient-Based Learning Applied to Document Recognition (Proc. IEEE 1998)"
+    url: "http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf"
+    level: başlangıç
+    hours: 6
+    goal: |
+      LeNet-5'i makaledeki ayrıntılarla yaz: C3'ün kısmi bağlantı tablosu (Tablo I), ölçekli tanh (1.7159 tanh(2x/3)), S katmanlarındaki eğitilebilir katsayı ve bias, RBF çıkış katmanı (ya da softmax ile karşılaştır). MNIST'te test hatasını (makale: %0.95) ve veri artırmanın etkisini (Şekil 9) ölç; parametre ve bağlantı sayılarını makaleyle karşılaştır.
+    steps:
+      - "Kısmi bağlantıyı maskelenmiş ağırlıklarla uygula."
+    accept:
+      - "Parametre sayıları makaleyle aynı."
+      - "Test hatası %1 civarı."

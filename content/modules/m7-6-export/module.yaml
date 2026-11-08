@@ -64,3 +64,17 @@ quiz:
       - {t: "Derleme önceden (ahead-of-time) yapılır ve sonuç Python yorumlayıcısı olmadan C++'tan yüklenebilen bir paket olur; çalışma anında JIT derleme yok", ok: true, why: "Sunucu ve gömülü dağıtımlarda soğuk başlatma ve Python bağımlılığı ortadan kalkar."}
       - {t: "Daha hızlı kernel'ler üretir", why: "Aynı Inductor arka ucu; fark derlemenin zamanı ve paket biçimi."}
       - {t: "Yalnız mobil içindir", why: "Sunucuda da kullanılır."}
+
+homework:
+  - title: "Chen ve ark. (2018): TVM"
+    paper: "Chen ve ark. — TVM: An Automated End-to-End Optimizing Compiler for Deep Learning (OSDI 2018)"
+    url: "https://arxiv.org/abs/1802.04799"
+    level: ileri
+    hours: 10
+    goal: |
+      Makalenin uçtan uca yığınını kendi modelin üzerinde izle: torch.export ile grafiği çıkar, ONNX'e aktar ve aynı modeli (a) eager PyTorch, (b) torch.compile, (c) ONNX Runtime, (d) TVM'in Relay/Relax + otomatik ayar (ya da Ansor) ile çalıştır. Gecikme ve verimi CPU'da batch 1 ve 32 için karşılaştır; makalenin operatör füzyonu ve veri düzeni dönüşümü (Bölüm 3) fikirlerinin hangi çalışma zamanında görüldüğünü üretilen grafiklerden göster.
+    steps:
+      - "Sayısal eşdeğerliği her çalışma zamanında 10⁻⁴ içinde doğrula."
+    accept:
+      - "Dört çalışma zamanı için gecikme/verim tablosu."
+      - "Füzyon ve düzen dönüşümü örnekleri."

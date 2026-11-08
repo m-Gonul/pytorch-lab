@@ -71,3 +71,17 @@ quiz:
       - {t: "Sapmalar gerçek $\\mu$ yerine verinin kendi ortalamasından ölçülür; ortalama veriye en yakın nokta olduğu için kareler toplamı küçülür", ok: true, why: "$\\mathbb E[\\hat\\sigma^2_{\\text{MLE}}]=\\frac{n-1}{n}\\sigma^2$. Bir serbestlik derecesi ortalamaya harcanır; $n-1$ ile bölmek bunu düzeltir (Bessel düzeltmesi)."}
       - {t: "Kayan nokta hatası yüzünden", why: "Tam aritmetikte de geçerli; istatistiksel bir yanlılık."}
       - {t: "Küçük çıkmaz; MLE her zaman yansızdır", why: "MLE tutarlıdır ($n\\to\\infty$'da doğru) ama her zaman yansız değildir."}
+
+homework:
+  - title: "Box & Muller (1958): normal sapmaların üretimi"
+    paper: "Box & Muller — A Note on the Generation of Random Normal Deviates (Annals of Mathematical Statistics 1958)"
+    url: "https://projecteuclid.org/journals/annals-of-mathematical-statistics/volume-29/issue-2/A-Note-on-the-Generation-of-Random-Normal-Deviates/10.1214/aoms/1177706645.full"
+    level: başlangıç
+    hours: 4
+    goal: |
+      Box–Muller dönüşümünü ve Marsaglia'nın kutupsal yöntemini yalnız düzgün sayılardan üret; Kolmogorov–Smirnov ve moment testleriyle N(0, 1)'e uyumu, kuyruk olasılıklarını (|z| > 4) ve hız farkını (trigonometri vs ret örneklemesi) ölç. Ters CDF yöntemiyle (Beasley–Springer–Moro ya da kendi rasyonel yaklaşımın) karşılaştır.
+    steps:
+      - "Kutupsal yöntemin kabul oranının π/4 olduğunu doğrula."
+    accept:
+      - "Üç yöntem de KS testinden geçer."
+      - "Hız ve kuyruk doğruluğu tablosu."

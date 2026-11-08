@@ -64,3 +64,17 @@ quiz:
       - {t: "`x` aynı düğüme iki kez girer; backward'da `grad = ...` (üzerine yazma) kullanılırsa $x$ çıkar, `grad += ...` gerekir", ok: true, why: "M3.1'deki kural tensörlerde de geçerli. Kontrol bu durumu test ediyor."}
       - {t: "pow kullanılmadığı için", why: "Çarpım kuralı yeterli; sorun birikim."}
       - {t: "Bozmaz", why: "Paylaşılan düğümde birikim olmadan yanlış çıkar."}
+
+homework:
+  - title: "Paszke ve ark. (2019): PyTorch"
+    paper: "Paszke ve ark. — PyTorch: An Imperative Style, High-Performance Deep Learning Library (NeurIPS 2019)"
+    url: "https://arxiv.org/abs/1912.01703"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin Bölüm 5'teki performans iddialarını kendi makinende sına: (1) Python yükünü — aynı küçük MLP'yi farklı batch boyutlarında çalıştırıp çekirdek süresi ile Python/dispatch süresini torch.profiler ile ayır (Şekil 1'deki gibi), (2) önbellekli ayırıcının (caching allocator) etkisini — PYTORCH_NO_CUDA_MEMORY_CACHING ya da CPU'da sık tensör ayırma ile ölç, (3) referans sayımlı serbest bırakmanın bellek tepe noktasına etkisi. Küçük batch'te yükün baskın olduğunu ve CUDA graphs / torch.compile'ın bunu nasıl azalttığını (M6.5) göster.
+    steps:
+      - "Profili Chrome trace olarak kaydet ve yorumla."
+    accept:
+      - "Batch boyutuna göre yük/çekirdek oranı grafiği."
+      - "Ayırıcı ve serbest bırakma ölçümleri."

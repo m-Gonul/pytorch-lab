@@ -65,3 +65,17 @@ quiz:
       - {t: "$v$", ok: true, why: "$\\partial(\\sum_i u_iv_i)/\\partial u_j = v_j$. Lineer bir fonksiyonun gradyanı katsayı vektörüdür."}
       - {t: "$u$", why: "O $\\tfrac12\\lVert u\\rVert^2$'nin gradyanı olurdu."}
       - {t: "$u\\cdot v$ (bir skaler)", why: "Bir skaler fonksiyonun $u$'ya göre gradyanı $u$ ile aynı shape'te bir vektördür."}
+
+homework:
+  - title: "Goldberg (1991): kayan nokta aritmetiği"
+    paper: "Goldberg — What Every Computer Scientist Should Know About Floating-Point Arithmetic (ACM Computing Surveys 1991)"
+    url: "https://dl.acm.org/doi/10.1145/103162.103163"
+    level: başlangıç
+    hours: 5
+    goal: |
+      Makalenin toplama hatası analizini (Bölüm 4.2) iç çarpım üzerinde dene: naif toplam, ikili (pairwise) toplam ve Kahan telafili toplamı yaz; 10³–10⁷ uzunluklu, işaretleri karışık ve büyüklükleri 10 mertebe yayılan vektörlerde float32/float64 sonucu, kesin (fractions.Fraction ya da math.fsum) değere göre göreli hata ile karşılaştır. Hatanın n ile büyüme hızını (naif O(nε), ikili O(ε log n), Kahan O(ε)) log-log grafikte göster; NumPy'ın np.dot ve np.sum'ının hangi stratejiyi kullandığını deneyle çıkar.
+    steps:
+      - "Koşul sayısı Σ|xᵢyᵢ| / |Σxᵢyᵢ| büyük örnekler üret: hata bu sayıyla orantılı."
+    accept:
+      - "Üç yöntemin hata büyüme hızları kuramla uyumlu."
+      - "np.dot / np.sum davranışı için deneysel gerekçe."

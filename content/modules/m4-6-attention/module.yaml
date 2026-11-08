@@ -70,3 +70,17 @@ quiz:
       - {t: "T×T skor matrisini HBM'e yazıp okumaz; blokları SRAM'de tutar ve online softmax ile birleştirir: darboğaz bellek trafiği", ok: true, why: "Attention bellek-bağımlı bir işlem; IO azalınca hız gelir. Geri geçişte de skorları saklamak yerine yeniden hesaplar."}
       - {t: "Yaklaşık (approximate) attention hesaplar", why: "Kesin sonuç verir; e aşamasında `F.scaled_dot_product_attention` ile birebir karşılaştırıyorsun."}
       - {t: "Daha az head kullanır", why: "Head yapısı değişmez."}
+
+homework:
+  - title: "Dao ve ark. (2022): FlashAttention"
+    paper: "Dao, Fu, Ermon, Rudra, Ré — FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (NeurIPS 2022)"
+    url: "https://arxiv.org/abs/2205.14135"
+    level: ileri
+    hours: 12
+    goal: |
+      e aşamasındaki online softmax'ı bir Triton çekirdeğine (M7.2) çevir: Q bloğu başına K/V bloklarını SRAM'e yükle, satır maksimumu ve paydayı güncelle (Algoritma 1), çıktıyı yeniden ölçekle. Geri geçişi makalenin yeniden hesaplama yaklaşımıyla (Algoritma 2; yalnız logsumexp sakla) yaz. Bellek kullanımını (O(N) vs O(N²)) ve HBM okuma sayısını kuramsal formülle (Teorem 2) karşılaştır; nedensel maske ve blok atlama ekle.
+    steps:
+      - "GPU yoksa TRITON_INTERPRET=1 ile doğruluğu, Colab'da hızı ölç."
+    accept:
+      - "Çıktı ve gradyanlar standart attention'la 10⁻³ içinde."
+      - "Uzun dizide bellek ve süre kazancı tablosu."

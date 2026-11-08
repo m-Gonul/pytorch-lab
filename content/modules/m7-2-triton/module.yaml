@@ -64,3 +64,17 @@ quiz:
       - {t: "$C$'nin HBM'e yazılıp ReLU için tekrar okunmasını önler: bir tam okuma + yazma tasarrufu", ok: true, why: "Epilogue füzyonu (bias, aktivasyon, ölçekleme) cuBLASLt ve Inductor'ın da yaptığı şey."}
       - {t: "Matmul'ün FLOP'unu azaltır", why: "Matmul aynı; tasarruf epilogue'un bellek trafiğinde."}
       - {t: "Hiçbir şey; derleyici zaten birleştirir", why: "Ayrı kernel'ler arasında füzyon ancak bir derleyici (Inductor) yaparsa olur."}
+
+homework:
+  - title: "Tillet, Kung, Cox (2019): Triton"
+    paper: "Tillet, Kung, Cox — Triton: An Intermediate Language and Compiler for Tiled Neural Network Computations (MAPL 2019)"
+    url: "https://dl.acm.org/doi/10.1145/3315508.3329973"
+    level: ileri
+    hours: 10
+    goal: |
+      Makalenin döşemeli (tiled) programlama modelinin karşılığı olarak Triton'da matmul çekirdeğini adım adım geliştir: blok boyutları (BLOCK_M/N/K), grup sıralı (swizzled) program kimlikleri ile L2 yeniden kullanımı, otomatik ayar (triton.autotune). Her adımda performansı cuBLAS'a (torch.matmul) göre raporla; makalenin Şekil 8'indeki gibi şekil taraması yap ve hangi şekillerde geride kaldığını açıkla.
+    steps:
+      - "CPU'da TRITON_INTERPRET=1 ile doğruluk; performans Colab GPU'sunda."
+    accept:
+      - "Doğru sonuç; büyük kare matrislerde cuBLAS'ın makul bir yüzdesi."
+      - "Swizzle'ın L2 isabetine/performansa etkisi ölçülmüş."

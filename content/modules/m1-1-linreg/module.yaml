@@ -75,3 +75,17 @@ quiz:
       - {t: "Her modelin kaybı yalnız kendi parametrelerine bağlı; toplamın $W_\\ell$'ye göre türevi yalnız $L_\\ell$'nin türevi", ok: true, why: "$\\partial(\\sum_k L_k)/\\partial W_\\ell=\\partial L_\\ell/\\partial W_\\ell$ çünkü $k\\ne\\ell$ için $L_k$, $W_\\ell$'yi içermez. Ortalama alsaydın gradyanlar $1/L$ ile ölçeklenirdi."}
       - {t: "Toplam kaybı küçültmek her modelin kaybını eşit küçültür", why: "Asıl neden parametrelerin ayrık olması; kayıpların eşit azalması gerekmez."}
       - {t: "Doğru vermez; her model için ayrı backward şart", why: "Parametreler paylaşılmadığı sürece tek backward yeterli. Bu, M0.3'teki toplam hilesinin aynısı."}
+
+homework:
+  - title: "Golub & Reinsch (1970): SVD ve en küçük kareler"
+    paper: "Golub & Reinsch — Singular Value Decomposition and Least Squares Solutions (Numerische Mathematik 1970)"
+    url: "https://link.springer.com/article/10.1007/BF02163027"
+    level: orta
+    hours: 6
+    goal: |
+      En küçük kareleri dört yolla çöz: normal denklemler, QR (Householder), SVD ve kesilmiş SVD (küçük tekil değerleri at). Koşul sayısı 10²…10¹² olan tasarım matrislerinde (ör. Vandermonde / polinom regresyonu) çözüm hatasını ve kalıntıyı karşılaştır; normal denklemlerin hatanın κ², QR/SVD'nin κ ile büyüdüğünü göster. Kesilmiş SVD'nin ridge'e (M1.3) benzer düzenleyici etkisini tartış.
+    steps:
+      - "Kesin çözümü bilinen sentetik problemler kur (x* seç, b = Ax* + küçük gürültü)."
+    accept:
+      - "Hata–κ grafiği: normal denklemler κ², QR/SVD κ."
+      - "Kesilmiş SVD'nin gürültülü veride daha iyi genelleme örneği."

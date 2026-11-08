@@ -65,3 +65,17 @@ quiz:
       - {t: "$v$ özvektörse $-v$ de öyle; farklı kütüphaneler/çalıştırmalar farklı işaret döndürür, testler ve görselleştirmeler kararsız olur", ok: true, why: "Bu modülde kural: her bileşenin mutlak değerce en büyük elemanı pozitif."}
       - {t: "Negatif özvektör negatif varyans demektir", why: "Varyans özdeğerdir, işaretten bağımsız."}
       - {t: "Belirsiz değildir", why: "$C(-v)=\\lambda(-v)$."}
+
+homework:
+  - title: "Halko, Martinsson, Tropp (2011): rastgele matris ayrışımları"
+    paper: "Halko, Martinsson, Tropp — Finding Structure with Randomness: Probabilistic Algorithms for Constructing Approximate Matrix Decompositions (SIAM Review 2011)"
+    url: "https://arxiv.org/abs/0909.4061"
+    level: orta
+    hours: 8
+    goal: |
+      Rastgele SVD'yi (Algoritma 4.1 + 5.1) yaz: Gauss test matrisi, aşırı örnekleme p ve q güç yinelemesi. Tekil değerleri yavaş ve hızlı sönen matrislerde (ör. görüntü yamaları, sentetik spektrumlar) rank-k yaklaşım hatasını kuramsal sınırla (Bölüm 10) ve np.linalg.svd ile karşılaştır; süre ölçeklemesini büyük matrislerde ölç. sklearn PCA(svd_solver='randomized') ile aynı sonucu verdiğini göster.
+    steps:
+      - "Güç yinelemesinde her adımda QR ile yeniden ortogonalleştir."
+    accept:
+      - "Hata kesin SVD'nin σ_{k+1}'ine yakın; q arttıkça iyileşir."
+      - "Büyük matrislerde belirgin hızlanma."

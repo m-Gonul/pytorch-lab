@@ -68,3 +68,29 @@ quiz:
       - {t: "O katmanın parametre parçalarını tüm işçilerden all-gather ile toplar, hesaplar, sonra tam kopyayı serbest bırakır", ok: true, why: "Bellek yerine iletişim harcar: parametreler kalıcı olarak yalnız $1/N$ boyutunda tutulur."}
       - {t: "Her işçi farklı katmanları hesaplar", why: "O, pipeline paralelliği."}
       - {t: "Parametreleri hiç toplamaz", why: "Hesap için tam katman ağırlığı gerekir."}
+
+homework:
+  - title: "Rajbhandari ve ark. (2020): ZeRO"
+    paper: "Rajbhandari, Rasley, Ruwase, He — ZeRO: Memory Optimizations Toward Training Trillion Parameter Models (SC 2020)"
+    url: "https://arxiv.org/abs/1910.02054"
+    level: ileri
+    hours: 10
+    goal: |
+      ZeRO'nun üç aşamasını (optimizer durumu, gradyan, parametre bölümleme) torch.distributed ile CPU üzerinde gloo arka ucuyla, 4 süreçte kendin yaz: aşama 1'de her süreç parametrelerin 1/N'inin Adam durumunu tutar, reduce-scatter + all-gather ile güncelleme. Makalenin bellek formülünü (Şekil 1: (2 + 2 + K)Ψ / N) her aşamada ölçülen bellekle karşılaştır ve iletişim hacmini (aşama 1–2: DDP ile aynı, aşama 3: 1.5×) sayarak doğrula; sonuçları torch FSDP ile karşılaştır.
+    steps:
+      - "İletişim hacmini kolektif çağrılarda gönderilen bayt sayısıyla say."
+    accept:
+      - "Bellek ölçümleri formülle uyumlu."
+      - "Aşamaların iletişim hacmi tablosu."
+  - title: "Li ve ark. (2020): PyTorch Distributed (DDP)"
+    paper: "Li ve ark. — PyTorch Distributed: Experiences on Accelerating Data Parallel Training (VLDB 2020)"
+    url: "https://arxiv.org/abs/2006.15704"
+    level: orta
+    hours: 8
+    goal: |
+      DDP'nin gradyan kovalama (bucketing) ve hesap–iletişim örtüşmesini (Bölüm 3.2) kendi küçük DDP'nle yeniden üret: parametre hook'larıyla gradyanlar hazır oldukça kovaları asenkron all-reduce'a gönder. Kova boyutuna göre adım süresini ölç (makale Şekil 7); no_sync ile gradyan biriktirmenin iletişimi azalttığını göster.
+    steps:
+      - "register_post_accumulate_grad_hook ile kovaları doldur."
+    accept:
+      - "Örtüşmeli sürüm örtüşmesizden hızlı."
+      - "Kova boyutu–süre grafiği."

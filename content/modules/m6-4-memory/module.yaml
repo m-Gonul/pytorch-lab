@@ -62,3 +62,17 @@ quiz:
       - {t: "$2+2+4+4+4=16$: fp32 Adam ile aynı; kazanç aktivasyonlarda ve hızda", ok: true, why: "Parametre belleğini düşürmek için ZeRO (optimizer durumunu GPU'lara bölmek) ya da 8-bit optimizer'lar gerekir."}
       - {t: "8", why: "fp32 master ve iki moment unutuldu."}
       - {t: "4", why: "Yalnız bf16 ağırlık + gradyan sayıldı."}
+
+homework:
+  - title: "Chen ve ark. (2016): alt-doğrusal bellekle derin ağ eğitimi"
+    paper: "Chen, Xu, Zhang, Guestrin — Training Deep Nets with Sublinear Memory Cost (2016)"
+    url: "https://arxiv.org/abs/1604.06174"
+    level: orta
+    hours: 8
+    goal: |
+      √n kontrol noktası stratejisini (Bölüm 4) n katmanlı bir MLP ya da Transformer yığınında torch.utils.checkpoint ile uygula: segment boyutu k için tepe bellek O(n/k + k) ve ek hesap; k'ya göre ölçülen bellek–süre eğrisini çiz ve en iyi k ≈ √n'yi doğrula. Makalenin bellek planlama (in-place, bellek paylaşımı) fikirlerinden birini torch.cuda.memory_stats / tracemalloc ile ölçerek göster.
+    steps:
+      - "Tepe belleği torch.cuda.max_memory_allocated ya da CPU'da özel ayırıcı sayacıyla ölç."
+    accept:
+      - "Bellek–k grafiği kuramla uyumlu."
+      - "√n seçiminde ek hesap ≈ bir ileri geçiş."

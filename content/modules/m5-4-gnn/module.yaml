@@ -67,3 +67,29 @@ quiz:
       - {t: "Grafların arasında kenar yok: birleşik komşuluk matrisi blok-köşegen, mesajlar graf sınırını geçmez", ok: true, why: "Kenar indekslerine düğüm ofseti eklemek yeterli; `batch` vektörü havuzlama için hangi düğümün hangi grafa ait olduğunu tutar."}
       - {t: "Grafları aynı boyuta pad'lediği için", why: "Pad'leme yok; düğümler art arda eklenir."}
       - {t: "Yaklaşık bir sonuç verir", why: "Grafı tek tek işlemekle birebir aynı; e aşamasında karşılaştırıyorsun."}
+
+homework:
+  - title: "Kipf & Welling (2017): grafik konvolüsyon ağları"
+    paper: "Kipf & Welling — Semi-Supervised Classification with Graph Convolutional Networks (ICLR 2017)"
+    url: "https://arxiv.org/abs/1609.02907"
+    level: orta
+    hours: 8
+    goal: |
+      GCN'i yayılım kuralıyla ($\tilde D^{-1/2}\tilde A\tilde D^{-1/2}HW$) seyrek matris çarpımıyla yaz; Cora'da (makale Tablo 2: %81.5) yarı denetimli düğüm sınıflandırmasını tekrarla. Renormalizasyon hilesinin (öz döngü) etkisini, katman sayısının (aşırı düzleştirme: 2'den 8 katmana) ve Chebyshev filtrelerinin (Denk. 5, K ∈ {1, 2, 3}) ablasyonunu yap.
+    steps:
+      - "Cora'yı PyG/OGB olmadan ham dosyalardan ya da sentetik bir stokastik blok modelinden kur."
+    accept:
+      - "2 katmanlı GCN makale doğruluğuna yakın."
+      - "Derinlikle aşırı düzleştirme (düğüm temsillerinin benzeşmesi) ölçülmüş."
+  - title: "Veličković ve ark. (2018): grafik attention ağları"
+    paper: "Veličković, Cucurull, Casanova, Romero, Liò, Bengio — Graph Attention Networks (ICLR 2018)"
+    url: "https://arxiv.org/abs/1710.10903"
+    level: orta
+    hours: 8
+    goal: |
+      GAT katmanını (Denk. 1–4: LeakyReLU'lu toplamsal attention, komşu maskesi, K başlı birleştirme/ortalama) kenar listesi üzerinde scatter-softmax ile yaz; Cora'da GCN ile karşılaştır. Öğrenilen attention katsayılarının entropisini düğüm derecesine göre incele ve tek başlı vs çok başlının kararlılığını ölç.
+    steps:
+      - "Kenar başına softmax'ı segment maksimumu ile kararlı hale getir."
+    accept:
+      - "GAT, GCN'e yakın ya da üstün doğruluk."
+      - "Attention dağılımlarının analizi."

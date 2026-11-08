@@ -66,3 +66,17 @@ quiz:
       - {t: "PyTorch toplamı sınıf sayısı $C$'ye böler; CS231n bölmez", ok: true, why: "PyTorch: $\\frac1C\\sum_{j\\ne y}\\max(0,\\Delta-s_y+s_j)$. Aynı minimizer, farklı ölçek; lr'yi buna göre ayarla."}
       - {t: "PyTorch margin'i 0 alır", why: "Varsayılan `margin=1`."}
       - {t: "Fark yok", why: "Bir $1/C$ çarpanı var; kontrol bunu sınar."}
+
+homework:
+  - title: "Platt (1998): Sequential Minimal Optimization"
+    paper: "Platt — Sequential Minimal Optimization: A Fast Algorithm for Training Support Vector Machines (Microsoft Research TR 1998)"
+    url: "https://www.microsoft.com/en-us/research/publication/sequential-minimal-optimization-a-fast-algorithm-for-training-support-vector-machines/"
+    level: ileri
+    hours: 10
+    goal: |
+      SMO'yu sıfırdan yaz: iki Lagrange çarpanını analitik olarak güncelleme (kırpma sınırları L, H), ikinci çarpan seçme sezgisi (|E₁ − E₂| maksimum), bias güncellemesi ve KKT ihlali kontrolü. RBF çekirdekli ikili bir problemde sonucu sklearn.svm.SVC (libsvm) ile karşılaştır: aynı destek vektörleri ve karar fonksiyonu; n = 10³…10⁴ için süre ölçeklemesi.
+    steps:
+      - "Hata önbelleği (error cache) ekleyip etkisini ölç."
+    accept:
+      - "Karar fonksiyonu libsvm ile 10⁻³ içinde aynı."
+      - "KKT koşulları tolerans içinde sağlanıyor."

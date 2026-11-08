@@ -63,3 +63,17 @@ quiz:
       - {t: "Sayım matrisi $X\\,(n\\times V)$ çarpı $\\log\\theta^\\top\\,(V\\times C)$, artı log-prior: lineer bir sınıflandırıcı", ok: true, why: "$\\log p(y=c\\mid x)=\\log\\pi_c+\\sum_v x_v\\log\\theta_{cv}+\\text{sabit}$. NB, ağırlıkları sayılardan hesaplanan bir lineer modeldir."}
       - {t: "Eleman eleman çarpım", why: "Kelime sayıları log-olasılıklarla ağırlıklandırılıp toplanır: bu bir iç çarpım."}
       - {t: "Matris karşılığı yoktur", why: "Tam bir matris çarpımıdır; e aşamasında bunu kullanıyorsun."}
+
+homework:
+  - title: "Ng & Jordan (2001): ayırt edici ve üretken sınıflandırıcılar"
+    paper: "Ng & Jordan — On Discriminative vs. Generative Classifiers: A comparison of logistic regression and naive Bayes (NeurIPS 2001)"
+    url: "https://ai.stanford.edu/~ang/papers/nips01-discriminativegenerative.pdf"
+    level: orta
+    hours: 6
+    goal: |
+      Makalenin Şekil 1'ini tekrarla: birkaç UCI veri setinde (sklearn'ün yerleşik kümeleri) eğitim örneği sayısına göre naive Bayes ve lojistik regresyonun test hatası eğrilerini çiz. Kuramsal iddiayı doğrula: NB asimptotik hatasına O(log d) örnekle, LR O(d) örnekle yaklaşır; az veride NB önde, çok veride LR. NB'nin bağımsızlık varsayımını bilerek bozan sentetik bir problemde asimptotik farkın büyüdüğünü göster.
+    steps:
+      - "Her eğitim boyutunda 20 rastgele alt örnekle ortalama al."
+    accept:
+      - "Eğriler kesişir: az veride NB, çok veride LR daha iyi."
+      - "Varsayım ihlalinde LR'nin asimptotik üstünlüğü artar."

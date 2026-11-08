@@ -62,3 +62,17 @@ quiz:
       - {t: "O girdi türevlenebilir değil (ör. bir sabit λ ya da tamsayı indeks); autograd ona gradyan akıtmaz", ok: true, why: "`backward`, `forward`'ın aldığı her girdi için (ctx hariç) bir değer döndürmelidir."}
       - {t: "Gradyanı sıfır yap", why: "Sıfır tensörü döndürmekten farklı: hiç gradyan yok."}
       - {t: "Hata", why: "Türevlenemeyen girdiler için beklenen dönüş."}
+
+homework:
+  - title: "Gomez ve ark. (2017): tersinir artık ağ (RevNet)"
+    paper: "Gomez, Ren, Urtasun, Grosse — The Reversible Residual Network: Backpropagation Without Storing Activations (NeurIPS 2017)"
+    url: "https://arxiv.org/abs/1707.04585"
+    level: ileri
+    hours: 10
+    goal: |
+      Tersinir bloğu ($y_1=x_1+F(x_2)$, $y_2=x_2+G(y_1)$) bir torch.autograd.Function ile yaz: ileri geçişte aktivasyonları saklama, geri geçişte girdileri çıktılardan yeniden kur ve F, G'nin gradyanlarını yerel olarak hesapla (Algoritma 1). Gradyanları sıradan autograd ile karşılaştır; derinlik arttıkça bellek kullanımının sabit kaldığını ve sayısal yeniden kurma hatasının birikimini ölç (Bölüm 5.1).
+    steps:
+      - "torch.enable_grad() içinde yerel alt grafik kur, torch.autograd.grad ile türev al."
+    accept:
+      - "Gradyanlar standart geri yayılımla eşleşir."
+      - "Derinliğe göre bellek grafiği: tersinir ağda sabit."

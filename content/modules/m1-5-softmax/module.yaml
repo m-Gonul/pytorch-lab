@@ -69,3 +69,17 @@ quiz:
       - {t: "Ham logit'ler (softmax uygulanmamış) ve sınıf indeksleri", ok: true, why: "İçeride `log_softmax` + NLL yapar. Önce softmax uygulayıp verirsen softmax iki kez uygulanır ve gradyanlar sönükleşir."}
       - {t: "Softmax olasılıkları ve one-hot etiketler", why: "Olasılıkları vermek yaygın bir hata; logit verilmeli."}
       - {t: "log-olasılıklar", why: "O `nn.NLLLoss`'un girdisi."}
+
+homework:
+  - title: "Guo ve ark. (2017): modern sinir ağlarının kalibrasyonu"
+    paper: "Guo, Pleiss, Sun, Weinberger — On Calibration of Modern Neural Networks (ICML 2017)"
+    url: "https://arxiv.org/abs/1706.04599"
+    level: orta
+    hours: 6
+    goal: |
+      Bir sınıflandırıcının (ör. M4.2'deki CNN) güvenilirlik diyagramını ve beklenen kalibrasyon hatasını (ECE, 15 kova) çiz. Makalenin sıcaklık ölçeklemesini (doğrulama kümesinde tek parametre T ile NLL'yi en küçükle) uygula ve histogram kovalama, izotonik regresyonla karşılaştır (Tablo 1). Sıcaklık ölçeklemenin doğruluğu neden hiç değiştirmediğini softmax'ın argmax değişmezliğiyle açıkla.
+    steps:
+      - "T'yi tek boyutlu doğrusal arama ya da LBFGS ile bul."
+    accept:
+      - "Sıcaklık ölçekleme ECE'yi belirgin düşürür, doğruluk sabit."
+      - "Güvenilirlik diyagramları önce/sonra."

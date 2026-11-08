@@ -75,3 +75,29 @@ quiz:
       - {t: "Başlangıçta Adam'ın ikinci moment tahmini gürültülü ve gradyanlar büyük; küçük adımlarla başlamak erken patlamaları ve kararsızlığı önler", ok: true, why: "Transformer eğitiminde warmup + cosine (ya da WSD) standart."}
       - {t: "Eğitimi hızlandırmak için", why: "Başlangıçta adımlar küçük; amaç kararlılık."}
       - {t: "Ezberlemeyi önlemek için", why: "Düzenlileştirme amaçlı değil."}
+
+homework:
+  - title: "Touvron ve ark. (2023): LLaMA"
+    paper: "Touvron ve ark. — LLaMA: Open and Efficient Foundation Language Models (2023)"
+    url: "https://arxiv.org/abs/2302.13971"
+    level: ileri
+    hours: 12
+    goal: |
+      Mini-LLM'ine LLaMA'nın mimari değişikliklerini (Bölüm 2.2) tek tek ekleyip ablasyon yap: RMSNorm (Pre-norm), SwiGLU FFN (gizli boyut 2/3·4d), RoPE (M4.14 x1), bias'sız doğrusal katmanlar. Aynı hesap bütçesiyle doğrulama kaybını ve token/s'yi karşılaştır; KV-cache'li üretimde RoPE'nin konum kaydırmayla nasıl çalıştığını göster.
+    steps:
+      - "SwiGLU'da parametre sayısını eşitlemek için gizli boyutu ayarla."
+    accept:
+      - "Her değişikliğin kayba etkisi tablosu."
+      - "LLaMA tarzı model aynı bütçede GPT-2 tarzından iyi ya da eşit."
+  - title: "Hoffmann ve ark. (2022): hesap-optimal LLM eğitimi (Chinchilla)"
+    paper: "Hoffmann ve ark. — Training Compute-Optimal Large Language Models (NeurIPS 2022)"
+    url: "https://arxiv.org/abs/2203.15556"
+    level: ileri
+    hours: 12
+    goal: |
+      Makalenin 1. yaklaşımını (sabit model boyutları, farklı token sayıları) küçük ölçekte uygula: 4–6 model boyutu × farklı eğitim uzunlukları; her FLOP bütçesi için minimum kaybı veren (N, D)'yi bul ve N_opt ∝ C^a, D_opt ∝ C^b üslerini uydur (makale: a ≈ b ≈ 0.5). Parametrik kayıp formunu L(N, D) = E + A/N^α + B/D^β (Yaklaşım 3) ölçümlerine uydur.
+    steps:
+      - "FLOP ≈ 6ND; öğrenme oranı kosinüs takvimini eğitim uzunluğuna eşitle (makalenin kritik bulgusu)."
+    accept:
+      - "a ve b üsleri raporlanmış, yaklaşık eşit."
+      - "Parametrik form uydurması ve kalıntılar."

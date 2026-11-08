@@ -62,3 +62,17 @@ quiz:
       - {t: "Eval'da BN sabit (running) istatistiklerle doğrusal bir afin dönüşüm; eğitimde batch istatistikleri her adımda değişir", ok: true, why: "Katlama, çıkarımda bir kernel ve bir bellek geçişi tasarrufu sağlar."}
       - {t: "Eğitimde gradyan hesaplanamadığı için", why: "Mesele istatistiklerin sabit olması."}
       - {t: "Her iki modda da geçerlidir", why: "Eğitimde batch'e bağlı normalizasyon katlanamaz."}
+
+homework:
+  - title: "Ansel ve ark. (2024): PyTorch 2"
+    paper: "Ansel ve ark. — PyTorch 2: Faster Machine Learning Through Dynamic Python Bytecode Transformation and Graph Compilation (ASPLOS 2024)"
+    url: "https://dl.acm.org/doi/10.1145/3620665.3640366"
+    level: ileri
+    hours: 8
+    goal: |
+      Makalenin iki bileşenini kendi örneklerinle incele: (1) TorchDynamo — graf kırılmalarını (print, veri bağımlı kontrol akışı, desteklenmeyen işlemler) torch._dynamo.explain ile say, korumaları (guards) ve yeniden derlemeyi tetikleyen şekil değişikliklerini göster; (2) TorchInductor — üretilen Triton/C++ kodunu TORCH_LOGS=output_code ile oku ve bir LayerNorm + GELU zincirinde füzyonu doğrula. Makale Şekil 7'deki gibi küçük bir model kümesinde eager vs compile hızlanmasını ve derleme süresini raporla.
+    steps:
+      - "dynamic=True ile değişken batch boyutunda yeniden derlemeyi önle."
+    accept:
+      - "Graf kırılması ve koruma örnekleri açıklamalı."
+      - "Füzyon kanıtı (üretilen çekirdek) ve hız tablosu."

@@ -66,3 +66,29 @@ quiz:
       - {t: "Yeni token yalnız kendi query'siyle geçmişin tüm key/value'larına bakar; eski query'ler bir daha hiç kullanılmaz (causal)", ok: true, why: "Eski konumların çıktıları da değişmez; bu yüzden onları yeniden hesaplamak tamamen boşa iş."}
       - {t: "Query'ler çok büyük", why: "Boyutları key'lerle aynı."}
       - {t: "Query'ler de saklanabilir, fark etmez", why: "Saklamak yalnız bellek harcar; kullanılmazlar."}
+
+homework:
+  - title: "Radford ve ark. (2019): GPT-2"
+    paper: "Radford, Wu, Child, Luan, Amodei, Sutskever — Language Models are Unsupervised Multitask Learners (OpenAI 2019)"
+    url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf"
+    level: orta
+    hours: 10
+    goal: |
+      d aşamasındaki nanoGPT tarzı modeli GPT-2'nin mimari değişiklikleriyle hizala (Bölüm 2.3: Pre-LN, son LN, artık katmanların 1/√N ile başlatılması, 50 257'lik bayt düzeyli BPE) ve Hugging Face'teki GPT-2 small ağırlıklarını kendi modeline yükleyip aynı logit'leri üret. Sıfır örnekli görevlerden birini (ör. LAMBADA benzeri son kelime tahmini ya da 'TL;DR:' istemiyle özetleme, Bölüm 3) küçük bir örneklemde dene.
+    steps:
+      - "Ağırlık adlarını eşlerken Conv1D'nin transpoze ağırlık düzenine dikkat."
+    accept:
+      - "Yüklenen ağırlıklarla logit'ler HF ile 10⁻⁴ içinde."
+      - "Sıfır örnekli görevden nitel örnekler."
+  - title: "Kaplan ve ark. (2020): dil modelleri için ölçekleme yasaları"
+    paper: "Kaplan ve ark. — Scaling Laws for Neural Language Models (2020)"
+    url: "https://arxiv.org/abs/2001.08361"
+    level: ileri
+    hours: 12
+    goal: |
+      Küçük ölçekte ölçekleme yasası çıkar: TinyStories ya da Shakespeare üzerinde 6–8 farklı boyutta (10⁵–10⁷ parametre, embedding hariç) model eğit; kaybı parametre sayısına ve hesaba (C ≈ 6ND) göre log-log çiz, L(N) = (N_c/N)^α_N uydur (makale Şekil 1). Erken durdurulmuş eğrilerden hesap-optimal sınırı çıkar ve Chinchilla (M8.1 ödevi) ile karşılaştır.
+    steps:
+      - "Her boyutta öğrenme oranını küçük bir taramayla ayarla."
+    accept:
+      - "Kayıp–N ilişkisi log-log'da yaklaşık doğrusal; α_N raporlanmış."
+      - "Hesap-optimal sınır grafiği."

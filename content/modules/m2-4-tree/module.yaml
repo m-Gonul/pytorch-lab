@@ -72,3 +72,17 @@ quiz:
       - {t: "Sıralı sırada eşik bir adım kaydıkça yalnız bir örnek sağdan sola geçer; sol sınıf sayımları bir cumsum'dur", ok: true, why: "Böylece $n-1$ eşiğin hepsi $O(n)$'de değerlendirilir; sıralama $O(n\\log n)$. Naive yol her eşik için $O(n)$ sayım: $O(n^2)$."}
       - {t: "Sıralamadan eşik tanımlanamaz", why: "Tanımlanabilir; sıralama hız için."}
       - {t: "Gini sıralı veri ister", why: "Gini yalnız sayımlara bakar."}
+
+homework:
+  - title: "Quinlan (1986): karar ağaçlarının tümevarımı (ID3)"
+    paper: "Quinlan — Induction of Decision Trees (Machine Learning 1986)"
+    url: "https://link.springer.com/article/10.1007/BF00116251"
+    level: orta
+    hours: 6
+    goal: |
+      ID3'ü makaledeki gibi bilgi kazancıyla yaz, çok değerli özniteliklere olan yanlılığı (Bölüm 7) bir 'kimlik' özniteliği ekleyerek göster ve kazanç oranıyla (gain ratio) düzelt. Gürültülü veride ağacın aşırı uyumunu çiz; makalenin χ² tabanlı erken durdurmasını ve maliyet-karmaşıklık budamasını (CART) karşılaştır. Makalenin 'Cumartesi sabahı' oyuncak verisinde ağacı birebir üret.
+    steps:
+      - "Sürekli öznitelikler için eşik aramayı (C4.5) ekle."
+    accept:
+      - "Oyuncak veride makaledeki ağaç."
+      - "Kazanç oranı yanlılığı giderir; budama test hatasını düşürür."

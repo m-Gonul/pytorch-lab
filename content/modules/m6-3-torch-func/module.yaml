@@ -64,3 +64,29 @@ quiz:
       - {t: "Maliyeti birkaç gradyan hesabı kadar; $d\\times d$ Hessian hiç kurulmaz", ok: true, why: "Newton-CG, eğrilik analizi, influence functions gibi yöntemler bu yüzden milyonlarca parametrede çalışabilir."}
       - {t: "Tam Hessian'dan daha doğru", why: "Aynı sayı; fark maliyet."}
       - {t: "Yalnız konveks fonksiyonlarda çalışır", why: "Her iki kez türevlenebilir fonksiyonda çalışır."}
+
+homework:
+  - title: "Finn, Abbeel, Levine (2017): MAML"
+    paper: "Finn, Abbeel, Levine — Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks (ICML 2017)"
+    url: "https://arxiv.org/abs/1703.03400"
+    level: orta
+    hours: 10
+    goal: |
+      MAML'ı torch.func ile yaz: functional_call ile parametreleri sözlük olarak geçir, iç döngüde grad ile adaptasyon, dış döngüde ikinci dereceden gradyan; görevler üzerinde vmap ile paralelleştir. Makalenin sinüs regresyonu deneyini (Şekil 2–3) tekrarla ve birinci dereceden yaklaşımı (FOMAML) karşılaştır.
+    steps:
+      - "Görev batch'ini vmap(in_dims) ile tek çağrıda işle."
+    accept:
+      - "K = 5 örnekle adaptasyon, ön eğitimli taban çizgisini belirgin geçer."
+      - "MAML vs FOMAML farkı ölçülmüş."
+  - title: "Abadi ve ark. (2016): diferansiyel gizlilikli derin öğrenme"
+    paper: "Abadi ve ark. — Deep Learning with Differential Privacy (CCS 2016)"
+    url: "https://arxiv.org/abs/1607.00133"
+    level: ileri
+    hours: 10
+    goal: |
+      DP-SGD'yi (Algoritma 1) örnek başı gradyanlarla yaz: vmap(grad(...)) ile her örneğin gradyanını hesapla, normunu C'ye kırp, toplayıp N(0, σ²C²) gürültü ekle. MNIST'te gizlilik bütçesine (ε) göre doğruluk eğrisini çiz; örnek başı gradyanları for döngüsü ve Opacus benzeri hook'larla hız açısından karşılaştır.
+    steps:
+      - "ε hesabı için momentler muhasebesini (ya da RDP) bir kütüphaneyle doğrula."
+    accept:
+      - "vmap'li örnek başı gradyanlar döngüyle aynı, çok daha hızlı."
+      - "ε–doğruluk ödünleşim grafiği."

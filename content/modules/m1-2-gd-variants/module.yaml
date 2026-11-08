@@ -71,3 +71,17 @@ quiz:
       - {t: "Sabit sıra, ardışık batch'ler arasında korelasyon yaratır (ör. sınıfa göre sıralı veri); gradyan tahmini yanlı ve salınımlı olur", ok: true, why: "Sıralı veride model önce hep bir sınıfı, sonra diğerini görür ve her blokta bir öncekini unutur."}
       - {t: "Hızlandırmak için", why: "Karıştırmanın küçük bir maliyeti var; amaç istatistiksel."}
       - {t: "Gerekli değil, yalnız alışkanlık", why: "Sıralı verilerde belirgin şekilde kötü sonuç verir."}
+
+homework:
+  - title: "Robbins & Monro (1951) ve Polyak & Juditsky (1992): stokastik yaklaşım ve ortalama"
+    paper: "Robbins & Monro — A Stochastic Approximation Method (1951); Polyak & Juditsky — Acceleration of Stochastic Approximation by Averaging (SIAM J. Control 1992)"
+    url: "https://projecteuclid.org/journals/annals-of-mathematical-statistics/volume-22/issue-3/A-Stochastic-Approximation-Method/10.1214/aoms/1177729586.full"
+    level: orta
+    hours: 6
+    goal: |
+      Gürültülü doğrusal regresyonda SGD'yi adım takvimleri ηₜ = c/tᵅ (α ∈ {0.3, 0.5, 0.7, 1}) ile çalıştır; Robbins–Monro koşullarını (Σηₜ = ∞, Σηₜ² < ∞) sağlayan ve sağlamayanların yakınsama davranışını karşılaştır. Polyak–Ruppert ortalamasını (iteratların ortalaması) ekle: α = 0.5 ile ortalanmış SGD'nin α = 1'in (en iyi c ile) asimptotik hızına, c seçimine duyarsız şekilde ulaştığını göster.
+    steps:
+      - "Hatanın t ile log-log eğimini ölç (beklenen: ortalamalıda −1)."
+    accept:
+      - "Koşulları sağlamayan sabit adımın gürültü tabanında kaldığı grafik."
+      - "Ortalama alma ile c'ye duyarsız O(1/t) hata."

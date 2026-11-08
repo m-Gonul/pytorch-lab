@@ -78,3 +78,17 @@ quiz:
       - {t: "$\\frac{wd}{2}\\lVert w\\rVert^2$; çünkü gradyana $wd\\cdot w$ ekler", ok: true, why: "$\\nabla\\frac{wd}{2}\\lVert w\\rVert^2=wd\\cdot w$. Kayıpta $\\lambda\\lVert w\\rVert^2$ kullanıyorsan $wd=2\\lambda$. Adam'da ise eşdeğerlik bozulur; AdamW bunu düzeltir (M3.4)."}
       - {t: "$wd\\cdot\\lVert w\\rVert^2$", why: "Gradyanı $2wd\\cdot w$ olurdu; PyTorch yalnız $wd\\cdot w$ ekler."}
       - {t: "$wd\\cdot\\lVert w\\rVert_1$", why: "L1 cezası için ayrı bir parametre yok; elle eklenir."}
+
+homework:
+  - title: "Tibshirani (1996): Lasso"
+    paper: "Tibshirani — Regression Shrinkage and Selection via the Lasso (JRSS-B 1996)"
+    url: "https://www.jstor.org/stable/2346178"
+    level: orta
+    hours: 6
+    goal: |
+      Lasso'yu koordinat inişiyle (yumuşak eşikleme) yaz, düzenlileştirme yolunu (λ'ya göre katsayılar, makale Şekil 2) prostate veri setinde ya da sentetik seyrek bir problemde çiz; ridge ile karşılaştır. Seyrek gerçek katsayılı (s ≪ d) problemde destek kurtarma oranını λ'ya göre ölç; makalenin ortogonal tasarımdaki kapalı form çözümünü (Denk. 3: sign(β̂)(|β̂| − γ)₊) doğrula.
+    steps:
+      - "Sıcak başlangıçla (warm start) λ yolunu büyükten küçüğe izle."
+    accept:
+      - "Yol grafikleri: Lasso katsayıları tam sıfıra iner, ridge inmez."
+      - "Ortogonal tasarımda kapalı formla birebir sonuç."

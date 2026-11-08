@@ -71,3 +71,17 @@ quiz:
       - {t: "Küresel olmayan (uzamış, iç içe, farklı yoğunluklu) kümelerde; kare Öklid uzaklığı her kümeyi eşit varyanslı bir küre gibi görür", ok: true, why: "GMM (M2.8) farklı kovaryanslara izin vererek bunu genelleştirir."}
       - {t: "Yalnız yüksek boyutta", why: "Boyuttan bağımsız bir şekil varsayımı sorunu."}
       - {t: "Hiçbirinde", why: "İç içe çemberler klasik başarısızlık örneğidir."}
+
+homework:
+  - title: "Arthur & Vassilvitskii (2007): k-means++"
+    paper: "Arthur & Vassilvitskii — k-means++: The Advantages of Careful Seeding (SODA 2007)"
+    url: "https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf"
+    level: orta
+    hours: 5
+    goal: |
+      k-means++ tohumlamasını (D² ağırlıklı örnekleme) yaz ve rastgele tohumlamayla karşılaştır: makalenin Tablo 1–4'teki gibi sentetik (iyi ayrılmış Gauss'lar) ve gerçek veride ortalama/en iyi potansiyel φ ve süre. O(log k) yaklaşım garantisini sentetik veride, bilinen optimuma göre oranla deneysel olarak kontrol et; tohumlamanın tek başına (Lloyd yinelemesiz) ne kadar iyi olduğunu ölç.
+    steps:
+      - "20 tekrar üzerinden ortalama ve en iyi φ."
+    accept:
+      - "k-means++ hem φ'de hem yinelenme sayısında rastgeleden iyi."
+      - "Optimuma oran log k'nin çok altında."

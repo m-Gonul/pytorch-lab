@@ -75,3 +75,17 @@ quiz:
       - {t: "Gerekli değil bu model için; ama kapalı formu bilinmeyen keyfi bir ağda (ör. bir CNN) aynı satır çalışır", ok: true, why: "`vmap(grad(f))` modelden bağımsız bir dönüşüm; kapalı form türetmek her mimari için yeniden iş."}
       - {t: "Kapalı form yanlış", why: "Kontrol tam bu formülle karşılaştırıyor."}
       - {t: "`loss.backward()` örnek başına gradyan verir", why: "`backward` batch toplamının gradyanını verir; örnekler tek bir vektöre toplanmış olur."}
+
+homework:
+  - title: "Paszke ve ark. (2017): PyTorch'ta otomatik türev"
+    paper: "Paszke ve ark. — Automatic differentiation in PyTorch (NIPS 2017 Autodiff Workshop)"
+    url: "https://openreview.net/forum?id=BJJsrmfCZ"
+    level: orta
+    hours: 6
+    goal: |
+      micrograd'ını makalenin tasarım ilkelerine göre genişlet: (1) dinamik, çalıştırarak tanımlanan (define-by-run) grafik, (2) yerinde (in-place) işlemleri sürüm sayaçlarıyla güvenli kılma (Bölüm 3), (3) create_graph ile ikinci türevler (grafiğin kendisini türevlenebilir yapmak). Sürüm sayacının yakaladığı bir 'yerinde değişiklik' hatası örneği üret; ikinci türevleri sayısal türevlerle doğrula.
+    steps:
+      - "Value'ya _version alanı ekle; geri geçişte kaydedilen sürümle karşılaştır."
+    accept:
+      - "Yerinde değişiklik geri geçişte yakalanır."
+      - "Hessian-vektör çarpımı sonlu farkla eşleşir."
