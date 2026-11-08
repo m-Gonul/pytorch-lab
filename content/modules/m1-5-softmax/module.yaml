@@ -100,6 +100,28 @@ labs:
       - {name: "Büyük aralık", params: {spread: 12}, note: "Neredeyse one-hot: çapraz entropi kaybı doğru sınıf için ≈ 0, yanlışsa ≈ 12."}
     limits: "Sabit, yapay logit dizisi."
 
+  - id: l2
+    lab: softmax2d
+    title: "Üç sınıflı softmax regresyonu: karar bölgeleri ve güven"
+    goal: |
+      Üç Gauss kümesi. Model her sınıfa bir logit $z_k=w_k\cdot x+b_k$ verir; karar sınırları (mor noktalar) argmax'ın değiştiği yerlerdir. Arka plan ya en büyük olasılığı (güven) ya da 3. sınıfın olasılığını gösterir. Sağda kayıp: $\ln 3$'ten başlamalı.
+    predict:
+      q: "Karar bölgelerinin sınırları nasıl görünür?"
+      options:
+        - {t: "Düz doğru parçaları; her bölge dışbükey bir çokgen", ok: true, why: "z_k = z_j bir doğrudur; bölge K − 1 yarım düzlemin kesişimidir."}
+        - {t: "Kümelerin şekline uyan eğriler", why: "Logitler x'in doğrusal fonksiyonu; eğri sınır için öznitelik dönüşümü gerekir."}
+        - {t: "Çemberler", why: "Bu, sınıf başına ayrı kovaryanslı Gauss modelinde (QDA) olurdu."}
+    presets:
+      - {name: "Ayrık kümeler", params: {spread: 0.4, lam: 0.01, lr: 0.5, steps: 300}, note: "Güven her yerde yüksek, yalnız sınırlarda düşük."}
+      - {name: "Örtüşen kümeler", params: {spread: 1.4, lam: 0.01, lr: 0.5, steps: 300}, note: "Geniş belirsiz bölgeler: sınırlar yakınında üç olasılık da 1/3 civarında."}
+      - {name: "Ceza yok, uzun eğitim", params: {spread: 0.4, lam: 0, lr: 1, steps: 1000}, note: "Ayrılabilir veride logitler sınırsız büyür: güven bandı çok incelir (M1.4'teki aşırı güven)."}
+      - {name: "Sınıf 3'ün olasılığı", params: {spread: 0.7, view: 1}, note: "P(sınıf 3 | x), sınıf 3 bölgesinden uzaklaştıkça sigmoid gibi düşer."}
+    questions:
+      - q: "Kayıp neden tam ln 3 ≈ 1.0986'dan başlıyor?"
+        a: "W = 0, b = 0'da tüm logitler 0: her sınıfa 1/3 olasılık, −log(1/3) = ln 3. Başlangıç kaybı ln K'dan çok farklıysa başlatmada sorun vardır."
+      - q: "Tabloda 'tüm wₖ'ya aynı vektörü eklemek' neden olasılığı değiştirmiyor?"
+        a: "Her logit aynı (5x₁ − 3x₂) miktarını alır: softmax kaydırma değişmezdir. Parametreler bu yüzden tek değildir; λ > 0 en küçük normlu çözümü seçer."
+    limits: "Tam batch GD, 2 öznitelik, sınıflar eşit sayıda ve eşit yayılımlı. Karar sınırı 160 × 160 ızgarada argmax değişiminden bulunur."
 practice:
   - id: p1
     type: çözülmüş

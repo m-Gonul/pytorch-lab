@@ -207,3 +207,49 @@ whatif:
     a: "Sigmoid'in genellemesi softmax'tır (M1.5); iki sınıfta softmax, logit farkının sigmoid'ine indirgenir."
   - q: "Öznitelikler doğrusal olarak ayrılamaz (XOR) olsaydı?"
     a: "Doğrusal karar sınırı yetmez; ya öznitelik eklenir ($x_1x_2$) ya da gizli katman (M3.8). Kayıp yine dışbükeydir ama erişilebilen en iyi doğruluk düşüktür."
+
+labs:
+  - id: l1
+    lab: logreg2d
+    title: "2B lojistik regresyon: olasılık haritası, sınır ve ‖w‖"
+    goal: |
+      İki Gauss kümesi (mavi sınıf 0, turuncu sınıf 1). Arka plan modelin $P(y=1\mid x)$ tahmini (koyu = 0'a yakın), mor doğru karar sınırı ($p=0.5$), gri kesikliler $p=0.1$ ve $0.9$. Sağ grafikte kayıp ve $\|w\|$ adımlarla nasıl değişiyor.
+    predict:
+      q: "Sınıflar tamamen ayrık (uzaklık 5, yayılım 0.5) ve ceza yok. 2000 adım sonra p = 0.1 ile 0.9 çizgileri arasındaki bant nasıl olur?"
+      options:
+        - {t: "Çok daralır ve daralmaya devam eder: ‖w‖ durmadan büyür", ok: true, why: "Ayrılabilir veride kayıp ancak ‖w‖ → ∞ iken sıfıra iner; GD ‖w‖'yi (yavaşça, log hızla) büyütmeye devam eder."}
+        - {t: "Belli bir genişlikte durur", why: "Bu, λ > 0 ile olur: ceza ‖w‖'nin büyümesini dengeler."}
+        - {t: "Genişler", why: "Bant genişliği 4.39/‖w‖: ‖w‖ küçülürse genişler, ama burada büyüyor."}
+    presets:
+      - {name: "Örtüşen sınıflar", params: {sep: 2, spread: 1, lam: 0, loss: 0, lr: 0.5, steps: 300}, note: "Sınıflar karışık: ‖w‖ sonlu bir değere yerleşir, olasılıklar ılımlı."}
+      - {name: "Ayrılabilir, ceza yok", params: {sep: 5, spread: 0.5, lam: 0, loss: 0, lr: 1, steps: 2000}, note: "‖w‖ log ölçekte bile yükselmeye devam ediyor: aşırı güven."}
+      - {name: "Ayrılabilir, λ = 0.01", params: {sep: 5, spread: 0.5, lam: 0.01, loss: 0, lr: 1, steps: 2000}, note: "Ceza ‖w‖'yi sınırlar; sınır yumuşak kalır."}
+      - {name: "MSE kaybı, kötü başlangıç", params: {sep: 2.5, spread: 0.8, lam: 0, loss: 1, lr: 0.5, steps: 100}, note: "Aynı adım sayısında MSE(σ) daha yavaş: gradyan p(1 − p) ile kısılıyor."}
+    questions:
+      - q: "Karar sınırı neden her zaman düz bir doğru?"
+        a: "p > ½ ⇔ w·x + b > 0. Sigmoid tekdüze olduğu için eşik z'de doğrusal bir koşula döner; olasılık haritası eğri görünse de eş-olasılık eğrileri birbirine paralel doğrulardır."
+      - q: "λ'yı çok büyük yaparsan (0.5) ne olur?"
+        a: "w küçülür, olasılıklar her yerde 0.5'e yaklaşır: model aşırı yanlı (eksik uyum). Doğruluk düşmeyebilir ama olasılıklar anlamsızlaşır."
+    limits: "Tam batch GD, 2 öznitelik. Sınıflar eşit sayıda. Olasılık haritası doğrusal bir renk ölçeğiyle çizilir."
+  - id: l2
+    lab: lossmargin
+    title: "Sınıflandırma kayıpları ve sayısal kararlılık"
+    goal: |
+      Sol: dört kaybın marj $m=(2y-1)z$'ye göre grafiği; seçilen kalın, diğerleri kesikli. Sağ: seçilen kaybın türevi — modelin o marjda ne kadar güçlü bir öğrenme sinyali aldığı. Tablo, seçilen logitte kaybı naif (önce σ, sonra log, float32) ve kararlı biçimde karşılaştırır.
+    predict:
+      q: "y = 1, z = −10 (model emin ve yanlış). Hangi kaybın gradyanı en küçüktür?"
+      options:
+        - {t: "σ üzerinde MSE", ok: true, why: "∂/∂z = −2(1 − p)·p(1 − p) ≈ −2·4.5·10⁻⁵ ≈ −9·10⁻⁵: neredeyse sıfır."}
+        - {t: "BCE", why: "∂ℓ/∂z = p − y ≈ −1: en büyük sinyal."}
+        - {t: "Hinge", why: "Marj < 1 olduğu sürece türev −1."}
+    presets:
+      - {name: "Emin ve yanlış", params: {hl: 2, z: -10, y: 1}, note: "MSE(σ) türevi düz: öğrenme durur."}
+      - {name: "BCE aynı yerde", params: {hl: 1, z: -10, y: 1}, note: "Türev ≈ −1."}
+      - {name: "Naif taşma (y = 0)", params: {hl: 1, z: 20, y: 0}, note: "float32'de σ(20) tam 1'e yuvarlanır; naif hesap log 0 = −∞ verir, kararlı hesap 20."}
+      - {name: "Naif taşma (y = 1)", params: {hl: 1, z: -100, y: 1}, note: "e^100 float32'de taşar: naif ∞, kararlı 100."}
+    questions:
+      - q: "BCE neden doğru tarafta (m > 0) bile sıfır olmaz?"
+        a: "log(1 + e^(−m)) > 0 her m için: model her zaman daha emin olmaya itilir. Bu, ayrılabilir veride ‖w‖'nin sonsuza gitmesinin sebebidir; hinge ise m ≥ 1'de durur."
+      - q: "softplus(z) = max(z, 0) + log(1 + e^(−|z|)) neden hiç taşmaz?"
+        a: "e^(−|z|) her zaman (0, 1] aralığındadır; büyük |z| doğrudan max(z, 0) terimiyle toplanır."
+    limits: "Naif hesap float32'yi Math.fround ile taklit eder. Marj grafiği [−4, 4] aralığını gösterir; tablo daha geniş z değerlerini de hesaplar."

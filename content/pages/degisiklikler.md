@@ -1,5 +1,27 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur) · Tam konu anlatımları (Faz 0 ve Faz 1)
+
+Geri bildirim: modül girişleri kısa bir özetten ibaretti. Her modüle artık aşamalardan **önce** gelen, slayt düzeyinde ya da daha ayrıntılı bir **Konu anlatımı** bölümü ekleniyor (sayfadaki "§ Konu anlatımı", içindekiler ve okuma süresiyle). Her anlatım aynı düzeni izler: problem → sezgi → kesin tanım → türetim/kanıt (koşullarıyla, açılır kutuda) → sayısal örnek → şekil → etkileşimli deney → yanılgılar → PyTorch karşılığı → özet tablosu → kaynaklar.
+
+| modül | bölüm | yeni şekil | deneyler (yeni) | öne çıkan türetimler |
+|---|---|---|---|---|
+| M0.1 iç çarpım | 12 | 5 | iki vektörü sürükle, Lp birim topları, yüksek boyutta kosinüs | kosinüs teoremi, izdüşüm artığının dikliği, Cauchy–Schwarz, üçgen eşitsizliği |
+| M0.2 matris çarpımı | 13 | 2 | dönüşüm ızgarası (sütunları sürükle), döngü sırası hız ölçümü | bileşke = çarpım, birleşme ve (AB)ᵀ = BᵀAᵀ kanıtı, dA = G Bᵀ ve dB = Aᵀ G |
+| M0.3 türev ve zincir kuralı | 13 | 3 | sekant/teğet ve sayısal türev hatası, gradyan ve kontur, adım adım geri yayılım, Jacobian'ın yerel yaklaşımı | sigmoid türevi, yönlü türev ve en dik çıkış, softmax Jacobian'ı, zincir kuralı kanıtı, ileri/merkezi fark hata analizi |
+| M0.4 olasılık ve MLE | 15 | 2 | Bayes ızgarası (1000 kişi), dağılımdan örnekleme, merkezi limit teoremi, olabilirlik/MAP | σ/√n, Bernoulli/Gauss/kategorik MLE, MLE varyansının yanlılığı, MSE/BCE/CE = NLL, NLL = H + KL |
+| M0.5 tensör araçları | 10 | 1 | storage ve stride görselleştirici, zaman ölçümü istatistiği | bitişik stride formülü, kayan pencere stride'ı |
+| M1.1 doğrusal regresyon | 10 | 1 | kapalı form vs GD ve koşul sayısı, dayanıklı kayıplar | MSE gradyanı, normal denklemler, izdüşümün en yakın nokta olduğu (Pisagor), η < 2/λ_max ve (κ−1)/(κ+1) hızı |
+| M1.2 GD varyantları | 6 | 1 | mini-batch gürültü topu (+ mevcut 1-B GD, 2-B momentum) | gürültü topu varyansı η s²/(B a (2 − ηa)), momentumun √κ hızlanması |
+| M1.3 düzenlileştirme | 8 | 1 | ridge/lasso yolları ve doğrulama hatası, L1/L2 geometrisi (+ mevcut polinom) | yanlılık–varyans ayrışımı, ridge SVD küçültmesi, soft-threshold, KKT, weight decay eşdeğerliği |
+| M1.4 lojistik regresyon | 8 | 1 | 2-B olasılık haritası ve ‖w‖, kayıplar ve sayısal kararlılık | ∂ℓ/∂z = p − y, BCE'nin dışbükeyliği, softplus ile kararlı kayıp |
+| M1.5 softmax | 8 | 0 | 3 sınıflı karar bölgeleri (+ mevcut sıcaklık) | ∂ℓ/∂z = p − onehot, log-sum-exp hilesi |
+
+- **23 yeni etkileşimli deney** (toplam 41). Sürüklenebilir şekiller (vektörler, matris sütunları, Jacobian noktası) fare, dokunma ve klavye (ok tuşları) ile çalışır; her birinin hesapları otomatik testlerle doğrulanır (`selfTest`). Standart deneylerde yine her kontrolün sonucu gerçekten değiştirdiği, geçersiz değerlerin açıklamayla reddedildiği ve aynı tohumun aynı sonucu verdiği test edilir.
+- **Düzeltilen hatalar:** M1.2 "Aynı η, iki eğrilik" senaryo notu kendisiyle çelişiyordu ("ıraksar" deyip ηa = 1.8 < 2 diyordu) — düzeltildi. Ders tabloları ve uzun satır içi kodlar dar ekranda sayfayı yatay taşırıyordu — tablolar kendi içinde kayıyor, kod kırılıyor. Sürükleme sırasında metin seçimi şekillerin üstünde mavi kutular bırakıyordu — kapatıldı.
+- **CI:** üç modülün (M4.10, M4.14, M5.6) eşikleri CI donanımındaki gürültüye göre gevşetildi; site yeniden yayında.
+- **Kalan:** Faz 2–11'in konu anlatımları (sırayla, aynı düzende); Faz 5–11'in kalan modüllerine pratik kartları.
+
 ## 2026-11 (2. tur) · Faz 0, 2, 3 ve 4'te pratik
 
 - **Faz 0** (iç çarpım, matris çarpımı, olasılık/MLE, tensör belleği), **Faz 2** (klasik ML, 8 modül), **Faz 3'ün kalanı** (micrograd, tensör autograd, perceptron, eğitim pratiği) ve **Faz 4'ün kalan 13 modülü** (CNN, LSTM/GRU, BPE, Transformer, CNN blokları, tespit, segmentasyon, zaman serisi, word2vec, seq2seq, kodlayıcı–kod çözücü Transformer, ViT, ön eğitimli dil modelleri) pratik kartları, sık yanılgılar ve "koşul değişirse" sorularıyla genişletildi. **Faz 0–4 artık bütünüyle kapsandı.**
