@@ -191,3 +191,70 @@ whatif:
     a: "PCA doğrusal alt uzay arar; manifoldu açamaz. Çekirdek PCA, Isomap, t-SNE/UMAP ya da otomatik kodlayıcılar (M5.6) gerekir."
   - q: "Özdeğerler hepsi eşitse?"
     a: "Hiçbir yön ayrıcalıklı değildir (izotropik veri); bileşenler tek değildir ve boyut indirgemenin anlamı yoktur."
+
+labs:
+  - id: l1
+    lab: pca2d
+    title: "Bir yön seç: korunan varyans ve yeniden kurma hatası"
+    goal: |
+      Ortalanmış 2B veri. Turuncu doğru senin seçtiğin yön θ; turuncu noktalar izdüşümler, gri parçalar artıklar (yeniden kurma hataları). Yeşil ok birinci temel bileşen. Sağda, tüm yönler için korunan varyans ve kaybedilen varyans: ikisinin toplamı sabit.
+    predict:
+      q: "θ'yı PC1'e dik yaparsan korunan varyans ne olur?"
+      options:
+        - {t: "En küçük değerine, λ₂'ye iner; hata en büyük olur", ok: true, why: "Korunan varyans λ₁cos² + λ₂sin² biçiminde: dik yönde λ₂."}
+        - {t: "Sıfır olur", why: "Ancak veri tam bir doğru üzerindeyse (λ₂ = 0)."}
+        - {t: "Toplam varyansın yarısı olur", why: "Bu, yalnız λ₁ = λ₂ iken (ya da 45°'de değil) geçerli değildir."}
+    presets:
+      - {name: "Seçili = PC1", params: {th: 30, rot: 30}, note: "Artıklar en kısa, korunan varyans en büyük."}
+      - {name: "Dik yön", params: {th: 120, rot: 30}, note: "Korunan varyans λ₂: en kötü 1-B özet."}
+      - {name: "İzotropik", params: {s1: 1, s2: 1, th: 60}, note: "λ₁ ≈ λ₂: her yön neredeyse eşit; PC1 tohumdan tohuma döner."}
+      - {name: "Aykırı nokta", params: {s1: 2, s2: 0.4, rot: 0, th: 0, out: 1}, note: "Tek nokta PC1'i yukarı doğru çeviriyor."}
+    questions:
+      - q: "Sağ grafikteki iki eğrinin toplamı neden her θ'da aynı?"
+        a: "Her nokta için ‖x‖² = (izdüşüm)² + (artık)² (Pisagor). Toplam varyans = iz(C) = λ₁ + λ₂, yönden bağımsız."
+      - q: "Verinin açısını değiştirirsen λ₁ ve λ₂ değişir mi?"
+        a: "Hayır (örnekleme gürültüsü dışında): döndürme özdeğerleri korur, yalnız özvektörleri döndürür."
+    limits: "2B Gauss veri; kovaryans n − 1 ile. Aykırı nokta veri ortalamasına da katılır."
+  - id: l2
+    lab: powerit
+    title: "Kuvvet yinelemesi: hız özdeğer oranına bağlı"
+    goal: |
+      2 × 2 simetrik bir matris (baş özdeğer 1, ikincisi oranla verilir). Sol: ilk yinelemeler birim çember üzerinde, yeşil doğru baş özvektör. Sağ: açı hatası ve kuramsal $|\lambda_2/\lambda_1|^t$.
+    predict:
+      q: "λ₂/λ₁ = 0.9 iken 10⁻⁶ hataya kabaca kaç adımda inilir?"
+      options:
+        - {t: "~130 adım", ok: true, why: "log(10⁻⁶)/log 0.9 ≈ 131."}
+        - {t: "~6 adım", why: "Bu, oran 0.1 olsaydı."}
+        - {t: "Hiç inilmez", why: "Oran < 1 olduğu sürece geometrik olarak iner; yalnız yavaş."}
+    presets:
+      - {name: "Hızlı", params: {ratio: 0.2, T: 15}, note: "Her adımda hata 5'te birine iner."}
+      - {name: "Yavaş", params: {ratio: 0.95, T: 60}, note: "Neredeyse eşit özdeğerler: çok yavaş."}
+      - {name: "Negatif λ₂", params: {ratio: -0.7, T: 20}, note: "Yaklaşım iki yandan, zikzak yaparak."}
+      - {name: "Neredeyse dik başlangıç", params: {ratio: 0.5, ang0: 114, T: 40}, note: "Başlangıç baş özvektöre neredeyse dik (25° + 90°): ilk hata ~1, ama oran aynı olduğu için yine geometrik iner."}
+    questions:
+      - q: "Başlangıç tam dik (a₁ = 0) olsaydı ne olurdu?"
+        a: "Kesin aritmetikte Cᵗv₀ hep e₂ yönünde kalır, e₁ hiç bulunmaz. Kayan noktada küçük yuvarlama hataları bir a₁ bileşeni yaratır ve yöntem sonunda kurtulur."
+    limits: "2 × 2 matris, baş özdeğer 1, özvektör 25°'de. Gerçek uygulamalarda boyut büyüktür ama yakınsama analizi aynıdır."
+  - id: l3
+    lab: svdcompress
+    title: "Görüntü bir matristir: rank-k yaklaşım ve gürültü giderme"
+    goal: |
+      48 × 48 gri tonlu bir görüntünün SVD'si tarayıcında hesaplanır (Jacobi yöntemi). Sol üst: girdi; sağ üst: yalnız ilk k tekil değerle kurulan görüntü. Alt: tekil değer spektrumu ve rank'a göre hata.
+    predict:
+      q: "'Pürüzsüz doku' görüntüsünü kusursuz kurmak için kaç bileşen gerekir?"
+      options:
+        - {t: "Birkaç (≤ 4): görüntü sinüs çarpımlarından oluşuyor, rank'ı çok düşük", ok: true, why: "sin(12x)cos(7y) bir dış çarpımdır (rank 1), sin(5y) ve sabit terim birer rank daha ekler."}
+        - {t: "48", why: "Tam rank yalnız rastgele ya da çok ayrıntılı görüntülerde gerekir."}
+        - {t: "~24", why: "Spektrum grafiğine bak: birkaç bileşenden sonra σ'lar sayısal sıfır."}
+    presets:
+      - {name: "Şekiller, k = 4", params: {img: 0, k: 4, noise: 0}, note: "Bulanık: kenarlar birçok bileşen ister."}
+      - {name: "Şekiller, k = 16", params: {img: 0, k: 16, noise: 0}, note: "Neredeyse kusursuz; özgün verinin ~%67'si kadar sayı (16 · 97 = 1552)."}
+      - {name: "Doku, k = 3", params: {img: 1, k: 3, noise: 0}, note: "Düşük ranklı görüntü: birkaç bileşen yeter."}
+      - {name: "Gürültü giderme", params: {img: 0, k: 6, noise: 0.15}, note: "Rank-6, temiz görüntüye gürültülü girdiden daha yakın (tabloya bak)."}
+      - {name: "Gürültü geri geliyor", params: {img: 0, k: 40, noise: 0.15}, note: "Büyük k gürültüyü de kurar."}
+    questions:
+      - q: "Gürültü eklenince spektrumun kuyruğu neden düzleşiyor?"
+        a: "Bağımsız gürültü matrisinin tekil değerleri birbirine yakın, düz bir dağılım oluşturur (yaklaşık σ√N civarında). Sinyalin büyük tekil değerleri bunun üstünde kalır; kuyruk gürültüye aittir."
+      - q: "Rank-k görüntüyü saklamak için kaç sayı gerekir?"
+        a: "k tekil değer + k sol + k sağ tekil vektör: k(2N + 1). N = 48, k = 8 için 776 sayı (özgün 2304)."
+    limits: "Küçük (48 × 48) yapay görüntüler; SVD, AᵀA'nın Jacobi özdeğer ayrışımıyla hesaplanır (küçük boyut için yeterli doğruluk). Gerçek görüntü sıkıştırma (JPEG) sabit bir taban (DCT) kullanır, veriye uyarlanmış SVD değil."
