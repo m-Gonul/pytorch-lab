@@ -182,3 +182,51 @@ pitfalls:
 whatif:
   - q: "Matrislerden biri köşegen olsaydı?"
     a: "$\\mathrm{diag}(d)A$ = A'nın satırlarını ölçeklemek: O(n²) yerine eleman eleman çarpım (`d[:, None] * A`) yeter."
+
+labs:
+  - id: l1
+    lab: matgrid
+    title: "Matris = dönüşüm: sütunları sürükle, ızgara dönüşsün"
+    goal: |
+      Mavi uç $Ae_1$ (birinci sütun), turuncu uç $Ae_2$ (ikinci sütun), yeşil uç $x$ (ince kesikli ok). Sütunları sürükledikçe bütün ızgara ve birim kare (gri) dönüşür; kalın yeşil ok $Ax$'tir. Kesikli yol sütun görünümüdür: önce $x_1$ kez birinci sütun, sonra $x_2$ kez ikinci sütun. Tablo aynı sonucu satır görünümüyle de hesaplar. Ok tuşları 0.25, Shift+ok 1 birim taşır.
+    predict:
+      q: "Sütunları $(1,0)$ ve $(2,0)$ yaparsan (iki sütun aynı doğru üzerinde) ızgaraya ne olur?"
+      options:
+        - {t: "Düzlemin tamamı yatay eksene çöker; det = 0", ok: true, why: "Her Ax = x₁(1,0) + x₂(2,0) yatay eksende kalır: sütun uzayı bir doğru. Birim kare alanı 0'a iner, farklı x'ler aynı Ax'e gider (ters yok)."}
+        - {t: "Izgara yalnız yatayda 2 kat gerilir", why: "Germe için ikinci sütun dikey bir bileşen taşımalıydı; burada ĵ yataya gidiyor."}
+        - {t: "Hiçbir şey değişmez", why: "Birim matris sütunları (1,0) ve (0,1)'dir."}
+    presets:
+      - {name: "Birim", params: {a: 1, b: 0, c: 0, d: 1, x1: 2, x2: 1}, note: "A = I: hiçbir şey hareket etmez, Ax = x."}
+      - {name: "Döndürme 90°", params: {a: 0, b: -1, c: 1, d: 0, x1: 2, x2: 1}, note: "Sütunlar (0,1) ve (−1,0): her şey 90° döner, alan korunur (det = 1)."}
+      - {name: "Germe", params: {a: 2, b: 0, c: 0, d: 1, x1: 2, x2: 1}, note: "Yatayda 2 kat: det = 2. Döndürmeden sonra/önce uygulamanın farklı sonuç verdiğini 'Bileşke ve sıra' bölümünde hesapladık."}
+      - {name: "Kayma (shear)", params: {a: 1, b: 1, c: 0, d: 1, x1: 2, x2: 1}, note: "Yatay çizgiler yerinde, dikeyler eğilir; alan değişmez (det = 1)."}
+      - {name: "Yansıma", params: {a: -1, b: 0, c: 0, d: 1, x1: 2, x2: 1}, note: "det = −1: kare turuncuya döner, yönelim ters (ayna)."}
+      - {name: "Tekil", params: {a: 1, b: 2, c: 0.5, d: 1, x1: 2, x2: 1}, note: "İkinci sütun birincinin 2 katı: düzlem bir doğruya çöker, det = 0."}
+    questions:
+      - q: "Izgaradaki her küçük karenin alanı neden aynı oranda değişir?"
+        a: "Doğrusal dönüşüm her karenin kenar vektörlerini aynı $A$ ile çarpar; her kare birim karenin ötelenmiş kopyasıdır, görüntüsü de aynı paralelkenarın ötelenmişidir. Alan oranı $|\\det A|$."
+      - q: "Sütunları değiştirmeden $x$'i sürükle: $Ax$ hangi kümede dolaşır? Tekil senaryoda?"
+        a: "Tekil değilse tüm düzlemde (her hedefe bir $x$ ulaşır). Tekilde yalnız sütunların doğrusu üzerinde: sütun uzayı bir doğrudur."
+      - q: "'Germe' ve 'Döndürme 90°' matrislerini kâğıtta iki sırayla çarp; $e_1$'i her ikisiyle gönder."
+        a: "$SR\\,e_1=(0,1)$, $RS\\,e_1=(0,2)$: aynı iki dönüşüm, farklı sıra, farklı sonuç."
+    limits: "2 × 2 matrisler (düzlem). Değerler 0.25'lik ızgaraya yapıştırılır ve [−5, 5] aralığında tutulur. Daha büyük boyutta da sütun görünümü ve det = hacim ölçeği geçerlidir ama çizilemez."
+  - id: l2
+    lab: looporder
+    title: "Aynı çarpım, dört döngü sırası: bellek erişimi hızı nasıl değiştirir?"
+    goal: |
+      Düz JavaScript'le yazılmış üçlü döngü matris çarpımını tarayıcında gerçekten çalıştırır ve dört farklı döngü sırası için süreyi ölçer (her biri 3 kez, en iyisi). Hepsi aynı sayıda işlem yapar; tek fark iç döngünün belleği hangi sırayla okuduğudur.
+    predict:
+      q: "Hangi sıra en yavaş olur?"
+      options:
+        - {t: "jki — iç döngü A ve C'yi sütun boyunca (n adım atlayarak) okur", ok: true, why: "Satır-öncelikli (row-major) bellekte sütun boyunca her erişim yeni bir önbellek satırı getirir; jki'de iç döngüdeki iki dizi de böyle."}
+        - {t: "ikj", why: "ikj iç döngüde B ve C'yi satır boyunca ardışık okur: genelde en hızlısı."}
+        - {t: "Hepsi aynı hızda, çünkü FLOP sayısı aynı", why: "FLOP aynı ama bellek erişim deseni farklı; modern işlemcide darboğaz çoğu zaman bellektir."}
+    presets:
+      - {name: "Küçük (n = 64)", params: {n: 64}, note: "Matrisler (3 × 32 KB) önbelleğe sığar: sıralar arası fark küçük."}
+      - {name: "Büyük (n = 512)", params: {n: 512}, note: "Her matris 2 MB: önbelleğe sığmaz, sütun boyunca okuma çok pahalılaşır. Ölçüm birkaç saniye sürebilir."}
+    questions:
+      - q: "n = 64 ile n = 512 arasında en yavaş/en hızlı oranı nasıl değişti? Neden?"
+        a: "Genelde büyür: küçük matrisler önbelleğe sığdığı için erişim sırası önemsizleşir; büyüklerde her atlamalı erişim ana belleğe gider."
+      - q: "GFLOP/s değerlerini NumPy'nin (e aşaması) değeriyle karşılaştır."
+        a: "BLAS bloklama, SIMD ve çok çekirdek kullandığı için onlarca–yüzlerce kat daha hızlıdır; aynı algoritma ($O(n^3)$), farklı uygulama."
+    limits: "Sonuçlar tarayıcıya, işlemciye ve o anki yüke göre değişir; mutlak sürelere değil oranlara bak. JS motoru (JIT) döngüleri farklı derleyebilir; Float64 kullanılır. Ölçüm ana iş parçacığında çalışır, sayfa kısa süre donabilir."
