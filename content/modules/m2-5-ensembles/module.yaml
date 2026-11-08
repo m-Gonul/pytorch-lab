@@ -202,3 +202,50 @@ whatif:
     a: "ρ = 1: topluluk tek modele eşittir, hiçbir kazanç yok. Çeşitlilik (bootstrap, öznitelik alt kümesi, farklı tohum) şarttır."
   - q: "Derin ağlarda topluluk?"
     a: "Farklı tohumlarla eğitilmiş birkaç ağın ortalaması doğruluğu ve kalibrasyonu belirgin iyileştirir (derin topluluklar); maliyeti çıkarımda çarpar — damıtma bunu tek ağa sığdırır."
+
+labs:
+  - id: l1
+    lab: boost1d
+    title: "Gradyan artırma adım adım: sözde artıklar, η ve tur sayısı"
+    goal: |
+      1B regresyon. Sol: veri, gerçek fonksiyon ve birkaç turdaki toplam tahmin $F_m$. Orta: son turdaki sözde artıklar (kaybın negatif gradyanı) ve onlara oturtulan ağaç. Sağ: eğitim ve test hatası tur sayısına göre.
+    predict:
+      q: "MSE, η = 0.2, stump. Tur sayısını 1'den 500'e çıkarınca test hatası nasıl değişir?"
+      options:
+        - {t: "Önce hızla düşer, bir yerde dibe vurur, sonra yavaşça yükselir (aşırı uyum)", ok: true, why: "Her tur eğitim hatasını azaltır; sonunda gürültüyü de modellemeye başlar. Tur sayısı bir düzenlileştiricidir."}
+        - {t: "Sürekli düşer", why: "Eğitim hatası sürekli düşer; test hatası düşmez."}
+        - {t: "Hiç değişmez", why: "Her tur bir ağaç ekler ve tahmini değiştirir."}
+    presets:
+      - {name: "Tek tur", params: {M: 1, eta: 1, depth: 1, loss: 0}, note: "F₁ = F₀ + h₁: tek bir basamak."}
+      - {name: "Az tur, büyük η", params: {M: 20, eta: 1, depth: 1, loss: 0}, note: "Hızlı ama kaba; gürültüye çabuk uyar."}
+      - {name: "Çok tur, küçük η", params: {M: 300, eta: 0.05, depth: 1, loss: 0}, note: "Pürüzsüz bir yaklaşım; test hatası dibine yakın."}
+      - {name: "Aykırı değerler, MSE", params: {M: 100, eta: 0.1, depth: 2, loss: 0, out: 0.1}, note: "Aykırı değerler F'yi yukarı çeker."}
+      - {name: "Aykırı değerler, MAE", params: {M: 100, eta: 0.1, depth: 2, loss: 1, out: 0.1}, note: "Sözde artıklar yalnız ±1: aykırının büyüklüğü önemsiz. Orta grafiğe bak."}
+      - {name: "Derin ağaçlar", params: {M: 100, eta: 0.3, depth: 5, loss: 0}, note: "Her ağaç güçlü: az turda aşırı uyum."}
+    questions:
+      - q: "MSE'de sözde artıklar turlar ilerledikçe neden küçülür?"
+        a: "r = y − F_m: F_m veriye yaklaştıkça artıklar gürültü düzeyine iner. Gerçek fonksiyon öğrenildikten sonra kalan artıklar yalnız gürültüdür; onlara uymak aşırı uyumdur."
+      - q: "η'yı yarıya indirip tur sayısını iki katına çıkarmak aynı sonucu verir mi?"
+        a: "Yaklaşık olarak, ama genelde küçük η daha iyi genelleşir: her ağaç artıkların yalnız küçük bir kısmını düzeltir, sonraki ağaçlar kalan yapıya bakar (Friedman 2001)."
+    limits: "Tek öznitelik, 80 eğitim örneği. Yaprak değerleri sözde artıkların ortalamasıdır (kayba özel 'line search' yapılmaz; MAE ve Huber'de bu basitleştirmedir). Test verisinde aykırı değer yoktur."
+  - id: l2
+    lab: bagvar
+    title: "Bagging'in varyans formülü: ρσ² + (1 − ρ)σ²/B"
+    goal: |
+      Sol: tek bir veri kümesinde bootstrap ağaçları (gri, ilk 8) ve ortalamaları (turuncu). Sağ: 24 farklı veri kümesi üzerinde topluluk tahmininin varyansı B'ye göre, formülün tahminiyle birlikte. σ² ve ρ verilerden ölçülür.
+    predict:
+      q: "B'yi 50'ye çıkarınca varyans 1/50'ye iner mi?"
+      options:
+        - {t: "Hayır: ρσ² tabanına iner; ağaçlar ilişkili olduğu için", ok: true, why: "Aynı veriden çekilen bootstrap örneklemleri büyük ölçüde örtüşür; ortak kısım ortalamayla gitmez."}
+        - {t: "Evet, bağımsız ortalamalar gibi", why: "Ancak ρ = 0 olsaydı."}
+        - {t: "Hiç inmez", why: "Bağımsız kısım (1 − ρ)σ²/B ile iner."}
+    presets:
+      - {name: "Bootstrap, derin", params: {depth: 6, samp: 0, noise: 0.4}, note: "ρ ≈ 0.35: taban yüksek."}
+      - {name: "Alt örnekleme %30", params: {depth: 6, samp: 1, frac: 0.3, noise: 0.4}, note: "Ağaçlar daha farklı veri görür: ρ düşer, topluluk varyansı belirgin azalır."}
+      - {name: "Sığ ağaçlar", params: {depth: 2, samp: 0, noise: 0.4}, note: "Sığ ağaçlar zaten düşük varyanslı: bagging'in kazancı küçük, yanlılık kalır."}
+    questions:
+      - q: "Alt örnekleme oranını çok küçültmek (0.1) neden bir noktadan sonra işe yaramaz?"
+        a: "ρ düşer ama her ağaç çok az veriyle eğitildiği için σ² ve yanlılık artar. Formüldeki iki terimin dengesi."
+      - q: "Bagging bir modelin yanlılığını neden değiştirmez?"
+        a: "Ortalamanın beklenen değeri tek bir modelin beklenen değeridir: E[f̄] = E[f_b]. Yalnız varyans azalır."
+    limits: "Tek öznitelik: rastgele ormanın öznitelik alt kümesi seçimi burada uygulanamaz; ρ'yu düşürmenin benzer bir yolu olarak alt örnekleme gösterilir. σ² ve ρ x'ler üzerinde ortalamadır."
