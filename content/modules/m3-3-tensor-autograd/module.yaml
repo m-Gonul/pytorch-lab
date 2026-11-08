@@ -173,3 +173,44 @@ pitfalls:
 whatif:
   - q: "Kayıp skaler değil de vektörse `backward()` ne yapar?"
     a: "Hata verir; `backward(v)` ile bir vektör–Jacobian çarpımı istemen gerekir (genelde `v = torch.ones_like(out)` = toplamın gradyanı)."
+
+labs:
+  - id: l1
+    lab: bcastviz
+    title: "Yayın ve geri geçişi: hangi eksenler toplanır?"
+    goal: |
+      İki shape yaz (ör. `(64, 10)` ve `(10,)`). Tablo sağdan hizalamayı, eksik eksenleri (parantezli 1) ve yayılan eksenleri (ok) gösterir. Altta, gelen gradyanı her girdinin shape'ine geri indirmek için hangi eksenler üzerinden toplanacağı yazılır.
+    predict:
+      q: "A (8, 1, 5), B (7, 1). Geri geçişte dB için ne yapılır?"
+      options:
+        - {t: "G (8, 7, 5): önce baştaki 8'lik eksen üzerinden topla, sonra son eksen (5) üzerinden keepdim ile topla → (7, 1)", ok: true, why: "B sağdan hizalanınca (1, 7, 1): 0. eksen eklendi, 2. eksen 1'den 5'e yayıldı."}
+        - {t: "Hiçbir şey; G'nin ilgili dilimini al", why: "Yayılan her eleman birçok çıktı elemanına katkı verdi: katkılar toplanmalı."}
+        - {t: "G'yi B'nin shape'ine reshape et", why: "Eleman sayıları farklı (280 vs 7); reshape anlamsız."}
+    presets:
+      - {name: "Bias", params: {a: "(64, 10)", b: "(10,)"}, note: "db = G.sum(0): batch üzerinden toplam."}
+      - {name: "Dış toplam", params: {a: "(3, 1)", b: "(1, 4)"}, note: "Her iki girdi de yayılır; ikisi de toplanır."}
+      - {name: "Üç boyut", params: {a: "(8, 1, 5)", b: "(7, 1)"}, note: "Sağdan hizalama: (8,1,5) ↔ (1,7,1)."}
+      - {name: "Uyumsuz", params: {a: "(64, 10)", b: "(64,)"}, note: "Sağdan: 10 ↔ 64 — hata. (64, 1) yazınca çalışır."}
+    questions:
+      - q: "Yayılan bir ağırlığın (ör. tüm konumlarda paylaşılan bir parametre) gradyanı neden büyüktür?"
+        a: "Her kullanımın gradyanı toplanır: n kez kullanılan bir parametre n katkı alır. Konvolüsyon çekirdekleri ve konum başına paylaşılan parametreler böyle büyük gradyanlar alır; kaybı ortalamak bunu ölçekler."
+    limits: "Yalnız shape düzeyi; en fazla birkaç eksen, her boyut 1–64."
+  - id: l2
+    lab: fwdrev
+    title: "Tam Jacobian: ileri mod mu, ters mod mu?"
+    goal: |
+      f(x) = W₂ tanh(W₁x), x ∈ ℝⁿ, f ∈ ℝᵐ. Jacobian (m × n) iki yoldan gerçekten hesaplanır: n tane JVP (her biri bir sütun) ve m tane VJP (her biri bir satır). Tablo iki sonucun farkını ve çarpma sayısını verir; grafik maliyetin n'ye göre büyümesini gösterir.
+    predict:
+      q: "n = 100, m = 1 (skaler kayıp). Hangisi daha ucuz, kabaca kaç kat?"
+      options:
+        - {t: "Ters mod, ~50 kat: 1 VJP'ye karşı 100 JVP", ok: true, why: "Her geçiş kabaca aynı maliyette; geçiş sayısı oranı 100:1, sabit ileri geçiş payıyla ~50 kat."}
+        - {t: "İleri mod", why: "İleri mod girdi başına bir geçiş ister: n = 100."}
+        - {t: "Eşit", why: "Ancak n = m iken."}
+    presets:
+      - {name: "Eğitim durumu", params: {n: 100, m: 1, h: 32}, note: "Skaler kayıp: ters mod açık ara."}
+      - {name: "Az girdi, çok çıktı", params: {n: 2, m: 100, h: 32}, note: "İleri mod kazanır."}
+      - {name: "Kare", params: {n: 50, m: 50, h: 32}, note: "Eşit maliyet."}
+    questions:
+      - q: "Ters mod her zaman kazanıyorsa ileri mod neden var?"
+        a: "Çok çıktılı, az girdili fonksiyonlarda daha ucuz; ayrıca bellek dostudur (ara değerleri saklamaz) ve Hessian–vektör çarpımında ters modla birleşir (jvp(grad(f)))."
+    limits: "Küçük, yoğun bir ağ; maliyet çarpma sayısı olarak sayılır (bellek erişimi ve paralellik dahil değil). İleri modda W₁v genel bir v için hesaplanır (birim vektörün seyrekliğinden yararlanılmaz)."

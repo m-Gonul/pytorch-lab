@@ -701,3 +701,4 @@ p code, li code, td code { overflow-wrap: anywhere; }
 .eg-bar { flex-wrap: wrap; gap: 8px 12px; }
 .eg-e input { width: min(26em, 70vw); font-family: var(--mono); } .eg-v input { width: min(22em, 70vw); font-family: var(--mono); }
 .eg-svg { min-width: 560px; }
+.bc-in { width: 9em; font-family: var(--mono); } .bc-tbl td.bc-pad { color: var(--ink-3); } .bc-tbl td.bc-exp { color: var(--c-b); font-weight: 600; } .bc-tbl tr.bc-res td { background: color-mix(in srgb, var(--c-p) 12%, transparent); }
