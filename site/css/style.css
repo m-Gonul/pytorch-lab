@@ -697,3 +697,7 @@ svg.jm { width: 100%; height: auto; user-select: none; -webkit-user-select: none
 .sv-blk { display: flex; flex-direction: column; gap: 3px; }
 @media (max-width: 560px) { .sv-store { grid-template-columns: repeat(12, minmax(0, 1fr)); } }
 p code, li code, td code { overflow-wrap: anywhere; }
+/* M3.1 ifade grafiği */
+.eg-bar { flex-wrap: wrap; gap: 8px 12px; }
+.eg-e input { width: min(26em, 70vw); font-family: var(--mono); } .eg-v input { width: min(22em, 70vw); font-family: var(--mono); }
+.eg-svg { min-width: 560px; }

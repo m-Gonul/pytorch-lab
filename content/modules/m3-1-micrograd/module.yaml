@@ -178,3 +178,48 @@ pitfalls:
 whatif:
   - q: "Grafikte max(a, b) düğümü ve a = b olursa?"
     a: "Türevlenemez nokta; uygulama bir alt gradyan seçer (genelde ilk girdi ya da eşit bölüşüm) — tutarlı olduğu sürece sorun çıkmaz."
+
+labs:
+  - id: l1
+    lab: exprgraph
+    title: "Tarayıcıda micrograd: kendi ifadeni yaz, grafiği ve gradyanları gör"
+    goal: |
+      Bir ifade ve değişken değerleri yaz; bir `Value` grafiği kurulur (bu sayfadaki JavaScript, micrograd'ın birebir çevirisi). Her kutu bir düğüm: #sıra (topolojik), işlem, ileri değer (yeşil) ve gradyan (turuncu). Tablo, geri yayılımın sonucunu merkezi farkla karşılaştırır.
+    predict:
+      q: "x*x + x ifadesinde x = 3. Geri yayılım ∂/∂x için ne verir?"
+      options:
+        - {t: "7: çarpmanın iki girdisi de x (3 + 3), toplamadan 1 daha", ok: true, why: "x üç yerde kullanılıyor; += ile katkılar toplanır: 3 + 3 + 1 = 7 = 2x + 1."}
+        - {t: "4", why: "Bu, gradyanlar '=' ile yazılırsa (son yol öncekileri silerse) çıkabilecek yanlış bir sonuç."}
+        - {t: "6", why: "Toplamadaki doğrudan yol unutulmuş."}
+    presets:
+      - {name: "Karpathy örneği", params: {preset: "karpathy"}, note: "L = (a·b + c)·f: ∂L/∂a = b·f = 6, ∂L/∂f = a·b + c = 4."}
+      - {name: "Tek nöron", params: {preset: "noron"}, note: "tanh(x₁w₁ + x₂w₂ + b) = 0.7071; ∂o/∂w₂ = 0 çünkü x₂ = 0."}
+      - {name: "Tekrar eden değişken", params: {preset: "tekrar"}, note: "Gradyan birikimi: 2x + 1 = 7."}
+      - {name: "Bölme", params: {preset: "bolme"}, note: "Bölme, çarpma ve −1. kuvvet düğümlerine açılır."}
+    questions:
+      - q: "Bir düğümün gradyanı neden ancak onu kullanan tüm düğümler işlendikten sonra doğrudur?"
+        a: "Gradyan, onu kullanan her düğümden gelen katkıların toplamıdır. Ters topolojik sıra, bir düğüm işlenmeden önce tüm kullanıcılarının katkılarını eklemesini garanti eder."
+      - q: "exp(x) düğümünün geri fonksiyonu neden çıktının kendisini kullanıyor?"
+        a: "d eˣ/dx = eˣ = o: ileri geçişte hesaplanan değer saklanır ve yeniden kullanılır; üs yeniden hesaplanmaz (tanh ve sigmoid için de aynı)."
+    limits: "Skaler ifadeler, en fazla 60 düğüm; üs sabit olmalı. Sayısal karşılaştırma h = 10⁻⁶ ile merkezi fark."
+  - id: l2
+    lab: mlpmoons
+    title: "Küçük bir MLP iki ay verisinde"
+    goal: |
+      Tam batch gradyan inişi (momentum 0.9) ile eğitilen bir MLP. Arka plan modelin P(y = 1 | x) tahmini. Gizli katman sayısını 0 yaparak lojistik regresyona dön, genişlik ve derinlikle oyna.
+    predict:
+      q: "Gizli katman sayısı 0 iken (yalnız doğrusal çıktı) iki ay verisinde doğruluk ne olur?"
+      options:
+        - {t: "~%85–90: doğrusal sınır ayların büyük kısmını ayırır ama uçlardaki kıvrımları kaçırır", ok: true, why: "Ayların uçları birbirinin içine girer; tek bir doğru onları ayıramaz."}
+        - {t: "%100", why: "İki ay doğrusal ayrılabilir değildir."}
+        - {t: "%50", why: "Doğrusal model yine de ayların ana gövdelerini ayırır."}
+    presets:
+      - {name: "Doğrusal (gizli katman yok)", params: {depth: 0, steps: 300}, note: "Lojistik regresyon: düz sınır."}
+      - {name: "Tek gizli katman, 4 nöron", params: {depth: 1, width: 4, act: 0, steps: 400}, note: "Birkaç bükülme yeter."}
+      - {name: "2 × 12, ReLU", params: {depth: 2, width: 12, act: 1, steps: 300}, note: "Parçalı doğrusal sınır (ReLU ağı parçalı doğrusal bir fonksiyondur)."}
+      - {name: "Derin sigmoid", params: {depth: 3, width: 12, act: 2, steps: 300}, note: "Aynı adım sayısında çok daha yavaş öğrenme: sigmoid'in küçük türevi ve sıfır merkezli olmayan çıktısı (M3.5)."}
+      - {name: "Büyük η", params: {depth: 2, width: 12, act: 0, lr: 1.5, steps: 300}, note: "Kayıp salınır ya da patlar."}
+    questions:
+      - q: "ReLU ağının olasılık haritası neden düz parçalardan oluşuyor gibi görünüyor?"
+        a: "ReLU ağı, girdi uzayını bölgelere ayırır ve her bölgede doğrusal bir fonksiyondur (aktivasyon desenleri sabit); logit parçalı doğrusaldır, sigmoid'den geçince yumuşar."
+    limits: "100 eğitim örneği, tam batch; çıkış kaybı BCE (logit üzerinden), çok küçük L2 (10⁻⁴). Başlatma tanh/sigmoid için √(1/n), ReLU için √(2/n)."
