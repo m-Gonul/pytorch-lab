@@ -117,3 +117,116 @@ labs:
       - q: "Gürültü σ = 0 yapınca derece 15 hâlâ kötü mü?"
         a: "Gürültü yoksa varyans terimi ortadan kalkar; yüksek derece düzgün bir fonksiyonu iyi yaklaşır (sayısal koşul dışında). Aşırı uyum, gürültüyü öğrenmenin adıdır."
     limits: "Legendre tabanı ve kapalı form çözüm kullanılıyor (sayısal kararlılık için); x ∈ [−1, 1]'de düzgün örnekleme. Test hatası 200 noktalı ızgarada gerçek fonksiyona uzaklık + σ²."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Ridge çözümü ve özdeğer büzülmesi
+    goal: Ridge'in katsayıları hangi yönlerde ne kadar küçülttüğünü görmek
+    needs: Normal denklemler (M1.1), özayrışım
+    q: |-
+      $L(w)=\|Xw-y\|^2+\lambda\|w\|^2$'nin minimumunu bul ve $X=U D V^\top$ (SVD) cinsinden yorumla.
+    solution: |-
+      **Gradyan:** $\nabla L=2X^\top(Xw-y)+2\lambda w=0\Rightarrow(X^\top X+\lambda I)w=X^\top y$. $\lambda>0$ iken $X^\top X+\lambda I$ her zaman pozitif tanımlıdır (özdeğerleri $d_i^2+\lambda>0$), yani çözüm **her zaman tektir** — M1.1 P6'daki tekillik sorunu biter.
+
+      **SVD ile:** $X^\top X=VD^2V^\top$, $X^\top y=VDU^\top y$. Yerine koy: $w_\lambda=V\,\mathrm{diag}\!\big(\tfrac{d_i}{d_i^2+\lambda}\big)U^\top y$. Karşılaştır: en küçük kareler $w_0=V\,\mathrm{diag}(1/d_i)\,U^\top y$.
+
+      **Yorum:** $i$. tekil yön boyunca katsayı $\frac{d_i^2}{d_i^2+\lambda}$ oranında küçülür. Verinin çok değiştiği yönler ($d_i^2\gg\lambda$) neredeyse dokunulmaz; az bilgi taşıyan, gürültüye açık yönler ($d_i^2\ll\lambda$) neredeyse sıfırlanır. Etkin serbestlik derecesi $\sum_i\frac{d_i^2}{d_i^2+\lambda}$: λ = 0'da d, λ → ∞'da 0.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Tek değişkenli ridge
+    goal: Kapalı formu uygulamak
+    needs: P1
+    q: |-
+      Kesişimsiz tek öznitelik: $\sum x_i^2=10$, $\sum x_iy_i=20$, $\lambda=10$. Ridge katsayısı $w$ kaç?
+    answer: 1.0
+    calc: "20/(10+10)"
+    mistakes:
+      - {answer: 2.0, msg: "λ'yı paydaya eklemeyi unuttun: bu cezasız en küçük kareler çözümü."}
+      - {answer: 1.3333333333333333, msg: "Kayıpta λ‖w‖² varsa paydada λ, (λ/2)‖w‖² varsa λ/2 olur; burada kayıp L = ‖Xw−y‖² + λ‖w‖²."}
+    hints:
+      - "Tek boyutta $(X^\\top X+\\lambda)w=X^\\top y$."
+    solution: |-
+      $w=\frac{\sum x_iy_i}{\sum x_i^2+\lambda}=\frac{20}{20}=1$; cezasız çözüm 2 idi, ceza yarıya indirdi ($d^2/(d^2+\lambda)=0.5$).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Yumuşak eşikleme
+    goal: Lasso'nun tek koordinat çözümünü uygulamak
+    needs: L1'in alt türevi
+    q: |-
+      $\min_w\frac12(w-z)^2+\lambda|w|$'nin çözümü $S_\lambda(z)=\mathrm{sign}(z)\max(|z|-\lambda,0)$. $z=1.2$, $\lambda=0.5$ için $w$?
+    answer: 0.7
+    calc: "1.2-0.5"
+    mistakes:
+      - {answer: 1.7, msg: "Ceza katsayıyı sıfıra doğru çeker: |z|'den λ çıkarılır."}
+      - {answer: 0.7999999999999999, msg: "Bu L2 (ridge) büzülmesi: oranla küçültür. L1 sabit miktar (λ) çıkarır."}
+    hints:
+      - "$|z|>\\lambda$ mı?"
+    solution: |-
+      $|z|=1.2>0.5$ → $w=1.2-0.5=0.7$. $|z|\le\lambda$ olsaydı $w=0$: L1'in seyreklik üretmesi tam olarak bu eşikten gelir.
+  - id: p4
+    type: açıkla
+    level: 2
+    title: Neden L1 sıfırlar da L2 sıfırlamaz?
+    goal: Seyrekliğin geometrisini kendi cümlelerinle açıklamak
+    needs: P3, kontur çizgileri
+    q: |-
+      İki parametreli bir problemde L1 cezasının katsayıları tam sıfıra götürüp L2'nin götürmediğini hem geometrik hem cebirsel olarak açıkla.
+    rubric:
+      - "Kısıtlı biçimi ($\\|w\\|_1\\le t$ elmas, $\\|w\\|_2\\le t$ disk) çizdim/anlattım"
+      - "Kayıp elipslerinin elmasa köşede (eksen üzerinde) değme olasılığının yüksek olduğunu söyledim"
+      - "Cebirsel olarak: L2 cezasının türevi $2\\lambda w$ sıfırda kaybolur, L1'in alt türevi $[-\\lambda,\\lambda]$ sıfırı bir aralıkta 'tutar' dedim"
+      - "Soft threshold ile ridge büzülmesini karşılaştırdım"
+    hints:
+      - "L2 cezasının $w$ küçükken itme kuvveti ne olur?"
+    solution: |-
+      Kısıtlı biçimde L1 bölgesi köşeleri eksenlerde olan bir elmastır; kayıp elipsi büyüdükçe bölgeye ilk değdiği nokta çoğunlukla bir köşedir — bir koordinat tam 0. L2 diski pürüzsüzdür; değme noktası genel konumdadır. Cebirsel: L2'nin cezası küçük $w$'de $\lambda w^2$, türevi $2\lambda w\to0$ — sıfıra yaklaşırken itme söner, katsayı küçülür ama sıfırlanmaz. L1'in itmesi $|w|$ ne kadar küçük olursa olsun sabit $\lambda$; veri gradyanı $\lambda$'dan küçükse katsayı sıfırda kalır (P3).
+  - id: p5
+    type: yöntem-seç
+    level: 2
+    title: İlişkili öznitelik grupları
+    goal: Ridge, lasso, elastic net arasında seçim yapmak
+    needs: P4
+    q: |-
+      1000 öznitelik; gerçekten ilgili olanlar 50, ama bunlar 10'luk gruplar hâlinde birbirleriyle çok ilişkili (aynı ölçümün farklı sensörleri). Hangisi?
+    choices:
+      - {t: "Lasso", why: "İlişkili gruptan genellikle keyfi tek bir öznitelik seçer ve seçim örneklemden örneklemle değişir."}
+      - {t: "Ridge", why: "Grupları birlikte tutar ama 950 gereksiz özniteliği de sıfırlamaz."}
+      - {t: "Elastic net (L1 + L2)", ok: true, why: "L1 seyreklik, L2 ilişkili öznitelikleri birlikte seçme (gruplama) etkisi verir."}
+    hints:
+      - "Lasso iki özdeş öznitelik arasında nasıl seçim yapar?"
+    solution: |-
+      Elastic net $\lambda_1\|w\|_1+\lambda_2\|w\|^2$: L2 terimi kesinlikle dışbükey yapar ve özdeş özniteliklere eşit ağırlık verdirir (gruplama), L1 terimi alakasız grupları sıfırlar (Zou & Hastie 2005).
+  - id: p6
+    type: birleştir
+    level: 3
+    title: Ridge = Gauss önsel ile MAP
+    goal: Düzenlileştirmeyi olasılıksal yorumla bağlamak (M0.4)
+    needs: Bayes kuralı, Gauss yoğunluğu
+    q: |-
+      $y_i=w^\top x_i+\varepsilon_i$, $\varepsilon_i\sim\mathcal N(0,\sigma^2)$, önsel $w\sim\mathcal N(0,\tau^2I)$. MAP kestiriminin ridge olduğunu göster ve λ'yı σ, τ cinsinden yaz. Lasso hangi önsele karşılık gelir?
+    rubric:
+      - "$\\log p(w|y)=\\log p(y|w)+\\log p(w)+$ sabit yazdım"
+      - "Olabilirlikten $-\\frac1{2\\sigma^2}\\|Xw-y\\|^2$, önselden $-\\frac1{2\\tau^2}\\|w\\|^2$ çıktığını gösterdim"
+      - "$\\lambda=\\sigma^2/\\tau^2$ buldum ve yorumladım (geniş önsel → az ceza)"
+      - "Lasso'nun Laplace önseline karşılık geldiğini söyledim"
+    hints:
+      - "MAP = argmax log-posterior; sabitleri at."
+      - "Her iki tarafı $-2\\sigma^2$ ile çarp."
+    solution: |-
+      $-\log p(w|y)=\frac1{2\sigma^2}\|Xw-y\|^2+\frac1{2\tau^2}\|w\|^2+c$. $2\sigma^2$ ile çarp: $\|Xw-y\|^2+\frac{\sigma^2}{\tau^2}\|w\|^2$ → ridge, $\lambda=\sigma^2/\tau^2$. Gürültü büyük ya da önsel dar → ceza büyük. Laplace önseli $p(w)\propto e^{-|w|/b}$ log'da $|w|/b$ verir → lasso, $\lambda=2\sigma^2/b$. **Fark:** MAP tek bir nokta verir; tam Bayes çözümü belirsizliği de taşır (posterior Gauss, ortalaması ridge çözümü).
+pitfalls:
+  - wrong: "Kesişim terimini (bias) de cezalandır."
+    right: "Kesişimi cezalandırma; aksi hâlde model y'nin ortalamasını kaydırmak için cezalandırılır ve sonuç y'nin ölçeğine/öteleme seçimine bağlı olur."
+  - wrong: "Öznitelikleri ölçeklemeden ridge/lasso uygulamak sorun değil."
+    right: "Ceza katsayılara eşit davranır; birimi küçük (değerleri büyük) özniteliğin katsayısı küçük olacağı için az cezalanır. Önce standartlaştır."
+  - wrong: "λ'yı test kümesinde en iyi sonucu verene göre seç."
+    right: "λ bir hiperparametredir: doğrulama kümesi ya da çapraz doğrulamayla seçilir; test kümesi yalnız son raporlama içindir (M3.9 sızıntı)."
+whatif:
+  - q: "n ≫ d (çok veri, az öznitelik) olsaydı ridge'e ihtiyaç kalır mı?"
+    a: "Varyans terimi ≈ dσ²/n zaten küçüktür; en iyi λ 0'a yaklaşır. Ama öznitelikler çok ilişkiliyse (küçük tekil değerler) ridge yine kararlılık kazandırır."
+  - q: "Ceza ‖w‖₂ (karesiz) olsaydı?"
+    a: "Hâlâ dışbükey ama sıfırda türevlenemez; grup lasso'nun bir grubuna karşılık gelir: tüm vektörü birden sıfıra çekebilir (grup düzeyinde seyreklik)."

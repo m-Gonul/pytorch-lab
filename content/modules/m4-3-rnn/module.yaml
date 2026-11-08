@@ -122,3 +122,108 @@ labs:
       - q: "Gradyan kırpma kaybolan gradyanı çözer mi?"
         a: "Hayır. Kırpma yalnız büyük normu sınırlar (patlamaya karşı); sönen gradyanı büyütmez. Kaybolmaya karşı çözüm mimari: kapılar, artık yollar, uygun başlatma."
     limits: "Rastgele, eğitilmemiş W ve tek bir rastgele geri yön. Eğitim sırasında W değişir; LSTM'de f de girdiye bağlıdır (burada sabit)."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: BPTT'de gradyan neden çarpımla taşınır?
+    goal: Kaybolan/patlayan gradyanın kaynağını türetmek
+    needs: Zincir kuralı, Jacobian
+    q: |-
+      $h_t=\tanh(W h_{t-1}+Ux_t+b)$. $\partial h_T/\partial h_k$'yı yaz ve normunu sınırla.
+    solution: |-
+      **1.** Tek adım: $\frac{\partial h_t}{\partial h_{t-1}}=\mathrm{diag}(1-h_t^2)\,W=:J_t$.
+
+      **2.** Zincir: $\frac{\partial h_T}{\partial h_k}=J_TJ_{T-1}\cdots J_{k+1}$ — $T-k$ matrisin çarpımı.
+
+      **3.** Sınır (eşitsizlik): $\|J_t\|\le\|\mathrm{diag}(1-h_t^2)\|\,\|W\|\le\gamma\,\sigma_{max}(W)$, $\gamma=\max|1-h^2|\le1$. Dolayısıyla $\big\|\frac{\partial h_T}{\partial h_k}\big\|\le(\gamma\sigma_{max})^{T-k}$.
+
+      **Sonuç:** $\gamma\sigma_{max}<1$ ise uzak geçmişin gradyanı **en az** üstel söner (yeterli koşul — Pascanu ve ark. 2013). Patlama için $\sigma_{max}>1$ **gerekli** ama yeterli değil (tanh doyabilir). Deney alanında etkin çarpanı ölç.
+
+      **Ne söylemez:** RNN'in uzun bağımlılığı temsil edemeyeceğini değil, gradyanla **öğrenemeyeceğini** söyler.
+  - id: p2
+    type: hesap
+    level: 1
+    title: RNN hücresinin parametre sayısı
+    goal: Ağırlıkları saymak
+    needs: Hücre denklemi
+    q: |-
+      Girdi boyu $d=64$, gizli boyu $h=128$, tek bias. $h_t=\tanh(W_hh_{t-1}+W_xx_t+b)$ kaç parametre?
+    answer: 24704.0
+    calc: "64*128+128*128+128"
+    mistakes:
+      - {answer: 8320.0, msg: "Rekürent ağırlık W_h (128 × 128) eksik."}
+      - {answer: 98816.0, msg: "Bu LSTM'in sayısı (dört kapı); düz RNN'de tek dönüşüm var."}
+    hints:
+      - "$W_x$: $d\\times h$, $W_h$: $h\\times h$."
+    solution: |-
+      $8192+16384+128=24\,704$. Parametre sayısı dizi uzunluğundan bağımsızdır (zaman boyunca ağırlık paylaşımı). LSTM dört kapıyla 4 katı: 98 816.
+  - id: p3
+    type: hesap
+    level: 1
+    title: 50 adım öncesi
+    goal: Üstel sönmeyi sayıya dökmek
+    needs: P1
+    q: |-
+      Adım başına etkin çarpan 0.9 ise 50 adım önceki gizli duruma ulaşan gradyan oranı?
+    answer: 0.00515377520732012
+    calc: "0.9**50"
+    tol: 1e-5
+    mistakes:
+      - {answer: 45.0, msg: "Çarpanlar toplanmaz, çarpılır."}
+      - {answer: 0.005726416897022355, msg: "50 adım geriye 50 Jacobian çarpılır."}
+    hints:
+      - "$0.9^{50}$."
+    solution: |-
+      $0.9^{50}=0.0052$: %0.5. 100 adımda $2.7\cdot10^{-5}$. Bu yüzden düz RNN pratikte ~10–20 adımlık bağımlılıkları öğrenebilir.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Uzun metinde tutarlı özne–yüklem uyumu
+    goal: Mimari seçmek
+    needs: P1, M4.4
+    q: |-
+      Bir model, 200 kelime önce geçen öznenin tekil/çoğul olmasına göre yüklemi seçmeli. Düz RNN + gradyan kırpma mı, LSTM mi, Transformer mı?
+    choices:
+      - {t: "Düz RNN + gradyan kırpma", why: "Kırpma patlamayı önler, kaybolmayı çözmez."}
+      - {t: "LSTM ya da Transformer: LSTM hücre yolu toplamsal (f ≈ 1), Transformer her konuma doğrudan erişir (yol uzunluğu 1)", ok: true, why: "İkisi de uzun bağımlılık gradyanını taşır; Transformer'ın bedeli n² hesap."}
+      - {t: "Daha derin bir düz RNN", why: "Derinlik zaman boyundaki çarpımı kısaltmaz."}
+    hints:
+      - "Gradyanın 200 adımdan geçtiği yolun uzunluğu her mimaride ne?"
+    solution: |-
+      Gradyanın kat ettiği "yol uzunluğu": düz RNN ve LSTM'de 200 adım (LSTM'de ama çarpan $f\approx1$), Transformer'da 1 (Vaswani ve ark. Tablo 1). Kırpma yalnız büyük normu sınırlar.
+  - id: p5
+    type: kod
+    level: 2
+    title: Dizi uzunluklarını ayırmayı unutmak
+    goal: Durumlu eğitimde gradyanı kesmek
+    needs: Kesilmiş BPTT (ek alıştırma E2)
+    q: |-
+      Uzun bir metni 100'lük parçalara bölüp sırayla eğitiyorsun ve gizli durumu parçalar arasında taşıyorsun:
+      ```python
+      for chunk in chunks:
+          out, h = rnn(chunk, h)
+          loss = crit(out, target); loss.backward(); opt.step(); opt.zero_grad()
+      ```
+      İkinci parçada "Trying to backward through the graph a second time" hatası alıyorsun. Düzeltme?
+    choices:
+      - {t: "`loss.backward(retain_graph=True)`", why: "Hatayı susturur ama grafik metin boyunca büyür: bellek ve süre doğrusal artar, eski adımlar güncellenmiş ağırlıklarla tutarsız."}
+      - {t: "Her parçadan önce `h = h.detach()`: durum (değer) taşınır, gradyan parça sınırında kesilir", ok: true, why: "Kesilmiş BPTT'nin tanımı."}
+      - {t: "Her parçada `h = None`", why: "Çalışır ama parçalar arası bilgiyi (ileri yön belleğini) de atar."}
+    hints:
+      - "`h` önceki parçanın hesap grafiğine bağlı mı?"
+    solution: |-
+      `h` önceki parçanın grafiğine bağlıdır; o grafik `backward` sonrası serbest bırakıldı. `h.detach()` değeri korur, grafikten koparır: ileri yönde tam bellek, geri yönde parça uzunluğu kadar BPTT.
+pitfalls:
+  - wrong: "Gradyan kırpma kaybolan gradyanı da çözer."
+    right: "Kırpma yalnız normu üstten sınırlar; küçük gradyanı büyütmez."
+  - wrong: "RNN'in belleği gizli durumun boyutuyla sınırsız uzar."
+    right: "Kapasite boyutla artar ama öğrenilebilirlik gradyan akışıyla sınırlıdır (P1)."
+  - wrong: "Çift yönlü RNN her görevde kullanılabilir."
+    right: "Gelecek girdiyi gördüğü için çevrimiçi tahmin ve dil modellemede (bir sonraki kelime) kullanılamaz."
+whatif:
+  - q: "W ortogonal başlatılsa (tüm tekil değerler 1)?"
+    a: "Doğrusal bölgede norm korunur; tanh türevi < 1 olduğu için yine yavaş söner ama çok daha geç. Uzun bağımlılık görevlerinde yaygın bir başlatma."
+  - q: "Aktivasyon ReLU olsaydı?"
+    a: "Türev 0 ya da 1: doymaz ama W'nin spektral yarıçapı > 1 ise patlama kolaylaşır; birim matrisle başlatılmış ReLU-RNN (IRNN, Le ve ark. 2015) bir alternatiftir."

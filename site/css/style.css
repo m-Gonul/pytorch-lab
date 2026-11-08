@@ -569,3 +569,16 @@ table.cov td:nth-child(2) { white-space: nowrap; }
 @media (max-width: 960px) { .search { flex: 1 1 auto; } .engine-pill { margin-left: 0; } }
 @media (max-width: 620px) { .lab { padding: 6px 10px 12px; } .lab-pair { grid-template-columns: 1fr; } .lab-plots { grid-template-columns: 1fr; } .lab-p { grid-template-columns: 1fr 5.4em; } }
 .lab-p.off { opacity: 0.45; }
+.box-body, .pr-q, .pr-meta, .lab-note, .hint-list li { overflow-x: auto; }
+@media (max-width: 620px) {
+  .top { gap: 8px; }
+  .search { flex: 1 1 0; min-width: 0; }
+  .search input { padding: 5px 7px; }
+  .engine-pill { padding: 4px 8px; font-size: 0.72rem; gap: 4px; }
+  .nav-toggle { padding-left: 8px; padding-right: 8px; }
+}
+.pr-rubric, fieldset { min-width: 0; } .pr-rubric { overflow-x: auto; }
+/* kapalı tooltip yerleşimi taşırmasın (mobilde yatay kaydırma) */
+dfn.term::after { display: none; }
+dfn.term:hover::after, dfn.term:focus::after, dfn.term.open::after { display: block; }
+@media (max-width: 620px) { dfn.term:hover::after, dfn.term:focus::after, dfn.term.open::after { position: fixed; left: 12px; right: 12px; bottom: 12px; top: auto; width: auto; max-width: none; transform: none; } }

@@ -52,12 +52,12 @@ export function plot(P, opt = {}) {
   if (P.field) {
     const F = P.field, dx = iw / F.nx, dy = ih / F.ny;
     const zs = F.z.filter(fin), lo = Math.min(...zs), hi = Math.max(...zs);
-    const tr = (z) => (F.log ? Math.log(z - lo + 1e-9) : z);
+    const tr = (z) => (F.log ? Math.log(z - lo + 0.02 * (hi - lo) + 1e-12) : z);
     const tlo = tr(lo), thi = tr(hi);
     let r = "";
     for (let j = 0; j < F.ny; j++) for (let i = 0; i < F.nx; i++) {
       const t = (tr(F.z[j * F.nx + i]) - tlo) / (thi - tlo || 1);
-      r += `<rect x="${(L + i * dx).toFixed(1)}" y="${(T + ih - (j + 1) * dy).toFixed(1)}" width="${(dx + 0.6).toFixed(1)}" height="${(dy + 0.6).toFixed(1)}" style="fill-opacity:${(0.04 + 0.7 * (1 - t) ** 1.5).toFixed(3)}" class="fld"/>`;
+      r += `<rect x="${(L + i * dx).toFixed(1)}" y="${(T + ih - (j + 1) * dy).toFixed(1)}" width="${(dx + 0.6).toFixed(1)}" height="${(dy + 0.6).toFixed(1)}" style="fill-opacity:${(0.05 + 0.5 * (1 - t)).toFixed(3)}" class="fld"/>`;
     }
     g += `<g>${r}</g>`;
   }

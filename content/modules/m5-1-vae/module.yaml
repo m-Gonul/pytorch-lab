@@ -97,3 +97,98 @@ homework:
     accept:
       - "β arttıkça daha az ama daha yorumlanabilir aktif boyut."
       - "Yeniden yapılandırma kalitesi–ayrıklık ödünleşimi tablosu."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: ELBO'yu iki yoldan türet
+    goal: VAE kaybının nereden geldiğini görmek
+    needs: Bayes kuralı, KL ıraksaması, Jensen eşitsizliği
+    q: |-
+      $\log p(x)\ge\mathbb E_{q(z|x)}[\log p(x|z)]-\mathrm{KL}(q(z|x)\,\|\,p(z))$'yi türet ve eşitsizliğin açığını bul.
+    solution: |-
+      **Yol 1 (eşitlik ile):** $\log p(x)=\mathbb E_q[\log p(x)]=\mathbb E_q\big[\log\frac{p(x,z)}{p(z|x)}\big]=\mathbb E_q\big[\log\frac{p(x,z)}{q(z|x)}\big]+\mathbb E_q\big[\log\frac{q(z|x)}{p(z|x)}\big]$. İkinci terim $\mathrm{KL}(q\,\|\,p(z|x))\ge0$. İlk terim ELBO: $\mathbb E_q[\log p(x|z)]-\mathrm{KL}(q\,\|\,p(z))$.
+
+      **Sonuç:** $\log p(x)=\mathrm{ELBO}+\mathrm{KL}(q(z|x)\,\|\,p(z|x))$ — bu bir **eşitliktir**; açık, kodlayıcının gerçek posteriordan uzaklığıdır. ELBO'yu büyütmek hem olabilirliği artırır hem kodlayıcıyı posteriora yaklaştırır.
+
+      **Yol 2 (Jensen):** $\log p(x)=\log\mathbb E_q\big[\frac{p(x,z)}{q(z|x)}\big]\ge\mathbb E_q\big[\log\frac{p(x,z)}{q(z|x)}\big]$ (log içbükey). Daha kısa ama açığın ne olduğunu söylemez.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Tek boyutta KL terimi
+    goal: Kapalı form KL'yi uygulamak
+    needs: $\mathrm{KL}(\mathcal N(\mu,\sigma^2)\|\mathcal N(0,1))=\frac12(\mu^2+\sigma^2-1-\ln\sigma^2)$
+    q: |-
+      $\mu=1$, $\sigma=0.5$. KL kaç (nat)?
+    answer: 0.8181471805599453
+    calc: "0.5*(1+0.25-1-math.log(0.25))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.5965735902799727, msg: "Formülde σ² var; σ = 0.5 ise σ² = 0.25."}
+      - {answer: 1.6362943611198906, msg: "½ çarpanını unuttun."}
+    hints:
+      - "$\\ln0.25=-1.386$."
+    solution: |-
+      $\frac12(1+0.25-1+1.386)=0.818$. $\mu$ terimi kodu merkeze, $\sigma^2-1-\ln\sigma^2$ terimi (minimumu σ = 1'de 0) varyansı 1'e çeker.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Yeniden parametrelendirme
+    goal: Örneklemenin türevlenebilir yazılışını uygulamak
+    needs: $z=\mu+\sigma\varepsilon$
+    q: |-
+      $\mu=1$, $\log\sigma^2=\ln0.25$, $\varepsilon=-2$. $z$?
+    answer: 0.0
+    calc: "1+0.5*(-2)"
+    mistakes:
+      - {answer: 0.5, msg: "log σ² verildi; σ = exp(½ log σ²) = 0.5, varyans değil std ile çarp."}
+    hints:
+      - "$\\sigma=e^{\\frac12\\log\\sigma^2}$."
+    solution: |-
+      $\sigma=0.5$, $z=1+0.5\cdot(-2)=0$. $\partial z/\partial\mu=1$, $\partial z/\partial\sigma=\varepsilon$: rastgelelik ε'ya taşındığı için gradyan μ ve σ'ya akar.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: KL sıfıra yapıştı
+    goal: Posterior çöküşünü tanımak
+    needs: P1
+    q: |-
+      Güçlü bir otoregresif kod çözücüyle VAE eğittin: KL terimi hızla ≈ 0'a indi, yeniden yapılandırma iyi, ama kod $z$'yi değiştirmek çıktıyı değiştirmiyor. Ne oldu?
+    choices:
+      - {t: "Mükemmel model: KL 0 en iyisi", why: "KL = 0, q(z|x) = p(z) demek: kod x hakkında hiçbir bilgi taşımıyor."}
+      - {t: "Posterior çöküşü: kod çözücü x'i z olmadan modelleyebildiği için z'yi yok sayıyor; KL ısınması, serbest bit ya da daha zayıf kod çözücü gerekir", ok: true, why: "Bowman ve ark. 2016."}
+      - {t: "Öğrenme oranı fazla", why: "Sistematik bir yerel optimum; η ile ilgili değil."}
+    hints:
+      - "KL = 0 ⇔ $q(z|x)=p(z)$ her x için."
+    solution: |-
+      ELBO'nun iki terimi çatışır: KL bedeli z'yi kullanmamayı ödüllendirir; kod çözücü tek başına yeterliyse optimum z'yi atmaktır. Çareler: KL ağırlığını 0'dan 1'e ısıtmak, boyut başına KL alt sınırı (free bits), kod çözücünün bağlamını kısıtlamak. β-VAE'de β > 1 bunu kötüleştirir (M5.1 ek alıştırması).
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Ortalama kod iyi örnek değildir
+    goal: Önselden örnekleme ile gizli uzay deliklerini ilişkilendirmek
+    needs: Toplam posterior (aggregate posterior)
+    q: |-
+      Yeniden yapılandırması iyi bir VAE'de $p(z)=\mathcal N(0,I)$'dan örneklenen kodlar neden bazen bulanık/anlamsız görüntü verir? $q(z)=\frac1N\sum_iq(z|x_i)$ ile $p(z)$'yi karşılaştırarak açıkla, bir örnek dağılım çiz/tarif et.
+    rubric:
+      - "Toplam posteriorun $p(z)$'ye eşit olmak zorunda olmadığını söyledim (KL her örnek için ayrı cezalandırır)"
+      - "Örnek: iki küme hâlinde kodlar, aradaki bölge p(z)'de yüksek yoğunluklu ama q(z)'de boş"
+      - "Kod çözücünün hiç görmediği bölgede ne üreteceğinin belirsiz olduğunu açıkladım"
+      - "Çözüm olarak daha esnek önsel (VampPrior, karışım), ikinci aşama önsel modeli ya da latent diffusion önerdim"
+    hints:
+      - "Önselin yoğun olduğu ama hiçbir eğitim örneğinin kodlanmadığı bir bölge var mı?"
+    solution: |-
+      KL terimi her $q(z|x_i)$'yi $p(z)$'ye çeker ama toplamları $p(z)$'yi tam doldurmayabilir: ör. sınıflar iki ayrı kümeye kodlanırsa aradaki "delik" p(z)'de olası, kod çözücü için yabancıdır → bulanık ortalama görüntüler. Çözümler: öğrenilmiş önsel, iki aşamalı VAE ya da gizli uzayda ikinci bir üretken model (latent diffusion, M5.8).
+pitfalls:
+  - wrong: "VAE'nin kod çözücüsü doğrudan p(x|z)'den örnek üretir, bulanıklık kaçınılmazdır."
+    right: "Bulanıklık çoğunlukla Gauss olabilirlik + ortalamayı çizmekten gelir; ayrık/otoregresif ya da algısal kayıplı kod çözücüler keskin örnek verir."
+  - wrong: "KL terimini kaldırırsam daha iyi bir model olur."
+    right: "Yeniden yapılandırma iyileşir ama önselden örnekleme anlamsızlaşır: kodlar önselle uyumsuz yerlere dağılır (sıradan AE)."
+  - wrong: "log σ yerine σ'yı doğrudan çıkarmak sorun değil."
+    right: "σ > 0 kısıtı ve sayısal kararlılık için log σ² (ya da softplus) çıkarılır."
+whatif:
+  - q: "Kodlayıcı varyansı her zaman çok küçük olsaydı?"
+    a: "KL'nin −ln σ² terimi büyür; yeniden yapılandırma deterministik AE'ye yaklaşır ama ceza çok artar. Denge, bilgi miktarını (bit) belirler."
+  - q: "Gizli boyut 2'den 200'e çıkarsa?"
+    a: "Kullanılmayan boyutlar önsele çöker (KL ≈ 0, 'etkin olmayan birimler'); etkin boyut sayısı verinin karmaşıklığı ve β tarafından belirlenir."

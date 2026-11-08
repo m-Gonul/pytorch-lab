@@ -116,3 +116,103 @@ labs:
       - q: "N(0, 0.01²) neden 'küçük ve güvenli' değil?"
         a: "Her katman varyansı n·10⁻⁴ ≈ 0.006 ile çarpar: sinyal birkaç katmanda sayısal sıfıra iner, tüm nöronlar aynı davranır."
     limits: "Rastgele Gauss girdi, eğitim yok (yalnız başlangıç anı); BN/artık bağlantı yok. Bunlar korunum koşulunu kendiliğinden sağlar (M3.6, M4.8)."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Varyans korunumu koşulunu türet
+    goal: He/Xavier formüllerinin kaynağını görmek
+    needs: Bağımsız rastgele değişkenlerin çarpım/toplam varyansı
+    q: |-
+      $z_j=\sum_{i=1}^{n}w_{ji}x_i$; $w$ ve $x$ bağımsız, $\mathbb E[w]=0$. $\mathrm{Var}(z)$'yi yaz ve ReLU ağında katmandan katmana korunması için $\mathrm{Var}(w)$'yi bul.
+    solution: |-
+      **1.** $\mathbb E[w]=0$ ve bağımsızlıkla $\mathrm{Var}(w_{ji}x_i)=\mathbb E[w^2]\mathbb E[x^2]=\mathrm{Var}(w)\,\mathbb E[x^2]$ (dikkat: $x$'in ortalaması sıfır olmak zorunda değil; **ikinci moment** girer).
+
+      **2.** Terimler bağımsız: $\mathrm{Var}(z)=n\,\mathrm{Var}(w)\,\mathbb E[x^2]$.
+
+      **3.** $x=\mathrm{ReLU}(z')$, $z'$ sıfır ortalamalı simetrik ise $\mathbb E[x^2]=\frac12\mathrm{Var}(z')$ (pozitif yarı aynen kalır, negatif yarı sıfırlanır).
+
+      **4.** Birleştir: $\mathrm{Var}(z)=\frac n2\mathrm{Var}(w)\mathrm{Var}(z')$. Korunum ($\mathrm{Var}(z)=\mathrm{Var}(z')$) için $\mathrm{Var}(w)=2/n$ — **He/Kaiming**.
+
+      Geri geçişte aynı akıl yürütme $n_{out}$ ile çıkar; Glorot ileri ve geri koşulun uzlaşması olarak $\mathrm{Var}(w)=2/(n_{in}+n_{out})$ seçer (tanh/doğrusal için, çarpan 1). **Ne söylemez:** yalnız başlangıç anı ve sonsuz genişlik ortalaması; sonlu genişlikte katman çarpanları rastgeledir (deney alanındaki "Sonlu genişlik").
+  - id: p2
+    type: hesap
+    level: 1
+    title: He başlatmasının std'si
+    goal: Formülü uygulamak
+    needs: P1
+    q: |-
+      ReLU katmanı, $n_{in}=512$. He normal başlatmanın standart sapması?
+    answer: 0.0625
+    calc: "math.sqrt(2/512)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.00390625, msg: "Bu varyans; std onun karekökü."}
+      - {answer: 0.04419417382415922, msg: "Bu LeCun (tanh/SELU için); ReLU yarısını sıfırladığı için çarpan 2."}
+    hints:
+      - "$\\mathrm{Var}=2/n_{in}$."
+    solution: |-
+      $\sqrt{2/512}=\sqrt{1/256}=0.0625$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Glorot düzgün sınırı
+    goal: Düzgün dağılımda varyans eşlemesi
+    needs: $U(-r,r)$'nin varyansı $r^2/3$
+    q: |-
+      Glorot düzgün: $w\sim U(-r,r)$ ve $\mathrm{Var}(w)=\frac2{n_{in}+n_{out}}$. $n_{in}=300$, $n_{out}=100$ için $r$?
+    answer: 0.1224744871391589
+    calc: "math.sqrt(6/400)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.07071067811865475, msg: "Bu std; düzgün dağılımda sınır r = √3 · std (Var = r²/3)."}
+    hints:
+      - "$r^2/3=2/400$."
+    solution: |-
+      $r=\sqrt{6/(n_{in}+n_{out})}=\sqrt{0.015}=0.1225$.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Aktivasyon histogramları
+    goal: Başlatma sorununu histogramdan teşhis etmek
+    needs: Doyma, tanh
+    q: |-
+      tanh'lı 10 katmanlı ağda katman katman aktivasyon histogramı: ilk katmanlar ±1'de iki tepe (U biçimi), son katmanlar da öyle. Teşhis?
+    choices:
+      - {t: "Ağırlıklar çok küçük: sinyal sönüyor", why: "Sönme, histogramların 0'da sivri bir tepeye çökmesi olarak görünürdü."}
+      - {t: "Ağırlıklar çok büyük: tanh doyuyor, türev ≈ 0 olduğu için gradyan akmıyor", ok: true, why: "±1'deki yığılma doyma işaretidir."}
+      - {t: "Öğrenme oranı büyük", why: "Başlangıçta (eğitim öncesi) histogram öğrenme oranından bağımsız."}
+    hints:
+      - "tanh'ın türevi ±1 civarında ne?"
+    solution: |-
+      U biçimi, ön-aktivasyonların |z| ≫ 1 olduğunu gösterir: $\tanh'(z)=1-\tanh^2z\approx0$. Geri yayılımda her katman gradyanı bu küçük çarpanla çarpar → kaybolan gradyan. Çare: Xavier ölçeği (deney alanında "tanh + N(0,1)" senaryosu).
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Sıfır başlatma ne zaman sorun değildir?
+    goal: Simetri bozma ilkesinin sınırlarını bulmak
+    needs: Geri yayılım
+    q: |-
+      "Ağırlıkları sıfırla başlatmak her zaman öğrenmeyi bozar" iddiası doğru mu? Hangi parametrelerin ya da modellerin sıfırla başlatılabileceğine en az iki örnek ver, gerekçelendir.
+    rubric:
+      - "Gizli katmanlarda simetrinin bozulmadığını (tüm birimler aynı gradyan) açıkladım"
+      - "Doğrusal/lojistik regresyonun (gizli katman yok) sıfırla başlatılabildiğini söyledim"
+      - "Bias'ların genelde sıfırla başlatıldığını söyledim"
+      - "Artık bloğun son katmanının bilerek sıfırla başlatıldığını (M8.2) ve bunun diğer katmanlar rastgele olduğu için işe yaradığını açıkladım"
+    hints:
+      - "Simetri sorunu birbirinin yerine geçebilen birimler olduğunda doğar."
+    solution: |-
+      Sorun simetridir: aynı girdiyi gören, aynı başlatılmış iki gizli birim her adımda aynı gradyanı alır. Gizli katman yoksa (doğrusal/lojistik regresyon, dışbükey) sıfır başlatma güvenlidir. Bias'lar: simetriyi ağırlıklar zaten bozar. Artık bloğun son konvolüsyonu ya da attention çıkış izdüşümü sıfırla başlatılır (blok özdeşlik olur); bloğun ilk katmanı rastgele olduğu için ilk adımda gradyan sıfırdan farklıdır ve simetri bozulur. Son katmanı sıfır olan bir MLP'de bile ilk adımda yalnız son katman öğrenir, sonra gradyan geriye akar.
+pitfalls:
+  - wrong: "Ne kadar küçük başlatma, o kadar güvenli."
+    right: "Çok küçük ağırlıklar sinyali katman katman söndürür ve simetriye yaklaşır; ölçek katman genişliğine göre seçilmeli."
+  - wrong: "BatchNorm kullanınca başlatma önemsizdir."
+    right: "BN ileri sinyali normalize eder ve duyarlılığı çok azaltır; ama artık bağlantılı derin ağlarda bloğun çıkış ölçeği (ör. sıfır-γ) yine önemlidir."
+  - wrong: "He başlatması çıkış katmanı için de doğrudur."
+    right: "Son katmanda ReLU yoksa ya da logit ölçeği önemliyse (softmax doyumu), daha küçük ölçek ya da sıfır başlatma tercih edilir."
+whatif:
+  - q: "Girdiler sıfır ortalamalı değil (ör. tüm pikseller 0–255) olsaydı?"
+    a: "İlk katmanın varyansı $n\\mathrm{Var}(w)\\mathbb E[x^2]$; büyük ikinci moment ilk katmanı doyurur. Girdiyi standartlaştır."
+  - q: "Ağ 1000 katmanlı olsaydı?"
+    a: "Küçük sapmalar üstel birikir; artık bağlantılar (çarpan 1 + küçük), normalizasyon ya da Fixup/T-Fixup gibi derinliğe göre ölçeklenmiş başlatmalar gerekir."

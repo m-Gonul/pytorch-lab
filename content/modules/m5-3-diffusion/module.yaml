@@ -120,3 +120,100 @@ labs:
       - q: "T'yi 1000'den 200'e indirip β aralığını değiştirmezsen ne bozulur?"
         a: "ᾱ_T büyür (≈ 0.13): son x_T hâlâ sinyal içerir ama örnekleme saf gürültüden başlar. DDPM'de T küçültülünce β_T büyütülür (M8.2'de 0.05)."
     limits: "Tek bir 1B sinyal; ε her ayar değişiminde aynı tohumla yeniden çekilir."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: "q(x_t | x_0) kapalı formu"
+    goal: Adım adım gürültülemenin tek adımda yazılabildiğini türetmek
+    needs: Bağımsız Gauss'ların toplamı
+    q: |-
+      $x_t=\sqrt{\alpha_t}x_{t-1}+\sqrt{1-\alpha_t}\varepsilon_t$, $\alpha_t=1-\beta_t$, $\varepsilon_t\sim\mathcal N(0,I)$ bağımsız. $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\varepsilon$ olduğunu tümevarımla göster.
+    solution: |-
+      **Taban:** $t=1$: $\bar\alpha_1=\alpha_1$ ✓.
+
+      **Adım:** $x_{t-1}=\sqrt{\bar\alpha_{t-1}}x_0+\sqrt{1-\bar\alpha_{t-1}}\varepsilon'$ varsay. Yerine koy:
+      $x_t=\sqrt{\alpha_t\bar\alpha_{t-1}}x_0+\underbrace{\sqrt{\alpha_t(1-\bar\alpha_{t-1})}\varepsilon'+\sqrt{1-\alpha_t}\varepsilon_t}_{\text{iki bağımsız sıfır ortalamalı Gauss}}$.
+
+      Bağımsız Gauss'ların toplamı Gauss'tur, varyanslar toplanır: $\alpha_t-\alpha_t\bar\alpha_{t-1}+1-\alpha_t=1-\bar\alpha_t$. Dolayısıyla gürültü terimi $\sqrt{1-\bar\alpha_t}\varepsilon$ ✓.
+
+      **Neden önemli:** eğitimde her örnek için rastgele bir $t$ seçip $x_t$'yi tek adımda üretebiliriz — $t$ adım simüle etmeye gerek yok. **Varsayım:** gürültüler bağımsız ve Gauss; bu bozulursa (ör. ilişkili gürültü) kapalı form değişir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Gürültülü örnek
+    goal: Kapalı formu uygulamak
+    needs: P1
+    q: |-
+      $\bar\alpha_t=0.36$, $x_0=2$, $\varepsilon=0.5$. $x_t$?
+    answer: 1.6
+    calc: "0.6*2+0.8*0.5"
+    mistakes:
+      - {answer: 1.04, msg: "Katsayılar karekök: √ᾱ = 0.6, √(1 − ᾱ) = 0.8."}
+    hints:
+      - "$\\sqrt{0.36}=0.6$, $\\sqrt{0.64}=0.8$."
+    solution: |-
+      $0.6\cdot2+0.8\cdot0.5=1.6$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: ε tahmininden x₀ tahmini
+    goal: Ağın ε çıktısını veri tahminine çevirmek
+    needs: P1
+    q: |-
+      $x_t=1.6$, $\bar\alpha_t=0.36$, ağın tahmini $\hat\varepsilon=0.5$. $\hat x_0$?
+    answer: 2.0000000000000004
+    calc: "(1.6-0.8*0.5)/0.6"
+    mistakes:
+      - {answer: 1.8333333333333335, msg: "ε̂'yı √(1 − ᾱ) = 0.8 ile çarpmayı unuttun."}
+      - {answer: 1.2000000000000002, msg: "√ᾱ = 0.6'ya bölmeyi unuttun."}
+    hints:
+      - "Kapalı formu $x_0$ için çöz."
+    solution: |-
+      $\hat x_0=(x_t-\sqrt{1-\bar\alpha}\hat\varepsilon)/\sqrt{\bar\alpha}=(1.6-0.4)/0.6=2$ (ε̂ doğru olduğu için tam $x_0$). DDIM bu $\hat x_0$'ı kullanır ve kırpar (M8.2).
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: ε mi, x₀ mı, v mi tahmin etmeli?
+    goal: Tahmin hedefinin farklı SNR'lerdeki davranışını değerlendirmek
+    needs: P3
+    q: |-
+      Çok yüksek gürültüde ($\bar\alpha\approx0$) ε tahmininden $\hat x_0=(x_t-\sqrt{1-\bar\alpha}\hat\varepsilon)/\sqrt{\bar\alpha}$ hesaplamak neden sorunludur ve hangi hedef bu bölgede daha kararlıdır?
+    choices:
+      - {t: "Sorun yok; ε her yerde en iyisi", why: "√ᾱ → 0'a bölmek ε̂'deki küçük hatayı dev x̂₀ hatasına çevirir."}
+      - {t: "v-tahmini (v = √ᾱ ε − √(1−ᾱ) x₀): iki ucun ortasında ölçekli, x̂₀ ve ε̂'ya kararlı biçimde çevrilir", ok: true, why: "Salimans & Ho 2022; damıtma ve sıfır son-SNR takvimlerinde standart."}
+      - {t: "Hiçbir hedef çalışmaz; T'yi azalt", why: "Hedef seçimi bu sorunu doğrudan çözer."}
+    hints:
+      - "$\\bar\\alpha\\to0$ iken P3'teki bölme ne olur?"
+    solution: |-
+      ε-tahmininde düşük SNR'de $\hat x_0$'ın hatası $\sqrt{(1-\bar\alpha)/\bar\alpha}$ ile büyür (sonsuza gider). x₀-tahmini yüksek SNR'de kötüdür (küçük farkları öğrenmek zor). v-tahmini iki ucu dengeler. Hepsi aynı bilgiyi taşır; fark, kaybın SNR'lere nasıl ağırlık verdiği ve sayısal kararlılıktır.
+  - id: p5
+    type: birleştir
+    level: 3
+    title: Denoising ↔ skor eşlemesi
+    goal: ε-tahmininin skor fonksiyonunu kestirdiğini göstermek
+    needs: Gauss yoğunluğunun log-gradyanı, M5.6 (gürültü giderici AE)
+    q: |-
+      $q(x_t|x_0)=\mathcal N(\sqrt{\bar\alpha}x_0,(1-\bar\alpha)I)$ için $\nabla_{x_t}\log q(x_t|x_0)=-\varepsilon/\sqrt{1-\bar\alpha}$ olduğunu göster. Bu, ε-tahmin eden ağın neyi öğrendiği hakkında ne söyler?
+    rubric:
+      - "Gauss log-yoğunluğunun gradyanını $-(x_t-\\sqrt{\\bar\\alpha}x_0)/(1-\\bar\\alpha)$ olarak yazdım"
+      - "Kapalı formla payın $\\sqrt{1-\\bar\\alpha}\\,\\varepsilon$ olduğunu yerine koydum"
+      - "MSE ile eğitilmiş ağın koşullu beklenen değeri, dolayısıyla marjinal skoru $\\nabla\\log q(x_t)$ kestirdiğini (Vincent 2011) söyledim"
+      - "Bunun örneklemenin skor tabanlı/SDE yorumuna bağlandığını ekledim"
+    hints:
+      - "$\\nabla_x\\log\\mathcal N(x;m,s^2I)=-(x-m)/s^2$."
+    solution: |-
+      $\nabla_{x_t}\log q=-\frac{x_t-\sqrt{\bar\alpha}x_0}{1-\bar\alpha}=-\frac{\sqrt{1-\bar\alpha}\varepsilon}{1-\bar\alpha}=-\frac{\varepsilon}{\sqrt{1-\bar\alpha}}$. MSE ile eğitilen $\hat\varepsilon(x_t,t)$, $\mathbb E[\varepsilon|x_t]$'ye yakınsar; beklenen değerin doğrusallığıyla bu, $-\sqrt{1-\bar\alpha}\,\nabla\log q(x_t)$ — marjinal **skor**. Dolayısıyla difüzyon modeli bir gürültü giderici otomatik kodlayıcıdır (M5.6) ve aynı zamanda veri dağılımının gürültülenmiş sürümlerinin skorlarını öğrenir; DDPM/DDIM bu skorla ters SDE/ODE'yi çözer.
+pitfalls:
+  - wrong: "Difüzyon modeli her adımda görüntünün tamamını yeniden üretir."
+    right: "Ağ gürültüyü (ya da x̂₀'ı) tahmin eder; örnekleme bu tahminle küçük bir adım atar."
+  - wrong: "T büyüdükçe örnekleme kalitesi otomatik artar."
+    right: "Eğitimde T ince taneli bir zaman ayrıklaştırmasıdır; örneklemede DDIM ile çok daha az adım yeterli olabilir (M8.2: 10 adım ≈ 25 adım)."
+  - wrong: "Son adımda x_T tamamen gürültüdür."
+    right: "Takvime bağlıdır: ᾱ_T > 0 kalırsa sinyal sızar ve eğitim–örnekleme uyuşmazlığı doğar (deney: 'Kısa T')."
+whatif:
+  - q: "Gürültü Gauss değil de maskeleme (token silme) olsaydı?"
+    a: "Kesikli difüzyon (D3PM, maskeli difüzyon dil modelleri) elde edilir; kapalı form geçiş matrislerinin çarpımıyla yazılır."
+  - q: "Ağ t'yi girdi olarak almasaydı?"
+    a: "Gürültü düzeyini girdiden kestirmek zorunda kalır; mümkün ama zor ve düşük SNR'de belirsiz. Zaman embedding'i bu yüzden standart (M8.2)."

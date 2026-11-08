@@ -2,7 +2,7 @@
 import { progress, kv } from "./store.js";
 
 const DAY = 864e5;
-const GAP = [0, 0, 1, 3, 7, 16]; // kutu → gün (kutu 1: aynı oturumda tekrar)
+const GAP = [0, 1, 3, 7, 16, 30]; // kutu → doğru cevaptan sonraki bekleme (gün); yanlışta kutu 1, hemen
 
 export async function initReview() {
   const card = document.getElementById("rv-card"), stat = document.getElementById("rv-stat"), scopeSel = document.getElementById("rv-scope");
@@ -41,7 +41,7 @@ export async function initReview() {
       const good = card.querySelector('.q-opt[data-ok="1"]'); good.classList.add("ok"); good.nextElementSibling.hidden = false;
       const st = kv.get("rv", {}), s = st[cur.id] || { b: 0 };
       s.b = ok ? Math.min(5, s.b + 1) : 1;
-      s.due = Date.now() + GAP[s.b] * DAY;
+      s.due = ok ? Date.now() + GAP[s.b] * DAY : Date.now();
       st[cur.id] = s; kv.set("rv", st);
       seen++; if (ok) right++;
       if (!ok) queue.splice(Math.min(3, queue.length), 0, cur); // yanlışı birkaç soru sonra yeniden sor

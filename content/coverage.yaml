@@ -18,7 +18,7 @@ groups:
         pages: [m1-2-gd-variants, m0-3-chain-rule, m3-2-mlp-backprop, m3-4-optimizers, m3-5-init, m3-6-norm, m3-7-regularization-nn, m3-9-training-practice]
         status: genis
         gap: "—"
-        done: "BP1–BP4 türetimi ek alıştırma olarak (M3.2); optimizasyon ve başlatma için etkileşimli deneyler (2B kuadratikte yöntem karşılaştırma, katman katman varyans); EMA deneyi; BN batch gürültüsü deneyi."
+        done: "BP1–BP4 türetimi ek alıştırma olarak ve sayısal çözülmüş örnek (M3.2 pratik); başlatma varyans koşulu, BN eğitim/çıkarım farkı, ters dropout ve momentum kararlılık sınırı türetimleri pratik kartlarında; optimizasyon ve başlatma için etkileşimli deneyler (2B kuadratikte yöntem karşılaştırma, katman katman varyans); EMA deneyi; BN batch gürültüsü deneyi."
       - src: "ch_14 — Evrişimli ağlar"
         topics: "görsel korteks esini, konvolüsyon/korelasyon, dolgu, adım, havuzlama, bellek gereksinimi, LeNet/AlexNet/VGG/GoogLeNet/ResNet/Xception/SENet, nesne tespiti (IoU, NMS, YOLO, mAP), FCN, transposed conv, U-Net"
         pages: [m4-1-conv, m4-2-cnn, m4-8-cnn-blocks, m4-9-detection, m4-10-segmentation]
@@ -42,7 +42,7 @@ groups:
         pages: [m5-6-autoencoders, m5-1-vae, m5-2-gan, m5-7-gan-advanced, m5-3-diffusion, m5-8-diffusion-guidance]
         status: genis
         gap: "—"
-        done: "Gürültü takvimi deneyi (ᾱ, SNR, doğrusal vs kosinüs); CFG ölçeği deneyi (kâhin skorlu 2B karışım)."
+        done: "Gürültü takvimi deneyi (ᾱ, SNR, doğrusal vs kosinüs); CFG ölçeği deneyi (kâhin skorlu 2B karışım); GAN maliyetinin (en iyi ayırıcı → JS) adım adım türetimi (M5.2); ELBO'nun iki yoldan türetimi ve q(x_t|x_0) kapalı formu çözülmüş örnek olarak (M5.1, M5.3)."
       - src: "embeddings_updated — Kelime gömmeleri"
         topics: "one-hot, OOV kovaları, gömme katmanı, word2vec (skip-gram, CBOW, negatif örnekleme), alt-kelime gömmeleri"
         pages: [m4-12-word2vec, m4-5-embed-bpe]

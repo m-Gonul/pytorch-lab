@@ -86,3 +86,124 @@ homework:
     accept:
       - "TRON, yüksek boyutta GD ve tam Newton'dan hızlı yakınsar."
       - "Hessian'sız Hv doğruluğu sonlu farkla doğrulanmış."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: "∂L/∂z = p − y: neden bu kadar sade?"
+    goal: İkili çapraz entropinin logit'e göre türevini türetmek
+    needs: Zincir kuralı, $\sigma'(z)=\sigma(z)(1-\sigma(z))$
+    q: |-
+      $p=\sigma(z)$, $L=-[y\ln p+(1-y)\ln(1-p)]$. $\partial L/\partial z$'yi bul.
+    solution: |-
+      **1.** $\sigma'(z)=\frac{e^{-z}}{(1+e^{-z})^2}=\sigma(z)\,(1-\sigma(z))$ (paydayı iki çarpana böl: $\frac1{1+e^{-z}}\cdot\frac{e^{-z}}{1+e^{-z}}$).
+
+      **2.** $\frac{\partial L}{\partial p}=-\frac yp+\frac{1-y}{1-p}$.
+
+      **3.** Zincir: $\frac{\partial L}{\partial z}=\Big(-\frac yp+\frac{1-y}{1-p}\Big)p(1-p)=-y(1-p)+(1-y)p=p-y$.
+
+      **Yorum:** hata sinyali tahmin ile hedef farkı; doğrusal regresyondaki $\hat y-y$ ile aynı biçim (ikisi de genelleştirilmiş doğrusal modellerin kanonik bağlantısı). $\partial L/\partial w=(p-y)x$. Kayıp $z$'de dışbükeydir: $\partial^2L/\partial z^2=p(1-p)\ge0$.
+
+      **MSE ile karşılaştır:** $L=(p-y)^2$ olsaydı $\partial L/\partial z=2(p-y)p(1-p)$; model eminken ve yanılırken ($p\approx0$, $y=1$) $p(1-p)\approx0$ → gradyan kaybolur. Çapraz entropi bu çarpanı sadeleştirerek tam en çok öğrenilmesi gereken yerde güçlü sinyal verir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Tek örneğin kaybı
+    goal: Kaybı logit'ten hesaplamak
+    needs: P1
+    q: |-
+      $z=2$, $y=1$. $L=-\ln\sigma(z)$ kaç?
+    answer: 0.1269280110429726
+    calc: "math.log(1+math.exp(-2))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 2.1269280110429727, msg: "Bu y = 0'ın kaybı: −ln(1 − σ(2))."}
+      - {answer: 0.8807970779778823, msg: "Bu σ(2), yani olasılık; kayıp onun negatif logaritması."}
+    hints:
+      - "$-\\ln\\sigma(z)=\\ln(1+e^{-z})$."
+    solution: |-
+      $\ln(1+e^{-2})=\ln1.1353=0.1269$. Model doğru sınıfa $p=0.881$ veriyor, kayıp küçük.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Logit gradyanı
+    goal: $p-y$ kuralını uygulamak
+    needs: P1
+    q: |-
+      Aynı örnek ($z=2$, $y=1$): $\partial L/\partial z$ kaç?
+    answer: -0.11920292202211769
+    calc: "1/(1+math.exp(-2))-1"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.11920292202211769, msg: "İşaret ters: p − y, y − p değil. Negatif gradyan z'yi artırmamız gerektiğini söyler."}
+    hints:
+      - "$p=\\sigma(2)\\approx0.8808$."
+    solution: |-
+      $p-y=0.8808-1=-0.1192$. Negatif: GD $z$'yi büyütür, yani modeli doğru sınıfa daha da emin yapar.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: "Kayıp nan oldu"
+    goal: Sayısal kararlılığı tanımak
+    needs: Kayan nokta taşması
+    q: |-
+      ```python
+      p = 1 / (1 + np.exp(-z))
+      loss = -(y * np.log(p) + (1 - y) * np.log(1 - p)).mean()
+      ```
+      Eğitimin ortasında `loss` = nan. En olası neden ve düzeltme?
+    choices:
+      - {t: "Öğrenme oranı çok küçük", why: "Küçük η nan üretmez."}
+      - {t: "Büyük |z|'de p tam 0 ya da 1'e yuvarlanır; log(0) = −∞ ve 0·(−∞) = nan. Logit'ten doğrudan hesapla: softplus/log-sum-exp (BCEWithLogitsLoss)", ok: true, why: "float64'te z ≈ 37'de 1 − p = 0 olur."}
+      - {t: "y değerleri 0/1 değil", why: "Olabilir ama tipik nan kaynağı log(0)."}
+    hints:
+      - "z = 40 iken `1 - p` kaç olur?"
+    solution: |-
+      $z=40$: $p=1/(1+e^{-40})$ float64'te tam 1 → $\ln(1-p)=-\infty$; $y=1$ ise $(1-y)\ln(1-p)=0\cdot(-\infty)=$ nan. Kararlı biçim: $L=\max(z,0)-zy+\ln(1+e^{-|z|})$ — PyTorch'ta `F.binary_cross_entropy_with_logits`. Kural: olasılığı değil logit'i kayba ver.
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: En çok olabilirlik ne zaman yoktur?
+    goal: Ayrılabilir veride MLE'nin davranışını görmek
+    needs: P1, düzenlileştirme (M1.3)
+    q: |-
+      Doğrusal olarak tam ayrılabilen bir veri kümesinde cezasız lojistik regresyonun en çok olabilirlik çözümü sonlu mudur? Bir örnekle göster, GD ne yapar, nasıl düzeltilir?
+    rubric:
+      - "1B örnek verdim (ör. x < 0 → 0, x > 0 → 1)"
+      - "$w\\to\\infty$ iken kaybın 0'a yaklaştığını ama hiçbir sonlu w'de 0 olmadığını gösterdim"
+      - "GD'nin ‖w‖'yi sınırsız (logaritmik hızda) büyüttüğünü söyledim"
+      - "L2 cezasının sonlu bir çözüm yarattığını söyledim; erken durdurmanın da örtük düzenlileştirme olduğunu ekledim"
+    hints:
+      - "$x=\\pm1$, $y=[0,1]$, $b=0$ için $L(w)$'yi yaz."
+    solution: |-
+      $x=[-1,1]$, $y=[0,1]$, $b=0$: $L(w)=2\ln(1+e^{-w})$ $w$ ile tekdüze azalır, $\inf=0$ ama ulaşılmaz — sonlu MLE yok. GD $\|w\|$'yi durmadan (yaklaşık $\ln t$ hızında) büyütür; yön en büyük marjinli ayırıcıya yakınsar (Soudry ve ark. 2018 — SVM bağlantısı, M2.3), olasılıklar 0/1'e doyar (aşırı güven). Çare: $\lambda\|w\|^2$ (sonlu ve tek çözüm) ya da erken durdurma.
+  - id: p6
+    type: uyarla
+    level: 3
+    title: Dolandırıcılık tespiti (%0.5 pozitif)
+    goal: Eşiği ve ölçütü maliyete göre seçmek
+    needs: Karar eşiği, kesinlik/duyarlılık
+    q: |-
+      İşlemlerin %0.5'i dolandırıcılık. Lojistik regresyonun doğruluğu %99.5 çıktı. Bu iyi mi? Modeli ve kararı nasıl kurarsın?
+    rubric:
+      - "Her şeye 'normal' diyen modelin de %99.5 doğruluk aldığını, doğruluğun anlamsız olduğunu söyledim"
+      - "Kesinlik–duyarlılık eğrisi / PR-AUC ya da maliyet ağırlıklı ölçüt önerdim"
+      - "Eşiği 0.5 değil, yanlış alarm ve kaçırma maliyetlerine göre seçmeyi önerdim ($p>c_{FP}/(c_{FP}+c_{FN})$)"
+      - "Sınıf ağırlığı/yeniden örneklemenin olasılık kalibrasyonunu bozduğunu not ettim"
+    hints:
+      - "Kaçırılan bir dolandırıcılık ile gereksiz bir alarmın maliyetleri eşit mi?"
+    solution: |-
+      Doğruluk taban oranı kadar: işe yaramaz. Kalibre olasılık $p$ ile beklenen maliyeti en küçükleyen karar: $p\cdot c_{FN}>(1-p)c_{FP}\iff p>\frac{c_{FP}}{c_{FP}+c_{FN}}$. Kaçırmak 100 kat pahalıysa eşik ≈ 0.01. Değerlendirme: PR eğrisi, belirli duyarlılıkta kesinlik. Sınıf ağırlığı (`pos_weight`) duyarlılığı artırır ama olasılıkları kaydırır; olasılık lazımsa sonra yeniden kalibre et (M8.2 x1'deki ödünleşimin aynısı).
+pitfalls:
+  - wrong: "Lojistik regresyon bir regresyon yöntemidir."
+    right: "Sınıflandırıcıdır; 'regresyon' log-odds'un girdiye doğrusal regresyonundan gelir: $\\ln\\frac p{1-p}=w^\\top x+b$."
+  - wrong: "MSE ile eğitmek aynı sonucu verir."
+    right: "Sigmoid + MSE dışbükey değildir ve emin-ama-yanlış örneklerde gradyan kaybolur (P1'in son paragrafı)."
+  - wrong: "Modelin verdiği olasılık her zaman güvenilirdir."
+    right: "Düzenlileştirme, sınıf ağırlıkları ve ayrılabilir veri olasılıkları bozabilir; kalibrasyonu güvenilirlik diyagramıyla kontrol et."
+whatif:
+  - q: "Sınıf sayısı 2'den fazla olsaydı?"
+    a: "Sigmoid'in genellemesi softmax'tır (M1.5); iki sınıfta softmax, logit farkının sigmoid'ine indirgenir."
+  - q: "Öznitelikler doğrusal olarak ayrılamaz (XOR) olsaydı?"
+    a: "Doğrusal karar sınırı yetmez; ya öznitelik eklenir ($x_1x_2$) ya da gizli katman (M3.8). Kayıp yine dışbükeydir ama erişilebilen en iyi doğruluk düşüktür."

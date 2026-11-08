@@ -89,3 +89,149 @@ homework:
     accept:
       - "Hata–κ grafiği: normal denklemler κ², QR/SVD κ."
       - "Kesilmiş SVD'nin gürültülü veride daha iyi genelleme örneği."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Kapalı formu sıfırdan türet
+    goal: En küçük kareler çözümünün nereden geldiğini görmek
+    needs: Kısmi türev, toplam sembolü
+    q: |-
+      $L(w,b)=\frac1n\sum_i(wx_i+b-y_i)^2$'yi en küçükleyen $w^*,b^*$'yi türet.
+    solution: |-
+      **1. Durağan nokta koşulu.** $L$, $(w,b)$'nin karesel ve dışbükey bir fonksiyonu (Hessian'ı $\frac2n\begin{bmatrix}\sum x_i^2&\sum x_i\\\sum x_i&n\end{bmatrix}$, en az iki farklı $x_i$ varsa pozitif tanımlı). Dışbükey bir fonksiyonda gradyanın sıfır olduğu nokta küresel minimumdur.
+
+      **2. $b$'ye göre türev:** $\frac{\partial L}{\partial b}=\frac2n\sum_i(wx_i+b-y_i)=0\Rightarrow b=\bar y-w\bar x$. Yorum: en iyi doğru, verinin ağırlık merkezi $(\bar x,\bar y)$'den geçer.
+
+      **3. $w$'ye göre türev:** $\frac{\partial L}{\partial w}=\frac2n\sum_i(wx_i+b-y_i)x_i=0$. Buraya $b=\bar y-w\bar x$ koy: $\sum_i\big(w(x_i-\bar x)-(y_i-\bar y)\big)x_i=0$.
+
+      **4. Merkezleme hilesi:** $\sum_i(x_i-\bar x)=0$ olduğundan $x_i$ yerine $x_i-\bar x$ yazılabilir (eklenen terim $\bar x\sum(\dots)=0$). Böylece $w\sum(x_i-\bar x)^2=\sum(x_i-\bar x)(y_i-\bar y)$, yani
+      $$w^*=\frac{\sum_i(x_i-\bar x)(y_i-\bar y)}{\sum_i(x_i-\bar x)^2}=\frac{\mathrm{Cov}(x,y)}{\mathrm{Var}(x)}.$$
+
+      **Ne söylemez:** $w^*$ nedensellik değildir; yalnız doğrusal ilişkinin en iyi kareler özetidir. Payda 0 ise (bütün $x_i$ aynı) türetim 3. adımda tıkanır: tek çözüm yoktur (P6).
+    alt: |-
+      Matris biçimi: $X=[\mathbf x\ \mathbf 1]$, $\theta=[w,b]^\top$. $L=\frac1n\|X\theta-y\|^2$, $\nabla_\theta L=\frac2nX^\top(X\theta-y)=0\Rightarrow X^\top X\theta=X^\top y$ (normal denklemler). Geometrik okuma: artık $X\theta-y$, $X$'in sütun uzayına diktir — $X\theta^*$, $y$'nin bu uzaya dik izdüşümüdür.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Üç noktada eğim
+    goal: Kapalı form eğimini hesaplamak
+    needs: P1'deki formül
+    q: |-
+      $x=[0,1,2]$, $y=[1,3,2]$. En küçük kareler eğimi $w^*$ kaç?
+    answer: 0.5
+    calc: "1/2"
+    mistakes:
+      - {answer: 1.4, msg: "Ortalamaları çıkarmadan Σxy/Σx² kullandın: bu, b = 0'a zorlanmış (orijinden geçen) doğrunun eğimi."}
+      - {answer: 0.3333333333333333, msg: "Paydada n·Var yerine Σ(x−x̄)²'yi n ile bölmüşsün ama payı bölmemişsin; ikisi aynı ölçekte olmalı."}
+    hints:
+      - "$\\bar x=1$, $\\bar y=2$."
+      - "Merkezlenmiş değerler: $x-\\bar x=[-1,0,1]$, $y-\\bar y=[-1,1,0]$."
+    solution: |-
+      $\sum(x_i-\bar x)(y_i-\bar y)=(-1)(-1)+0\cdot1+1\cdot0=1$, $\sum(x_i-\bar x)^2=2$ → $w^*=1/2$. $b^*=\bar y-w^*\bar x=1.5$.
+    alt: |-
+      Normal denklemler: $X^\top X=\begin{bmatrix}5&3\\3&3\end{bmatrix}$, $X^\top y=\begin{bmatrix}7\\6\end{bmatrix}$; çözüm $[0.5,\ 1.5]$.
+  - id: p3
+    type: tamamla
+    level: 1
+    title: Kesişim terimi
+    goal: $b^*=\bar y-w^*\bar x$ adımını uygulamak
+    needs: P2
+    q: |-
+      P2'deki verinin en iyi kesişimi $b^*$ kaç?
+    answer: 1.5
+    calc: "2-0.5*1"
+    mistakes:
+      - {answer: 2.0, msg: "b* = ȳ yalnız x̄ = 0 iken doğru; burada x̄ = 1, w*x̄ terimini çıkar."}
+    hints:
+      - "En iyi doğru $(\\bar x,\\bar y)$'den geçer."
+    solution: |-
+      $b^*=\bar y-w^*\bar x=2-0.5\cdot1=1.5$.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Kayıp neden artıyor?
+    goal: Gradyanın işaretini kontrol etmek
+    needs: Zincir kuralı (M0.3)
+    q: |-
+      Aşağıdaki GD döngüsünde kayıp her adımda büyüyor:
+      ```python
+      e = y - (w * x + b)
+      w -= lr * 2 * np.mean(e * x)
+      b -= lr * 2 * np.mean(e)
+      ```
+      Hata nerede?
+    choices:
+      - {t: "Öğrenme oranı çok büyük", why: "Küçük lr ile de kayıp büyür: yön yanlış, büyüklük değil."}
+      - {t: "Hata y − ŷ olarak tanımlanmış; bu tanımla gradyan −2·mean(e·x) olur, güncelleme işareti ters", ok: true, why: "$\\partial L/\\partial w=\\frac2n\\sum(\\hat y-y)x=-\\frac2n\\sum ex$. Ya e = ŷ − y tanımla ya da `w += ...` yaz."}
+      - {t: "np.mean yerine np.sum kullanılmalı", why: "Toplam yalnız ölçeği değiştirir (lr ile telafi edilir), yönü değil."}
+    hints:
+      - "Gradyanı kendi tanımladığın $e$ cinsinden yeniden türet."
+    solution: |-
+      $L=\frac1n\sum(\hat y-y)^2$, $\partial L/\partial w=\frac2n\sum(\hat y-y)x$. Kodda $e=y-\hat y$, yani gerçek gradyan $-\frac2n\sum ex$. `w -= lr*2*mean(e*x)` gradyan **artı** yönde (yokuş yukarı) adım atar. Düzeltme: `e = (w*x + b) - y`. Genel alışkanlık: gradyanı sayısal farkla bir kez kontrol et (M0.3 gradyan kontrolü).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Artık grafiği U çiziyor
+    goal: Model varsayımını artıklarla sınamak
+    needs: Artık kavramı
+    q: |-
+      Doğrusal modelin artıklarını ($y_i-\hat y_i$) $x_i$'ye karşı çizdin: küçük ve büyük $x$'te pozitif, ortada negatif — U şekli. Ne anlama gelir?
+    choices:
+      - {t: "Gürültü fazla; daha çok veri topla", why: "Gürültü sistematik bir şekil üretmez; artıklar rastgele dağılırdı."}
+      - {t: "İlişki doğrusal değil; x² gibi bir öznitelik eksik", ok: true, why: "Artıklarda kalan yapı, modelin yakalayamadığı sinyaldir."}
+      - {t: "Öğrenme oranı yanlış", why: "Kapalı form çözümünde lr yok; şekil modelin kendisinden."}
+    hints:
+      - "İyi bir modelin artıkları $x$'ten bağımsız, sıfır çevresinde rastgele saçılır."
+    solution: |-
+      U şekli, gerçek ilişkinin eğrisel olduğunu gösterir: doğru, uçlarda veriyi altta, ortada üstte bırakır. Çözüm modeli parametrelerde doğrusal tutup özniteliği genişletmek ($[x, x^2]$) — M1.3'teki polinom deneyi.
+  - id: p6
+    type: karşı-örnek
+    level: 3
+    title: Tek çözüm ne zaman yok?
+    goal: Kapalı formun varsayımını bulmak
+    needs: P1
+    q: |-
+      "En küçük kareler problemi her zaman tek bir çözüme sahiptir" iddiasına bir karşı örnek ver ve hangi adımın bozulduğunu söyle. Sonra bu durumda hangi çözümü seçmenin makul olduğunu öner.
+    rubric:
+      - "Tüm $x_i$'lerin eşit olduğu (ya da çok boyutta sütunların doğrusal bağımlı olduğu) bir veri örneği verdim"
+      - "$\\sum(x_i-\\bar x)^2=0$ / $X^\\top X$'in tekil olduğunu belirttim"
+      - "Sonsuz çözümün aynı tahminleri verdiğini (artık aynı) açıkladım"
+      - "En küçük normlu çözüm (sözde ters) ya da ridge önerdim"
+    hints:
+      - "P1'in 4. adımında paydaya bak."
+      - "Çok boyutta: iki öznitelik birbirinin katıysa ne olur?"
+    solution: |-
+      Örnek: $x=[2,2,2]$, $y=[1,2,3]$. $\sum(x_i-\bar x)^2=0$; $w$ belirsiz: her $w$ için $b=\bar y-2w$ aynı kaybı verir (hepsi $\hat y=2$ tahmin eder). Matris dilinde $X^\top X$ tekil, normal denklemlerin sonsuz çözümü var. Seçim: en küçük normlu çözüm $\theta=X^+y$ (`np.linalg.lstsq` bunu verir) ya da ridge ($X^\top X+\lambda I$ tersinir). Pratikte daha sık görülen hâl "neredeyse tekil": çok ilişkili öznitelikler katsayıları kararsız ve dev yapar.
+  - id: p7
+    type: uyarla
+    level: 3
+    title: Aykırı değerli fiyat verisi
+    goal: Kayıp seçimini veriye uydurmak
+    needs: MSE'nin Gauss olabilirliğiyle ilişkisi
+    q: |-
+      Ev fiyatı tahmini yapıyorsun; verinin %2'si girişte yanlış yazılmış (fiyat 10 kat büyük). MSE mi, MAE mi, Huber mı? Seçimini gerekçelendir ve bedelini söyle.
+    rubric:
+      - "MSE'nin büyük hataları karesiyle cezalandırdığı için aykırı değerlere duyarlı olduğunu söyledim"
+      - "MSE = Gauss gürültü, MAE = Laplace gürültü varsayımı bağlantısını kurdum"
+      - "Huber'ın küçük hatada karesel, büyükte doğrusal olduğunu ve δ eşiği seçimini belirttim"
+      - "Bedeli (MAE'de türevin 0'da tanımsız oluşu, koşullu medyanı tahmin etmesi; kapalı form yok) söyledim"
+      - "Veriyi temizlemenin (aykırı değeri bulmanın) kayıp değiştirmekten önce düşünülmesi gerektiğini ekledim"
+    hints:
+      - "Tek bir 10× hatalı nokta MSE'ye ne kadar katkı yapar?"
+    solution: |-
+      MSE, Gauss gürültüsü altında en çok olabilirlik kestirimidir ve koşullu **ortalamayı** tahmin eder; hatalı bir noktanın katkısı hatasının karesiyle büyüdüğü için doğruyu ona doğru çeker. MAE (Laplace gürültüsü) koşullu **medyanı** tahmin eder; aykırı değer etkisi doğrusal ve sınırlıdır, ama 0'da türevi tanımsız ve kapalı formu yok. Huber ikisinin arası: $|e|\le\delta$ için $\frac12e^2$, sonrası $\delta(|e|-\frac\delta2)$; δ'yı "normal" hata ölçeğinde seç (ör. artıkların medyan mutlak sapmasının ~1.35 katı). Önce: hatalı girişler bulunabiliyorsa düzelt — kayıp seçimi, bilinmeyen kirliliğe karşı sigortadır.
+pitfalls:
+  - wrong: "R² yüksekse model doğrudur."
+    right: "R² yalnız açıklanan varyans oranıdır; yanlış biçimli bir model de yüksek R² verebilir."
+    why: "Anscombe'un dörtlüsü: aynı R², aynı doğru, bambaşka veriler. Her zaman artıkları çiz (P5)."
+  - wrong: "Doğrusal regresyon yalnız düz çizgi uydurur."
+    right: "Model **parametrelerde** doğrusaldır; öznitelikler ($x^2$, $\\sin x$, etkileşimler) doğrusal olmayabilir."
+  - wrong: "Kapalı form her zaman en iyi yöntemdir."
+    right: "$X^\\top X$'i kurmak koşul sayısının karesini alır ve $O(d^3)$ maliyetlidir; QR/SVD tabanlı `lstsq` ya da büyük veride GD tercih edilir."
+whatif:
+  - q: "Gürültü Gauss değil de ağır kuyruklu (ör. ara sıra dev hatalar) olsaydı?"
+    a: "MSE'nin olabilirlik gerekçesi kalkar; birkaç uç nokta çözümü sürükler. Sağlam kayıplar (MAE, Huber) ya da RANSAC (M9.15) gerekir."
+  - q: "Bir öznitelik başka bir özniteliğin tam kopyası olsaydı?"
+    a: "$X^\\top X$ tekil olur, sonsuz çözüm vardır; katsayılar ikisi arasında keyfi bölüşülür. Tahminler değişmez, yorum anlamsızlaşır. Ridge ya da öznitelik eleme."

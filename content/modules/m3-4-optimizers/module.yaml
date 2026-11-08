@@ -147,3 +147,114 @@ labs:
       - q: "Gürültünün kalan std oranı neden √((1−β)/(1+β))?"
         a: "Bağımsız gürültü için $\\mathrm{Var}(m)=(1-\\beta)^2\\sum_k\\beta^{2k}\\sigma^2=\\frac{(1-\\beta)^2}{1-\\beta^2}\\sigma^2=\\frac{1-\\beta}{1+\\beta}\\sigma^2$."
     limits: "Gürültü bağımsız Gauss; gerçek gradyan gürültüsü ilişkili ve durağan değildir."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Adam'ın ilk adımı neden ±η?
+    goal: Yanlılık düzeltmesinin etkisini görmek
+    needs: EMA (deney alanı)
+    q: |-
+      Adam: $m_t=\beta_1m_{t-1}+(1-\beta_1)g_t$, $v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2$, $\hat m_t=m_t/(1-\beta_1^t)$, $\hat v_t=v_t/(1-\beta_2^t)$, $\Delta w=-\eta\hat m_t/(\sqrt{\hat v_t}+\epsilon)$. İlk adımı ($m_0=v_0=0$) hesapla.
+    solution: |-
+      $m_1=(1-\beta_1)g$, $\hat m_1=g$; $v_1=(1-\beta_2)g^2$, $\hat v_1=g^2$. $\Delta w=-\eta\,g/|g|=-\eta\,\mathrm{sign}(g)$ ($\epsilon$ ihmal).
+
+      **Yorum:** gradyan ne kadar büyük ya da küçük olursa olsun ilk adım tam η boyundadır — Adam adım boyunu gradyan ölçeğinden ayırır. Düzeltme olmasaydı: $m_1/\sqrt{v_1}=\frac{(1-\beta_1)g}{\sqrt{1-\beta_2}|g|}=\frac{0.1}{0.0316}\approx3.16$: ilk adımlar ~3 kat büyük olurdu (β₂ = 0.999).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Momentum hızı
+    goal: Momentum birikimini hesaplamak
+    needs: Ağır top güncellemesi
+    q: |-
+      $v_t=\beta v_{t-1}+g_t$, $v_0=0$, $\beta=0.9$, gradyan her adımda $g=1$. $v_3$ kaç?
+    answer: 2.71
+    calc: "1+0.9+0.81"
+    mistakes:
+      - {answer: 1.0, msg: "Momentum geçmiş gradyanları biriktirir: v₃ = g + βg + β²g."}
+      - {answer: 0.271, msg: "Bu (1 − β) ağırlıklı EMA biçimi; soru v = βv + g biçimini kullanıyor."}
+    hints:
+      - "$v_1=1$, $v_2=0.9\\cdot1+1$."
+    solution: |-
+      $v_1=1$, $v_2=1.9$, $v_3=2.71$. Sabit gradyanda $v_t\to\frac1{1-\beta}=10$: momentum yatık yönde etkin öğrenme oranını 10 katına çıkarır.
+  - id: p3
+    type: hesap
+    level: 1
+    title: AdaGrad'ın küçülen adımı
+    goal: Birikimli ölçeklemenin etkisini görmek
+    needs: AdaGrad
+    q: |-
+      AdaGrad: $G_t=\sum_{s\le t}g_s^2$, $\Delta w=-\eta g_t/\sqrt{G_t}$. η = 0.1, gradyanlar 2, 2, 2. Üçüncü adımın büyüklüğü $|\Delta w_3|$?
+    answer: 0.05773502691896258
+    calc: "0.1*2/math.sqrt(12)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.1, msg: "G yalnız son gradyan değil, toplam: 4 + 4 + 4 = 12."}
+      - {answer: 0.016666666666666666, msg: "Karekökü unuttun."}
+    hints:
+      - "$G_3=4+4+4$."
+    solution: |-
+      $0.1\cdot2/\sqrt{12}=0.0577$; ilk adım 0.1 idi. Sabit gradyanda adım $\propto1/\sqrt t$ küçülür — dışbükey problemde iyi, derin ağlarda erken durmaya yol açar; RMSProp toplam yerine EMA kullanarak bunu düzeltir.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Kayıp eğrisi testere dişi
+    goal: Öğrenme oranı takvimini okumak
+    needs: LR takvimleri
+    q: |-
+      Kayıp eğrisi her 10 epoch'ta bir aniden düşüyor, aralarında yavaşça iniyor. Hangi takvim ve neden ani düşüş?
+    choices:
+      - {t: "Kosinüs takvimi", why: "Kosinüs sürekli azalır, ani basamak yok."}
+      - {t: "Basamaklı (step) takvim: her basamakta η ≈ 10 kat düşer, gürültü topu küçülür ve kayıp yeni bir tabana iner", ok: true, why: "Gürültü tabanı η ile orantılı (M1.2 P5)."}
+      - {t: "Isınma (warmup)", why: "Isınma başta η'yı artırır; düşüşler periyodik değildir."}
+    hints:
+      - "Sabit η'da SGD'nin kaybı nerede takılıyordu?"
+    solution: |-
+      Her η değerinin kendi gürültü tabanı vardır; η basamakla düşünce model hemen daha dar bir bölgeye yerleşir → ani düşüş, sonra yeni platoda yavaş iniş. Deney alanında "Gürültülü gradyan" senaryosunda η'yı yarıya indirerek aynı etkiyi gör.
+  - id: p5
+    type: yöntem-seç
+    level: 2
+    title: Seyrek gradyanlı gömme tablosu
+    goal: Uyarlamalı yöntemin ne zaman avantajlı olduğunu seçmek
+    needs: Koordinat başına ölçekleme
+    q: |-
+      100 000 kelimelik gömme tablosu; çoğu kelime nadiren görünüyor (her adımda yalnız birkaç satırın gradyanı sıfırdan farklı). Hangi optimizasyon ailesi neden uygun?
+    choices:
+      - {t: "Sabit η'lı SGD", why: "Nadir kelimeler az güncellendiği için çok yavaş öğrenir."}
+      - {t: "AdaGrad/Adam ailesi: nadir görülen koordinatların birikmiş gradyanı küçük, etkin adımları büyük", ok: true, why: "Koordinat başına ölçekleme seyrek özniteliklerde tam bunun için tasarlandı (Duchi ve ark. 2011)."}
+      - {t: "Newton yöntemi", why: "100 000 × d boyutlu Hessian ters çevrilemez."}
+    hints:
+      - "Nadir bir satırın $\\sqrt{G}$'si nasıldır?"
+    solution: |-
+      Sık görülen kelimeler büyük $G$ biriktirip küçük adım, nadir kelimeler büyük adım atar: öğrenme hızları kendiliğinden dengelenir. Pratikte seyrek gömmeler için `SparseAdam` ya da Adagrad kullanılır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Momentumun kararlılık sınırı
+    goal: Ağır topun kuadratikte yakınsama koşulunu bulmak
+    needs: İkinci dereceden doğrusal yineleme, özdeğer
+    q: |-
+      $f=\frac a2w^2$, $v_{t+1}=\beta v_t+aw_t$, $w_{t+1}=w_t-\eta v_{t+1}$. $(w,v)$ için 2 × 2 yineleme matrisini yaz ve $0\le\beta<1$ iken yakınsama koşulunun $0<\eta a<2(1+\beta)$ olduğunu göster.
+    rubric:
+      - "$\\begin{bmatrix}w_{t+1}\\\\v_{t+1}\\end{bmatrix}=\\begin{bmatrix}1-\\eta a&-\\eta\\beta\\\\a&\\beta\\end{bmatrix}\\begin{bmatrix}w_t\\\\v_t\\end{bmatrix}$ yazdım"
+      - "Karakteristik polinomu $\\lambda^2-(1+\\beta-\\eta a)\\lambda+\\beta=0$ buldum"
+      - "İki kökün birim çember içinde olma koşulunu (Jury/Schur: $|\\beta|<1$, $|1+\\beta-\\eta a|<1+\\beta$) uyguladım"
+      - "Sınırı yorumladım: momentum kararlı η aralığını (1+β) katına genişletir"
+    hints:
+      - "$w_{t+1}=w_t-\\eta(\\beta v_t+aw_t)$."
+      - "$\\lambda^2+c_1\\lambda+c_0$'ın kökleri birim çemberdeyse $|c_0|<1$ ve $|c_1|<1+c_0$."
+    solution: |-
+      Matris $M=\begin{bmatrix}1-\eta a&-\eta\beta\\a&\beta\end{bmatrix}$; $\det M=\beta(1-\eta a)+\eta a\beta=\beta$, $\mathrm{tr}M=1+\beta-\eta a$. Karakteristik polinom $\lambda^2-\mathrm{tr}\,\lambda+\beta$. Schur koşulları: $|\beta|<1$ ve $|1+\beta-\eta a|<1+\beta\iff0<\eta a<2(1+\beta)$. β = 0.9'da sınır $3.8/a$ — deney alanındaki "Momentum için sınır" satırı. **Not:** kararlılık hız demek değildir; en hızlı yakınsama, köklerin büyüklüğü $\sqrt\beta$'ya eşitlendiği (kritik sönüm) ayardadır.
+pitfalls:
+  - wrong: "Adam her zaman SGD'den iyidir."
+    right: "Adam genelde daha hızlı ve η'ya daha az duyarlıdır; ama bazı görevlerde (ör. görüntü sınıflandırmada) iyi ayarlanmış SGD + momentum daha iyi genelleyebilir."
+  - wrong: "Adam'da L2 cezası ile ağırlık bozunması aynıdır."
+    right: "Adam'da L2 terimi de √v'ye bölünür; ayrık (decoupled) ağırlık bozunması (AdamW) bunu düzeltir."
+  - wrong: "Momentum β büyüdükçe hep daha hızlı."
+    right: "β → 1 sönümü azaltır: salınım uzar, hatta kararlılık sınırına yaklaşılır (deney alanı 'Momentum fazla')."
+whatif:
+  - q: "Gradyan her adımda işaret değiştiriyorsa (dik vadi) momentum ne yapar?"
+    a: "Zıt işaretli katkılar birbirini götürür: o yöndeki etkin adım küçülür (salınım sönümlenir), yatık yöndeki tutarlı gradyan ise birikir."
+  - q: "Adam'da ε = 1 gibi büyük seçilirse?"
+    a: "√v ≪ ε olan koordinatlarda Adam ölçeklenmemiş momentumlu SGD'ye dönüşür; ε aslında bir 'uyarlamayı kapatma' düğmesidir."

@@ -91,3 +91,96 @@ homework:
     accept:
       - "İzler makaledeki tablolarla birebir."
       - "Jacobian maliyet tablosu: ileri mod ∝ n, geri mod ∝ m."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir hesap grafiğinde ileri ve geri geçiş
+    goal: Yerel türevleri zincirleyerek gradyanı bulmak
+    needs: Kısmi türev
+    q: |-
+      $f(x,y,z)=(x+y)\,z$, $x=-2$, $y=5$, $z=-4$. Tüm kısmi türevleri hesap grafiği üzerinden bul.
+    solution: |-
+      **İleri:** $q=x+y=3$, $f=qz=-12$.
+
+      **Geri (sondan başa):** $\partial f/\partial f=1$. Çarpma düğümü: $\partial f/\partial q=z=-4$, $\partial f/\partial z=q=3$ (her girdiye **diğerinin** değeri). Toplama düğümü gelen gradyanı aynen dağıtır: $\partial f/\partial x=\partial f/\partial q\cdot1=-4$, $\partial f/\partial y=-4$.
+
+      **Kural özeti:** toplama → dağıtıcı, çarpma → değiştokuşçu, max → yönlendirici (yalnız kazanana), bir değişken birden çok yerde kullanılıyorsa gradyanlar **toplanır** (çok değişkenli zincir kuralı).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Sigmoid kapısı
+    goal: Sigmoid'in yerel türevini kullanmak
+    needs: $\sigma'=\sigma(1-\sigma)$
+    q: |-
+      $f=\sigma(wx+b)$, $w=2$, $x=-1$, $b=2$. $\partial f/\partial w$?
+    answer: -0.25
+    calc: "0.5*0.5*(-1)"
+    mistakes:
+      - {answer: 0.25, msg: "σ'(0) = 0.25 doğru; ama ∂(wx + b)/∂w = x = −1 ile çarp."}
+      - {answer: -0.5, msg: "σ'(z) = σ(z)(1 − σ(z)) = 0.25, σ(z) değil."}
+    hints:
+      - "$z=wx+b=0$, $\\sigma(0)=0.5$."
+    solution: |-
+      $z=0$, $\sigma'(0)=0.25$, $\partial z/\partial w=x=-1$ → $-0.25$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Değişken iki kez kullanılırsa
+    goal: Dallanmada gradyanların toplandığını görmek
+    needs: P1
+    q: |-
+      $f(x)=x\cdot x+3x$, $x=2$. Hesap grafiğiyle $f'(x)$?
+    answer: 7.0
+    calc: "2*2+3"
+    mistakes:
+      - {answer: 5.0, msg: "x çarpmaya iki kez giriyor: her kolun katkısı x, toplam 2x."}
+      - {answer: 4.0, msg: "3x kolunun katkısı (3) da toplanmalı."}
+    hints:
+      - "$x$ üç yerde kullanılıyor; her kolun gradyanını topla."
+    solution: |-
+      Çarpmanın iki girdisi de $x$: katkılar $x+x=4$; $3x$ kolundan 3. Toplam 7 $=2x+3$ ✓. Autograd'da `.grad` biriktirmesinin (`+=`) matematiksel nedeni budur (M3.1).
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Max düğümünde gradyan
+    goal: Max'ın yönlendirici davranışını uygulamak
+    needs: P1
+    q: |-
+      $f=\max(a,b)$, $a=3$, $b=1$, $\partial L/\partial f=5$. Bir öğrenci $\partial L/\partial a=\partial L/\partial b=2.5$ yazmış. Doğrusu?
+    choices:
+      - {t: "İkisi de 5", why: "Bu toplama düğümünün kuralı."}
+      - {t: "∂L/∂a = 5, ∂L/∂b = 0", ok: true, why: "Küçük değişimde yalnız kazanan girdi çıktıyı etkiler."}
+      - {t: "Öğrenci haklı", why: "Eşit bölüşüm yalnız a = b iken (türevlenemez nokta) bir alt gradyan seçimidir."}
+    hints:
+      - "$b$'yi biraz artırırsan $f$ değişir mi?"
+    solution: |-
+      $a>b$ iken $f=a$ yerel olarak; $\partial f/\partial a=1$, $\partial f/\partial b=0$. Max havuzlamada gradyanın yalnız en büyük piksele gitmesi bundandır.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Vektör zincir kuralı ve shape'ler
+    goal: Jacobian çarpımının sırasını ve boyutunu gerekçelendirmek
+    needs: Jacobian
+    q: |-
+      $x\in\mathbb R^n$, $u=g(x)\in\mathbb R^m$, $L=h(u)\in\mathbb R$. $\nabla_xL=J_g^\top\nabla_uL$ olduğunu göster; bu çarpımı Jacobian'ı kurmadan hesaplamanın neden mümkün olduğunu ($y=Wx$ örneğiyle) açıkla.
+    rubric:
+      - "$\\frac{\\partial L}{\\partial x_j}=\\sum_i\\frac{\\partial L}{\\partial u_i}\\frac{\\partial u_i}{\\partial x_j}$ yazdım"
+      - "Bunu $J_g^\\top\\nabla_uL$ (n × m · m) olarak tanıdım"
+      - "$y=Wx$ için $J=W$, dolayısıyla VJP'nin $W^\\top g$ olduğunu söyledim"
+      - "Eleman eleman fonksiyonlarda Jacobian köşegen olduğu için VJP'nin ⊙ olduğunu söyledim"
+    hints:
+      - "Tek bir $x_j$, $L$'yi tüm $u_i$'ler üzerinden etkiler."
+    solution: |-
+      Çok değişkenli zincir kuralı: $\partial L/\partial x_j=\sum_i(\partial L/\partial u_i)(J_g)_{ij}$ → $\nabla_xL=J_g^\top\nabla_uL$. Autograd her düğüm için tam Jacobian'ı değil bu **vektör–Jacobian çarpımını** (VJP) uygular: $y=Wx$'te $J=W$ ve VJP $W^\top g$ — $m\times n$ boyutunda bir matris zaten var, yeni bir şey kurulmaz. $\tanh$ gibi eleman eleman fonksiyonlarda $J$ köşegendir, VJP $g\odot\tanh'(x)$. Bu, ters modun bellek ve hesap açısından verimliliğidir (M6.3).
+pitfalls:
+  - wrong: "Bir değişkenin gradyanı, onun kullanıldığı son yerden gelir."
+    right: "Değişken birden çok yerde kullanılıyorsa tüm yollardan gelen gradyanlar toplanır (P3)."
+  - wrong: "Zincir kuralında Jacobian'lar hangi sırayla çarpılsa olur."
+    right: "Matris çarpımı değişmeli değildir; shape'ler sırayı belirler (P5). Sıra yalnız hesap maliyetini (ileri vs ters mod) değiştirmek için yeniden gruplanabilir (birleşme özelliği)."
+whatif:
+  - q: "Fonksiyon bir noktada türevlenemezse (ReLU'da 0, max'ta eşitlik)?"
+    a: "Alt gradyan seçilir (ReLU'da 0'da genelde 0); ölçüsü sıfır kümede olduğu için pratikte sorun çıkmaz."
+  - q: "Çıktı skaler değil de vektörse?"
+    a: "Tek bir gradyan yoktur, Jacobian vardır; ters mod her çıktı için bir geçiş ister (ya da `backward(v)` ile bir VJP)."

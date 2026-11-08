@@ -100,3 +100,120 @@ homework:
     accept:
       - "Matris biçimi, döngülü sürümle aynı gradyanı verir."
       - "Süre oranı P ile doğrusal büyür."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: İki katmanlı ağda geri yayılım, sayılarla
+    goal: BP1–BP4'ü tek bir örnekte uygulamak
+    needs: Zincir kuralı (M0.3)
+    q: |-
+      $x=1$, $z_1=w_1x+b_1$ ($w_1=2$, $b_1=0$), $h=\mathrm{ReLU}(z_1)$, $\hat y=w_2h+b_2$ ($w_2=-1.5$, $b_2=0$), $L=\frac12(\hat y-y)^2$, $y=1$. Tüm gradyanları bul.
+    solution: |-
+      **İleri:** $z_1=2$, $h=2$, $\hat y=-3$, $L=\frac12(-4)^2=8$.
+
+      **Çıkış hatası (BP1):** $\delta_2=\partial L/\partial\hat y=\hat y-y=-4$.
+
+      **Çıkış katmanı parametreleri (BP3, BP4):** $\partial L/\partial w_2=\delta_2\,h=-8$, $\partial L/\partial b_2=\delta_2=-4$.
+
+      **Gizli katmana yayılım (BP2):** $\delta_1=(w_2\,\delta_2)\odot\mathrm{ReLU}'(z_1)=(-1.5)(-4)(1)=6$.
+
+      **Gizli katman parametreleri:** $\partial L/\partial w_1=\delta_1x=6$, $\partial L/\partial b_1=\delta_1=6$.
+
+      **Kontrol (sayısal fark):** $w_1\to2.001$: $\hat y=-3.0015$, $L=8.006$ → eğim ≈ 6 ✓. **Gözlem:** bias gradyanı her katmanda o katmanın $\delta$'sının kendisidir; ağırlık gradyanı $\delta$ ile girdinin dış çarpımı (ders alıştırması 2'nin sorusu).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Gizli birim ölüyse
+    goal: ReLU türevinin geri yayılıma etkisini görmek
+    needs: P1
+    q: |-
+      P1'de yalnız $b_1=-3$ olsun (diğer her şey aynı). $\partial L/\partial w_1$ kaç?
+    answer: 0.0
+    calc: "0"
+    mistakes:
+      - {answer: 6.0, msg: "z₁ = 2 − 3 = −1 < 0: ReLU'nun türevi 0, gradyan gizli katmana geçmez."}
+    hints:
+      - "Önce $z_1$'i hesapla."
+    solution: |-
+      $z_1=-1$, $h=0$, $\mathrm{ReLU}'(z_1)=0$ ⇒ $\delta_1=0$ ⇒ $\partial L/\partial w_1=0$. Bu birim, girdilerin hepsinde negatif kalırsa hiç güncellenmez: "ölü ReLU" (M3.5 ek alıştırması).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Çıkış ağırlığının gradyanı, başka bir hedefle
+    goal: BP4'ü uygulamak
+    needs: P1
+    q: |-
+      P1'deki ağ ve aynı ileri geçiş ($\hat y=-3$, $h=2$), ama hedef $y=-2$. $\partial L/\partial w_2$ kaç?
+    answer: -2.0
+    calc: "(-3-(-2))*2"
+    mistakes:
+      - {answer: -1.0, msg: "Bu δ₂ (bias gradyanı); ağırlık için h = 2 ile çarp."}
+      - {answer: 2.0, msg: "İşaret: δ₂ = ŷ − y = −3 − (−2) = −1."}
+    hints:
+      - "$\\delta_2=\\hat y-y$, sonra $\\delta_2h$."
+    solution: |-
+      $\delta_2=-3-(-2)=-1$, $\partial L/\partial w_2=-1\cdot2=-2$.
+  - id: p4
+    type: kod
+    level: 2
+    title: Shape'ler uyuşmuyor
+    goal: Batch'li geri yayılımda boyutları akıl yürütmek
+    needs: Matris çarpımı (M0.2)
+    q: |-
+      $X$ (B, d), $W_1$ (d, h), $H=\mathrm{relu}(XW_1)$ (B, h), $\hat Y=HW_2$ (B, k). `dY` (B, k) verildi. Hangisi $\partial L/\partial W_1$'dir?
+    choices:
+      - {t: "`X.T @ ((dY @ W2.T) * (H > 0))`", ok: true, why: "(d, B) @ (B, h) = (d, h) ✓; maske ReLU türevi."}
+      - {t: "`((dY @ W2.T) * (H > 0)) @ X.T`", why: "(B, h) @ (d, B) çarpılamaz."}
+      - {t: "`X.T @ (dY @ W2.T)`", why: "Shape doğru ama ReLU türevi (maske) unutulmuş."}
+    hints:
+      - "Her gradyan, türev alınan tensörle aynı shape'te olmalı."
+    solution: |-
+      $dH=dY\,W_2^\top$ (B, h); $dZ_1=dH\odot\mathbb 1[Z_1>0]$; $dW_1=X^\top dZ_1$ (d, h). Kural: "shape'i tutturan tek çarpım genelde doğrudur" — ama maske gibi eleman eleman çarpanlar shape'i değiştirmediği için unutulur; P4'teki 3. seçenek sessiz bir hatadır, gradyan kontrolü yakalar.
+  - id: p5
+    type: açıkla
+    level: 2
+    title: Geri yayılım neden ucuz?
+    goal: Ters mod türevin maliyetini açıklamak
+    needs: Hesap grafiği
+    q: |-
+      Milyonlarca parametreli bir ağın tüm gradyanının yaklaşık bir ileri geçiş maliyetinde (sabit bir katı) hesaplanabilmesinin nedenini, sonlu farkla karşılaştırarak açıkla.
+    rubric:
+      - "Sonlu farkın her parametre için ayrı ileri geçiş (P geçiş) gerektirdiğini söyledim"
+      - "Ters modun skaler çıkıştan geriye bir kez gidip ara türevleri (δ'ları) paylaştığını açıkladım"
+      - "Bedelin bellek olduğunu (ileri aktivasyonlar saklanır) ekledim"
+      - "İleri modun girdi başına, ters modun çıktı başına ucuz olduğunu (Jacobian satırı vs sütunu) belirttim"
+    hints:
+      - "δ'lar kaç parametre tarafından ortak kullanılıyor?"
+    solution: |-
+      Sonlu fark: $P$ parametre için $P+1$ ileri geçiş. Ters mod: tek ileri geçiş (ara değerler saklanır) + tek geri geçiş; her düğüm yerel türevini bir kez uygular ve $\delta$'lar o düğümün altındaki tüm parametrelerce paylaşılır. Geri geçiş ileri geçişin ~2 katı iş yapar (her matmul için iki matmul: $dW$ ve $dX$). Bedel: aktivasyon belleği — M6.4'teki gradyan checkpointing bunu hesapla takas eder. Skaler kayıp (tek çıktı) için ters mod idealdir; çok çıktılı/az girdili fonksiyonlarda ileri mod (JVP) daha ucuzdur.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: BP2'yi genel katmanda türet
+    goal: Matris biçimli geri yayılım denklemini kanıtlamak
+    needs: P1, Hadamard çarpımı ⊙
+    q: |-
+      $z^{l+1}=W^{l+1}a^l+b^{l+1}$, $a^l=\sigma(z^l)$, $\delta^l:=\partial L/\partial z^l$. $\delta^l=\big((W^{l+1})^\top\delta^{l+1}\big)\odot\sigma'(z^l)$ olduğunu indis düzeyinde kanıtla.
+    rubric:
+      - "$z^l_j$'nin $L$'yi yalnız $z^{l+1}_k$'lar üzerinden etkilediğini (çok değişkenli zincir kuralı) yazdım"
+      - "$\\partial z^{l+1}_k/\\partial z^l_j=W^{l+1}_{kj}\\sigma'(z^l_j)$ türettim"
+      - "$k$ üzerinden toplamı matris–vektör çarpımı olarak tanıdım"
+      - "σ'nın eleman eleman olmasının ⊙'yu (köşegen Jacobian) verdiğini açıkladım"
+    hints:
+      - "$\\delta^l_j=\\sum_k\\frac{\\partial L}{\\partial z^{l+1}_k}\\frac{\\partial z^{l+1}_k}{\\partial z^l_j}$."
+    solution: |-
+      $\delta^l_j=\sum_k\delta^{l+1}_k\frac{\partial z^{l+1}_k}{\partial z^l_j}$. $z^{l+1}_k=\sum_iW^{l+1}_{ki}\sigma(z^l_i)+b_k$ ⇒ $\frac{\partial z^{l+1}_k}{\partial z^l_j}=W^{l+1}_{kj}\sigma'(z^l_j)$ (yalnız $i=j$ terimi). Yerine: $\delta^l_j=\sigma'(z^l_j)\sum_kW^{l+1}_{kj}\delta^{l+1}_k=\sigma'(z^l_j)\,[(W^{l+1})^\top\delta^{l+1}]_j$. Aktivasyon eleman eleman olmasaydı (ör. softmax) $\sigma'$ köşegen olmaz, ⊙ yerine tam Jacobian çarpımı gerekirdi.
+pitfalls:
+  - wrong: "Geri yayılım bir öğrenme algoritmasıdır."
+    right: "Geri yayılım yalnız gradyanı **hesaplama** yöntemidir; öğrenmeyi optimizasyon algoritması (SGD, Adam) yapar."
+  - wrong: "Tüm ağırlıkları sıfırla başlatmak güvenlidir."
+    right: "Simetri bozulmaz: aynı katmandaki tüm birimler aynı gradyanı alır, hep eşit kalır (M3.5)."
+  - wrong: "Gradyanı doğru türettiysem kontrol etmeye gerek yok."
+    right: "Shape'i doğru ama maskesi/işareti yanlış gradyanlar sessizce yanlış öğrenir; merkezi farkla gradyan kontrolü ucuz bir sigortadır."
+whatif:
+  - q: "Aktivasyon ReLU yerine doğrusal olsaydı derin ağ ne olurdu?"
+    a: "Katmanların bileşimi tek bir doğrusal dönüşümdür ($W_2W_1$): derinlik ifade gücü kazandırmaz (ama optimizasyon dinamiği yine ilginçtir)."
+  - q: "Kayıp ortalama yerine toplam olsaydı?"
+    a: "Tüm gradyanlar B kat büyür; aynı davranış için öğrenme oranı B'ye bölünmelidir. Batch boyu değişince ortalama kayıp daha kararlıdır."

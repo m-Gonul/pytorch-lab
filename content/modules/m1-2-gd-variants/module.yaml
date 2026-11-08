@@ -112,3 +112,136 @@ labs:
       - q: "η negatif olursa?"
         a: "Deney bunu geçersiz sayar: $1-\\eta a>1$, adım yokuş yukarıdır (gradyan çıkışı)."
     limits: "Tek boyutlu, gürültüsüz kuadratik. Gerçek kayıplarda eğrilik konuma göre değişir; mini-batch gürültüsü ayrıca bir taban oluşturur (bkz. M3.4 deneyi)."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Kuadratikte GD ne zaman yakınsar?
+    goal: Kararlılık koşulunu türetmek
+    needs: Geometrik dizi
+    q: |-
+      $f(x)=\frac a2x^2$ ($a>0$) üzerinde sabit adımlı GD için $\eta$'nın hangi aralıkta yakınsadığını türet.
+    solution: |-
+      $f'(x)=ax$, güncelleme $x_{t+1}=x_t-\eta ax_t=(1-\eta a)x_t$. Dolayısıyla $x_t=(1-\eta a)^tx_0$ — bir geometrik dizi.
+
+      $x_t\to0$ **ancak ve ancak** $|1-\eta a|<1$, yani $-1<1-\eta a<1\iff0<\eta<\frac2a$.
+
+      Rejimler: $0<\eta a<1$ tekdüze, $\eta a=1$ tek adımda, $1<\eta a<2$ salınarak yakınsama; $\eta a>2$ ıraksama.
+
+      **Çok boyut:** $f(x)=\frac12x^\top Hx$ için $H$'nin özvektör tabanında her bileşen ayrı ayrı $(1-\eta\lambda_i)$ ile çarpılır. Kararlılık için $\eta<2/\lambda_{max}$; en yavaş bileşen $1-\eta\lambda_{min}$ ile söner. En iyi sabit η ile yakınsama hızı $\frac{\kappa-1}{\kappa+1}$, $\kappa=\lambda_{max}/\lambda_{min}$.
+
+      **Ne söylemez:** Dışbükey olmayan kayıplarda eğrilik yere göre değişir; bu sınır yalnız yerel bir rehberdir. Deney alanında dene.
+  - id: p2
+    type: hesap
+    level: 1
+    title: En büyük kararlı η
+    goal: Kararlılık sınırını uygulamak
+    needs: P1
+    q: |-
+      $f(x)=3x^2$ için GD'nin yakınsadığı en büyük öğrenme oranı (sınır değer) kaç?
+    answer: 0.3333333333333333
+    calc: "2/6"
+    mistakes:
+      - {answer: 0.6666666666666666, msg: "a, f''(x) olmalı: 3x²'nin ikinci türevi 6, 3 değil (f = a x²/2 biçimine dikkat)."}
+    hints:
+      - "$f(x)=\\frac a2x^2$ biçimine getir: $a$ kaç?"
+    solution: |-
+      $3x^2=\frac62x^2$, yani $a=6$; sınır $\eta<2/a=1/3$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Üç adım sonra
+    goal: Güncellemeyi elle izlemek
+    needs: P1
+    q: |-
+      $a=2$, $\eta=0.3$, $x_0=4$. Üç GD adımından sonra $x_3$ kaç?
+    answer: 0.25600000000000006
+    calc: "4*0.4**3"
+    mistakes:
+      - {answer: 1.3719999999999997, msg: "Çarpan 1 − η değil, 1 − ηa = 1 − 0.6 = 0.4."}
+      - {answer: 1.6, msg: "Bu yalnız bir adım; üç kez çarp."}
+    hints:
+      - "Her adım $x$'i aynı sayıyla çarpar."
+    solution: |-
+      $1-\eta a=0.4$; $x_3=4\cdot0.4^3=0.256$.
+  - id: p4
+    type: tamamla
+    level: 2
+    title: Kaç adım gerekir?
+    goal: Yakınsama hızından adım sayısına geçmek
+    needs: Logaritma
+    q: |-
+      $|x_t|=|1-\eta a|^t|x_0|$. $x_0=1$, $\eta a=0.1$ için $|x_t|\le10^{-3}$ olması için gereken en küçük tamsayı $t$ kaç?
+    answer: 66.0
+    calc: "math.ceil(math.log(1e-3)/math.log(0.9))"
+    mistakes:
+      - {answer: 65.0, msg: "Aşağı yuvarladın: bu t'de |x| hâlâ 10⁻³'ün üstünde. Yukarı yuvarla."}
+    hints:
+      - "$0.9^t\\le10^{-3}$'ün iki yanının logaritmasını al; $\\ln0.9<0$ olduğu için eşitsizlik yön değiştirir."
+    solution: |-
+      $t\ge\ln10^{-3}/\ln0.9=65.56$ → $t=66$. Genel kural: hatayı $\varepsilon$'a indirmek $\approx\frac1{\eta a}\ln\frac{|x_0|}\varepsilon$ adım ister (küçük ηa için $-\ln(1-\eta a)\approx\eta a$).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: SGD kaybı bir yerde takılıyor
+    goal: Gürültü tabanını tanımak
+    needs: Mini-batch gradyanı
+    q: |-
+      Sabit η ile mini-batch SGD: kayıp hızla düşüyor, sonra ortalaması sabit kalıp yukarı aşağı sıçrıyor. Tam batch GD ise aynı η ile düşmeye devam ediyor. En iyi açıklama?
+    choices:
+      - {t: "Model kapasitesi yetmiyor", why: "Tam batch GD aynı modelle daha aşağı iniyor."}
+      - {t: "Gradyan gürültüsü sabit η ile minimum çevresinde bir 'gürültü topu' bırakıyor; η'yı azaltmak ya da batch'i büyütmek tabanı düşürür", ok: true, why: "Taban kabaca ησ²/B ile orantılı."}
+      - {t: "Öğrenme oranı kararlılık sınırını aştı", why: "Iraksama olsaydı kayıp büyürdü."}
+    hints:
+      - "Minimumda tam gradyan sıfır; mini-batch gradyanı da sıfır mı?"
+    solution: |-
+      Minimumda $\nabla L=0$ ama mini-batch gradyanının varyansı ($\sigma^2/B$) sıfır değil; sabit η ile her adım bir rastgele itme. Denge: kabaca $\mathbb E[L-L^*]\propto\eta\sigma^2/B$. Çareler: öğrenme oranı takvimi (azalt), daha büyük batch, ya da ağırlık ortalaması (Polyak/EMA). M3.4 deneyinde "Gürültülü gradyan" senaryosuna bak.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Mini-batch gradyanı yansızdır
+    goal: SGD'nin neden çalıştığını kanıtlamak
+    needs: Beklenen değer, varyansın doğrusallığı
+    q: |-
+      Veri kümesinden yerine koyarak düzgün çekilmiş $B$ örnekle $\hat g=\frac1B\sum_{k=1}^B\nabla\ell_{i_k}(w)$. (a) $\mathbb E[\hat g]=\nabla L(w)$, (b) $\mathrm{Cov}(\hat g)=\frac1B\Sigma$ olduğunu göster ($\Sigma$ tek örnek gradyanının kovaryansı). Varsayımları yaz.
+    rubric:
+      - "$L=\\frac1n\\sum_i\\ell_i$ tanımını ve $i_k$'nın düzgün dağılımını kullandım"
+      - "Beklenen değerin doğrusallığıyla (a)'yı gösterdim"
+      - "Çekimlerin bağımsızlığını (yerine koyarak) kullanarak varyansların toplandığını gösterdim"
+      - "Yerine koymadan çekimde sonlu kitle düzeltmesi $(n-B)/(n-1)$ çıktığını not ettim"
+    hints:
+      - "Tek bir çekim için $\\mathbb E[\\nabla\\ell_{i}]=\\sum_i\\frac1n\\nabla\\ell_i$."
+      - "Bağımsız terimlerin toplamının kovaryansı kovaryansların toplamıdır."
+    solution: |-
+      (a) $\mathbb E[\nabla\ell_{i_k}]=\sum_{i=1}^n\frac1n\nabla\ell_i=\nabla L$; doğrusallıkla $\mathbb E[\hat g]=\frac1B\sum_k\nabla L=\nabla L$.
+      (b) $i_k$'lar bağımsız ve özdeş dağılımlı, her biri kovaryansı $\Sigma$. $\mathrm{Cov}(\sum_k X_k)=\sum_k\mathrm{Cov}(X_k)=B\Sigma$; $1/B^2$ çarpanıyla $\Sigma/B$. Yerine koymadan çekimde terimler hafif negatif ilişkili, sonuç $\frac{n-B}{n-1}\frac\Sigma B$ ($B=n$'de 0: tam batch). **Ne söylemez:** yansızlık yakınsamayı tek başına garanti etmez; adım boyu koşulları (ör. $\sum\eta_t=\infty$, $\sum\eta_t^2<\infty$) gerekir.
+  - id: p7
+    type: yöntem-seç
+    level: 2
+    title: 10 milyon örnek
+    goal: GD varyantını probleme göre seçmek
+    needs: Batch, mini-batch, SGD farkları
+    q: |-
+      10 milyon örnek, model belleğe sığıyor ama veri sığmıyor. Tam batch GD mi, saf SGD (B = 1) mi, mini-batch (B = 256) mı?
+    choices:
+      - {t: "Tam batch GD: en doğru gradyan", why: "Tek adım için 10M örneği okumak gerekir; aynı sürede binlerce mini-batch adımı atılır."}
+      - {t: "Mini-batch: vektörleşmeden (GPU) yararlanır, gradyan gürültüsünü makul tutar, veriyi akış hâlinde okur", ok: true, why: "Pratik standart."}
+      - {t: "Saf SGD: en çok adım", why: "B = 1 donanımı boşa harcar (vektörleşme yok) ve gürültü büyük."}
+    hints:
+      - "Bir adımın maliyeti ve gürültüsü B ile nasıl değişir?"
+    solution: |-
+      Adım maliyeti ∝ B, gürültü std'si ∝ $1/\sqrt B$: B'yi 4 katına çıkarmak gürültüyü yalnız yarıya indirir. Donanım belli bir B'ye kadar neredeyse bedava paralel çalıştığı için (GPU doluluğu) o noktaya kadar B'yi büyütmek kazançlıdır; ötesinde örnek başına verim düşer. Mini-batch bu dengedir.
+pitfalls:
+  - wrong: "Kayıp düşmüyorsa öğrenme oranını büyüt."
+    right: "Önce kaybın salınıp salınmadığına bak: salınım ya da büyüme η'nın **fazla** olduğunu gösterir."
+    why: "Kararlılık sınırını aşan η kaybı tekdüze değil, zikzaklı ya da üstel artırır (deney alanındaki 'Salınım' ve 'Iraksama' senaryoları)."
+  - wrong: "SGD'nin gürültüsü her zaman zararlıdır."
+    right: "Gürültü sivri minimumlardan kaçmaya ve genellemeye yardım edebilir; zararı, sabit η ile tam yakınsamayı engellemesidir."
+  - wrong: "Bir epoch bir adımdır."
+    right: "Bir epoch, veri kümesinin bir kez tamamen geçilmesidir: n/B adım."
+whatif:
+  - q: "Batch boyutunu 4 katına çıkarırsan η'yı nasıl değiştirmelisin?"
+    a: "Gürültü varyansı 4 kat azalır. SGD için yaygın sezgisel kural η'yı da (kararlılık sınırına kadar) 4 katına çıkarmak (doğrusal ölçekleme; Goyal ve ark. 2017), ısınma (warmup) ile. Adam gibi uyarlamalı yöntemlerde √4 = 2 kat daha güvenli bir başlangıçtır. Kararlılık sınırı $2/\\lambda_{max}$ yine de aşılamaz."
+  - q: "Kayıp dışbükey değilse 2/a sınırı ne anlama gelir?"
+    a: "Yerel eğriliğe göre bir sınırdır; eğitim boyunca eğrilik değişir. Derin ağlarda büyük η ile eğitim sıklıkla tam bu sınırın civarında dolaşır ('kararlılığın kıyısı', Cohen ve ark. 2021)."

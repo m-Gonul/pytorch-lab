@@ -126,3 +126,98 @@ labs:
       - q: "B = 2 iken neden çıktı yalnız ±1 civarında?"
         a: "İki sayıyı kendi ortalamaları ve (yanlı) std'leriyle normalize edersen her zaman −1 ve +1 elde edersin; x'in büyüklüğü kaybolur."
     limits: "Tek özellik, Gauss veri; ε = 10⁻⁵. Gerçek ağda BN'in etkisi optimizasyon manzarasını da değiştirir (M3.6 anlatımı)."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: BN eğitimde ve çıkarımda iki farklı fonksiyondur
+    goal: Batch istatistiği ile koşu istatistiğinin farkını görmek
+    needs: Ortalama, varyans
+    q: |-
+      Bir özellik için batch $[1,2,3,6]$, $\gamma=1$, $\beta=0$, $\epsilon\approx0$. (a) Eğitimde 6'nın BN çıktısı nedir? (b) Çıkarımda koşu ortalaması $\mu=2$, koşu varyansı $\sigma^2=4$ ise aynı 6 neye eşlenir?
+    solution: |-
+      **(a)** $\mu_B=3$, $\sigma_B^2=\frac14[(1-3)^2+(2-3)^2+0+(6-3)^2]=\frac{14}4=3.5$ (BN **yanlı**, $n$'ye bölünen varyans kullanır). $\hat x=(6-3)/\sqrt{3.5}=1.604$.
+
+      **(b)** $(6-2)/\sqrt4=2$.
+
+      **Yorum:** aynı girdi eğitimde 1.60, çıkarımda 2.00 oluyor. Eğitimde çıktı batch'teki **diğer** örneklere bağlıdır (batch'ler arası gürültü ve örnekler arası bilgi sızıntısı); çıkarımda deterministiktir. `model.eval()`'i unutmak bu yüzden sonuçları değiştirir. Koşu istatistikleri eğitim boyunca EMA ile ($\mu\leftarrow(1-m)\mu+m\mu_B$, PyTorch'ta $m=0.1$) güncellenir; PyTorch koşu varyansında yansız ($n-1$) tahmini saklar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Normalize değer
+    goal: BN ileri geçişini elle yapmak
+    needs: P1
+    q: |-
+      Batch $[2,4,6,8]$, $\gamma=1$, $\beta=0$, $\epsilon=0$. 8'in BN çıktısı?
+    answer: 1.3416407864998738
+    calc: "(8-5)/math.sqrt(5)"
+    tol: 1e-3
+    mistakes:
+      - {answer: 1.161895003862225, msg: "BN yanlı varyans kullanır: n'ye böl (4), n − 1'e değil."}
+      - {answer: 0.6, msg: "Varyansın karekökü (std) ile böl, varyansla değil."}
+    hints:
+      - "$\\mu=5$, $\\sigma^2=\\frac14(9+1+1+9)$."
+    solution: |-
+      $\sigma^2=5$, $(8-5)/\sqrt5=1.342$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: BN'i önceki katmana katla
+    goal: Çıkarımda BN'in doğrusal bir dönüşüm olduğunu kullanmak
+    needs: P1(b)
+    q: |-
+      $y=\gamma\frac{(wx+b)-\mu}{\sigma}+\beta$, $w=0.5$, $b=1$, $\gamma=2$, $\beta=1$, $\mu=3$, $\sigma=2$. Katlanmış katmanın biası $b'$ (yani $y=w'x+b'$)?
+    answer: -1.0
+    calc: "2*(1-3)/2+1"
+    mistakes:
+      - {answer: -2.0, msg: "β'yı eklemeyi unuttun."}
+      - {answer: -2.0, msg: "γ/σ ölçeği hem w'ye hem (b − μ)'ye uygulanır."}
+    hints:
+      - "$y=\\frac\\gamma\\sigma w\\,x+\\big(\\frac\\gamma\\sigma(b-\\mu)+\\beta\\big)$."
+    solution: |-
+      $w'=\gamma w/\sigma=0.5$, $b'=\gamma(b-\mu)/\sigma+\beta=2(-2)/2+1=-1$. Çıkarımda BN ek maliyetsizdir (M3.6 ek alıştırması).
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Batch boyu 2, segmentasyon
+    goal: Normalizasyon türünü koşula göre seçmek
+    needs: BN, LN, GN farkı
+    q: |-
+      Büyük görüntülerle segmentasyon; GPU belleği yüzünden batch boyu 2. BN mi, LayerNorm mu, GroupNorm mu?
+    choices:
+      - {t: "BatchNorm", why: "İki örnekten kestirilen istatistik çok gürültülü; eğitim–çıkarım farkı büyür (deney: B = 2)."}
+      - {t: "GroupNorm: kanal gruplarında, örnek başına normalize eder; batch boyundan bağımsız", ok: true, why: "Wu & He 2018'in tam bu durum için önerisi; M8.2'deki U-Net'te de bu var."}
+      - {t: "Normalizasyon kullanma", why: "Mümkün ama derin ağı eğitmek zorlaşır."}
+    hints:
+      - "Hangi yöntemin istatistiği batch'teki diğer örneklere bağlı?"
+    solution: |-
+      BN istatistiği batch ekseni üzerinden alır; B = 2'de çok gürültülüdür. LN tüm kanallar ve konumlar üzerinden alır — evrişimli ağlarda kanallar farklı ölçekte olduğu için kötü olabilir. GN (ör. 32 grup) arada: örnek başına, kanal grupları içinde; B'den bağımsız.
+  - id: p5
+    type: açıkla
+    level: 2
+    title: BN neden ağırlık ölçeğinden bağımsız?
+    goal: Ölçek değişmezliğinin optimizasyona etkisini açıklamak
+    needs: P1
+    q: |-
+      BN'den önce gelen $W$'yi $cW$ ($c>0$) yapmak çıktıyı değiştirmez. Bunu göster; bunun gradyan ve ağırlık bozunması için ne anlama geldiğini açıkla.
+    rubric:
+      - "$\\mathrm{BN}(cWx)=\\mathrm{BN}(Wx)$ çünkü ortalama ve std da c ile ölçeklenir dedim"
+      - "Gradyanın $W$'ye dik olduğunu ($\\langle\\nabla_WL,W\\rangle=0$) ve $\\|\\nabla_{cW}L\\|=\\|\\nabla_WL\\|/c$ olduğunu söyledim"
+      - "Ağırlık bozunmasının normu küçültüp etkin öğrenme oranını artırdığını açıkladım"
+    hints:
+      - "$L(cW)=L(W)$'nin iki tarafının $c$'ye göre türevini $c=1$'de al."
+    solution: |-
+      $\mu(cz)=c\mu(z)$, $\sigma(cz)=c\sigma(z)$ ⇒ $\hat x$ değişmez. $L(cW)=L(W)$ ⇒ $c$'ye göre türev: $\langle\nabla L(W),W\rangle=0$ — gradyan $W$'ye diktir, SGD normu yalnız büyütür. Zincir kuralıyla $\nabla L(cW)=\nabla L(W)/c$: norm büyüdükçe etkin adım $\eta/\|W\|^2$ küçülür. Ağırlık bozunması normu küçük tutarak etkin öğrenme oranını yüksek tutar — BN'li ağlarda L2'nin düzenlileştirmeden çok bir **öğrenme oranı ayarı** olmasının nedeni.
+pitfalls:
+  - wrong: "BN eğitimde ve testte aynı hesabı yapar."
+    right: "Eğitimde batch istatistiği, testte koşu istatistiği kullanılır; `model.eval()` unutulursa test sonuçları batch bileşimine bağlı olur."
+  - wrong: "BN, iç ortak değişken kayması (internal covariate shift) azalttığı için çalışır."
+    right: "Bu ilk açıklamaydı; sonraki çalışmalar (Santurkar ve ark. 2018) asıl etkinin kayıp yüzeyini pürüzsüzleştirmek (daha büyük kararlı η) olduğunu gösterdi."
+  - wrong: "Konvolüsyondan sonra bias + BN gereklidir."
+    right: "BN ortalamayı çıkardığı için önceki bias işe yaramaz; β onun yerini alır (`bias=False`)."
+whatif:
+  - q: "Batch'ler sınıfa göre sıralanmış (her batch tek sınıf) olsaydı?"
+    a: "Batch istatistiği sınıfı kodlar; model eğitimde bu sızıntıyı kullanır, testte (koşu istatistikleriyle) çöker. Veriyi karıştır."
+  - q: "Dizi modellerinde (değişken uzunluk) BN?"
+    a: "Konum başına batch istatistiği tutarsızdır (dolgu, farklı uzunluklar); bu yüzden Transformer ve RNN'lerde LayerNorm kullanılır."

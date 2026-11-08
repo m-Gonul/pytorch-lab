@@ -104,3 +104,95 @@ homework:
     accept:
       - "Eğitim aralığı dışında belirsizlik büyür."
       - "Döndürme açısı arttıkça sınıf olasılıklarının yayılımı artar."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Ters (inverted) dropout neden beklenen değeri korur?
+    goal: Dropout ölçeklemesini türetmek
+    needs: Bernoulli dağılımı
+    q: |-
+      Tutma olasılığı $q=1-p$. Eğitimde $\tilde h=\frac{m}{q}h$, $m\sim\mathrm{Bernoulli}(q)$. $\mathbb E[\tilde h]$ ve $\mathrm{Var}(\tilde h)$?
+    solution: |-
+      $\mathbb E[\tilde h]=\frac{\mathbb E[m]}qh=h$: test zamanında hiçbir şey yapmaya gerek kalmaz (eski "test zamanında $q$ ile çarp" kuralının yerine). $\mathrm{Var}(\tilde h)=\frac{q(1-q)}{q^2}h^2=\frac pqh^2$: dropout her birime çarpımsal gürültü ekler; $p=0.5$'te std = $|h|$.
+
+      **Yorum:** beklenen değer korunur ama doğrusal olmayan katmanlardan sonra ortalama bir ağ "tam" ağa eşit değildir — test çıktısı, tüm alt ağların ortalamasının yalnızca bir yaklaşımıdır (geometrik ortalama yorumu, Srivastava ve ark. 2014). Monte Carlo dropout testte de maskeleyip ortalama alarak bunu ve belirsizliği tahmin eder.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Ters dropout çıktısı
+    goal: Ölçeklemeyi uygulamak
+    needs: P1
+    q: |-
+      $p=0.2$ (bırakma), birim tutuldu, $h=4$. Eğitimdeki çıktı?
+    answer: 5.0
+    calc: "4/0.8"
+    mistakes:
+      - {answer: 3.2, msg: "Bu eski (ters olmayan) dropout'un test zamanı ölçeklemesi; ters dropout eğitimde 1/q ile çarpar."}
+      - {answer: 20.0, msg: "p bırakma olasılığı; tutma olasılığı q = 0.8 ile böl."}
+    hints:
+      - "$\\tilde h=h/q$, $q=1-p$."
+    solution: |-
+      $4/0.8=5$. Birim %20 olasılıkla 0, %80 olasılıkla 5: beklenen 4.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Max-norm kısıtı
+    goal: Ağırlık vektörünü normu sınırlayarak izdüşürmek
+    needs: Öklid normu
+    q: |-
+      Bir birimin gelen ağırlıkları $w=[3,4]$, max-norm sınırı $c=3$. İzdüşümden sonra $w_1$?
+    answer: 1.8
+    calc: "3*3/5"
+    mistakes:
+      - {answer: 3.0, msg: "Max-norm kırpma bileşen bileşen değil, vektörün normunu c'ye ölçekler."}
+    hints:
+      - "$\\|w\\|=5>3$ ⇒ $w\\leftarrow w\\cdot c/\\|w\\|$."
+    solution: |-
+      $w\leftarrow[3,4]\cdot3/5=[1.8,2.4]$. Yön korunur, norm sınıra iner. Dropout ile birlikte büyük η kullanmayı mümkün kılar (Srivastava ve ark. 2014).
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Doğrulama kaybı U çiziyor
+    goal: Erken durdurmayı ve aşırı uyumu okumak
+    needs: Eğitim/doğrulama eğrileri
+    q: |-
+      Eğitim kaybı sürekli iniyor; doğrulama kaybı epoch 12'ye kadar iniyor, sonra yükseliyor; doğrulama **doğruluğu** ise epoch 20'ye kadar hafifçe artmaya devam ediyor. Ne olur, hangi kontrol noktasını seçersin?
+    choices:
+      - {t: "Epoch 12; doğruluk artışı tesadüf", why: "Kayıp ve doğruluk farklı şeyleri ölçer; ayrılmaları bilgilendiricidir."}
+      - {t: "Model aşırı **güvenli** hâle geliyor: yanlış tahminlerinde olasılıkları uçlara itiyor (kayıp ↑) ama sıralaması hâlâ biraz iyileşiyor (doğruluk ↑); seçim hedef ölçüte göre yapılır", ok: true, why: "Kalibrasyon bozulurken sınıflandırma sınırı iyileşebilir."}
+      - {t: "Veri sızıntısı var", why: "Sızıntı genelde doğrulamayı gerçekdışı iyi yapar, U çizdirmez."}
+    hints:
+      - "Çapraz entropi yalnız doğru/yanlışı değil, ne kadar emin olunduğunu da ölçer."
+    solution: |-
+      Doğruluk argmax'a, kayıp olasılığın kendisine bakar. Geç aşamada model az sayıdaki yanlışına çok emin olur (−ln p büyür) ama sınır bölgesindeki örnekleri biraz daha iyi ayırır. Olasılık lazımsa (risk, kalibrasyon) epoch 12'yi seç ya da sonradan sıcaklık ölçekle; yalnız etiket lazımsa doğruluğa göre seç. Her durumda seçim doğrulama kümesinde, test kümesi dokunulmadan yapılır.
+  - id: p5
+    type: birleştir
+    level: 3
+    title: Dropout ve L2 bağlantısı
+    goal: Dropout'u doğrusal modelde uyarlamalı bir L2 cezası olarak yorumlamak (M1.3)
+    needs: P1, beklenen değer
+    q: |-
+      Doğrusal regresyonda girdiye dropout: $\hat y=\sum_jw_j\frac{m_j}qx_j$. Beklenen kare kaybın $\mathbb E[(y-\hat y)^2]=(y-w^\top x)^2+\frac pq\sum_jw_j^2x_j^2$ olduğunu göster ve yorumla.
+    rubric:
+      - "Önyargı–varyans ayrışımını ($\\mathbb E[(y-\\hat y)^2]=(y-\\mathbb E\\hat y)^2+\\mathrm{Var}\\hat y$) kullandım"
+      - "$\\mathbb E\\hat y=w^\\top x$ ve $\\mathrm{Var}\\hat y=\\sum_j w_j^2x_j^2\\frac pq$ (bağımsız maskeler) buldum"
+      - "Veri üzerinden toplanınca cezanın $\\lambda_j\\propto\\sum_i x_{ij}^2$ ağırlıklı L2 olduğunu söyledim"
+      - "Sık/büyük değerli özniteliklerin daha çok cezalandırıldığını yorumladım"
+    hints:
+      - "$\\mathrm{Var}(m_j/q)=p/q$."
+    solution: |-
+      $\mathbb E[\hat y]=w^\top x$; maskeler bağımsız olduğundan $\mathrm{Var}(\hat y)=\sum_jw_j^2x_j^2\mathrm{Var}(m_j/q)=\frac pq\sum_jw_j^2x_j^2$. Veri üzerinden toplam: $\|y-Xw\|^2+\frac pq\sum_jw_j^2\sum_ix_{ij}^2$ — veri ölçeğine göre ağırlıklandırılmış ridge (Wager ve ark. 2013). Derin ağlarda bu basit bağlantı tam geçerli değildir ama sezgi aynıdır: dropout tek tek birimlere aşırı güvenmeyi cezalandırır.
+pitfalls:
+  - wrong: "Dropout'u test zamanında da açık bırak."
+    right: "Standart kullanımda test zamanı deterministiktir (`model.eval()`); bilinçli olarak açık bırakmak MC dropout'tur ve ortalama alınmalıdır."
+  - wrong: "BatchNorm ve dropout'u her yerde birlikte kullanmak hep iyidir."
+    right: "Dropout BN'den önce gelirse eğitim–test arasında varyans kayması yaratır (Li ve ark. 2019); dikkatli yerleştir ya da birini seç."
+  - wrong: "Daha çok düzenlileştirme daha iyi genelleme demektir."
+    right: "Fazlası eksik uyuma (yüksek yanlılık) götürür; doğrulama eğrisiyle ayarla."
+whatif:
+  - q: "Veri 100 kat artarsa dropout oranı ne olmalı?"
+    a: "Varyans terimi zaten küçüldüğü için genelde daha az düzenlileştirme gerekir; büyük dil modelleri çoğu zaman dropout'suz eğitilir."
+  - q: "Gradyan kırpma bir düzenlileştirme midir?"
+    a: "Doğrudan değil: amacı optimizasyonu kararlı tutmaktır (patlayan gradyan). Yan etkisi olarak büyük adımları sınırladığı için dinamiği değiştirir."

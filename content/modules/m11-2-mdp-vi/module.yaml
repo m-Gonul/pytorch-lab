@@ -118,3 +118,100 @@ labs:
       - q: "Kalan hata sınırı γ^k R_max/(1−γ) neden gerçek farktan çok büyük?"
         a: "En kötü durum sınırıdır; gerçek yakınsama hızı geçiş yapısına (ör. sönümlenen yolların sayısına) bağlıdır. Yine de eğim (ln γ) birebir tutar."
     limits: "5 × 5 ızgara, iki duvar; kayma yalnız sağa/sola dik yönde."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bellman operatörü bir büzülmedir
+    goal: Değer iterasyonunun yakınsamasını kanıtlamak
+    needs: Sup-normu, Banach sabit nokta teoremi (sezgisel)
+    q: |-
+      $(TV)(s)=\max_a\big[r(s,a)+\gamma\sum_{s'}P(s'|s,a)V(s')\big]$. $\|TV-TU\|_\infty\le\gamma\|V-U\|_\infty$ olduğunu kanıtla.
+    solution: |-
+      **Lemma:** $|\max_af(a)-\max_ag(a)|\le\max_a|f(a)-g(a)|$. (Kanıt: $a^*$, $f$'nin argmax'ı olsun: $\max f-\max g\le f(a^*)-g(a^*)\le\max|f-g|$; simetrik.)
+
+      **Uygula:** $|(TV)(s)-(TU)(s)|\le\max_a\gamma\big|\sum_{s'}P(s'|s,a)(V(s')-U(s'))\big|\le\gamma\max_a\sum_{s'}P(s'|s,a)\|V-U\|_\infty=\gamma\|V-U\|_\infty$ (olasılıklar toplamı 1).
+
+      **Sonuç:** $s$ üzerinden maksimum alınca iddia. Banach teoremiyle tek bir sabit nokta $V^*$ vardır ve $V_k=T^kV_0\to V^*$, hata $\gamma^k\|V_0-V^*\|_\infty$ ile söner. Durdurma: $\|V_{k+1}-V_k\|_\infty<\varepsilon(1-\gamma)/(2\gamma)$ ise greedy politika $\varepsilon$-en iyidir.
+
+      **γ = 1 olursa** büzülme kalkar; sonlu ufuk ya da sonlanan (proper) politikalar olmadan sonuç geçmez.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Sabit ödülün indirimli toplamı
+    goal: Geometrik seriyle değer hesaplamak
+    needs: Geometrik seri
+    q: |-
+      Her adımda ödül 1, sonsuza dek, $\gamma=0.95$. Getiri $G=\sum_{t\ge0}\gamma^t$?
+    answer: 19.999999999999982
+    calc: "1/(1-0.95)"
+    mistakes:
+      - {answer: 18.999999999999982, msg: "Toplam t = 0'dan başlıyor: ilk ödül indirimsiz, 1/(1 − γ)."}
+    hints:
+      - "$\\sum_{t\\ge0}\\gamma^t=\\frac1{1-\\gamma}$."
+    solution: |-
+      $1/0.05=20$. γ'nın "etkin ufku" ≈ $1/(1-\gamma)=20$ adım.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Bir Bellman güncellemesi
+    goal: Değer iterasyonu adımını elle yapmak
+    needs: P1
+    q: |-
+      Durum $s$, iki eylem. $a_1$: ödül 1, olasılık 1 ile $s'$'ye ($V(s')=10$). $a_2$: ödül 3, olasılık 0.5 ile $s'$'ye, 0.5 ile çukura ($V=0$). $\gamma=0.9$. $(TV)(s)$?
+    answer: 10.0
+    calc: "max(1+0.9*10, 3+0.9*(0.5*10+0.5*0))"
+    mistakes:
+      - {answer: 7.5, msg: "Bu a₂'nin değeri; max her iki eylemi karşılaştırır: a₁ = 1 + 9 = 10."}
+      - {answer: 11.0, msg: "Gelecek değeri γ ile indirgemeyi unuttun."}
+    hints:
+      - "Her eylem için $r+\\gamma\\mathbb E[V(s')]$, sonra max."
+    solution: |-
+      $a_1$: $1+0.9\cdot10=10$; $a_2$: $3+0.9\cdot5=7.5$. $(TV)(s)=10$, greedy eylem $a_1$: anlık ödülü küçük ama güvenli.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Kaç iterasyon yeter?
+    goal: Büzülme sınırını kullanarak iterasyon sayısı bulmak
+    needs: P1
+    q: |-
+      $\gamma=0.9$, $\|V_1-V_0\|_\infty=1$. $\|V_{k+1}-V_k\|_\infty\le\gamma^k$ sınırıyla farkın $10^{-3}$'ün altına inmesi için en küçük $k$?
+    answer: 66.0
+    calc: "math.ceil(math.log(1e-3)/math.log(0.9))"
+    mistakes:
+      - {answer: 1.0, msg: "Sınır doğrusal değil üstel: γ^k ≤ 10⁻³ ⇒ k ≥ ln 10⁻³ / ln γ."}
+    hints:
+      - "$0.9^k\\le10^{-3}$."
+    solution: |-
+      $k\ge\ln10^{-3}/\ln0.9=65.6$ → 66. γ = 0.99'da ≈ 688: uzun ufuk yavaş yakınsama demek.
+  - id: p5
+    type: uyarla
+    level: 3
+    title: Dinamik fiyatlandırmayı MDP olarak kur
+    goal: Gerçek bir problemi MDP bileşenlerine çevirmek
+    needs: MDP tanımı
+    q: |-
+      Bir mağaza her gün bir ürün için fiyat seçiyor (3 seviye); stok her sabah belli bir miktara tamamlanmıyor, sipariş 3 gün sonra geliyor. Durum, eylem, geçiş, ödül ve γ'yı tanımla; Markov varsayımının nerede zorlandığını söyle.
+    rubric:
+      - "Durumu (stok düzeyi + yolda olan siparişler + gerekirse haftanın günü) tanımladım"
+      - "Eylemi (fiyat seviyesi, sipariş miktarı) tanımladım"
+      - "Geçişi talep dağılımına (fiyata bağlı) dayandırdım"
+      - "Ödülü (gelir − stok tutma − stoksuz kalma maliyeti) yazdım"
+      - "Gecikmeli siparişlerin durumu genişletmeden Markov olmayacağını, mevsimselliğin de durum gerektirdiğini açıkladım"
+    hints:
+      - "Yarın ne olacağını bilmek için bugün neleri bilmen gerekir?"
+    solution: |-
+      Durum: $s=(\text{stok},\ \text{yolda olan siparişler } o_1,o_2,o_3,\ \text{gün})$; yalnız stok yetmez, çünkü 3 gün sonra gelecek sipariş geleceği belirler — durumu genişletmek Markov özelliğini geri getirir. Eylem: (fiyat, sipariş). Geçiş: talep $D\sim\mathrm{Poisson}(\lambda(\text{fiyat}))$, stok $\leftarrow\max(\text{stok}-D,0)+o_1$. Ödül: $\text{fiyat}\cdot\min(D,\text{stok})-h\cdot\text{stok}-c\cdot\max(D-\text{stok},0)$. γ ≈ 0.99 (günlük, uzun ufuk). Modül anlatımındaki perakende örneği bunun en basit hâli.
+pitfalls:
+  - wrong: "γ yalnız matematiksel bir kolaylıktır."
+    right: "γ aynı zamanda problemin tanımıdır: küçük γ kısa vadeli, büyük γ uzun vadeli davranış ister ve yakınsamayı yavaşlatır."
+  - wrong: "Değer iterasyonu değerler tam yakınsamadan durdurulursa politika kötüdür."
+    right: "Greedy politika genellikle değerlerden çok önce sabitlenir (deney: 'Erken durdurma'); bu politika iterasyonunun hızlı olmasının nedenidir."
+  - wrong: "Ödül her zaman pozitif olmalı."
+    right: "Negatif adım ödülü (ceza) 'hızlı bitir' demektir; ödül tasarımı istenen davranışı belirler, tuhaf kısayollara da açabilir."
+whatif:
+  - q: "Geçiş olasılıkları bilinmiyorsa?"
+    a: "Değer iterasyonu doğrudan uygulanamaz; deneyimden öğrenen modelsiz yöntemler (MC, TD, Q-öğrenme — M11.4–11.5) ya da modeli öğrenip planlama (Dyna, M11.10) gerekir."
+  - q: "Durum sayısı 10¹⁰ olsaydı?"
+    a: "Tablo tutulamaz; değer fonksiyonu yaklaşık temsil edilir (doğrusal ya da sinir ağı, M11.6) ve büzülme garantisi kaybolabilir (ölümcül üçlü)."

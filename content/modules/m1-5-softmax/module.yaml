@@ -99,3 +99,114 @@ labs:
       - {name: "Logitler eşit", params: {spread: 0}, note: "Düzgün dağılım: H = ln K."}
       - {name: "Büyük aralık", params: {spread: 12}, note: "Neredeyse one-hot: çapraz entropi kaybı doğru sınıf için ≈ 0, yanlışsa ≈ 12."}
     limits: "Sabit, yapay logit dizisi."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Softmax + çapraz entropinin gradyanı
+    goal: $\nabla_zL=p-e_y$'yi türetmek
+    needs: Softmax Jacobian'ı
+    q: |-
+      $p_i=e^{z_i}/\sum_je^{z_j}$, $L=-\ln p_y$. $\partial L/\partial z_k$'yı bul.
+    solution: |-
+      **Yol 1 (log-sum-exp):** $L=-z_y+\ln\sum_je^{z_j}$. Türev: $\frac{\partial L}{\partial z_k}=-\mathbb 1[k=y]+\frac{e^{z_k}}{\sum_je^{z_j}}=p_k-\mathbb 1[k=y]$.
+
+      **Yol 2 (Jacobian):** $\frac{\partial p_i}{\partial z_k}=p_i(\mathbb 1[i=k]-p_k)$. $\frac{\partial L}{\partial z_k}=-\frac1{p_y}\frac{\partial p_y}{\partial z_k}=-(\mathbb 1[y=k]-p_k)$ — aynı sonuç.
+
+      **Yorum:** $\sum_kp_k-1=0$: gradyanın bileşenleri toplamı sıfırdır. Bu, softmax'ın kayma değişmezliğinin ($z\to z+c\mathbf 1$ hiçbir şeyi değiştirmez) gradyandaki izidir: $\mathbf 1$ yönünde öğrenecek bir şey yoktur.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kayıp
+    goal: LSE ile kaybı hesaplamak
+    needs: P1
+    q: |-
+      $z=[2,1,0]$, doğru sınıf $y=0$. $L=-\ln p_0$ kaç?
+    answer: 0.40760596444438013
+    calc: "math.log(math.exp(2)+math.exp(1)+1)-2"
+    tol: 1e-3
+    mistakes:
+      - {answer: 2.40760596444438, msg: "LSE(z)'yi buldun; doğru sınıfın logit'ini (2) çıkar."}
+      - {answer: 0.6652409557748219, msg: "Bu p₀; kayıp −ln p₀."}
+    hints:
+      - "$L=\\ln(e^2+e^1+e^0)-2$."
+    solution: |-
+      $e^2+e+1=11.107$, $\ln=2.4076$, $L=0.4076$; $p_0=e^{-0.4076}=0.665$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Yanlış sınıfın gradyanı
+    goal: $p-e_y$'yi bileşen bileşen okumak
+    needs: P1, P2
+    q: |-
+      Aynı örnekte $\partial L/\partial z_1$ kaç?
+    answer: 0.24472847105479764
+    calc: "math.exp(1)/(math.exp(2)+math.exp(1)+1)"
+    tol: 1e-3
+    mistakes:
+      - {answer: -0.7552715289452023, msg: "−1 yalnız doğru sınıfın (y = 0) bileşeninde; z₁ yanlış sınıf."}
+    hints:
+      - "Yanlış sınıflar için gradyan kendi olasılığıdır."
+    solution: |-
+      $p_1=e/11.107=0.2447$. GD $z_1$'i olasılığı oranında düşürür.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: "e^1000"
+    goal: Kayma değişmezliğini sayısal kararlılık için kullanmak
+    needs: Kayan nokta aralığı
+    q: |-
+      `p = np.exp(z) / np.exp(z).sum()` $z=[1000, 999, 998]$ için `[nan, nan, nan]` veriyor. Düzeltme hangisi ve neden doğru?
+    choices:
+      - {t: "z'yi 1000'e böl", why: "Bu sıcaklığı değiştirir: başka bir dağılım hesaplarsın."}
+      - {t: "z'den max(z)'yi çıkar: softmax(z − c) = softmax(z), en büyük üs 0 olur", ok: true, why: "Pay ve payda aynı e^{−c} ile çarpılır; taşma imkânsızlaşır."}
+      - {t: "float32 yerine float64 kullan", why: "float64'te de e^{1000} = inf."}
+    hints:
+      - "$e^{709}$ float64'ün sınırına yakın."
+    solution: |-
+      $\frac{e^{z_i-c}}{\sum_je^{z_j-c}}=\frac{e^{-c}e^{z_i}}{e^{-c}\sum e^{z_j}}$. $c=\max z$ ile üslerin en büyüğü 0, hiçbir terim taşmaz, en az biri 1 olduğu için payda ≥ 1. Kayıp için doğrudan $\mathrm{LSE}(z)=c+\ln\sum e^{z_j-c}$ kullan (log-softmax).
+  - id: p5
+    type: açıkla
+    level: 2
+    title: İki sınıfta softmax = sigmoid
+    goal: Softmax ile lojistik regresyon arasındaki bağı kurmak
+    needs: M1.4
+    q: |-
+      İki sınıflı softmax'ın lojistik regresyona indirgendiğini göster. Bu, softmax'ın parametreleri hakkında ne söyler?
+    rubric:
+      - "$p_1=\\frac{e^{z_1}}{e^{z_0}+e^{z_1}}=\\sigma(z_1-z_0)$ yazdım"
+      - "Yalnız logit farkının önemli olduğunu, K sınıfta K−1 serbest logit olduğunu söyledim"
+      - "Bu fazlalığın (ağırlık vektörlerine aynı vektörü eklemek) tanımlanabilirlik sorunu yarattığını ve düzenlileştirmenin bunu çözdüğünü belirttim"
+    hints:
+      - "Payı ve paydayı $e^{z_1}$'e böl."
+    solution: |-
+      $p_1=\frac1{1+e^{-(z_1-z_0)}}=\sigma(z_1-z_0)$. Softmax'ta tüm $w_k$'lara aynı $v$'yi eklemek hiçbir olasılığı değiştirmez: parametreler tek değildir (K−1 bağımsız). Cezasız eğitimde bu yön boyunca kayma serbesttir; L2 cezası en küçük normlu (ortalaması sıfır) temsiliyi seçer.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Çapraz entropinin dışbükeyliği
+    goal: Logit'lerde dışbükeyliği Hessian ile göstermek
+    needs: P1, pozitif yarı tanımlılık
+    q: |-
+      $L(z)=\mathrm{LSE}(z)-z_y$'nin Hessian'ı $H=\mathrm{diag}(p)-pp^\top$'dir. $H$'nin pozitif yarı tanımlı olduğunu kanıtla ve sıfır özdeğerinin yönünü bul.
+    rubric:
+      - "$v^\\top Hv=\\sum_ip_iv_i^2-(\\sum_ip_iv_i)^2$ yazdım"
+      - "Bunu $p$ dağılımı altında $v$'nin varyansı olarak tanıdım (≥ 0)"
+      - "Sıfır özdeğer yönünün $v=\\mathbf 1$ (sabit vektör) olduğunu ve kayma değişmezliğiyle ilişkisini söyledim"
+    hints:
+      - "Bir rastgele değişken $V$ olasılığı $p_i$ ile $v_i$ değerini alsın."
+    solution: |-
+      $v^\top Hv=\sum_ip_iv_i^2-(\sum_ip_iv_i)^2=\mathbb E_p[V^2]-\mathbb E_p[V]^2=\mathrm{Var}_p(V)\ge0$. Eşitlik ancak $V$ sabitken: $v\propto\mathbf 1$. $W$'ye göre ($z=Wx$) dışbükeylik doğrusal bir dönüşümle korunur; dolayısıyla softmax regresyonu dışbükeydir (ama $\mathbf 1$ yönünde tek değildir, P5).
+pitfalls:
+  - wrong: "Softmax çıktısı modelin ne kadar emin olduğunu güvenilir biçimde gösterir."
+    right: "Softmax olasılıkları çoğu zaman aşırı güvenlidir (özellikle dağılım dışı girdilerde); kalibrasyon için sıcaklık ölçekleme gerekir."
+  - wrong: "softmax ve log'u ayrı ayrı hesapla."
+    right: "log(softmax(z)) küçük olasılıklarda −∞'a yuvarlanır; doğrudan log-softmax = z − LSE(z) kullan (PyTorch: `F.cross_entropy` logit alır)."
+  - wrong: "Softmax en büyük logit'in sırasını değiştirebilir."
+    right: "exp tekdüze olduğu için argmax değişmez; sıcaklık yalnız 'ne kadar keskin' olduğunu değiştirir."
+whatif:
+  - q: "Hedefler one-hot değil de yumuşak (ör. 0.9 / 0.05 / 0.05, etiket yumuşatma) olsaydı?"
+    a: "Gradyan yine $p-q$ ($q$ hedef dağılım) olur; model logit'leri sonsuza itmeye çalışmaz, aşırı güven azalır (M4.14)."
+  - q: "Sınıf sayısı 50 000 (sözlük) olsaydı?"
+    a: "Her adımda tüm sınıfların toplamı pahalıdır: örneklenmiş softmax, negatif örnekleme (M4.12) ya da hiyerarşik softmax kullanılır."

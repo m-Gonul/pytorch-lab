@@ -105,3 +105,116 @@ labs:
       - q: "Entropi–d_k grafiğinde ölçekli eğri neden yatay?"
         a: "Ölçekli skorların dağılımı d_k'dan bağımsız (std 1); dolayısıyla softmax dağılımı da d_k'dan bağımsız."
     limits: "Rastgele q, k; eğitilmiş modellerde q ve k ilişkilidir ve normları öğrenilir (QK-norm gibi teknikler bu yüzden var)."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: "q·k'nın varyansı d_k: √d_k nereden geliyor?"
+    goal: Ölçekleme çarpanını türetmek
+    needs: Bağımsız değişkenlerin çarpımının varyansı
+    q: |-
+      $q,k\in\mathbb R^{d_k}$, bileşenler bağımsız, ortalama 0, varyans 1. $q\cdot k$'nın ortalamasını ve varyansını bul.
+    solution: |-
+      $q\cdot k=\sum_{i=1}^{d_k}q_ik_i$. Her terim: $\mathbb E[q_ik_i]=\mathbb E[q_i]\mathbb E[k_i]=0$, $\mathrm{Var}(q_ik_i)=\mathbb E[q_i^2]\mathbb E[k_i^2]=1$. Terimler bağımsız: $\mathrm{Var}(q\cdot k)=d_k$.
+
+      $\frac{q\cdot k}{\sqrt{d_k}}$'nın varyansı 1'dir, $d_k$'dan bağımsız. Ölçeklenmezse $d_k=512$'de skorların std'si ≈ 22.6 olur; softmax neredeyse one-hot'a doyar ve Jacobian'ı $\mathrm{diag}(\alpha)-\alpha\alpha^\top\approx0$ olur (deney alanı). **Varsayım:** başlangıçta bağımsız birim varyanslı bileşenler; eğitim sonrası q ve k ilişkili olur — bu yüzden bazı modeller ayrıca QK-norm kullanır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Bir attention ağırlığı
+    goal: Ölçekli skor ve softmax'ı elle hesaplamak
+    needs: P1, softmax (M1.5)
+    q: |-
+      $q=[1,1]$, anahtarlar $k_1=[1,0]$, $k_2=[0,1]$, $k_3=[1,1]$, $d_k=2$. Üçüncü anahtarın ağırlığı $\alpha_3$?
+    answer: 0.5034898434845538
+    calc: "math.exp(2/math.sqrt(2))/(2*math.exp(1/math.sqrt(2))+math.exp(2/math.sqrt(2)))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.5761168847658291, msg: "Skorları √d_k = √2'ye bölmeyi unuttun."}
+      - {answer: 0.5, msg: "Ağırlıklar skorların oranı değil, softmax'ı."}
+    hints:
+      - "Skorlar $[1,1,2]/\\sqrt2$."
+    solution: |-
+      Skorlar $[0.707,0.707,1.414]$; $\alpha_3=\frac{e^{1.414}}{2e^{0.707}+e^{1.414}}=\frac{4.113}{4.056+4.113}=0.503$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Çok başlı attention'ın parametreleri
+    goal: Başların parametreyi değil hesabı böldüğünü görmek
+    needs: Doğrusal izdüşümler
+    q: |-
+      $d_{model}=512$, 8 baş, $d_k=d_v=64$, $W_Q,W_K,W_V,W_O$ bias'lı. Toplam parametre?
+    answer: 1050624.0
+    calc: "4*512*512+4*512"
+    mistakes:
+      - {answer: 787968.0, msg: "Çıkış izdüşümü W_O'yu (512 × 512 + bias) unuttun: dört izdüşüm var."}
+      - {answer: 1048576.0, msg: "Dört izdüşümün bias'larını (4 × 512) ekle."}
+    hints:
+      - "Q, K, V izdüşümleri 8 başın birleşimi olarak $512\\times512$; çıkış $512\\times512$."
+    solution: |-
+      $4\cdot512^2+4\cdot512=1\,050\,624$. Baş sayısı parametreyi değiştirmez (h·d_k = d_model sabit), yalnız temsili alt uzaylara böler.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Skor matrisinin belleği
+    goal: Attention'ın n² maliyetini somutlaştırmak
+    needs: Bellek hesabı
+    q: |-
+      $n=4096$ token, 16 baş, fp16 (2 bayt), batch 1. Tek katmandaki skor matrislerinin (softmax öncesi) toplam belleği kaç MiB?
+    answer: 512.0
+    calc: "16*4096*4096*2/2**20"
+    unit: MiB
+    mistakes:
+      - {answer: 0.125, msg: "Skor matrisi n × n: 4096² eleman."}
+      - {answer: 1024.0, msg: "fp16 2 bayttır, fp32 değil."}
+    hints:
+      - "Eleman sayısı: baş × n × n."
+    solution: |-
+      $16\cdot4096^2\cdot2\ \text{B}=512$ MiB, tek katman, tek örnek — geri yayılım için saklanırsa katman sayısıyla çarpılır. FlashAttention bu matrisi hiç tam yazmadan, bloklar hâlinde çevrimiçi softmax ile hesaplar (M7.2).
+  - id: p5
+    type: açıkla
+    level: 2
+    title: Attention bir sözlük aramasıdır
+    goal: Q/K/V rollerini kendi cümlelerinle anlatmak
+    needs: Ağırlıklı ortalama
+    q: |-
+      Q, K, V'yi "yumuşak sözlük araması" benzetmesiyle açıkla; sert (argmax) aramadan farkını ve neden türevlenebilir olmanın önemli olduğunu söyle.
+    rubric:
+      - "Sorgu ile her anahtarın benzerliği (iç çarpım) ölçülür dedim"
+      - "Değerlerin benzerliğe göre ağırlıklı ortalaması döner dedim"
+      - "Sert aramanın tek anahtarı seçtiğini ve türevlenemediğini, softmax'ın ağırlıkları sürekli yaptığını açıkladım"
+      - "Anahtar ile değerin neden ayrı izdüşümler olduğunu (neye göre bulunduğu ≠ ne taşıdığı) söyledim"
+    hints:
+      - "Python sözlüğü `d[q]` ile karşılaştır."
+    solution: |-
+      Sözlükte sorgu tam bir anahtarla eşleşir, o anahtarın değeri döner. Attention'da sorgu tüm anahtarlarla benzerlik skoru üretir; softmax bu skorları olasılığa çevirir; çıktı değerlerin bu olasılıklarla ortalamasıdır. Argmax'ın türevi hemen her yerde 0'dır; softmax ağırlıkları skorların düzgün fonksiyonudur, böylece "neye bakılacağı" gradyanla öğrenilir. K ve V'nin ayrı izdüşümleri, bir token'ın "nasıl bulunacağını" (anahtar) "ne aktaracağından" (değer) ayırır.
+  - id: p6
+    type: karşı-örnek
+    level: 3
+    title: Konumsuz attention sırayı görmez
+    goal: Permütasyon eşdeğerliğini göstermek
+    needs: Matris permütasyonu
+    q: |-
+      Konum kodlaması olmayan öz-attention'ın permütasyona eşdeğer olduğunu ($\mathrm{Attn}(PX)=P\,\mathrm{Attn}(X)$) kanıtla ve bunun "köpek adamı ısırdı" / "adam köpeği ısırdı" için ne anlama geldiğini söyle.
+    rubric:
+      - "$Q=XW_Q$ ise $PX$ için $PQ$, $PK$, $PV$ olduğunu yazdım"
+      - "$\\mathrm{softmax}(PQK^\\top P^\\top)=P\\,\\mathrm{softmax}(QK^\\top)P^\\top$ (satır işlemi permütasyonla değişir) gösterdim"
+      - "Sonucu $P\\,\\mathrm{Attn}(X)$ olarak tamamladım ($P^\\top P=I$)"
+      - "Kelime sırası farklı iki cümlenin aynı çıktı kümesini (yeniden sıralanmış) vereceğini ve konum kodlamasının gerekli olduğunu söyledim"
+    hints:
+      - "Satır-bazlı softmax, satırları ve sütunları aynı permütasyonla değiştirmeye nasıl tepki verir?"
+    solution: |-
+      $S'=(PQ)(PK)^\top/\sqrt d=PSP^\top$. Softmax satır satır uygulanır ve bir satırdaki elemanların yerini değiştirmek çıktıyı aynı biçimde değiştirir: $\mathrm{softmax}(PSP^\top)=P\,\mathrm{softmax}(S)\,P^\top$. Çıktı $P\,\mathrm{softmax}(S)P^\top PV=P\,\mathrm{Attn}(X)$. Yani iki cümledeki "köpek" token'ı aynı vektörü alır; anlam farkı kaybolur. Sinüzoidal ya da öğrenilen konum kodlaması (M4.14) ya da göreli konum (RoPE) bu simetriyi kırar. Nedensel maske de sırayı kısmen kodlar (P'yi bozar).
+pitfalls:
+  - wrong: "Attention ağırlıkları modelin 'neye baktığını' güvenilir biçimde açıklar."
+    right: "Ağırlıklar değerlerin normunu ve sonraki katmanları hesaba katmaz; farklı ağırlıklar aynı çıktıyı verebilir (Jain & Wallace 2019)."
+  - wrong: "Çok başlı attention parametre sayısını baş sayısıyla çarpar."
+    right: "Toplam izdüşüm boyutu sabit tutulur (P3); başlar alt uzaylara bölünmüş temsil sağlar."
+  - wrong: "Maske eklemek için skoru 0 yap."
+    right: "Softmax'tan **önce** −∞ (ya da çok negatif sayı) eklenir; 0 skoru e⁰ = 1 ağırlık demektir."
+whatif:
+  - q: "Ölçek √d_k yerine d_k olsaydı?"
+    a: "Skor varyansı 1/d_k olur: büyük d_k'da softmax neredeyse düzgüne yakınsar, attention seçiciliğini kaybeder (öğrenilebilir ama başlangıç kötü)."
+  - q: "Dizi uzunluğu 10 katına çıkarsa?"
+    a: "Skor matrisi ve hesap 100 kat büyür (n²); seyrek, kayan pencereli ya da doğrusal attention ve FlashAttention bu yüzden var."
