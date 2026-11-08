@@ -1,11 +1,11 @@
 # Değişiklik günlüğü
 
-## 2026-11 (2. tur) · Faz 2 ve Faz 4'te pratik
+## 2026-11 (2. tur) · Faz 0, 2, 3 ve 4'te pratik
 
-- **Faz 2 (klasik ML, 8 modül)** ve **Faz 4'ün kalan 13 modülü** (CNN, LSTM/GRU, BPE, Transformer, CNN blokları, tespit, segmentasyon, zaman serisi, word2vec, seq2seq, kodlayıcı–kod çözücü Transformer, ViT, ön eğitimli dil modelleri) pratik kartları, sık yanılgılar ve "koşul değişirse" sorularıyla genişletildi.
-- Toplam: **38 modülde 212 kart** (38 çözülmüş örnek, 76 temel, 61 uygulama, 37 zorlayıcı); türler: hesaplama 81, yöntem seçme 22, açıklama 15, karşı örnek 14, yorumlama 12, kanıt 10, hata bulma 8, birleştirme 4, uyarlama 3, kod 3, eksik adım 2. **95 yanılgı, 63 koşul sorusu.**
-- Yeni çözülmüş türetimler: uzaklık matrisi açılımı ve sayısal yok etme riski, Gini/entropi kazancı, bagging varyansı $\rho\sigma^2+(1-\rho)\sigma^2/B$, pseudo-residual = negatif gradyan, ortak varyanslı Gaussian NB'nin doğrusal oluşu, polinom çekirdeğinin öznitelik haritası, Lloyd'un sonluluğu, EM'in sert limiti olarak k-means, AR(1) momentleri, sinüzoidal konum kodlamasının göreli konumu dönme olarak taşıması, transposed conv çıkış boyu, Transformer bloğunun 12d² + 13d parametresi, DPO'nun RLHF'den türetilmesi.
-- Kontrol: tüm sayısal cevaplar bağımsız hesapla doğrulandı; sık hata değerlerinin doğru cevaptan farklı olduğu test edildi (bir çakışma yakalanıp düzeltildi).
+- **Faz 0** (iç çarpım, matris çarpımı, olasılık/MLE, tensör belleği), **Faz 2** (klasik ML, 8 modül), **Faz 3'ün kalanı** (micrograd, tensör autograd, perceptron, eğitim pratiği) ve **Faz 4'ün kalan 13 modülü** (CNN, LSTM/GRU, BPE, Transformer, CNN blokları, tespit, segmentasyon, zaman serisi, word2vec, seq2seq, kodlayıcı–kod çözücü Transformer, ViT, ön eğitimli dil modelleri) pratik kartları, sık yanılgılar ve "koşul değişirse" sorularıyla genişletildi. **Faz 0–4 artık bütünüyle kapsandı.**
+- Toplam: **46 modülde 252 kart** (46 çözülmüş örnek, 92 temel, 70 uygulama, 44 zorlayıcı); türler: hesaplama 98, yöntem seçme 23, açıklama 18, karşı örnek 16, yorumlama 14, hata bulma 12, kanıt 11, kod 4, birleştirme 4, uyarlama 3, eksik adım 2, proje 1. **111 yanılgı, 71 koşul sorusu.**
+- Yeni çözülmüş türetim ve kanıtlar: Cauchy–Schwarz, matris zinciri çarpım sırası, Bernoulli MLE, stride ile adresleme, micrograd geri geçişi, yayının gradyanı (unbroadcast), Novikoff yakınsama teoremi, XOR'un ayrılamazlığı, uzaklık matrisi açılımı ve sayısal yok etme riski, Gini/entropi kazancı, bagging varyansı $\rho\sigma^2+(1-\rho)\sigma^2/B$, pseudo-residual = negatif gradyan, ortak varyanslı Gaussian NB'nin doğrusal oluşu, polinom çekirdeğinin öznitelik haritası, Lloyd'un sonluluğu, EM'in sert limiti olarak k-means, AR(1) momentleri, sinüzoidal konum kodlamasının göreli konumu dönme olarak taşıması, transposed conv çıkış boyu, Transformer bloğunun 12d² + 13d parametresi, DPO'nun RLHF'den türetilmesi.
+- Kontrol: tüm sayısal cevaplar bağımsız hesapla doğrulandı; sık hata değerlerinin doğru cevaptan farklı olduğu test edildi (iki çakışma yakalanıp düzeltildi); çözülmüş örneklerde tekrar eden etiket kaldırıldı.
 
 ## 2026-11 (1. tur)
 
@@ -54,7 +54,7 @@ Model çözümlerin tüm kontrolleri geçmesi ve iskeletlerin geçmemesi (101 mo
 
 ### Henüz eksik olanlar
 
-- (1. tur sonunda) Pratik kartları 17 modüldeydi; 2. turda 38'e çıktı. Kalanlar: Faz 0'ın diğer modülleri, Faz 3'ün kalanı, Faz 5–11 (difüzyon/VAE dışında).
+- (1. tur sonunda) Pratik kartları 17 modüldeydi; 2. turda 46'ya çıktı (Faz 0–4 tamam). Kalanlar: Faz 5 (VAE ve difüzyon dışında), Faz 6–11 (MDP dışında): 55 modül.
 - Statik açıklayıcı diyagramlar (hesap grafiği, mimari çizimleri) henüz yok; görseller deneylerin gerçek hesaplı grafikleriyle sınırlı.
 - Slaytlardaki şekiller metin olarak okunamadığı için karşılaştırma başlık ve metin düzeyinde yapıldı.
 - Doku belleği (M10.4) ve CUDA alıştırmaları tarayıcıda GPU olmadığı için kavramsal/Colab'da.

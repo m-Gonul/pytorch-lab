@@ -85,3 +85,94 @@ homework:
     accept:
       - "Üç yöntem de KS testinden geçer."
       - "Hız ve kuyruk doğruluğu tablosu."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bernoulli için en çok olabilirlik
+    goal: MLE'yi türevle bulmak
+    needs: Logaritma, türev
+    q: |-
+      $n$ atışta $h$ tura. $p$'nin MLE'sini türet.
+    solution: |-
+      **Olabilirlik:** $L(p)=p^h(1-p)^{n-h}$ (atışlar bağımsız). Logaritma tekdüze olduğundan $\log L$'yi en büyüklemek aynıdır ve çarpımı toplama çevirir: $\ell(p)=h\log p+(n-h)\log(1-p)$.
+
+      **Türev:** $\ell'(p)=\frac hp-\frac{n-h}{1-p}=0\Rightarrow h(1-p)=(n-h)p\Rightarrow\hat p=h/n$. $\ell''<0$: maksimum.
+
+      **Bağlantı:** $-\ell(p)/n$, ikili çapraz entropidir. Lojistik regresyon (M1.4) aynı olabilirliği $p=\sigma(w^\top x)$ ile en büyükler. **Sınır:** $h=0$ ise $\hat p=0$ — "hiç görmediğim şey imkânsız" (P5).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Yazı-tura MLE'si
+    goal: P1'i uygulamak
+    needs: P1
+    q: |-
+      10 atışta 7 tura. $\hat p$?
+    answer: 0.7
+    calc: "7/10"
+    mistakes:
+      - {answer: 0.5, msg: "Bu önsel bir varsayım; MLE gözlenen orandır."}
+    hints:
+      - "$h/n$."
+    solution: |-
+      $0.7$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Negatif log-olabilirlik
+    goal: NLL'yi hesaplamak
+    needs: P1
+    q: |-
+      Aynı veri, $p=0.7$. NLL $=-[7\ln0.7+3\ln0.3]$ (nat)?
+    answer: 6.108643020548936
+    calc: "-(7*math.log(0.7)+3*math.log(0.3))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 2.6529499557412155, msg: "Doğal log (ln) kullan; log₁₀ farklı ölçek verir."}
+      - {answer: 1.5606477482646686, msg: "Her gözlem katkı yapar: 7 tura, 3 yazı."}
+    hints:
+      - "$\\ln0.7=-0.357$, $\\ln0.3=-1.204$."
+    solution: |-
+      $7\cdot0.357+3\cdot1.204=6.109$.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Gauss'un MLE varyansı
+    goal: Yanlı MLE varyansını hesaplamak
+    needs: Ortalama, varyans
+    q: |-
+      Veri $[1,2,3,6]$. Gauss MLE'sinin varyansı ($\frac1n\sum(x-\bar x)^2$)?
+    answer: 3.5
+    calc: "(4+1+0+9)/4"
+    mistakes:
+      - {answer: 4.666666666666667, msg: "Bu yansız (n − 1) tahmin; MLE n'ye böler."}
+    hints:
+      - "$\\bar x=3$."
+    solution: |-
+      $14/4=3.5$. MLE varyansı yanlıdır: $\mathbb E[\hat\sigma^2]=\frac{n-1}n\sigma^2$, çünkü $\bar x$ veriye uydurulmuştur (bir serbestlik derecesi harcanır). BN tam bu yanlı tahmini kullanır (M3.6).
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Az veride MLE aşırı güvenlidir
+    goal: Önselin rolünü göstermek
+    needs: P1, Bayes kuralı
+    q: |-
+      3 atışta 0 tura: MLE $\hat p=0$. Bu neden kötü bir tahmin ve Beta(α, β) önseliyle posterior ortalaması ne olur? α = β = 1 için hesapla ve yorumla.
+    rubric:
+      - "p = 0'ın gelecekte tura gelme olasılığını sıfır saydığını, log-kaybı sonsuz yapabileceğini söyledim"
+      - "Beta önselinin posteriorunun Beta(α + h, β + n − h) olduğunu yazdım"
+      - "Posterior ortalamasını (h + α)/(n + α + β) = 1/5 buldum"
+      - "Bunun Laplace düzeltmesiyle (M2.2) aynı olduğunu ve n büyüdükçe MLE'ye yaklaştığını söyledim"
+    hints:
+      - "Beta–Bernoulli eşleniktir."
+    solution: |-
+      $\hat p=0$ ile bir sonraki tura için log-kayıp ∞. Önsel Beta(1, 1) (düzgün): posterior Beta(1, 4), ortalaması $\frac{0+1}{3+2}=0.2$. Bu Laplace "+1" kuralıdır. Veri arttıkça önselin etkisi $\frac{\alpha+\beta}{n}$ oranında söner.
+pitfalls:
+  - wrong: "Olabilirlik, parametrenin olasılığıdır."
+    right: "$L(\\theta)=p(\\text{veri}|\\theta)$, θ'nın fonksiyonu olarak verinin olasılığıdır; θ üzerinde integrali 1 olmak zorunda değil. θ'nın olasılığı posteriordur."
+  - wrong: "MLE her zaman yansızdır."
+    right: "Gauss varyansında olduğu gibi yanlı olabilir (P4); tutarlıdır (n → ∞'da doğruya gider)."
+whatif:
+  - q: "Gözlemler bağımsız değilse (zaman serisi)?"
+    a: "Olabilirlik çarpana ayrılmaz; koşullu çarpım $\\prod p(x_t|x_{<t})$ kullanılır — dil modellerinin kaybı tam olarak budur."

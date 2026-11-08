@@ -105,3 +105,97 @@ homework:
     accept:
       - "Elle kurulan ağın hatası ~1/N azalır."
       - "Testere dişinde derin ağ birkaç birimle, sığ ağ ~2^k birimle başarılı."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Perceptron yakınsama teoreminin kanıtı (Novikoff)
+    goal: Hata sayısının üst sınırını türetmek
+    needs: İç çarpım, Cauchy–Schwarz (M0.1 P1)
+    q: |-
+      Veri $\gamma$ marjıyla ayrılabilir: birim normlu $w^*$ için $y_i\,w^{*\top}x_i\ge\gamma$, ve $\|x_i\|\le R$. Perceptron ($w\leftarrow w+y_ix_i$ her hatada, $w_0=0$) en fazla $(R/\gamma)^2$ hata yapar.
+    solution: |-
+      $k$ hatadan sonraki ağırlık $w_k$.
+
+      **1. Hizalanma büyür:** her hatada $w_{k}\cdot w^*=w_{k-1}\cdot w^*+y_ix_i\cdot w^*\ge w_{k-1}\cdot w^*+\gamma$ ⇒ $w_k\cdot w^*\ge k\gamma$.
+
+      **2. Norm yavaş büyür:** $\|w_k\|^2=\|w_{k-1}\|^2+2y_iw_{k-1}\cdot x_i+\|x_i\|^2\le\|w_{k-1}\|^2+R^2$, çünkü hata yapıldığı için $y_iw_{k-1}\cdot x_i\le0$. ⇒ $\|w_k\|^2\le kR^2$.
+
+      **3. Birleştir (Cauchy–Schwarz):** $k\gamma\le w_k\cdot w^*\le\|w_k\|\|w^*\|=\|w_k\|\le\sqrt kR$ ⇒ $k\le(R/\gamma)^2$.
+
+      **Ne söyler/söylemez:** sınır boyuttan ve veri sayısından bağımsızdır; yalnız geometri (marj) belirler. Veri ayrılabilir değilse sınır yoktur ve perceptron sonsuza dek salınır (XOR, P4).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Hata sınırı
+    goal: Novikoff sınırını uygulamak
+    needs: P1
+    q: |-
+      $R=2$, $\gamma=0.5$. En fazla kaç hata?
+    answer: 16.0
+    calc: "(2/0.5)**2"
+    mistakes:
+      - {answer: 4.0, msg: "Sınır (R/γ)²: karesini al."}
+    hints:
+      - "$(R/\\gamma)^2$."
+    solution: |-
+      16.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Bir perceptron güncellemesi
+    goal: Öğrenme kuralını uygulamak
+    needs: P1
+    q: |-
+      $w=(0,0)$, $b=0$, örnek $x=(1,2)$, $y=+1$ (karar $\mathrm{sign}(w\cdot x+b)$, 0 hata sayılır). Güncellemeden sonra $w_2$?
+    answer: 2.0
+    calc: "2"
+    mistakes:
+      - {answer: 0.0, msg: "w·x + b = 0 ≤ 0: hata var, güncelleme yapılır."}
+      - {answer: -2.0, msg: "y = +1: w ← w + y x."}
+    hints:
+      - "$w\\leftarrow w+yx$."
+    solution: |-
+      $w=(1,2)$, $b=1$ → $w_2=2$.
+  - id: p4
+    type: kanıt
+    level: 2
+    title: XOR doğrusal ayrılamaz
+    goal: Tek katmanın sınırını kanıtlamak
+    needs: Doğrusal eşitsizlikler
+    q: |-
+      $(0,0)\to0$, $(1,1)\to0$, $(0,1)\to1$, $(1,0)\to1$'i ayıran $w_1x_1+w_2x_2+b$ ($>0$ ↔ sınıf 1) olmadığını kanıtla.
+    rubric:
+      - "Dört eşitsizliği yazdım: b ≤ 0, w₁ + w₂ + b ≤ 0, w₂ + b > 0, w₁ + b > 0"
+      - "Son ikisini toplayıp w₁ + w₂ + 2b > 0 elde ettim"
+      - "İlk ikisini toplayıp w₁ + w₂ + 2b ≤ 0 elde ettim ve çelişki gösterdim"
+      - "Bir gizli katmanın (ör. x₁ OR x₂ ve x₁ AND x₂) çözdüğünü belirttim"
+    hints:
+      - "Eşitsizlikleri çiftler hâlinde topla."
+    solution: |-
+      (1) $b\le0$, (2) $w_1+w_2+b\le0$, (3) $w_2+b>0$, (4) $w_1+b>0$. (3) + (4): $w_1+w_2+2b>0$. (1) + (2): $w_1+w_2+2b\le0$. Çelişki. Gizli katman: $h_1=[x_1+x_2-0.5>0]$ (OR), $h_2=[x_1+x_2-1.5>0]$ (AND), çıktı $[h_1-h_2-0.5>0]$. Minsky & Papert'in (1969) bu gözlemi tek katmanlı ağlara ilgiyi uzun süre söndürdü.
+  - id: p5
+    type: yöntem-seç
+    level: 2
+    title: Perceptron mu, lojistik regresyon mu?
+    goal: İki doğrusal sınıflandırıcıyı karşılaştırmak
+    needs: M1.4
+    q: |-
+      Veri gürültülü (ayrılabilir değil), olasılık çıktısı da lazım. Perceptron mu lojistik regresyon mu?
+    choices:
+      - {t: "Perceptron", why: "Ayrılamaz veride yakınsamaz ve olasılık vermez."}
+      - {t: "Lojistik regresyon", ok: true, why: "Dışbükey, düzgün kayıp; ayrılamaz veride de iyi tanımlı minimum ve olasılık çıktısı."}
+      - {t: "Fark etmez, ikisi de doğrusal", why: "Sınır doğrusal olsa da eğitim ve çıktı farklı."}
+    hints:
+      - "Perceptron kuralı hangi kaybın alt-gradyanıdır?"
+    solution: |-
+      Perceptron kuralı $\max(0,-y\,w^\top x)$ kaybının alt-gradyanı: marj sıfır, doğru sınıflanan örneklerden öğrenmez, ayrılamaz veride salınır (ortalama perceptron ya da cebli algoritma yardımcı olur). Lojistik regresyon olasılık verir ve her örnekten öğrenir.
+pitfalls:
+  - wrong: "Perceptron her veride sonunda doğru ayırıcıyı bulur."
+    right: "Yalnız doğrusal ayrılabilir veride; aksi hâlde salınır (P1, P4)."
+  - wrong: "Yapay nöron biyolojik nöronun modelidir."
+    right: "Esin kaynağıdır, model değil: gerçek nöronlar zamansal spike'lar, dendritik hesap ve çok çeşitli plastisite gösterir."
+whatif:
+  - q: "Marj γ çok küçükse?"
+    a: "Sınır (R/γ)² büyür: neredeyse ayrılamaz veride yakınsama çok yavaş."

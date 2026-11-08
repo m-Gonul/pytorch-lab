@@ -92,3 +92,93 @@ homework:
     accept:
       - "Eşik üstünde Strassen'in daha hızlı olduğu bir n (ya da olmadığına dair ölçüm)."
       - "Hata tablosu: Strassen hatası n ile daha hızlı büyür."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Matris zinciri çarpımında sıra
+    goal: Birleşme özelliğinin maliyeti nasıl değiştirdiğini görmek
+    needs: Çarpma sayısı
+    q: |-
+      $A$ (10 × 100), $B$ (100 × 5), $C$ (5 × 50). $(AB)C$ ve $A(BC)$ için skaler çarpma sayısını karşılaştır.
+    solution: |-
+      $(m\times k)(k\times n)$ çarpımı $mkn$ çarpma (ve ~aynı sayıda toplama; FLOP ≈ $2mkn$).
+
+      $(AB)C$: $AB$: $10\cdot100\cdot5=5000$ → (10 × 5); sonra $\cdot C$: $10\cdot5\cdot50=2500$. **Toplam 7500.**
+      $A(BC)$: $BC$: $100\cdot5\cdot50=25\,000$ → (100 × 50); sonra $A\cdot$: $10\cdot100\cdot50=50\,000$. **Toplam 75 000.**
+
+      Sonuç matematiksel olarak aynı ($(AB)C=A(BC)$), maliyet 10 kat farklı. **Uygulama:** geri yayılımda $\nabla_x=W_1^\top W_2^\top g$'yi sağdan sola (vektörle) hesaplamak, önce matrisleri çarpmaktan çok daha ucuzdur — ters mod türevin verimliliği (M3.2 P5). `torch.linalg.multi_dot` ve `einsum(optimize=...)` en iyi sırayı arar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: En ucuz sıra
+    goal: P1'i uygulamak
+    needs: P1
+    q: |-
+      P1'deki matrisler için en ucuz sıranın skaler çarpma sayısı?
+    answer: 7500.0
+    calc: "10*100*5+10*5*50"
+    mistakes:
+      - {answer: 75000.0, msg: "Bu A(BC) sırası — 10 kat pahalı."}
+    hints:
+      - "Önce küçük ara sonuç üreten çarpımı yap."
+    solution: |-
+      $(AB)C$: 7500.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Bir katmanın FLOP'u
+    goal: Matris çarpımının hesap maliyetini sayıya dökmek
+    needs: P1
+    q: |-
+      Batch 64, girdi 1024, çıktı 4096'lık doğrusal katman (bias'sız): $XW$'nin FLOP sayısı ($2mkn$)?
+    answer: 536870912.0
+    calc: "2*64*1024*4096"
+    mistakes:
+      - {answer: 268435456.0, msg: "Bu çarpma sayısı; her çarpmaya bir toplama eşlik eder: FLOP ≈ 2mkn."}
+    hints:
+      - "$m=64$, $k=1024$, $n=4096$."
+    solution: |-
+      $2\cdot64\cdot1024\cdot4096\approx5.4\cdot10^8$ FLOP. Geri geçiş $dX$ ve $dW$ için iki çarpım daha: eğitim adımı ≈ 3 × ileri.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Batch'li çarpımda yanlış eksen
+    goal: Shape'leri okuyarak hatayı bulmak
+    needs: Batch matmul
+    q: |-
+      `A` (B, n, k), `X` (B, k, m). Bir öğrenci `torch.einsum('bnk,bmk->bnm', A, X)` yazmış ve "shape uymuyor" hatası alıyor. Doğrusu?
+    choices:
+      - {t: "`einsum('bnk,bkm->bnm', A, X)`", ok: true, why: "X'in eksenleri (b, k, m); toplanan indeks k."}
+      - {t: "`einsum('bnk,bmk->bmn', A, X)`", why: "X'i (b, m, k) varsaymaya devam ediyor."}
+      - {t: "`A @ X.T`", why: "3B tensörde .T tüm eksenleri ters çevirir (uyarıyla); batch ekseni kayar."}
+    hints:
+      - "Her tensörün eksen harflerini shape'iyle eşle."
+    solution: |-
+      Einsum dizgisindeki harfler tensörün **gerçek** eksen sırasını izlemeli: X (b, k, m) → `bkm`. Eşdeğeri `A @ X` ya da `torch.bmm(A, X)`. Transpoze gerekiyorsa `X.transpose(-1, -2)` kullan, `.T` değil.
+  - id: p5
+    type: açıkla
+    level: 3
+    title: Matris çarpımının dört görünümü
+    goal: Aynı işlemi farklı yorumlarla anlatmak
+    needs: Satır, sütun, dış çarpım
+    q: |-
+      $C=AB$'yi dört farklı biçimde yorumla (eleman, sütun, satır, dış çarpım toplamı). Hangisi hangi durumda düşünmeyi kolaylaştırır?
+    rubric:
+      - "$C_{ij}=a_i^{(satır)}\\cdot b_j^{(sütun)}$ (iç çarpımlar) yazdım"
+      - "C'nin her sütunu A'nın sütunlarının doğrusal birleşimi (B'nin sütunu katsayı) dedim"
+      - "C'nin her satırı B'nin satırlarının doğrusal birleşimi dedim"
+      - "$C=\\sum_k a_{:,k}b_{k,:}$ (rank-1 dış çarpımlar toplamı) yazdım ve düşük ranklı yaklaşım/SVD ile ilişkilendirdim"
+    hints:
+      - "Bir sütun için $Ab_j$ ne demek?"
+    solution: |-
+      (1) İç çarpımlar: hesap ve benzerlik (attention skorları). (2) Sütun görünümü: $C$'nin sütun uzayı $A$'nınkinin içinde (rank ≤ rank A). (3) Satır görünümü: bir batch'teki her örnek (satır) aynı dönüşümle çarpılır. (4) Dış çarpımlar: $\sum_k$ rank-1 matrisler — SVD, LoRA (düşük ranklı güncelleme $BA$) ve gradyanın $\nabla_W=\sum_ix_i\delta_i^\top$ biçimi.
+pitfalls:
+  - wrong: "Matris çarpımı değişmelidir."
+    right: "Genelde $AB\\ne BA$ (shape'ler uysa bile); birleşmelidir, sırayla gruplama serbesttir (P1)."
+  - wrong: "`*` ve `@` aynı şeydir."
+    right: "`*` eleman eleman (Hadamard), `@` matris çarpımıdır; shape'ler yayınla uyuşursa `*` sessizce yanlış sonuç verir."
+whatif:
+  - q: "Matrislerden biri köşegen olsaydı?"
+    a: "$\\mathrm{diag}(d)A$ = A'nın satırlarını ölçeklemek: O(n²) yerine eleman eleman çarpım (`d[:, None] * A`) yeter."

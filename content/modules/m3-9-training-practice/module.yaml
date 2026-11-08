@@ -98,3 +98,90 @@ homework:
       - "Sızıntılı ve sızıntısız skorları aynı tabloda raporla."
     accept:
       - "Her sızıntı türü için skor farkı ve düzeltilmiş protokol."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Sızıntı nereden girer?
+    goal: Ön işlemedeki veri sızıntısını tanımak
+    needs: Eğitim/doğrulama/test ayrımı
+    q: |-
+      Bir öğrenci önce **tüm** veriyi standartlaştırıp (ortalama/std), sonra eğitim/test diye bölüyor; ayrıca PCA'yı ve öznitelik seçimini de bölmeden önce yapıyor. Test skoru neden iyimser ve doğru akış ne?
+    solution: |-
+      **Sızıntı:** test örnekleri ortalama/std, PCA yönleri ve öznitelik seçimine katkı yaptı: model dolaylı olarak test dağılımını "gördü". Ortalama/std'de etki küçüktür; **öznitelik seçiminde** büyüktür: binlerce gürültülü öznitelikten etiketle en ilişkili olanlar tüm veride seçilirse, saf gürültüde bile test doğruluğu şansın çok üstünde çıkar.
+
+      **Doğru akış:** önce böl; her dönüşümün parametrelerini **yalnız eğitim** kümesinde öğren (`fit`), sonra doğrulama ve teste uygula (`transform`). Çapraz doğrulamada bu her katmanın içinde tekrarlanır (scikit-learn `Pipeline`). Zaman serisinde ve gruplu veride (aynı hastanın birden çok görüntüsü) bölme de zamana/gruba göre yapılmalı.
+  - id: p2
+    type: hesap
+    level: 1
+    title: MLP'nin parametre sayısı
+    goal: Tam bağlı ağın parametrelerini saymak
+    needs: Doğrusal katman
+    q: |-
+      784-300-100-10 MLP (bias'lı). Toplam parametre?
+    answer: 266610.0
+    calc: "784*300+300+300*100+100+100*10+10"
+    mistakes:
+      - {answer: 266200.0, msg: "Bias'ları ekle: 300 + 100 + 10."}
+    hints:
+      - "Her katman $n_{in}n_{out}+n_{out}$."
+    solution: |-
+      $235\,500+30\,100+1\,010=266\,610$. İlk katman parametrelerin %88'i: girdi boyu büyük katmanlar pahalıdır (CNN'in ağırlık paylaşımı bunu çözer, M4.8).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Epoch başına adım
+    goal: Epoch, batch ve adım ilişkisini kurmak
+    needs: Bölme, tavan
+    q: |-
+      60 000 örnek, batch 128, son eksik batch atılmıyor. Epoch başına adım sayısı?
+    answer: 469.0
+    calc: "math.ceil(60000/128)"
+    mistakes:
+      - {answer: 468.0, msg: "Bu drop_last=True; son eksik batch de bir adım."}
+    hints:
+      - "$\\lceil60000/128\\rceil$."
+    solution: |-
+      469 (468 tam batch + 96 örnekli son batch). 20 epoch ≈ 9380 adım; öğrenme oranı takvimleri adımla tanımlanıyorsa bu sayı lazım.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Eğitim kaybı hiç düşmüyor
+    goal: Hata ayıklama sırasını uygulamak
+    needs: Eğitim döngüsü
+    q: |-
+      Yeni bir modelin eğitim kaybı ilk epoch'tan beri ln(10) ≈ 2.30 civarında sabit (10 sınıf). İlk yapılacak kontrol hangisi?
+    choices:
+      - {t: "Modeli büyüt", why: "Kayıp hiç düşmüyorsa kapasite sorunu değil."}
+      - {t: "Tek bir küçük batch'i aşırı ezberletmeyi dene: kayıp ~0'a inmiyorsa döngüde hata var (zero_grad, optimizer'a verilen parametreler, etiket/çıktı uyumu, öğrenme oranı)", ok: true, why: "ln(10) = rastgele tahminin kaybı; model hiçbir şey öğrenmiyor."}
+      - {t: "Daha çok veri topla", why: "Aynı."}
+    hints:
+      - "ln(10) hangi tahminin çapraz entropisi?"
+    solution: |-
+      ln K, düzgün tahminin kaybıdır: model girdiyi hiç kullanmıyor. Karpathy'nin "tek batch'i ezberle" testi bunu hızla ayırır. Sık nedenler: `optimizer.step()`/`zero_grad()` eksik, optimizer başka bir modelin parametrelerini tutuyor, softmax iki kez uygulanmış (`CrossEntropyLoss` logit bekler), etiketler karışık, η çok küçük ya da çok büyük, veri normalize edilmemiş.
+  - id: p5
+    type: proje
+    level: 3
+    title: Öğrenme oranı aralık testi
+    goal: η'yı sistematik seçmek
+    needs: LR takvimleri (M3.4)
+    q: |-
+      Bir öğrenme oranı aralık testi (LR range test) tasarla: nasıl çalıştırırsın, eğrinin hangi noktasından η seçersin, ne zaman yanıltır?
+    rubric:
+      - "η'yı birkaç yüz adım boyunca küçükten büyüğe üstel artırıp kaybı kaydettiğimi söyledim"
+      - "Kaybın en hızlı düştüğü bölgeden (ya da minimumun ~1/10'u) seçtiğimi söyledim"
+      - "Kaybın patladığı noktanın üst sınırı verdiğini açıkladım"
+      - "Gürültülü eğriyi yumuşatmak, testi model ilk ağırlıklarıyla tekrarlamak ve takvim/ısınma ile birlikte düşünmek gerektiğini belirttim"
+    hints:
+      - "x ekseni log η, y ekseni (yumuşatılmış) kayıp."
+    solution: |-
+      Smith (2017): η'yı 10⁻⁷'den 10'a üstel artır, her adımda kaybı kaydet (EMA ile yumuşat), kayıp minimumun ~4 katını geçince dur. Seçim: eğimin en dik olduğu η ya da minimumdaki η'nın ~1/10'u. Yanıltabilir: Adam'da ısınma etkisi, BN'li ağlarda ölçek değişmezliği, çok kısa test. Seçilen η ile kısa bir doğrulama koşusu yap.
+pitfalls:
+  - wrong: "Test kümesine bakarak hiperparametre seçmek sorun değil, yalnız bir kez baktım."
+    right: "Her bakış testi doğrulama kümesine çevirir; raporlanan skor iyimser olur. Test kümesi en sonda bir kez kullanılır."
+  - wrong: "Eğitim kaybı sıfırsa model iyidir."
+    right: "Aşırı uyum olabilir; doğrulama kaybına ve eğitim–doğrulama farkına bak."
+whatif:
+  - q: "Aynı deneyi farklı tohumlarla tekrarlayınca sonuç ±2 puan değişiyorsa?"
+    a: "Karşılaştırmalar en az 3–5 tohumla ortalama ± std ve eşleştirilmiş bootstrap ile raporlanmalı (M8.2 x3); tek koşuluk 1 puanlık 'iyileşme' gürültü olabilir."

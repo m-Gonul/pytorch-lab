@@ -79,3 +79,91 @@ homework:
     accept:
       - "Üç yöntemin hata büyüme hızları kuramla uyumlu."
       - "np.dot / np.sum davranışı için deneysel gerekçe."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Cauchy–Schwarz ve kosinüsün [−1, 1]'de kalması
+    goal: Kosinüs benzerliğinin neden iyi tanımlı olduğunu kanıtlamak
+    needs: İç çarpım, ikinci dereceden polinom
+    q: |-
+      $|a\cdot b|\le\|a\|\,\|b\|$'yi kanıtla ve bunun $\cos\theta=\frac{a\cdot b}{\|a\|\|b\|}$ için ne anlama geldiğini söyle.
+    solution: |-
+      **Kanıt:** $b\ne0$ olsun (aksi hâlde iki taraf 0). Her gerçel $t$ için $\|a-tb\|^2\ge0$: $p(t)=\|b\|^2t^2-2(a\cdot b)t+\|a\|^2\ge0$. Hiç negatif olmayan ikinci dereceden polinomun diskriminantı ≤ 0: $4(a\cdot b)^2-4\|a\|^2\|b\|^2\le0$ ⇒ iddia. **Eşitlik** ancak $a=tb$ (bir $t$ için $p(t)=0$), yani vektörler paralelken.
+
+      **Sonuç:** kosinüs her zaman $[-1,1]$'dedir ve ±1 yalnız aynı/zıt yönde vektörlerde. **Varsayım:** sıfırdan farklı vektörler; sıfır vektörünün kosinüsü tanımsız (pratikte paydaya küçük ε eklenir).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kosinüs benzerliği
+    goal: Kosinüsü hesaplamak
+    needs: P1
+    q: |-
+      $a=(1,2,3)$, $b=(4,-5,6)$. $\cos\theta$?
+    answer: 0.3654869423239036
+    calc: "12/(math.sqrt(14)*math.sqrt(77))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 12.0, msg: "Bu iç çarpım; normların çarpımına böl."}
+      - {answer: 0.011131725417439703, msg: "Normlar karekök: ‖a‖ = √14, ‖b‖ = √77."}
+    hints:
+      - "$a\\cdot b=4-10+18$."
+    solution: |-
+      $a\cdot b=12$, $\|a\|=\sqrt{14}$, $\|b\|=\sqrt{77}$ → $12/32.83=0.366$ (≈ 68.5°).
+  - id: p3
+    type: hesap
+    level: 1
+    title: İç çarpımın gradyanı
+    goal: $\nabla_a(a\cdot b)=b$'yi uygulamak
+    needs: Kısmi türev
+    q: |-
+      $f(a)=a\cdot b$, $b=(4,-5,6)$. $\partial f/\partial a_2$?
+    answer: -5.0
+    calc: "-5"
+    mistakes:
+      - {answer: 2.0, msg: "Gradyan a'ya değil b'ye eşittir: ∂(Σaᵢbᵢ)/∂a₂ = b₂."}
+    hints:
+      - "$f=a_1b_1+a_2b_2+a_3b_3$."
+    solution: |-
+      $b_2=-5$. Doğrusal katmanda $\partial(w\cdot x)/\partial w=x$: ağırlığın gradyanı girdidir (M3.2).
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Yüksek boyutta rastgele vektörler
+    goal: Boyutla kosinüs dağılımının daralmasını yorumlamak
+    needs: Bağımsız rastgele değişkenler
+    q: |-
+      Bağımsız N(0, I) vektörler arasındaki kosinüs, $d=3$'te geniş bir dağılım gösterirken $d=1000$'de hemen hep 0 civarında (±0.06). Neden ve ne anlama gelir?
+    choices:
+      - {t: "Yüksek boyutta vektörler daha kısa olur", why: "Normlar √d ile büyür."}
+      - {t: "a·b'nin std'si √d, normların çarpımı ≈ d: kosinüs std'si ≈ 1/√d. Rastgele yönler neredeyse diktir; anlamlı benzerlik 0'dan belirgin sapmadır", ok: true, why: "Ölçüm yoğunlaşması."}
+      - {t: "Sayısal hata", why: "Gerçek bir olasılık sonucu."}
+    hints:
+      - "$\\mathrm{Var}(a\\cdot b)=d$."
+    solution: |-
+      $\cos\approx\frac{\mathcal N(0,d)}{d}$ → std $1/\sqrt d=0.032$ ($d=1000$). Yüksek boyutta birbirine neredeyse dik çok sayıda yön sığar; gömme uzaylarında 0.2'lik bir kosinüs bile anlamlı olabilir. Attention'daki √d ölçeği (M4.6) aynı hesaptan gelir.
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Kosinüs uzaklığı bir metrik midir?
+    goal: Benzerlikten uzaklığa geçişin koşullarını sınamak
+    needs: Metrik aksiyomları
+    q: |-
+      $d(a,b)=1-\cos(a,b)$ bir metrik mi? Aksiyomları sına, bozulan için karşı örnek ver; metrik olan bir alternatif öner.
+    rubric:
+      - "Aynı yönlü farklı uzunluklu vektörlerde d = 0 ama a ≠ b (özdeşlik aksiyomu bozuk) dedim"
+      - "Üçgen eşitsizliğinin bozulduğu bir örnek verdim (ör. 0°, 45°, 90° yönlü birim vektörler)"
+      - "Açısal uzaklık θ = arccos(cos) ya da birim vektörlerde Öklid uzaklığını √(2 − 2cos) metrik olarak önerdim"
+    hints:
+      - "$a=e_1$, $b=(e_1+e_2)/\\sqrt2$, $c=e_2$ için $d(a,c)$ ile $d(a,b)+d(b,c)$'yi karşılaştır."
+    solution: |-
+      $d(a,c)=1$; $d(a,b)=d(b,c)=1-\frac1{\sqrt2}=0.293$ → toplam 0.586 < 1: üçgen eşitsizliği bozuk. Ayrıca $d(a,2a)=0$. Açı $\theta=\arccos\cos$ birim küre üzerinde gerçek bir metriktir; normalize vektörlerde Öklid uzaklığı $\sqrt{2-2\cos}$ da öyle (ve aynı sıralamayı verir). Metrik özellik, ağaç tabanlı indeksler ve bazı ANN yöntemleri için önemlidir.
+pitfalls:
+  - wrong: "İç çarpım büyükse vektörler benzerdir."
+    right: "İç çarpım normlara da bağlıdır; benzerlik için kosinüs (normalize edilmiş iç çarpım) kullanılır."
+  - wrong: "Sıfır vektörünün kosinüsü 0'dır."
+    right: "Tanımsızdır (0/0); uygulamalarda ε eklenir ve bu bir uzlaşmadır."
+whatif:
+  - q: "Vektörler önce ortalamaları çıkarılarak merkezlenirse kosinüs neye dönüşür?"
+    a: "Pearson korelasyon katsayısına."

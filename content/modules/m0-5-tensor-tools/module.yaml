@@ -82,3 +82,97 @@ homework:
     accept:
       - "Kendi dizinin sonuçları NumPy ile aynı."
       - "Kopya gerektiren reshape örneklerinin strides gerekçesi."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Stride ile adres hesabı ve kopyasız transpoze
+    goal: Shape, stride ve offset'in belleği nasıl tanımladığını görmek
+    needs: Satır öncelikli yerleşim
+    q: |-
+      float32, shape (2, 3, 4), bitişik (contiguous) tensör. Eleman cinsinden stride'lar, bayt cinsinden stride'lar, `[1, 2, 3]` elemanının adresi ve `transpose(0, 2)`'nin stride'ları?
+    solution: |-
+      **Stride (eleman):** son eksen 1; önceki eksen, sonrakilerin boyları çarpımı: $(3\cdot4,\,4,\,1)=(12,4,1)$. Bayt: ×4 → (48, 16, 4).
+
+      **Adres:** offset + $\sum_i\mathrm{idx}_i\cdot\mathrm{stride}_i=1\cdot12+2\cdot4+3\cdot1=23$. eleman → 92. bayt.
+
+      **Transpoze:** veri kopyalanmaz; yalnız shape ve stride sırası değişir: shape (4, 3, 2), stride (1, 4, 12). Artık son eksenin stride'ı 1 değil → **bitişik değil**. `view` bitişik bellek ister (hata verir), `reshape` gerekirse kopyalar, `.contiguous()` kopyalayıp yeniden düzenler. Bitişik olmayan tensörlerde bazı çekirdekler yavaşlar (önbellek dostu olmayan erişim).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Eleman adresi
+    goal: Stride'larla indeksi adrese çevirmek
+    needs: P1
+    q: |-
+      Shape (4, 5), bitişik, offset 0. `[2, 3]` elemanının eleman cinsinden adresi?
+    answer: 13.0
+    calc: "2*5+3"
+    mistakes:
+      - {answer: 14.0, msg: "Satır öncelikli düzende stride (5, 1): 2·5 + 3."}
+    hints:
+      - "Stride (5, 1)."
+    solution: |-
+      $13$. Sütun öncelikli (Fortran) düzende $3\cdot4+2=14$ olurdu.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Transpozun stride'ı
+    goal: Görünümlerin stride'larını izlemek
+    needs: P1
+    q: |-
+      Shape (4, 5) bitişik tensörün `.T`'sinde birinci eksenin stride'ı (eleman)?
+    answer: 1.0
+    calc: "1"
+    mistakes:
+      - {answer: 5.0, msg: "Transpoze stride'ları da yer değiştirir: (5, 1) → (1, 5)."}
+    hints:
+      - "Shape (5, 4), stride'lar ters sırada."
+    solution: |-
+      $(1,5)$: birinci eksen 1. Ardışık satırlar artık bellekte ardışık değil.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Görünümü değiştirince orijinal de değişti
+    goal: Görünüm (view) ile kopyayı ayırt etmek
+    needs: P1
+    q: |-
+      ```python
+      x = torch.zeros(3, 4)
+      y = x[:, 1]
+      y += 1
+      ```
+      Sonra `x` de değişmiş. Neden, ve x'i korumak için ne yapılmalı?
+    choices:
+      - {t: "PyTorch hatası", why: "Tasarım gereği: dilimleme bir görünümdür."}
+      - {t: "Temel dilimleme aynı belleği paylaşan bir görünüm döndürür; yerinde işlem (+=) orijinali değiştirir. `y = x[:, 1].clone()`", ok: true, why: "Görünüm yalnız shape/stride/offset tutar."}
+      - {t: "`y = x[:, 1] + 0` yazmak hiçbir şey değiştirmez", why: "Aslında yeni tensör üretir ve işe yarar; ama niyeti belirten `.clone()`."}
+    hints:
+      - "`y.data_ptr()` ile `x.data_ptr()` ilişkisi?"
+    solution: |-
+      `x[:, 1]` offset 1, stride (4,) olan bir görünümdür. Yerinde işlemler paylaşılan belleği değiştirir. Gelişmiş indeksleme (`x[[0, 2]]`, maske) ise kopya döndürür — fark sık hata kaynağıdır. Autograd'da görünüm üzerinde yerinde işlem bazen "a leaf Variable that requires grad is being used in an in-place operation" hatası verir.
+  - id: p5
+    type: kod
+    level: 3
+    title: Kayan pencereyi kopyasız kur
+    goal: as_strided ile pencere görünümü oluşturmak
+    needs: P1
+    q: |-
+      1B bitişik dizi `a` (n eleman, stride 1). Boyu k, adımı s olan tüm pencereleri (W, k) görünümü olarak kuran shape ve stride'ları yaz; W'yi formülle ver. Bu görünüme yazmanın neden tehlikeli olduğunu açıkla.
+    rubric:
+      - "W = ⌊(n − k)/s⌋ + 1 yazdım (M4.1 formülü)"
+      - "shape (W, k), stride (s, 1) (eleman cinsinden) yazdım"
+      - "Pencereler örtüştüğü için aynı bellek konumunun birden çok görünüm elemanına karşılık geldiğini, yazmanın beklenmedik sonuçlar vereceğini açıkladım"
+      - "`sliding_window_view`/`unfold`'un salt okunur ya da güvenli alternatif olduğunu söyledim"
+    hints:
+      - "Bir sonraki pencere bellekte kaç eleman ileride başlar?"
+    solution: |-
+      `as_strided(a, shape=(W, k), strides=(s, 1))` (bayt stride'ı için ×itemsize), $W=\lfloor(n-k)/s\rfloor+1$. Pencereler örtüşürse ($s<k$) bir eleman birden çok satırda görünür; bir hücreye yazmak öteki pencereleri de değiştirir. Yanlış shape/stride bellek dışına okur (çökme ya da çöp). Güvenli: `np.lib.stride_tricks.sliding_window_view` (varsayılan salt okunur), `torch.Tensor.unfold`. Bu, konvolüsyonun im2col'udur (M4.1).
+pitfalls:
+  - wrong: "`reshape` her zaman kopyasızdır."
+    right: "Bitişik değilse kopyalar; `view` ise kopyalamaz ama bitişik olmayan tensörde hata verir."
+  - wrong: "Shape aynıysa bellek düzeni de aynıdır."
+    right: "Stride'lar farklı olabilir (transpoze edilmiş vs bitişik); performans ve view uyumluluğu stride'a bağlıdır."
+whatif:
+  - q: "Bir eksenin stride'ı 0 olursa?"
+    a: "O eksen boyunca aynı veri tekrarlanır: yayın (broadcast) ve `expand` bunu bellek kullanmadan yapar; yazmak tehlikelidir."

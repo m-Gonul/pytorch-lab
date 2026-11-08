@@ -89,3 +89,92 @@ homework:
     accept:
       - "Yerinde değişiklik geri geçişte yakalanır."
       - "Hessian-vektör çarpımı sonlu farkla eşleşir."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir nöronun elle geri geçişi
+    goal: Skaler autograd'ın adımlarını izlemek
+    needs: Zincir kuralı (M0.3)
+    q: |-
+      $o=\tanh(n)$, $n=x_1w_1+x_2w_2+b$; $x_1=2$, $w_1=-3$, $x_2=0$, $w_2=1$, $b=6.8814$. Tüm gradyanları bul.
+    solution: |-
+      **İleri:** $x_1w_1=-6$, $x_2w_2=0$, $n=0.8814$, $o=\tanh(0.8814)=0.7071$.
+
+      **Geri:** $\partial o/\partial n=1-o^2=0.5$. Toplama düğümü dağıtır: $\partial o/\partial b=0.5$, $\partial o/\partial(x_1w_1)=0.5$, $\partial o/\partial(x_2w_2)=0.5$. Çarpma değiştokuş eder: $\partial o/\partial w_1=0.5\cdot x_1=1.0$, $\partial o/\partial x_1=0.5\cdot w_1=-1.5$, $\partial o/\partial w_2=0.5\cdot x_2=0$, $\partial o/\partial x_2=0.5\cdot w_2=0.5$.
+
+      **Uygulama ilkesi:** her düğüm yerel türevini bilir; geri geçiş topolojik sıranın tersinde her düğümün `_backward`'ını çağırır ve gradyanları **toplar** (`+=`). $x_2=0$ olduğu için $w_2$ hiç öğrenmez: sıfır girdi sıfır ağırlık gradyanı verir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Basit bir grafik
+    goal: Çarpma düğümü kuralını uygulamak
+    needs: P1
+    q: |-
+      $f=a\cdot b+c$, $a=2$, $b=-3$, $c=10$. $\partial f/\partial a$?
+    answer: -3.0
+    calc: "-3"
+    mistakes:
+      - {answer: 2.0, msg: "Çarpma düğümünde gradyan diğer girdinin değeridir: b = −3."}
+    hints:
+      - "Toplama c'yi ayırır, çarpma $a\\cdot b$'nin türevi $b$."
+    solution: |-
+      $-3$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: tanh'ın yerel türevi
+    goal: Aktivasyonun yerel türevini kullanmak
+    needs: $\tanh'=1-\tanh^2$
+    q: |-
+      $o=\tanh(n)=0.6$. $\partial o/\partial n$?
+    answer: 0.64
+    calc: "1-0.36"
+    mistakes:
+      - {answer: 0.4, msg: "1 − tanh², yani 1 − 0.36."}
+    hints:
+      - "Çıktının kendisiyle ifade edilir: $1-o^2$."
+    solution: |-
+      $0.64$. Yerel türevi çıktıdan hesaplamak, girdiyi saklamaya gerek bırakmaz.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Bir değişken iki kez kullanılınca yanlış gradyan
+    goal: Gradyan biriktirmenin gerekliliğini göstermek
+    needs: M0.3 P3
+    q: |-
+      `b = a + a` için `b.backward()` sonrası `a.grad` 1 çıkıyor (doğrusu 2). `_backward` içinde hangi hata var?
+    choices:
+      - {t: "`self.grad = 1.0 * out.grad` (atama)", ok: true, why: "İkinci kullanım birincinin katkısının üstüne yazar; `+=` olmalı."}
+      - {t: "Topolojik sıralama yanlış", why: "Tek düğümlü grafikte sıra sorun değil."}
+      - {t: "`out.grad` 1 ile başlatılmamış", why: "Öyle olsaydı 0 çıkardı."}
+    hints:
+      - "`a` toplama düğümünün iki girdisi; her biri için `_backward` ne yazıyor?"
+    solution: |-
+      Toplama düğümünün iki girdisi de aynı nesne; ikinci `self.grad = …` birincinin üstüne yazar. Çok değişkenli zincir kuralı gradyanların toplanmasını ister: `self.grad += out.grad`. Bu yüzden her `backward`'dan önce gradyanlar sıfırlanır (`zero_grad`).
+  - id: p5
+    type: açıkla
+    level: 3
+    title: Neden topolojik sıra?
+    goal: Geri geçiş sırasının doğruluk koşulunu açıklamak
+    needs: Yönlü döngüsüz graf
+    q: |-
+      Bir düğümün `_backward`'ı çağrılmadan önce neden tüm "kullanıcılarının" (onu girdi alan düğümlerin) gradyanlarını yaymış olması gerekir? Ters topolojik sıranın bunu nasıl garanti ettiğini açıkla.
+    rubric:
+      - "Bir düğümün gradyanının tüm kullanıcılarından gelen katkıların toplamı olduğunu söyledim"
+      - "Eksik toplanmış bir gradyanı yaymanın aşağıdaki düğümlere eksik gradyan göndereceğini açıkladım"
+      - "Topolojik sıranın her düğümü girdilerinden sonra koyduğunu, tersinin her düğümü kullanıcılarından sonra işlediğini söyledim"
+      - "Grafiğin döngüsüz olması gerektiğini (yerinde döngüler yerine zamana açılmış grafik) belirttim"
+    hints:
+      - "Diamond biçimli bir grafik düşün: a → b, a → c, b, c → d."
+    solution: |-
+      $a$'nın gradyanı $b$ ve $c$ yollarının toplamıdır. $a$'yı $c$'nin katkısı gelmeden yayarsak yalnız $b$ yolunu aşağı göndeririz. Ters topolojik sıra (d, c, b, a ya da d, b, c, a) bir düğümü tüm kullanıcılarından sonra işler; DFS ile çıkış sırasında listeye eklemek bu sırayı verir. Grafik döngüsüz olmalı: RNN'ler zamana açılarak (BPTT) döngüsüz hâle getirilir.
+pitfalls:
+  - wrong: "Geri geçiş ileri geçişin tersine aynı işlemleri yapar."
+    right: "Her işlem için ayrı bir türev kuralı (VJP) uygulanır; geri geçiş ileri geçişin değerlerini kullanır ama farklı hesaplar yapar."
+  - wrong: "Gradyanlar her backward'da kendiliğinden sıfırlanır."
+    right: "Birikir (`+=`); her adımdan önce `zero_grad()` gerekir — gradyan biriktirme (accumulation) bu davranışı bilerek kullanır."
+whatif:
+  - q: "Grafikte max(a, b) düğümü ve a = b olursa?"
+    a: "Türevlenemez nokta; uygulama bir alt gradyan seçer (genelde ilk girdi ya da eşit bölüşüm) — tutarlı olduğu sürece sorun çıkmaz."
