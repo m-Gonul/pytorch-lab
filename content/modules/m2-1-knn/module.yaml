@@ -213,3 +213,49 @@ whatif:
     a: "Çoğunluk sınıfı komşuluklara hâkim olur; uzaklıkla ağırlıklı oylama, sınıf başına eşik ya da sınıf dengeli örnekleme gerekir."
   - q: "Komşuların oyları uzaklıkla ağırlıklandırılırsa?"
     a: "k'ya duyarlılık azalır; k = n bile anlamlı hâle gelir (çekirdek regresyonuna — Nadaraya–Watson — yaklaşır)."
+
+labs:
+  - id: l1
+    lab: knn2d
+    title: "k-NN: k, mesafe ölçüsü ve öznitelik ölçeği"
+    goal: |
+      Üç sınıflı 2B veri. Mor noktalar k-NN'nin karar sınırlarıdır (ızgarada tahminin değiştiği yerler). Sağ grafik eğitim hatasını (sorgu kendi komşusu sayılır), birini-dışarıda-bırak hatasını ve 300 ayrı doğrulama örneğindeki hatayı k'ya göre verir.
+    predict:
+      q: "k = 1'de eğitim hatası kaçtır? Doğrulama hatası en küçük k = 1'de mi olur?"
+      options:
+        - {t: "Eğitim hatası 0; doğrulama hatası genelde k = 1'de en küçük değildir", ok: true, why: "Her nokta kendisinin en yakın komşusudur. Gürültülü sınıflarda k = 1 yüksek varyanslıdır; orta bir k doğrulamada kazanır."}
+        - {t: "İkisi de en küçük k = 1'de", why: "Eğitim hatası evet; doğrulamada aşırı uyum yüzünden genelde hayır."}
+        - {t: "Eğitim hatası rastgele tahmin kadar", why: "k = 1'de eğitim noktası kendi etiketini oylar."}
+    presets:
+      - {name: "k = 1", params: {k: 1, spread: 0.8}, note: "Pürüzlü sınırlar, gürültülü noktaların etrafında adalar."}
+      - {name: "Orta k", params: {k: 15, spread: 0.8}, note: "Sınırlar yumuşadı; doğrulama hatası genelde burada düşük."}
+      - {name: "Çok büyük k", params: {k: 60, n: 90, spread: 0.8}, note: "Komşuların üçte ikisi her zaman başka sınıflardan: küçük sınıf bölgeleri kaybolmaya başlar."}
+      - {name: "Ölçeksiz öznitelik", params: {k: 5, stretch: 8}, note: "x₁ 8 katına çıktı: mesafe x₁'e hükmediyor, x₂'deki ayrım kayboluyor."}
+      - {name: "L∞ ölçüsü", params: {k: 5, metric: 2}, note: "Sınırlar eksenlere paralel ve 45° parçalardan oluşur: birim 'çember' bir kare."}
+    questions:
+      - q: "LOO hatası ile ayrı doğrulama hatası neden birbirine yakın?"
+        a: "LOO, her eğitim noktasını görülmemiş bir örnek gibi değerlendirir: k-NN'de neredeyse yansız bir doğrulama tahminidir ve ayrı veri gerektirmez."
+      - q: "Ağırlıklı oy, k büyükken neden daha iyi?"
+        a: "Uzak komşuların oyu küçülür; etkili komşuluk k'dan bağımsız olarak yerel kalır. k'ya duyarlılık azalır."
+    limits: "2B, üç Gauss kümesi; sınır 90 × 90 ızgarada argmax değişiminden çizilir. Hesap kaba kuvvettir (her sorgu için tüm uzaklıklar)."
+  - id: l2
+    lab: distconc
+    title: "Boyutun laneti: uzaklıklar yoğunlaşır, komşuluk yerel değildir"
+    goal: |
+      Birim küpte düzgün n nokta ve bir rastgele sorgu. Sol: sorgudan tüm noktalara uzaklıkların histogramı. Orta: en uzak ile en yakın arasındaki göreli farkın boyutla düşüşü. Sağ: verinin r oranını kapsamak için gereken alt küp kenarı $r^{1/d}$.
+    predict:
+      q: "d = 1000'de en uzak komşu en yakın komşudan yaklaşık yüzde kaç uzaktadır?"
+      options:
+        - {t: "Yalnız %10–20 kadar", ok: true, why: "Uzaklıklar √(d/6) ≈ 12.9 etrafında yoğunlaşır, std ≈ sabit (~0.24): göreli fark birkaç std / 12.9."}
+        - {t: "Yaklaşık 2 kat", why: "Bu düşük boyutta (d ≈ 10) görülür."}
+        - {t: "Yüzlerce kat", why: "d = 1–2'de en yakın komşu çok yakın olabilir; yüksek boyutta tersine yaklaşır."}
+    presets:
+      - {name: "d = 2", params: {d: 2, n: 1000, frac: 0.01}, note: "Geniş histogram: en yakın komşu belirgin biçimde yakın."}
+      - {name: "d = 100", params: {d: 100, n: 1000, frac: 0.01}, note: "Dar bir tepe: her nokta kabaca aynı uzaklıkta."}
+      - {name: "d = 1000", params: {d: 1000, n: 1000, frac: 0.01}, note: "Kontrast ~%10–20."}
+    questions:
+      - q: "n'yi 50'den 5000'e çıkarmak d = 1000'de en yakın komşuyu ne kadar yaklaştırır?"
+        a: "Çok az: daha fazla nokta, yoğunlaşmış dağılımın sol kuyruğundan biraz daha uç bir değer getirir. Yüksek boyutta veri miktarını artırmak lanetten kurtarmaz."
+      - q: "Gerçek görüntülerde k-NN neden yine de bir ölçüde çalışır?"
+        a: "Görüntüler 3072 boyutlu uzayda düzgün dağılmaz; düşük boyutlu bir manifolda yakındır. Etkili boyut çok daha düşüktür. İyi bir gömme bu yapıyı daha da belirginleştirir."
+    limits: "Düzgün dağılmış yapay veri: gerçek verideki manifold yapısı yoktur, bu yüzden lanetin en kötü hâlini gösterir."
