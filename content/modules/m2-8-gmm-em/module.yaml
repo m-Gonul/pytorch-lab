@@ -209,3 +209,29 @@ whatif:
     a: "EM eksik veriyi de gizli değişken gibi ele alıp E adımında koşullu beklentisini kullanabilir: eksik değerli GMM doğal olarak eğitilir."
   - q: "Bileşen sayısını önceden bilmiyorsan?"
     a: "BIC ile seçim ya da Dirichlet süreci karışımı (bileşen sayısını veriden öğrenen Bayesçi model)."
+
+labs:
+  - id: l1
+    lab: gmm2d
+    title: "EM adım adım: elipsler, sorumluluklar, monoton olabilirlik"
+    goal: |
+      Gauss karışımı EM ile eğitilir (60 iterasyon önceden hesaplanır; sürgüyle istediğin iterasyona git). Renkler noktaların en olası bileşeni, gri halkalı noktalar belirsiz olanlar (en büyük sorumluluk < 0.8). Düz elips 1σ, kesikli 2σ. Sağda ortalama log-olabilirlik: hiç düşmemeli.
+    predict:
+      q: "'2 eğik, uzamış grup' verisinde kovaryans türünü 'küresel' yaparsan ne olur?"
+      options:
+        - {t: "Bileşenler daire olmak zorunda; eğik grupları kötü ayırır, log-olabilirlik daha düşük kalır", ok: true, why: "Küresel kovaryans + sert atama limiti k-means'tir: uzamış kümeleri ortadan böler."}
+        - {t: "Hiçbir şey değişmez", why: "Kovaryans türü bileşenlerin şeklini kısıtlar."}
+        - {t: "Daha yüksek log-olabilirlik", why: "Daha kısıtlı model, aynı veride en fazla tam kovaryanslı kadar olabilirlik elde edebilir."}
+    presets:
+      - {name: "Başlangıç", params: {data: 1, K: 2, cov: 0, t: 0}, note: "Rastgele iki noktadan, birim kovaryansla başlar."}
+      - {name: "Birkaç adım", params: {data: 1, K: 2, cov: 0, t: 5}, note: "Elipsler grupların şekline dönmeye başladı."}
+      - {name: "Yakınsamış", params: {data: 1, K: 2, cov: 0, t: 60}, note: "Her bileşen bir eğik grubu temsil ediyor."}
+      - {name: "Küresel = k-means benzeri", params: {data: 1, K: 2, cov: 2, t: 60}, note: "Daireler eğik grupları iyi temsil edemez."}
+      - {name: "İç içe gruplar", params: {data: 2, K: 2, cov: 0, t: 60}, note: "Geniş ve dar iki grup aynı merkezde değil ama örtüşüyor: k-means bunu ayıramazdı, GMM varyans farkıyla ayırır."}
+      - {name: "Fazla bileşen", params: {data: 0, K: 5, cov: 0, t: 60}, note: "3 gerçek grup, 5 bileşen: bazı bileşenler bir grubu paylaşır. BIC bunu cezalandırır."}
+    questions:
+      - q: "Tohumu değiştirince sonuç neden değişebiliyor?"
+        a: "EM yerel bir optimuma yakınsar; başlangıç merkezlerine bağlıdır. Pratikte birkaç başlatma (ya da k-means ile başlatma) yapılıp en yüksek olabilirlikli sonuç seçilir."
+      - q: "Belirsiz noktalar nerede toplanıyor?"
+        a: "İki bileşenin yoğunluklarının (ağırlıklarıyla) yaklaşık eşit olduğu bölgede: sorumlulukların 0.5 civarında olduğu karar sınırının çevresinde."
+    limits: "2B; kovaryansa 10⁻⁴'lük bir taban eklenir (çöken bileşene karşı) — bu, log-olabilirlikte 10⁻⁹ mertebesinde sayısal dalgalanmalara yol açabilir. Başlangıç: rastgele K nokta, birim kovaryans, eşit ağırlık."

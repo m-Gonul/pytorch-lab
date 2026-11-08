@@ -106,6 +106,28 @@ labs:
         a: "Evet, k arttıkça en iyi J azalır (k = n'de 0). Bu yüzden J tek başına k seçemez; dirsek, siluet ya da BIC (GMM) kullanılır."
     limits: "2B, eşit varyanslı Gauss kümeleri; 20 iterasyon."
 
+  - id: l2
+    lab: kchoice
+    title: "k seçimi ve k-means'in varsayımları"
+    goal: |
+      k = 1…8 için k-means++ (5 başlatmanın en iyisi) çalıştırılır. Sol: seçilen k ile kümeler ve merkezler (gri). Orta: dirsek eğrisi J(k). Sağ: ortalama siluet. Veri kümelerinin üçü k-means'in varsayımlarını bilerek bozar.
+    predict:
+      q: "'Farklı boyut ve yoğunluk' verisinde (1 büyük seyrek, 2 küçük yoğun grup) k = 3 ile k-means ne yapar?"
+      options:
+        - {t: "Büyük grubu ikiye böler, iki küçük yoğun grubu tek kümede birleştirir", ok: true, why: "Kalabalık ve geniş bir kümenin kare uzaklık toplamı büyüktür; onu bölmek J'yi, küçük kümeleri ayrı tutmaktan daha çok azaltır."}
+        - {t: "Üç gerçek grubu doğru bulur", why: "Ancak gruplar benzer boyut ve yayılımda olsaydı."}
+        - {t: "Boş küme oluşur", why: "k-means++ başlatması boş küme olasılığını çok düşürür."}
+    presets:
+      - {name: "İdeal durum", params: {data: 0, k: 4}, note: "Dirsek ve siluet aynı k'yı gösterir."}
+      - {name: "Farklı boyutlar", params: {data: 1, k: 3}, note: "Büyük grup bölündü (saflık oranına bak)."}
+      - {name: "Uzamış kümeler", params: {data: 2, k: 2}, note: "İki yatay şerit yerine dikey bir kesim: k-means kümeleri küresel varsayar."}
+      - {name: "İki ay", params: {data: 3, k: 2}, note: "Dışbükey olmayan kümeler: hiçbir k doğru yapıyı vermez."}
+    questions:
+      - q: "Uzamış kümelerde siluet hangi k'yı seçiyor? Neden yanıltıcı?"
+        a: "Genelde gerçek sayıdan (2) büyük bir k: siluet de Öklid uzaklığına ve kompakt, küresel kümelere dayanır. Yanlış bir varsayımla seçilen k da yanlış olur."
+      - q: "Bu veri kümelerinden hangisinde GMM (M2.8) belirgin biçimde daha iyi olur?"
+        a: "Uzamış ve farklı boyutlu kümelerde: her bileşen kendi kovaryansını ve ağırlığını öğrenir. İki ayda GMM de zorlanır (birçok bileşenle yaklaşabilir)."
+    limits: "2B yapay veri. Siluet O(n²) ile tam hesaplanır. Saflık, gerçek etiketlerle eşleştirmesiz bir uyum ölçüsüdür (her küme kendi en kalabalık gerçek grubuna sayılır)."
 practice:
   - id: p1
     type: çözülmüş
