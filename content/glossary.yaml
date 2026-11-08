@@ -187,3 +187,6 @@ terms:
   mod çöküşü: "Mode collapse: GAN üreticisinin çıktılarının çeşitliliğini yitirip verinin birkaç moduna (sınıfına) sıkışması; ayırıcıyla birlikte modlar arasında çevrime girebilir."
   fid: "Fréchet Inception Distance: gerçek ve üretilen görüntülerin önceden eğitilmiş bir ağdaki öznitelikleri Gauss kabul edilerek ‖μ_r − μ_g‖² + tr(Σ_r + Σ_g − 2(Σ_rΣ_g)^{1/2}) ile ölçülen uzaklık; düşük daha iyi, hem kaliteyi hem çeşitliliği yansıtır."
   adain: "Adaptive Instance Normalization: öznitelik haritasını kanal başına kendi ortalama/std'siyle normalize edip dışarıdan verilen stil ölçek ve kaymasını uygulamak: y_s(x − μ)/σ + y_b (StyleGAN, stil aktarımı)."
+  sınıflandırıcısız yönlendirme: "Classifier-free guidance: aynı ağın koşullu ve (etiket bırakmayla öğrenilmiş) koşulsuz ε tahminlerini ε_u + s(ε_c − ε_u) ile karıştırmak; s > 1 kesinliği artırır, çeşitliliği azaltır."
+  sınıflandırıcı yönlendirmesi: "Classifier guidance: difüzyon örneklemesinde ε tahminini gürültülü veride eğitilmiş bir sınıflandırıcının ∇log p(y|x_t) gradyanıyla kaydırmak; p(x)p(y|x)^s'den örneklemeye karşılık gelir."
+  latent diffusion: "Difüzyonu piksel uzayı yerine önceden eğitilmiş bir otomatik kodlayıcının küçük gizli uzayında yapıp sonucu kod çözücüyle görüntüye açmak (Stable Diffusion)."

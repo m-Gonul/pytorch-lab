@@ -1,0 +1,106 @@
+id: m5-8-diffusion-guidance
+code: M5.8
+title: Diffusion II — koşullu üretim, sınıflandırıcı ve sınıflandırıcısız yönlendirme, latent diffusion
+phase: 5
+minutes: 380
+prereq: [m5-3-diffusion, m5-6-autoencoders]
+summary: >
+  DDPM'den Stable Diffusion'a: ileri sürecin ölçeklemesi (varyansın 1'e
+  yakınsaması), doğrusal ve kosinüs gürültü takvimleri ve SNR; koşullu
+  gürültü tahmini, sınıflandırıcı yönlendirmesi (Dhariwal & Nichol 2021) ve
+  sınıflandırıcısız yönlendirme (Ho & Salimans 2022) — ikisinin kesin
+  modellerde neden aynı olduğu, yönlendirme ölçeğinin kesinlik–çeşitlilik
+  ödünleşimi ve "aşırı doyma"; latent diffusion (Rombach ve ark. 2022):
+  önce otomatik kodlayıcıyla sıkıştır, gizli uzayda difüze et. NumPy'da
+  Gauss karışımı için kapalı formda "kâhin" ε ile yönlendirilmiş DDIM, PyTorch'ta
+  etiket bırakmalı koşullu bir ağ ve CFG, sonda piksel uzayı vs gizli uzay
+  difüzyonu. Ekler: takvimler, DDIM ters çevirme ile düzenleme, ε/x₀/v/skor
+  parametrizasyonları.
+goals:
+  - "[[sınıflandırıcısız yönlendirme]]: $\\hat\\varepsilon=\\varepsilon_u+s(\\varepsilon_c-\\varepsilon_u)$; [[sınıflandırıcı yönlendirmesi]]: $\\hat\\varepsilon=\\varepsilon-s\\sqrt{1-\\bar\\alpha}\\nabla\\log p(y|x_t)$"
+  - "Yönlendirme = $p(x)p(y|x)^s$'den örneklemek: Gauss örneğinde kapalı form"
+  - "Kosinüs takvimi, SNR; etiket bırakma ile tek ağda koşullu + koşulsuz model"
+  - "[[latent diffusion]]: AE + gizli uzayda difüzyon; maliyet ve kalite"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 17 (DDPM)", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Ho, Jain, Abbeel — Denoising Diffusion Probabilistic Models (NeurIPS 2020)", url: "https://arxiv.org/abs/2006.11239", license: "arXiv", use: link}
+  - {title: "Nichol & Dhariwal — Improved Denoising Diffusion Probabilistic Models (ICML 2021)", url: "https://arxiv.org/abs/2102.09672", license: "arXiv", use: link}
+  - {title: "Dhariwal & Nichol — Diffusion Models Beat GANs on Image Synthesis (NeurIPS 2021)", url: "https://arxiv.org/abs/2105.05233", license: "arXiv", use: link}
+  - {title: "Ho & Salimans — Classifier-Free Diffusion Guidance (2022)", url: "https://arxiv.org/abs/2207.12598", license: "arXiv", use: link}
+  - {title: "Rombach ve ark. — High-Resolution Image Synthesis with Latent Diffusion Models (CVPR 2022)", url: "https://arxiv.org/abs/2112.10752", license: "arXiv", use: link}
+  - {title: "Song, Meng, Ermon — Denoising Diffusion Implicit Models (ICLR 2021)", url: "https://arxiv.org/abs/2010.02502", license: "arXiv", use: link}
+  - {title: "Salimans & Ho — Progressive Distillation (v-parametrizasyonu, ICLR 2022)", url: "https://arxiv.org/abs/2202.00512", license: "arXiv", use: link}
+  - {title: "fast.ai Part 2 — Stable Diffusion from the Foundations", url: "https://course.fast.ai/Lessons/part2.html", license: "Apache-2.0", use: link}
+
+hand:
+  groups:
+    - title: "Yönlendirme"
+      fields:
+        - {id: cfg, label: "CFG: $\\varepsilon_u=0.2$, $\\varepsilon_c=0.5$, s = 3 → $\\hat\\varepsilon$", answer: 1.1, tol: 1.0e-9}
+        - {id: cg, label: "Sınıflandırıcı yönlendirmesi: ε = 0.4, $\\bar\\alpha=0.75$, s = 2, $\\nabla\\log p(y|x_t)=0.3$", answer: 0.1, tol: 1.0e-9}
+        - {id: gmean, label: "$p(x)=N(0,1)$, $p(y|x)\\propto N(x;2,1)$, $p(x)p(y|x)^s$ ile s = 3: ortalama", answer: 1.5, tol: 1.0e-9}
+        - {id: gvar, label: "Aynı dağılımın varyansı", answer: 0.25, tol: 1.0e-9}
+    - title: "Takvimler ve latent diffusion"
+      fields:
+        - {id: cosab, label: "Kosinüs takvimi (s = 0.008): $\\bar\\alpha$ tam ortada (t = T/2)", answer: 0.49384359044063775, tol: 1.0e-6}
+        - {id: snr, label: "$\\bar\\alpha=0.75$'te SNR = $\\bar\\alpha/(1-\\bar\\alpha)$", answer: 3, tol: 1.0e-9}
+        - {id: lat, label: "512 × 512 × 3 görüntü → 64 × 64 × 4 gizli kod: boyut küçülme oranı", answer: 48}
+  verify: |
+    import math
+    f = lambda t: math.cos((t + 0.008) / 1.008 * math.pi / 2) ** 2
+    answers = dict(cfg=0.2 + 3 * (0.5 - 0.2), cg=0.4 - 2 * math.sqrt(1 - 0.75) * 0.3, gmean=2 * 3 / (1 + 3), gvar=1 / (1 + 3),
+                   cosab=f(0.5) / f(0.0), snr=0.75 / 0.25, lat=512 * 512 * 3 // (64 * 64 * 4))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Gürültü takvimleri: doğrusal vs kosinüs, SNR", engine: browser}
+  - {id: x2, title: "DDIM ters çevirme ve koşulu değiştirerek düzenleme", engine: browser}
+  - {id: x3, title: "Parametrizasyonlar: ε, x₀, v ve skor", engine: browser}
+
+quiz:
+  - q: "Sınıflandırıcısız yönlendirmede s > 1 ne yapar?"
+    options:
+      - {t: "$p(x)p(y|x)^s$'den örnekler: koşula daha 'emin' örnekler (kesinlik ↑) ama çeşitlilik ↓; çok büyük s'de örnekler verinin dışına taşar (aşırı doyma)", ok: true, why: "c ve d aşamalarında yarıçapın s ile büyüdüğü görülür."}
+      - {t: "Örneklemeyi hızlandırır", why: "Her adımda iki ağ değerlendirmesi gerekir: yavaşlatır."}
+      - {t: "Modeli yeniden eğitir", why: "Yalnız örnekleme anında."}
+  - q: "Tek bir ağ hem koşullu hem koşulsuz ε'yu nasıl tahmin eder?"
+    options:
+      - {t: "Eğitimde etiket rastgele (%10–20) boş (null) token'la değiştirilir; çıkarımda aynı ağ etiketle ve boş token'la iki kez çağrılır", ok: true, why: "Ho & Salimans 2022."}
+      - {t: "İki ayrı ağ zorunludur", why: "Gerekmez."}
+      - {t: "Koşulsuz model gerekmez", why: "CFG'nin tanımında var."}
+  - q: "Latent diffusion'ın temel kazancı nedir?"
+    options:
+      - {t: "Algısal olarak önemsiz yüksek frekans ayrıntısını otomatik kodlayıcıya bırakıp difüzyonu çok daha küçük bir gizli uzayda yapmak: eğitim ve örnekleme maliyeti büyük ölçüde düşer, kalite korunur", ok: true, why: "Rombach ve ark. 2022; e aşamasında aynı bütçede fark."}
+      - {t: "Gürültü takvimine gerek kalmaması", why: "Takvim yine var."}
+      - {t: "Tek adımda örnekleme", why: "Hayır."}
+
+homework:
+  - title: "Ho & Salimans (2022): CFG'yi rakamlarda/CIFAR'da"
+    paper: "Ho & Salimans — Classifier-Free Diffusion Guidance (NeurIPS 2021 Workshop / 2022)"
+    url: "https://arxiv.org/abs/2207.12598"
+    level: orta
+    hours: 12
+    goal: |
+      M5.3'teki U-Net'i sınıf embedding'iyle koşullu yap, etiket bırakma olasılığı p_uncond ∈ {0.1, 0.2, 0.5} ile MNIST/CIFAR-10'da eğit. Makale Tablo 1–2'nin küçük sürümü: yönlendirme ağırlığı w ∈ {0, 0.3, 1, 2, 4} için FID ve IS (M5.7'deki ölçücüler); FID–IS eğrisini çiz (Şekil 4). Büyük w'de renk/kontrast aşırı doymasını gözle ve "dinamik eşikleme" (Saharia ve ark. 2022, Imagen) ile düzelt.
+    steps:
+      - "Dinamik eşikleme: x̂₀'ın mutlak değerlerinin p-yüzdeliği s ile kırp ve s'ye böl."
+    accept:
+      - "w arttıkça IS artar, FID önce düşer sonra artar."
+      - "Dinamik eşikleme büyük w'de FID'i iyileştirir."
+  - title: "Rombach ve ark. (2022): küçük bir latent diffusion"
+    paper: "Rombach, Blattmann, Lorenz, Esser, Ommer — High-Resolution Image Synthesis with Latent Diffusion Models (CVPR 2022)"
+    url: "https://arxiv.org/abs/2112.10752"
+    level: ileri
+    hours: 18
+    goal: |
+      CelebA-64 ya da CIFAR-10'da KL düzenlemeli bir konvolüsyonel otomatik kodlayıcı (f ∈ {1, 2, 4, 8} küçültme, M5.6) eğit; her f için gizli uzayda aynı U-Net bütçesiyle difüzyon modeli eğitip FID ve eğitim süresini karşılaştır (makale Şekil 6: f = 4–16 tatlı nokta). Sınıf koşulunu U-Net'e cross-attention ile ver (M4.14), CFG ile örnekle.
+    steps:
+      - "Gizli kodları birim varyansa ölçekle (makalenin 'scale factor'ü)."
+    accept:
+      - "f = 1 (piksel uzayı) en yavaş; f çok büyükse yeniden yapılandırma kalitesi FID'i sınırlar."
+      - "Cross-attention koşullama + CFG sınıf doğruluğunu artırır."
