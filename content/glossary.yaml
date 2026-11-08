@@ -181,3 +181,6 @@ terms:
   maskeli dil modeli: "Masked language modeling: token'ların ~%15'ini seçip (80% [MASK], 10% rastgele, 10% aynı) bağlamın iki yanından orijinallerini tahmin ettiren ön eğitim amacı (BERT)."
   bradley–terry modeli: "İkili tercihler için olasılık modeli: P(a ≻ b) = σ(r(a) − r(b)); RLHF'te insan karşılaştırmalarından ödül modeli eğitmek için kullanılır."
   dpo: "Direct Preference Optimization: KL cezalı ödül maksimizasyonunun kapalı form çözümünü kullanıp ödül modeli ve RL olmadan tercih çiftleri üzerinde −log σ(β[log π/π_ref (y_w) − log π/π_ref (y_l)]) kaybını en küçükleyen hizalama yöntemi."
+  bağlı ağırlıklar: "Tied weights: simetrik autoencoder'da kod çözücü katmanının ağırlığını kodlayıcıdaki karşılığının transpozu olarak almak (W_{N−L+1} = W_Lᵀ); parametreleri yarıya indirir."
+  gürültü giderici autoencoder: "Denoising autoencoder: girdiye Gauss ya da maskeleme gürültüsü eklenip temiz girdinin geri istendiği AE; aşırı tam kodla bile özdeşliği kopyalayamaz, veri yapısını öğrenir."
+  seyrek autoencoder: "Sparse autoencoder: kod katmanında aynı anda az nöronun aktif olmasını L1 ya da KL(ρ‖ρ̂) cezasıyla zorlayan AE; her nöron seçici bir özniteliğe karşılık gelir."

@@ -1,0 +1,107 @@
+id: m5-6-autoencoders
+code: M5.6
+title: Autoencoder ailesi — yığılmış, bağlı ağırlıklı, gürültü giderici, seyrek, konvolüsyonel
+phase: 5
+minutes: 360
+prereq: [m5-1-vae, m3-7-regularization-nn]
+summary: >
+  Kısıtlar altında özdeşlik fonksiyonunu öğrenmenin yan ürünü olarak
+  temsiller: eksik (undercomplete) ve aşırı tam (overcomplete) kodlar,
+  yığılmış (derin) autoencoder'lar, kodlayıcı–kod çözücü ağırlıklarını
+  bağlamak ($W_{N-L+1}=W_L^\top$), açgözlü katman katman ön eğitim,
+  autoencoder ile denetimsiz ön eğitim ve az etiketle sınıflandırma,
+  gürültü giderici (Gauss ve maskeleme gürültüsü), seyrek (L1 ve KL
+  cezası) ve konvolüsyonel/rekürent autoencoder'lar. NumPy'da bağlı
+  ağırlıklı seyrek autoencoder'ın gradyanları elle, PyTorch'ta yığılmış AE,
+  bağlı ağırlık, DAE ve ön eğitimle sınıflandırma, sonda konvolüsyonel vs
+  yoğun AE. Ekler: doğrusal DAE'nin kapalı form çözümü, büzüşen
+  (contractive) AE, yeniden yapılandırma hatasıyla anomali tespiti.
+goals:
+  - "Eksik / aşırı tam kod; [[bağlı ağırlıklar]] ile parametreyi yarıya indirmek"
+  - "[[gürültü giderici autoencoder]]: maskeleme ve Gauss gürültüsü; doğrusal DAE = büzülme"
+  - "[[seyrek autoencoder]]: KL($\\rho\\Vert\\hat\\rho$) cezası ve gradyanı"
+  - "Denetimsiz ön eğitim: AE kodlayıcısı + az etiket"
+sources:
+  - {title: "Géron — Hands-On Machine Learning (3. baskı), Bölüm 17", url: "https://github.com/ageron/handson-ml3", license: "Apache-2.0 (kod)", use: link}
+  - {title: "Hinton & Salakhutdinov — Reducing the Dimensionality of Data with Neural Networks (Science 2006)", url: "https://www.cs.toronto.edu/~hinton/absps/science.pdf", license: "©", use: link}
+  - {title: "Vincent ve ark. — Stacked Denoising Autoencoders (JMLR 2010)", url: "https://www.jmlr.org/papers/v11/vincent10a.html", license: "©", use: link}
+  - {title: "Ng — Sparse autoencoder (CS294A ders notları)", url: "https://web.stanford.edu/class/cs294a/sparseAutoencoder.pdf", license: "©", use: link}
+  - {title: "Rifai ve ark. — Contractive Auto-Encoders (ICML 2011)", url: "https://icml.cc/2011/papers/455_icmlpaper.pdf", license: "©", use: link}
+  - {title: "Bengio ve ark. — Greedy Layer-Wise Training of Deep Networks (NeurIPS 2006)", url: "https://papers.nips.cc/paper/2006/hash/5da713a690c067105aeb2fae32403405-Abstract.html", license: "©", use: link}
+  - {title: "UvA DL Notebooks — Tutorial 9: Autoencoders", url: "https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial9/AE_CIFAR10.html", license: "MIT", use: link}
+
+hand:
+  groups:
+    - title: "Yığılmış AE 784 → 100 → 30 → 100 → 784 (bias dahil)"
+      fields:
+        - {id: full, label: "Bağsız parametre sayısı", answer: 163814}
+        - {id: tied, label: "Bağlı ağırlıklarla ($W_{dec}=W_{enc}^\\top$, kod çözücü bias'ları ayrı)", answer: 82414}
+    - title: "Seyrek AE: hedef $\\rho=0.05$, ölçülen ortalama aktivasyon $\\hat\\rho=0.2$"
+      fields:
+        - {id: kl, label: "$\\mathrm{KL}(\\rho\\Vert\\hat\\rho)=\\rho\\log\\frac{\\rho}{\\hat\\rho}+(1-\\rho)\\log\\frac{1-\\rho}{1-\\hat\\rho}$", answer: 0.09394302602433154, tol: 1.0e-6}
+        - {id: dkl, label: "$\\partial\\mathrm{KL}/\\partial\\hat\\rho$", answer: 0.9375, tol: 1.0e-9}
+    - title: "Diğer"
+      fields:
+        - {id: pca, label: "Doğrusal AE, 2 boyutlu kod; veri kovaryansının özdeğerleri 5, 3, 1, 0.5 → en küçük toplam yeniden yapılandırma hatası (örnek başına beklenen)", answer: 1.5, tol: 1.0e-9}
+        - {id: up, label: "Konvolüsyonel kod çözücü: 7 × 7 → ConvTranspose(k = 3, s = 2, p = 1, output_padding = 1) → kenar", answer: 14}
+  verify: |
+    import math
+    lin = lambda a, b: a * b + b
+    full = lin(784, 100) + lin(100, 30) + lin(30, 100) + lin(100, 784)
+    tied = lin(784, 100) + lin(100, 30) + 100 + 784
+    answers = dict(full=full, tied=tied, kl=0.05 * math.log(0.05 / 0.2) + 0.95 * math.log(0.95 / 0.8), dkl=-0.05 / 0.2 + 0.95 / 0.8,
+                   pca=1 + 0.5, up=(7 - 1) * 2 - 2 + 3 + 1)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Doğrusal gürültü giderici AE'nin kapalı form çözümü", engine: browser}
+  - {id: x2, title: "Büzüşen (contractive) autoencoder: Jacobian cezası", engine: browser}
+  - {id: x3, title: "Yeniden yapılandırma hatasıyla anomali tespiti ve ROC AUC", engine: browser}
+
+quiz:
+  - q: "Aşırı tam (kod girdiden büyük) bir autoencoder neden kısıtsız eğitilemez?"
+    options:
+      - {t: "Özdeşliği doğrudan kopyalayabilir: yeniden yapılandırma mükemmel olur ama hiçbir yapı öğrenilmez. Gürültü, seyreklik ya da Jacobian cezası gibi kısıtlar gerekir", ok: true, why: "Eksik kodda darboğazın kendisi kısıttır."}
+      - {t: "Çok yavaş olduğu için", why: "Sorun öğrenilen temsil."}
+      - {t: "Gradyanlar sıfır olduğu için", why: "Hayır."}
+  - q: "Seyreklik için neden aktivasyonlara L2 değil L1 cezası?"
+    options:
+      - {t: "L1 önemsiz kodları tam sıfıra iterken önemlileri korur; L2 tüm kodları orantılı küçültür", ok: true, why: "Géron; M1.3'teki Lasso/Ridge farkının aynısı."}
+      - {t: "L1 türevlenebilir, L2 değil", why: "Tersi daha doğru (0'da)."}
+      - {t: "Fark yok", why: "Var."}
+  - q: "Bağlı ağırlıklarda W'nin gradyanı neden iki terimden oluşur?"
+    options:
+      - {t: "Aynı matris hem kodlayıcıda ($XW$) hem kod çözücüde ($zW^\\top$) kullanılır; zincir kuralı iki kullanımın katkısını toplar", ok: true, why: "c aşamasında elle türetilir."}
+      - {t: "Momentum yüzünden", why: "Hayır."}
+      - {t: "Bias'tan dolayı", why: "Hayır."}
+
+homework:
+  - title: "Vincent ve ark. (2010): yığılmış gürültü giderici AE'ler"
+    paper: "Vincent, Larochelle, Lajoie, Bengio, Manzagol — Stacked Denoising Autoencoders: Learning Useful Representations in a Deep Network with a Local Denoising Criterion (JMLR 2010)"
+    url: "https://www.jmlr.org/papers/v11/vincent10a.html"
+    level: orta
+    hours: 10
+    goal: |
+      MNIST'te 3 katmanlı SDAE'yi açgözlü katman katman eğit (her katman bir öncekinin kodunu maskeleme gürültüsüyle yeniden yapılandırır), sonra denetimli ince ayar yap. Makale Tablo 3'ün küçük sürümü: gürültü türü (maskeleme, Gauss, tuz-biber) × düzeyi için sınıflandırma hatası; ilk katman filtrelerini (Şekil 6–7) gürültü düzeyine göre görselleştir — gürültü arttıkça filtrelerin yerelleşip kenar dedektörlerine dönüştüğünü göster.
+    steps:
+      - "d aşamasındaki greedy_pretrain ve maskeleme gürültüsünü kullan."
+    accept:
+      - "Gürültüsüz AE ön eğitimine göre SDAE daha düşük test hatası."
+      - "Filtre görselleri gürültüyle yapılanır."
+  - title: "Hinton & Salakhutdinov (2006): derin AE ile boyut indirgeme"
+    paper: "Hinton & Salakhutdinov — Reducing the Dimensionality of Data with Neural Networks (Science 2006)"
+    url: "https://www.cs.toronto.edu/~hinton/absps/science.pdf"
+    level: orta
+    hours: 8
+    goal: |
+      784-1000-500-250-2 derin autoencoder'ı (RBM ön eğitimi yerine katman katman AE ön eğitimi ya da modern başlatma + Adam ile) eğit; 2B kodları PCA'nın ilk iki bileşeniyle yan yana çiz (makale Şekil 3) ve 30 boyutlu kodda yeniden yapılandırma hatasını PCA-30 ile karşılaştır (Şekil 2). Ön eğitimsiz, rastgele başlatılmış derin AE'nin (2006 koşullarında) neden takıldığını sigmoid aktivasyon + SGD ile gözle.
+    steps:
+      - "Aynı ağı ReLU + BatchNorm + Adam ile ön eğitimsiz de eğit: 2006'nın problemi bugün çözülmüş mü?"
+    accept:
+      - "Derin AE 2B'de sınıfları PCA'dan belirgin daha iyi ayırır."
+      - "30 boyutta yeniden yapılandırma hatası PCA'dan düşük."
