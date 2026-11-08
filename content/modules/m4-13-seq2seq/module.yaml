@@ -106,3 +106,94 @@ homework:
     accept:
       - "Zamanlanmış örnekleme gürültülü testte hata yayılımını azaltır."
       - "Takvimlerin karşılaştırma tablosu ve eğitim eğrileri."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Işın araması ve uzunluk normalizasyonu
+    goal: Dizi olasılıklarını log uzayında karşılaştırmak
+    needs: Logaritma, koşullu olasılık
+    q: |-
+      İki aday çeviri. A: token olasılıkları 0.5, 0.4, 0.9 (sonra EOS). B: 0.6 (sonra EOS). Hangisi seçilir: ham log-olasılıkla ve token başına normalize edilmiş log-olasılıkla?
+    solution: |-
+      **Ham:** $\log P(A)=\ln0.5+\ln0.4+\ln0.9=\ln0.18=-1.715$; $\log P(B)=\ln0.6=-0.511$ → **B** (kısa olan).
+
+      **Normalize:** A: $-1.715/3=-0.572$; B: $-0.511/1=-0.511$ → yine B, ama fark küçüldü. Her ek token olasılığı 1'den küçük bir sayıyla çarptığı için ham skor kısa dizileri sistematik olarak kayırır; uzunluk normalizasyonu (Wu ve ark. 2016'da $\mathrm{lp}=\frac{(5+|Y|)^\alpha}{6^\alpha}$, α ≈ 0.6–0.7) bunu dengeler.
+
+      **Işın araması:** her adımda en iyi $B$ kısmi diziyi tutar, her birini tüm sözlükle genişletir ($B\cdot V$ aday), yine en iyi $B$'yi seçer. Greedy ($B=1$) ilk adımdaki yerel en iyiye kilitlenir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Dizi log-olasılığı
+    goal: Zincir kuralıyla dizi olasılığı hesaplamak
+    needs: P1
+    q: |-
+      Token olasılıkları 0.5, 0.4, 0.9. Dizinin toplam log-olasılığı (doğal log)?
+    answer: -1.7147984280919266
+    calc: "math.log(0.5*0.4*0.9)"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.18000000000000002, msg: "Bu olasılığın kendisi; logaritmasını al."}
+      - {answer: 0.5877866649021191, msg: "Olasılıklar çarpılır, log'lar toplanır."}
+    hints:
+      - "$\\ln(0.18)$."
+    solution: |-
+      $\ln0.18=-1.715$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Işın aramasının maliyeti
+    goal: Adım başına aday sayısını hesaplamak
+    needs: P1
+    q: |-
+      Işın genişliği 4, hedef sözlük 10 000. Her adımda kaç aday skorlanır?
+    answer: 40000.0
+    calc: "4*10000"
+    mistakes:
+      - {answer: 4.0, msg: "Her ışın tüm sözlükle genişletilir."}
+    hints:
+      - "$B\\cdot V$."
+    solution: |-
+      40 000; en iyi 4'ü `topk` ile seçilir. Kod çözücü ağın çağrısı ise 4 dizi için tek batch'tir.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Eğitimde iyi, çıkarımda saçmalıyor
+    goal: Maruz kalma yanlılığını tanımak
+    needs: Öğretmen zorlaması
+    q: |-
+      Öğretmen zorlamasıyla eğitilen model, eğitim ve doğrulama kaybında çok iyi; ama kendi ürettiği token'larla çalışırken bir hatadan sonra çorba üretiyor. Neden?
+    choices:
+      - {t: "Aşırı uyum", why: "Doğrulama kaybı da iyi."}
+      - {t: "Maruz kalma yanlılığı: eğitimde hep doğru önceki token'ı gördü, kendi hatalarından sonraki durumları hiç görmedi", ok: true, why: "Eğitim ve çıkarım dağılımları farklı."}
+      - {t: "Işın genişliği küçük", why: "Işın yardımcı olabilir ama asıl neden dağılım farkı."}
+    hints:
+      - "Eğitimde kod çözücünün girdisi nereden geliyor?"
+    solution: |-
+      Öğretmen zorlaması eğitimi paralel ve kararlı yapar ama çıkarım koşullarını hiç göstermez. Azaltma: zamanlanmış örnekleme (Bengio ve ark. 2015: eğitimde giderek artan oranda modelin kendi tahminini girdi yapmak), dizi düzeyinde eğitim, ışın araması.
+  - id: p5
+    type: açıkla
+    level: 3
+    title: Darboğaz vektörü
+    goal: Sabit boyutlu bağlam vektörünün sınırını açıklamak
+    needs: RNN kodlayıcı
+    q: |-
+      Bahdanau ve ark. (2015), attention'sız kodlayıcı–kod çözücünün BLEU skorunun cümle uzunluğu arttıkça düştüğünü gösterdi. Neden ve attention nasıl çözer?
+    rubric:
+      - "Tüm kaynak cümlenin tek bir sabit boyutlu vektöre sıkıştırıldığını söyledim"
+      - "Uzun cümlede bilginin bu vektöre sığmadığını ve baştaki kelimelerin unutulduğunu açıkladım"
+      - "Attention'ın her çıkış adımında tüm kodlayıcı durumlarına ağırlıklı erişim verdiğini söyledim"
+      - "Gradyan yolunun da kısaldığını ekledim"
+    hints:
+      - "50 kelimelik bir cümle, 512 sayıya nasıl sığar?"
+    solution: |-
+      Sabit vektör bir bilgi darboğazıdır; uzun cümlelerde ilk kelimelerin bilgisi kaybolur (kaynağı ters çevirmek, Sutskever ve ark. 2014, bu yüzden yardımcı oldu). Attention her kod çözücü adımında $c_t=\sum_s\alpha_{ts}h_s$ hesaplar: bellek kaynak uzunluğuyla büyür ve her kaynak kelimesine doğrudan (kısa) bir gradyan yolu açılır — Transformer'ın çıkış noktası.
+pitfalls:
+  - wrong: "Işın genişliği büyüdükçe çeviri her zaman iyileşir."
+    right: "Çok büyük ışın kısa ve genel çevirileri seçer (ışın araması laneti); uzunluk normalizasyonu ve ılımlı ışın (4–10) gerekir."
+  - wrong: "Dolgu token'ları kayba katılabilir."
+    right: "Kayıp ve attention dolguyu maskelemeli; aksi hâlde model dolguyu tahmin etmeyi öğrenir."
+whatif:
+  - q: "Kaynak cümle ters çevrilip verilirse (attention'sız modelde)?"
+    a: "İlk hedef kelimeler ilk kaynak kelimelere zaman olarak yaklaşır, gradyan yolu kısalır; Sutskever ve ark. bunun BLEU'yu belirgin artırdığını buldu."

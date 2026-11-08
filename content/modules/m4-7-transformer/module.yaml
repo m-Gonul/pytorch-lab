@@ -92,3 +92,103 @@ homework:
     accept:
       - "Kayıp–N ilişkisi log-log'da yaklaşık doğrusal; α_N raporlanmış."
       - "Hesap-optimal sınır grafiği."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir Transformer bloğunun parametreleri
+    goal: 12d² kuralını türetmek
+    needs: Doğrusal katman parametreleri
+    q: |-
+      Model boyu $d$, MLP genişliği $4d$, bias'lı doğrusal katmanlar, iki LayerNorm. Blok başına parametre sayısını türet; $d=768$ için hesapla.
+    solution: |-
+      **Attention:** Q, K, V, O izdüşümleri $4(d^2+d)$.
+      **MLP:** $d\to4d$: $4d^2+4d$; $4d\to d$: $4d^2+d$. Toplam $8d^2+5d$.
+      **LayerNorm:** iki tane, her biri γ ve β: $4d$.
+      **Blok:** $12d^2+13d$. $d=768$: $12\cdot589\,824+9\,984=7\,087\,872$.
+
+      **GPT-2 small:** 12 blok ≈ 85M + gömmeler (token 38.6M + konum 1024 × 768 ≈ 0.8M) + son LN ≈ 124M. **Gözlem:** büyük modellerde parametrelerin çoğu $12d^2L$ terimindedir; FLOP sayısı token başına ≈ $2\times$ parametre (ileri geçiş).
+  - id: p2
+    type: hesap
+    level: 1
+    title: KV önbelleği
+    goal: Çıkarım belleğini hesaplamak
+    needs: Attention'ın K, V'yi saklaması
+    q: |-
+      12 katman, $d=768$, bağlam 1024 token, fp16, batch 1. K ve V önbelleği kaç MiB?
+    answer: 36.0
+    calc: "2*12*1024*768*2/2**20"
+    unit: MiB
+    mistakes:
+      - {answer: 18.0, msg: "Hem K hem V saklanır: 2 ile çarp."}
+      - {answer: 72.0, msg: "fp16 2 bayt."}
+    hints:
+      - "Katman × token × d × (K ve V) × bayt."
+    solution: |-
+      $2\cdot12\cdot1024\cdot768\cdot2$ B $=36$ MiB. Uzun bağlam ve büyük batch'te KV önbelleği model ağırlıklarını geçebilir; çok sorgulu attention (MQA/GQA) K ve V başlarını paylaşarak bunu küçültür.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Sıcaklıklı örnekleme
+    goal: Sıcaklığın olasılığa etkisini hesaplamak
+    needs: Softmax (M1.5)
+    q: |-
+      Logitler $[2,1]$, sıcaklık $T=0.5$. Birinci token'ın olasılığı?
+    answer: 0.8807970779778823
+    calc: "1/(1+math.exp(-(2-1)/0.5))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.7310585786300049, msg: "Bu T = 1; logitleri T'ye böl."}
+      - {answer: 0.6224593312018546, msg: "T ile çarpmadın mı? Bölmelisin: (2 − 1)/0.5 = 2."}
+    hints:
+      - "İki sınıfta softmax = farkın sigmoid'i."
+    solution: |-
+      $\sigma(2)=0.881$ (T = 1'de 0.731). Deney alanı: M4.16.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Pre-LN mi Post-LN mi?
+    goal: Normalizasyon yerleşimini seçmek
+    needs: Artık bağlantı
+    q: |-
+      48 katmanlı bir dil modelini ısınma (warmup) olmadan eğitmek istiyorsun. Post-LN ($x\leftarrow\mathrm{LN}(x+F(x))$) mi Pre-LN ($x\leftarrow x+F(\mathrm{LN}(x))$) mi?
+    choices:
+      - {t: "Post-LN", why: "Derin Post-LN'de çıkışa yakın katmanların gradyanı büyüktür; ısınma olmadan kararsız (Xiong ve ark. 2020)."}
+      - {t: "Pre-LN", ok: true, why: "Artık yol normalizasyonsuz kaldığı için gradyan doğrudan akar; derin modellerde kararlı, ısınmaya daha az duyarlı."}
+      - {t: "Normalizasyonsuz", why: "Derin modelde aktivasyonlar katmanlarla büyür."}
+    hints:
+      - "Artık yolda bir LN var mı?"
+    solution: |-
+      Pre-LN'de $x_L=x_0+\sum_lF_l(\cdot)$: özdeşlik yolu temiz. Bedel: son katmanda bir LN daha gerekir ve temsil normları derinlikle büyür. Modern LLM'ler Pre-LN (ya da RMSNorm) kullanır.
+  - id: p5
+    type: kod
+    level: 3
+    title: Nedensel maske hatası
+    goal: Maskelemeyi kodda doğrulamak
+    needs: M4.6 P6
+    q: |-
+      ```python
+      mask = torch.tril(torch.ones(T, T))
+      att = (q @ k.transpose(-2, -1)) / math.sqrt(d)
+      att = att * mask
+      att = att.softmax(-1)
+      ```
+      Eğitim kaybı inanılmaz hızlı düşüyor ama üretilen metin anlamsız. Hata ne, nasıl doğrularsın?
+    rubric:
+      - "Maskelenen skorların 0 olduğunu, softmax'ta e⁰ = 1 ağırlık alıp geleceğe sızdırdığını açıkladım"
+      - "Doğrusunun `masked_fill(mask == 0, float('-inf'))` olduğunu yazdım"
+      - "Hızlı düşen kaybın sızıntı belirtisi olduğunu söyledim"
+      - "Test: t. konumdaki çıktının t'den sonraki girdileri değiştirince değişmediğini doğrulayan bir birim testi önerdim"
+    hints:
+      - "Softmax'a 0 giren bir skor hangi ağırlığı alır?"
+    solution: |-
+      Çarpmayla maskelenen skor 0 olur, softmax'ta $e^0=1$ ağırlık alır: gelecek token'lar attention'a girer. Model eğitimde cevabı görür (kayıp sahte düşer), üretimde gelecek yoktur. Düzeltme: softmax'tan önce `-inf`. Test: girdinin t+1. konumunu rastgele değiştir; 0..t çıktıları değişmemeli.
+pitfalls:
+  - wrong: "Parametrelerin çoğu attention'dadır."
+    right: "Blokta MLP 8d², attention 4d²: parametrelerin ~⅔'ü MLP'de (P1)."
+  - wrong: "Uzun bağlamın maliyeti yalnız attention hesabıdır."
+    right: "Çıkarımda KV önbelleği belleği de bağlamla doğrusal büyür (P2)."
+whatif:
+  - q: "MLP genişliği 4d yerine 8/3·d ve SwiGLU olsaydı?"
+    a: "Üç matris (geçitli) ile parametre sayısı ≈ aynı kalır; LLaMA ailesinin tercihi, aynı bütçede biraz daha iyi."

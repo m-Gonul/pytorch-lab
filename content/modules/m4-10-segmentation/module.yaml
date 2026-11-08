@@ -118,3 +118,92 @@ homework:
     accept:
       - "Ağırlık haritasıyla değen hücreler ayrı örnekler olarak çıkar; onsuz birleşir."
       - "Döşemeli çıkarım, tek parça çıkarımla kenarlarda aynı sonucu verir."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Transposed convolution'ın çıkış boyu
+    goal: Formülü konvolüsyonun tersinden türetmek
+    needs: M4.1 P1
+    q: |-
+      Adımı $s$, çekirdeği $k$, dolgusu $p$ olan transposed convolution'ın çıkış boyunu türet; $n=16$, $s=2$, $k=4$, $p=1$ için hesapla.
+    solution: |-
+      Transposed conv, aynı parametreli konvolüsyonun **geri geçişidir** (gradyanını alır): konvolüsyon $m\to n$ ise transposed $n\to m$. Konvolüsyon: $n=\lfloor(m+2p-k)/s\rfloor+1$. Bölme tam iken $m$'yi çöz: $m=(n-1)s-2p+k$.
+
+      $n=16$: $(15)\cdot2-2+4=32$ — tam iki kat. **Belirsizlik:** taban fonksiyonu yüzünden birden çok $m$ aynı $n$'yi verebilir; PyTorch'ta `output_padding` bunu seçer.
+
+      **Dama tahtası artefaktı:** $k$, $s$'nin katı değilse (ör. $k=3$, $s=2$) çıkış pikselleri farklı sayıda katkı alır → düzenli desen. Çare: $k$'yı $s$'nin katı seç ya da "yukarı örnekle + konvolüsyon" kullan (Odena ve ark. 2016).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Çıkış boyu
+    goal: Formülü uygulamak
+    needs: P1
+    q: |-
+      Transposed conv: $n=7$, $s=2$, $k=3$, $p=1$, output_padding 0. Çıkış boyu?
+    answer: 13.0
+    calc: "(7-1)*2-2+3"
+    mistakes:
+      - {answer: 14.0, msg: "Çıkış tam 2n olmayabilir: (n − 1)s − 2p + k."}
+    hints:
+      - "$(n-1)s-2p+k$."
+    solution: |-
+      $12-2+3=13$; 14 istiyorsan `output_padding=1`.
+  - id: p3
+    type: hesap
+    level: 1
+    title: IoU'dan Dice'a
+    goal: İki örtüşme ölçütünü birbirine çevirmek
+    needs: Küme kesişimi
+    q: |-
+      Bir maskenin IoU'su 0.5. Dice?
+    answer: 0.6666666666666666
+    calc: "2*0.5/(1+0.5)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.5, msg: "Dice ve IoU farklıdır: Dice = 2·IoU/(1 + IoU) ≥ IoU."}
+    hints:
+      - "Dice $=\\frac{2|A\\cap B|}{|A|+|B|}$, $|A|+|B|=|A\\cup B|+|A\\cap B|$."
+    solution: |-
+      $\frac{2\cdot0.5}{1.5}=0.667$. Dice her zaman IoU'dan büyük ya da eşit; ölçütleri karıştırma.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Küçük nesneler kayboluyor
+    goal: Atlama bağlantısının rolünü değerlendirmek
+    needs: U-Net
+    q: |-
+      FCN-32s ile segmentasyonda büyük bölgeler doğru, ince yapılar (direk, tel) kaybolmuş. En etkili mimari değişiklik?
+    choices:
+      - {t: "Daha derin kodlayıcı", why: "Toplam adımı ve dolayısıyla ayrıntı kaybını artırır."}
+      - {t: "Kodlayıcının yüksek çözünürlüklü haritalarını kod çözücüye atlama bağlantılarıyla taşımak (FCN-8s, U-Net) ya da genişletilmiş konvolüsyonla adımı küçük tutmak", ok: true, why: "İnce konum bilgisi yüksek çözünürlüklü katmanlardadır."}
+      - {t: "Daha büyük batch", why: "Çözünürlük kaybını etkilemez."}
+    hints:
+      - "32 kat küçültülmüş bir haritada 2 piksellik bir tel nerede?"
+    solution: |-
+      Toplam adım 32 ise 32 pikselden ince yapılar en derin haritada temsil edilemez. Atlama bağlantıları yerel ayrıntıyı (nerede) derin anlamla (ne) birleştirir; genişletilmiş konvolüsyon (DeepLab) alıcı alanı büyütürken çözünürlüğü korur.
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Piksel doğruluğu yanıltır
+    goal: Segmentasyon ölçütünü sınıf dengesizliğine göre seçmek
+    needs: P3
+    q: |-
+      Piksel doğruluğu %95 olan ama işe yaramayan bir segmentasyon modeli örneği ver. Hangi ölçüt bunu yakalar?
+    rubric:
+      - "Arka planın %95 olduğu, modelin her şeye 'arka plan' dediği örneği verdim"
+      - "Sınıf başına IoU ve ortalaması (mIoU) ya da Dice'ın bunu yakaladığını söyledim"
+      - "Sınıf ağırlıklandırma / Dice kaybı (M8.2 x1) bağlantısını kurdum"
+    hints:
+      - "Piksellerin çoğu hangi sınıf?"
+    solution: |-
+      Tümör pikselleri %5: her şeye "arka plan" diyen model %95 piksel doğruluğu alır, tümör IoU'su 0. mIoU her sınıfı eşit ağırlıkla ortalar (bu model için ~0.47); Dice/IoU ön plan sınıfı için 0. Eğitimde de BCE yerine Dice ya da ağırlıklı kayıp gerekir.
+pitfalls:
+  - wrong: "Transposed convolution konvolüsyonun matematiksel tersidir."
+    right: "Tersi değil, transpozudur (geri geçişi): boyutu geri getirir, değerleri değil."
+  - wrong: "Örnek (instance) segmentasyon, anlamsal segmentasyonun aynısıdır."
+    right: "Anlamsal segmentasyon aynı sınıftaki iki nesneyi ayırt etmez; örnek segmentasyon her nesneye ayrı maske verir (Mask R-CNN)."
+whatif:
+  - q: "Kod çözücüde transposed conv yerine çift doğrusal yukarı örnekleme + 3 × 3 konv kullanılırsa?"
+    a: "Dama tahtası artefaktı kaybolur, parametre sayısı benzer; çoğu modern U-Net bunu kullanır (M8.2 U-Net'i de öyle)."

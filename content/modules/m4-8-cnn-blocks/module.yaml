@@ -107,3 +107,95 @@ homework:
     accept:
       - "SE, %1'den az ek parametreyle doğruluğu artırır ya da korur."
       - "Son katmanlarda sınıflar arası uyarım farkı ilk katmanlardan büyük."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Derinlemesine ayrılabilir konvolüsyon ne kadar tasarruf eder?
+    goal: Maliyet oranını türetmek
+    needs: M4.1 P3
+    q: |-
+      $k\times k$ standart konvolüsyonu ($C_{in}\to C_{out}$) derinlemesine ($k\times k$, kanal başına) + noktasal (1 × 1) konvolüsyonla değiştir. Parametre oranını türet.
+    solution: |-
+      Standart: $k^2C_{in}C_{out}$. Ayrılabilir: $k^2C_{in}$ (derinlemesine) $+\ C_{in}C_{out}$ (noktasal).
+      $$\frac{k^2C_{in}+C_{in}C_{out}}{k^2C_{in}C_{out}}=\frac1{C_{out}}+\frac1{k^2}.$$
+      $k=3$, $C_{out}=256$: $\approx\frac19+\frac1{256}=0.115$ → ~8.7 kat az parametre ve FLOP (aynı uzamsal boyutta).
+
+      **Varsayım ve bedel:** uzamsal ve kanal karışımının ayrılabildiği varsayılır (düşük ranklı bir çarpanlama); ifade gücü biraz düşer, ama MobileNet/Xception aynı bütçede daha derin/geniş ağla bunu telafi eder. Derinlemesine konvolüsyonun aritmetik yoğunluğu düşüktür: FLOP kazancı her donanımda süre kazancına dönmez (bellek bant genişliği sınırı, M7).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Ayrılabilir katmanın parametreleri
+    goal: P1'i uygulamak
+    needs: P1
+    q: |-
+      3 × 3, $C_{in}=C_{out}=256$, bias'sız. Derinlemesine ayrılabilir konvolüsyonun parametre sayısı?
+    answer: 67840.0
+    calc: "3*3*256+256*256"
+    mistakes:
+      - {answer: 589824.0, msg: "Bu standart konvolüsyon."}
+      - {answer: 2304.0, msg: "Noktasal (1 × 1) kısmı unuttun: 256 × 256."}
+    hints:
+      - "$k^2C_{in}+C_{in}C_{out}$."
+    solution: |-
+      $2304+65\,536=67\,840$; standart 589 824.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Darboğaz bloğu
+    goal: 1 × 1 ile kanal azaltmanın kazancını hesaplamak
+    needs: P2
+    q: |-
+      ResNet darboğazı: 1 × 1 (256 → 64), 3 × 3 (64 → 64), 1 × 1 (64 → 256), bias'sız. Toplam parametre?
+    answer: 69632.0
+    calc: "256*64+9*64*64+64*256"
+    mistakes:
+      - {answer: 1179648.0, msg: "Bu iki 3 × 3 (256 kanal) temel bloğun sayısı; darboğaz çok daha ucuz."}
+      - {answer: 53248.0, msg: "Son 1 × 1 genişletme katmanını ekle."}
+    hints:
+      - "Üç katmanı ayrı ayrı say."
+    solution: |-
+      $16\,384+36\,864+16\,384=69\,632$; 256 kanallı iki 3 × 3 katman 1 179 648 ederdi.
+  - id: p4
+    type: açıkla
+    level: 2
+    title: Squeeze-and-excitation ne yapar?
+    goal: Kanal attention'ını kendi cümlelerinle açıklamak
+    needs: Global havuzlama, sigmoid
+    q: |-
+      SE bloğunun adımlarını açıkla, neden ucuz olduğunu ve neyi öğrendiğini söyle.
+    rubric:
+      - "Global ortalama havuzlamayla kanal başına tek sayı (squeeze) aldığını söyledim"
+      - "İki küçük FC (C → C/r → C) + sigmoid ile kanal ağırlıkları ürettiğini (excitation) söyledim"
+      - "Haritaların bu ağırlıklarla kanal kanal ölçeklendiğini, yani girdiye bağlı kanal seçimi olduğunu açıkladım"
+      - "Parametre maliyetinin 2C²/r olduğunu, FLOP'un ihmal edilebilir olduğunu belirttim"
+    hints:
+      - "Uzamsal bilgi nerede kayboluyor, neden önemli değil?"
+    solution: |-
+      Squeeze: her kanal için küresel bağlam (ortalama). Excitation: darboğazlı MLP ve sigmoid → (0, 1) kanal ağırlıkları. Ölçekleme: bu görüntü için hangi kanalların önemli olduğu dinamik olarak seçilir (attention'ın kanal ekseninde bir biçimi). Maliyet r = 16, C = 256 için 8192 parametre; uzamsal boyuttan bağımsız.
+  - id: p5
+    type: yöntem-seç
+    level: 3
+    title: Ağı büyütmek için bütçe nereye?
+    goal: Bileşik ölçeklemenin gerekçesini değerlendirmek
+    needs: FLOP ölçekleme
+    q: |-
+      FLOP bütçeni 2 katına çıkarabilirsin. Yalnız derinliği, yalnız genişliği, yalnız çözünürlüğü mü artırırsın, yoksa üçünü dengeli mi? FLOP'un her birine bağımlılığını kullan.
+    rubric:
+      - "FLOP ∝ derinlik, ∝ genişlik², ∝ çözünürlük² olduğunu yazdım"
+      - "Tek eksende büyütmenin getirisinin hızla doyduğunu söyledim"
+      - "EfficientNet'in α·β²·γ² ≈ 2 kısıtlı bileşik ölçeklemesini açıkladım"
+      - "Daha yüksek çözünürlüğün daha geniş alıcı alan ve kanal gerektirdiği sezgisini verdim"
+    hints:
+      - "Genişliği √2 katına çıkarmak FLOP'u kaç katına çıkarır?"
+    solution: |-
+      Derinlik ×2 → FLOP ×2; genişlik ×√2 → ×2; çözünürlük ×√2 → ×2. Tan & Le (2019) tek eksende büyütmenin getirisinin hızla doyduğunu gösterdi; φ katsayısıyla $d=\alpha^\phi$, $w=\beta^\phi$, $r=\gamma^\phi$, $\alpha\beta^2\gamma^2\approx2$ (ızgara aramasıyla α = 1.2, β = 1.1, γ = 1.15) aynı FLOP'ta daha yüksek doğruluk verir.
+pitfalls:
+  - wrong: "Daha az FLOP her zaman daha hızlı çıkarım demektir."
+    right: "Derinlemesine konvolüsyon gibi düşük aritmetik yoğunluklu katmanlar bellek sınırlıdır; gerçek süre donanıma bağlıdır — ölç."
+  - wrong: "1 × 1 konvolüsyon uzamsal bilgi işlemez, işe yaramaz."
+    right: "Kanallar arası karışım ve boyut azaltma yapar; darboğaz ve Inception'ın temelidir."
+whatif:
+  - q: "Gruplu konvolüsyonda grup sayısı = kanal sayısı olursa?"
+    a: "Derinlemesine konvolüsyon elde edilir; grup sayısı 1 standart konvolüsyondur — ResNeXt ikisinin arasıdır."

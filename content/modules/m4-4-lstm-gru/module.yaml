@@ -98,3 +98,92 @@ homework:
     accept:
       - "GRU, eşit bütçede LSTM'e yakın doğruluk."
       - "Temsiller biçime/aya göre anlamlı kümeler oluşturur."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir LSTM adımı, sayılarla
+    goal: Kapıların hücre durumunu nasıl güncellediğini izlemek
+    needs: Sigmoid, tanh
+    q: |-
+      $c_{t-1}=2$, kapılar $f=0.9$, $i=0.5$, $o=1.0$, aday $\tilde c=-1$. $c_t$ ve $h_t$?
+    solution: |-
+      $c_t=f\,c_{t-1}+i\,\tilde c=0.9\cdot2+0.5\cdot(-1)=1.3$. $h_t=o\tanh(c_t)=\tanh1.3=0.862$.
+
+      **Okuma:** unutma kapısı eski belleğin %90'ını tuttu; giriş kapısı yeni adayın yarısını ekledi; çıkış kapısı hücrenin tamamını dışarı açtı. **Türev:** $\partial c_t/\partial c_{t-1}=f=0.9$ (doğrudan yol) — intro'daki türetim kutusu. Hücre durumu sınırsız büyüyebilir (toplamsal); $h$ ise tanh ile $(-1,1)$'de kalır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: LSTM parametre sayısı
+    goal: Kapı başına ağırlıkları saymak
+    needs: P1
+    q: |-
+      Girdi $d=64$, gizli $h=128$, **tek** bias vektörü (kapı başına). LSTM hücresi kaç parametre?
+    answer: 98816.0
+    calc: "4*(128*(64+128)+128)"
+    mistakes:
+      - {answer: 99328.0, msg: "Bu PyTorch'un sayısı (b_ih ve b_hh ayrı: 8h bias); soru tek bias diyor."}
+      - {answer: 74112.0, msg: "Üç kapı + aday: GRU'nun sayısı (3 blok). LSTM'de dört blok var (i, f, o, aday)."}
+    hints:
+      - "Dört blok, her biri $W\\in\\mathbb R^{h\\times(d+h)}$ + bias."
+    solution: |-
+      $4\cdot(128\cdot192+128)=98\,816$. GRU: 74 112 (¾'ü). PyTorch iki bias tuttuğu için `sum(p.numel())` 99 328 verir.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Hücre yolunda 50 adım
+    goal: Unutma kapısının bellek ufkunu sayıyla görmek
+    needs: P1
+    q: |-
+      Unutma kapısı sürekli 0.98. Hücre yolunda 50 adım geriye ulaşan gradyan oranı?
+    answer: 0.36416968008711675
+    calc: "0.98**50"
+    tol: 1e-4
+    mistakes:
+      - {answer: 49.0, msg: "Çarpanlar çarpılır: 0.98⁵⁰."}
+    hints:
+      - "Doğrudan yolda çarpan $f$."
+    solution: |-
+      $0.98^{50}=0.364$; düz RNN'de 0.9 çarpanla aynı mesafe 0.005 idi (M4.3 P3). Bellek ufku ≈ $1/(1-f)=50$ adım.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: LSTM mi GRU mu?
+    goal: İki kapılı hücreyi koşula göre seçmek
+    needs: P2
+    q: |-
+      Küçük bir veri setinde (10k dizi) mobil cihazda çalışacak bir model. LSTM mi GRU mu?
+    choices:
+      - {t: "LSTM: her zaman daha güçlü", why: "Karşılaştırmalı çalışmalar (Chung ve ark. 2014; Jozefowicz ve ark. 2015) çoğu görevde fark bulamadı."}
+      - {t: "GRU: ~%25 daha az parametre ve hesap, benzer başarı; az veri ve kısıtlı donanımda iyi bir varsayılan", ok: true, why: "Ama bazı görevlerde (ör. sayma) LSTM'in ayrı hücre durumu avantajlıdır; ikisini de dene."}
+      - {t: "Düz RNN", why: "Uzun bağımlılıkta kaybolan gradyan."}
+    hints:
+      - "Parametre farkı ve bilinen karşılaştırmalar."
+    solution: |-
+      GRU, unutma ve giriş kapılarını tek bir güncelleme kapısında birleştirir ($1-z$ ve $z$) ve ayrı hücre durumu tutmaz. Kesin üstünlük yok; az parametre küçük veri ve sınırlı donanımda avantaj.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Unutma kapısı bias'ını 1 başlatmak
+    goal: Başlatmanın bellek ufkuna etkisini nicelendirmek
+    needs: P3, sigmoid
+    q: |-
+      $f=\sigma(W_fx+U_fh+b_f)$, ağırlıklar küçük başlatılmış. $b_f=0$ ile $b_f=1$ için başlangıçta tipik $f$'yi ve bellek ufkunu ($1/(1-f)$) karşılaştır. Neden önerilir?
+    rubric:
+      - "Küçük ağırlıklarda ön-aktivasyonun ≈ b_f olduğunu söyledim"
+      - "$\\sigma(0)=0.5$ → ufuk 2 adım; $\\sigma(1)=0.73$ → ≈ 3.7 adım buldum"
+      - "Başlangıçta bilgiyi koruma eğiliminin gradyanın uzun mesafeye ulaşmasını sağladığını açıkladım"
+      - "Chrono başlatmayı (b_f ~ log U(1, T−1)) bağlantılı olarak andım"
+    hints:
+      - "$\\sigma(1)=1/(1+e^{-1})$."
+    solution: |-
+      $b_f=0$: $f\approx0.5$, ufuk ≈ 2 adım — başlangıçta LSTM neredeyse her şeyi unutur, uzak bağımlılıkların gradyanı ulaşmaz. $b_f=1$: $f\approx0.73$, ufuk ≈ 3.7; daha büyük $b_f$ daha uzun. Jozefowicz ve ark. (2015) 1'in tutarlı kazanç sağladığını buldu; chrono başlatma (Tallec & Ollivier 2018) beklenen bağımlılık uzunluğu T'ye göre $b_f$'yi seçer (M4.4 ek alıştırması).
+pitfalls:
+  - wrong: "LSTM kaybolan gradyanı tamamen çözer."
+    right: "Yalnız doğrudan hücre yolunda çarpanı f yapar; f küçük öğrenilirse ya da dolaylı yollarda gradyan yine söner/patlar."
+  - wrong: "Gizli durum h ile hücre durumu c aynı şeydir."
+    right: "c toplamsal bellek (sınırsız), h ise o ⊙ tanh(c): dışarıya açılan, sınırlı görünüm."
+whatif:
+  - q: "Unutma kapısı kaldırılırsa (ilk LSTM sürümü)?"
+    a: "c_t = c_{t−1} + i ⊙ c̃: bellek hiç silinmez, uzun akışlarda c sınırsız büyür; Gers ve ark. (2000) unutma kapısını bu yüzden ekledi."

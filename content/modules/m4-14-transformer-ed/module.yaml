@@ -114,3 +114,95 @@ homework:
     accept:
       - "Post-LN'de gradyan normu çıkışa doğru artar; Pre-LN'de yaklaşık sabittir."
       - "Pre-LN warm-up olmadan eğitilebilir; Post-LN büyük öğrenme oranında warm-up'sız ıraksar."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Sinüzoidal konum kodlaması göreli konumu nasıl taşır?
+    goal: Konum farkının doğrusal bir dönüşüm olduğunu göstermek
+    needs: Trigonometri toplam formülleri
+    q: |-
+      $PE(p)_{2i}=\sin(\omega_ip)$, $PE(p)_{2i+1}=\cos(\omega_ip)$, $\omega_i=10000^{-2i/d}$. $PE(p+k)$'nın $PE(p)$'nin $p$'den bağımsız bir doğrusal dönüşümü olduğunu göster.
+    solution: |-
+      Bir frekans çifti için: $\sin(\omega(p+k))=\sin\omega p\cos\omega k+\cos\omega p\sin\omega k$, $\cos(\omega(p+k))=\cos\omega p\cos\omega k-\sin\omega p\sin\omega k$. Matris biçiminde:
+      $$\begin{bmatrix}\sin\omega(p+k)\\\cos\omega(p+k)\end{bmatrix}=\begin{bmatrix}\cos\omega k&\sin\omega k\\-\sin\omega k&\cos\omega k\end{bmatrix}\begin{bmatrix}\sin\omega p\\\cos\omega p\end{bmatrix}.$$
+      Matris yalnız $k$'ya bağlı bir dönmedir. Tüm frekanslar için blok köşegen bir dönme matrisi $R_k$ ile $PE(p+k)=R_kPE(p)$ ✓.
+
+      **Ne söyler:** attention bir doğrusal izdüşümle "k adım ötedeki" ilişkisini öğrenebilir (Vaswani ve ark.'ın gerekçesi). **Ne söylemez:** konum kodlaması girdiye **eklendiği** için bu ilişki içerikle karışır; RoPE dönmeyi doğrudan q ve k'ya uygulayarak $q_p^\top k_{p'}$'nın yalnız $p-p'$'ye bağlı olmasını sağlar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Bir konum kodlaması bileşeni
+    goal: Formülü uygulamak
+    needs: P1
+    q: |-
+      $p=1$, $i=0$ (ilk frekans, $\omega_0=1$). $PE(1)_0$?
+    answer: 0.8414709848078965
+    calc: "math.sin(1)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.5403023058681398, msg: "Çift indisler sinüs, tek indisler kosinüs."}
+      - {answer: 0.01745240643728351, msg: "Argüman radyan: sin(1 rad)."}
+    hints:
+      - "$\\sin(1)$, radyan."
+    solution: |-
+      $\sin1=0.841$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Etiket yumuşatma hedefi
+    goal: Yumuşatılmış hedef dağılımı hesaplamak
+    needs: Softmax hedefi
+    q: |-
+      $K=4$ sınıf, $\varepsilon=0.1$, hedef $q=(1-\varepsilon)\,\mathrm{onehot}+\varepsilon/K$. Doğru sınıfın hedef olasılığı?
+    answer: 0.925
+    calc: "0.9+0.1/4"
+    mistakes:
+      - {answer: 0.9, msg: "ε/K payı doğru sınıfa da eklenir."}
+      - {answer: 0.9333333333333333, msg: "Bu sürüm ε'yu yalnız yanlış sınıflara (K − 1) dağıtır; soru ε/K tanımını kullanıyor."}
+    hints:
+      - "Her sınıf ε/K = 0.025 alır."
+    solution: |-
+      $0.925$; yanlış sınıflar 0.025. Model logit'leri sonsuza itmez, kalibrasyon iyileşir (perplexity biraz kötüleşir, BLEU iyileşir — Vaswani ve ark.).
+  - id: p4
+    type: hesap
+    level: 2
+    title: Noam takvimi
+    goal: Isınmalı öğrenme oranı takvimini hesaplamak
+    needs: Kuvvet
+    q: |-
+      $\eta=d^{-0.5}\min(t^{-0.5},\,t\cdot w^{-1.5})$, $d=512$, $w=4000$. Zirve öğrenme oranı ($t=w$)?
+    answer: 0.0006987712429686843
+    calc: "512**-0.5*4000**-0.5"
+    tol: 1e-6
+    mistakes:
+      - {answer: 0.015811388300841896, msg: "d^(−0.5) çarpanını unuttun."}
+    hints:
+      - "$t=w$'de iki terim eşit: $w^{-0.5}$."
+    solution: |-
+      $512^{-0.5}\cdot4000^{-0.5}=0.0442\cdot0.0158=6.99\cdot10^{-4}$. Önce doğrusal artış (Adam'ın ilk adımlarındaki güvenilmez ikinci moment ve Post-LN kararsızlığı için), sonra $1/\sqrt t$ azalış.
+  - id: p5
+    type: açıkla
+    level: 2
+    title: Cross-attention'da Q, K, V nereden gelir?
+    goal: Kodlayıcı–kod çözücü bağlantısını açıklamak
+    needs: M4.6
+    q: |-
+      Kod çözücüdeki cross-attention'da sorgu, anahtar ve değer hangi kaynaktan gelir? Maske gerekli mi? Kodlayıcının çıktısı çıkarım sırasında kaç kez hesaplanır?
+    rubric:
+      - "Q'nun kod çözücüden, K ve V'nin kodlayıcı çıktısından geldiğini söyledim"
+      - "Nedensel maskenin gerekmediğini (kaynağın tamamı bilinir), yalnız dolgu maskesi gerektiğini söyledim"
+      - "Kodlayıcı çıktısının bir kez hesaplanıp her kod çözme adımında yeniden kullanıldığını (K, V önbelleklenir) açıkladım"
+    hints:
+      - "Kod çözücü kaynağın hangi kısmını görmemeli?"
+    solution: |-
+      Q = kod çözücü durumu ("ne arıyorum"), K, V = kodlayıcı çıktısı ("kaynakta ne var"). Kaynak cümle tamamen bilindiği için nedensel maske yok; dolgu maskesi var. Kodlayıcı bir kez çalışır; her katmanın cross-attention K, V izdüşümleri bir kez hesaplanıp önbelleğe alınır.
+pitfalls:
+  - wrong: "Konum kodlaması öğrenilebilir olmalı, sabit sinüzoidal işe yaramaz."
+    right: "Vaswani ve ark. ikisini benzer buldu; sinüzoidal, eğitimde görülmemiş uzunluklara (sınırlı da olsa) genellenir."
+  - wrong: "Kod çözücü eğitimde de token token çalışır."
+    right: "Eğitimde nedensel maske sayesinde tüm konumlar tek geçişte paralel hesaplanır; token token çalışma yalnız çıkarımdadır."
+whatif:
+  - q: "Konum kodlaması tamamen kaldırılırsa?"
+    a: "Kodlayıcı kelime torbasına döner (M4.6 P6); kod çözücü nedensel maske sayesinde sırayı kısmen çıkarabilir ama zayıf."

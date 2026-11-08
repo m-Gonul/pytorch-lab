@@ -106,3 +106,93 @@ homework:
     accept:
       - "Yorumlanabilir sürümün trend ve mevsim yığınları ayrık bileşenleri ayırır (çizimle)."
       - "N-BEATS mevsimsel veride naif ve SARIMA-benzeri modeli geçer."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: AR(1) sürecinin varyansı ve otokorelasyonu
+    goal: Durağan AR(1)'in momentlerini türetmek
+    needs: Varyans, bağımsızlık
+    q: |-
+      $x_t=\phi x_{t-1}+\varepsilon_t$, $\varepsilon_t\sim(0,\sigma^2)$ bağımsız, süreç durağan. $\mathrm{Var}(x_t)$ ve $\rho(k)$?
+    solution: |-
+      **Varyans:** $\varepsilon_t$, $x_{t-1}$'den bağımsız (yalnız geçmiş gürültülere bağlı). $\mathrm{Var}(x_t)=\phi^2\mathrm{Var}(x_{t-1})+\sigma^2$. Durağanlıkta $\mathrm{Var}(x_t)=\mathrm{Var}(x_{t-1})=\gamma_0$: $\gamma_0=\frac{\sigma^2}{1-\phi^2}$. Pozitif ve sonlu olması $|\phi|<1$ ister — **durağanlık koşulu** (ve $\phi=1$ rastgele yürüyüş: varyans t ile büyür).
+
+      **Otokovaryans:** $\gamma_k=\mathrm{Cov}(x_t,x_{t-k})=\phi\,\mathrm{Cov}(x_{t-1},x_{t-k})=\phi\gamma_{k-1}$ ⇒ $\gamma_k=\phi^k\gamma_0$, $\rho(k)=\phi^k$.
+
+      **Tanıma işareti:** AR(1)'in ACF'si üstel söner, PACF'si 1. gecikmeden sonra kesilir; MA(q)'da tersi (ACF q'dan sonra kesilir). Box–Jenkins model belirleme bu kurala dayanır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Otokorelasyon
+    goal: $\rho(k)=\phi^k$'yı uygulamak
+    needs: P1
+    q: |-
+      $\phi=0.8$. $\rho(3)$?
+    answer: 0.5120000000000001
+    calc: "0.8**3"
+    mistakes:
+      - {answer: 2.4000000000000004, msg: "Gecikme başına çarpan: φ³."}
+    hints:
+      - "$\\rho(k)=\\phi^k$."
+    solution: |-
+      $0.512$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Durağan varyans
+    goal: P1'i uygulamak
+    needs: P1
+    q: |-
+      $\phi=0.8$, $\sigma^2=1$. $\mathrm{Var}(x_t)$?
+    answer: 2.7777777777777777
+    calc: "1/(1-0.64)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 5.000000000000001, msg: "Payda 1 − φ², 1 − φ değil."}
+    hints:
+      - "$\\sigma^2/(1-\\phi^2)$."
+    solution: |-
+      $1/0.36=2.778$.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Eğilimli seri
+    goal: Durağanlaştırmayı seçmek
+    needs: Fark alma
+    q: |-
+      Aylık satışlar doğrusal bir eğilimle artıyor ve 12 aylık mevsimsellik gösteriyor. ARMA uydurmadan önce ne yaparsın?
+    choices:
+      - {t: "Doğrudan ARMA uydur", why: "ARMA durağanlık varsayar; eğilim ve mevsimsellik ihlal eder."}
+      - {t: "Birinci fark (eğilim) ve 12 gecikmeli mevsimsel fark al, ya da SARIMA(p,1,q)(P,1,Q)₁₂ kullan", ok: true, why: "Fark alma eğilim ve mevsimselliği kaldırır; SARIMA bunu modelin içine koyar."}
+      - {t: "Seriyi standartlaştır", why: "Ölçek değişir, eğilim kalır."}
+    hints:
+      - "$y_t-y_{t-1}$ doğrusal eğilimi ne yapar?"
+    solution: |-
+      $\nabla y_t=y_t-y_{t-1}$ doğrusal eğilimi sabite çevirir; $\nabla_{12}y_t=y_t-y_{t-12}$ yıllık deseni kaldırır. Durağanlık ADF/KPSS testleriyle sınanır; aşırı fark alma yapay negatif otokorelasyon üretir.
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Saf son değer tahmini yenilmiyor
+    goal: Tahmin modelini doğru taban çizgisiyle değerlendirmek
+    needs: Rastgele yürüyüş
+    q: |-
+      Bir LSTM'in hisse fiyatı tahmininde "saf" tahmin edici ($\hat x_{t+1}=x_t$) kadar iyi olamadığı durumu açıkla. Bu neden beklenir ve değerlendirmeyi nasıl kurmalısın?
+    rubric:
+      - "Fiyatların yaklaşık rastgele yürüyüş olduğunu, bu durumda en iyi tahminin son değer olduğunu söyledim"
+      - "Fiyat yerine getiri (fark) üzerinde değerlendirmenin gerekliliğini açıkladım"
+      - "MSE'nin fiyat düzeyinde yanıltıcı olduğunu (gecikmeli kopya iyi görünür) gösterdim"
+      - "Zaman sırasına saygılı (ileriye doğru kayan) doğrulama ve sızıntıdan kaçınma önerdim"
+    hints:
+      - "$x_t=x_{t-1}+\\varepsilon_t$ için $\\mathbb E[x_{t+1}|\\text{geçmiş}]$ nedir?"
+    solution: |-
+      Rastgele yürüyüşte $\mathbb E[x_{t+1}|x_{\le t}]=x_t$: hiçbir model bundan iyisini yapamaz (ε öngörülemezse). LSTM'in fiyat grafiği "gerçeği izliyor" gibi görünür ama çoğu zaman bir gecikmeli kopyadır. Değerlendirme getiriler üzerinde, saf tahmin ve AR taban çizgileriyle, zaman sırasına göre kayan pencereyle (rastgele bölme sızıntı yapar) yapılmalı.
+pitfalls:
+  - wrong: "Zaman serisi verisini rastgele eğitim/test diye bölebilirsin."
+    right: "Gelecek, geçmişi tahmin etmek için kullanılır; bölme zamana göre yapılır (kayan başlangıçlı doğrulama)."
+  - wrong: "Durağanlık, serinin sabit olması demektir."
+    right: "Dağılımın (geniş anlamda: ortalama, varyans, otokovaryans) zamana göre değişmemesi; seri dalgalanabilir."
+whatif:
+  - q: "φ = 1 olursa?"
+    a: "Birim kök: rastgele yürüyüş, varyans t ile büyür, durağan değil; fark alınınca beyaz gürültü olur (ARIMA'nın I'sı)."

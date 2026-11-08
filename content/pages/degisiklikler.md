@@ -1,5 +1,14 @@
 # Değişiklik günlüğü
 
+## 2026-11 (2. tur) · Faz 2 ve Faz 4'te pratik
+
+- **Faz 2 (klasik ML, 8 modül)** ve **Faz 4'ün kalan 13 modülü** (CNN, LSTM/GRU, BPE, Transformer, CNN blokları, tespit, segmentasyon, zaman serisi, word2vec, seq2seq, kodlayıcı–kod çözücü Transformer, ViT, ön eğitimli dil modelleri) pratik kartları, sık yanılgılar ve "koşul değişirse" sorularıyla genişletildi.
+- Toplam: **38 modülde 212 kart** (38 çözülmüş örnek, 76 temel, 61 uygulama, 37 zorlayıcı); türler: hesaplama 81, yöntem seçme 22, açıklama 15, karşı örnek 14, yorumlama 12, kanıt 10, hata bulma 8, birleştirme 4, uyarlama 3, kod 3, eksik adım 2. **95 yanılgı, 63 koşul sorusu.**
+- Yeni çözülmüş türetimler: uzaklık matrisi açılımı ve sayısal yok etme riski, Gini/entropi kazancı, bagging varyansı $\rho\sigma^2+(1-\rho)\sigma^2/B$, pseudo-residual = negatif gradyan, ortak varyanslı Gaussian NB'nin doğrusal oluşu, polinom çekirdeğinin öznitelik haritası, Lloyd'un sonluluğu, EM'in sert limiti olarak k-means, AR(1) momentleri, sinüzoidal konum kodlamasının göreli konumu dönme olarak taşıması, transposed conv çıkış boyu, Transformer bloğunun 12d² + 13d parametresi, DPO'nun RLHF'den türetilmesi.
+- Kontrol: tüm sayısal cevaplar bağımsız hesapla doğrulandı; sık hata değerlerinin doğru cevaptan farklı olduğu test edildi (bir çakışma yakalanıp düzeltildi).
+
+## 2026-11 (1. tur)
+
 Bu sayfa, kaynak ekleme kurallarına göre yapılan geliştirmeleri denetlenebilir biçimde listeler: ne eklendi, hangi kaynaktaki eksik kapatıldı, neler düzeltildi ve neler henüz eksik. Hangi kaynak bölümünün hangi sayfaya eşlendiği [Kapsam tablosu](kapsam.html)'ndadır.
 
 ## 2026-11 · Öğrenme deneyimi ve kapsam denetimi
@@ -45,7 +54,7 @@ Model çözümlerin tüm kontrolleri geçmesi ve iskeletlerin geçmemesi (101 mo
 
 ### Henüz eksik olanlar
 
-- Pratik kartları ve yanılgı bölümleri 101 modülün 17'sinde var (Faz 0–1 doğrusal modeller, Faz 3 çekirdeği, CNN/RNN/attention, VAE, difüzyon, MDP). Diğer modüllerde pratik, el hesabı + beş kod aşaması + ek alıştırmalar + sınama + makale ödevi olarak duruyor; kart biçimine taşınmadı.
+- (1. tur sonunda) Pratik kartları 17 modüldeydi; 2. turda 38'e çıktı. Kalanlar: Faz 0'ın diğer modülleri, Faz 3'ün kalanı, Faz 5–11 (difüzyon/VAE dışında).
 - Statik açıklayıcı diyagramlar (hesap grafiği, mimari çizimleri) henüz yok; görseller deneylerin gerçek hesaplı grafikleriyle sınırlı.
 - Slaytlardaki şekiller metin olarak okunamadığı için karşılaştırma başlık ve metin düzeyinde yapıldı.
 - Doku belleği (M10.4) ve CUDA alıştırmaları tarayıcıda GPU olmadığı için kavramsal/Colab'da.

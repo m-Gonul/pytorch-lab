@@ -103,3 +103,92 @@ homework:
     accept:
       - "CNN öğretmenli sert damıtma, damıtmasız DeiT'i geçer."
       - "İki token'ın benzerliği derin katmanlarda artar ama 1'e ulaşmaz."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Yama boyutu, dizi uzunluğu ve maliyet
+    goal: ViT'nin hesap maliyetini yama boyutuna bağlamak
+    needs: Attention maliyeti (M4.6 P4)
+    q: |-
+      224 × 224 görüntü. Yama boyu 16 ve 8 için token sayısını ve attention skor matrisinin boyutunu karşılaştır.
+    solution: |-
+      $P=16$: $(224/16)^2=196$ yama + [class] = **197** token; skor matrisi $197^2\approx38.8$k (baş başına).
+
+      $P=8$: $28^2=784$ + 1 = 785 token; skor matrisi $\approx616$k — **16 kat**. Genel olarak token sayısı $\propto1/P^2$, attention maliyeti $\propto1/P^4$.
+
+      **Ödünleşim:** küçük yama daha ince ayrıntı ve genelde daha yüksek doğruluk verir (ViT-B/16 vs B/32), ama maliyet hızla büyür. Swin bu yüzden attention'ı yerel pencerelerle sınırlar, yüksek çözünürlüklü görevlerde maliyeti doğrusal tutar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Token sayısı
+    goal: Yamalama formülünü uygulamak
+    needs: P1
+    q: |-
+      384 × 384 görüntü, yama 16, [class] token'ı var. Token sayısı?
+    answer: 577.0
+    calc: "(384//16)**2+1"
+    mistakes:
+      - {answer: 576.0, msg: "[class] token'ını ekle."}
+    hints:
+      - "$24^2+1$."
+    solution: |-
+      $576+1=577$. Ön eğitim 224'te yapıldıysa konum gömmeleri 14 × 14'ten 24 × 24'e 2B enterpolasyonla büyütülür (Dosovitskiy ve ark. ince ayar yöntemi).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Yama gömme katmanının parametreleri
+    goal: Yamalama + doğrusal izdüşümü konvolüsyon olarak saymak
+    needs: M4.1 P3
+    q: |-
+      Yama 16, 3 kanal, $d=768$, bias'lı. Yama gömme katmanı kaç parametre?
+    answer: 590592.0
+    calc: "16*16*3*768+768"
+    mistakes:
+      - {answer: 197376.0, msg: "Yama 3 kanallı: 16·16·3 = 768 değer."}
+    hints:
+      - "Çekirdeği ve adımı 16 olan Conv2d(3, 768)."
+    solution: |-
+      $590\,592$. Yamalama + doğrusal izdüşüm, çekirdeği = adımı = P olan bir konvolüsyonla tam aynıdır.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: ImageNet-1k'da ViT, ResNet'in gerisinde
+    goal: Tümevarımsal yanlılık ile veri miktarı ilişkisini okumak
+    needs: Endüktif yanlılık
+    q: |-
+      Yalnız ImageNet-1k (1.3M görüntü) ile eğitilen ViT-B, benzer boyuttaki ResNet'in gerisinde; JFT-300M'de önce eğitilince öne geçiyor. Neden?
+    choices:
+      - {t: "ViT'nin mimarisi hatalı", why: "Çok veride üstün; sorun veri verimliliği."}
+      - {t: "CNN yerellik ve öteleme eşdeğerliği yanlılıklarını mimariyle bedava alır; ViT bunları veriden öğrenmek zorunda, bu yüzden daha çok veri ister — ama çok veride bu yanlılıklar sınırlayıcı olur", ok: true, why: "Dosovitskiy ve ark.'ın ana bulgusu."}
+      - {t: "ViT'nin parametresi az", why: "Parametre sayıları karşılaştırılabilir."}
+    hints:
+      - "CNN hangi varsayımları mimarisine gömmüş?"
+    solution: |-
+      Endüktif yanlılık az veride yardımcı, çok veride kısıtlayıcıdır. DeiT güçlü veri artırma, düzenlileştirme ve CNN öğretmenden damıtmayla ViT'yi yalnız ImageNet-1k'da da rekabetçi yaptı.
+  - id: p5
+    type: yöntem-seç
+    level: 3
+    title: Sınıflandırma için [class] token'ı mı ortalama havuzlama mı?
+    goal: Çıkış temsili seçimini gerekçelendirmek
+    needs: P1
+    q: |-
+      ViT'de sınıflandırma başlığına [class] token'ının son durumu mu, tüm yama token'larının ortalaması (GAP) mı verilmeli? Avantajları ve bir uyarıyla değerlendir.
+    rubric:
+      - "[class] token'ının BERT'ten gelen, tüm yamalara attention ile bakan özel bir toplayıcı olduğunu söyledim"
+      - "GAP'in de benzer sonuç verdiğini, ama farklı öğrenme oranı gerektirebildiğini (ViT makalesi ek deneyleri) belirttim"
+      - "Kendi kendine denetimli yöntemlerde (MAE) ortalama havuzlamanın sık kullanıldığını söyledim"
+      - "Seçimin ince ayar ve aktarımda tutarlı tutulması gerektiğini vurguladım"
+    hints:
+      - "İki yöntem de 'tüm görüntünün özeti'ni nasıl çıkarır?"
+    solution: |-
+      [class] token öğrenilen bir sorgu gibi tüm yamalardan bilgi toplar; GAP sabit bir ortalamadır. Dosovitskiy ve ark. ikisinin benzer sonuç verdiğini, ama GAP'in daha düşük öğrenme oranıyla çalıştığını raporladı. MAE gibi yöntemler GAP kullanır. Önemli olan ön eğitim ile ince ayarın aynı seçimi kullanması.
+pitfalls:
+  - wrong: "ViT görüntüyü piksel piksel işler."
+    right: "16 × 16'lık yamalar tek token olur; yama içindeki uzamsal yapı ilk doğrusal izdüşümde düzleştirilir."
+  - wrong: "ViT her koşulda CNN'den iyidir."
+    right: "Az veride ve küçük modellerde CNN (ya da hibrit) çoğu zaman daha iyidir; ViT'nin üstünlüğü ölçekle gelir."
+whatif:
+  - q: "Konum gömmeleri kaldırılırsa?"
+    a: "Model yama torbasına döner; ViT makalesinde bu ImageNet doğruluğunu birkaç puan düşürdü (yamalar içerikten kısmen konum ipucu taşır)."

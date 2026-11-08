@@ -125,3 +125,94 @@ labs:
       - q: "Entropi T ile nasıl değişir? Hangi T'de ln K'ya ulaşır?"
         a: "Monoton artar; yalnız T → ∞ limitinde (ya da tüm logitler eşitse) ln K olur."
     limits: "Sabit, yapay logit dizisi; gerçek modellerde top-k/top-p ile kuyruk ayrıca kesilir."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: BERT'in 80/10/10 maskeleme kuralı
+    goal: Maskeleme stratejisinin gerekçesini anlamak
+    needs: Maskeli dil modeli
+    q: |-
+      BERT token'ların %15'ini tahmin hedefi seçer; bunların %80'ini [MASK], %10'unu rastgele bir token, %10'unu olduğu gibi bırakır. 512 token'lık bir dizide beklenen [MASK] sayısı kaç? Neden hepsi [MASK] değil?
+    solution: |-
+      **Sayı:** $512\cdot0.15\cdot0.8=61.4$ [MASK]; ayrıca ~7.7 rastgele, ~7.7 değişmemiş hedef. Toplam ~76.8 tahmin hedefi.
+
+      **Gerekçe:** [MASK] ince ayar ve çıkarımda hiç görünmez. Hepsi [MASK] olsaydı model yalnız [MASK] konumlarında iyi temsil öğrenmeyi, diğer token'ların temsillerini ise önemsememeyi öğrenebilirdi (ön eğitim–ince ayar uyuşmazlığı). Rastgele token, modeli her konumun "bozulmuş olabileceğine" karşı hazırlar; değiştirilmemiş hedefler, gerçek token'ın temsilinin de iyi olmasını teşvik eder.
+
+      **Bedel:** her dizide yalnız %15 konumdan kayıp gelir: otoregresif LM'e göre örnek verimliliği düşüktür. ELECTRA tüm konumlardan sinyal alarak bunu düzeltir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Beklenen [MASK] sayısı
+    goal: P1'i uygulamak
+    needs: P1
+    q: |-
+      256 token'lık dizide beklenen [MASK] token sayısı?
+    answer: 30.72
+    calc: "256*0.15*0.8"
+    tol: 1e-6
+    mistakes:
+      - {answer: 38.4, msg: "Bu tüm tahmin hedefleri; yalnız %80'i [MASK] ile değiştirilir."}
+    hints:
+      - "$256\\cdot0.15\\cdot0.8$."
+    solution: |-
+      $30.72$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Bradley–Terry tercih olasılığı
+    goal: Ödül modelinin olasılık yorumunu kullanmak
+    needs: Sigmoid
+    q: |-
+      Ödül modeli: $r(a)=1.5$, $r(b)=-0.5$. $P(a\succ b)=\sigma(r(a)-r(b))$?
+    answer: 0.8807970779778823
+    calc: "1/(1+math.exp(-2))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.8175744761936437, msg: "Fark kullanılır: 1.5 − (−0.5) = 2."}
+    hints:
+      - "$\\sigma(2)$."
+    solution: |-
+      $\sigma(2)=0.881$. Ödül yalnız farkla tanımlıdır: tüm ödüllere sabit eklemek tercihleri değiştirmez.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Sınıflandırma için hangi ön eğitimli model?
+    goal: Kodlayıcı, kod çözücü ve kodlayıcı–kod çözücü arasında seçmek
+    needs: BERT, GPT, BART
+    q: |-
+      Etiketli 5000 örnekle müşteri yorumlarında duygu sınıflandırması yapacaksın; çıkarım ucuz olmalı. Hangisi?
+    choices:
+      - {t: "Yalnız kod çözücülü büyük LM ile metin üretip cevabı ayrıştırmak", why: "Çalışır ama çıkarım pahalı; küçük ince ayarlı kodlayıcı genelde daha ucuz ve iyi."}
+      - {t: "BERT tarzı kodlayıcı + sınıflandırma başlığıyla ince ayar", ok: true, why: "Çift yönlü bağlam, tek ileri geçiş; anlama görevleri için standart."}
+      - {t: "word2vec ortalaması + lojistik regresyon", why: "Güçlü taban çizgisi; bağlam ve kelime sırası kaybolur."}
+    hints:
+      - "Görev üretim mi, anlama mı?"
+    solution: |-
+      Anlama görevlerinde çift yönlü kodlayıcı (BERT/RoBERTa/DeBERTa) ince ayarı verimli ve güçlüdür. Etiket çok azsa büyük LM ile az örnekli istem (few-shot prompting) bir alternatif; bu durumda taban çizgisi olarak hep raporlanmalı.
+  - id: p5
+    type: birleştir
+    level: 3
+    title: DPO'nun RLHF'den farkı
+    goal: Tercih öğrenmede ödül modelinin rolünü tartışmak
+    needs: P3, M4.16 anlatımı, KL ıraksaması (M5.1)
+    q: |-
+      RLHF: ödül modeli eğit, sonra KL cezalı RL (PPO) ile politikayı optimize et. DPO bunu tek bir sınıflandırma benzeri kayba indirger. Hangi gözlem bunu mümkün kılar ve ne kaybedilir/kazanılır?
+    rubric:
+      - "KL kısıtlı ödül en büyüklemenin kapalı form çözümünü ($\\pi^*\\propto\\pi_{ref}e^{r/\\beta}$) yazdım"
+      - "Bunu ödül için çözüp ($r=\\beta\\log\\frac{\\pi}{\\pi_{ref}}+$ sabit) Bradley–Terry'ye koyunca sabitin sadeleştiğini söyledim"
+      - "Kazanç: ayrı ödül modeli ve RL döngüsü yok, kararlı; kayıp: çevrimiçi keşif yok, sabit tercih verisine bağlı"
+      - "β'nın referans modelden uzaklaşmayı kontrol ettiğini belirttim"
+    hints:
+      - "Ödül, politikanın kendisi cinsinden yazılabilir mi?"
+    solution: |-
+      $\max_\pi\mathbb E[r]-\beta\mathrm{KL}(\pi\|\pi_{ref})$'nin çözümü $\pi^*(y|x)=\frac1Z\pi_{ref}(y|x)e^{r(x,y)/\beta}$. Ters çevir: $r=\beta\log\frac{\pi^*}{\pi_{ref}}+\beta\log Z(x)$. Bradley–Terry yalnız ödül farkına baktığı için $Z(x)$ sadeleşir: $\mathcal L=-\log\sigma\big(\beta\log\frac{\pi(y_w)}{\pi_{ref}(y_w)}-\beta\log\frac{\pi(y_l)}{\pi_{ref}(y_l)}\big)$ (Rafailov ve ark. 2023). Kazanç: basit, kararlı, ödül modeli yok. Kayıp: politika kendi örnekleriyle keşif yapmaz; dağılım dışına genelleme ve aşırı optimizasyon davranışı farklıdır.
+pitfalls:
+  - wrong: "BERT metin üretmek için idealdir."
+    right: "Çift yönlü maskeli model doğal bir soldan sağa olasılık vermez; üretim için otoregresif (GPT) ya da kodlayıcı–kod çözücü (BART/T5) kullanılır."
+  - wrong: "Ön eğitimli modelin tüm katmanlarını her zaman ince ayarlamak gerekir."
+    right: "Az veride son katmanları ya da adaptörleri (LoRA) eğitmek daha kararlı ve ucuzdur; büyük öğrenme oranı ön eğitim bilgisini silebilir (felaket unutma)."
+whatif:
+  - q: "Maskeleme oranı %15'ten %40'a çıkarılırsa?"
+    a: "Wettig ve ark. (2023) büyük modellerde %40'ın %15'ten iyi olabildiğini gösterdi; çok yüksek oranda bağlam yetersiz kalır."

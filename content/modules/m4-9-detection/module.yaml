@@ -127,3 +127,96 @@ homework:
     accept:
       - "Tam FPN küçük nesnelerde AP'yi belirgin artırır."
       - "Yanal bağlantısız sürüm konumlandırmada (AP@0.75) geride kalır."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: NMS adım adım
+    goal: Maksimum olmayanı bastırmayı elle uygulamak
+    needs: IoU
+    q: |-
+      Aynı sınıf için kutular ve skorlar: A (0.9), B (0.8), C (0.7), D (0.6). IoU(A,B) = 0.7, IoU(A,C) = 0.1, IoU(A,D) = 0.05, IoU(C,D) = 0.6, IoU(B,C) = 0.2. Eşik 0.5 ile NMS hangi kutuları tutar?
+    solution: |-
+      **Algoritma:** skora göre sırala; en yükseği tut; onunla IoU'su eşiği aşanları sil; kalanlarla tekrarla.
+
+      1. A tutulur. B (0.7 > 0.5) silinir; C (0.1) ve D (0.05) kalır.
+      2. Kalanlardan en yüksek C tutulur. D (0.6 > 0.5) silinir.
+      3. Sonuç: **A ve C**.
+
+      **Not:** B'nin C ile IoU'su hiç kullanılmadı — B önce A tarafından silindi. NMS açgözlüdür ve sıralamaya bağlıdır. Kalabalık sahnede birbirine çok yakın iki gerçek nesneden biri yanlışlıkla silinebilir; Soft-NMS silmek yerine skoru IoU'ya göre düşürür.
+  - id: p2
+    type: hesap
+    level: 1
+    title: IoU
+    goal: Kesişim / birleşim oranını hesaplamak
+    needs: Dikdörtgen alanı
+    q: |-
+      Kutular $(x_1,y_1,x_2,y_2)$: $[0,0,2,2]$ ve $[1,1,3,3]$. IoU?
+    answer: 0.14285714285714285
+    calc: "1/7"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.25, msg: "Payda birleşim: 4 + 4 − 1 = 7, tek kutunun alanı değil."}
+      - {answer: 0.125, msg: "Kesişim birleşimde bir kez sayılır: toplamdan çıkar."}
+    hints:
+      - "Kesişim $[1,1,2,2]$, alanı 1."
+    solution: |-
+      Kesişim 1, birleşim $4+4-1=7$ → $1/7=0.143$. Kutular yarı yarıya kaymış gibi görünse de IoU düşük: IoU küçük konum hatalarına çok duyarlıdır.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Izgara tabanlı tespitte aday sayısı
+    goal: Tek geçişli dedektörün çıktı boyutunu hesaplamak
+    needs: Izgara ve çapa kutuları
+    q: |-
+      13 × 13 ızgara, hücre başına 5 çapa kutusu. Görüntü başına kaç kutu tahmini çıkar?
+    answer: 845.0
+    calc: "13*13*5"
+    mistakes:
+      - {answer: 169.0, msg: "Her hücre birden çok çapa (5) için tahmin yapar."}
+    hints:
+      - "Hücre sayısı × çapa."
+    solution: |-
+      845 aday; çoğu düşük skorlu. Skor eşiği + NMS bunları birkaç kutuya indirir. Çok ölçekli dedektörlerde (FPN, M4.9 ödevi) her seviyenin adayları toplanır.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: mAP@0.5 yüksek, mAP@[.5:.95] düşük
+    goal: Ölçütleri okumak
+    needs: AP
+    q: |-
+      Modelin mAP@0.5'i 0.72, COCO tarzı mAP@[0.5:0.95]'i 0.31. Ne söyler?
+    choices:
+      - {t: "Model nesneleri bulamıyor", why: "0.5 IoU'da çoğunu buluyor."}
+      - {t: "Nesneleri buluyor ama kutuları gevşek yerleştiriyor: yüksek IoU eşiklerinde eşleşme başarısız", ok: true, why: "COCO ölçütü kutu kalitesini ödüllendirir."}
+      - {t: "Sınıflandırma hatalı", why: "Sınıf hatası her iki ölçütü de düşürürdü."}
+    hints:
+      - "İki ölçüt arasındaki tek fark IoU eşiği."
+    solution: |-
+      mAP@[.5:.95], IoU eşiği 0.5'ten 0.95'e 10 eşikte AP ortalaması. Büyük fark, yerleştirme hassasiyetinin düşük olduğunu gösterir: kutu regresyonu kaybı (GIoU/DIoU), daha ince öznitelik haritaları ya da ikinci aşamalı iyileştirme yardım eder.
+  - id: p5
+    type: açıkla
+    level: 3
+    title: Tam bağlı katmanı konvolüsyona çevirmek
+    goal: FCN dönüşümünün kayan pencereyi neden bedavalaştırdığını açıklamak
+    needs: Konvolüsyon, M4.2 P5
+    q: |-
+      7 × 7 × 512 haritadan 4096'ya giden FC katmanı 7 × 7 konvolüsyona çevrilirse ve ağa daha büyük bir görüntü verilirse ne olur? Kayan pencereyle ilişkisini ve hesap tasarrufunu açıkla.
+    rubric:
+      - "FC'nin, girdi tam 7 × 7 iken 7 × 7 çekirdekli (4096 çıkış kanallı) konvolüsyonla aynı hesap olduğunu söyledim"
+      - "Büyük girdide çıktının uzamsal bir skor haritası olduğunu, her konumun bir pencereye karşılık geldiğini açıkladım"
+      - "Örtüşen pencerelerin ortak hesaplarının paylaşıldığını (tasarruf) söyledim"
+      - "Pencere adımının ağın toplam adımı (ör. 32) olduğunu belirttim"
+    hints:
+      - "Ağırlık tensörünü (4096, 512·7·7)'den (4096, 512, 7, 7)'ye yeniden şekillendir."
+    solution: |-
+      Ağırlıklar aynen yeniden şekillendirilir; 7 × 7 girdide çıktı 1 × 1 (aynı sayı). Daha büyük girdide çıktı H' × W' skor haritası: her konum, girdide ağın toplam adımıyla kaydırılmış bir pencerenin sınıf skorlarıdır (OverFeat, Sermanet ve ark. 2014). Örtüşen pencerelerin konvolüsyon öznitelikleri bir kez hesaplanır; ayrı ayrı kırpıp ağdan geçirmeye göre büyük tasarruf.
+pitfalls:
+  - wrong: "IoU 0.5 'yarı yarıya doğru' demektir."
+    right: "Aynı boyutlu iki kutu, kenarının ~1/3'ü kadar kayınca IoU 0.5'e düşer; IoU kaymaya çok duyarlıdır."
+  - wrong: "NMS eşiği ne kadar düşükse o kadar temiz sonuç."
+    right: "Düşük eşik birbirine yakın gerçek nesneleri de siler; kalabalık sahnelerde eşik ya da Soft-NMS ayarlanmalı."
+whatif:
+  - q: "NMS'siz, uçtan uca bir dedektör mümkün mü?"
+    a: "DETR: tahminler ile gerçek kutular arasında Macar eşlemesi (birebir) kayıpla eğitilir; tekrar eden tahminler cezalandırıldığı için NMS gerekmez."

@@ -103,3 +103,94 @@ homework:
     accept:
       - "Unigram bölütlemeleri morfem sınırlarına BPE'den daha yakın."
       - "Örneklenen bölütleme çeşitliliği gösterimi."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: BPE'nin ilk birleştirmesi
+    goal: Çift sayımını ve birleştirmeyi elle yapmak
+    needs: Sayma
+    q: |-
+      Kelime sıklıkları (karakterlere bölünmüş): `l o w` ×5, `l o w e r` ×2, `n e w e s t` ×6, `w i d e s t` ×3. İlk birleştirme hangisi?
+    solution: |-
+      Her kelimedeki bitişik çiftleri sıklıkla ağırlıklandırıp say:
+      - `l o`: 5 + 2 = 7; `o w`: 7; `w e`: 2 + 6 = 8; `e r`: 2
+      - `n e`: 6; `e w`: 6; `e s`: 6 + 3 = 9; `s t`: 9
+      - `w i`: 3; `i d`: 3; `d e`: 3
+
+      En sık: `e s` ve `s t` (9). Eşitlikte bir kural gerekir (ör. ilk görülen); `e s` → `es` seçilirse ikinci tur `es t` = 9 → `est`. Sennrich ve ark. (2016) örneği: sık ekler (-est) ve kökler zamanla token olur, nadir kelimeler parçalara bölünür — sözlük dışı kelime kalmaz.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Gömme tablosunun parametreleri
+    goal: Sözlük boyunun maliyetini görmek
+    needs: Embedding = satır seçimi
+    q: |-
+      GPT-2: sözlük 50 257, $d=768$. Token gömme tablosu kaç parametre?
+    answer: 38597376.0
+    calc: "50257*768"
+    mistakes:
+      - {answer: 77194752.0, msg: "GPT-2'de çıkış katmanı gömme tablosuyla bağlı (aynı ağırlık); ayrı sayılmaz."}
+    hints:
+      - "Tablo V × d."
+    solution: |-
+      $38\,597\,376$ ≈ 38.6M: 124M'lik modelin ~%31'i. Bu yüzden küçük modellerde çıkış katmanı gömmeyle bağlanır (M5.6'daki bağlı ağırlık fikri).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Tekrar eden token'ın gradyanı
+    goal: Gömme geri geçişindeki scatter-add'i anlamak
+    needs: Zincir kuralı, çok kullanılan değişken (M0.3 P3)
+    q: |-
+      Bir dizide token 7 üç kez geçiyor; bu konumlarda gömme çıktısına gelen gradyanların ilk bileşenleri 0.2, −0.5, 0.1. Gömme tablosunun 7. satırının ilk bileşeninin gradyanı?
+    answer: -0.19999999999999998
+    calc: "0.2-0.5+0.1"
+    mistakes:
+      - {answer: 0.1, msg: "Son yazma kazanmaz: aynı satır üç kez kullanıldı, gradyanlar toplanır (scatter-add)."}
+      - {answer: -0.06666666666666667, msg: "Ortalama değil toplam."}
+    hints:
+      - "Bir değişken birden çok yerde kullanılırsa gradyanlar…"
+    solution: |-
+      $0.2-0.5+0.1=-0.2$. NumPy'da `G[idx] += g` tekrar eden indekslerde yanlış (son yazma kazanır); doğrusu `np.add.at(G, idx, g)` ya da PyTorch `index_add_`.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Sözlük boyu
+    goal: Tokenizasyon granülerliğini seçmek
+    needs: P1
+    q: |-
+      Türkçe gibi eklemeli bir dil için karakter düzeyi, kelime düzeyi ve alt-kelime (BPE/Unigram, ~32k) arasında hangisi ve neden?
+    choices:
+      - {t: "Kelime düzeyi", why: "Eklerle kelime biçimi sayısı patlar; dev sözlük ve çok sayıda OOV."}
+      - {t: "Karakter düzeyi", why: "OOV yok ama diziler 4–5 kat uzar; attention maliyeti n² ile büyür."}
+      - {t: "Alt-kelime", ok: true, why: "Sık kökler/ekler token olur, nadir kelimeler parçalanır; sözlük boyu ve dizi uzunluğu dengelenir."}
+    hints:
+      - "\"evlerimizden\" kelime düzeyinde kaç farklı biçimden biri?"
+    solution: |-
+      Alt-kelime iki ucun dengesidir. Eklemeli dillerde çok dilli tokenizer'lar (çoğunlukla İngilizce verisiyle eğitilmiş) Türkçe metni çok daha fazla token'a böler: aynı içerik daha pahalı ve bağlam penceresi daha kısa. Dile özgü tokenizer bu yüzden değerlidir.
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Token sınırları modeli yanıltır
+    goal: Tokenizasyonun modele görünmeyen yanlılıklarını tanımak
+    needs: P1, P4
+    q: |-
+      Tokenizasyonun bir dil modelinin basit bir görevi zorlaştırdığı iki somut örnek ver ve nedenini açıkla.
+    rubric:
+      - "Harf sayma / ters çevirme gibi karakter düzeyi görevlerde token'ın harfleri görmediğini söyledim"
+      - "Sayıların tutarsız bölünmesinin (ör. '1234' → '12' '34') aritmetiği zorlaştırdığını söyledim"
+      - "Baştaki boşluk/büyük harf farkının aynı kelimeyi farklı token'lar yaptığını belirttim"
+      - "Çözüm yönü önerdim (sayıları rakam rakam bölmek, byte düzeyi modeller)"
+    hints:
+      - "Model 'strawberry' kelimesindeki r'leri neden yanlış sayabilir?"
+    solution: |-
+      Model token kimliklerini görür, harfleri değil: "strawberry" 2–3 token'sa harf sayısı ancak dolaylı öğrenilir. Sayılar BPE ile düzensiz bölünür; basamak hizası kaybolur (LLaMA gibi modeller rakamları tek tek böler). " Hello" ve "Hello" farklı token'dır. Byte düzeyi ya da karakter farkındalıklı modeller bu sorunları azaltır.
+pitfalls:
+  - wrong: "Gömme katmanı one-hot ile çarpılan bir matristir, öyle hesaplanmalı."
+    right: "Matematiksel olarak eşdeğer ama hesapta indeksleme (satır seçimi) kullanılır; one-hot matris kurmak boşa bellek."
+  - wrong: "BPE sözlüğü dilden bağımsızdır."
+    right: "Eğitildiği metnin dağılımını yansıtır; farklı dil/alan metninde token sayısı ve kalitesi belirgin değişir."
+whatif:
+  - q: "Birleştirme sayısı 0 olursa? Sonsuz olursa?"
+    a: "0: karakter (byte) düzeyi. Çok büyük: neredeyse kelime düzeyi; sık kelimeler tek token, nadirler yine parçalanır."

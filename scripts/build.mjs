@@ -252,7 +252,7 @@ function practiceItemHTML(m, x) {
   const rubric = x.rubric ? `<fieldset class="pr-rubric"><legend>Değerlendirme ölçütleri (çözümü okuduktan sonra işaretle)</legend>${x.rubric.map((r, i) => `<label><input type="checkbox" data-r="${i}"> ${md.inline(r)}</label>`).join("")}</fieldset>` : "";
   const worked = x.level === 0;
   return `<article class="pr" id="pr-${esc(x.id)}" data-pid="${esc(x.id)}" data-level="${x.level}" data-type="${esc(x.type)}">
-<header class="pr-head"><span class="pr-level l${x.level}">${LEVEL_NAME[x.level]}</span><span class="pr-type">${PTYPES[x.type]}</span>${x.title ? `<h3>${md.inline(x.title)}</h3>` : ""}</header>
+<header class="pr-head"><span class="pr-level l${x.level}">${LEVEL_NAME[x.level]}</span>${x.type === "çözülmüş" ? "" : `<span class="pr-type">${PTYPES[x.type]}</span>`}${x.title ? `<h3>${md.inline(x.title)}</h3>` : ""}</header>
 <dl class="pr-meta"><div><dt>Hedef</dt><dd>${md.inline(x.goal || "")}</dd></div>${x.needs ? `<div><dt>Gerekenler</dt><dd>${md.inline(x.needs)}</dd></div>` : ""}</dl>
 <div class="prose pr-q">${md.block(x.q)}</div>
 ${answer}

@@ -105,3 +105,95 @@ homework:
     accept:
       - "d büyüdükçe korelasyon 1'e yaklaşır."
       - "SPPMI-SVD ile SGNS'in analoji doğrulukları aynı mertebede."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Skip-gram eğitim çiftleri
+    goal: Bağlam penceresinden eğitim örneklerini üretmek
+    needs: Pencere kavramı
+    q: |-
+      Cümle: "kedi süt içti sonra uyudu", pencere 2 (her yana 2 kelime). Kaç (merkez, bağlam) çifti oluşur?
+    solution: |-
+      Her konumda pencereye düşen komşu sayısı:
+      - "kedi": sağda 2 → 2
+      - "süt": solda 1, sağda 2 → 3
+      - "içti": 2 + 2 → 4
+      - "sonra": 2 + 1 → 3
+      - "uyudu": solda 2 → 2
+
+      Toplam **14** çift. Skip-gram her çift için $\log\sigma(u_c^\top v_w)$'yi büyütür; tam softmax yerine **negatif örnekleme** $k$ rastgele kelime için $\log\sigma(-u_n^\top v_w)$ ekler. word2vec ayrıca pencere boyunu rastgele kısaltır (yakın komşular daha sık örneklenir) ve çok sık kelimeleri alt örnekler.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Negatif örnekleme dağılımı
+    goal: Unigram^0.75 düzeltmesinin etkisini görmek
+    needs: Normalizasyon
+    q: |-
+      İki kelime: sayımlar 100 ve 1. Negatifler $P(w)\propto\mathrm{sayım}^{0.75}$ ile çekiliyor. Nadir kelimenin seçilme olasılığı?
+    answer: 0.030653430031715508
+    calc: "1/(100**0.75+1)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.009900990099009901, msg: "Bu ham unigram olasılığı; 0.75 kuvveti nadir kelimelerin payını artırır."}
+    hints:
+      - "$100^{0.75}=31.6$."
+    solution: |-
+      $1/(31.6+1)=0.0307$ — ham olasılığın (0.0099) ~3 katı. Mikolov ve ark. (2013) 0.75'i deneysel olarak seçti: sık kelimeleri hâlâ çok örnekler ama nadirlere de pay bırakır.
+  - id: p3
+    type: hesap
+    level: 1
+    title: One-hot × W
+    goal: Gömme katmanının bir satır seçimi olduğunu görmek
+    needs: Matris çarpımı
+    q: |-
+      Sözlük 10 000, gömme boyu 300. 10 000 boyutlu one-hot vektör ile $W$ (10 000 × 300) çarpımı kaç **sıfırdan farklı** çarpma içerir (verimli uygulamada kaç sayı okunur)?
+    answer: 300.0
+    calc: "300"
+    mistakes:
+      - {answer: 3000000.0, msg: "Naif matris çarpımı; one-hot'un yalnız bir elemanı 1 olduğundan yalnız bir satır okunur."}
+    hints:
+      - "One-hot vektörde kaç eleman sıfır değil?"
+    solution: |-
+      Yalnız bir satır (300 sayı) seçilir: embedding katmanı = biassız, one-hot girdili yoğun katman, ama indekslemeyle uygulanır.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: One-hot mu, gömme mi?
+    goal: Kategorik özniteliği kodlama biçimini seçmek
+    needs: P3
+    q: |-
+      Tablo verisinde "şehir" sütunu 900 farklı değer alıyor; bir sinir ağına vereceksin. One-hot mu gömme mi?
+    choices:
+      - {t: "One-hot", why: "900 boyutlu seyrek girdi; benzer şehirler arasında hiçbir benzerlik paylaşılmaz."}
+      - {t: "Öğrenilen gömme (ör. 16–32 boyut)", ok: true, why: "Kategori sayısı büyük; gömme benzer kategorileri yakın yerleştirip istatistik paylaştırır."}
+      - {t: "Etiket kodlama (0, 1, 2, …) tek sayı olarak", why: "Var olmayan bir sıra ve uzaklık dayatır."}
+    hints:
+      - "Kural: <10 kategori one-hot, >50 gömme."
+    solution: |-
+      Géron'un sezgisel kuralı: 10'dan az kategoride one-hot, 50'den fazlada gömme, arası deneme. Nadir kategoriler için OOV kovası ya da sıklık eşiği; çok sayıda nadir kategori için hedef kodlama (sızıntıya dikkat) bir alternatif.
+  - id: p5
+    type: açıkla
+    level: 3
+    title: Analoji aritmetiği neden çalışır, neden yanıltır?
+    goal: Gömme geometrisinin sınırlarını tartışmak
+    needs: Kosinüs benzerliği
+    q: |-
+      "kral − erkek + kadın ≈ kraliçe" neden çoğu zaman çalışır? Değerlendirmedeki yaygın hileyi ve gömmelerdeki toplumsal yanlılık sorununu açıkla.
+    rubric:
+      - "Benzer bağlamlarda geçen kelimelerin farklarının tutarlı bir 'ilişki yönü' oluşturduğunu söyledim (PMI matrisi çarpanlaması bağlantısı)"
+      - "Değerlendirmede girdi kelimelerin aday listesinden çıkarıldığını, aksi hâlde en yakının çoğu zaman 'kral' olduğunu belirttim"
+      - "Eğitim metnindeki yanlılıkların (meslek–cinsiyet) gömmelere geçtiğini ve analojilerle görünür olduğunu açıkladım"
+    hints:
+      - "Kosinüs komşusu ararken 'kral'ı listeden çıkarmazsan ne olur?"
+    solution: |-
+      Skip-gram negatif örneklemeyle örtük olarak kaydırılmış PMI matrisini çarpanlar (Levy & Goldberg 2014); "erkek→kadın" bağlam farkı birçok kelime çiftinde benzer olduğu için yaklaşık sabit bir vektör olur. Ama standart değerlendirme girdi kelimeleri aday dışı bırakır; bırakmazsa vektörün en yakını genelde "kral"ın kendisidir (Nissim ve ark. 2020). Gömmeler eğitim metnindeki kalıp yargıları da kodlar ("doktor − erkek + kadın → hemşire"); Bolukbasi ve ark. (2016) bunu ölçtü ve azaltma yöntemleri önerdi.
+pitfalls:
+  - wrong: "word2vec kelimenin anlamını öğrenir."
+    right: "Dağılımsal benzerliği (hangi bağlamlarda geçtiğini) öğrenir; zıt anlamlılar benzer bağlamlarda geçtiği için yakın çıkabilir."
+  - wrong: "Her kelimenin tek bir vektörü yeterlidir."
+    right: "Çok anlamlı kelimeler (yüz: sayı / surat) tek vektörde karışır; bağlamsal gömmeler (M4.16) bunu çözer."
+whatif:
+  - q: "Pencere boyu 2'den 10'a çıkarsa?"
+    a: "Küçük pencere sözdizimsel/işlevsel benzerlik (aynı rolde kelimeler), büyük pencere konusal benzerlik yakalar."
