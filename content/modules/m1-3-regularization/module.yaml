@@ -118,6 +118,52 @@ labs:
         a: "Gürültü yoksa varyans terimi ortadan kalkar; yüksek derece düzgün bir fonksiyonu iyi yaklaşır (sayısal koşul dışında). Aşırı uyum, gürültüyü öğrenmenin adıdır."
     limits: "Legendre tabanı ve kapalı form çözüm kullanılıyor (sayısal kararlılık için); x ∈ [−1, 1]'de düzgün örnekleme. Test hatası 200 noktalı ızgarada gerçek fonksiyona uzaklık + σ²."
 
+  - id: l2
+    lab: regpath
+    title: "Ridge ve lasso yolları; doğrulama hatası ile λ seçimi"
+    goal: |
+      d öznitelikli sentetik veri: yalnız ilk k tanesi gerçekten etkili (kalın, renkli), diğerlerinin gerçek katsayısı 0 (gri kesikli). Sol grafik her katsayının λ ile nasıl değiştiğini, sağ grafik 400 ayrı doğrulama örneğinde hatayı gösterir. Ölçekleme: amaç $\frac1{2n}\|y-Xw\|^2+\lambda\,\Omega(w)$.
+    predict:
+      q: "Lasso'da λ'yı çok büyükten küçüğe doğru azaltırken hangi katsayılar ilk sıfırdan ayrılır?"
+      options:
+        - {t: "Artıkla korelasyonu en büyük olanlar — genelde gerçekten etkili ve büyük katsayılı öznitelikler", ok: true, why: "KKT: |xⱼᵀr|/n > λ olan öznitelik girer. λ_max'ta ilk giren, y ile en ilişkili özniteliktir."}
+        - {t: "Hepsi aynı anda", why: "Bu ridge'in davranışıdır (hepsi birden, düzgünce)."}
+        - {t: "Rastgele sırayla", why: "Sıra veriyle belirlenir; korelasyonlu özniteliklerde ise kararsız olabilir."}
+    presets:
+      - {name: "Seyrek gerçek, lasso", params: {method: 1, n: 40, d: 10, k: 3, rho: 0.3, noise: 1, lam: 0.1}, note: "Uygun λ'da 3 etkili öznitelik kalır, gerisi tam 0."}
+      - {name: "Aynısı, ridge", params: {method: 0, n: 40, d: 10, k: 3, rho: 0.3, noise: 1, lam: 0.1}, note: "Gereksiz katsayılar küçülür ama sıfır olmaz."}
+      - {name: "n < d", params: {method: 0, n: 15, d: 20, k: 3, rho: 0.3, noise: 1, lam: 0.1}, note: "En küçük kareler tanımsız (sonsuz çözüm); ridge her λ > 0 için tek çözüm verir."}
+      - {name: "Çok ilişkili, lasso", params: {method: 1, n: 40, d: 10, k: 4, rho: 0.9, noise: 1, lam: 0.05}, note: "Lasso ilişkili grubun içinden birkaçını seçer; tohumu değiştir, seçim değişir."}
+      - {name: "Yoğun gerçek", params: {method: 1, n: 60, d: 10, k: 10, rho: 0.3, noise: 1, lam: 0.05}, note: "Tüm öznitelikler etkiliyken lasso'nun seyreklik varsayımı yanlıştır; en iyi λ küçük çıkar."}
+    questions:
+      - q: "Doğrulama eğrisinin en sağında (büyük λ) hata neye yaklaşır?"
+        a: "Tüm katsayılar 0: model yalnız ortalamayı tahmin eder; hata y'nin varyansına yaklaşır (yanlılık baskın)."
+      - q: "En iyi doğrulama hatası neden σ²'nin altına inemez?"
+        a: "σ² indirgenemez gürültüdür (yanlılık–varyans ayrışımının üçüncü terimi); en iyi model bile yeni örneklerin gürültüsünü tahmin edemez."
+    limits: "Öznitelikler tek bir ortak faktörle eşit korelasyonlu Gauss. Doğrulama 400 ayrı örnekle yapılır (CV değil). Lasso coordinate descent ile, 200 tur ya da 10⁻⁷ değişime kadar."
+  - id: l3
+    lab: l1l2geom
+    title: "Neden L1 seyreklik üretir? Elmasın köşeleri"
+    goal: |
+      Kayıp, cezasız optimum $w^*$ (gri) etrafında elipslerdir (koyu = küçük). Mavi şekil kısıt bölgesi, yeşil nokta kısıtlı çözüm, turuncu kesikli eğri çözümden geçen kayıp elipsi. Çözüm, büyüyen elipsin bölgeye ilk değdiği yerdir.
+    predict:
+      q: "w* = (2, 1), t = 1, elips neredeyse çember. L1 kısıtında çözüm nerededir?"
+      options:
+        - {t: "(1, 0) köşesinde: w₂ tam sıfır", ok: true, why: "w*'a en yakın elmas noktası köşedir; Öklid izdüşümü (2,1)'i köşeye taşır."}
+        - {t: "(2/3, 1/3) gibi kenarın ortasında", why: "Bu, w* elmasın kenarına dik yönde olsaydı olurdu."}
+        - {t: "(2, 1)", why: "w* bütçenin dışında: |2| + |1| = 3 > 1."}
+    presets:
+      - {name: "Köşe (seyrek)", params: {p: 0, wx: 2, wy: 1, t: 1, kap: 1, ang: 0}, note: "w₂ = 0."}
+      - {name: "Aynısı, L2", params: {p: 1, wx: 2, wy: 1, t: 1, kap: 1, ang: 0}, note: "Çözüm (0.89, 0.45): iki katsayı da sıfırdan farklı."}
+      - {name: "Kenar", params: {p: 0, wx: 1.5, wy: 1.4, t: 1, kap: 1, ang: 0}, note: "w* köşegene yakın: elmasın kenarına değer, seyreklik yok."}
+      - {name: "Uzun elips", params: {p: 0, wx: 1.5, wy: 1.4, t: 1, kap: 10, ang: 0}, note: "Aynı w*, ama kayıp w₂ yönünde çok yatık (w₂'yi değiştirmek ucuz): çözüm (1, 0) köşesine kayar. Açıyı 90°'ye getir: bu kez w₁ = 0. Seyreklik verinin korelasyon yapısına da bağlıdır."}
+      - {name: "Bütçe yeterli", params: {p: 0, wx: 0.6, wy: 0.3, t: 1.5, kap: 4, ang: 20}, note: "w* bölgenin içinde: ceza etkisiz, çözüm = w*."}
+    questions:
+      - q: "Bütçe t'yi küçültmek cezalı biçimde neye karşılık gelir?"
+        a: "λ'yı büyütmeye. Her t'ye bir Lagrange çarpanı λ ≥ 0 karşılık gelir; t küçüldükçe λ büyür."
+      - q: "Yüksek boyutta seyreklik neden daha olası?"
+        a: "L1 topunun köşeleri ve düşük boyutlu yüzleri (bazı koordinatların sıfır olduğu kısımlar), yüzeyin büyük bölümünün 'yakalama alanını' oluşturur; rastgele bir elips büyük olasılıkla böyle bir yüze değer."
+    limits: "İki boyut; kayıp kesin kuadratik. Çözüm izdüşümlü gradyan inişiyle (4000 adıma kadar) bulunur; sınırda sayısal hata ~10⁻⁹."
 practice:
   - id: p1
     type: çözülmüş
