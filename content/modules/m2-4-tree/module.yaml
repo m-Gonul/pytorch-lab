@@ -86,3 +86,114 @@ homework:
     accept:
       - "Oyuncak veride makaledeki ağaç."
       - "Kazanç oranı yanlılığı giderir; budama test hatasını düşürür."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: En iyi bölünmeyi saf kirlilikle bul
+    goal: Gini kazancını adım adım hesaplamak
+    needs: Olasılık, ağırlıklı ortalama
+    q: |-
+      8 örnek: 4 A, 4 B. Bölünme 1: sol {3A, 1B}, sağ {1A, 3B}. Bölünme 2: sol {4A, 2B}, sağ {0A, 2B}. Gini'ye göre hangisi daha iyi?
+    solution: |-
+      **Tanım:** $G=1-\sum_kp_k^2$ (rastgele seçilen bir örneğin, düğümün sınıf dağılımına göre rastgele etiketlenirse yanlış etiketlenme olasılığı). Kök: $1-(0.5^2+0.5^2)=0.5$.
+
+      **Bölünme 1:** her iki çocuk $1-(0.75^2+0.25^2)=0.375$; ağırlıklı $\frac48\cdot0.375+\frac48\cdot0.375=0.375$; kazanç $0.125$.
+
+      **Bölünme 2:** sol $1-(\frac{4}{6}^2+\frac26^2)=1-\frac{20}{36}=0.444$, sağ saf: 0. Ağırlıklı $\frac68\cdot0.444=0.333$; kazanç $0.167$ → **bölünme 2 daha iyi**.
+
+      **Yorum:** Gini saf bir yaprak üretmeyi ödüllendirir. Entropiyle ($H=-\sum p\log_2p$) aynı hesap: bölünme 1 kazanç 0.189, bölünme 2 kazanç 0.311 — burada aynı seçim; iki ölçüt pratikte nadiren farklı ağaç üretir. Sınıflandırma hatası ($1-\max p$) ise ikisine de 0.25 verir: kazancı ayırt edemez, bu yüzden bölünme seçiminde kullanılmaz.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Gini
+    goal: Gini kirliliğini hesaplamak
+    needs: P1
+    q: |-
+      Düğümde 3 A, 1 B. Gini?
+    answer: 0.375
+    calc: "1-(0.75**2+0.25**2)"
+    mistakes:
+      - {answer: 0.625, msg: "Bu Σp²; Gini 1 − Σp²."}
+      - {answer: 0.25, msg: "Bu sınıflandırma hatası 1 − max p, Gini değil."}
+    hints:
+      - "$p_A=0.75$, $p_B=0.25$."
+    solution: |-
+      $1-(0.5625+0.0625)=0.375$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Entropi
+    goal: Entropiyi bit cinsinden hesaplamak
+    needs: Logaritma
+    q: |-
+      Aynı düğüm (3 A, 1 B): entropi kaç bit?
+    answer: 0.8112781244591328
+    calc: "-(0.75*math.log2(0.75)+0.25*math.log2(0.25))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.5623351446188083, msg: "Bu nat cinsinden (doğal log); bit için log₂."}
+    hints:
+      - "$\\log_20.25=-2$, $\\log_20.75\\approx-0.415$."
+    solution: |-
+      $0.75\cdot0.415+0.25\cdot2=0.811$ bit (azami 1 bit, 50/50'de).
+  - id: p4
+    type: karşı-örnek
+    level: 3
+    title: Açgözlü bölünme XOR'da tıkanır
+    goal: Açgözlü ağaç kurmanın sınırını görmek
+    needs: P1
+    q: |-
+      İki ikili öznitelik, etiket $y=x_1\oplus x_2$, dört nokta eşit sayıda. Kökte hiçbir bölünmenin Gini kazancı vermediğini göster; buna rağmen derinliği 2 olan bir ağacın hatasız olduğunu açıkla. Bu, durdurma kuralları için ne anlama gelir?
+    rubric:
+      - "x₁'e (ya da x₂'ye) göre bölününce her çocuğun hâlâ 50/50 olduğunu, kazancın 0 olduğunu gösterdim"
+      - "İkinci düzeyde öteki özniteliğe göre bölmenin saf yapraklar verdiğini gösterdim"
+      - "'Kazanç eşiğin altındaysa dur' kuralının burada ağacı hiç büyütmeyeceğini söyledim"
+      - "Çözüm olarak tam büyütüp sonra budamayı (cost-complexity pruning) önerdim"
+    hints:
+      - "x₁ = 0 olan noktaların etiketleri neler?"
+    solution: |-
+      x₁ = 0 → {(0,0): 0, (0,1): 1}; x₁ = 1 → {(1,0): 1, (1,1): 0}: her iki çocuk 50/50, kazanç 0 (x₂ için de aynı). İkinci düzeyde x₂'ye bölmek dört saf yaprak verir. Açgözlü yöntem etkileşimleri tek adımda göremez; erken durdurma ("kazanç < ε ise dur") bu yapıyı kaçırır. Bu yüzden ağaç genelde tam büyütülüp sonra maliyet–karmaşıklık budamasıyla küçültülür.
+  - id: p5
+    type: açıkla
+    level: 2
+    title: Ağaçlar ölçekten bağımsız ama dışarıya genelleyemez
+    goal: Ağaçların tümevarımsal yanlılığını tanımlamak
+    needs: Eşik bölünmesi
+    q: |-
+      Karar ağacının neden öznitelik ölçeklemesine ihtiyaç duymadığını ve neden eğitim aralığının dışına (ekstrapolasyon) genelleyemediğini açıkla.
+    rubric:
+      - "Bölünmelerin yalnız sıralamaya bağlı olduğunu (tekdüze dönüşümler sonucu değiştirmez) söyledim"
+      - "Yaprak tahminlerinin eğitim hedeflerinin ortalaması olduğunu, dolayısıyla aralık dışına çıkamayacağını açıkladım"
+      - "Eksen hizalı sınırların eğik sınırları basamak basamak yaklaştırdığını belirttim"
+    hints:
+      - "x yerine log x kullanınca hangi bölünmeler mümkün olur?"
+    solution: |-
+      Bölünme "x_j < t" biçiminde; herhangi bir tekdüze dönüşüm noktaların sırasını korur, aynı bölünmeleri (farklı eşiklerle) mümkün kılar. Regresyon yaprağı eğitim hedeflerinin ortalamasıdır: zaman serisinde eğilimli bir hedefi gelecekte sürdüremez (son yaprağın değerinde kalır). Eğik bir sınırı (x₁ + x₂ = 1) çok sayıda eksen hizalı basamakla yaklaştırır.
+  - id: p6
+    type: yöntem-seç
+    level: 2
+    title: Müşteri numarası özniteliği
+    goal: Çok değerli özniteliklerin yanlılığını tanımak
+    needs: Bilgi kazancı
+    q: |-
+      Veride benzersiz "müşteri_no" sütunu var. Bilgi kazancıyla kurulan ağaç onu kökte seçiyor, test doğruluğu çok düşük. Ne yapmalı?
+    choices:
+      - {t: "Ağacı derinleştir", why: "Sorun ağaç değil, ezberlemeye izin veren öznitelik."}
+      - {t: "Sütunu çıkar (ya da kazanç oranı gibi çok değerli öznitelikleri cezalandıran ölçüt kullan)", ok: true, why: "Her değer ayrı yaprak: eğitimde saf, testte anlamsız."}
+      - {t: "Gini'ye geç", why: "Gini de aynı yanlılığa sahip."}
+    hints:
+      - "Her müşteri_no değerinde kaç örnek var?"
+    solution: |-
+      Benzersiz değerli öznitelik eğitim kümesini tamamen saf yapraklara böler (kazanç azami) ama genelleme yoktur. C4.5'in kazanç oranı bölünmenin kendi entropisine bölerek bunu cezalandırır; pratikte kimlik sütunları çıkarılır.
+pitfalls:
+  - wrong: "Eğitim doğruluğu %100 olan ağaç iyi bir modeldir."
+    right: "Derinliği sınırsız ağaç her örneği ayrı yaprağa koyabilir; derinlik, yaprak başına en az örnek ya da budamayla düzenlileştir."
+  - wrong: "Öznitelik önemleri (kirlilik azalması) güvenilirdir."
+    right: "Çok değerli ve sürekli özniteliklere yanlıdır; permütasyon önemi daha güvenilirdir."
+whatif:
+  - q: "Eğitim verisi biraz değişirse ağaç ne kadar değişir?"
+    a: "Çok: kökteki bölünme değişirse bütün ağaç değişir (yüksek varyans). Bagging ve rastgele orman bu yüzden doğar (M2.5)."
+  - q: "Hedef sürekli olsaydı?"
+    a: "Kirlilik yerine varyans (MSE) azalması kullanılır; yaprak tahmini ortalamadır."

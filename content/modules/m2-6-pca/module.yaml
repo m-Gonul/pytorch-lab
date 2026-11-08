@@ -79,3 +79,115 @@ homework:
     accept:
       - "Hata kesin SVD'nin σ_{k+1}'ine yakın; q arttıkça iyileşir."
       - "Büyük matrislerde belirgin hızlanma."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: 2 × 2 kovaryansta bileşenler
+    goal: Özdeğer ve açıklanan varyans oranını elle bulmak
+    needs: Intro'daki türetim kutusu, karakteristik polinom
+    q: |-
+      $S=\begin{bmatrix}2&1\\1&2\end{bmatrix}$. Ana bileşenleri ve birinci bileşenin açıkladığı varyans oranını bul.
+    solution: |-
+      **Özdeğerler:** $\det(S-\lambda I)=(2-\lambda)^2-1=0\Rightarrow\lambda=3,\,1$. Kontrol: toplam = iz = 4, çarpım = det = 3 ✓.
+
+      **Özvektörler:** $\lambda=3$: $(S-3I)u=0\Rightarrow-u_1+u_2=0\Rightarrow u=\frac1{\sqrt2}(1,1)$. $\lambda=1$: $u=\frac1{\sqrt2}(1,-1)$ — birbirine dik ✓.
+
+      **Oran:** $3/(3+1)=0.75$. Veri en çok $x_1=x_2$ köşegeni boyunca değişir (iki öznitelik pozitif ilişkili: kovaryans 1). Tek bileşenle izdüşürmek varyansın %25'ini, yani $(1,-1)$ yönündeki farkları atar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: İki bileşenin açıkladığı varyans
+    goal: Açıklanan varyans oranını hesaplamak
+    needs: P1
+    q: |-
+      Özdeğerler $[5,3,1,1]$. İlk iki bileşenin açıkladığı varyans oranı?
+    answer: 0.8
+    calc: "(5+3)/10"
+    mistakes:
+      - {answer: 0.5, msg: "Bu yalnız ilk bileşen; ikinciyi (3) ekle."}
+      - {answer: 0.8888888888888888, msg: "Payda tüm özdeğerlerin toplamı: 5 + 3 + 1 + 1 = 10."}
+    hints:
+      - "Toplam varyans = özdeğerlerin toplamı = kovaryansın izi."
+    solution: |-
+      $8/10=0.8$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Kuvvet iterasyonunun bir adımı
+    goal: Kuvvet iterasyonunu uygulamak
+    needs: Matris–vektör çarpımı, normalizasyon
+    q: |-
+      $S$ P1'deki gibi, $v_0=(1,0)$. $v_1=Sv_0/\|Sv_0\|$'nin birinci bileşeni?
+    answer: 0.8944271909999159
+    calc: "2/math.sqrt(5)"
+    tol: 1e-3
+    mistakes:
+      - {answer: 2.0, msg: "Normalize etmeyi unuttun: Sv₀ = (2, 1), ‖·‖ = √5."}
+      - {answer: 0.7071067811865475, msg: "Bu yakınsanan değer (birinci özvektör); tek adım henüz orada değil."}
+    hints:
+      - "$Sv_0=(2,1)$."
+    solution: |-
+      $(2,1)/\sqrt5=(0.894,0.447)$. Her adımda $\lambda_2/\lambda_1=1/3$ oranında ikinci özvektör bileşeni söner; yakınsama hızı özdeğer boşluğuna bağlıdır.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Merkezlemeyi unutmak
+    goal: PCA'nın ortalamayı çıkarma adımının gerekliliğini görmek
+    needs: Kovaryans tanımı
+    q: |-
+      Bir öğrenci `U, S, Vt = np.linalg.svd(X)` ile PCA yapıyor (X merkezlenmemiş, tüm değerler 100 civarında). Birinci "bileşen" hep yaklaşık $(1,1,\dots,1)/\sqrt d$ çıkıyor. Neden?
+    choices:
+      - {t: "Verideki en büyük varyans yönü gerçekten bu", why: "Değil: merkezlenmemiş veride SVD, ikinci momenti (ortalama dahil) çözümler."}
+      - {t: "Merkezlenmemiş SVD XᵀX'i çözümler; ortalama vektörü (100, …, 100) baskın yön olur. Önce X − ortalama", ok: true, why: "Kovaryans merkezlenmiş verinin XᵀX/n'sidir."}
+      - {t: "Öznitelikler standartlaştırılmamış", why: "Ölçek sorunu ayrı bir konu; sabit yönün nedeni ortalama."}
+    hints:
+      - "$X^\\top X/n$, merkezlenmemişken kovaryansa eşit mi?"
+    solution: |-
+      $\frac1nX^\top X=S+\mu\mu^\top$. $\|\mu\|$ büyük olduğundan baskın özvektör $\mu$ yönüdür. Merkezlemek (`X - X.mean(0)`) bu terimi kaldırır. (Seyrek veride merkezleme yoğunluğu bozduğu için bazen bilinçli olarak yapılmaz: TruncatedSVD/LSA.)
+  - id: p5
+    type: karşı-örnek
+    level: 3
+    title: Ayırt edici bilgi düşük varyanslı yönde
+    goal: PCA'nın denetimsiz olmasının bedelini göstermek
+    needs: LDA (fikir düzeyinde)
+    q: |-
+      İki sınıflı bir 2B veri kümesi tarif et: PCA'nın birinci bileşenine izdüşürünce sınıflar tamamen karışsın, ikinci bileşende mükemmel ayrılsın. Hangi yöntem bunu kendiliğinden doğru yapar?
+    rubric:
+      - "Sınıfların x₁ boyunca uzun (büyük varyans), x₂ boyunca küçük ama farklı ortalamalı olduğu bir örnek verdim"
+      - "PCA'nın etiketleri kullanmadığını, yalnız toplam varyansa baktığını söyledim"
+      - "LDA'nın sınıf içi varyansa göre sınıflar arası ayrımı en büyüklediğini ve doğru yönü seçtiğini söyledim"
+    hints:
+      - "İki uzun, paralel, birbirine yakın şerit düşün."
+    solution: |-
+      Sınıf A: $x_1\sim U(-10,10)$, $x_2=+0.5+$ küçük gürültü; sınıf B: aynı ama $x_2=-0.5$. Toplam varyans $x_1$ boyunca ≫: PCA1 = $x_1$, izdüşümde sınıflar üst üste. Ayrım $x_2$'de. LDA $\max\frac{w^\top S_Bw}{w^\top S_Ww}$ ile $x_2$'yi seçer. Ders: boyut indirgemeyi aşağıdaki görevi göz önüne almadan yapmak bilgi atabilir.
+  - id: p6
+    type: hesap
+    level: 2
+    title: SVD'den özdeğere
+    goal: SVD ile kovaryans özayrışımı arasındaki ilişkiyi kullanmak
+    needs: SVD
+    q: |-
+      Merkezlenmiş $X$ (n = 9 satır) için en büyük tekil değer $s_1=6$. Kovaryansın ($S=X^\top X/n$) en büyük özdeğeri?
+    answer: 4.0
+    calc: "6**2/9"
+    mistakes:
+      - {answer: 0.6666666666666666, msg: "Özdeğer tekil değerin karesine karşılık gelir: XᵀX = V S² Vᵀ."}
+      - {answer: 4.5, msg: "Bu yansız (n − 1) kovaryans; soru S = XᵀX/n tanımını kullanıyor."}
+    hints:
+      - "$X=U\\Sigma V^\\top\\Rightarrow X^\\top X=V\\Sigma^2V^\\top$."
+    solution: |-
+      $36/9=4$. Pratikte PCA SVD ile yapılır: kovaryansı kurmak koşul sayısının karesini alır ve sayısal olarak daha kötüdür.
+pitfalls:
+  - wrong: "PCA bileşenleri anlamlı, yorumlanabilir etkenlerdir."
+    right: "Bileşenler yalnız varyansı en büyükleyen dik yönlerdir; işaretleri keyfidir, karışık yorumlanır (yorum için seyrek PCA/faktör analizi)."
+  - wrong: "Öznitelikleri ölçeklemeden PCA uygulamak sorun değil."
+    right: "Birimi büyük öznitelik toplam varyansa hâkim olur; farklı birimlerde standartlaştır (korelasyon matrisi PCA'sı)."
+  - wrong: "Test verisinin ortalamasıyla merkezle."
+    right: "Ortalama ve bileşenler yalnız eğitim verisinden öğrenilir, test verisine aynen uygulanır (sızıntı)."
+whatif:
+  - q: "Veri doğrusal olmayan bir manifold üzerindeyse (ör. İsviçre rulosu)?"
+    a: "PCA doğrusal alt uzay arar; manifoldu açamaz. Çekirdek PCA, Isomap, t-SNE/UMAP ya da otomatik kodlayıcılar (M5.6) gerekir."
+  - q: "Özdeğerler hepsi eşitse?"
+    a: "Hiçbir yön ayrıcalıklı değildir (izotropik veri); bileşenler tek değildir ve boyut indirgemenin anlamı yoktur."

@@ -84,3 +84,132 @@ homework:
     accept:
       - "Ölçülen 1-NN hataları Cover–Hart sınırları içinde."
       - "k-NN hatasının R*'a yaklaşma grafiği ve boyut etkisi."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Uzaklık matrisini döngüsüz yazmanın cebiri ve bedeli
+    goal: ‖a − b‖² açılımını türetmek ve sayısal riskini görmek
+    needs: İç çarpım, yayın (broadcasting)
+    q: |-
+      $X$ (n × d) ile $Y$ (m × d) arasındaki tüm kare uzaklıkları tek ifadede yaz. Bu yazımın kayan noktada nerede sorun çıkardığını göster.
+    solution: |-
+      **Açılım:** $\|a-b\|^2=(a-b)^\top(a-b)=a^\top a-2a^\top b+b^\top b$ (iç çarpım simetrik: $a^\top b=b^\top a$).
+
+      **Matris biçimi:** $D=\underbrace{\mathrm{sum}(X^2,1)}_{(n,1)}+\underbrace{\mathrm{sum}(Y^2,1)^\top}_{(1,m)}-2XY^\top$. İlk iki terim yayınla (n, m)'ye genişler; asıl iş tek bir matris çarpımıdır (BLAS, GPU'da çok hızlı).
+
+      **Bedel — yok etme (cancellation):** $a\approx b$ ve normlar büyükken $\|a\|^2+\|b\|^2$ ile $2a^\top b$ neredeyse eşit büyük sayılardır; farkları göreli hatası büyük, küçük bir sayıdır. Örnek: $a=(10^4,\,0)$, $b=(10^4,\,10^{-3})$: gerçek değer $10^{-6}$; float32'de $10^8$ civarındaki sayılar ancak ~8 birimlik adımlarla temsil edilir, sonuç 0 ya da **negatif** çıkabilir. Çare: sonucu `clamp(min=0)` ile kırp, veriyi merkezle (uzaklık ötelemeden bağımsızdır, normları küçültür), gerekirse float64 ya da `torch.cdist(..., compute_mode='donot_use_mm_for_euclid_dist')`.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Açılımla bir uzaklık
+    goal: Açılımı elle uygulamak
+    needs: P1
+    q: |-
+      $a=(1,2)$, $b=(3,-1)$. $\|a\|^2+\|b\|^2-2a\cdot b$ kaç?
+    answer: 13.0
+    calc: "5+10-2*1"
+    mistakes:
+      - {answer: 15.0, msg: "−2a·b terimini unuttun."}
+      - {answer: 17.0, msg: "İşaret: −2a·b. a·b = 3 − 2 = 1."}
+      - {answer: 3.605551275463989, msg: "Soru kare uzaklığı soruyor; kök almana gerek yok."}
+    hints:
+      - "$\\|a\\|^2=5$, $\\|b\\|^2=10$, $a\\cdot b=1\\cdot3+2\\cdot(-1)$."
+    solution: |-
+      $5+10-2=13$; doğrudan: $(1-3)^2+(2+1)^2=4+9=13$ ✓.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Boyutun laneti
+    goal: Yüksek boyutta "yakın" komşunun ne kadar uzak olduğunu hesaplamak
+    needs: Hacim, kök
+    q: |-
+      Veri $[0,1]^d$ birim küpünde düzgün dağılmış. Verinin %1'ini içine alan alt küpün kenar uzunluğu $d=10$ için kaç?
+    answer: 0.6309573444801932
+    calc: "0.01**(1/10)"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.001, msg: "Hacim kenarın d. kuvvetidir: kenar = 0.01^(1/d), 0.01/d değil."}
+      - {answer: 0.01, msg: "Bu d = 1 için doğru; 10 boyutta kenar çok daha uzun olmalı."}
+    hints:
+      - "$\\ell^{10}=0.01$."
+    solution: |-
+      $\ell=0.01^{1/10}=0.631$: verinin yalnız %1'ini toplamak için her eksende aralığın %63'ünü kapsamak gerekir. "Yerel" komşuluk yüksek boyutta yerel değildir; ayrıca en yakın ve en uzak komşu uzaklıklarının oranı 1'e yaklaşır. kNN'in yüksek boyutta öznitelik seçimi ya da öğrenilmiş gömmelerle (düşük içsel boyut) çalışmasının nedeni.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Maaş ve yaş
+    goal: Ölçeklemenin uzaklığa etkisini fark etmek
+    needs: Öklid uzaklığı
+    q: |-
+      Öznitelikler: yaş (20–65) ve yıllık maaş (TL, 200 000–3 000 000). kNN'in doğruluğu, maaşı tek başına kullanmakla aynı çıkıyor. Neden?
+    choices:
+      - {t: "Yaş bilgisiz bir öznitelik", why: "Yaşın bilgi taşıyıp taşımadığını bu deney söyleyemez: uzaklığa katkısı zaten yok."}
+      - {t: "Uzaklık, değer aralığı ~10⁶ olan maaş tarafından belirleniyor; yaş farkları yuvarlama hatası düzeyinde. Öznitelikleri standartlaştır", ok: true, why: "Öklid uzaklığı birimlere duyarlıdır."}
+      - {t: "k çok küçük", why: "k ne olursa olsun komşuluk yalnız maaşa göre belirlenir."}
+    hints:
+      - "İki kişi arasındaki yaş farkının ve maaş farkının karelerini karşılaştır."
+    solution: |-
+      40 yaş farkı karede 1600 katkı; 100 000 TL fark 10¹⁰. Standartlaştırma (z-skor) ya da min-maks ölçekleme her özniteliğe eşit "söz hakkı" verir; alan bilgisi varsa ağırlıklı uzaklık ya da öğrenilmiş metrik (Mahalanobis, metrik öğrenme) daha iyidir. Ölçekleme parametreleri yalnız eğitim kümesinden hesaplanmalı (sızıntı).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: k'ya karşı doğrulama hatası
+    goal: k'nın yanlılık–varyans rolünü okumak
+    needs: Aşırı uyum
+    q: |-
+      k = 1'de eğitim doğruluğu %100, doğrulama %81; k = 15'te eğitim %90, doğrulama %88; k = 200'de ikisi de %70. Yorum?
+    choices:
+      - {t: "k = 1 en iyisi: eğitimde hatasız", why: "1-NN eğitim noktasının kendisini bulduğu için eğitim hatası her zaman 0'dır; bilgi vermez."}
+      - {t: "Küçük k yüksek varyans (gürültüyü ezberliyor), büyük k yüksek yanlılık (sınır aşırı düz); k = 15 dolayı iyi denge", ok: true, why: "Etkin parametre sayısı ≈ n/k."}
+      - {t: "Veri sızıntısı var", why: "Eğri tipik U şeklini gösteriyor."}
+    hints:
+      - "k = n olursa model ne tahmin eder?"
+    solution: |-
+      k = n'de her sorguya çoğunluk sınıfı döner (sabit model). k küçüldükçe sınır esneşir; kNN'in etkin serbestlik derecesi kabaca n/k. En iyi k çapraz doğrulamayla seçilir; modülün e aşamasındaki tek sıralamayla 20 k değerini birden değerlendirme hilesi bu seçimi ucuzlatır.
+  - id: p6
+    type: yöntem-seç
+    level: 2
+    title: 10 milyon gömme vektörü
+    goal: Komşu arama yöntemini ölçeğe göre seçmek
+    needs: Karmaşıklık
+    q: |-
+      10 milyon adet 768 boyutlu metin gömmesi; sorgu başına < 10 ms'de en yakın 10 komşu lazım, %95 isabet yeterli. Kaba kuvvet mi, kd-ağacı mı, yaklaşık en yakın komşu (HNSW/IVF) mu?
+    choices:
+      - {t: "Kaba kuvvet", why: "Sorgu başına 10⁷ × 768 ≈ 8·10⁹ çarpma; tek sorguda saniyeler."}
+      - {t: "kd-ağacı", why: "Yüksek boyutta budama çalışmaz; neredeyse tüm yaprakları ziyaret eder."}
+      - {t: "Yaklaşık en yakın komşu (HNSW graf indeksi ya da IVF + nicemleme)", ok: true, why: "Kesinlikten biraz vazgeçip logaritmik benzeri sorgu süresi elde eder (FAISS, hnswlib)."}
+    hints:
+      - "kd-ağacının budaması hangi boyutlarda işe yarar?"
+    solution: |-
+      kd-ağacı ~20 boyutun altında etkilidir. 768 boyutta ANN indeksleri standarttır: HNSW (çok katmanlı yakınlık grafı) ya da IVF (kaba kümeleme + yalnız yakın kümelerde arama), çoğu zaman ürün nicemlemesiyle (PQ) sıkıştırılmış. Değerlendirme: recall@10 ve gecikme birlikte.
+  - id: p7
+    type: karşı-örnek
+    level: 3
+    title: Öklid uzaklığı yanıltıyor
+    goal: Uzaklık seçiminin modelin kendisi olduğunu görmek
+    needs: Kosinüs benzerliği
+    q: |-
+      Öklid uzaklıklı kNN'in açıkça yanlış komşu bulduğu bir veri türü ve somut bir örnek ver. Hangi uzaklık daha uygun ve neden?
+    rubric:
+      - "Somut bir örnek verdim (ör. kelime sayım vektörleri: aynı konudaki uzun ve kısa belge)"
+      - "Öklid'in büyüklüğe (uzunluk/norm) duyarlı olduğunu gösterdim"
+      - "Kosinüs (ya da normalize edilmiş vektörlerde Öklid) önerdim ve normalize vektörlerde ‖a − b‖² = 2 − 2cos olduğunu söyledim"
+      - "Başka bir örnek türü (zaman serisinde kayma → DTW, görüntüde öteleme) andım"
+    hints:
+      - "Bir belgeyi kendisiyle iki kez birleştirince sayım vektörü ne olur?"
+    solution: |-
+      Belge A'nın sayım vektörü $v$, aynı metnin iki kopyası $2v$: konu aynı ama $\|v-2v\|=\|v\|$ büyük; kısa ama farklı konulu bir belge daha yakın çıkabilir. Kosinüs açıya bakar: $\cos(v,2v)=1$. Birim normlu vektörlerde $\|a-b\|^2=2-2\cos(a,b)$, yani ikisi aynı sıralamayı verir — gömmeleri normalize etmek bu yüzden yaygın. Zaman serilerinde küçük faz kayması Öklid'i büyütür (DTW), görüntülerde bir piksellik öteleme de öyle (öğrenilmiş öznitelikler).
+pitfalls:
+  - wrong: "kNN eğitilmez, dolayısıyla aşırı uyamaz."
+    right: "k küçükken eğitim verisini ezberler ve gürültüye aşırı uyar; k, düzenlileştirme hiperparametresidir."
+  - wrong: "Uzaklık hesaplamak her zaman ucuzdur."
+    right: "Tahmin maliyeti O(n·d) sorgu başına; eğitim ucuzluğunun bedeli çıkarımda ödenir."
+  - wrong: "Daha çok öznitelik her zaman daha iyi komşu demektir."
+    right: "Bilgisiz öznitelikler uzaklığa gürültü ekler; yüksek boyutta tüm uzaklıklar birbirine yaklaşır (P3)."
+whatif:
+  - q: "Sınıflar çok dengesizse (%95 / %5)?"
+    a: "Çoğunluk sınıfı komşuluklara hâkim olur; uzaklıkla ağırlıklı oylama, sınıf başına eşik ya da sınıf dengeli örnekleme gerekir."
+  - q: "Komşuların oyları uzaklıkla ağırlıklandırılırsa?"
+    a: "k'ya duyarlılık azalır; k = n bile anlamlı hâle gelir (çekirdek regresyonuna — Nadaraya–Watson — yaklaşır)."

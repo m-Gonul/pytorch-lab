@@ -77,3 +77,136 @@ homework:
     accept:
       - "Eğriler kesişir: az veride NB, çok veride LR daha iyi."
       - "Varsayım ihlalinde LR'nin asimptotik üstünlüğü artar."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: İstenmeyen e-posta, sayılarla
+    goal: Önsel, olabilirlik ve posterior'u bir örnekte birleştirmek
+    needs: Bayes kuralı, intro'daki türetim kutusu
+    q: |-
+      E-postaların %40'ı istenmeyen (S). "bedava" kelimesi S'lerin %20'sinde, normal (N) e-postaların %2'sinde geçiyor; "toplantı" S'lerin %1'inde, N'lerin %10'unda. İkisini de içeren bir e-posta için $P(S\mid x)$?
+    solution: |-
+      **Koşullu bağımsızlık varsayımıyla:** $P(x\mid S)=0.20\cdot0.01=0.002$, $P(x\mid N)=0.02\cdot0.10=0.002$.
+
+      **Pay:** $P(S)P(x\mid S)=0.4\cdot0.002=0.0008$; $P(N)P(x\mid N)=0.6\cdot0.002=0.0012$.
+
+      **Normalize:** $P(S\mid x)=\frac{0.0008}{0.0008+0.0012}=0.4$. İki kelimenin kanıtları birbirini tam götürdü (biri S yönünde 10 kat, diğeri N yönünde 10 kat), geriye önsel kaldı.
+
+      **Log-oran biçimi** (daha sağlam ve okunur): $\log\frac{P(S|x)}{P(N|x)}=\log\frac{0.4}{0.6}+\log\frac{0.20}{0.02}+\log\frac{0.01}{0.10}=\log\frac23+\log10-\log10$. Her kelime log-orana **toplamsal** bir katkı yapar — Naive Bayes doğrusal bir sınıflandırıcıdır (P7).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Laplace düzeltmesi
+    goal: Sıfır sayımı düzeltmek
+    needs: Intro'daki türetim kutusu
+    q: |-
+      Bir sınıfta toplam 8 kelime sayıldı, sözlükte 4 kelime var, bir kelime bu sınıfta hiç görülmedi. α = 1 ile o kelimenin olasılığı?
+    answer: 0.08333333333333333
+    calc: "(0+1)/(8+1*4)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.0, msg: "Düzeltmesiz tahmin; tek bir görülmemiş kelime tüm çarpımı sıfırlar."}
+      - {answer: 0.1111111111111111, msg: "Paydaya α yerine α·V (her kelimeye 1 eklendi: 4) eklenmeli."}
+    hints:
+      - "$\\frac{n+\\alpha}{N+\\alpha V}$."
+    solution: |-
+      $\frac{0+1}{8+4}=\frac1{12}=0.0833$. Diğer kelimelerin olasılıkları da aynı paydayla küçülür; toplam yine 1.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Posterior
+    goal: Bayes kuralını uygulamak
+    needs: P1
+    q: |-
+      $P(S)=0.4$, $P(x\mid S)=0.05$, $P(x\mid N)=0.01$. $P(S\mid x)$?
+    answer: 0.7692307692307693
+    calc: "0.4*0.05/(0.4*0.05+0.6*0.01)"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.05, msg: "Bu olabilirlik P(x | S); posterior için önsel ve normalizasyon gerekir."}
+      - {answer: 0.020000000000000004, msg: "Bu pay; P(x)'e (iki sınıfın toplamı) böl."}
+    hints:
+      - "Payda $P(x)=0.4\\cdot0.05+0.6\\cdot0.01$."
+    solution: |-
+      $\frac{0.02}{0.02+0.006}=0.769$.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Uzun belgelerde hep aynı sınıf
+    goal: Alttan taşmayı fark etmek
+    needs: Kayan nokta
+    q: |-
+      ```python
+      score[c] = prior[c] * np.prod(p_word[c, words])
+      ```
+      500 kelimelik belgelerde her sınıfın skoru 0 çıkıyor ve argmax hep 0. sınıfı veriyor. Düzeltme?
+    choices:
+      - {t: "float32 yerine float64", why: "0.01⁵⁰⁰ = 10⁻¹⁰⁰⁰, float64'ün alt sınırı (~10⁻³⁰⁸) da yetmez."}
+      - {t: "Log uzayında topla: `log(prior[c]) + np.log(p_word[c, words]).sum()`", ok: true, why: "Toplam alttan taşmaz; argmax log altında değişmez."}
+      - {t: "Laplace α'yı büyüt", why: "Sıfır olasılığı çözer, alttan taşmayı değil."}
+    hints:
+      - "500 tane 0.01'in çarpımı kaçtır?"
+    solution: |-
+      Olasılık çarpımı alttan taşar; log monoton olduğu için sınıflandırma log-toplamla aynı kalır. Olasılık gerekiyorsa log-sum-exp ile normalize et (M1.5).
+  - id: p5
+    type: açıkla
+    level: 2
+    title: Yanlış varsayım, iyi sınıflandırıcı
+    goal: Sınıflandırma ile olasılık kestirimini ayırmak
+    needs: P1
+    q: |-
+      Kelimeler açıkça bağımsız değil ("New" ve "York"). Naive Bayes yine de metin sınıflandırmada neden çoğu zaman iyi çalışır ve neyi kötü yapar?
+    rubric:
+      - "Sınıflandırma için yalnız argmax'ın doğru olmasının yettiğini söyledim"
+      - "İlişkili kanıtın çift sayılmasının olasılıkları uçlara ittiğini (kötü kalibrasyon) açıkladım"
+      - "Az veriyle düşük varyanslı (az parametre) olduğunu, yanlılık–varyans dengesine değindim"
+      - "Ayırıcı bir modelle (lojistik regresyon) karşılaştırdım: çok veride genelde LR kazanır (Ng & Jordan 2002)"
+    hints:
+      - "Çift sayılan kanıt, doğru sınıfın sırasını mı değiştirir yoksa yalnız güveni mi?"
+    solution: |-
+      Hedef $\arg\max_yP(y|x)$; olasılıklar yanlış ölçekli olsa da sıralama çoğu zaman korunur (Domingos & Pazzani 1997). İlişkili kelimeler aynı kanıtı iki kez ekler: posterior'lar 0/1'e yığılır (kalibrasyon kötü). Parametre sayısı az olduğu için az veride hızla yakınsar; çok veride ayırıcı modeller (LR) daha düşük asimptotik hata verir.
+  - id: p6
+    type: yöntem-seç
+    level: 2
+    title: Hangi Naive Bayes?
+    goal: Olabilirlik ailesini veriye göre seçmek
+    needs: Dağılımlar
+    q: |-
+      Belgeler kelime **sayımlarıyla** temsil ediliyor (bir kelime belgede birçok kez geçebilir). Gaussian, Bernoulli, multinomial?
+    choices:
+      - {t: "Gaussian NB", why: "Sayımlar negatif olmayan tamsayı ve çok çarpık; Gauss uygun değil."}
+      - {t: "Bernoulli NB", why: "Yalnız var/yok bilgisini kullanır; sayımları atar (kısa metinlerde yine de iyi olabilir)."}
+      - {t: "Multinomial NB", ok: true, why: "Belge, sınıfa özgü bir kelime dağılımından bağımsız çekilişler dizisi olarak modellenir."}
+    hints:
+      - "Verinin türü: sürekli mi, ikili mi, sayım mı?"
+    solution: |-
+      Sayım → multinomial; ikili var/yok → Bernoulli (görülmeyen kelimeleri de kanıt sayar); sürekli öznitelik → Gaussian. TF-IDF ağırlıkları sürekli olsa da pratikte multinomial ile iyi çalışır (Rennie ve ark. 2003).
+  - id: p7
+    type: kanıt
+    level: 3
+    title: Ortak varyanslı Gaussian NB doğrusal sınıflandırıcıdır
+    goal: Üretken ve ayırıcı modeller arasındaki bağı kurmak
+    needs: Gauss log-yoğunluğu, M1.4
+    q: |-
+      İki sınıf, her öznitelik için sınıflardan bağımsız varyans $\sigma_j^2$ ve sınıfa bağlı ortalama $\mu_{yj}$. $\log\frac{P(1|x)}{P(0|x)}$'in $x$'te doğrusal olduğunu göster ve $w_j$'yi yaz.
+    rubric:
+      - "Log-orantıyı önsel oranı + öznitelik başına log-olabilirlik oranları toplamı olarak yazdım"
+      - "$x_j^2$ terimlerinin ortak varyans sayesinde sadeleştiğini gösterdim"
+      - "$w_j=(\\mu_{1j}-\\mu_{0j})/\\sigma_j^2$ buldum"
+      - "Sonucun lojistik regresyon biçiminde olduğunu, ama parametrelerin farklı (üretken) yoldan kestirildiğini söyledim"
+    hints:
+      - "$\\log\\mathcal N(x;\\mu,\\sigma^2)=-\\frac{(x-\\mu)^2}{2\\sigma^2}+c$."
+    solution: |-
+      $\log\frac{P(1|x)}{P(0|x)}=\log\frac{\pi_1}{\pi_0}+\sum_j\frac{(x_j-\mu_{0j})^2-(x_j-\mu_{1j})^2}{2\sigma_j^2}$. Açınca $x_j^2$'ler sadeleşir: $\sum_j\frac{\mu_{1j}-\mu_{0j}}{\sigma_j^2}x_j+b$. Yani $P(1|x)=\sigma(w^\top x+b)$, $w_j=\frac{\mu_{1j}-\mu_{0j}}{\sigma_j^2}$. Varyanslar sınıfa bağlı olsaydı karesel terimler kalır, sınır karesel olurdu (QDA).
+pitfalls:
+  - wrong: "Naive Bayes'in verdiği olasılık güvenilir bir güven ölçüsüdür."
+    right: "Bağımsızlık varsayımı yüzünden olasılıklar aşırı uçlara itilir; karar iyi olsa da olasılık kötü kalibredir."
+  - wrong: "Laplace düzeltmesi yalnız sıfırları değiştirir."
+    right: "Payda da büyüdüğü için tüm olasılıklar biraz değişir (sıfıra doğru değil, düzgüne doğru)."
+whatif:
+  - q: "α çok büyük seçilirse (ör. 1000)?"
+    a: "Tüm kelime olasılıkları düzgüne yaklaşır; veri neredeyse yok sayılır ve sınıflandırma önsele indirgenir."
+  - q: "İki öznitelik birbirinin tam kopyası olsaydı?"
+    a: "Kanıt iki kez sayılır: log-oran o özniteliğin katkısının iki katı olur. Sınıflandırma değişebilir, kalibrasyon kesin bozulur."

@@ -78,3 +78,134 @@ homework:
     accept:
       - "Log-olabilirlik hiçbir yinelemede azalmaz."
       - "Bileşenler yaklaştıkça EM yavaşlar."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir E adımı ve bir M adımı, 1B
+    goal: Sorumlulukları ve parametre güncellemesini sayılarla izlemek
+    needs: Intro'daki türetim kutusu, Gauss yoğunluğu
+    q: |-
+      İki bileşen: $\pi_1=\pi_2=0.5$, $\mu_1=0$, $\mu_2=4$, $\sigma_1=\sigma_2=1$. Noktalar $x=[0,1,4]$. Bir EM turu yap.
+    solution: |-
+      **E adımı:** $r_{i1}=\frac{\pi_1\mathcal N(x_i;\mu_1)}{\pi_1\mathcal N(x_i;\mu_1)+\pi_2\mathcal N(x_i;\mu_2)}$. Eşit π ve σ'da normalizasyon sabitleri sadeleşir: $r_{i1}=\frac1{1+e^{-[(x_i-4)^2-x_i^2]/2}}=\frac1{1+e^{-(16-8x_i)/2}}$.
+      - $x=0$: $\frac1{1+e^{-8}}\approx1.000$
+      - $x=1$: $\frac1{1+e^{-4}}=0.982$
+      - $x=4$: $\frac1{1+e^{8}}\approx0.000$
+
+      **M adımı:** $N_1=\sum r_{i1}=1.982$; $\mu_1=\frac{0\cdot1+1\cdot0.982+4\cdot0.0003}{1.982}=0.496$; $\mu_2=\frac{0+1\cdot0.018+4\cdot1.000}{1.018}=3.947$; $\pi_1=1.982/3=0.661$; varyanslar sorumluluk ağırlıklı kare sapmalardan.
+
+      **Yorum:** EM, k-means'in yumuşak sürümüdür: x = 1, %98 küme 1'e ve %2 küme 2'ye "bölünür". k-means'te tamamen küme 1'e giderdi.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Sorumluluk
+    goal: E adımını uygulamak
+    needs: P1
+    q: |-
+      $\pi_1=\pi_2=0.5$, $\mu_1=0$, $\mu_2=2$, $\sigma=1$. $x=0.5$ için $r_1$?
+    answer: 0.7310585786300049
+    calc: "1/(1+math.exp(-1))"
+    tol: 1e-3
+    mistakes:
+      - {answer: 0.8824969025845955, msg: "Bu yalnız payın Gauss çekirdeği; iki bileşenin toplamına böl."}
+      - {answer: 0.5, msg: "x = 0.5, μ₁ = 0'a daha yakın; sorumluluk 0.5'ten büyük olmalı (eşitlik x = 1'de)."}
+    hints:
+      - "$r_1=\\frac{e^{-0.125}}{e^{-0.125}+e^{-1.125}}$."
+    solution: |-
+      $\frac1{1+e^{-1}}=0.731$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: M adımında ortalama
+    goal: Ağırlıklı ortalamayı uygulamak
+    needs: P1
+    q: |-
+      Noktalar $[0,1,4]$, bileşen 1 için sorumluluklar $[1,\ 0.5,\ 0]$. Yeni $\mu_1$?
+    answer: 0.3333333333333333
+    calc: "(0*1+1*0.5+4*0)/(1+0.5+0)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.16666666666666666, msg: "Payda nokta sayısı değil, sorumlulukların toplamı (N₁ = 1.5)."}
+    hints:
+      - "$\\mu_1=\\frac{\\sum r_ix_i}{\\sum r_i}$."
+    solution: |-
+      $0.5/1.5=0.333$.
+  - id: p4
+    type: hata-bul
+    level: 2
+    title: Olabilirlik sonsuza gidiyor
+    goal: GMM'in tekillik sorununu tanımak
+    needs: Gauss yoğunluğu
+    q: |-
+      EM sırasında log-olabilirlik bir anda +∞'a, bir bileşenin varyansı 0'a gidiyor. Neden ve düzeltme?
+    choices:
+      - {t: "EM'de hata var: olabilirlik artmamalı", why: "EM olabilirliği artırır; sorun olabilirliğin sınırsız olması."}
+      - {t: "Bir bileşen tek bir noktaya çöktü: N(x; x, σ²) σ → 0'da sonsuz. Kovaryansa küçük düzenlileştirme (reg_covar) ya da önsel ekle", ok: true, why: "MLE bu modelde iyi tanımlı değil."}
+      - {t: "Öğrenme oranını düşür", why: "EM'de öğrenme oranı yok."}
+    hints:
+      - "Bir noktanın tam üstündeki Gauss'un yoğunluğu σ küçüldükçe ne olur?"
+    solution: |-
+      $\mathcal N(x;x,\sigma^2)=\frac1{\sqrt{2\pi}\sigma}\to\infty$; diğer bileşenler öteki noktaları açıkladıkça toplam olabilirlik sınırsız. Çareler: kovaryansa $\epsilon I$ eklemek (sklearn `reg_covar`), Wishart önseli (MAP-EM), çöken bileşeni yeniden başlatmak.
+  - id: p5
+    type: hesap
+    level: 2
+    title: Parametre sayısı ve BIC
+    goal: Model karmaşıklığını saymak
+    needs: Simetrik matris
+    q: |-
+      Tam kovaryanslı GMM, $d=2$, $k=3$. Bağımsız parametre sayısı (ortalamalar + kovaryanslar + karışım ağırlıkları)?
+    answer: 17.0
+    calc: "3*2+3*3+2"
+    mistakes:
+      - {answer: 21.0, msg: "Kovaryans simetrik: 2 × 2 için 3 bağımsız eleman; ağırlıklar toplamı 1 olduğu için k − 1 = 2."}
+      - {answer: 18.0, msg: "Ağırlıklar toplamı 1'e kısıtlı: k − 1 bağımsız."}
+    hints:
+      - "d boyutlu kovaryansta $d(d+1)/2$ bağımsız eleman."
+    solution: |-
+      $6+9+2=17$. BIC $=-2\log L+p\log n$: k artınca log-olabilirlik iyileşir ama ceza $17\log n$ büyür; k'yı BIC'in en küçük olduğu yerde seç.
+  - id: p6
+    type: açıkla
+    level: 2
+    title: k-means, EM'in sert limitidir
+    goal: İki algoritma arasındaki bağı kendi cümlelerinle kurmak
+    needs: P1, M2.7
+    q: |-
+      Eşit ağırlıklı, kovaryansı $\sigma^2I$ olan GMM'de $\sigma\to0$ iken E ve M adımlarının k-means'in atama ve güncelleme adımlarına dönüştüğünü açıkla.
+    rubric:
+      - "Sorumluluğun $\\propto\\exp(-\\|x-\\mu_k\\|^2/2\\sigma^2)$ olduğunu yazdım"
+      - "σ → 0'da en yakın merkezin sorumluluğunun 1'e, diğerlerinin 0'a gittiğini açıkladım"
+      - "M adımının sert atamayla küme ortalamasına indirgendiğini söyledim"
+      - "Farkı yorumladım: k-means belirsizlik ve küme biçimi taşımaz"
+    hints:
+      - "İki üstel ifadenin oranı, üsler arasındaki farkın 1/σ² katına bağlıdır."
+    solution: |-
+      $r_{ik}=\frac{e^{-d_{ik}^2/2\sigma^2}}{\sum_je^{-d_{ij}^2/2\sigma^2}}$; en küçük $d_{ik}$ dışındaki terimler $e^{-(d_{ij}^2-d_{ik}^2)/2\sigma^2}\to0$: sert atama. M adımında ağırlıklar 0/1 → küme ortalaması. GMM ek olarak belirsizliği (yumuşak üyelik), küme şekli ve büyüklüğünü modeller.
+  - id: p7
+    type: karşı-örnek
+    level: 3
+    title: EM yerel optimuma takılır
+    goal: Başlatmanın önemini somut örnekle göstermek
+    needs: P1
+    q: |-
+      Üç iyi ayrılmış küme ve k = 3 olan bir veri için, EM'in iki bileşeni tek bir kümeye, tek bileşeni iki kümeye yerleştirdiği ve oradan kurtulamadığı bir başlatma tarif et. Neden kurtulamıyor, nasıl önlenir?
+    rubric:
+      - "Somut başlatma tarif ettim (iki ortalama aynı kümenin içinde)"
+      - "Sorumlulukların bu yapıyı koruduğunu (her adım olabilirliği artırıyor ama yerel olarak) açıkladım"
+      - "Birden çok başlatma ve k-means/k-means++ ile başlatma önerdim"
+      - "Bölme–birleştirme (split–merge EM) gibi yöntemleri andım"
+    hints:
+      - "Uzaktaki iki kümenin noktaları, aralarındaki tek bileşene ne sorumluluk verir?"
+    solution: |-
+      Kümeler A, B, C; iki ortalama A'nın içinde, biri B ile C'nin ortasında. E adımında A'nın noktaları ikiye bölünür; B ve C'nin noktalarının hepsi üçüncü bileşene gider, bu bileşen büyük bir varyansla ikisini birden kapsar. Bu yapı yerel bir maksimumdur: küçük bir değişiklik olabilirliği düşürür. Önlem: birden çok başlatma (en yüksek log-olabilirliği seç), k-means++ ile başlatma, split–merge EM.
+pitfalls:
+  - wrong: "EM her zaman küresel en çok olabilirlik çözümünü bulur."
+    right: "Yalnız olabilirliği hiç düşürmediği garanti; sonuç yerel bir maksimumdur ve başlatmaya bağlıdır."
+  - wrong: "GMM'de log-olabilirliği en yüksek k en iyidir."
+    right: "Olabilirlik k ile artar; BIC/AIC ya da doğrulama olabilirliği kullan (P5)."
+whatif:
+  - q: "Bazı öznitelikler eksikse?"
+    a: "EM eksik veriyi de gizli değişken gibi ele alıp E adımında koşullu beklentisini kullanabilir: eksik değerli GMM doğal olarak eğitilir."
+  - q: "Bileşen sayısını önceden bilmiyorsan?"
+    a: "BIC ile seçim ya da Dirichlet süreci karışımı (bileşen sayısını veriden öğrenen Bayesçi model)."

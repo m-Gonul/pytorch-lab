@@ -80,3 +80,131 @@ homework:
     accept:
       - "Karar fonksiyonu libsvm ile 10⁻³ içinde aynı."
       - "KKT koşulları tolerans içinde sağlanıyor."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Hinge kaybı ve alt-gradyanı
+    goal: SVM'nin gradyanla nasıl eğitildiğini görmek
+    needs: Intro'daki türetim kutusu, alt-gradyan
+    q: |-
+      $L(w)=\frac\lambda2\|w\|^2+\max(0,1-y\,w^\top x)$. Tek örnek için alt-gradyanı yaz; $x=(1,2)$, $y=+1$, $w=(0.2,0.1)$, $\lambda=0.1$ için hesapla.
+    solution: |-
+      **Hinge'in alt-gradyanı:** $m=y\,w^\top x$ (marj). $m<1$ ise $-yx$; $m>1$ ise 0; $m=1$'de $[-yx,0]$ aralığından herhangi biri (genelde 0 seçilir).
+
+      **Sayılar:** $m=1\cdot(0.2+0.2)=0.4<1$ → hinge aktif. $\nabla=\lambda w-yx=(0.02,0.01)-(1,2)=(-0.98,-1.99)$. Adım $w\leftarrow w-\eta\nabla$, $w$'yi $x$ yönüne iter (marjı büyütür).
+
+      **Yorum:** marjı 1'i aşan örnekler yalnız düzenlileştirme terimiyle $w$'yi küçültür; öğrenmeye katkı veren yalnız marjı yetersiz örneklerdir — destek vektörlerinin gradyan dilindeki karşılığı. Lojistik kayıpta ise her örnek (azalan da olsa) katkı verir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Marj genişliği
+    goal: 2/‖w‖ formülünü uygulamak
+    needs: Intro'daki türetim kutusu
+    q: |-
+      Kanonik biçimde $w=(3,4)$. Sınıflar arası şeridin genişliği?
+    answer: 0.4
+    calc: "2/5"
+    mistakes:
+      - {answer: 0.08, msg: "‖w‖² değil, ‖w‖ = 5 ile böl."}
+      - {answer: 0.2, msg: "Bu sınırdan en yakın noktaya uzaklık; şerit iki yanı kapsar: 2/‖w‖."}
+    hints:
+      - "$\\|w\\|=5$."
+    solution: |-
+      $2/\|w\|=0.4$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Çok sınıflı SVM kaybı
+    goal: Weston–Watkins (CS231n) kaybını hesaplamak
+    needs: Hinge
+    q: |-
+      Skorlar $s=[3.2,\ 5.1,\ -1.7]$, doğru sınıf 0, $\Delta=1$. $L=\sum_{j\ne y}\max(0,s_j-s_y+\Delta)$?
+    answer: 2.8999999999999995
+    calc: "max(0,5.1-3.2+1)+max(0,-1.7-3.2+1)"
+    tol: 1e-6
+    mistakes:
+      - {answer: 3.8999999999999995, msg: "Doğru sınıfın kendisi toplama girmez (j ≠ y); girseydi her zaman Δ eklerdi."}
+      - {answer: -1.0000000000000009, msg: "Negatif terimler max(0, ·) ile sıfırlanır."}
+    hints:
+      - "İki terim: sınıf 1 ve sınıf 2."
+    solution: |-
+      $\max(0,2.9)+\max(0,-3.9)=2.9$. Yalnız sınıf 1 marjı ihlal ediyor.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: C'yi büyütmek
+    goal: C'nin düzenlileştirme rolünü okumak
+    needs: Yumuşak marj
+    q: |-
+      RBF SVM'de C = 0.1 iken karar sınırı düz ve eğitim hatası %8; C = 1000 iken sınır her eğitim noktasını dolanıyor, eğitim hatası %0, doğrulama hatası arttı. Hangi yorum doğru?
+    choices:
+      - {t: "C büyüdükçe marj büyür", why: "Tersi: büyük C ihlalleri pahalı yapar, dar marjı kabul eder."}
+      - {t: "C = 1/λ: büyük C zayıf düzenlileştirme, yüksek varyans; C çapraz doğrulamayla (γ ile birlikte) seçilmeli", ok: true, why: "Amaç ½‖w‖² + C Σ hinge."}
+      - {t: "RBF çekirdeği bu veri için yanlış", why: "Küçük C ile makul çalışıyor; sorun düzenlileştirme düzeyi."}
+    hints:
+      - "Amaçta C hangi terimi çarpıyor?"
+    solution: |-
+      C ihlal cezasını ölçekler; C → ∞ sert marja (her noktayı doğru sınıflama) gider. RBF'de γ da esnekliği belirler: büyük γ dar çekirdek, her nokta kendi adası. İkisi birlikte ızgara aramayla seçilir.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Polinom çekirdeğinin öznitelik haritası
+    goal: Çekirdek hilesini somut bir öznitelik uzayıyla doğrulamak
+    needs: İç çarpım, açılım
+    q: |-
+      $d=2$ için $k(x,z)=(x^\top z+1)^2$'nin bir $\phi$ ile $\phi(x)^\top\phi(z)$ olarak yazılabildiğini göster. $\phi$ kaç boyutlu? Genel $d$ ve derece $p$ için boyutun nasıl büyüdüğünü söyle.
+    rubric:
+      - "$(x_1z_1+x_2z_2+1)^2$'yi açtım"
+      - "$\\phi(x)=(x_1^2,\\ x_2^2,\\ \\sqrt2x_1x_2,\\ \\sqrt2x_1,\\ \\sqrt2x_2,\\ 1)$ (6 boyut) buldum"
+      - "Genel boyutun $\\binom{d+p}{p}$ olduğunu söyledim"
+      - "Çekirdeğin bu boyutu hiç kurmadan O(d)'de hesaplandığını, RBF'nin sonsuz boyutlu φ'ye karşılık geldiğini belirttim"
+    hints:
+      - "$\\sqrt2$ katsayıları çapraz terimlerden gelir."
+    solution: |-
+      $(x^\top z+1)^2=x_1^2z_1^2+x_2^2z_2^2+2x_1x_2z_1z_2+2x_1z_1+2x_2z_2+1=\phi(x)^\top\phi(z)$, $\phi$ 6 boyutlu. Genelde $\binom{d+p}{p}$: d = 100, p = 3'te 176 851; çekirdek yine tek iç çarpım + kuvvet. RBF'nin Taylor açılımı tüm derecelerden terim içerir: sonsuz boyutlu φ. Bedel: n × n çekirdek matrisi (P6).
+  - id: p6
+    type: yöntem-seç
+    level: 2
+    title: Bir milyon örnek
+    goal: Çekirdekli ve doğrusal SVM arasında ölçeğe göre seçmek
+    needs: P5
+    q: |-
+      10⁶ örnek, 100 öznitelik. Çekirdekli SVM (RBF) mi, doğrusal SVM (SGD/liblinear) mi?
+    choices:
+      - {t: "Çekirdekli SVM", why: "Çekirdek matrisi 10¹² eleman (~4 TB float32); eğitim O(n²)–O(n³)."}
+      - {t: "Doğrusal SVM ya da rastgele Fourier öznitelikleri (RFF) + doğrusal model", ok: true, why: "Maliyet n'de doğrusal; RFF RBF çekirdeğini yaklaşık açık öznitelikle taklit eder (Rahimi & Recht 2007)."}
+      - {t: "kNN", why: "Sınıflandırıcı değiştirmek soruyu atlamak; ayrıca sorgu maliyeti yüksek."}
+    hints:
+      - "Çekirdek matrisi kaç elemanlı?"
+    solution: |-
+      Çekirdek yöntemleri n² bellek/hesap ister; ~10⁵'in üstünde pratik değildir. Doğrusal SVM ya da çekirdeğin rastgele öznitelik yaklaşımı (RFF, Nyström) + doğrusal model ölçeklenir.
+  - id: p7
+    type: karşı-örnek
+    level: 3
+    title: SVM skoru olasılık değildir
+    goal: Marj skorunun olasılık olarak yorumlanamayacağını göstermek
+    needs: Lojistik regresyon (M1.4)
+    q: |-
+      SVM'nin $f(x)=w^\top x+b$ çıktısını $\sigma(f(x))$ ile olasılığa çevirmek neden hatalıdır? Hinge kaybının neyi optimize etmediğini göster ve doğru yolu öner.
+    rubric:
+      - "Marjı ≥ 1 olan tüm noktaların kayba katkısının 0 olduğunu, dolayısıyla f'nin ölçeğinin olasılık bilgisi taşımadığını söyledim"
+      - "C değiştikçe f'nin ölçeğinin değiştiğini ama sınıflamanın aynı kalabildiğini gösterdim"
+      - "Platt ölçeklemesi (doğrulama kümesinde σ(Af + B) uydurma) ya da izotonik regresyon önerdim"
+    hints:
+      - "Hinge kaybı uygun kayıp (proper scoring rule) mudur?"
+    solution: |-
+      Hinge kaybı yalnız işaretin doğruluğunu ve marjı önemser; marjı geçen noktalar için kayıp sabit 0 olduğundan "ne kadar emin" bilgisi öğrenilmez. f'yi 10 ile çarpmak sınıflamayı değiştirmez ama σ(f) olasılıklarını tamamen değiştirir. Doğru yol: ayrı bir doğrulama kümesinde $P(y=1|f)=\sigma(Af+B)$ uydurmak (Platt 1999) ya da izotonik kalibrasyon; sklearn'de `probability=True` bunu çapraz doğrulamayla yapar.
+pitfalls:
+  - wrong: "SVM her zaman lojistik regresyondan iyidir."
+    right: "Doğrusal durumda ikisi çoğu zaman benzer sonuç verir; fark kayıp biçiminde (hinge seyrek destek vektörü, lojistik olasılık verir)."
+  - wrong: "Destek vektörü sayısı az olmalı, çoksa model kötüdür."
+    right: "Örtüşen sınıflarda ve büyük C'de çok destek vektörü doğaldır; sayıları genelleme sınırıyla ilişkilidir ama tek başına ölçüt değildir."
+  - wrong: "Çekirdek seçimi önemsizdir, RBF her şeyi çözer."
+    right: "RBF'nin γ'sı ve özniteliklerin ölçeklenmesi kritik; ölçeklenmemiş veride RBF anlamsız uzaklıklarla çalışır."
+whatif:
+  - q: "Hinge yerine kare hinge kullanılsaydı?"
+    a: "Türevlenebilir (L2-SVM) olur ve ihlalleri daha sert cezalandırır; aykırı değerlere daha duyarlıdır."
+  - q: "Veri tam ayrılabilir ve C → ∞?"
+    a: "Sert marj SVM; tek bir aykırı nokta sınırı tamamen değiştirebilir. Ayrılamazsa çözüm yoktur."

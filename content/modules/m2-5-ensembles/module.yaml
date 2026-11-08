@@ -95,3 +95,110 @@ homework:
     accept:
       - "Huber/LAD aykırı değerlerde kareden iyi."
       - "Küçük ν daha çok ağaçla daha iyi test hatası."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bagging varyansı ne kadar azaltır?
+    goal: İlişkili tahminlerin ortalamasının varyansını türetmek
+    needs: Kovaryans, varyansın doğrusallığı
+    q: |-
+      $B$ model, her birinin varyansı $\sigma^2$, her çiftin korelasyonu $\rho$. Ortalamalarının varyansı?
+    solution: |-
+      $\mathrm{Var}\big(\frac1B\sum_bf_b\big)=\frac1{B^2}\Big[\sum_b\mathrm{Var}(f_b)+\sum_{b\ne b'}\mathrm{Cov}(f_b,f_{b'})\Big]=\frac1{B^2}\big[B\sigma^2+B(B-1)\rho\sigma^2\big]$.
+      $$=\rho\sigma^2+\frac{1-\rho}B\sigma^2.$$
+      **Yorum:** $B\to\infty$ iken ikinci terim söner, ilk terim **kalır**: ortalama alma ilişkili hatayı silemez. Bagging'in sınırı $\rho$'dur; rastgele orman her bölünmede özniteliklerin rastgele bir alt kümesini deneyerek ağaçlar arası $\rho$'yu düşürür. Yanlılık değişmez: bagging yanlılığı düşük, varyansı yüksek (derin ağaç) modeller için uygundur.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Sayılarla
+    goal: P1'i uygulamak
+    needs: P1
+    q: |-
+      $\rho=0.3$, $\sigma^2=1$, $B=10$. Ortalamanın varyansı?
+    answer: 0.37
+    calc: "0.3+0.7/10"
+    mistakes:
+      - {answer: 0.1, msg: "Bu bağımsız modeller (ρ = 0) için; korelasyon terimi ρσ² kalır."}
+      - {answer: 0.3, msg: "Bu B → ∞ limiti; B = 10'da (1 − ρ)σ²/B = 0.07 eklenir."}
+    hints:
+      - "$\\rho\\sigma^2+(1-\\rho)\\sigma^2/B$."
+    solution: |-
+      $0.3+0.07=0.37$; 1000 ağaç bile 0.3'ün altına inemez.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Gradient boosting'in bir turu
+    goal: Kare kayıpta pseudo-residual'ı kullanmak
+    needs: Gradyan, ortalama
+    q: |-
+      $y=[1,3,8]$. $F_0=\bar y$. Kare kayıpta pseudo-residual $r_i=y_i-F_0(x_i)$; bir stump üçüncü örneğin residual'ını tam tahmin ediyor. Öğrenme oranı 0.1 ile $F_1(x_3)$?
+    answer: 4.4
+    calc: "4+0.1*(8-4)"
+    mistakes:
+      - {answer: 8.0, msg: "Öğrenme oranı (shrinkage) 0.1 ile çarpmayı unuttun."}
+      - {answer: 8.0, msg: "Tek turda hedefe atlamaz; F₀ + η·r."}
+    hints:
+      - "$F_0=4$, $r_3=4$."
+    solution: |-
+      $F_1(x_3)=4+0.1\cdot4=4.4$. Küçük adımlar çok tur ister ama genellemeyi iyileştirir (Friedman'ın shrinkage'ı).
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Boosting turları ve doğrulama hatası
+    goal: Boosting'de aşırı uyumu okumak
+    needs: Erken durdurma
+    q: |-
+      Öğrenme oranı 1.0 ile boosting: doğrulama hatası 30. turda dibe iniyor, sonra yükseliyor. Öğrenme oranı 0.05 ile dip 500. turda ve daha alçak. Yorum?
+    choices:
+      - {t: "Boosting asla aşırı uymaz", why: "AdaBoost'un marj davranışı için zaman zaman söylenir; gradient boosting kesinlikle aşırı uyar."}
+      - {t: "Her tur eğitim artıklarına uyar; turlar arttıkça gürültüye uyar. Küçük η + erken durdurma daha iyi bir dibe ulaşır", ok: true, why: "Shrinkage düzenlileştirmedir; tur sayısı doğrulamayla seçilir."}
+      - {t: "η = 1.0 daha iyi: daha az tur", why: "Hız için evet, ama dip daha yüksek."}
+    hints:
+      - "Bagging ile boosting aynı hatayı mı azaltır?"
+    solution: |-
+      Bagging varyansı, boosting yanlılığı azaltır; boosting sıralı olarak artıklara uyduğu için yeterince turda gürültüyü de öğrenir. Küçük η, her ağacın katkısını küçük tutar ve daha pürüzsüz bir yol izler. Ek düzenlileştirmeler: alt örnekleme (stokastik GB), ağaç derinliği sınırı, yaprak sayısı cezası (XGBoost'ta γ, λ).
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Pseudo-residual = negatif gradyan
+    goal: Gradient boosting'i fonksiyon uzayında gradyan inişi olarak görmek
+    needs: Türev
+    q: |-
+      Her örnek için $r_i=-\frac{\partial\ell(y_i,F)}{\partial F}\big|_{F=F_{m-1}(x_i)}$. Kare kayıp ($\frac12(y-F)^2$), mutlak kayıp ($|y-F|$) ve lojistik kayıp için $r_i$'yi bul; yeni ağacın bu değerlere uydurulmasının neden mantıklı olduğunu açıkla.
+    rubric:
+      - "Kare kayıpta $r=y-F$ (sıradan artık) buldum"
+      - "Mutlak kayıpta $r=\\mathrm{sign}(y-F)$ buldum ve aykırı değerlere dayanıklılığı yorumladım"
+      - "Lojistik kayıpta $r=y-\\sigma(F)$ buldum (M1.4 ile aynı biçim)"
+      - "Ağacın, F'nin n boyutlu 'fonksiyon değerleri' uzayında negatif gradyanı yaklaşan bir adım olduğunu açıkladım"
+    hints:
+      - "F'yi her örnekte ayrı bir parametre gibi düşün."
+    solution: |-
+      Eğitim kaybı $\sum_i\ell(y_i,F(x_i))$, $F$'nin n noktadaki değerlerinin fonksiyonu; gradyan inişi her $F(x_i)$'yi $-\partial\ell/\partial F$ yönünde iter. Ama yeni noktalara genelleşen bir **fonksiyon** gerektiğinden bu yön bir ağaçla yaklaştırılır. Kare: $y-F$; mutlak: $\mathrm{sign}(y-F)$ (aykırı değerin büyüklüğü önemsiz); lojistik: $y-\sigma(F)$. Ayrıntı: ağacın yaprak değerleri sonra her yaprak için ayrı bir çizgi aramasıyla (ya da Newton adımıyla — XGBoost) yeniden hesaplanır.
+  - id: p6
+    type: yöntem-seç
+    level: 2
+    title: Tablo verisi
+    goal: Tablo verisi için model ailesi seçmek
+    needs: Ağaç ve topluluk yöntemleri
+    q: |-
+      50 000 satır, 40 sütun (kategorik + sayısal, eksik değerler var), bir kredi temerrüt tahmini. İlk denenecek güçlü model?
+    choices:
+      - {t: "Derin MLP", why: "Tablo verisinde genelde iyi ayarlanmış GBDT'nin gerisinde kalır (Grinsztajn ve ark. 2022)."}
+      - {t: "Gradient boosted ağaçlar (XGBoost/LightGBM/CatBoost)", ok: true, why: "Ölçekleme gerektirmez, eksik değerleri ve kategorikleri doğrudan işler, güçlü varsayılan."}
+      - {t: "Tek karar ağacı", why: "Yorumlanabilir ama yüksek varyans; taban çizgisi olarak kalsın."}
+    hints:
+      - "Bu veri türünde rekabetlerde hangi model aileleri baskın?"
+    solution: |-
+      GBDT tablo verisinin güçlü varsayılanıdır; taban çizgisi olarak lojistik regresyon ve tek ağaç da raporlanmalı. Değerlendirme dengesiz sınıflar için PR-AUC ve kalibrasyonla (M1.4 P6).
+pitfalls:
+  - wrong: "Daha çok ağaç her zaman aşırı uyuma yol açar."
+    right: "Bagging/rastgele ormanda ağaç eklemek varyansı azaltır, aşırı uyutmaz; boosting'de ise tur sayısı aşırı uyumu artırabilir."
+  - wrong: "Bagging yanlılığı da azaltır."
+    right: "Ortalama, bileşenlerin yanlılığını korur; bagging yalnız varyansı azaltır (P1)."
+whatif:
+  - q: "Tüm modeller aynı veri ve aynı tohumla eğitilirse?"
+    a: "ρ = 1: topluluk tek modele eşittir, hiçbir kazanç yok. Çeşitlilik (bootstrap, öznitelik alt kümesi, farklı tohum) şarttır."
+  - q: "Derin ağlarda topluluk?"
+    a: "Farklı tohumlarla eğitilmiş birkaç ağın ortalaması doğruluğu ve kalibrasyonu belirgin iyileştirir (derin topluluklar); maliyeti çıkarımda çarpar — damıtma bunu tek ağa sığdırır."

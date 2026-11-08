@@ -105,3 +105,114 @@ labs:
       - q: "k'yı 8'e çıkarınca J hep düşer mi? Bu k seçimi için ne anlama gelir?"
         a: "Evet, k arttıkça en iyi J azalır (k = n'de 0). Bu yüzden J tek başına k seçemez; dirsek, siluet ya da BIC (GMM) kullanılır."
     limits: "2B, eşit varyanslı Gauss kümeleri; 20 iterasyon."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Lloyd'un bir iterasyonu
+    goal: Atama ve güncelleme adımlarını sayılarla izlemek
+    needs: Öklid uzaklığı, ortalama
+    q: |-
+      1B noktalar $[1,2,6,7,8]$, başlangıç merkezleri $\mu_1=1$, $\mu_2=2$. Bir iterasyonu yap ve amacın düştüğünü göster.
+    solution: |-
+      **Başlangıç amacı:** en yakın merkeze kare uzaklıklar: 1→1: 0; 2→2: 0; 6,7,8→2: 16+25+36=77. $J=77$.
+
+      **Atama:** {1} → küme 1; {2, 6, 7, 8} → küme 2 (2'den başka hepsi de 2'ye daha yakın).
+
+      **Güncelleme:** $\mu_1=1$, $\mu_2=(2+6+7+8)/4=5.75$. Yeni $J$: $0+(3.75^2+0.25^2+1.25^2+2.25^2)=14.06+0.06+1.56+5.06=20.75$.
+
+      **İkinci iterasyonda** 2, $\mu_1=1$'e daha yakın olur (uzaklık 1 < 3.75): kümeler {1, 2}, {6, 7, 8}, merkezler 1.5 ve 7, $J=0.25+0.25+1+0+1=2.5$ ve sonra değişmez. Her adım J'yi artıramaz (P6).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Atalet (inertia)
+    goal: k-means amacını hesaplamak
+    needs: P1
+    q: |-
+      Noktalar $[1,2,6]$, merkezler $1.5$ ve $6$ (en yakına atanmış). $J=\sum\|x-\mu_{c(x)}\|^2$?
+    answer: 0.5
+    calc: "0.25+0.25+0"
+    mistakes:
+      - {answer: 1.0, msg: "Kare uzaklık: 0.5² = 0.25."}
+    hints:
+      - "1 ve 2, 1.5'e; 6, 6'ya atanır."
+    solution: |-
+      $0.25+0.25+0=0.5$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: k-means++ seçim olasılığı
+    goal: D² örneklemesini uygulamak
+    needs: Olasılık
+    q: |-
+      İlk merkez seçildi. Kalan üç noktanın ona uzaklıkları 1, 2, 3. k-means++ ikinci merkezi uzaklığın **karesiyle** orantılı olasılıkla seçer. En uzak noktanın seçilme olasılığı?
+    answer: 0.6428571428571429
+    calc: "9/(1+4+9)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.5, msg: "Olasılık uzaklığın karesiyle orantılı (D²), uzaklıkla değil."}
+    hints:
+      - "Ağırlıklar 1, 4, 9."
+    solution: |-
+      $9/14=0.643$. Uzak noktalar tercih edilir ama garanti edilmez (aykırı bir nokta her zaman seçilmesin diye). Arthur & Vassilvitskii (2007): beklenen J en iyinin $O(\log k)$ katı içinde.
+  - id: p4
+    type: karşı-örnek
+    level: 3
+    title: İç içe halkalar
+    goal: k-means'in kümelerin şekli hakkındaki varsayımını görmek
+    needs: Voronoi bölgeleri
+    q: |-
+      k-means'in, J'nin küresel minimumunu bulsa bile "yanlış" kümelediği bir veri tarif et. Neden yanlış? Hangi yöntem doğru kümeler?
+    rubric:
+      - "İç içe iki halka (ya da iki hilal) gibi dışbükey olmayan kümeler verdim"
+      - "k-means sınırlarının merkezler arasındaki dik açıortaylar (Voronoi, dışbükey bölgeler) olduğunu söyledim"
+      - "Küresel minimumun bile halkaları ikiye böldüğünü açıkladım: sorun optimizasyon değil model"
+      - "Spektral kümeleme, DBSCAN ya da çekirdek k-means önerdim"
+    hints:
+      - "k-means'in iki kümesi arasındaki sınır ne biçimdedir?"
+    solution: |-
+      k-means kümeleri, merkezlerin Voronoi hücreleridir: dışbükey bölgeler. İç içe halkalarda doğru kümeleme dışbükey değildir; J'nin küresel minimumu halkaları soldan sağa ikiye böler. Spektral kümeleme (yakınlık grafının özvektörleri) ya da yoğunluk tabanlı DBSCAN bağlantılılığa bakar.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Lloyd algoritması sonlu adımda durur
+    goal: Monotonluk ve sonluluk argümanını kurmak
+    needs: Ortalamanın kare uzaklığı en küçüklediği
+    q: |-
+      Lloyd'un (i) atama ve (ii) güncelleme adımlarının J'yi artıramayacağını, ve algoritmanın sonlu adımda durduğunu kanıtla. Küresel optimum garantisi var mı?
+    rubric:
+      - "(i): merkezler sabitken her noktayı en yakına atamanın her terimi küçülttüğünü söyledim"
+      - "(ii): atama sabitken $\\sum_{x\\in C}\\|x-\\mu\\|^2$'yi en küçükleyen μ'nün ortalama olduğunu türevle gösterdim"
+      - "Bölümleme sayısının sonlu olduğunu, J kesin azaldıkça bir bölümlemenin tekrar etmeyeceğini, dolayısıyla durduğunu söyledim"
+      - "Yalnız yerel optimum garantisi olduğunu (NP-zor problem) belirttim"
+    hints:
+      - "$\\frac{\\partial}{\\partial\\mu}\\sum_{x\\in C}\\|x-\\mu\\|^2=-2\\sum(x-\\mu)$."
+    solution: |-
+      (i) Her nokta en yakın merkeze geçince kendi terimi küçülür ya da aynı kalır. (ii) Türev sıfır: $\mu=\frac1{|C|}\sum_{x\in C}x$; amaç μ'de dışbükey olduğundan bu en küçüktür. J tekdüze azalır ve aşağıdan 0 ile sınırlıdır. n noktanın k kümeye bölünmeleri sonludur; J her gerçek değişimde kesin azaldığı için hiçbir bölümleme tekrar etmez → sonlu adımda durur. Küresel optimum yok: problem NP-zor; başlatma ve çok tekrar (n_init) bu yüzden.
+  - id: p6
+    type: yöntem-seç
+    level: 2
+    title: Uzun ve farklı büyüklükte kümeler
+    goal: k-means ile GMM arasında seçmek
+    needs: Kovaryans
+    q: |-
+      Kümeler eğik ve uzun elipsler, biri diğerinden 10 kat geniş. k-means mi, tam kovaryanslı GMM mi?
+    choices:
+      - {t: "k-means", why: "Eşit, küresel kümeler varsayar; geniş kümenin ucunu dar kümeye verir."}
+      - {t: "Tam kovaryanslı GMM", ok: true, why: "Her kümenin kendi kovaryansı ve ağırlığı vardır; uzaklık Mahalanobis'tir."}
+      - {t: "k'yı artırılmış k-means", why: "Kümeleri parçalar; sayıyı ve anlamı bozar."}
+    hints:
+      - "k-means hangi uzaklığı kullanır?"
+    solution: |-
+      k-means, GMM'in kovaryansları eşit ve izotropik ($\sigma^2I$), $\sigma\to0$ olan sınırıdır. Biçim ve ölçek farklıysa tam kovaryanslı GMM (M2.8) doğru modeldir; bedeli daha çok parametre ve yerel optimum riskidir.
+pitfalls:
+  - wrong: "J'nin en küçük olduğu k en iyisidir."
+    right: "J, k ile her zaman azalır (k = n'de 0); k için dirsek, siluet ya da olasılıksal modelde BIC kullanılır."
+  - wrong: "k-means sonucu deterministiktir."
+    right: "Başlatmaya bağlıdır; farklı tohumlar farklı yerel minimumlar verir — en düşük J'li sonucu seç."
+whatif:
+  - q: "Öklid yerine L1 uzaklığı kullanılırsa?"
+    a: "Güncelleme adımında ortalama yerine medyan en iyidir: k-medians; aykırı değerlere daha dayanıklıdır."
+  - q: "Veri sürekli akıyorsa (akış)?"
+    a: "Mini-batch k-means: her adımda küçük bir örnekle merkezleri azalan adım boyuyla günceller (SGD benzeri)."
