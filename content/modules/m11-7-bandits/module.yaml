@@ -100,3 +100,20 @@ homework:
     accept:
       - "Thompson eğrisinin eğimi Lai–Robbins sınırına yaklaşır, UCB'den düşük kalır."
       - "Gecikmede Thompson UCB'den daha az etkilenir."
+
+labs:
+  - id: l1
+    lab: bandit
+    title: "ε-greedy, UCB1 ve Thompson: pişmanlık nasıl büyür?"
+    goal: "Pişmanlık $R_T=\\sum_t(\\mu^*-\\mu_{a_t})$. Sabit ε'lu ε-greedy sonsuza dek ε oranında rastgele kol çeker: $R_T\\approx\\varepsilon\\bar\\Delta T$ (doğrusal). UCB1 ve Thompson keşfi belirsizlikle orantılı yapar: $R_T=O(\\log T)$."
+    predict:
+      q: "Ufku 500'den 5000'e çıkarırsan ε-greedy (ε = 0.1) ile Thompson'ın farkı nasıl değişir?"
+      options:
+        - {t: "Kapanır", why: "ε-greedy doğrusal, Thompson logaritmik büyür."}
+        - {t: "Açılır", ok: true, why: "Doğrusal ile logaritmik arasındaki fark T ile büyür."}
+    presets:
+      - {name: "Uzun ufuk", params: {T: 5000}, note: "Eğrilerin şekline bak: doğru vs log."}
+      - {name: "Küçük fark", params: {gap: 0.02, T: 5000}, note: "Δ küçükken en iyi kolu bulmak ≈ 1/Δ² çekiş ister; pişmanlık uzun süre doğrusal görünür."}
+      - {name: "ε = 0", params: {eps: 0}, note: "Saf açgözlü: ilk şanslı kola takılabilir (tohumları dene)."}
+      - {name: "UCB c küçük", params: {c: 0.3, B: {c: 2}}, note: "Az keşif hızlıdır ama yanlış kola kilitlenme riski taşır."}
+    limits: "Bernoulli ödüller, 30 tekrar ortalaması; kollar sabit (durağan)."

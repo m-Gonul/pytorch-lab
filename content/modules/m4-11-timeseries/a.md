@@ -1,3 +1,5 @@
+<!-- çözüm -->
+
 AR(2): 1.2 + 0.3 = 1.5. ARMA(1,1): 1.0 + 0.2 = 1.2. ARIMA: fark [2, 2, 2, 2], tahmin edilen fark 2 → 11 + 2 = 13.
 
 Yule–Walker: $\rho_k=\phi_1\rho_{k-1}+\phi_2\rho_{k-2}$ ($\rho_0=1$, $\rho_{-k}=\rho_k$). $k=1$: $\rho_1=\phi_1+\phi_2\rho_1\Rightarrow\rho_1=\phi_1/(1-\phi_2)=0.6/0.7=0.857$. $k=2$: $\rho_2=0.6\cdot0.857+0.3=0.814$. Tersine, örnek otokorelasyonlardan $\phi$ çözülür: Yule–Walker tahmincisi (c aşaması).

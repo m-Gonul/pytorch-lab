@@ -103,3 +103,47 @@ homework:
     accept:
       - "1cycle, aynı epoch'ta adım takviminden yüksek ya da eşit doğruluk."
       - "LR aralık testi grafiği ve seçilen η₁ gerekçesi."
+
+labs:
+  - id: l1
+    lab: optim2d
+    title: "Kötü koşullu vadide SGD, Momentum, Nesterov, RMSProp, Adam"
+    goal: |
+      İki boyutlu kuadratik $f(w)=\tfrac12 w^\top Hw$, özdeğerler 1 ve $1/\kappa$. Dik yön η'nun üst sınırını ($2/\lambda_{max}$), yatık yön hızı belirler. Momentum yatık yönde hızı birikimle artırır; RMSProp/Adam her **koordinatı** kendi gradyan büyüklüğüyle ölçekler — vadi eksenlere hizalıysa harika, döndürülmüşse avantaj azalır.
+    predict:
+      q: "κ = 100, açı 0°. Aynı η = 0.05 ile 150 adımda hangisi en düşük kayba iner?"
+      options:
+        - {t: "SGD", why: "Yatık yönde çarpan 1 − 0.05·0.01 ≈ 0.9995: neredeyse hiç ilerlemez."}
+        - {t: "RMSProp ya da Adam", ok: true, why: "Eksenlere hizalı vadide koordinat başına ölçekleme eğriliği tam dengeler. Açıyı 45°'ye getirip tekrar dene."}
+        - {t: "Hepsi aynı", why: "Ön koşullandırma farkı burada çok büyük."}
+    presets:
+      - {name: "SGD vs Momentum", params: {m: 0, lr: 0.3, kappa: 50, rot: 30, T: 120, B: {m: 1, lr: 0.3}}, note: "Aynı η. A (SGD) yatık yönde sürünür; B (momentum β = 0.9) hızlanır ama dik yönde salınır."}
+      - {name: "Momentum fazla", params: {m: 1, lr: 0.3, beta: 0.99, kappa: 50, rot: 30}, note: "β → 1: sönümsüz salınım, uzun 'spiral'. Etkin adım ≈ η/(1 − β) = 30."}
+      - {name: "Nesterov sönümler", params: {m: 1, lr: 0.3, beta: 0.95, kappa: 50, rot: 30, B: {m: 2}}, note: "Bakış noktasında gradyan almak salınımı erken fark eder."}
+      - {name: "Eksen hizalı: Adam parlar", params: {m: 4, lr: 0.1, kappa: 100, rot: 0, B: {m: 0}}, note: "A Adam, B SGD; vadi eksenlere hizalı."}
+      - {name: "Döndürülmüş: avantaj azalır", params: {m: 4, lr: 0.1, kappa: 100, rot: 45, B: {m: 1}}, note: "45°'de iki koordinat da aynı karışık eğriliği görür; köşegen ölçekleme yardım etmez."}
+      - {name: "Gürültülü gradyan", params: {m: 1, lr: 0.1, noise: 1, kappa: 10, rot: 30, B: {m: 4}}, note: "Mini-batch gürültüsü minimum çevresinde bir 'gürültü topu' bırakır; sabit η ile tam yakınsama yok — η'yı azaltmak (takvim) gerekir."}
+    questions:
+      - q: "SGD için η'yı 2'nin hemen üstüne çıkar. Ne olur, neden 2?"
+        a: "λ_max = 1 olduğundan dik yönde çarpan 1 − η > 1 olur: ıraksama. Momentumla sınır 2(1 + β)/λ_max'a genişler."
+      - q: "Gürültülü preset'te tohumu değiştir. Hangi büyüklük tohumdan bağımsız?"
+        a: "Son kaybın kendisi değişir ama ortalama 'gürültü topu' boyutu ≈ ησ²·(boyut)/(2λ) mertebesinde kalır: η'yı yarıya indirince taban da yarıya iner."
+    limits: "Kuadratik kayıp, sabit Hessian. Gerçek ağlarda eğrilik konuma bağlı, Adam'ın genelleme davranışı ayrı bir konu (bu deney yalnız optimizasyon hızını gösterir)."
+  - id: l2
+    lab: ema
+    title: "Üstel hareketli ortalama: momentum ve Adam'ın içindeki süzgeç"
+    goal: "Momentum ve Adam'ın birinci/ikinci momentleri, gradyanların EMA'sıdır: $m_t=\\beta m_{t-1}+(1-\\beta)g_t$. β gürültü bastırma ile gecikme arasında bir ödünleşim kurar; sıfırdan başlatma ilk adımlarda yanlılık getirir, Adam bunu $1-\\beta^t$'ye bölerek düzeltir."
+    predict:
+      q: "β = 0.99 iken sinyal aniden sıçrıyor. EMA'nın yeni seviyeye ~%63 yaklaşması kaç adım sürer?"
+      options:
+        - {t: "≈ 1", why: "Bu β = 0 için geçerli."}
+        - {t: "≈ 100", ok: true, why: "Zaman sabiti 1/(1 − β) = 100 adım; $1-0.99^{100}\\approx 0.63$."}
+        - {t: "≈ 1000", why: "Bu β = 0.999'un zaman sabiti."}
+    presets:
+      - {name: "β = 0.9 (momentum)", params: {beta: 0.9}, note: "Pencere 10 adım."}
+      - {name: "β = 0.999 (Adam v)", params: {beta: 0.999, T: 1000}, note: "Ham EMA ilk yüzlerce adım sıfıra yapışık; düzeltme olmadan Adam'ın ilk adımları çok büyük olurdu (v küçük → bölme büyük)."}
+      - {name: "β karşılaştır", params: {beta: 0.8, B: {beta: 0.98}}, note: "A hızlı ama gürültülü, B düzgün ama gecikmeli."}
+    questions:
+      - q: "Gürültünün kalan std oranı neden √((1−β)/(1+β))?"
+        a: "Bağımsız gürültü için $\\mathrm{Var}(m)=(1-\\beta)^2\\sum_k\\beta^{2k}\\sigma^2=\\frac{(1-\\beta)^2}{1-\\beta^2}\\sigma^2=\\frac{1-\\beta}{1+\\beta}\\sigma^2$."
+    limits: "Gürültü bağımsız Gauss; gerçek gradyan gürültüsü ilişkili ve durağan değildir."

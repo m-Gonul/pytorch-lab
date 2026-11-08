@@ -99,3 +99,24 @@ homework:
     accept:
       - "η = 0, az adımda DDPM'den çok daha iyi FID."
       - "Aynı x_T farklı S'lerde benzer üst düzey yapı üretir."
+
+labs:
+  - id: l1
+    lab: diffsched
+    title: "Gürültü takvimi: ᾱ_t, SNR ve gürültülenmiş sinyal"
+    goal: |
+      İleri süreç kapalı formda: $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\,\varepsilon$, $\bar\alpha_t=\prod_{s\le t}(1-\beta_s)$. Takvim, sinyal-gürültü oranının ($\mathrm{SNR}=\bar\alpha/(1-\bar\alpha)$) zamanla nasıl söndüğünü belirler. Son adımda $\bar\alpha_T\approx0$ olmalı ki örnekleme N(0, I)'dan başlayabilsin.
+    predict:
+      q: "Doğrusal takvim (10⁻⁴ → 0.02, T = 1000): SNR = 1'e (ᾱ = 0.5) hangi t civarında ulaşılır?"
+      options:
+        - {t: "t ≈ 500", why: "β doğrusal artarken log ᾱ ≈ −Σβ karesel azalır."}
+        - {t: "t ≈ 260", ok: true, why: "Σβ ≈ 10⁻⁴t + 10⁻⁵t² = ln 2 → t ≈ 260."}
+        - {t: "t ≈ 900", why: "Doğrusal takvim sinyali erken söndürür."}
+    presets:
+      - {name: "Doğrusal vs kosinüs", params: {kind: 0, B: {kind: 1}}, note: "Kosinüs SNR'yi daha dengeli düşürür: adımlar ortada yoğunlaşır."}
+      - {name: "Kısa T", params: {T: 50, t: 40}, note: "β aynı aralıkta ama 50 adım: ᾱ_T ≈ 0.6 — son adımda veri hâlâ duruyor (örneklemeyle uyuşmaz)."}
+      - {name: "Sonda", params: {t: 900}, note: "Sinyal neredeyse görünmüyor; bu adımlar 'kaba yapı', erken adımlar 'ince ayrıntı' üretir."}
+    questions:
+      - q: "T'yi 1000'den 200'e indirip β aralığını değiştirmezsen ne bozulur?"
+        a: "ᾱ_T büyür (≈ 0.13): son x_T hâlâ sinyal içerir ama örnekleme saf gürültüden başlar. DDPM'de T küçültülünce β_T büyütülür (M8.2'de 0.05)."
+    limits: "Tek bir 1B sinyal; ε her ayar değişiminde aynı tohumla yeniden çekilir."

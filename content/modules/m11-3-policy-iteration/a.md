@@ -1,1 +1,3 @@
+<!-- çözüm -->
+
 $\pi_0$=(kal, kal): $V(s_0)=0+0.5V(s_0)=0$, $V(s_1)=2+0.5V(s_1)=4$. İyileştirme: $s_0$'da git $1+0.5\cdot4=3>0$; $s_1$'de kal $4>0$. $\pi_1$=(git, kal): $V(s_0)=1+0.5\cdot4=3$. İkinci iyileştirme aynı politikayı verir → dur.

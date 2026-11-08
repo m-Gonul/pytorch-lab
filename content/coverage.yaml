@@ -1,0 +1,249 @@
+intro: |
+  Bu tablo, siteye kaynak olarak verilen ders notlarının (dört ders: BİL 442 Derin Öğrenme, BİL 467 Görüntü İşleme, BİL 455 Paralel Programlama, YAP 446 Pekiştirmeli Öğrenme; ayrıca 11 makale) her bölümünü sitedeki sayfalara eşler. Slaytlar yayımlanmadı ve kopyalanmadı; içerik kendi anlatımımızla yeniden yazıldı, ilgili modüllerin sonunda kaynak bağlantıları var.
+
+  **Nasıl denetlendi:** 82 PDF'in metni çıkarıldı (toplam ≈ 31 700 satır); her slayt başlığı ilgili modülün tüm dosyalarında (anlatım, alıştırma, kontrol, kod) aranıp eşleşmeyenler elle incelendi. **Erişim sınırı:** slaytlardaki şekil ve ekran görüntüleri metin olarak okunamadı; yalnız başlık, metin ve formüllerin metne dökülebilen kısmı karşılaştırıldı. Görsel içerikli slaytlar (ör. görüntü örnekleri, mimari çizimleri) konu başlığı üzerinden eşlendi.
+
+  **Durumlar:** *kapsandı* — kaynaktaki konu sitede en az aynı derinlikte; *kapsandı + genişletildi* — sitede kaynakta olmayan türetim, alıştırma ya da deney de var; *kısmen* — konu var ama kaynaktaki bir alt başlık bilinçli olarak yüzeysel; *bilinçli olarak farklı* — kaynaktaki araç yerine başka bir araç (ör. Keras yerine PyTorch). Yeni kaynak geldikçe tablo genişletilir; tamamlanmış satırlar geri alınmaz.
+groups:
+  - title: "BİL 442 Derin Öğrenme — bölümler"
+    rows:
+      - src: "ch_10 — Giriş, yapay sinir ağları, MLP"
+        topics: "AI > ML > DL; biyolojik nöron; TLU/perceptron; çok katmanlı ağ; evrensel yaklaşım; sınıflandırma için MLP tasarımı; hiperparametreler; AlexNet/GoogLeNet/ResNet/GPT-3 örnekleri"
+        pages: [m3-8-perceptron, m3-2-mlp-backprop, m3-9-training-practice, m1-1-linreg]
+        status: genis
+        gap: "Keras referans uygulaması (bizde PyTorch). Tarihsel ağ örnekleri bizde M4.2/M4.8'de mimari olarak işleniyor."
+        done: "Perceptron yakınsama kanıtı, XOR, evrensel yaklaşım deneyi, double descent (M3.8); parametre sayısı ve tasarım kuralları (M3.9); başlatma deneyi (M3.5)."
+      - src: "ch_11 — Derin ağların eğitimi"
+        topics: "GD (f = x²), zincir kuralı, BP-1…BP-4 türetimleri, Hadamard çarpımı, kaybolan/patlayan gradyan, Glorot/He, aktivasyonlar (ReLU ailesi, SELU), BN, gradyan kırpma, transfer/ön eğitim, yardımcı görev, optimizasyon (momentum, Nesterov, AdaGrad, RMSProp, Adam, AdaMax, Nadam), LR takvimleri, dropout, max-norm, yoğun DNN kuralları"
+        pages: [m1-2-gd-variants, m0-3-chain-rule, m3-2-mlp-backprop, m3-4-optimizers, m3-5-init, m3-6-norm, m3-7-regularization-nn, m3-9-training-practice]
+        status: genis
+        gap: "—"
+        done: "BP1–BP4 türetimi ek alıştırma olarak (M3.2); optimizasyon ve başlatma için etkileşimli deneyler (2B kuadratikte yöntem karşılaştırma, katman katman varyans); EMA deneyi; BN batch gürültüsü deneyi."
+      - src: "ch_14 — Evrişimli ağlar"
+        topics: "görsel korteks esini, konvolüsyon/korelasyon, dolgu, adım, havuzlama, bellek gereksinimi, LeNet/AlexNet/VGG/GoogLeNet/ResNet/Xception/SENet, nesne tespiti (IoU, NMS, YOLO, mAP), FCN, transposed conv, U-Net"
+        pages: [m4-1-conv, m4-2-cnn, m4-8-cnn-blocks, m4-9-detection, m4-10-segmentation]
+        status: genis
+        gap: "Görsel korteks (Hubel–Wiesel) esini bizde yoktu."
+        done: "M4.1'e görsel korteks sezgi kutusu eklendi; 1B konvolüsyon deneyi (çekirdek, adım, dolgu, genişleme, çıktı boyu formülü canlı)."
+      - src: "ch_15 — RNN ve zaman serileri"
+        topics: "rastgele süreç, durağanlık, ARMA/ARIMA/SARIMA, uyarlamalı süzgeç, RNN hücresi, BPTT, LSTM/GRU, peephole, WaveNet, tahmin modelleri"
+        pages: [m4-3-rnn, m4-4-lstm-gru, m4-11-timeseries]
+        status: genis
+        gap: "—"
+        done: "Kaybolan/patlayan gradyan deneyi (düz RNN vs LSTM hücre yolu); kesilmiş BPTT, LN-RNN, uçurum ve kırpma ek alıştırmaları."
+      - src: "ch_16 — NLP, seq2seq, attention, Transformer"
+        topics: "kodlayıcı–kod çözücü NMT, çift yönlü RNN, beam search, Bahdanau/Luong attention, Transformer, konum kodlaması, ViT"
+        pages: [m4-13-seq2seq, m4-6-attention, m4-7-transformer, m4-14-transformer-ed, m4-15-vit]
+        status: genis
+        gap: "—"
+        done: "√d_k ölçekleme deneyi (softmax doyması ve entropi)."
+      - src: "ch_17 — Üretken modeller"
+        topics: "AE ailesi (yığılmış, bağlı ağırlık, gürültü giderici, seyrek), VAE ve maliyet türetimi, KL, GAN ve maliyet türetimi, DCGAN, mod çöküşü, StyleGAN, DDPM"
+        pages: [m5-6-autoencoders, m5-1-vae, m5-2-gan, m5-7-gan-advanced, m5-3-diffusion, m5-8-diffusion-guidance]
+        status: genis
+        gap: "—"
+        done: "Gürültü takvimi deneyi (ᾱ, SNR, doğrusal vs kosinüs); CFG ölçeği deneyi (kâhin skorlu 2B karışım)."
+      - src: "embeddings_updated — Kelime gömmeleri"
+        topics: "one-hot, OOV kovaları, gömme katmanı, word2vec (skip-gram, CBOW, negatif örnekleme), alt-kelime gömmeleri"
+        pages: [m4-12-word2vec, m4-5-embed-bpe]
+        status: genis
+        gap: "Kaynaktaki California housing örneği (kategorik öznitelik gömme) bizde metin örneğiyle işleniyor."
+        done: "—"
+      - src: "contextualizedEmbeddings — Bağlamsal gömmeler"
+        topics: "ELMo, GPT-1/2/3, BERT, BART, InstructGPT/RLHF, ChatGPT"
+        pages: [m4-16-pretrained-lm]
+        status: genis
+        gap: "—"
+        done: "Softmax sıcaklığı deneyi (örnekleme çeşitliliği)."
+      - src: "Alıştırmalar ex1 (2) – ex6 (1)"
+        topics: "MLPRegressor ile fonksiyon yaklaşımı; BP denklemleriyle bias/ağırlık güncellemesi; doğrusal sınıflandırıcı; Keras MLP; FC vs CNN verimliliği (Fashion-MNIST); RNN ile zaman serisi tahmini"
+        pages: [m3-8-perceptron, m3-2-mlp-backprop, m1-4-logreg, m3-9-training-practice, m4-2-cnn, m4-11-timeseries]
+        status: bilincli
+        gap: "Keras/TF yerine PyTorch kullanılıyor; veri setleri tarayıcıda çalışabilmesi için küçültüldü (sklearn digits, sentetik seriler)."
+        done: "Her alıştırmanın soru içeriği ilgili modülün aşamalarında ya da ek alıştırmalarında otomatik kontrollü."
+  - title: "BİL 467 Görüntü İşleme"
+    rows:
+      - src: "lect_1_and_2 — Giriş, dijital görüntü"
+        topics: "görüntüleme modaliteleri ve EM spektrum, insan görme sistemi, Bayer deseni, örnekleme/nicemleme, bit derinliği, piksel komşulukları, tekil/komşuluk işlemleri, LSI sistemler, Fourier"
+        pages: [m9-1-digital-image, m9-10-frequency, m9-9-color]
+        status: genis
+        gap: "Modaliteler/EM spektrum ve Bayer deseni (demozaikleme) bizde yoktu."
+        done: "M9.1'e modalite ve algılayıcı sezgi kutusu + Bayer demozaikleme ek alıştırması (x4) eklendi."
+      - src: "lect_3_and_4 — Yoğunluk dönüşümleri ve uzamsal süzgeçleme"
+        topics: "negatif, log, gamma, kontrast germe, bit düzlemi, histogram eşitleme/eşleme, korelasyon/konvolüsyon, düzleştirme, sıra istatistiği süzgeçleri, keskinleştirme"
+        pages: [m9-2-intensity-histogram, m9-3-spatial-filtering, m9-4-sharpening, m9-1-digital-image]
+        status: genis
+        gap: "—"
+        done: "Yoğunluk dönüşümü deneyi (gamma, germe, HE; histogram ve T(r) canlı)."
+      - src: "lect_5 (1) — Restorasyon"
+        topics: "bozulma modeli, gürültü PDF'leri (Gauss, Rayleigh, Erlang, üstel, düzgün, tuz-biber), ortalama/sıra süzgeçleri, uyarlamalı süzgeçler"
+        pages: [m9-5-restoration]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "lect_6 (1), lect_7 (1) — Kenar ve köşe"
+        topics: "türev, Sobel/Prewitt/Kirsch, LoG, Canny, Harris–Stephens"
+        pages: [m9-6-edges, m9-7-corners]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "lect_8_and_9 — Morfoloji"
+        topics: "aşındırma, genleşme, dualite, açma/kapama, isabet-ıska, sınır, delik doldurma, gri seviye morfoloji"
+        pages: [m9-8-morphology]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "lect_10_and_11 — Renk"
+        topics: "renk temelleri, üç renk katsayıları, metamerizm, CIE, RGB/CMY/HSI/Lab, sahte renk, renk dilimleme, renk düzeltme, renkli gradyan"
+        pages: [m9-9-color]
+        status: genis
+        gap: "Metamerizm ve trikromatik katsayılar yalnız adıyla geçiyordu."
+        done: "M9.9'a metamerizm ve trikromatik katsayılar tanım kutusu eklendi."
+      - src: "lect_12 (1) — Segmentasyon"
+        topics: "nokta/çizgi algılama, k-means, süper pikseller (SLIC), eşikleme (Otsu)"
+        pages: [m9-11-segmentation, m2-7-kmeans]
+        status: genis
+        gap: "—"
+        done: "k-means adım adım deneyi (başlatma, boş küme, amaç monotonluğu)."
+      - src: "lect_13 (1), lect_17, lect_HoG — SIFT, SURF, HOG"
+        topics: "ölçek uzayı, DoG ekstremumları, alt piksel konum, kenar yanıtı eleme, yönelim, tanımlayıcı; Fast-Hessian, kutu süzgeçleri; HOG adımları"
+        pages: [m9-14-features]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "lect_14, lect_15, lect_16 — CLAHE, bilateral, NLM"
+        topics: "AHE/CLAHE ve enterpolasyon; bilateral süzgeç parametreleri, ince çizgileri geçme, yineleme; NLM ağırlıkları"
+        pages: [m9-12-edge-preserving, m9-2-intensity-histogram]
+        status: genis
+        gap: "Bilateral süzgecin yinelenmesi ve parametre uzayı yalnız metinde vardı."
+        done: "1B bilateral deneyi: σ_s, σ_r ve yineleme sayısı canlı; Gauss ile karşılaştırma."
+      - src: "lect_18_and_19 — Örüntü eşleme ve izleme"
+        topics: "korelasyonla şablon eşleme, SIFT eşleme, izleyiciler (DCF), RANSAC/panorama"
+        pages: [m9-15-matching]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "lect_20 — Görüntü kalitesi"
+        topics: "MSE, PSNR, SSIM (parlaklık/kontrast/yapı karşılaştırmaları)"
+        pages: [m9-13-quality]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "lect_21, lect_22, lect_23, lect_LucasKanade — Video, hareket, FRUC, sabitleme"
+        topics: "hareket kestirimi, blok eşleme, optik akış (LK, piramit), zamansal gürültü giderme, FRUC, video sabitleme (kamera hareketi, düzgünlük–sadakat, kırpma, rolling shutter, paralaks)"
+        pages: [m9-17-motion]
+        status: genis
+        gap: "Sabitlemenin zorlukları (düşük doku, paralaks, rolling shutter, kırpma) ve yöntem aileleri yalnız kısmen vardı."
+        done: "M9.17'ye sabitleme zorlukları ve yöntem aileleri ayrıntı kutusu eklendi."
+      - src: "lect_ViBE, lect_ViolaJones"
+        topics: "ViBe modeli, güncelleme, komşuya yayılım; Haar öznitelikleri, integral görüntü, AdaBoost, kaskad"
+        pages: [m9-18-background, m9-16-viola-jones]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "Alıştırmalar ex1 – ex9"
+        topics: "HE, kutu süzgeç, medyan, uyarlamalı ortalama, integral görüntü, SLIC + k-means ve panorama, CLAHE, bilateral, NLM"
+        pages: [m9-2-intensity-histogram, m9-3-spatial-filtering, m9-5-restoration, m9-11-segmentation, m9-15-matching, m9-12-edge-preserving]
+        status: tam
+        gap: "OpenCV ile karşılaştırma tarayıcıda yok; yerel motorda/Colab'da yapılabilir."
+        done: "Her biri kendi uygulamamız + otomatik kontrol."
+  - title: "BİL 455 Paralel Programlama"
+    rows:
+      - src: "lect_01, lect_02 — Paralel bilgisayarlar, PCAM, ayrıştırma desenleri"
+        topics: "Moore yasası, çok çekirdek, GPGPU, Flynn sınıflaması, paylaşımlı/dağıtık bellek, Amdahl, Gustafson–Barsis; PCAM; görev/veri/böl-yönet/boru hattı/olay tabanlı ayrıştırma; SPMD, MPMD, usta–işçi"
+        pages: [m10-1-parallel-models]
+        status: genis
+        gap: "Somut çipler (Kepler, TILE-Gx) bizde örnek olarak yok."
+        done: "Amdahl/Gustafson deneyi (seri kesir, iletişim ek yükü, verim)."
+      - src: "lect_03 — Thread'ler ve eşzamanlama"
+        topics: "fork, thread, C++11 thread, veri yarışı, mutex, sıralı tutarlılık/doğrusallaştırılabilirlik, semaforlar (ikili, sayan), kritik bölge, call_once, livelock/açlık, üretici–tüketici ve sonlandırma, CAS ve LL/SC, monitörler, fiber'ler, hata ayıklama"
+        pages: [m10-2-threads-sync, m10-3-cpu-parallel]
+        status: genis
+        gap: "Semaforlar, monitörler, CAS/LL-SC, livelock, sonlandırma (zehirli hap), call_once ve fiber'ler bizde yoktu."
+        done: "M10.2'ye iki ek alıştırma (x4 semafor ve monitörle sınırlı tampon + sonlandırma; x5 CAS ile kilitsiz yığın, ABA sorunu, livelock) ve sıralı tutarlılık/fiber ayrıntı kutuları eklendi."
+      - src: "lect_04, lect_05, lect_06, lect_07 — GPU, CUDA"
+        topics: "CPU–GPU farkı, SIMT, SM, warp, thread hiyerarşisi, bellek türleri, CGMA, gecikme gizleme, nvcc/PTX/JIT, hizalama, bank çakışması, sabit ve doku belleği, hata kontrolü, dal ayrışması, döngü açma"
+        pages: [m7-1-cuda, m10-4-cuda-memory, m10-7-gpu-conv]
+        status: kismi
+        gap: "Doku (texture) belleği API'si (eski texture reference ve texture object) yalnız kavram olarak var; tarayıcıda GPU olmadığından uygulamalı değil."
+        done: "M10.4'e doku belleği ve hizalama ayrıntı kutusu eklendi; uygulama Colab/yerel motor için ödevde."
+      - src: "lect_08, lect_09 — Indirgeme ve tarama"
+        topics: "indirgeme ağacı, kontrol/bellek ayrışması, paylaşımlı bellek, warp shuffle; Kogge–Stone, Brent–Kung, iş verimliliği, keyfi uzunluk"
+        pages: [m10-5-reduction, m10-6-scan]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "Alıştırmalar ex1 (1) – ex4 (1)"
+        topics: "çok thread'li histogram, çok thread'li 2B konvolüsyon, CUDA histogram, CUDA 2B konvolüsyon"
+        pages: [m10-3-cpu-parallel, m10-7-gpu-conv]
+        status: tam
+        gap: "CUDA kısımları tarayıcıda çalışmaz; NumPy modeli + Colab notebook'u."
+        done: "—"
+  - title: "YAP 446 Pekiştirmeli Öğrenme"
+    rows:
+      - src: "lect_1, lect_2 — RL'ye giriş, rastgele süreçler"
+        topics: "denetimli/yarı denetimli/denetimsiz/pekiştirmeli öğrenme, hayvan psikolojisi, ATARI, ticaret ve öneri örnekleri; rastgele süreç, durağanlık, Wiener süreci, Markov zinciri"
+        pages: [m11-1-markov, m5-5-rl]
+        status: genis
+        gap: "Öğrenme türleri arasındaki ayrım ve uygulama örnekleri bizde anlatılmıyordu."
+        done: "M11.1'e öğrenme türleri ve uygulama alanları sezgi kutusu eklendi."
+      - src: "lect_3, lect_4, lect_5 — MDP, değer iterasyonu, politika iterasyonu"
+        topics: "MDP, indirimli getiri, Bellman denklemi, VI ve matris biçimi, büzülme ve sınırlar, PI, monoton iyileşme, karmaşıklık, değiştirilmiş PI"
+        pages: [m11-2-mdp-vi, m11-3-policy-iteration]
+        status: genis
+        gap: "—"
+        done: "Değer iterasyonu deneyi (γ-büzülme, kayma olasılığı, greedy politika)."
+      - src: "lect_6, lect_7 — Modelsiz değerlendirme ve kontrol, fonksiyon yaklaşımı"
+        topics: "MC ve TD değerlendirme, ajan bileşenleri ve türleri, keşif–sömürü ve yöntemleri, SARSA, Q-öğrenme, yakınsama, Q yaklaşımı, DQN"
+        pages: [m11-4-mc-td, m11-5-sarsa-q, m11-6-dqn]
+        status: genis
+        gap: "Ajan türleri sınıflaması ve keşif yöntemleri (ε-greedy dışında) M11.4'te yoktu."
+        done: "M11.4'e ajan türleri tanım kutusu ve keşif yöntemleri ek alıştırması (x4: ε-greedy, azalan ε, Boltzmann, iyimser başlangıç) eklendi."
+      - src: "lect_8, lect_9 — Politika gradyanı, actor–critic, AlphaGo"
+        topics: "stokastik politika, politika gradyanı teoremi, REINFORCE, taban çizgisi, actor–critic, avantaj, AlphaGo"
+        pages: [m11-9-actor-critic, m11-11-alphazero, m5-5-rl]
+        status: genis
+        gap: "—"
+        done: "—"
+      - src: "lect_10, lect_11 — Haydutlar"
+        topics: "keşif–sömürü, pişmanlık, ε-greedy, UCB (belirsizlik karşısında iyimserlik), Hoeffding, Thompson örneklemesi, Beta–Bernoulli, endüstri kullanımı"
+        pages: [m11-7-bandits, m11-8-contextual-bandits]
+        status: genis
+        gap: "—"
+        done: "Haydut deneyi (ε-greedy, UCB1, Thompson birikimli pişmanlık)."
+      - src: "lect_12, lect_13 — Modele dayalı RL, güven bölgesi"
+        topics: "Dyna-Q, kısmi planlama, ağaç arama, MCTS; güven bölgesi yöntemleri, TRPO/PPO"
+        pages: [m11-10-planning, m11-12-trust-region]
+        status: genis
+        gap: "—"
+        done: "—"
+  - title: "Makaleler"
+    note: "Her makale ilgili modülde anlatılıyor ve bir makale ödevi olarak uygulatılıyor (Ödevler sayfası)."
+    rows:
+      - src: "Mnih ve ark. 2013 — Playing Atari with Deep RL"
+        pages: [m11-6-dqn]
+        status: genis
+      - src: "Silver ve ark. 2016, 2017 — AlphaGo, AlphaGo Zero"
+        pages: [m11-11-alphazero]
+        status: genis
+      - src: "Vaswani ve ark. 2017 — Attention Is All You Need"
+        pages: [m4-7-transformer, m4-14-transformer-ed]
+        status: genis
+      - src: "Dosovitskiy ve ark. 2021 — ViT"
+        pages: [m4-15-vit]
+        status: genis
+      - src: "Lin ve ark. 2017 — Feature Pyramid Networks"
+        pages: [m4-9-detection]
+        status: genis
+      - src: "Dalal & Triggs 2005 — HOG; Bay ve ark. 2006 — SURF"
+        pages: [m9-14-features]
+        status: genis
+      - src: "Wang ve ark. 2004 — SSIM"
+        pages: [m9-13-quality]
+        status: genis
+      - src: "Barnich & Van Droogenbroeck — ViBe"
+        pages: [m9-18-background]
+        status: genis
+      - src: "Viola & Jones 2001"
+        pages: [m9-16-viola-jones]
+        status: genis

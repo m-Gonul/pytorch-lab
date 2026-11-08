@@ -82,3 +82,27 @@ homework:
     accept:
       - "Üç yöntem aynı sonucu verir."
       - "Büyük k'da FFT'nin üstün olduğu kesişim noktası."
+
+labs:
+  - id: l1
+    lab: conv1d
+    title: "Çekirdek, adım, dolgu, genişleme: çıktı neye benziyor, kaç eleman?"
+    goal: |
+      Aynı sinyale farklı çekirdeklerle 1B çapraz korelasyon uygula. Çıktı boyu formülü $\lfloor (n+2P-((k-1)d+1))/s\rfloor+1$ her ayarda sayılan değerle karşılaştırılır. Ortalama çekirdeği düzleştirir, türev kenarda tepe verir, Laplace kenarın iki yanında zıt işaretli tepe (sıfır geçişi) üretir.
+    predict:
+      q: "n = 120, k = 7, s = 2, dolgu yok, d = 1: çıktı kaç eleman?"
+      options:
+        - {t: "57", ok: true, why: "⌊(120 − 7)/2⌋ + 1 = 56 + 1 = 57."}
+        - {t: "60", why: "Bu 'same' dolguyla (P = 3) olurdu: ⌊(120 + 6 − 7)/2⌋ + 1 = 60."}
+        - {t: "114", why: "Adımı unuttun: 120 − 7 + 1 = 114."}
+    presets:
+      - {name: "Türev ve gürültü", params: {ker: 2, noise: 0.2}, note: "Türev yüksek frekansı büyütür: gürültü kenarlardan daha belirgin."}
+      - {name: "Önce düzleştir", params: {ker: 4, k: 9, noise: 0.2, B: {ker: 2}}, note: "A geniş 'kenar algılayıcı' (ortalama farkı), B ham türev: A gürültüye çok daha dayanıklı."}
+      - {name: "Genişleme", params: {ker: 0, k: 3, dil: 5, B: {dil: 1}}, note: "Aynı 3 parametre, alıcı alan 11'e çıktı."}
+      - {name: "Adım = 4", params: {ker: 1, k: 7, s: 4, pad: 1}, note: "Örnekleme seyreldi: konumsal çözünürlük düştü (havuzlama gibi)."}
+    questions:
+      - q: "Laplace çıktısında kenar nerede?"
+        a: "İki zıt işaretli tepe arasındaki sıfır geçişinde (Marr–Hildreth / LoG fikri)."
+      - q: "'Aynı (yansıtma)' ile 'aynı (sıfır)' farkı nerede görünüyor?"
+        a: "Yalnız uçlarda: sıfır dolgu sinyali uçlarda yapay olarak 0'a çeker (sahte kenar), yansıtma bunu önler."
+    limits: "Tek kanal, 1B. 2B'de aynı formül her eksen için ayrı uygulanır; çok kanallı katmanda parametre sayısı k·C_in·C_out (+ C_out)."

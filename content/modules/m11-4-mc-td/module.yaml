@@ -55,6 +55,7 @@ extras:
   - {id: x1, title: "Blackjack: Monte Carlo ile politika değerlendirme", engine: browser}
   - {id: x2, title: "Öğrenme oranı koşulları deneyi", engine: browser}
   - {id: x3, title: "n adımlı TD: 19 durumlu yürüyüşte n ve α", engine: browser}
+  - {id: x4, title: "Keşif yöntemleri: ε-greedy, azalan ε, Boltzmann, iyimser başlangıç", engine: browser}
 
 quiz:
   - q: "TD hedefi neden yanlıdır?"

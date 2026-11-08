@@ -1,5 +1,5 @@
 // Her sayfada çalışan giriş noktası.
-import { progress } from "./store.js";
+import { progress, kv } from "./store.js";
 import { onChange, checkLocal, captureRunnerLink, runnerConf, setRunnerConf, warmBrowser } from "./engines.js";
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -104,6 +104,96 @@ function runnerPanel() {
   if (captured) setTimeout(() => $("#motorlar")?.scrollIntoView(), 50);
 }
 runnerPanel();
+
+// --- arama (başlıkta; "/" ile odaklan)
+const fold = (t) => t.toLocaleLowerCase("tr").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i");
+const qIn = $("#q"), qRes = $("#q-res");
+let IDX = null;
+async function loadIdx() { if (!IDX) { try { IDX = (await (await fetch("search.json")).json()).map((e) => ({ ...e, f: fold(e.t + " " + e.s + " " + e.k) })); } catch { IDX = []; } } return IDX; }
+function closeRes() { qRes.hidden = true; qIn.setAttribute("aria-expanded", "false"); }
+if (qIn) {
+  let sel = -1;
+  const show = async () => {
+    const words = fold(qIn.value).split(/\s+/).filter(Boolean);
+    if (!words.length) return closeRes();
+    const idx = await loadIdx();
+    const hits = idx.filter((e) => words.every((w) => e.f.includes(w)))
+      .map((e) => ({ e, sc: (fold(e.t).startsWith(words[0]) ? 3 : 0) + (e.k === "modül" ? 2 : 0) + (fold(e.t).includes(words.join(" ")) ? 1 : 0) }))
+      .sort((a, b) => b.sc - a.sc).slice(0, 12);
+    sel = -1;
+    qRes.innerHTML = hits.length ? hits.map(({ e }, i) => `<a role="option" id="qr-${i}" href="${e.u}"><span class="k">${e.k}</span> <b>${e.t.replace(/</g, "&lt;")}</b>${e.s ? `<span class="s">${e.s.replace(/</g, "&lt;").slice(0, 120)}</span>` : ""}</a>`).join("") : `<p class="muted">Sonuç yok. Daha kısa ya da İngilizce terimle dene (ör. “dropout”, “attention”).</p>`;
+    qRes.hidden = false; qIn.setAttribute("aria-expanded", "true");
+  };
+  qIn.addEventListener("input", show);
+  qIn.addEventListener("focus", () => { loadIdx(); if (qIn.value) show(); });
+  qIn.addEventListener("keydown", (e) => {
+    const opts = $$("a", qRes);
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sel = (sel + (e.key === "ArrowDown" ? 1 : -1) + opts.length) % Math.max(opts.length, 1); opts.forEach((o, i) => o.classList.toggle("sel", i === sel)); opts[sel]?.scrollIntoView({ block: "nearest" }); qIn.setAttribute("aria-activedescendant", opts[sel]?.id || ""); }
+    if (e.key === "Enter" && opts.length) { e.preventDefault(); location.href = (opts[sel] || opts[0]).getAttribute("href"); }
+    if (e.key === "Escape") { closeRes(); qIn.blur(); }
+  });
+  document.addEventListener("click", (e) => { if (!e.target.closest(".search")) closeRes(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "/" && !/input|textarea|select/i.test(document.activeElement?.tagName) && !document.activeElement?.isContentEditable) { e.preventDefault(); qIn.focus(); } });
+}
+
+// --- ana sayfa: kaldığın yerden devam
+const resume = kv.get("resume");
+const home = $(".page-home .hero .cta");
+if (home && resume?.mod) home.insertAdjacentHTML("beforebegin", `<p class="resume"><a class="btn big" href="${resume.mod}.html#${resume.sec || ""}">Kaldığın yerden devam: ${resume.code} · ${(resume.name || "").replace(/</g, "&lt;")}</a></p>`);
+
+// --- önkoşul haritası
+for (const n of $$(".map a.n")) {
+  const id = n.dataset.mod, k = progress.count(id);
+  $$(".pips rect", n).forEach((r, i) => r.classList.toggle("on", i < k));
+  n.classList.toggle("complete", k === 5);
+  if (!window.PTL.modules.includes(id)) n.classList.add("soon");
+  const hl = (on) => {
+    for (const e of $$(`.map path.e[data-to="${id}"], .map path.e[data-from="${id}"]`)) e.classList.toggle(e.dataset.to === id ? "in" : "out", on);
+    for (const e of $$(`.map path.e[data-to="${id}"]`)) $(`.map a.n[data-mod="${e.dataset.from}"]`)?.classList.toggle("pre", on);
+    for (const e of $$(`.map path.e[data-from="${id}"]`)) $(`.map a.n[data-mod="${e.dataset.to}"]`)?.classList.toggle("post", on);
+  };
+  n.addEventListener("mouseenter", () => hl(true)); n.addEventListener("mouseleave", () => hl(false));
+  n.addEventListener("focus", () => hl(true)); n.addEventListener("blur", () => hl(false));
+}
+for (const li of $$(".seq li[data-mod]")) { const k = progress.count(li.dataset.mod); if (k) li.insertAdjacentHTML("beforeend", ` <span class="status${k === 5 ? " complete" : ""}">${k}/5</span>`); }
+
+// --- notlar sayfası
+const noteList = $("#note-list");
+if (noteList) {
+  const titles = JSON.parse($("#mod-titles").textContent);
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const paint = () => {
+    const r = kv.get("resume");
+    if (r?.mod) $("#resume-box").innerHTML = `<a href="${r.mod}.html#${r.sec || ""}">${esc(titles[r.mod] || r.mod)} — ${esc(r.name || "")}</a> <span class="muted small">(${new Date(r.t).toLocaleString("tr")})</span>`;
+    const bms = kv.get("bookmarks", []) || [];
+    if (bms.length) $("#bm-list").innerHTML = bms.map((b, i) => `<li><a href="${b.mod}.html">${esc(titles[b.mod] || b.mod)}</a> <button class="btn ghost small" type="button" data-rm="${i}">Kaldır</button></li>`).join("");
+    const notes = kv.keys("note.").map((k) => [k.slice(5), kv.get(k)]).filter(([, v]) => v);
+    if (notes.length) noteList.innerHTML = notes.map(([m, v]) => `<article class="note-item"><h3><a href="${m}.html">${esc(titles[m] || m)}</a></h3><pre class="note-text">${esc(v)}</pre></article>`).join("");
+  };
+  paint();
+  $("#bm-list").addEventListener("click", (e) => { const i = e.target.dataset.rm; if (i == null) return; const b = kv.get("bookmarks", []); b.splice(Number(i), 1); kv.set("bookmarks", b); $("#bm-list").innerHTML = '<li class="muted">Yer imi yok.</li>'; paint(); });
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-act=notes-export]")) {
+      const dump = { app: "pytorch-lab-notes", v: 1, bookmarks: kv.get("bookmarks", []), resume: kv.get("resume"), notes: Object.fromEntries(kv.keys("note.").map((k) => [k, kv.get(k)])), self: Object.fromEntries(kv.keys("self.").map((k) => [k, kv.get(k)])), practice: Object.fromEntries(kv.keys("pr.").map((k) => [k, kv.get(k)])) };
+      const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([JSON.stringify(dump, null, 2)], { type: "application/json" })), download: "pytorch-lab-notlar.json" });
+      a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+  });
+  document.addEventListener("change", async (e) => {
+    if (e.target.dataset?.act !== "notes-import") return;
+    try {
+      const j = JSON.parse(await e.target.files[0].text());
+      if (j.app !== "pytorch-lab-notes") throw new Error();
+      kv.set("bookmarks", j.bookmarks || []); if (j.resume) kv.set("resume", j.resume);
+      for (const o of [j.notes, j.self, j.practice]) for (const [k, v] of Object.entries(o || {})) kv.set(k, v);
+      paint();
+    } catch { alert("Bu dosya bir pytorch-lab not dosyası değil."); }
+    e.target.value = "";
+  });
+}
+
+// --- karışık tekrar
+if ($("#rv-card")) import("./review.js").then((m) => m.initReview());
 
 // --- modül sayfası
 if ($("#page-data")) import("./module.js").then((m) => m.initModule());

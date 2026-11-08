@@ -1,3 +1,5 @@
+<!-- çözüm -->
+
 Önce olabilirliği iki farklı $p$ için doğrudan çarpımla hesapla: $p=0.75$ daha yüksek çıkmalı, çünkü veride 4 atışın 3'ü tura. Sonra $\log L$'nin türevini sıfıra eşitle:
 
 $$

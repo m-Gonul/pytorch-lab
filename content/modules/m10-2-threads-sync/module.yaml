@@ -57,6 +57,8 @@ extras:
   - {id: x1, title: "Yemek yiyen filozoflar: kilitlenme ve kaynak sıralaması", engine: browser}
   - {id: x2, title: "Peterson algoritması: karşılıklı dışlamanın kanıtı (durum uzayı)", engine: browser}
   - {id: x3, title: "Okuyucu–yazıcı kilidi ve yazıcı açlığı", engine: browser}
+  - {id: x4, title: "Semaforlarla sınırlı tampon ve zehirli hapla sonlandırma (monitörler)", engine: browser}
+  - {id: x5, title: "CAS ile kilitsiz yığın ve ABA sorunu (LL/SC, livelock)", engine: browser}
 
 quiz:
   - q: "Veri yarışı ile yarış koşulu arasındaki fark nedir?"

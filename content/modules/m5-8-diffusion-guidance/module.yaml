@@ -104,3 +104,24 @@ homework:
     accept:
       - "f = 1 (piksel uzayı) en yavaş; f çok büyükse yeniden yapılandırma kalitesi FID'i sınırlar."
       - "Cross-attention koşullama + CFG sınıf doğruluğunu artırır."
+
+labs:
+  - id: l1
+    lab: cfg2d
+    title: "Yönlendirme ölçeği s: kalite mi, çeşitlilik mi?"
+    goal: |
+      Üç bileşenli 2B Gauss karışımında koşulsuz ve koşullu ε **tam** bilinir (kâhin). CFG: $\hat\varepsilon=\varepsilon_u+s(\varepsilon_c-\varepsilon_u)$. s = 1 koşullu dağılımı verir; s > 1 örnekleri hedef bileşenin "en tipik" bölgesine iter — sınıf doğruluğu artar, çeşitlilik (std) azalır, merkez öteki sınıflardan uzağa kayar.
+    predict:
+      q: "s = 6 ile hedef kümedeki std (gerçek değer 0.5) ne olur?"
+      options:
+        - {t: "≈ 0.5, değişmez", why: "Yalnız s = 1 koşullu dağılımı korur."}
+        - {t: "Belirgin küçülür (≈ 0.3)", ok: true, why: "Aşırı yönlendirme dağılımı daraltır: p(x)p(c|x)^s keskinleşir."}
+        - {t: "Büyür", why: "Yönlendirme çeşitliliği azaltır."}
+    presets:
+      - {name: "s = 0 / 1", params: {s: 0, B: {s: 1}}, note: "A koşulsuz (üç küme), B koşullu."}
+      - {name: "Aşırı yönlendirme", params: {s: 6}, note: "Küme daraldı ve öteki kümelerden uzağa itildi."}
+      - {name: "Az adım", params: {s: 3, steps: 5, B: {steps: 60}}, note: "DDIM adım sayısının etkisi: kâhin modelde bile az adım dağılımı bozar."}
+    questions:
+      - q: "Kâhin model kusursuzken neden s > 1 'yanlış' dağılım verir?"
+        a: "Çünkü $\\varepsilon_u+s(\\varepsilon_c-\\varepsilon_u)$ hiçbir gerçek dağılımın skoru değildir (her t'de farklı üsle keskinleşmiş karışım); s > 1 bilinçli bir yanlılıktır: algısal kalite için çeşitlilikten vazgeçilir."
+    limits: "Kâhin ε (öğrenilmiş ağ yok); deterministik DDIM, T = 200 doğrusal takvim."

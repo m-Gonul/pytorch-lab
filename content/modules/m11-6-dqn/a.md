@@ -1,3 +1,5 @@
+<!-- çözüm -->
+
 Doğrusal: $\hat q=0.5+1=1.5$, $e=3-1.5=1.5$, $w\leftarrow w+0.1\cdot1.5\cdot x=(0.65,0.8)$.
 
 Huber: $|e|\le1$ için $\tfrac12e^2$, yoksa $|e|-\tfrac12$ → türev $\mathrm{clip}(e,-1,1)$. DQN'nin "hata kırpma"sı budur.

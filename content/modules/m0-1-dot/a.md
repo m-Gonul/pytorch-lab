@@ -1,3 +1,5 @@
+<!-- çözüm -->
+
 $$
 u=\begin{bmatrix}1\\2\\3\end{bmatrix},\qquad v=\begin{bmatrix}4\\-5\\6\end{bmatrix}
 $$

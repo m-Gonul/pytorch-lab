@@ -1,0 +1,3 @@
+# Değişiklik günlüğü
+
+(yazılıyor)

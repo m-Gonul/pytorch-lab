@@ -1,3 +1,5 @@
+<!-- çözüm -->
+
 Çıkış: $(7-1)\cdot2-2\cdot1+4=14$.
 
 1B scatter: 1 · [1, 2, 1] konum 0'dan, 2 · [1, 2, 1] konum 2'den, 3 · [1, 2, 1] konum 4'ten → [1, 2, 1 + 2, 4, 2 + 3, 6, 3] = [1, 2, 3, 4, 5, 6, 3]; indeks 4 = **5**. Çekirdek [½, 1, ½] olsaydı tam doğrusal interpolasyon olurdu.

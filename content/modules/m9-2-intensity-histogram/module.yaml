@@ -94,3 +94,19 @@ homework:
       - "Çıkış 8 bit ve kırpılan piksel oranı %1'in altında."
       - "Parlak ve karanlık bölgelerin ikisinde de ayrıntı görünüyor (her ikisinde yerel std > 5 gri seviye)."
       - "OpenCV'nin Reinhard operatörüyle aynı parametrelerde ortalama mutlak fark < 10 gri seviye."
+
+labs:
+  - id: l1
+    lab: histeq
+    title: "Gamma, germe ve histogram eşitleme aynı karanlık görüntüde"
+    goal: "Üç noktasal dönüşüm: $s=r^\\gamma$, yüzdelik tabanlı doğrusal germe ve HE ($s=\\mathrm{CDF}(r)$). Görüntü, iki histogram ve dönüşüm eğrisi birlikte güncellenir: dönüşümün eğimi > 1 olduğu yerde kontrast açılır."
+    predict:
+      q: "HE'den sonra dolu histogram kovası sayısı artar mı?"
+      options:
+        - {t: "Artar: histogram düzgünleşir", why: "Düzgünleşen kovaların aralığı; ayrık değerler birleşebilir ama ayrılamaz."}
+        - {t: "Artmaz (aynı ya da azalır)", ok: true, why: "T monoton bir eşleme: bir kova ya bir kovaya gider ya da başka kovalarla birleşir."}
+    presets:
+      - {name: "γ < 1", params: {m: 1, gamma: 0.4}, note: "Koyu tonlar açıldı."}
+      - {name: "Germe vs HE", params: {m: 2, clip: 1, B: {m: 3}}, note: "A şekli korur, B dağılımı düzgünleştirir."}
+      - {name: "Gürültülü düz alan", params: {m: 3, noise: 0.06}, note: "HE gürültüyü de gerer: düz bölgeler 'kumlu' — CLAHE'nin kırpma motivasyonu."}
+    limits: "Sentetik 96 × 72 görüntü, 256 seviye."

@@ -104,3 +104,25 @@ homework:
     accept:
       - "BN küçük batch'te belirgin kötüleşir, GN hemen hemen sabit kalır."
       - "Grup sayısı ablasyon tablosu."
+
+labs:
+  - id: l1
+    lab: bnnoise
+    title: "Batch normalizasyonu bir örneği nasıl görür: batch'e bağlı gürültü"
+    goal: |
+      Eğitimde BN, bir örneği **o batch'in** ortalaması ve varyansıyla normalize eder: aynı örnek her batch'te biraz farklı bir değere eşlenir. Bu gürültü küçük bir düzenlileştiricidir ama küçük batch'te ya da batch bileşimi değiştiğinde eğitim–çıkarım farkına dönüşür.
+    predict:
+      q: "B = 4 ile B = 64 arasında BN(x)'in batch'ten batch'e std'si kabaca kaç kat değişir?"
+      options:
+        - {t: "≈ 16 kat", why: "Std √B ile ölçeklenir, B ile değil."}
+        - {t: "≈ 4 kat", ok: true, why: "Örnek ortalama/varyansın standart hatası ∝ 1/√B: √(64/4) = 4."}
+        - {t: "Değişmez", why: "Batch istatistiklerinin belirsizliği B ile azalır."}
+    presets:
+      - {name: "Küçük batch", params: {B: 4}, note: "Dağılım geniş ve çarpık: aynı örnek bazen 0.5'e bazen 3'e eşleniyor."}
+      - {name: "Büyük batch", params: {B: 256}, note: "Batch istatistikleri popülasyona yaklaşıyor."}
+      - {name: "Karışık kaynak", params: {B: 32, mix: 0.5}, note: "İki farklı dağılımdan karışık batch: hem gürültü hem kayma."}
+      - {name: "B = 2", params: {B: 2}, note: "İki örnekli batch'te normalize değer yalnız ±1 olabilir — işaret dışında bilgi kalmaz."}
+    questions:
+      - q: "B = 2 iken neden çıktı yalnız ±1 civarında?"
+        a: "İki sayıyı kendi ortalamaları ve (yanlı) std'leriyle normalize edersen her zaman −1 ve +1 elde edersin; x'in büyüklüğü kaybolur."
+    limits: "Tek özellik, Gauss veri; ε = 10⁻⁵. Gerçek ağda BN'in etkisi optimizasyon manzarasını da değiştirir (M3.6 anlatımı)."

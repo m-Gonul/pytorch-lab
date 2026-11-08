@@ -58,6 +58,38 @@ def check_module(d: Path) -> list[str]:
     if extra:
         errs.append(f"a: verify fazladan değer üretiyor: {sorted(extra)}")
 
+    # --- pratik kartları: sayısal cevaplar `calc` ifadesinin hesabına, sık hata değerleri doğru cevaptan farklı olmalı
+    pids = set()
+    for i, x in enumerate(meta.get("practice") or []):
+        pid = x.get("id", f"p{i + 1}")
+        if pid in pids:
+            errs.append(f"pratik: tekrar eden kimlik {pid}")
+        pids.add(pid)
+        for k in ("type", "goal", "q", "solution"):
+            if not x.get(k):
+                errs.append(f"pratik {pid}: {k} eksik")
+        if x.get("level", 0) > 0 and not x.get("hints"):
+            errs.append(f"pratik {pid}: ipucu yok")
+        if "answer" in x:
+            if "calc" not in x:
+                errs.append(f"pratik {pid}: sayısal cevabın `calc` doğrulaması yok")
+            else:
+                env = {"math": math}
+                exec("import math\nfrom math import *\n", env)
+                got = float(eval(x["calc"], env))
+                if not math.isclose(float(x["answer"]), got, rel_tol=2e-6, abs_tol=1e-9):
+                    errs.append(f"pratik {pid}: cevap {x['answer']} ama calc {got}")
+            for mm in x.get("mistakes") or []:
+                if math.isclose(float(mm["answer"]), float(x["answer"]), rel_tol=1e-6, abs_tol=max(float(x.get("tol", 0)), 1e-12)):
+                    errs.append(f"pratik {pid}: sık hata değeri doğru cevapla aynı")
+        if x.get("choices") and sum(1 for c in x["choices"] if c.get("ok")) != 1:
+            errs.append(f"pratik {pid}: tam bir doğru seçenek olmalı")
+        if not ("answer" in x or x.get("choices") or x.get("rubric") or x.get("level") == 0):
+            errs.append(f"pratik {pid}: cevap biçimi yok (answer / choices / rubric)")
+    for x in meta.get("pitfalls") or []:
+        if not (x.get("wrong") and x.get("right")):
+            errs.append("yanılgı: wrong/right eksik")
+
     # --- (b–e) kod aşamaları + ek alıştırmalar (x1, x2, …)
     extras = [x["id"] for x in (meta.get("extras") or [])]
     if len(set(extras)) != len(extras):

@@ -1,5 +1,5 @@
 // Modül sayfası: el hesabı (a), kod kutuları (b–e), sınama, aşama rayı.
-import { progress, saved } from "./store.js";
+import { progress, saved, kv } from "./store.js";
 import { enhance } from "./editor.js";
 import { runBrowser, runLocal, stopBrowser, warmBrowser, state, onChange, checkLocal } from "./engines.js";
 
@@ -23,14 +23,21 @@ export function initModule() {
   for (const box of $$(".codebox")) initCodebox(mod, box, data.stages[box.dataset.stage]);
   initQuiz(mod);
   initRail(mod);
+  initPractice(mod);
+  initGoals(mod);
+  initTools(mod, data);
+  initReadiness(data);
+  if (Object.keys(data.labs || {}).length) import("./labs/runtime.js").then((L) => L.mountAll(data.labs)).catch((e) => console.error(e));
+  paintReview(mod, data);
+  addEventListener("ptl:progress", () => paintReview(mod, data));
   // tarayıcı aşaması varsa Python'u arka planda ısıt; yerel motoru yokla
   if ($$('.codebox[data-engine="browser"]').length) setTimeout(warmBrowser, 600);
   checkLocal();
 }
 
 // ------------------------------------------------------------------ (a) el hesabı
-function parseNum(s) {
-  s = s.trim().replace(/\s+/g, "").replace(/[−–]/g, "-");
+export function parseNum(s) {
+  s = s.trim().replace(/\s+/g, "").replace(/[−–]/g, "-").replace(/[a-zA-ZçğıöşüÇĞİÖŞÜµ%°²³]+$/u, "");
   if (!s) return NaN;
   if (/^-?\d+(?:[.,]\d+)?\/-?\d+(?:[.,]\d+)?$/.test(s)) { const [a, b] = s.replace(/,/g, ".").split("/"); return Number(a) / Number(b); }
   if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, ""); // 262.144 → binlik ayırıcı
@@ -50,7 +57,12 @@ function initHand(mod) {
     if (Number.isNaN(x)) return null;
     return Math.abs(x - want) <= Math.max(tol, 1e-9) + 1e-12 * Math.abs(want);
   };
-  const mark = (f, ok) => { f.classList.toggle("ok", ok === true); f.classList.toggle("bad", ok === false); $(".hf-mark", f).textContent = ok === true ? "✓" : ok === false ? "✗" : ""; };
+  const mark = (f, ok) => {
+    f.classList.toggle("ok", ok === true); f.classList.toggle("bad", ok === false); $(".hf-mark", f).textContent = ok === true ? "✓" : ok === false ? "✗" : "";
+    const why = $(".hf-why", f);
+    const msg = ok === false ? mistakeMsg(f.dataset.mistakes, parseNum($("input", f).value), Number(f.dataset.answer)) : "";
+    why.innerHTML = msg; why.hidden = !msg;
+  };
   const check = () => {
     let right = 0, empty = 0;
     for (const f of fields) { const ok = judge(f); mark(f, ok); if (ok) right++; if (ok === null) empty++; }
@@ -67,8 +79,16 @@ function initHand(mod) {
   root.addEventListener("click", (e) => {
     const act = e.target.closest("[data-act]")?.dataset.act;
     if (act === "hand-check") check();
-    if (act === "hand-hint") for (const f of fields) $(".hf-hint", f).hidden = judge(f) === true;
-    if (act === "hand-reset") { for (const f of fields) { $("input", f).value = ""; mark(f, null); $(".hf-hint", f).hidden = true; } status.textContent = ""; save(); }
+    if (act === "hand-hint") {
+      let any = false;
+      for (const f of fields) {
+        if (judge(f) === true) continue;
+        const next = $$(".hf-hint[hidden]", f)[0];
+        if (next) { next.hidden = false; any = true; }
+      }
+      status.textContent = any ? "Yanlış ya da boş alanlarda bir sonraki ipucu açıldı." : "Açılacak başka ipucu yok — adım adım çözüme bakabilirsin.";
+    }
+    if (act === "hand-reset") { for (const f of fields) { $("input", f).value = ""; mark(f, null); $$(".hf-hint", f).forEach((x) => (x.hidden = true)); } status.textContent = ""; save(); }
   });
   if (fields.some((f) => $("input", f).value)) for (const f of fields) mark(f, judge(f));
 }
@@ -150,6 +170,7 @@ function initCodebox(mod, box, spec) {
     const act = e.target.closest("[data-act]")?.dataset.act;
     if (act === "check") go(true);
     if (act === "run") go(false);
+    if (act === "next-hint") nextHint(e.target.closest(".cb-hints"));
     if (act === "reset" && confirm("Kodun başlangıç hâline dönsün mü? Yazdıkların silinir.")) { ed.set(spec.start); saved.del(key); out.replaceChildren(); }
     if (act === "solution" && confirm("Model çözüm kodunun yerine yazılsın mı? Önce kendin denemen önerilir; mevcut kodun silinir.")) { ed.set(spec.sol); out.replaceChildren(); }
   });
@@ -162,6 +183,8 @@ function initQuiz(mod) {
       const b = e.target.closest(".q-opt");
       if (!b) return;
       const ok = b.dataset.ok === "1";
+      const qi = q.dataset.q, hist = kv.get(`quiz.${mod}`, {});
+      if (!(qi in hist)) { hist[qi] = ok ? 1 : 0; kv.set(`quiz.${mod}`, hist); dispatchEvent(new CustomEvent("ptl:progress")); }
       b.classList.add(ok ? "ok" : "bad");
       b.setAttribute("aria-pressed", "true");
       b.nextElementSibling.hidden = false;
@@ -181,4 +204,134 @@ function initRail(mod) {
     for (const en of ents) if (en.isIntersecting) for (const a of links) a.classList.toggle("here", a.dataset.rail === en.target.id);
   }, { rootMargin: "-30% 0px -60% 0px" });
   secs.forEach((s) => io.observe(s));
+}
+
+// ------------------------------------------------------------------ ortak yardımcılar
+export function mistakeMsg(json, x, want) {
+  if (!json || Number.isNaN(x)) return "";
+  try {
+    for (const m of JSON.parse(json)) if (Math.abs(x - m.v) <= 1e-6 * Math.max(1, Math.abs(m.v))) return m.m;
+  } catch {}
+  if (want !== 0 && Math.abs(x + want) <= 1e-6 * Math.abs(want)) return "İşaret hatası: büyüklük doğru, yön (işaret) ters.";
+  if (want !== 0 && [10, 100, 1000, 0.1, 0.01, 0.001].some((k) => Math.abs(x - want * k) <= 1e-6 * Math.abs(want * k))) return "Büyüklük mertebesi kaymış: birim ya da ondalık basamağını kontrol et.";
+  return "";
+}
+
+function nextHint(box) {
+  if (!box) return;
+  const items = $$(".hint-list > li", box), n = items.length, shown = items.filter((x) => !x.hidden).length;
+  if (shown < n) items[shown].hidden = false;
+  const b = $("[data-act]", box);
+  b.textContent = shown + 1 >= n ? `Tüm ipuçları açık (${n}/${n})` : `Sonraki ipucu (${shown + 1}/${n})`;
+  b.disabled = shown + 1 >= n;
+}
+
+// ------------------------------------------------------------------ pratik kartları
+function initPractice(mod) {
+  const sec = $("#pratik");
+  if (!sec) return;
+  const st = kv.get(`pr.${mod}`, {});
+  const save = () => { kv.set(`pr.${mod}`, st); dispatchEvent(new CustomEvent("ptl:progress")); };
+  for (const b of $$(".pr-filter [data-lvl]", sec)) b.addEventListener("click", () => {
+    $$(".pr-filter [data-lvl]", sec).forEach((x) => x.classList.toggle("on", x === b));
+    for (const a of $$(".pr", sec)) a.hidden = b.dataset.lvl !== "all" && a.dataset.level !== b.dataset.lvl;
+  });
+  for (const a of $$(".pr", sec)) {
+    const pid = a.dataset.pid, s = (st[pid] = st[pid] || {});
+    const ans = $(".pr-answer", a);
+    if (ans) {
+      const inp = $("input", ans), msg = $(".pr-msg", ans);
+      if (s.v) inp.value = s.v;
+      const check = () => {
+        const x = parseNum(inp.value), want = Number(ans.dataset.answer), tol = Number(ans.dataset.tol) || 0;
+        s.v = inp.value;
+        if (Number.isNaN(x)) { msg.textContent = "Bir sayı yaz (kesir, virgül ve birim kabul edilir)."; msg.className = "pr-msg"; return; }
+        const ok = Math.abs(x - want) <= Math.max(tol, 1e-9) + 1e-12 * Math.abs(want);
+        if (!("first" in s)) s.first = ok ? 1 : 0;
+        s.ok = ok ? 1 : s.ok || 0;
+        const why = ok ? "" : mistakeMsg(ans.dataset.mistakes, x, want);
+        msg.innerHTML = ok ? "Doğru. Çözümdeki başka yolu da oku." : `Henüz değil.${why ? " " + why : " Bir ipucu açmayı dene."}`;
+        msg.className = "pr-msg " + (ok ? "good" : "bad");
+        a.classList.toggle("solved", ok);
+        save();
+      };
+      $("[data-act=pr-check]", ans).addEventListener("click", check);
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); check(); } });
+      if (s.ok) a.classList.add("solved");
+    }
+    for (const b of $$(".pr-choices .q-opt", a)) b.addEventListener("click", () => {
+      const ok = b.dataset.ok === "1";
+      b.classList.add(ok ? "ok" : "bad"); b.setAttribute("aria-pressed", "true"); b.nextElementSibling.hidden = false;
+      if (!("first" in s)) s.first = ok ? 1 : 0;
+      if (ok) { s.ok = 1; a.classList.add("solved"); }
+      save();
+    });
+    const ta = $(".pr-open textarea", a);
+    if (ta) { if (s.text) ta.value = s.text; ta.addEventListener("input", () => { s.text = ta.value; kv.set(`pr.${mod}`, st); }); }
+    const rub = $$(".pr-rubric input", a);
+    rub.forEach((c) => { c.checked = !!(s.r || [])[c.dataset.r]; c.addEventListener("change", () => { s.r = rub.map((x) => (x.checked ? 1 : 0)); s.ok = s.r.every(Boolean) ? 1 : 0; a.classList.toggle("solved", !!s.ok); save(); }); });
+    if (rub.length && s.ok) a.classList.add("solved");
+    const hb = $("[data-act=pr-hint]", a);
+    hb?.addEventListener("click", () => { nextHint(hb.closest(".pr-hints")); s.hints = (s.hints || 0) + 1; kv.set(`pr.${mod}`, st); });
+    $(".pr-sol", a)?.addEventListener("toggle", (e) => { if (e.target.open && !("first" in s) && a.dataset.level !== "0") { s.peek = 1; kv.set(`pr.${mod}`, st); } });
+  }
+}
+
+// ------------------------------------------------------------------ öz değerlendirme, notlar, yer imi, kaldığın yer
+function initGoals(mod) {
+  const boxes = $$("input[data-goal]");
+  const st = kv.get(`self.${mod}`, {});
+  for (const c of boxes) { c.checked = !!st[c.dataset.goal]; c.addEventListener("change", () => { st[c.dataset.goal] = c.checked ? 1 : 0; kv.set(`self.${mod}`, st); dispatchEvent(new CustomEvent("ptl:progress")); }); }
+}
+
+function initTools(mod, data) {
+  const ta = $(".notes textarea");
+  if (ta) {
+    ta.value = kv.get(`note.${mod}`, "") || "";
+    if (ta.value) $(".notes").open = true;
+    ta.addEventListener("input", () => (ta.value ? kv.set(`note.${mod}`, ta.value) : kv.del(`note.${mod}`)));
+  }
+  const bm = $("[data-act=bookmark]");
+  const paintBm = () => { const on = (kv.get("bookmarks", []) || []).some((b) => b.mod === mod && !b.sec); bm.setAttribute("aria-pressed", String(on)); bm.textContent = on ? "Yer iminde ✓" : "Yer imi ekle"; };
+  bm?.addEventListener("click", () => {
+    let list = kv.get("bookmarks", []) || [];
+    if (list.some((b) => b.mod === mod && !b.sec)) list = list.filter((b) => !(b.mod === mod && !b.sec));
+    else list.push({ mod, title: document.querySelector(".module h1")?.textContent, code: data.code, t: Date.now() });
+    kv.set("bookmarks", list); paintBm();
+  });
+  if (bm) paintBm();
+  // kaldığın yer: görünür bölüm
+  const io = new IntersectionObserver((ents) => {
+    for (const en of ents) if (en.isIntersecting) kv.set("resume", { mod, code: data.code, title: document.querySelector(".module h1")?.textContent, sec: en.target.id, name: (en.target.querySelector("h2,h3")?.textContent || "").trim().slice(0, 80), t: Date.now() });
+  }, { rootMargin: "-40% 0px -55% 0px" });
+  $$(".stage, .lab, .practice, .extras, .quiz-sec, .intro").forEach((s) => s.id && io.observe(s));
+}
+
+function initReadiness(data) {
+  const box = $("#hazir .rc-body");
+  if (!box || !data.ready?.length) return;
+  box.innerHTML = `<p class="muted small">Bu modülün önkoşullarından birkaç soru. Yanlış yaptığın varsa önce o modüle dönmek zaman kazandırır.</p><ol class="quiz">${data.ready.map((q, i) => `<li class="q" data-r="${i}"><div class="q-text"><span class="tag">${q.code}</span> ${q.q}</div><ul class="q-opts">${q.o.map((o) => `<li><button type="button" class="q-opt" data-ok="${o.ok ? 1 : 0}">${o.t}</button><div class="q-why" hidden>${o.why}</div></li>`).join("")}</ul><p class="rc-back" hidden>Bunu <a href="${q.mod}.html">${q.code}</a> modülünde tekrar etmen önerilir.</p></li>`).join("")}</ol>`;
+  box.addEventListener("click", (e) => {
+    const b = e.target.closest(".q-opt"); if (!b) return;
+    const ok = b.dataset.ok === "1", li = b.closest(".q");
+    b.classList.add(ok ? "ok" : "bad"); b.nextElementSibling.hidden = false;
+    if (!ok) li.querySelector(".rc-back").hidden = false;
+  });
+}
+
+function paintReview(mod, data) {
+  const sec = $("#geri-don"), ul = $(".review-list", sec || document);
+  if (!sec) return;
+  const items = [];
+  const qh = kv.get(`quiz.${mod}`, {});
+  for (const [qi, v] of Object.entries(qh)) if (!v) { const t = $(`.quiz .q[data-q="${qi}"] .q-text`)?.textContent || ""; items.push(`<li><a href="#sinama">Sınama sorusu ${Number(qi) + 1}</a>: ${t.slice(0, 110)}${t.length > 110 ? "…" : ""} <span class="muted small">— ilgili bölümü tekrar oku, sonra karışık tekrar sayfasında yeniden gel</span></li>`); }
+  const self = kv.get(`self.${mod}`, {});
+  const touched = Object.keys(qh).length || Object.keys(progress.get(mod)).length;
+  $$("input[data-goal]").forEach((c, i) => { if (touched && !self[i]) items.push(`<li>Kazanım işaretlenmedi: ${c.closest("label").querySelector("span").textContent.slice(0, 120)}</li>`); });
+  const p = progress.get(mod);
+  if (touched) for (const s of "abcde") if (!p[s]) items.push(`<li><a href="#${s}">Aşama ${s}</a> henüz geçilmedi.</li>`);
+  const pr = kv.get(`pr.${mod}`, {});
+  for (const [pid, s] of Object.entries(pr)) if (s.first === 0 && !s.ok) items.push(`<li><a href="#pr-${pid}">Pratik ${pid}</a>: ilk denemede yanlış, henüz çözülmedi.</li>`);
+  ul.innerHTML = items.join("");
+  sec.hidden = !items.length;
 }

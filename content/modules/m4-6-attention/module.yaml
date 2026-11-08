@@ -84,3 +84,24 @@ homework:
     accept:
       - "Çıktı ve gradyanlar standart attention'la 10⁻³ içinde."
       - "Uzun dizide bellek ve süre kazancı tablosu."
+
+labs:
+  - id: l1
+    lab: attnscale
+    title: "Neden √d_k'ya bölüyoruz?"
+    goal: |
+      $q,k$ bileşenleri bağımsız N(0,1) ise $q\cdot k=\sum_i q_ik_i$'nin varyansı $d_k$'dır. Skorlar büyüdükçe softmax tek bir anahtara yığılır (doyar), Jacobian'ı $\mathrm{diag}(\alpha)-\alpha\alpha^\top\to0$ olur ve gradyan akmaz. $1/\sqrt{d_k}$ ölçeği varyansı 1'e çeker.
+    predict:
+      q: "Ölçeksiz, d_k = 512, 32 anahtar: en büyük attention ağırlığı tipik olarak ne olur?"
+      options:
+        - {t: "≈ 1/32", why: "Bu düzgün dağılım; skorların std'si ≈ 22 iken imkânsız."}
+        - {t: "≈ 0.3", why: "Ölçekli durumda bile tipik değer daha küçük."}
+        - {t: "≈ 1 (one-hot)", ok: true, why: "En büyük skor ikinciden onlarca birim büyük: e^{farklar} hepsini ezer."}
+    presets:
+      - {name: "Ölçekli vs ölçeksiz", params: {d: 256, scale: 0, B: {scale: 1}}, note: "A Transformer'daki gibi, B ölçeksiz."}
+      - {name: "Küçük d_k", params: {d: 2, scale: 1}, note: "d_k küçükken ölçeğin etkisi az: √2 ≈ 1.4."}
+      - {name: "Uzun dizi", params: {d: 64, n: 128}, note: "Entropinin üst sınırı ln n büyür; ölçekli attention'da bile ağırlıklar dağılır."}
+    questions:
+      - q: "Entropi–d_k grafiğinde ölçekli eğri neden yatay?"
+        a: "Ölçekli skorların dağılımı d_k'dan bağımsız (std 1); dolayısıyla softmax dağılımı da d_k'dan bağımsız."
+    limits: "Rastgele q, k; eğitilmiş modellerde q ve k ilişkilidir ve normları öğrenilir (QK-norm gibi teknikler bu yüzden var)."

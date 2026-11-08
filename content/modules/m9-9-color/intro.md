@@ -14,3 +14,9 @@ Geri dönüş üç bölgede (RG: $0\le H<120$, GB, BR): örn. RG bölgesinde $B=
 **Tam renkli işleme:** her kanalı ayrı işlemek ile vektörü işlemek **doğrusal** komşuluk işlemlerinde aynıdır (ortalama, Laplacian); median, kenar ve eşitleme gibi doğrusal olmayanlarda değil. **Renk bölütleme:** örnek renklerin ortalaması $a$; $D(z,a)=\sqrt{(z-a)^TC^{-1}(z-a)}\le D_0$ (Mahalanobis; $C=I$ ise küre).
 
 **[[Di Zenzo gradyanı]]:** $g_{xx}=|\partial_x\mathbf c|^2$, $g_{yy}=|\partial_y\mathbf c|^2$, $g_{xy}=\partial_x\mathbf c\cdot\partial_y\mathbf c$; yön $\theta=\frac12\tan^{-1}\frac{2g_{xy}}{g_{xx}-g_{yy}}$, büyüklük $F_\theta=\sqrt{\frac12[(g_{xx}+g_{yy})+(g_{xx}-g_{yy})\cos2\theta+2g_{xy}\sin2\theta]}$.
+
+:::tanım Üç renk katsayıları ve metamerizm
+Bir rengi üç birincil rengin (CIE X, Y, Z tristimulus değerleri) karışımı olarak yazarız; **trikromatik katsayılar** bunların oranlarıdır: $x=\frac{X}{X+Y+Z}$, $y=\frac{Y}{X+Y+Z}$, $z=1-x-y$. $(x,y)$ ikilisi rengin parlaklıktan bağımsız "rengini" (renklilik, chromaticity) verir: CIE renklilik diyagramı bu düzlemdir; bir cihazın gösterebildiği renkler (gamut) bu diyagramda birincil renklerinin oluşturduğu üçgendir.
+
+**Metamerizm:** spektral olarak **farklı** iki ışığın aynı X, Y, Z değerlerini (dolayısıyla aynı algılanan rengi) üretmesi. Göz üç tür koniyle sonsuz boyutlu bir spektrumu üç sayıya indirdiği için bilgi kaybeder; bu kayıp hem renkli ekranların (üç birincil renkle her rengi taklit etmek) hem de "dükkânda aynı, güneşte farklı" kumaş sorununun (aydınlatma değişince metamerler ayrışır) nedenidir.
+:::

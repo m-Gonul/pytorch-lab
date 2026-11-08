@@ -83,3 +83,19 @@ homework:
     accept:
       - "Sıcaklık ölçekleme ECE'yi belirgin düşürür, doğruluk sabit."
       - "Güvenilirlik diyagramları önce/sonra."
+
+labs:
+  - id: l1
+    lab: softmaxT
+    title: "Softmax: sıcaklık, entropi ve kayma değişmezliği"
+    goal: "Softmax logitleri olasılığa çevirir: $p_i=e^{z_i/T}/\\sum_j e^{z_j/T}$. Bu deneyde logit aralığını, sınıf sayısını ve sıcaklığı değiştir; en büyük olasılık, entropi ve 'etkin sınıf sayısı' $e^H$ canlı hesaplanır."
+    predict:
+      q: "Tüm logitlere 50 eklersen olasılıklar ne olur?"
+      options:
+        - {t: "Hepsi büyür", why: "Paydaki ve paydadaki her terim aynı e^{50} ile çarpılır."}
+        - {t: "Değişmez", ok: true, why: "softmax(z + c) = softmax(z)."}
+        - {t: "Taşma olur, NaN çıkar", why: "Saf formülde e^{50+…} büyük ama float64'te taşmaz; uygulama zaten max'ı çıkararak hesaplar."}
+    presets:
+      - {name: "Logitler eşit", params: {spread: 0}, note: "Düzgün dağılım: H = ln K."}
+      - {name: "Büyük aralık", params: {spread: 12}, note: "Neredeyse one-hot: çapraz entropi kaybı doğru sınıf için ≈ 0, yanlışsa ≈ 12."}
+    limits: "Sabit, yapay logit dizisi."

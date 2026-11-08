@@ -85,3 +85,30 @@ homework:
     accept:
       - "Koşulları sağlamayan sabit adımın gürültü tabanında kaldığı grafik."
       - "Ortalama alma ile c'ye duyarsız O(1/t) hata."
+
+labs:
+  - id: l1
+    lab: gd1d
+    title: "Öğrenme oranı ve kararlılık: f(x) = a·x²/2"
+    goal: |
+      GD'nin tek boyutlu en basit hâli: $x_{t+1}=x_t-\eta f'(x_t)=(1-\eta a)\,x_t$. Bütün davranış tek bir sayıda, $1-\eta a$'da saklı. Amaç: tekdüze yakınsama, salınımlı yakınsama ve ıraksama arasındaki sınırları **formülden önce** deneyle bulmak, sonra formülle doğrulamak.
+    predict:
+      q: "a = 2 iken η'yı 0.3'ten yavaşça artırıyorsun. Hangi η'dan sonra x sonsuza kaçar?"
+      options:
+        - {t: "η > 0.5", why: "η = 0.5 = 1/a tek adımda minimuma iner; sonrası salınımlı ama hâlâ yakınsar."}
+        - {t: "η > 1", ok: true, why: "|1 − ηa| < 1 ⇔ 0 < η < 2/a = 1."}
+        - {t: "η > 2", why: "Sınır a'ya bağlı: 2/a."}
+    presets:
+      - {name: "Yavaş ve güvenli", params: {lr: 0.05}, note: "ηa = 0.1: her adım hatanın yalnız %10'unu siler; 25 adımda $0.9^{25}\\approx0.07$."}
+      - {name: "Tek adımda çözüm", params: {lr: 0.5}, note: "η = 1/a: Newton adımı. Çok boyutta her yön için ayrı 1/a gerektiği için tek η ile mümkün değil."}
+      - {name: "Salınım", params: {lr: 0.9}, note: "1 < ηa < 2: x her adımda işaret değiştirir ama küçülür."}
+      - {name: "Iraksama", params: {lr: 1.05}, note: "ηa = 2.1: |1 − ηa| = 1.1 > 1."}
+      - {name: "Aynı η, iki eğrilik", params: {lr: 0.3, a: 1, B: {a: 6}}, note: "Çok boyutlu bir problemin iki yönü gibi düşün: η = 0.3, a = 6'lık yönde ıraksar (ηa = 1.8 hâlâ < 2, salınır), a = 1 yönünde yavaştır. Koşul sayısının bedeli."}
+    questions:
+      - q: "Kayıp log ölçekte neden düz bir çizgi?"
+        a: "$f(x_t)=\\tfrac a2(1-\\eta a)^{2t}x_0^2$; logaritması t'nin doğrusal fonksiyonu, eğimi $2\\ln|1-\\eta a|$."
+      - q: "η'yı sabit tutup a'yı artırınca ne olur? Hangi a'dan sonra ıraksar?"
+        a: "Sınır $a<2/\\eta$. Dik (büyük eğrilikli) bir yön, aynı η ile ıraksamaya ilk düşen yöndür — bu yüzden η en büyük özdeğere göre seçilir."
+      - q: "η negatif olursa?"
+        a: "Deney bunu geçersiz sayar: $1-\\eta a>1$, adım yokuş yukarıdır (gradyan çıkışı)."
+    limits: "Tek boyutlu, gürültüsüz kuadratik. Gerçek kayıplarda eğrilik konuma göre değişir; mini-batch gürültüsü ayrıca bir taban oluşturur (bkz. M3.4 deneyi)."

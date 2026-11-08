@@ -100,3 +100,20 @@ homework:
       - "Test PSNR ≥ 25 dB (kendi hedefin için) ve 1080p'de CPU'da bile < 100 ms çıkarım."
       - "Rehber haritasının görselleştirmesi."
       - "Izgara derinliği (8, 16) ve uzaysal çözünürlük (8, 16) ablasyonu."
+
+labs:
+  - id: l1
+    lab: bilateral1d
+    title: "Bilateral süzgeç: σ_s, σ_r ve yineleme"
+    goal: "Bilateral ağırlık = uzamsal Gauss × değer Gauss'u: $w=e^{-\\|p-q\\|^2/2\\sigma_s^2}\\,e^{-(I_p-I_q)^2/2\\sigma_r^2}$. Değer farkı σ_r'yi aşan komşular ortalamaya girmez: kenar korunur. Ama kontrastı σ_r'den küçük ince yapılar da 'gürültü' sayılır."
+    predict:
+      q: "σ_r'yi çok büyük yaparsan bilateral neye dönüşür?"
+      options:
+        - {t: "Medyan süzgecine", why: "Ağırlıklı ortalama kalır."}
+        - {t: "Gauss süzgecine", ok: true, why: "Değer terimi ≈ 1 olur."}
+        - {t: "Hiçbir şey yapmaz", why: "Bu σ_r → 0 limiti."}
+    presets:
+      - {name: "Bilateral ≈ Gauss", params: {sr: 2}, note: "Kenarlar yayıldı."}
+      - {name: "σ_r < gürültü", params: {sr: 0.03, noise: 0.1}, note: "Hiç düzleştirmiyor."}
+      - {name: "Yineleme", params: {it: 6, B: {it: 1}}, note: "Yinelemek düz bölgeleri iyice düzleştirir, eğimleri basamaklandırır (karikatür)."}
+    limits: "1B sinyal; 2B'de aynı ilke, maliyet pencere alanıyla büyür."

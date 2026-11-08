@@ -1,1 +1,3 @@
+<!-- çözüm -->
+
 Tiling'de her block, k-ekseni boyunca $n/T=2$ adımda $A$'dan bir $2\times2$ tile, $B$'den bir $2\times2$ tile yükler: block başına $2\cdot(4+4)=16$, dört block'ta 64. Naifin yarısı: kazanç tile boyutu $T$ kadar.

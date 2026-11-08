@@ -104,3 +104,19 @@ homework:
     accept:
       - "Küçük görevlerde merkezi kuyruk çekişmeden yavaşlar, iş çalma ölçeklenir."
       - "Çalma sayısı p·T∞ mertebesinde."
+
+labs:
+  - id: l1
+    lab: amdahl
+    title: "Amdahl ve Gustafson–Barsis: aynı sayılar, farklı sorular"
+    goal: "Amdahl (problem sabit): $S(N)=1/(f+(1-f)/N)\\le1/f$. Gustafson (işlemci başına iş sabit, problem N ile büyür): $S(N)=f+(1-f)N$. İletişim ek yükü eklenince Amdahl eğrisi bir N'den sonra düşer."
+    predict:
+      q: "f = %5 seri kod: 1024 çekirdekle en fazla kaç kat hızlanırsın (Amdahl)?"
+      options:
+        - {t: "≈ 1024", why: "Seri kısım hızlanmaz."}
+        - {t: "≈ 20", ok: true, why: "1/(0.05 + 0.95/1024) ≈ 19.6."}
+        - {t: "≈ 50", why: "Üst sınır 1/f = 20."}
+    presets:
+      - {name: "f = %1", params: {f: 0.01}, note: "Tavan 100: büyük makinelerde %1 seri kod bile çok pahalı."}
+      - {name: "İletişim ek yükü", params: {f: 0.02, ov: 0.004}, note: "En iyi N belirdi; sonrası yavaşlama."}
+    limits: "Kusursuz yük dengesi; ek yük modeli log₂N (ağaç indirgeme)."

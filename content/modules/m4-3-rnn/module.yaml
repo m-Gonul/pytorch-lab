@@ -100,3 +100,25 @@ homework:
     accept:
       - "LN'li model daha hızlı ve daha kararlı yakınsar."
       - "Değişmezlik tablosu deneylerle uyumlu."
+
+labs:
+  - id: l1
+    lab: rnngrad
+    title: "Zaman boyunca geri yayılım: gradyan neden söner ya da patlar?"
+    goal: |
+      $h_t=\tanh(Wh_{t-1}+Ux_t)$ için $\partial h_T/\partial h_t=\prod_{k=t+1}^{T}\mathrm{diag}(1-h_k^2)\,W$. Normu adım başına kabaca $\rho\cdot\mathbb E[1-h^2]$ ile çarpılır. Karşılaştırma: LSTM hücre yolu $c_t=f\odot c_{t-1}+\dots$ boyunca çarpan yalnız $f$'dir — f ≈ 1 iken gradyan çok uzun yaşar.
+    predict:
+      q: "ρ = 1, girdi ölçeği 1, T = 80: düz RNN'de 50 adım öncesine gradyanın ne kadarı ulaşır?"
+      options:
+        - {t: "Neredeyse tamamı (≈ 1)", why: "tanh türevi ortalamada < 1: çarpan ρ·E[1 − h²] < 1."}
+        - {t: "Çok küçük bir kısmı (≪ 10⁻³)", ok: true, why: "Çarpan ≈ 0.5–0.6 → 0.55⁵⁰ ≈ 10⁻¹³."}
+        - {t: "Patlar (≫ 1)", why: "Patlama için ρ·E[1 − h²] > 1 gerekir."}
+    presets:
+      - {name: "Doğrusal, ρ = 1.1", params: {act: 1, rho: 1.1}, note: "Aktivasyon yok: çarpan ≈ spektral yarıçap; > 1 → patlama."}
+      - {name: "Doyma", params: {rho: 1.5, xs: 3}, note: "Büyük girdi tanh'ı doyurur: ρ büyük olsa bile türevler küçük, gradyan söner."}
+      - {name: "Kaosun kıyısı", params: {rho: 1.0, xs: 0.1}, note: "Küçük girdiyle tanh neredeyse doğrusal: çarpan ≈ 1, gradyan uzun yaşar."}
+      - {name: "f = 0.99", params: {f: 0.99}, note: "LSTM hücre yolunda 10⁻³'e ≈ 690 adımda iner."}
+    questions:
+      - q: "Gradyan kırpma kaybolan gradyanı çözer mi?"
+        a: "Hayır. Kırpma yalnız büyük normu sınırlar (patlamaya karşı); sönen gradyanı büyütmez. Kaybolmaya karşı çözüm mimari: kapılar, artık yollar, uygun başlatma."
+    limits: "Rastgele, eğitilmemiş W ve tek bir rastgele geri yön. Eğitim sırasında W değişir; LSTM'de f de girdiye bağlıdır (burada sabit)."

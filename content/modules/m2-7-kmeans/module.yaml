@@ -85,3 +85,23 @@ homework:
     accept:
       - "k-means++ hem φ'de hem yinelenme sayısında rastgeleden iyi."
       - "Optimuma oran log k'nin çok altında."
+
+labs:
+  - id: l1
+    lab: kmeans
+    title: "Lloyd algoritması adım adım: atama, güncelleme, yerel minimum"
+    goal: "Her iterasyon iki adım: (1) her noktayı en yakın merkeze ata, (2) her merkezi kümesinin ortalamasına taşı. İkisi de amacı $J=\\sum\\|x-\\mu_{c(x)}\\|^2$ artıramaz; J monoton iner ve sonlu adımda durur — ama başlatmaya bağlı bir **yerel** minimumda."
+    predict:
+      q: "'Hepsi aynı köşede' başlatmasıyla 4 gerçek küme, k = 4: sonuç ne olur?"
+      options:
+        - {t: "Yine doğru 4 küme", why: "Merkezler aynı noktadan başlayınca çoğu hiç nokta almaz."}
+        - {t: "Boş kümeler ve birleşmiş gerçek kümeler", ok: true, why: "Tek bir merkez her şeyi alır; diğerleri boş kalır ve güncellenmez."}
+    presets:
+      - {name: "Rastgele vs k-means++", params: {init: 0, it: 20, B: {init: 1}}, note: "Tohumu değiştirerek rastgele başlatmanın bazen iki merkezi aynı kümeye koyduğunu gör."}
+      - {name: "Kötü başlatma", params: {init: 2, it: 20}, note: "Boş küme sorunu."}
+      - {name: "Yanlış k", params: {k: 2, true: 4, it: 20}, note: "k < gerçek: kümeler birleşir. k'yı artırıp J'nin nasıl düştüğüne bak (dirsek yöntemi)."}
+      - {name: "Örtüşen kümeler", params: {spread: 1.6, it: 20}, note: "Sınırlar belirsiz; k-means küresel, eşit boyutlu kümeler varsayar."}
+    questions:
+      - q: "k'yı 8'e çıkarınca J hep düşer mi? Bu k seçimi için ne anlama gelir?"
+        a: "Evet, k arttıkça en iyi J azalır (k = n'de 0). Bu yüzden J tek başına k seçemez; dirsek, siluet ya da BIC (GMM) kullanılır."
+    limits: "2B, eşit varyanslı Gauss kümeleri; 20 iterasyon."

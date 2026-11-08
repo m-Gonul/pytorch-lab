@@ -1,5 +1,7 @@
 Grafiği kâğıda çiz: iki girdi düğümü ($x$, $y$), bir toplama düğümü ($a$), bir çarpma düğümü ($f$). $y$'den **iki** ok çıktığına dikkat et.
 
+<!-- çözüm -->
+
 Geri geçişte $\partial f/\partial f = 1$ ile başla ve her düğümde aşağıdaki tabloyu kullan:
 
 | düğüm | yerel türevler |

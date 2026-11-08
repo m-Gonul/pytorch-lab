@@ -21,3 +21,11 @@ export const saved = {
   set: (k, v) => safe(() => localStorage.setItem("ptl.code." + k, v)),
   del: (k) => safe(() => localStorage.removeItem("ptl.code." + k)),
 };
+
+// Genel JSON anahtar–değer (öz değerlendirme, pratik, sınama geçmişi, notlar, yer imleri, tekrar kutuları).
+export const kv = {
+  get: (k, d = null) => safe(() => { const v = localStorage.getItem("ptl." + k); return v == null ? d : JSON.parse(v); }, d),
+  set: (k, v) => safe(() => localStorage.setItem("ptl." + k, JSON.stringify(v))),
+  del: (k) => safe(() => localStorage.removeItem("ptl." + k)),
+  keys: (prefix) => safe(() => Object.keys(localStorage).filter((x) => x.startsWith("ptl." + prefix)).map((x) => x.slice(4)), []),
+};

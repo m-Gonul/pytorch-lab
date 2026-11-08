@@ -11,3 +11,7 @@ Yanlı (V yanlışken hedef de yanlış), **düşük varyans**, her adımda öğ
 **Toplu güncelleme:** sınırlı veriyi tekrar tekrar sunarsak MC ve TD **farklı** cevaplara yakınsar: MC eğitim verisindeki getirilerin ortalamasını, TD ise verinin en çok olabilirlikli Markov modelinin değerini ("kesinlik eşdeğerliği"). Markov ortamlarda TD genelde daha iyi genelleştirir.
 
 **Arası:** n adımlı getiri $G^{(n)}_t=r_t+\cdots+\gamma^{n-1}r_{t+n-1}+\gamma^nV(s_{t+n})$; λ-getirisi $G^\lambda_t=(1-\lambda)\sum_n\lambda^{n-1}G^{(n)}_t$. Geriye bakış: **uygunluk izi** $e(s)\leftarrow\gamma\lambda e(s)+\mathbb 1[s=s_t]$, her adımda $V\leftarrow V+\alpha\delta_te$. λ = 0 → TD(0), λ = 1 → MC.
+
+:::tanım Bir RL ajanının bileşenleri ve ajan türleri
+Bir ajan şunlardan bir ya da birkaçını içerir: **politika** $\pi(a|s)$ (ne yapacağı), **değer fonksiyonu** $V(s)$ ya da $Q(s,a)$ (ne kadar iyi olduğu), **model** $\hat P(s'|s,a)$, $\hat r(s,a)$ (ortamın nasıl davrandığı). Buna göre: **değer tabanlı** (Q öğrenir, politika örtük: $\arg\max_aQ$; SARSA, Q-öğrenme, DQN), **politika tabanlı** (politikayı doğrudan parametreleştirir; REINFORCE), **aktör–eleştirmen** (ikisi birden; M11.9); ayrıca **modelsiz** (deneyimden doğrudan) ve **modele dayalı** (modeli öğrenip planlar; Dyna, MCTS — M11.10). Bu modülün MC ve TD yöntemleri modelsiz değer tahminidir; kontrol için **keşif** gerekir: hiç denenmemiş bir eylemin değeri öğrenilemez. Ek alıştırma E4 keşif yöntemlerini (ε-greedy, azalan ε, Boltzmann/softmax, iyimser başlangıç) aynı problemde karşılaştırır.
+:::

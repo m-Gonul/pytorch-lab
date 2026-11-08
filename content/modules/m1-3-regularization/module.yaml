@@ -92,3 +92,28 @@ homework:
     accept:
       - "Yol grafikleri: Lasso katsayıları tam sıfıra iner, ridge inmez."
       - "Ortogonal tasarımda kapalı formla birebir sonuç."
+
+labs:
+  - id: l1
+    lab: biasvar
+    title: "Derece, ridge λ ve veri miktarı: yanlılık–varyans"
+    goal: |
+      Aynı veriye giderek esnekleşen polinomlar uydur. Eğitim hatası dereceyle hep düşer; **test** hatası önce düşer sonra yükselir. Ridge cezası $\lambda\|w\|^2$ ağırlıkları küçülterek esnekliği dereceden bağımsız olarak kısar. Taban: gürültü varyansı $\sigma^2$'nin altına hiçbir model inemez.
+    predict:
+      q: "Derece 9, n = 15, λ ≈ 0. n'yi 200'e çıkarırsan test hatası ne olur?"
+      options:
+        - {t: "Belirgin düşer, σ²'ye yaklaşır", ok: true, why: "Varyans terimi ≈ (parametre sayısı)·σ²/n: n büyüdükçe esnek model de gürültüyü ezberleyemez."}
+        - {t: "Değişmez; derece aynı", why: "Yanlılık değişmez ama varyans n ile azalır."}
+        - {t: "Artar; daha çok gürültü var", why: "Gürültü düzeyi aynı, örnek sayısı arttı."}
+    presets:
+      - {name: "Aşırı uyum", params: {d: 12, lam: 1.0e-8, n: 15}, note: "13 parametre, 15 nokta: eğri noktalar arasında çılgınca salınır."}
+      - {name: "Ridge kurtarır", params: {d: 12, lam: 0.01, n: 15}, note: "Aynı derece; ceza ağırlık normunu küçültür, test hatası düşer."}
+      - {name: "Eksik uyum", params: {d: 1, lam: 1.0e-8, n: 50}, note: "Doğru eğriyi doğruyla yaklaşmak: eğitim hatası da yüksek."}
+      - {name: "Çok veri", params: {d: 12, lam: 1.0e-8, n: 200}, note: "Varyans n ile söner."}
+      - {name: "λ karşılaştırması", params: {d: 12, n: 20, lam: 1.0e-8, B: {lam: 0.05}}, note: "A cezasız, B ridge: kesikli çizgi B."}
+    questions:
+      - q: "Hata–λ grafiğinde λ çok büyüyünce test hatası neden yeniden yükseliyor?"
+        a: "Ceza ağırlıkları sıfıra iter; model sabit fonksiyona yaklaşır (yüksek yanlılık). En iyi λ, iki uç arasındaki U'nun dibidir — çapraz doğrulamayla seçilir."
+      - q: "Gürültü σ = 0 yapınca derece 15 hâlâ kötü mü?"
+        a: "Gürültü yoksa varyans terimi ortadan kalkar; yüksek derece düzgün bir fonksiyonu iyi yaklaşır (sayısal koşul dışında). Aşırı uyum, gürültüyü öğrenmenin adıdır."
+    limits: "Legendre tabanı ve kapalı form çözüm kullanılıyor (sayısal kararlılık için); x ∈ [−1, 1]'de düzgün örnekleme. Test hatası 200 noktalı ızgarada gerçek fonksiyona uzaklık + σ²."

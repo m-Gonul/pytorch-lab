@@ -97,3 +97,24 @@ homework:
     accept:
       - "28 × 28'de VIN başarı oranı ≥ %85, düz CNN'den en az 15 puan yüksek."
       - "K'ya karşı başarı grafiği; K < harita çapı olduğunda başarının düştüğü gösterilmiş."
+
+labs:
+  - id: l1
+    lab: valueiter
+    title: "Değer iterasyonu: γ-büzülme ve politika"
+    goal: "$V_{k+1}(s)=\\max_a\\sum_{s'}P(s'|s,a)[r+\\gamma V_k(s')]$. Bellman operatörü ∞-normda γ-büzülme olduğundan $\\|V_{k+1}-V_k\\|_\\infty\\le\\gamma^k\\|V_1-V_0\\|_\\infty$: log grafikte eğimi ln γ olan bir doğru. Kayma olasılığı ve adım ödülü, greedy politikanın ne kadar risk aldığını belirler."
+    predict:
+      q: "γ = 0.99 ile 10⁻⁶ hassasiyete kaç iterasyon gerekir (kabaca)?"
+      options:
+        - {t: "≈ 14", why: "Bu γ = 0.37 için."}
+        - {t: "≈ 1400", ok: true, why: "ln(10⁻⁶)/ln(0.99) ≈ 1375."}
+        - {t: "≈ 140", why: "Bu γ = 0.9 için (≈ 131)."}
+    presets:
+      - {name: "Kısa görüş", params: {g: 0.5, k: 30}, note: "γ küçükken uzak hedefin değeri γ^mesafe ile söner: uzak durumlarda politika anlamsızlaşır."}
+      - {name: "Riskli zemin", params: {slip: 0.5, k: 60}, note: "Kayma yüksek: çukurun yanından geçmek pahalı, politika dolaşır."}
+      - {name: "Acele et", params: {step: -0.6, slip: 0.3, k: 60}, note: "Adım cezası büyük: çukura düşme riskini göze alıp kısa yolu seçer."}
+      - {name: "Erken durdurma", params: {k: 3, B: {k: 40}}, note: "Değerler henüz yakınsamadan greedy politika çoğu zaman zaten doğrudur — politika iterasyonunun hızlı olmasının nedeni."}
+    questions:
+      - q: "Kalan hata sınırı γ^k R_max/(1−γ) neden gerçek farktan çok büyük?"
+        a: "En kötü durum sınırıdır; gerçek yakınsama hızı geçiş yapısına (ör. sönümlenen yolların sayısına) bağlıdır. Yine de eğim (ln γ) birebir tutar."
+    limits: "5 × 5 ızgara, iki duvar; kayma yalnız sağa/sola dik yönde."

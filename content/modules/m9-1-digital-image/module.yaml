@@ -61,6 +61,7 @@ extras:
   - {id: x1, title: "Bit düzlemleri ve yanlış kontur", engine: browser}
   - {id: x2, title: "Mesafe dönüşümleri: iki geçişli $D_4$ ve $D_8$", engine: browser}
   - {id: x3, title: "Döndürme ve bağlantı noktalarından afin kestirimi", engine: browser}
+  - {id: x4, title: "Bayer mozaiği ve demozaikleme: tek sensörden renkli görüntü", engine: browser}
 
 quiz:
   - q: "`cv2.resize` hedef pikselin kaynak koordinatını neden $(x+0.5)s-0.5$ ile hesaplar, $x\\cdot s$ ile değil?"

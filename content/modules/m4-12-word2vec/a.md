@@ -1,3 +1,5 @@
+<!-- çözüm -->
+
 One-hot: $\|e_i-e_j\|^2=1+1=2$. OOV: 10 000 + 100. Embedding: 20 × 10 = 200 (bias yok).
 
 Çiftler: konum 0 → 2 bağlam, 1 → 3, 2 → 4, 3 → 3, 4 → 2: **14**.

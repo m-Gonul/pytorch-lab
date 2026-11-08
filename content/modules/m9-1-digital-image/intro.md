@@ -24,3 +24,11 @@ $$
 **Komşuluk ve mesafe:** 4-komşular yatay/dikey, 8-komşular çaprazları da içerir; $D_4=|\Delta x|+|\Delta y|$, $D_8=\max(|\Delta x|,|\Delta y|)$, $D_e=\sqrt{\Delta x^2+\Delta y^2}$.
 
 Test görüntüleri: `skimage.data.camera()` (512 × 512) gibi scikit-image ile gelen kamu malı görüntüler; tarayıcıda da yüklenir.
+
+:::sezgi Görüntüyü kim, hangi dalga boyunda üretiyor?
+"Görüntü" yalnız görünür ışık değildir; **görüntüleme modalitesi** algılanan fiziksel büyüklüğe göre değişir. Elektromanyetik spektrumda kısa dalgadan uzuna: gama ışını (nükleer tıp, PET; ~10⁻⁶ µm), X-ışını (röntgen, BT; ~10⁻⁴ µm), morötesi (floresan mikroskopi, astronomi), görünür ışık (0.4–0.7 µm; kameralar), kızılötesi (termal kameralar, uydu bitki örtüsü; 1–1000 µm), mikrodalga (sentetik açıklıklı radar, SAR; bulutun içinden görür), radyo (MRI; hidrojen çekirdeklerinin radyo frekansı yanıtı). Elektromanyetik olmayanlar: ultrason (ses yankısı), elektron mikroskobu. Hepsi sonunda aynı şeye dönüşür: bir ızgara üzerinde örneklenmiş, nicemlenmiş sayılar — bu modülün konusu.
+:::
+
+:::tanım Tek sensörlü renkli kamera: Bayer deseni
+Bir görüntü algılayıcısının her pikseli yalnız ışık **şiddetini** ölçer. Renk için önüne bir **renk süzgeci dizisi** (CFA) konur; en yaygını Bayer deseni (RGGB): 2 × 2'lik her blokta bir kırmızı, iki yeşil, bir mavi süzgeç. Yeşil iki kat örneklenir çünkü insan gözünün parlaklık duyarlılığı en çok yeşildedir (koni hücrelerinin tepkileri M ve L konilerinde örtüşür). Her pikselde eksik iki renk komşulardan **kestirilir** (demozaikleme); kenarlarda yanlış renk (*false color*) ve fermuar (*zipper*) artefaktları bu kestirimden gelir. Ek alıştırma E4'te kendin yapacaksın.
+:::

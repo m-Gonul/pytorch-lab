@@ -13,3 +13,7 @@
 $$T_{ij}=P(s_{t+1}=S_i\mid s_t=S_j),\qquad\mathbf p_{t+1}=T\mathbf p_t,\qquad\mathbf p_n=T^n\mathbf p_0.$$
 
 (Bu modülde sütunlar "nereden", satırlar "nereye"; sütun toplamları 1. MDP modüllerinde satır-stokastik $P=T^\top$ da kullanılacak.) **Durağan dağılım:** $T\boldsymbol\pi=\boldsymbol\pi$ — özdeğer 1'in özvektörü; indirgenemez ve periyodik olmayan zincirde tek ve her başlangıçtan yakınsanır.
+
+:::sezgi Pekiştirmeli öğrenme nerede duruyor?
+**Denetimli öğrenme:** her girdi için doğru cevap (etiket) verilir; hata doğrudan ölçülür. **Denetimsiz:** etiket yok; verinin yapısı (küme, yoğunluk, düşük boyutlu temsil) aranır. **Yarı denetimli:** az etiketli + çok etiketsiz veri. **Pekiştirmeli öğrenme:** doğru cevap yok, yalnız bir **ödül sinyali** var — üstelik gecikmeli (iyi bir hamlenin değeri oyunun sonunda belli olur) ve ajanın kendi eylemleri hangi veriyi göreceğini belirler (veri i.i.d. değil). Kökü hayvan psikolojisinde: Thorndike'ın etki yasası, Pavlov ve Skinner'ın koşullanması, ödül tahmin hatasının dopamin nöronlarıyla ilişkisi (TD hatası, M11.4). Uygulamalar: oyunlar (Atari, Go — M11.6, M11.11), robotik, envanter ve dinamik fiyatlandırma (M11.2), öneri sistemleri ve reklam (çevrimiçi karar: haydutlar, M11.7–11.8), algoritmik alım satım (durağan olmayan, gürültülü ödül — dikkatli değerlendirme gerektirir), büyük dil modellerinin insan tercihleriyle hizalanması (RLHF, M4.16). Bu modülde temel taş: geleceğin yalnız şimdiye bağlı olduğu rastgele süreçler — Markov zincirleri.
+:::

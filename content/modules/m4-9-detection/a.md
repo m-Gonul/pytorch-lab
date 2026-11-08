@@ -1,3 +1,5 @@
+<!-- çözüm -->
+
 IoU: kesişim $[3,5]\times[2,5]$ = 2·3 = 6; birleşim 16 + 16 − 6 = 26 → 0.2308.
 
 NMS: 0.9'luk kutu kalır; (1,1,11,11) ile IoU = 81/119 = 0.68 → silinir. 0.7'lik kalır; (8,8,18,18) ilk kutuyla 4/196 → kalır; (21,19,31,29) ile 0.7'lik arasında 81/119 → silinir. **3 kutu.**

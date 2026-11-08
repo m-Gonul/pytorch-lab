@@ -111,3 +111,17 @@ homework:
     accept:
       - "DPO aynı KL'de PPO'dan yüksek ya da eşit ödül verir."
       - "β küçüldükçe ödül ve KL birlikte artar (sınır eğrisi)."
+
+labs:
+  - id: l1
+    lab: softmaxT
+    title: "Örnekleme sıcaklığı: aynı logitler, farklı dağılımlar"
+    goal: "Dil modeli bir sonraki token için logit üretir; örnekleme $p\\propto e^{z/T}$'den yapılır. T < 1 dağılımı keskinleştirir (tekrarcı, güvenli), T > 1 düzleştirir (yaratıcı, hatalı). Sabit eklemek hiçbir şeyi değiştirmez — softmax kayma değişmezdir."
+    presets:
+      - {name: "Greedy'ye yakın", params: {T: 0.1}, note: "Neredeyse argmax."}
+      - {name: "Yaratıcı", params: {T: 2}, note: "Kuyruktaki token'ların payı belirgin."}
+      - {name: "Kayma değişmezliği", params: {shift: 40, B: {shift: -40}}, note: "Çubuklar birebir aynı."}
+    questions:
+      - q: "Entropi T ile nasıl değişir? Hangi T'de ln K'ya ulaşır?"
+        a: "Monoton artar; yalnız T → ∞ limitinde (ya da tüm logitler eşitse) ln K olur."
+    limits: "Sabit, yapay logit dizisi; gerçek modellerde top-k/top-p ile kuyruk ayrıca kesilir."
