@@ -184,3 +184,100 @@ whatif:
     a: "Alt gradyan seçilir (ReLU'da 0'da genelde 0); ölçüsü sıfır kümede olduğu için pratikte sorun çıkmaz."
   - q: "Çıktı skaler değil de vektörse?"
     a: "Tek bir gradyan yoktur, Jacobian vardır; ters mod her çıktı için bir geçiş ister (ya da `backward(v)` ile bir VJP)."
+
+labs:
+  - id: l1
+    lab: numdiff
+    title: "Sekanttan teğete: ileri fark, merkezi fark ve en iyi h"
+    goal: |
+      Soldaki grafikte $x_0$ ve $x_0+h$'den geçen sekant (turuncu kesikli) ile gerçek teğeti (yeşil) karşılaştır. Sağdaki grafik, $h$'yi $10^{-14}$'ten $1$'e kadar tarayıp iki yaklaşımın mutlak hatasını log–log çizer. Seçili $h$ dikey çizgiyle işaretlidir.
+    predict:
+      q: "float64'te ileri farkla $f'(x)$'i hesaplarken $h=10^{-14}$ seçmek $h=10^{-8}$'e göre daha mı doğrudur?"
+      options:
+        - {t: "Hayır, daha kötüdür: f(x+h) − f(x) farkı yuvarlama gürültüsüne gömülür", ok: true, why: "Yuvarlama hatası ~ε|f|/h: h = 10⁻¹⁴'te ~10⁻², h = 10⁻⁸'de ~10⁻⁸. Kesme hatası ise ~h|f''|/2. Toplamın en küçüğü h ≈ √ε ≈ 10⁻⁸ civarında."}
+        - {t: "Evet, h küçüldükçe her zaman daha doğru", why: "Bu, gerçek sayılarda (sonsuz hassasiyet) doğrudur; kayan noktada farkı alınan iki sayı neredeyse eşit olunca göreli hata patlar."}
+        - {t: "İkisi aynıdır", why: "Hata eğrisi V biçimlidir; iki uç farklı mekanizmalardan gelir."}
+    presets:
+      - {name: "Büyük h", params: {fn: 0, x0: 1, h: 0.8, prec: 0}, note: "Sekant teğetten belirgin biçimde ayrılıyor: kesme hatası (eğrilik f''(1) = 6)."}
+      - {name: "En iyi bölge", params: {fn: 0, x0: 1, h: 0.00001, prec: 0}, note: "Merkezi fark için h ≈ ∛ε ≈ 10⁻⁵ civarı: hata ~10⁻¹⁰."}
+      - {name: "Çok küçük h", params: {fn: 1, x0: 1, h: 1e-13, prec: 0}, note: "Yuvarlama baskın: ileri fark bile birkaç basamakta yanlış."}
+      - {name: "float32", params: {fn: 3, x0: 0.5, h: 0.0001, prec: 1}, note: "float32'de ε ≈ 10⁻⁷: V'nin dibi ~10⁻³–10⁻⁵. Gradyan kontrolünü bu yüzden float64'te yap."}
+      - {name: "ReLU kırılması", params: {fn: 4, x0: 0, h: 0.001, prec: 0}, note: "x₀ = 0'da sol ve sağ eğim farklı (0 ve 1): merkezi fark 0.5 verir, hangi h olursa olsun."}
+      - {name: "Kırılmaya yakın", params: {fn: 5, x0: 0.0005, h: 0.001, prec: 0}, note: "x₀ türevli bir noktada (türev 1) ama h kırılmayı aşıyor: merkezi fark yanlış (0.5). Gradyan kontrolündeki yanlış alarmların kaynağı."}
+    questions:
+      - q: "Hata grafiğinin sağ kolunda ileri farkın eğimi ~1, merkezi farkın eğimi ~2. Nedenini Taylor açılımıyla açıkla."
+        a: "İleri fark hatası $\\tfrac12f''(x)h$ (h'nin 1. kuvveti), merkezi farkta çift dereceli terimler sadeleştiği için $\\tfrac16f'''(x)h^2$. Log–log ölçekte $h^p$ eğimi $p$ olan bir doğrudur."
+      - q: "$f=$ eˣ, $x_0$ büyükken (ör. 3) V'nin dibi neden yükselir?"
+        a: "Yuvarlama hatası $\\varepsilon|f|/h$ ile orantılıdır ve $|f|=e^3\\approx20$; mutlak hata büyür. Göreli hataya bakmak bu yüzden daha anlamlıdır."
+      - q: "$f=x^3-2x$ için merkezi fark, $h$ büyükken bile neden çok doğru?"
+        a: "Merkezi farkın hatası $\\tfrac16f'''h^2$ ve $f'''=6$ sabit: hata tam olarak $h^2$, daha yüksek dereceli terim yok. $h=0.3$'te hata $0.09$; ileri farkta ise $\\tfrac12f''(x)h=3xh$ ($x_0=1$'de $0.9$) artı $h^2$."
+    limits: "float32 benzetimi, her ara sonucu Math.fround ile yuvarlar; gerçek float32 donanım hesabına çok yakındır ama fonksiyonun kendisi (sin, exp) float64'te hesaplanıp sonra yuvarlanır. Yalnız tek değişkenli fonksiyonlar."
+  - id: l2
+    lab: graphstep
+    title: "Hesap grafiğinde adım adım geri yayılım"
+    goal: |
+      Bir ifade seç, girdileri değiştir ve "İleri" düğmesiyle (ya da ← → tuşlarıyla) ilerle. Önce düğüm değerleri soldan sağa (yeşil), sonra gradyanlar sağdan sola (turuncu) hesaplanır. Her geri adımda hangi kenardan ne aktığı ve neyin çarpıldığı yazılır. Son adımda sonuç merkezi farkla karşılaştırılır.
+    predict:
+      q: "Üçüncü ifadede ($f=\\max(x\\cdot y,0)+x$) $x=2$, $y=-1$ iken $\\partial f/\\partial y$ kaçtır?"
+      options:
+        - {t: "0 — ReLU kapalı (xy = −2 < 0), gradyan y'ye ulaşmaz", ok: true, why: "max kapısı yönlendiricidir: kaybeden (burada xy, çünkü 0 > −2) gradyan almaz."}
+        - {t: "x = 2", why: "Bu, ReLU açık olsaydı çarpma kapısının y'ye vereceği değerdi."}
+        - {t: "1", why: "1, x'in doğrudan (toplama) yolundan gelen katkıdır; y'nin böyle bir yolu yok."}
+    presets:
+      - {name: "Modülün el hesabı", params: {expr: 0, x: 2, y: 3, step: 0}, note: "Hand bölümündeki örnek: sonda ∂f/∂y = 5 + 3 = 8 olduğunu, iki yolun toplandığını izle."}
+      - {name: "Nöron, sonucu göster", params: {expr: 1, w: 0.8, x: 1.5, b: -0.5, t: 1, step: -1}, note: "Ders metnindeki 'Tam bir örnek' bölümüyle aynı sayılar. Geri adımlarla tek tek doğrula."}
+      - {name: "Doymuş sigmoid", params: {expr: 1, w: 4, x: 2, b: 1, t: 0, step: -1}, note: "z = 9: σ'(z) ≈ 1.2·10⁻⁴. Kayıp büyük (a ≈ 1, hedef 0) ama gradyan neredeyse sıfır — sigmoid + kare kaybın öğrenmeyi durdurduğu durum (M2.3: çapraz entropi bunu çözer)."}
+      - {name: "ReLU kapalı", params: {expr: 2, x: 2, y: -1, step: -1}, note: "y'nin gradyanı 0; x yalnız doğrudan yoldan 1 alır."}
+      - {name: "ReLU açık", params: {expr: 2, x: 2, y: 1.5, step: -1}, note: "Artık iki yol da açık: ∂f/∂x = y + 1 = 2.5, ∂f/∂y = x = 2."}
+    questions:
+      - q: "Nöron ifadesinde $x$'i 0 yaparsan $\\partial L/\\partial w$ ne olur? Neden?"
+        a: "0 olur: $\\partial L/\\partial w=\\partial L/\\partial z\\cdot x$. Girdisi sıfır olan bağlantının ağırlığı o örnekten hiç öğrenmez; bias ise öğrenmeye devam eder."
+      - q: "Birinci ifadede geri geçişte $y$'ye neden iki ayrı adımda gradyan gelir?"
+        a: "$y$ iki düğümde kullanılıyor ($a=x+y$ ve $f=a\\cdot y$). Çok değişkenli zincir kuralı her yolun katkısını toplar; ters topolojik sıra sayesinde $y$ işlenmeden önce iki katkı da gelmiş olur."
+    limits: "Skaler düğümlerle küçük grafikler; gerçek ağlarda düğümler tensördür ve yerel türevler Jacobian–vektör çarpımı olarak uygulanır (ders metni, 'İleri mod ve ters mod'). Girdi kutularına sayı yazınca grafik hemen yeniden hesaplanır."
+  - id: l3
+    lab: jacmap
+    title: "Jacobian: eğri dönüşümün yerel doğrusal yaklaşımı"
+    goal: |
+      Soldaki düzlemde $p$ noktasını sürükle (ya da odaklanıp ok tuşlarıyla taşı). $p$'nin çevresindeki küçük kare (kenarı $2\varepsilon$) sağda $g$ ile dönüşür (mavi, eğri olabilir). Turuncu kesikli paralelkenar aynı karenin $J(p)$ ile doğrusal görüntüsüdür. $\varepsilon$'u küçült ve "yakınlaştır"ı aç: ikisi çakışır. Tablo $J$'yi formülle ve sayısal olarak, $\det J$'yi ve görüntünün alan oranını verir.
+    predict:
+      q: "Kutupsal dönüşümde $r$ küçülürken (θ sabit) aynı küçük karenin görüntüsünün alanı nasıl değişir?"
+      options:
+        - {t: "Küçülür: det J = r, r → 0'da sıfıra gider", ok: true, why: "θ yönündeki adım çıktıda r·dθ uzunluğunda bir yay olur; orijine yaklaştıkça yaylar kısalır. r = 0'da tüm θ'lar aynı noktaya gider: dönüşüm orada tersinmez."}
+        - {t: "Hep aynı kalır", why: "Bu yalnız det J sabitse (ör. döndürmeler) olur."}
+        - {t: "Büyür", why: "det J = r; r büyüdükçe büyür, küçüldükçe küçülür."}
+    presets:
+      - {name: "Modülün alıştırması", params: {map: 0, px: 2, py: 2.4, eps: 0.2, zoom: false}, note: "g(x, y) = (xy, x + y²): J = [[y, x], [1, 2y]]. Hand bölümündeki Jacobian (2, 3)'te; burada kenara sığsın diye (2, 2.4)."}
+      - {name: "Küçük ε, yakın", params: {map: 0, px: 1, py: 1, eps: 0.02, zoom: true}, note: "Eğri görüntü ile paralelkenar neredeyse aynı: türev = en iyi doğrusal yaklaşım."}
+      - {name: "Büyük ε, yakın", params: {map: 0, px: 1, py: 1, eps: 0.8, zoom: true}, note: "Yaklaşım bozuluyor: göreli hata ε ile orantılı."}
+      - {name: "det J = 0", params: {map: 0, px: 0.5, py: 0.5, eps: 0.15, zoom: true}, note: "det J = 2y² − x = 0.5 − 0.5 = 0: kare bir doğruya ezilir. Bu noktada g yerel olarak tersinmez."}
+      - {name: "Kutupsal, orijine yakın", params: {map: 1, px: 0.3, py: 0.8, eps: 0.15, zoom: false}, note: "det J = r = 0.3: görüntü küçük ve eğri bir yay parçası."}
+      - {name: "Doğrusal dönüşüm", params: {map: 3, px: 0.5, py: 0.5, eps: 0.8, zoom: false}, note: "J her yerde aynı ve yaklaşım tam (hata 0): doğrusal bir dönüşümün türevi kendisidir."}
+    questions:
+      - q: "Tabloda görüntü alanı / kare alanı ile det J ne zaman birbirinden ayrılıyor?"
+        a: "ε büyükken: alan oranı karenin her noktasındaki det J'nin ortalamasıdır, det J ise yalnız p'deki değer. ε → 0'da ikisi eşitlenir (değişken değiştirme formülünün temeli; normalizing flow'larda log|det J|)."
+      - q: "J'nin birinci sütunu çıktı düzleminde neye karşılık gelir?"
+        a: "Girdide yalnız birinci koordinat yönünde (x ya da r) küçük bir adımın çıktıdaki yer değiştirme vektörüne (birim adım başına). Paralelkenarın bir kenarı."
+    limits: "Yalnız ℝ² → ℝ² dönüşümler. Girdap dönüşümünün J'si analitik değil, merkezi farkla hesaplanır (tablodaki iki sütun bu yüzden aynı). Alan oranı sınırın 240 noktasıyla yaklaşık hesaplanır."
+  - id: l4
+    lab: gradfield
+    title: "Gradyan, konturlar ve yönlü türev"
+    goal: |
+      Koyu bölgeler küçük $f$ değerleridir. Gri noktalar $p$'den geçen eş-yükselti eğrisidir. Kırmızı ok $\nabla f(p)$'nin yönü, mavi ok seçtiğin birim yön $u$. Sağdaki grafik, $u$'yu tam bir tur döndürünce yönlü türevin nasıl değiştiğini gösterir.
+    predict:
+      q: "Eliptik çanakta (½x² + 2y²) $p=(1.2,\\ 0.6)$ iken $-\\nabla f$ doğrudan minimuma (orijine) mı bakar?"
+      options:
+        - {t: "Hayır: ∇f = (1.2, 2.4), −∇f orijin yönüne (−1.2, −0.6) göre dar eksene doğru sapar", ok: true, why: "Gradyan konturlara diktir; uzun elipslerde kontura dik yön merkeze bakmaz. Gradyan inişinin zikzakının nedeni."}
+        - {t: "Evet, gradyan her zaman minimumu gösterir", why: "Yalnız konturlar çemberse (izotropik çanak) doğru."}
+        - {t: "Gradyan minimuma dik bakar", why: "Gradyan konturlara diktir, minimuma değil."}
+    presets:
+      - {name: "Gradyan yönünde", params: {fn: 0, px: 1.2, py: 0.6, th: 63}, note: "θ ≈ ∇f'nin açısı (63.4°): yönlü türev ‖∇f‖'ye eşit (en büyük)."}
+      - {name: "Kontura teğet", params: {fn: 0, px: 1.2, py: 0.6, th: 153}, note: "θ = 63° + 90°: u konturlara teğet, yönlü türev ≈ 0."}
+      - {name: "Eyer noktası", params: {fn: 1, px: 0, py: 0, th: 0}, note: "∇f = 0 ama minimum değil: x yönünde yukarı, y yönünde aşağı kıvrılır. Gradyan tek başına minimumu eyerden ayıramaz (Hessian gerekir)."}
+      - {name: "Muz vadisi", params: {fn: 2, px: -1, py: 0.5, th: 0}, note: "Gradyan vadinin dik duvarına bakar; minimum (1, 1) çok farklı yönde."}
+    questions:
+      - q: "Sağdaki eğri neden her fonksiyonda saf bir kosinüs?"
+        a: "$D_uf=\\nabla f\\cdot(\\cos\\theta,\\sin\\theta)=\\|\\nabla f\\|\\cos(\\theta-\\theta_\\nabla)$. Fonksiyon ne olursa olsun, sabit bir noktada yönlü türev $u$'nun doğrusal bir fonksiyonudur (türevlenebilirliğin anlamı)."
+      - q: "Tablodaki formülle hesaplanan ve sayısal yönlü türev neden aynı?"
+        a: "Türevlenebilir bir fonksiyonda $D_uf=\\nabla f\\cdot u$ eşitliği kesindir; sayısal değer $u$ boyunca merkezi farkla, $h=10^{-5}$ ile hesaplanır ve hata ~$10^{-10}$'dur."
+    limits: "Eş-yükselti eğrisi 220 × 220 ızgarada işaret değişimiyle bulunur (noktalı görünür). Isı haritası rengi göreli; muz vadisinde log ölçekli. Görselde eksenler eşit ölçekli olsun diye grafik kare tutulur."

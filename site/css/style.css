@@ -610,7 +610,7 @@ figure.fig figcaption { font-size: 0.86rem; color: var(--ink-2); text-align: lef
 /* sürüklenebilir vektör şekli */
 .dd-wrap { display: grid; grid-template-columns: minmax(260px, 420px) 1fr; gap: 14px; align-items: start; }
 @media (max-width: 760px) { .dd-wrap { grid-template-columns: 1fr; } }
-svg.dd { width: 100%; height: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; touch-action: none; font-family: var(--font); }
+svg.dd { width: 100%; height: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; touch-action: none; user-select: none; -webkit-user-select: none; font-family: var(--font); }
 .dd-gl { stroke: var(--line-2); } .dd-ax { stroke: var(--ink-3); }
 .dd-tk { fill: var(--ink-3); font-size: 10px; text-anchor: middle; }
 .dd-a { stroke: var(--c-a); stroke-width: 3; } .dd-b { stroke: var(--c-b); stroke-width: 3; } .dd-p { stroke: var(--c-p); stroke-width: 4; opacity: 0.85; }
@@ -635,3 +635,33 @@ figure.fig { max-width: 440px; }
 .mg-mat { font-family: var(--mono); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .mg-m { display: inline-grid; grid-template-columns: auto auto; gap: 2px 12px; padding: 2px 8px; border-left: 2px solid var(--ink-2); border-right: 2px solid var(--ink-2); border-radius: 3px; }
 .mg-m span:nth-child(odd) { color: var(--c-a); } .mg-m span:nth-child(even) { color: var(--c-b); }
+/* M0.3 hesap grafiği adımlayıcı */
+.gs-bar { flex-wrap: wrap; gap: 8px 14px; }
+.gs-vars { display: inline-flex; flex-wrap: wrap; gap: 6px 12px; }
+.gs-in input { width: 5.5em; }
+.gs-in input[aria-invalid="true"] { outline: 2px solid var(--c-b); }
+.gs-wrap { overflow-x: auto; margin: 8px 0; }
+.gs-wrap svg.gs { min-width: 560px; width: 100%; height: auto; display: block; }
+.gs-n rect { fill: var(--paper); stroke: var(--ink-3); stroke-width: 1.4; }
+.gs-n.inp rect { stroke-dasharray: 4 3; }
+.gs-n.cur rect { stroke: var(--c-a); stroke-width: 3; }
+.gs-n.tgt rect { stroke: var(--c-b); stroke-width: 2.4; }
+.gs-l { font-size: 12.5px; fill: var(--ink); font-weight: 600; }
+.gs-v { font-size: 13px; fill: var(--c-p); font-family: var(--mono); }
+.gs-g { font-size: 12px; fill: var(--c-b); font-family: var(--mono); }
+.gs-e { stroke: var(--ink-3); stroke-width: 1.5; } .gs-e.on { stroke: var(--c-b); stroke-width: 3; }
+.gs-arf { fill: var(--ink-3); }
+.gs-msg { min-height: 3.2em; border-left: 3px solid var(--c-a); padding: 4px 10px; margin: 6px 0; }
+.gs-kv { color: var(--c-p); font-weight: 700; } .gs-kg { color: var(--c-b); font-weight: 700; }
+/* M0.3 Jacobian haritası */
+.jm-wrap { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0; }
+.jm-pane { flex: 1 1 260px; max-width: 380px; margin: 0; }
+.jm-pane figcaption { font-size: 0.85rem; color: var(--ink-2); margin-bottom: 4px; }
+svg.jm { width: 100%; height: auto; user-select: none; -webkit-user-select: none; border: 1px solid var(--line, #d6dbe1); border-radius: 6px; background: var(--paper); touch-action: none; }
+.jm-sq { fill: none; stroke: var(--c-a); stroke-width: 1.4; }
+.jm-img { fill: none; stroke: var(--c-a); stroke-width: 1.6; }
+.jm-lin { fill: var(--c-b); fill-opacity: 0.08; stroke: var(--c-b); stroke-width: 2.2; stroke-dasharray: 6 4; }
+.jm-bg { fill: none; stroke: var(--c-q); stroke-opacity: 0.28; }
+.jm-gp { fill: var(--c-p); }
+.jm-ax { font-size: 12px; fill: var(--ink-2); }
+.jm-read .mg-m { font-family: var(--mono); }
