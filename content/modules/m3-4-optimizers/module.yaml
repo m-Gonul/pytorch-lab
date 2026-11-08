@@ -72,3 +72,34 @@ quiz:
       - {t: "Tüm tensör listesini tek bir dispatch ile işler; mümkünse işleri birleştirilmiş (multi-tensor apply) kernel'lara toplar", ok: true, why: "Binlerce küçük parametre tensörü olan modellerde optimizer adımının çoğu Python + dispatch maliyetidir. `foreach=True` PyTorch optimizer'larında varsayılan."}
       - {t: "Gradyanları daha doğru hesaplar", why: "Sayısal sonuç aynı; kazanç hızda."}
       - {t: "Bellek kullanımını yarıya indirir", why: "Bellek değil, çağrı sayısı azalır."}
+
+extras:
+  - {id: x1, title: "Unutma faktörü, ağır top ve Nesterov momentumu (ders alıştırması 3)", engine: browser}
+  - {id: x2, title: "AdaGrad, AdaMax, Nadam ve seyrek öznitelikler", engine: browser}
+  - {id: x3, title: "Öğrenme oranı takvimleri: power, üstel, parçalı, performans, 1cycle", engine: browser}
+
+homework:
+  - title: "Sutskever, Martens, Dahl, Hinton (2013): başlatma ve momentumun önemi"
+    paper: "Sutskever, Martens, Dahl, Hinton — On the importance of initialization and momentum in deep learning (ICML 2013)"
+    url: "https://proceedings.mlr.press/v28/sutskever13.html"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin derin otomatik kodlayıcı deneyini küçük ölçekte tekrarla (MNIST, 784-400-200-100-50-25-6 simetrik AE, sigmoid): seyrek başlatma (her birime 15 rastgele bağlantı) ile klasik momentum ve Nesterov'u, makaledeki μ takvimiyle (Denk. 5: $\mu_t=\min(1-2^{-1-\log_2(\lfloor t/250\rfloor+1)},\mu_{max})$) karşılaştır; μ_max ∈ {0.9, 0.99, 0.995} için Tablo 1'deki gibi eğitim hatasını raporla. Nesterov'un yüksek μ'da daha kararlı olduğunu x1'deki kuadratik analizle ilişkilendir.
+    steps:
+      - "Son 'ince ayar' aşamasında μ'yu 0.9'a düşürmenin etkisini de ölç."
+    accept:
+      - "Nesterov, yüksek μ_max'ta klasik momentumdan belirgin düşük hata."
+      - "Rastgele (yoğun) başlatma ile seyrek başlatma farkı tabloda."
+  - title: "Smith & Topin (2019): süper yakınsama ve 1cycle"
+    paper: "Smith & Topin — Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates (2019)"
+    url: "https://arxiv.org/abs/1708.07120"
+    level: orta
+    hours: 8
+    goal: |
+      Öğrenme oranı aralık testini (LR range test: oranı üstel artırırken kaybı izle) uygula, bundan η₁'i seç; CIFAR-10'da küçük bir ResNet'i aynı epoch bütçesinde sabit oran, adım takvimi ve 1cycle (oran + ters momentum döngüsü 0.95 → 0.85 → 0.95) ile eğit. Makale Şekil 1'deki gibi doğruluk eğrilerini ve son doğrulukları raporla; az veri (CIFAR'ın %10'u) rejiminde farkın büyüdüğünü kontrol et.
+    steps:
+      - "PyTorch'ta OneCycleLR ile kendi x3 uygulamanı karşılaştır."
+    accept:
+      - "1cycle, aynı epoch'ta adım takviminden yüksek ya da eşit doğruluk."
+      - "LR aralık testi grafiği ve seçilen η₁ gerekçesi."

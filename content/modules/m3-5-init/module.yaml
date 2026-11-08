@@ -60,3 +60,34 @@ quiz:
       - {t: "Pürüzsüz ve negatif bölgede küçük gradyan geçirirler; ölü nöron sorunu azalır ve optimizasyon yüzeyi daha düzgündür", ok: true, why: "Sıfırda türevleri süreklidir. Bedeli biraz daha pahalı hesaplama."}
       - {t: "Doyarlar, bu yüzden kararlıdırlar", why: "Pozitif tarafta doymazlar (sigmoid/tanh'ın tersine)."}
       - {t: "Varyansı otomatik korurlar", why: "Başlatma hâlâ gereklidir."}
+
+extras:
+  - {id: x1, title: "SELU ve öz-normalizasyon: sabit nokta ve 50 katman", engine: browser}
+  - {id: x2, title: "ReLU ailesi: RReLU, PReLU, ELU, Mish ve ölü ReLU'lar", engine: browser}
+  - {id: x3, title: "Glorot, He, LeCun: ileri ve geri varyans dengesi", engine: browser}
+
+homework:
+  - title: "Klambauer ve ark. (2017): öz-normalize eden sinir ağları"
+    paper: "Klambauer, Unterthiner, Mayr, Hochreiter — Self-Normalizing Neural Networks (NeurIPS 2017)"
+    url: "https://arxiv.org/abs/1706.02515"
+    level: orta
+    hours: 8
+    goal: |
+      Makalenin Şekil 1'ini tekrarla: Fashion-MNIST'te 8, 16 ve 32 katmanlı tam bağlı ağları (a) SELU + LeCun normal, (b) ReLU + He + BatchNorm, (c) ReLU + He ile eğitip eğitim kaybı eğrilerini karşılaştır. x1'deki moment sabit noktasını SELU'nun (μ, ν) eşlemesinin Jacobian'ı üzerinden kararlılık analiziyle (Teorem 1: |özdeğerler| < 1) sayısal olarak doğrula. Alpha dropout'u (M3.7 x1) ekleyip normal dropout'la karşılaştır.
+    steps:
+      - "Moment eşlemesi: (μ, ν) → (E[selu(z)], E[selu(z)²]), z ~ N(μ, ν); Jacobian'ı sonlu farklarla."
+    accept:
+      - "SELU, BN'siz derin ağlarda ReLU'dan daha düzgün ve hızlı eğitim eğrisi."
+      - "Sabit noktada Jacobian'ın spektral yarıçapı < 1."
+  - title: "He ve ark. (2015): PReLU ve He başlatması"
+    paper: "He, Zhang, Ren, Sun — Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification (ICCV 2015)"
+    url: "https://arxiv.org/abs/1502.01852"
+    level: orta
+    hours: 8
+    goal: |
+      Makale Şekil 3'ün deneyini küçük ölçekte yap: 22 ve 30 katmanlı düz (atlama bağlantısız) CNN'leri CIFAR-10'da Xavier ve He başlatmasıyla eğit; 30 katmanlıda Xavier'in hiç öğrenemediğini, He'nin öğrendiğini göster. PReLU'nun öğrendiği α'ları katman ve kanal başına çiz (makale Tablo 1: ilk katmanlarda büyük, derinde küçük α).
+    steps:
+      - "Kanal başına ve katman başına paylaşılan PReLU'yu karşılaştır."
+    accept:
+      - "30 katmanda He başlatma yakınsar, Xavier takılır."
+      - "Öğrenilmiş α'ların derinlikle azaldığı grafik."

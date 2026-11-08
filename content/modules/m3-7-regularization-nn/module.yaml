@@ -73,3 +73,34 @@ quiz:
       - {t: "Durma kararı `patience` kadar kötüleşmeden sonra verilir; son ağırlıklar zaten aşırı uyumun başladığı noktadan sonradır", ok: true, why: "Bu yüzden en iyi `state_dict`'in kopyası (deepcopy) saklanır; referans saklamak yetmez, ağırlıklar yerinde değişir."}
       - {t: "Son ağırlıklar her zaman daha kötüdür", why: "Daha kötü olmak zorunda değil ama doğrulama hatasına göre en iyisi değil."}
       - {t: "Farketmez", why: "patience = 10 ile 10 epoch'luk aşırı uyum fark eder."}
+
+extras:
+  - {id: x1, title: "Alpha dropout: SELU ile uyumlu bırakma", engine: browser}
+  - {id: x2, title: "Max-norm düzenlileştirmesi", engine: browser}
+  - {id: x3, title: "Gradyan kırpma: değere göre vs (global) norma göre", engine: browser}
+
+homework:
+  - title: "Srivastava ve ark. (2014): Dropout"
+    paper: "Srivastava, Hinton, Krizhevsky, Sutskever, Salakhutdinov — Dropout: A Simple Way to Prevent Neural Networks from Overfitting (JMLR 2014)"
+    url: "https://jmlr.org/papers/v15/srivastava14a.html"
+    level: orta
+    hours: 8
+    goal: |
+      MNIST'te makale Tablo 2'nin küçük sürümü: 784-1024-1024-10 ağı (a) düzenlileştirmesiz, (b) L2, (c) dropout (giriş 0.2, gizli 0.5), (d) dropout + max-norm (r = 3) ile eğit. Şekil 7'deki gibi ilk katman özniteliklerini dropout'lu ve dropout'suz görselleştir; Şekil 8'deki seyreklik etkisini (gizli aktivasyonların histogramı ve ortalama aktivasyon) ölç. Ağırlık ölçekleme çıkarımını Monte Carlo ortalamasıyla (k örnek) karşılaştır (Şekil 11).
+    steps:
+      - "x2'deki max_norm'u PyTorch'a taşı (her optimizer adımından sonra torch.no_grad içinde)."
+    accept:
+      - "Dropout + max-norm en düşük test hatası."
+      - "Dropout'lu ağın gizli aktivasyonları daha seyrek."
+  - title: "Gal & Ghahramani (2016): Bayesçi yaklaşım olarak dropout"
+    paper: "Gal & Ghahramani — Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning (ICML 2016)"
+    url: "https://arxiv.org/abs/1506.02142"
+    level: orta
+    hours: 8
+    goal: |
+      c aşamasındaki MC dropout'u bir regresyon problemine uygula (makale Şekil 2: CO₂ verisi yerine kendi 1B gürültülü fonksiyonun, eğitim aralığının dışına çıkan test noktalarıyla): T = 100 stokastik geçişin ortalaması ve std'si ile tahmin aralıkları çiz; dropout olasılığı ve model hassasiyeti τ ile öngörü varyansını (Denk. 8: $\tau^{-1}+\mathrm{Var}$) hesapla. Rakamlarda (MNIST/digits) döndürülmüş "1" görüntüleri için sınıf olasılıklarının belirsizliğini çiz (Şekil 4).
+    steps:
+      - "Kalibrasyon: tahmin aralıklarının kapsama oranını nominal düzeyle karşılaştır."
+    accept:
+      - "Eğitim aralığı dışında belirsizlik büyür."
+      - "Döndürme açısı arttıkça sınıf olasılıklarının yayılımı artar."

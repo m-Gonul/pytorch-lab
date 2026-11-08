@@ -69,3 +69,34 @@ quiz:
       - {t: "E modelin ağırlıkları bir batch boyutuna dizilir; her katman E ayrı küçük matmul yerine tek bir batched matmul olur", ok: true, why: "Kernel çağrı sayısı E kat azalır. Küçük modellerde maliyetin çoğu çağrı başına sabit maliyettir (M0.2'deki ders)."}
       - {t: "Modeller ağırlık paylaşır", why: "Paylaşmaz; her biri kendi parametrelerini taşır."}
       - {t: "Gradyan hesaplamaz", why: "Kazanç ileri geçişte de var; vmap autograd ile de birleşir."}
+
+extras:
+  - {id: x1, title: "Dört geri yayılım denklemi (BP1–BP4) ve yavaş öğrenme", engine: browser}
+  - {id: x2, title: "Sigmoid vs tanh: sıfır merkezlilik ve doyma (ders alıştırması 2)", engine: browser}
+  - {id: x3, title: "MSE vs çapraz entropi: doymuş çıkışta öğrenme yavaşlaması", engine: browser}
+
+homework:
+  - title: "Rumelhart, Hinton, Williams (1986): geri yayılımın orijinal deneyleri"
+    paper: "Rumelhart, Hinton, Williams — Learning representations by back-propagating errors (Nature 1986)"
+    url: "https://www.nature.com/articles/323533a0"
+    level: başlangıç
+    hours: 6
+    goal: |
+      Makalenin iki deneyini c aşamasındaki NumPy ağınla tekrarla: (1) simetri tespiti — 6 girdili, 2 gizli nöronlu ağın, girdi vektörünün ayna simetrik olup olmadığını öğrenmesi ve öğrenilen ağırlıkların makaledeki Şekil 1'deki gibi "ayna" desenini (eşit büyüklük, zıt işaret, 1:2:4 oranları) alması; (2) 8-3-8 kodlayıcı — gizli katmanın 3 bitlik ikili kod keşfetmesi. Momentum (makale Denk. 9, α = 0.9) ile ve onsuz yakınsama sürelerini karşılaştır.
+    steps:
+      - "Ağırlıkları küçük rastgele değerlerle başlat; simetri kırma gerekliliğini sıfır başlatmayla göster."
+    accept:
+      - "Simetri ağında gizli ağırlık oranları ≈ 1:2:4 ve aynalı işaretler."
+      - "8-3-8'de gizli aktivasyonlar 8 farklı köşeye (ikili kod) yakınsar."
+  - title: "Nielsen (2015), Bölüm 2: geri yayılımın matris biçimi ve hız"
+    paper: "Nielsen — Neural Networks and Deep Learning, Ch. 2 'How the backpropagation algorithm works'"
+    url: "http://neuralnetworksanddeeplearning.com/chap2.html"
+    level: başlangıç
+    hours: 4
+    goal: |
+      x1'deki tek örnekli BP1–BP4'ü mini-batch matris biçimine çevir (tüm batch tek matris çarpımlarıyla) ve bölümün sonundaki "neden hızlı" argümanını ölç: parametre sayısı P olan ağda sonlu farklarla gradyan (P + 1 ileri geçiş) ile geri yayılımın (≈ 2 ileri geçiş) süresini P = 10²…10⁵ için karşılaştır.
+    steps:
+      - "Sonlu farkın doğruluğunu h ∈ {10⁻², 10⁻⁴, 10⁻⁶, 10⁻⁸} için çiz: kesme ve yuvarlama hatası dengesi."
+    accept:
+      - "Matris biçimi, döngülü sürümle aynı gradyanı verir."
+      - "Süre oranı P ile doğrusal büyür."

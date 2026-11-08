@@ -73,3 +73,34 @@ quiz:
       - {t: "$\\text{running}\\leftarrow0.9\\cdot\\text{running}+0.1\\cdot\\mu_B$; running_var için batch'in **yansız** ($\\frac1{N-1}$) varyansı kullanılır", ok: true, why: "Normalize ederken ise yanlı ($\\frac1N$) varyans kullanılır. CS231n'in momentum'u bunun tersi tanımlıdır (0.9 = eski değerin ağırlığı); d aşamasında bu farka dikkat."}
       - {t: "$\\text{running}\\leftarrow0.1\\cdot\\text{running}+0.9\\cdot\\mu_B$", why: "PyTorch'ta momentum yeni gözlemin ağırlığıdır."}
       - {t: "Tüm batch'lerin aritmetik ortalaması", why: "O `momentum=None` durumudur (kümülatif ortalama)."}
+
+extras:
+  - {id: x1, title: "Batch boyutu, BN gürültüsü ve yansız kayan varyans", engine: browser}
+  - {id: x2, title: "Çıkarımda BN'i önceki katmana katlamak", engine: browser}
+  - {id: x3, title: "BN'in ölçek değişmezliği ve etkin öğrenme oranı", engine: browser}
+
+homework:
+  - title: "Ioffe & Szegedy (2015): Batch Normalization"
+    paper: "Ioffe & Szegedy — Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift (ICML 2015)"
+    url: "https://arxiv.org/abs/1502.03167"
+    level: orta
+    hours: 8
+    goal: |
+      Makale Şekil 1'i tekrarla: MNIST'te 3 gizli katmanlı (100'er sigmoid) ağı BN'li ve BN'siz eğit; doğruluk eğrisini ve son gizli katmandaki tek bir nöronun girdisinin {15, 50, 85}. yüzdeliklerinin eğitim boyunca değişimini çiz. BN'li ağda öğrenme oranını 5× ve 30× artırıp (Bölüm 4.2.1) hâlâ eğitilebildiğini göster; x2'deki katlamayla çıkarım hızını ölç.
+    steps:
+      - "Yüzdelikleri sabit bir doğrulama batch'i üzerinde hesapla."
+    accept:
+      - "BN'siz ağda dağılım yüzdelikleri kayar, BN'li ağda kararlı."
+      - "BN'li ağ yüksek öğrenme oranında da yakınsar."
+  - title: "Wu & He (2018): Group Normalization"
+    paper: "Wu & He — Group Normalization (ECCV 2018)"
+    url: "https://arxiv.org/abs/1803.08494"
+    level: orta
+    hours: 8
+    goal: |
+      Makale Şekil 1'in küçük sürümü: CIFAR-10'da bir ResNet'i batch boyutu {32, 16, 8, 4, 2} ile BN ve GN (G = 32 ya da kanal/2) kullanarak eğit; doğruluğu batch boyutuna göre çiz. x1'deki gürültü ölçümünün, BN'in küçük batch'teki çöküşünü öngördüğünü göster; GN'in grup sayısı ablasyonu (Tablo 3).
+    steps:
+      - "Aynı epoch sayısında, öğrenme oranını batch boyutuyla doğrusal ölçekle."
+    accept:
+      - "BN küçük batch'te belirgin kötüleşir, GN hemen hemen sabit kalır."
+      - "Grup sayısı ablasyon tablosu."
