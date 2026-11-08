@@ -1,0 +1,105 @@
+id: m4-15-vit
+code: M4.15
+title: Vision Transformer (ViT)
+phase: 4
+minutes: 360
+prereq: [m4-14-transformer-ed, m4-8-cnn-blocks]
+summary: >
+  "An Image is Worth 16×16 Words" (Dosovitskiy ve ark. 2021): görüntüyü
+  P × P'lik yamalara bölüp her yamayı doğrusal izdüşümle bir token'a
+  çevirmek, başa öğrenilebilir [class] token'ı eklemek, öğrenilebilir 1B
+  konum embedding'leri, Pre-LN Transformer kodlayıcı ve MLP başı.
+  Yama sayısı, dizi uzunluğu ve ViT-B/16'nın 86M parametresi elle; yama
+  embedding'inin adımı P olan bir konvolüsyon olduğu (unfold = conv),
+  yüksek çözünürlükte ince ayar için konum embedding'lerinin 2B
+  interpolasyonu, ortalama attention uzaklığı. PyTorch'ta küçük bir ViT'i
+  CNN ile az veride karşılaştırmak (endüktif yanlılık), [class] token vs
+  GAP ve konum embedding'siz ViT. Ekler: 2B sin-cos konumlar, permütasyon
+  eşdeğerliği, Swin'in pencere attention'ı.
+goals:
+  - "[[yama embedding'i]]: $N=HW/P^2$; $x_pE$ = adımı P olan konvolüsyon"
+  - "[class] token, öğrenilebilir konum embedding'i, ViT-B/16 parametre sayımı"
+  - "Çözünürlük değişince konum embedding'lerini 2B interpolasyonla uyarlamak"
+  - "[[endüktif yanlılık]]: az veride CNN > ViT; konumsuz ViT bir yama torbasıdır"
+sources:
+  - {title: "Dosovitskiy ve ark. — An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (ICLR 2021)", url: "https://arxiv.org/abs/2010.11929", license: "arXiv", use: link}
+  - {title: "Touvron ve ark. — Training data-efficient image transformers & distillation through attention (DeiT, ICML 2021)", url: "https://arxiv.org/abs/2012.12877", license: "arXiv", use: link}
+  - {title: "Liu ve ark. — Swin Transformer (ICCV 2021)", url: "https://arxiv.org/abs/2103.14030", license: "arXiv", use: link}
+  - {title: "He ve ark. — Masked Autoencoders Are Scalable Vision Learners (CVPR 2022)", url: "https://arxiv.org/abs/2111.06377", license: "arXiv", use: link}
+  - {title: "UvA DL Notebooks — Tutorial 15: Vision Transformers", url: "https://uvadlc-notebooks.readthedocs.io/en/latest/tutorial_notebooks/tutorial15/Vision_Transformer.html", license: "MIT", use: link}
+  - {title: "d2l.ai — 11.8 Transformers for Vision", url: "https://d2l.ai/chapter_attention-mechanisms-and-transformers/vision-transformer.html", license: "CC-BY-SA 4.0", use: link}
+
+hand:
+  groups:
+    - title: "Yamalar"
+      fields:
+        - {id: n224, label: "224 × 224, P = 16: yama sayısı N", answer: 196}
+        - {id: seq, label: "[class] token'ıyla dizi uzunluğu", answer: 197}
+        - {id: n384, label: "384 × 384'te ince ayar, P = 16: N", answer: 576}
+        - {id: grid, label: "Konum embedding ızgarası 14 × 14'ten kaç × kaç'a interpole edilir? (kenar)", answer: 24}
+        - {id: cost, label: "Attention skor matrisi maliyet oranı (384 / 224, [class] dahil): $(577/197)^2$", answer: 8.578654435826742, tol: 1.0e-6}
+    - title: "ViT-B/16: D = 768, L = 12, MLP 3072, 1000 sınıf"
+      fields:
+        - {id: pe, label: "Yama embedding'i (RGB, bias dahil)", answer: 590592}
+        - {id: layer, label: "Bir kodlayıcı katmanı (MSA + MLP + 2 LN)", answer: 7087872}
+        - {id: total, label: "Toplam ([class], konum, son LN ve doğrusal baş dahil)", answer: 86567656}
+  verify: |
+    D, L, M = 768, 12, 3072
+    pe = 16 * 16 * 3 * D + D
+    layer = 4 * (D * D + D) + D * M + M + M * D + D + 4 * D
+    answers = dict(n224=196, seq=197, n384=576, grid=24, cost=(577 / 197) ** 2, pe=pe, layer=layer,
+                   total=pe + D + 197 * D + L * layer + 2 * D + D * 1000 + 1000)
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Konum embedding'leri: interpolasyon ve 2B sin-cos", engine: browser}
+  - {id: x2, title: "Konumsuz ViT = yama torbası (permütasyon eşdeğerliği)", engine: browser}
+  - {id: x3, title: "Swin: pencere attention'ı ve kaydırılmış pencereler", engine: browser}
+
+quiz:
+  - q: "ViT neden ImageNet boyutunda veride ResNet'in gerisinde kalıp JFT-300M'de onu geçer?"
+    options:
+      - {t: "CNN'in yerellik ve kaydırma eşdeğerliği önseli ViT'te (yalnız MLP ve yama düzeyinde) yoktur; az veride bu önsel avantajdır, çok veride ViT'in esnekliği öne geçer", ok: true, why: "Makale: 'large scale training trumps inductive bias'. d aşamasında küçük ölçekte görülür."}
+      - {t: "ViT'in daha az parametresi olduğu için", why: "Daha fazla ya da benzer."}
+      - {t: "Attention'ın yanlış uygulanması", why: "Hayır."}
+  - q: "Yama embedding'i neden bir konvolüsyonla yazılabilir?"
+    options:
+      - {t: "Her yamaya aynı doğrusal izdüşüm uygulanır ve yamalar örtüşmez: çekirdeği ve adımı P olan, D filtreli konvolüsyonun tanımı budur", ok: true, why: "c ve e aşamaları eşitliği gösterir."}
+      - {t: "Konvolüsyon daha doğru olduğu için", why: "Aynı hesap."}
+      - {t: "Yazılamaz", why: "Yazılabilir."}
+  - q: "Daha yüksek çözünürlükte ince ayar yaparken ne değişir?"
+    options:
+      - {t: "Yama boyutu sabit kalır, yama sayısı artar; önceden eğitilmiş konum embedding'leri artık anlamlı değildir → 2B ızgara olarak interpole edilir (ViT'te görüntünün 2B yapısının elle verildiği tek yer)", ok: true, why: "Makale Bölüm 3.2."}
+      - {t: "Yama boyutu büyütülür", why: "Önceden eğitilmiş embedding izdüşümü değişirdi."}
+      - {t: "Hiçbir şey", why: "Dizi uzunluğu değişir."}
+
+homework:
+  - title: "Dosovitskiy ve ark. (2021): ViT'i CIFAR-10'da sıfırdan"
+    paper: "Dosovitskiy ve ark. — An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (ICLR 2021)"
+    url: "https://arxiv.org/abs/2010.11929"
+    level: ileri
+    hours: 14
+    goal: |
+      d aşamasındaki ViT'i CIFAR-10'a taşı (32 × 32, P = 4, D = 192, L = 6): (1) artırmasız, (2) RandAugment + Mixup/CutMix + etiket yumuşatma ile eğit; aynı bütçeli bir ResNet-18 ile karşılaştır. Makalenin analizlerini küçük ölçekte tekrarla: öğrenilmiş konum embedding'lerinin benzerlik haritası (Şekil 7 orta), katman başına ortalama attention uzaklığı (Şekil 7 sağ, c aşamasındaki fonksiyonla), yama boyutu P ∈ {2, 4, 8} için doğruluk/hesap ödünleşimi.
+    steps:
+      - "Ortalama attention uzaklığı: başlar boyunca ve 100 test görüntüsü üzerinde ortala."
+    accept:
+      - "Artırma ViT'e CNN'den çok daha fazla yarar (endüktif yanlılık eksikliğini veri artırma telafi eder)."
+      - "İlk katmanlarda bazı başlar yerel (kısa uzaklık), bazıları küresel; derinlikle uzaklık artar."
+  - title: "Touvron ve ark. (2021): DeiT ve damıtma token'ı"
+    paper: "Touvron ve ark. — Training data-efficient image transformers & distillation through attention (ICML 2021)"
+    url: "https://arxiv.org/abs/2012.12877"
+    level: orta
+    hours: 10
+    goal: |
+      d aşamasındaki ViT'e [class] token'ının yanına bir damıtma token'ı ekle; öğretmen olarak eğitilmiş bir CNN kullanıp (d aşamasındaki ya da CIFAR'da ResNet) yumuşak (KL, sıcaklık τ) ve sert (öğretmenin argmax'ı) damıtmayı karşılaştır (makale Tablo 3). Çıkarımda iki token'ın başlarının ortalamasını kullan; iki token'ın vektörleri arasındaki kosinüs benzerliğinin katmanlar boyunca nasıl değiştiğini ölç.
+    steps:
+      - "Sert damıtma kaybı: ½ CE(Z_cls, y) + ½ CE(Z_dist, argmax öğretmen)."
+    accept:
+      - "CNN öğretmenli sert damıtma, damıtmasız DeiT'i geçer."
+      - "İki token'ın benzerliği derin katmanlarda artar ama 1'e ulaşmaz."

@@ -1,0 +1,2 @@
+- `patch_embed_unfold(x, W, b, P)` ve `patch_embed_reshape(x, W, b, P)` (`view` + `permute`; kopyasız yeniden şekillendirme) — `W (D, C·P·P)`.
+- Ölçüm: 224 × 224 görüntü, P ∈ {32, 16, 8}: dizi uzunluğu, bir ViT-S katmanının (D = 384, 6 baş) süresi ve attention payı.

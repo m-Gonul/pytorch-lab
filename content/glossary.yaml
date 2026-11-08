@@ -175,3 +175,5 @@ terms:
   cross-attention: "Sorguların bir diziden (kod çözücü), anahtar ve değerlerin başka bir diziden (kodlayıcı çıktısı) geldiği attention; kod çözücünün kaynak cümleye bakmasını sağlar."
   etiket yumuşatma: "Label smoothing: one-hot hedefi (1 − ε)·onehot + ε/V ile değiştirmek; modeli aşırı güvenden alıkoyar, logit'leri sınırlı tutar."
   noam takvimi: "Transformer öğrenme oranı takvimi: lr = d^{−1/2}·min(s^{−1/2}, s·w^{−3/2}) — w adım doğrusal ısınma, ardından 1/√s azalma."
+  yama embedding'i: "Patch embedding: görüntüyü P × P'lik örtüşmeyen yamalara bölüp her yamayı aynı doğrusal izdüşümle D boyutlu token'a çevirmek; çekirdeği ve adımı P olan konvolüsyona eşdeğer (ViT)."
+  endüktif yanlılık: "Inductive bias: modelin mimarisine gömülü, veriden önce gelen varsayımlar (CNN'de yerellik ve kaydırma eşdeğerliği gibi); az veride genellemeyi kolaylaştırır, çok veride esnekliği kısıtlayabilir."
