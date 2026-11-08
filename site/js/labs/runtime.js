@@ -36,6 +36,18 @@ export function evaluate(spec, p, seed = 1) {
 
 function mount(sec, spec, cfg) {
   const ui = sec.querySelector(".lab-ui");
+  if (spec.custom) {
+    // Serbest etkileşimli şekil: kendi çizimini ve olaylarını yönetir; senaryolar api.set ile uygulanır.
+    const api = spec.mount(ui, { init: cfg.init || {}, fmt, rng }) || {};
+    sec.querySelector(".lab-presets")?.addEventListener("click", (e) => {
+      const i = e.target.closest("[data-preset]")?.dataset.preset;
+      if (i == null || !api.set) return;
+      api.set(cfg.presets[i].params || {});
+      const n = sec.querySelector(".lab-preset-note"); if (n) n.innerHTML = cfg.presets[i].note || "";
+    });
+    for (const b of sec.querySelectorAll(".lab-predict .q-opt")) b.addEventListener("click", () => { b.classList.add(b.dataset.ok === "1" ? "ok" : "bad"); b.nextElementSibling.hidden = false; });
+    return;
+  }
   const base = defaults(spec, cfg.init);
   const st = { A: { ...base }, B: { ...base }, cmp: false, seed: 1 };
   const canCmp = spec.compare !== false;

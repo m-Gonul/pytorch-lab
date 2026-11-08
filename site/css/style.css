@@ -582,3 +582,47 @@ table.cov td:nth-child(2) { white-space: nowrap; }
 dfn.term::after { display: none; }
 dfn.term:hover::after, dfn.term:focus::after, dfn.term.open::after { display: block; }
 @media (max-width: 620px) { dfn.term:hover::after, dfn.term:focus::after, dfn.term.open::after { position: fixed; left: 12px; right: 12px; bottom: 12px; top: auto; width: auto; max-width: none; transform: none; } }
+
+/* ---- ders metni ve şekiller ---- */
+:root { --c-a: #2f6db5; --c-b: #c0622f; --c-p: #2c7a57; --c-q: #8a4fb0; }
+:root[data-theme="dark"] { --c-a: #7fb2ec; --c-b: #f0a072; --c-p: #6fcf9f; --c-q: #c79be6; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --c-a: #7fb2ec; --c-b: #f0a072; --c-p: #6fcf9f; --c-q: #c79be6; } }
+.lesson { border-top: 2px solid var(--line); margin-top: 32px; }
+.lesson-toc { border: 1px solid var(--line); border-radius: 9px; background: var(--sheet); padding: 6px 16px 8px; margin: 12px 0 20px; }
+.lesson-toc-title { margin: 4px 0; font-weight: 700; font-size: 0.9rem; }
+.lesson-toc ol { margin: 0; padding-left: 1.4em; columns: 2 260px; font-size: 0.92rem; }
+.lesson-toc li { break-inside: avoid; margin: 2px 0; }
+.lesson-body h3 { margin-top: 2.2em; padding-top: 0.6em; border-top: 1px solid var(--line-2); }
+.lesson-body h4 { margin-top: 1.4em; }
+figure.fig { margin: 18px auto; max-width: 560px; text-align: center; }
+figure.fig.wide { max-width: 760px; }
+figure.fig svg { width: 100%; height: auto; display: block; font-family: var(--font); }
+figure.fig figcaption { font-size: 0.86rem; color: var(--ink-2); text-align: left; margin-top: 6px; line-height: 1.45; }
+.fig .ink { stroke: var(--ink); fill: none; } .fig .ink-f { fill: var(--ink); }
+.fig .mute { stroke: var(--line); fill: none; } .fig .mute-f { fill: var(--line-2); }
+.fig .ca { stroke: var(--c-a); fill: none; } .fig .ca-f { fill: var(--c-a); }
+.fig .cb { stroke: var(--c-b); fill: none; } .fig .cb-f { fill: var(--c-b); }
+.fig .cp { stroke: var(--c-p); fill: none; } .fig .cp-f { fill: var(--c-p); }
+.fig .cq { stroke: var(--c-q); fill: none; } .fig .cq-f { fill: var(--c-q); }
+.fig .soft-a { fill: var(--c-a); fill-opacity: 0.12; stroke: none; } .fig .soft-b { fill: var(--c-b); fill-opacity: 0.12; stroke: none; } .fig .soft-p { fill: var(--c-p); fill-opacity: 0.14; stroke: none; }
+.fig text { fill: var(--ink); font-size: 13px; } .fig text.sm { font-size: 11px; fill: var(--ink-2); } .fig text.ta { fill: var(--c-a); font-weight: 700; } .fig text.tb { fill: var(--c-b); font-weight: 700; } .fig text.tp { fill: var(--c-p); font-weight: 700; } .fig text.tq { fill: var(--c-q); font-weight: 700; }
+.fig .dash { stroke-dasharray: 5 4; } .fig .w2 { stroke-width: 2.2; } .fig .w3 { stroke-width: 3; }
+/* sürüklenebilir vektör şekli */
+.dd-wrap { display: grid; grid-template-columns: minmax(260px, 420px) 1fr; gap: 14px; align-items: start; }
+@media (max-width: 760px) { .dd-wrap { grid-template-columns: 1fr; } }
+svg.dd { width: 100%; height: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; touch-action: none; font-family: var(--font); }
+.dd-gl { stroke: var(--line-2); } .dd-ax { stroke: var(--ink-3); }
+.dd-tk { fill: var(--ink-3); font-size: 10px; text-anchor: middle; }
+.dd-a { stroke: var(--c-a); stroke-width: 3; } .dd-b { stroke: var(--c-b); stroke-width: 3; } .dd-p { stroke: var(--c-p); stroke-width: 4; opacity: 0.85; }
+.dd-a-fill { fill: var(--c-a); } .dd-b-fill { fill: var(--c-b); } .dd-p-fill { fill: var(--c-p); }
+.dd-perp { stroke: var(--ink-3); stroke-dasharray: 4 3; } .dd-ra { stroke: var(--ink-3); fill: none; }
+.dd-arc { stroke: var(--ink-2); fill: none; stroke-width: 1.5; }
+.dd-lbl { fill: var(--ink); font-size: 14px; font-weight: 700; } .dd-at { fill: var(--c-a); } .dd-bt { fill: var(--c-b); }
+.dd-h { cursor: grab; stroke: var(--paper); stroke-width: 2; } .dd-h.drag { cursor: grabbing; }
+.dd-ha { fill: var(--c-a); } .dd-hb { fill: var(--c-b); }
+.dd-h:focus { outline: none; stroke: var(--ink); stroke-width: 3; }
+.dd-pos { fill: var(--c-b); fill-opacity: 0.1; } .dd-hyp { stroke: var(--c-b); stroke-dasharray: 6 4; stroke-width: 2; }
+.dd-unit { fill: none; stroke: var(--ink-3); stroke-dasharray: 3 3; }
+figure.fig { max-width: 440px; }
+.lesson-body h3 { font-size: 1.28rem; }
+.lesson-body h4 { font-size: 1.05rem; }

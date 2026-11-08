@@ -24,6 +24,14 @@ const finiteDeep = (o, path = "") => {
 const sig = (out) => JSON.stringify(out, (k, v) => (typeof v === "number" ? Number(v.toPrecision(6)) : v));
 
 for (const [name, spec] of Object.entries(specs)) {
+  if (spec.custom) {
+    test(`etkileşimli şekil ${name}: kendi hesap testleri`, () => {
+      assert.equal(typeof spec.mount, "function");
+      assert.equal(typeof spec.selfTest, "function", "custom şekiller hesaplarını selfTest ile doğrulamalı");
+      spec.selfTest(assert);
+    });
+    continue;
+  }
   test(`deney ${name}: varsayılanla çalışır, çizilir`, () => {
     const r = evaluate(spec, defaults(spec), 1);
     assert.ok(r.out, `${name}: ${JSON.stringify(r.issues)}`);
@@ -83,6 +91,7 @@ test("modüllerdeki deney tanımları geçerli (dosya, senaryo parametreleri)", 
       n++;
       const spec = specs[L.lab];
       assert.ok(spec, `${id}: bilinmeyen deney ${L.lab}`);
+      if (spec.custom) { for (const pr of L.presets || []) for (const k of Object.keys(pr.params || {})) assert.ok((spec.keys || []).includes(k), `${id}/${L.id}: bilinmeyen ayar ${k}`); continue; }
       const ids = new Set(spec.params.map((q) => q.id));
       for (const pr of L.presets || []) {
         const { B, seed, ...A } = pr.params || {};

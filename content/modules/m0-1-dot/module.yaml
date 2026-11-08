@@ -167,3 +167,63 @@ pitfalls:
 whatif:
   - q: "Vektörler önce ortalamaları çıkarılarak merkezlenirse kosinüs neye dönüşür?"
     a: "Pearson korelasyon katsayısına."
+
+labs:
+  - id: l1
+    lab: dotdrag
+    title: "İki vektörü sürükle: iç çarpım, açı, izdüşüm"
+    goal: |
+      Mavi ($a$) ve turuncu ($b$) okların uçlarını sürükle (ya da uca odaklanıp ok tuşlarını kullan). Tablo iç çarpımı iki yoldan hesaplar: bileşenlerden ($a_1b_1+a_2b_2$) ve uzunluk–açıdan ($\|a\|\|b\|\cos\theta$). "Tam sayılara yapıştır" ile el hesabı alıştırmalarını burada kontrol edebilirsin.
+    predict:
+      q: "$b$'yi sabit tutup $a$'yı $b$'nin etrafında bir tur döndürsen $a\\cdot b$ en büyük ve en küçük değerini nerede alır?"
+      options:
+        - {t: "En büyük $a$ $b$ ile aynı yöndeyken, en küçük zıt yöndeyken; dikken 0", ok: true, why: "‖a‖ ve ‖b‖ sabitken a·b yalnız cos θ ile değişir: +1, 0, −1."}
+        - {t: "En büyük dikken", why: "Dik vektörlerin iç çarpımı 0'dır."}
+        - {t: "Döndürmek iç çarpımı değiştirmez", why: "Uzunluklar değişmez ama açı değişir."}
+    presets:
+      - {name: "Dik", params: {ax: 3, ay: 1, bx: -1, by: 3, mode: 0}, note: "a·b = −3 + 3 = 0: izdüşüm sıfır, açı 90°."}
+      - {name: "Zıt yön", params: {ax: 2, ay: 2, bx: -3, by: -3, mode: 0}, note: "cos θ = −1: Cauchy–Schwarz'ın eşitlik durumu (paralel vektörler)."}
+      - {name: "Alıştırmadaki gibi", params: {ax: 1, ay: 2, bx: 4, by: -5, mode: 0, snap: true}, note: "a = (1, 2), b = (4, −5): a·b = 4 − 10 = −6, açı 90°'den büyük."}
+      - {name: "İşaret bölgeleri", params: {ax: 2, ay: -1, bx: 1, by: 2, mode: 1}, note: "b, kesikli doğruya diktir; a gölgeli taraftaysa a·b > 0. Doğrusal sınıflandırıcının karar sınırı tam olarak budur (Şekil 5)."}
+      - {name: "Birim vektörler", params: {mode: 2}, note: "İki vektör de birim çembere izdüşürülür: a·b doğrudan cos θ olur — kosinüs benzerliği."}
+    questions:
+      - q: "Yalnız $a$'yı 2 katına uzatırsan $a\\cdot b$, $\\cos\\theta$ ve izdüşüm nasıl değişir?"
+        a: "$a\\cdot b$ ve skaler izdüşüm 2 katına çıkar (doğrusallık); $\\cos\\theta$ değişmez (yalnız yöne bakar)."
+      - q: "İzdüşüm görünümünde artık (kesikli çizgi) neden her zaman $b$'ye dik?"
+        a: "$r=a-\\frac{a\\cdot b}{b\\cdot b}b$ için $r\\cdot b=0$ (İzdüşüm bölümündeki türetim)."
+      - q: "$b$'yi sıfır vektörüne sürüklersen ne olur?"
+        a: "Açı ve izdüşüm tanımsızdır (sıfıra bölme); tablo bunu açıkça yazar. Kodda $\\varepsilon$ eklemenin nedeni."
+    limits: "2B; yüksek boyutta aynı formüller geçerli ama görselleştirilemez — oradaki davranış için son deneye bak."
+  - id: l2
+    lab: normball
+    title: "Lp normları: birim top nasıl değişir?"
+    goal: "$p$'yi değiştir ve $\\|x\\|_p=1$ eğrisini izle; bir $v$ noktasının L1, L2, L∞ ve Lp normlarını karşılaştır."
+    predict:
+      q: "$v=(1,\\ 0.6)$ için hangisi en büyük: $\\|v\\|_1$, $\\|v\\|_2$, $\\|v\\|_\\infty$?"
+      options:
+        - {t: "$\\|v\\|_1=1.6$", ok: true, why: "‖v‖∞ ≤ ‖v‖₂ ≤ ‖v‖₁ her zaman: 1 ≤ 1.166 ≤ 1.6."}
+        - {t: "$\\|v\\|_2$", why: "L2, L1 ile L∞ arasında kalır."}
+        - {t: "$\\|v\\|_\\infty$", why: "L∞ en küçüğüdür: yalnız en büyük bileşen."}
+    presets:
+      - {name: "Elmas (L1)", params: {p: 1}, note: "Köşeler eksenlerde: L1 cezası optimumu eksen üzerine (bir bileşen 0) çekmeye eğilimlidir."}
+      - {name: "Neredeyse kare", params: {p: 20}, note: "p büyüdükçe L∞'a yaklaşır."}
+      - {name: "Norm olmayan", params: {p: 0.5}, note: "Birim 'top' içbükey yıldız: üçgen eşitsizliği bozulur."}
+    questions:
+      - q: "Neden her zaman $\\|v\\|_\\infty\\le\\|v\\|_2\\le\\|v\\|_1$?"
+        a: "En büyük bileşenin karesi tüm karelerin toplamından büyük olamaz ($\\max|v_i|\\le\\|v\\|_2$); $(\\sum|v_i|)^2=\\sum v_i^2+2\\sum_{i<j}|v_i||v_j|\\ge\\sum v_i^2$."
+    limits: "2B. d boyutta da sıralama aynıdır; ayrıca ‖v‖₁ ≤ √d·‖v‖₂ ≤ d·‖v‖∞."
+  - id: l3
+    lab: highdimcos
+    title: "Yüksek boyutta rastgele vektörler neden neredeyse diktir?"
+    goal: "Boyutu artır ve 1500 rastgele çiftin kosinüs histogramının 0 çevresinde nasıl daraldığını gör; teorik std $1/\\sqrt d$ ile karşılaştır."
+    predict:
+      q: "$d=1000$'de rastgele iki N(0, I) vektörün kosinüsü tipik olarak hangi aralıktadır?"
+      options:
+        - {t: "−1 ile 1 arasında düzgün", why: "Bu ancak d = 2 civarında yaklaşık doğrudur."}
+        - {t: "±0.06 civarı (std ≈ 1/√1000 ≈ 0.032)", ok: true, why: "Ölçünün yoğunlaşması."}
+        - {t: "Hep 1'e yakın", why: "Bağımsız yönler hizalanmaz."}
+    presets:
+      - {name: "d = 2", params: {d: 2}, note: "Düzlemde rastgele açı: kosinüs dağılımı uçlarda yoğun (arcsin dağılımı)."}
+      - {name: "d = 1000", params: {d: 1000}, note: "Neredeyse hepsi dik."}
+      - {name: "Pozitif bileşenler", params: {d: 500, dist: 1}, note: "Hepsi pozitif bileşenli vektörler 0.75 civarına yığılır: merkezlemeden benzerlik ölçmenin tuzağı."}
+    limits: "Bağımsız bileşenli rastgele vektörler; gerçek gömmeler ilişkili ve düşük içsel boyutludur."

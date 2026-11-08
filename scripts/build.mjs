@@ -42,7 +42,7 @@ for (const id of readdirSync(modDir)) {
   if (!existsSync(join(d, "module.yaml"))) continue;
   const m = yaml(join(d, "module.yaml"));
   const f = (n) => (existsSync(join(d, n)) ? read(join(d, n)) : null);
-  m.md = { intro: f("intro.md"), outro: f("outro.md") };
+  m.md = { intro: f("intro.md"), outro: f("outro.md"), lesson: f("lesson.md") };
   for (const s of "abcde") m.md[s] = f(`${s}.md`);
   m.files = {};
   for (const s of "bcde") m.files[s] = { start: f(`${s}.py`), sol: f(`${s}.sol.py`), check: f(`${s}.check.py`) };
@@ -302,6 +302,14 @@ function readinessData(m) {
   return out.slice(0, 6);
 }
 
+function lessonHTML(m, R) {
+  const body = R(m.md.lesson);
+  const heads = [...body.matchAll(/<h3 id="([^"]+)">([\s\S]*?)<\/h3>/g)];
+  const toc = heads.length ? `<nav class="lesson-toc" aria-label="Konu anlatımı içindekiler"><p class="lesson-toc-title">İçindekiler</p><ol>${heads.map(([, id, t]) => `<li><a href="#${id}">${t.replace(/<a [^>]*class="anchor"[^>]*>.*?<\/a>/g, "")}</a></li>`).join("")}</ol></nav>` : "";
+  const words = m.md.lesson.split(/\s+/).length;
+  return `<section class="lesson" id="ders"><h2>Konu anlatımı</h2><p class="muted small">≈ ${Math.max(1, Math.round(words / 160))} dk okuma · şekillerdeki noktaları sürükleyebilir, kaydırıcılarla oynayabilirsin.</p>${toc}<div class="prose lesson-body">${body}</div></section>`;
+}
+
 function placeLabs(m, html, placed) {
   return html.replace(/<p>::lab ([\w-]+)<\/p>/g, (_, lid) => {
     const L = m.labs.find((x) => x.id === lid);
@@ -323,7 +331,8 @@ function modulePage(id) {
   });
   const placed = new Set();
   const R = (txt) => placeLabs(m, md.block(txt), placed);
-  const railExtra = (m.labs.length ? `<li><a href="#${m.labs.length === 1 ? "lab-" + m.labs[0].id : "deney"}" data-rail="deney"><span class="rail-n">≈</span><span class="rail-name">Deney</span></a></li>` : "")
+  const railExtra0 = m.md.lesson ? `<li><a href="#ders" data-rail="ders"><span class="rail-n">§</span><span class="rail-name">Konu anlatımı</span></a></li>` : "";
+  const railExtra = railExtra0 + (m.labs.length ? `<li><a href="#${m.labs.length === 1 ? "lab-" + m.labs[0].id : "deney"}" data-rail="deney"><span class="rail-n">≈</span><span class="rail-name">Deney</span></a></li>` : "")
     + (m.practice.length ? `<li><a href="#pratik" data-rail="pratik"><span class="rail-n">✓</span><span class="rail-name">Pratik</span></a></li>` : "")
     + (m.extras.length ? `<li><a href="#ek" data-rail="ek"><span class="rail-n">+${m.extras.length}</span><span class="rail-name">Ek</span></a></li>` : "")
     + (m.homework.length ? `<li><a href="#odev" data-rail="odev"><span class="rail-n">✎</span><span class="rail-name">Ödev</span></a></li>` : "");
@@ -353,6 +362,7 @@ ${s.k === "a" ? handHTML(m) : codeboxHTML(m, s.k)}
 </header>
 <div class="rail-wrap">${rail}</div>
 <section class="intro prose">${R(m.md.intro)}</section>
+${m.md.lesson ? lessonHTML(m, R) : ""}
 ${m.labs.filter((L) => !placed.has(L.id)).length ? `<section class="labs" id="deney"><h2>Deney alanı</h2>${m.labs.filter((L) => !placed.has(L.id)).map((L) => labHTML(m, L)).join("")}</section>` : ""}
 ${stageSec}
 ${extrasHTML(m)}
@@ -508,8 +518,8 @@ function searchIndex() {
     const m = modules[r.id];
     out.push({ t: `${m.code} ${m.title}`, u: `${r.id}.html`, k: "modül", s: plain(m.summary).slice(0, 220) });
     for (const g of m.goals) out.push({ t: plain(g), u: `${r.id}.html`, k: `${m.code} kazanım`, s: "" });
-    for (const txt of [m.md.intro, m.md.outro, ...STAGES.map((s) => m.md[s.k])]) for (const [, h] of String(txt || "").matchAll(/^#{2,4}\s+(.+?)(?:\s*\{#[\w-]+\})?$/gm)) out.push({ t: plain(h), u: `${r.id}.html`, k: `${m.code} başlık`, s: "" });
-    for (const [, kind, t] of [m.md.intro, m.md.outro, ...STAGES.map((s) => m.md[s.k])].join("\n").matchAll(/^:::([^\s:]+)[ \t]+(.+)$/gm)) out.push({ t: plain(t), u: `${r.id}.html`, k: `${m.code} ${kind}`, s: "" });
+    for (const txt of [m.md.intro, m.md.lesson, m.md.outro, ...STAGES.map((s) => m.md[s.k])]) for (const [, h] of String(txt || "").matchAll(/^#{2,4}\s+(.+?)(?:\s*\{#[\w-]+\})?$/gm)) out.push({ t: plain(h), u: `${r.id}.html`, k: `${m.code} başlık`, s: "" });
+    for (const [, kind, t] of [m.md.intro, m.md.lesson, m.md.outro, ...STAGES.map((s) => m.md[s.k])].join("\n").matchAll(/^:::([^\s:]+)[ \t]+(.+)$/gm)) out.push({ t: plain(t), u: `${r.id}.html`, k: `${m.code} ${kind}`, s: "" });
     m.extras.forEach((x) => out.push({ t: plain(x.title), u: `${r.id}.html#${x.id}`, k: `${m.code} ek alıştırma`, s: "" }));
     m.labs.forEach((L) => out.push({ t: plain(L.title), u: `${r.id}.html#lab-${L.id}`, k: `${m.code} deney`, s: "" }));
     m.practice.forEach((x) => out.push({ t: plain(x.title || x.goal), u: `${r.id}.html#pr-${x.id}`, k: `${m.code} pratik`, s: "" }));
