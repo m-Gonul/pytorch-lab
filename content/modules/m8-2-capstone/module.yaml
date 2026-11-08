@@ -1,0 +1,102 @@
+id: m8-2-capstone
+code: M8.2
+title: "Bitirme projesi: U-Net ile koşullu difüzyon ve segmentasyon"
+phase: 8
+minutes: 480
+prereq: [m5-8-diffusion-guidance, m4-10-segmentation, m8-1-mini-llm]
+summary: >
+  Kursun görüntü tarafını tek bir araştırma prototipinde birleştiriyorsun:
+  zaman ve sınıf embedding'li, GroupNorm'lu artık bloklar, düşük
+  çözünürlükte öz-attention ve atlama bağlantılarıyla küçük bir U-Net;
+  sınıflandırıcısız yönlendirmeli koşullu difüzyon eğitimi, EMA ağırlıkları,
+  DDIM ile hızlı örnekleme ve sınıflandırıcı öznitelikleriyle FID/sınıf
+  doğruluğu değerlendirmesi. Yanında aynı mimari ailesinin ikinci kullanımı:
+  sınıf dengesizliği olan küçük "lezyon" segmentasyonunda BCE, Dice ve
+  karışık kayıpların hassasiyet–duyarlılık ödünleşimi. Araştırma pratiği:
+  RePaint tarzı difüzyonla tamamlama (inpainting) ve neden kolay
+  olmadığı, eşleştirilmiş bootstrap ile iki modeli dürüstçe karşılaştırma.
+goals:
+  - "Difüzyon U-Net'inin parçaları: zaman embedding'i (FiLM), GroupNorm + SiLU artık bloklar, sıfır başlatılmış çıkış, öz-attention"
+  - "[[ema ağırlıkları]], CFG etiket bırakma, DDIM adım sayısı ve toplu CFG ile çıkarım maliyeti"
+  - "Değerlendirme: FID'in gerçek–gerçek taban çizgisi, sınıf doğruluğu, yönlendirmenin kalite–çeşitlilik etkisi"
+  - "Segmentasyonda kayıp seçimi; eşleştirilmiş bootstrap güven aralığı"
+sources:
+  - {title: "Ho, Jain, Abbeel — DDPM (NeurIPS 2020) ve resmi U-Net mimarisi", url: "https://arxiv.org/abs/2006.11239", license: "arXiv", use: link}
+  - {title: "Nichol & Dhariwal — Improved DDPM (ICML 2021)", url: "https://arxiv.org/abs/2102.09672", license: "arXiv", use: link}
+  - {title: "Ho & Salimans — Classifier-Free Diffusion Guidance (2022)", url: "https://arxiv.org/abs/2207.12598", license: "arXiv", use: link}
+  - {title: "Lugmayr ve ark. — RePaint: Inpainting using Denoising Diffusion Probabilistic Models (CVPR 2022)", url: "https://arxiv.org/abs/2201.09865", license: "arXiv", use: link}
+  - {title: "Isensee ve ark. — nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation (Nature Methods 2021)", url: "https://www.nature.com/articles/s41592-020-01008-z", license: "©", use: link}
+  - {title: "Milletari, Navab, Ahmadi — V-Net ve Dice kaybı (3DV 2016)", url: "https://arxiv.org/abs/1606.04797", license: "arXiv", use: link}
+  - {title: "UvA DL Notebooks / fast.ai Part 2 — diffusion U-Net'leri", url: "https://course.fast.ai/Lessons/part2.html", license: "Apache-2.0", use: link}
+  - {title: "Efron & Tibshirani — An Introduction to the Bootstrap", url: "https://www.taylorfrancis.com/books/mono/10.1201/9780429246593/introduction-bootstrap-bradley-efron-tibshirani", license: "©", use: link}
+
+hand:
+  groups:
+    - title: "Eğitim ve çıkarım bütçesi"
+      fields:
+        - {id: ema, label: "EMA bozunması 0.999: 1000 adım önceki ağırlığın payı $0.999^{1000}$", answer: 0.36769542477096373, tol: 1.0e-6}
+        - {id: win, label: "EMA bozunması 0.995'in etkin penceresi $1/(1-\\beta)$ (adım)", answer: 200, tol: 1.0e-9}
+        - {id: nfe, label: "DDIM 25 adım + CFG (koşullu ve koşulsuz ayrı çağrılar): ağ değerlendirmesi sayısı", answer: 50}
+        - {id: temb, label: "Zaman embedding'i d = 8: frekans $\\omega_1=10000^{-1/4}$, t = 50 → $\\sin(\\omega_1t)$", answer: -0.9589242746631385, tol: 1.0e-6}
+    - title: "Mimari ve ölçüt"
+      fields:
+        - {id: att, label: "16 × 16 girdi, iki 2× küçültme sonrası öz-attention: skor matrisi eleman sayısı (tek örnek, tek baş)", answer: 256}
+        - {id: skip, label: "c = 16: en üst kod çözücü bloğunun girdi kanalı (2c'lik yukarı örneklenmiş + c'lik atlama)", answer: 48}
+        - {id: dice, label: "Tahmin 30 piksel, gerçek 40, kesişim 25: Dice", answer: 0.7142857142857143, tol: 1.0e-6}
+  verify: |
+    import math
+    answers = dict(ema=0.999 ** 1000, win=1 / (1 - 0.995), nfe=25 * 2, temb=math.sin(50 * 10000 ** (-1 / 4)), att=(4 * 4) ** 2, skip=2 * 16 + 16, dice=2 * 25 / (30 + 40))
+
+stages:
+  b: {engine: browser}
+  c: {engine: browser}
+  d: {engine: torch}
+  e: {engine: torch}
+
+extras:
+  - {id: x1, title: "Segmentasyon izi: küçük lezyonlarda BCE, Dice ve karışık kayıp", engine: torch}
+  - {id: x2, title: "Difüzyonla tamamlama (RePaint) neden zor: kâhin modelle deney", engine: browser}
+  - {id: x3, title: "İki modeli dürüstçe karşılaştırmak: eşleştirilmiş bootstrap", engine: browser}
+
+quiz:
+  - q: "Artık bloğun son konvolüsyonunu sıfırla başlatmanın amacı nedir?"
+    options:
+      - {t: "Başlangıçta her blok özdeşlik olur: derin ağ eğitime sığ bir ağ gibi başlar, gradyan atlama yolundan sorunsuz akar (ResNet'teki 'sıfır γ' hilesi, DDPM U-Net'inde standart)", ok: true, why: "c aşamasında blok çıktısının girdiye eşit olduğunu doğruluyorsun."}
+      - {t: "Parametre sayısını azaltmak", why: "Sayı değişmez."}
+      - {t: "Aşırı uyumu önlemek", why: "Amaç optimizasyon kolaylığı."}
+  - q: "d aşamasında EMA ağırlıklarıyla örnekleme neden çok daha düşük FID veriyor?"
+    options:
+      - {t: "Son birkaç yüz adımın ağırlık ortalaması SGD gürültüsünü süzer; difüzyonda ağın küçük hataları yüzlerce adım boyunca birikir, bu yüzden ağırlık gürültüsüne çok duyarlıdır", ok: true, why: "Polyak ortalaması (M1.2 ödevi) ile aynı fikir."}
+      - {t: "EMA ağı daha uzun eğitildiği için", why: "Aynı adım sayısı."}
+      - {t: "EMA'nın daha çok parametresi olduğu için", why: "Aynı mimari."}
+  - q: "Segmentasyonda yalnız BCE ile eğitilen model küçük lezyonları neden kaçırır?"
+    options:
+      - {t: "Pikselerin %95'i arka plan: BCE ortalaması arka planı doğru bilmekle zaten küçüktür, az sayıdaki ön plan pikseli kayba az katkı verir; Dice kaybı ön plan örtüşmesini doğrudan ölçer (dengesizlikten bağımsız), ağırlıklı BCE ise duyarlılığı precision pahasına artırır", ok: true, why: "x1 tablosundaki duyarlılık–kesinlik ödünleşimi."}
+      - {t: "BCE türevlenemediği için", why: "Türevlenebilir."}
+      - {t: "U-Net'in kapasitesi yetmediği için", why: "Aynı mimari diğer kayıplarla daha iyi."}
+
+homework:
+  - title: "Lugmayr ve ark. (2022): RePaint"
+    paper: "Lugmayr, Danelljan, Romero, Yu, Timofte, Van Gool — RePaint: Inpainting using Denoising Diffusion Probabilistic Models (CVPR 2022)"
+    url: "https://arxiv.org/abs/2201.09865"
+    level: ileri
+    hours: 14
+    goal: |
+      d aşamasında eğittiğin koşulsuz (boş token'lı) U-Net'i yeniden eğitmeden tamamlama için kullan: bilinen bölgeyi her adımda ileri süreçle gürültülendirip yerleştir (Algoritma 1), atlama uzunluğu j ve yeniden örnekleme sayısı r için makale Tablo 4/Şekil 5 ablasyonunu yap. Maske türleri: yarım görüntü, kalın çizgi, rastgele %50 piksel. LPIPS yerine sınıflandırıcı öznitelik uzaklığı ve sınıf tutarlılığıyla değerlendir; x2'deki kâhin deneyindeki başarısızlık türünün gerçek modelde de görüldüğünü göster ve "reconstruction guidance" (bilinen bölgeye göre x̂₀ gradyanı) ile karşılaştır.
+    steps:
+      - "r = 1 (naif yerleştirme) ile r = 10'u aynı NFE bütçesinde karşılaştır."
+    accept:
+      - "Yeniden örnekleme, bilinen ve üretilen bölgeler arasındaki uyumu belirgin iyileştirir."
+      - "Maske türüne göre sonuç tablosu ve örnek görseller."
+  - title: "Isensee ve ark. (2021): nnU-Net"
+    paper: "Isensee, Jaeger, Kohl, Petersen, Maier-Hein — nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation (Nature Methods 2021)"
+    url: "https://www.nature.com/articles/s41592-020-01008-z"
+    level: ileri
+    hours: 16
+    goal: |
+      x1'deki segmentasyon hattını nnU-Net'in "sabit / kural tabanlı / deneysel" yapılandırma ayrımıyla yeniden düzenle: veri parmak izinden (görüntü boyutu, aralık, yoğunluk dağılımı) yama boyutu, batch boyutu ve ağ derinliğini kurallarla türet; Dice + CE, derin denetim, poly öğrenme oranı ve ağır veri artırma (sabit kurallar) uygula. Herkese açık küçük bir tıbbi veri setinde (ör. Medical Segmentation Decathlon'un bir görevi, 2B dilimler) 5 katlı çapraz doğrulamayla Dice raporla ve x3'teki eşleştirilmiş bootstrap ile tasarım seçimlerinin farkının anlamlılığını sına.
+    steps:
+      - "Ablasyon: derin denetim yok, yalnız CE, artırma yok."
+    accept:
+      - "Kural tabanlı yapılandırma elle ayarlanmış taban çizgisine yakın ya da üstün."
+      - "Her ablasyon için güven aralıklı fark."

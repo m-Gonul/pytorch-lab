@@ -190,3 +190,6 @@ terms:
   sınıflandırıcısız yönlendirme: "Classifier-free guidance: aynı ağın koşullu ve (etiket bırakmayla öğrenilmiş) koşulsuz ε tahminlerini ε_u + s(ε_c − ε_u) ile karıştırmak; s > 1 kesinliği artırır, çeşitliliği azaltır."
   sınıflandırıcı yönlendirmesi: "Classifier guidance: difüzyon örneklemesinde ε tahminini gürültülü veride eğitilmiş bir sınıflandırıcının ∇log p(y|x_t) gradyanıyla kaydırmak; p(x)p(y|x)^s'den örneklemeye karşılık gelir."
   latent diffusion: "Difüzyonu piksel uzayı yerine önceden eğitilmiş bir otomatik kodlayıcının küçük gizli uzayında yapıp sonucu kod çözücüyle görüntüye açmak (Stable Diffusion)."
+  ema ağırlıkları: "Eğitim boyunca model ağırlıklarının üstel hareketli ortalaması (θ_ema ← βθ_ema + (1 − β)θ); etkin pencere ≈ 1/(1 − β) adım. Son ağırlıklardaki SGD gürültüsünü süzer; difüzyon ve GAN örneklemesinde standart (Polyak ortalamasının üstel sürümü)."
+  dice kaybı: "Soft Dice loss: 1 − (2Σpy + ε)/(Σp + Σy + ε); segmentasyonda ön plan örtüşmesini doğrudan optimize eder, sınıf dengesizliğine BCE'den daha az duyarlıdır."
+  eşleştirilmiş bootstrap: "Paired bootstrap: iki modelin aynı test örneklerindeki skor farklarını yeniden örnekleyerek farkın güven aralığını bulmak; örnek zorluğundan gelen ortak varyansı yok ettiği için eşleştirilmemiş karşılaştırmadan çok daha keskindir."
