@@ -235,3 +235,51 @@ whatif:
     a: "MSE'nin olabilirlik gerekçesi kalkar; birkaç uç nokta çözümü sürükler. Sağlam kayıplar (MAE, Huber) ya da RANSAC (M9.15) gerekir."
   - q: "Bir öznitelik başka bir özniteliğin tam kopyası olsaydı?"
     a: "$X^\\top X$ tekil olur, sonsuz çözüm vardır; katsayılar ikisi arasında keyfi bölüşülür. Tahminler değişmez, yorum anlamsızlaşır. Ridge ya da öznitelik eleme."
+
+labs:
+  - id: l1
+    lab: linregfit
+    title: "Kapalı form, gradyan inişi ve koşul sayısı"
+    goal: |
+      Veri $y=1.5x-1+\varepsilon$'dan üretilir. Sol grafik veriyi, kapalı form çözümünü (yeşil kesikli) ve GD'nin ara/son doğrularını gösterir. Orta grafik $(w,b)$ düzleminde kayıp yüzeyidir (koyu = düşük) ve GD'nin $(0,0)$'dan başlayan yolu. Sağ grafik kaybın optimumdan farkını log ölçekte verir: düz bir çizgi doğrusal (geometrik) yakınsamadır.
+    predict:
+      q: "x'lerin merkezini 0'dan 8'e taşırsan (aynı η ile) GD'ye ne olur?"
+      options:
+        - {t: "Ya ıraksar (λ_max büyüdü) ya da η'yi küçültmek zorunda kalınca çok yavaşlar (κ büyüdü)", ok: true, why: "Σx² büyüdükçe λ_max büyür, kararlılık sınırı 2/λ_max küçülür; λ_min ise küçük kalır. Vadi uzar."}
+        - {t: "Hiçbir şey değişmez; veri sadece kaydı", why: "Kapalı form çözümü kaymaya uyum sağlar ama GD'nin hızı Hessian'ın şekline bağlıdır."}
+        - {t: "Daha hızlı yakınsar", why: "Ters yönde: w ve b'nin etkileri karışır."}
+    presets:
+      - {name: "İyi koşullu", params: {c: 0, std: 0, lr: 0.3, steps: 50}, note: "x sıfır etrafında: κ küçük, GD hızlı."}
+      - {name: "Uzak merkez", params: {c: 6, std: 0, lr: 0.02, steps: 300}, note: "κ yüzlerce: yol önce vadinin dik duvarına iner, sonra dipte sürünür."}
+      - {name: "Iraksama", params: {c: 6, std: 0, lr: 0.06, steps: 50}, note: "η > 2/λ_max: her adımda hata büyür."}
+      - {name: "Standartlaştırılmış", params: {c: 6, std: 1, lr: 0.5, steps: 5}, note: "H = 2I, η = 1/2: tek adımda optimum. Aynı veri, aynı model, yalnız öznitelik ölçeği değişti."}
+      - {name: "Az veri, çok gürültü", params: {n: 5, noise: 2, c: 0, std: 0, lr: 0.3, steps: 100}, note: "Kapalı form bile gerçek doğrudan uzak: optimizasyon değil, veri sınırlayıcı (tohumu değiştir)."}
+    questions:
+      - q: "Kararlılık sınırını tabloda oku ve η'yi sınırın hemen altına ve hemen üstüne getir. Ne gözlüyorsun?"
+        a: "Hemen altında GD salınarak (en dik yönde işaret değiştirerek) yakınsar; hemen üstünde salınım büyür ve ıraksar. 2/λ_max kesin bir eşiktir çünkü kayıp tam olarak ikinci derecedendir."
+      - q: "Kayıp grafiği neden log ölçekte düz bir çizgi?"
+        a: "Hata her adımda sabit bir oranla (1 − ηλ) çarpılır: geometrik dizi; log'u doğrusal. İki farklı eğim görüyorsan iki özdeğer yönü farklı hızda sönüyor demektir."
+    limits: "Tek öznitelik, tam-batch GD (gürültüsüz gradyan). Kayıp yüzeyi penceresi dışına çıkan yol noktaları kenara kırpılarak çizilir. Standartlaştırmada parametreler orijinal x eksenine geri çevrilerek raporlanır."
+  - id: l2
+    lab: robustfit
+    title: "Aykırı değerler: MSE, MAE ve Huber"
+    goal: |
+      Örneklerin bir kısmı (turuncu) yukarı doğru büyük bir hatayla bozulur. Seçilen kayıpla uydurulan doğru (yeşil) MSE'nin doğrusuyla (kırmızı kesikli) ve gerçek doğruyla (gri kesikli) karşılaştırılır. Sağ grafik kaybın ve bir örneğin gradyana katkısının ($\psi$) artığa göre nasıl büyüdüğünü gösterir.
+    predict:
+      q: "%10 aykırı değer varken hangi kayıp gerçek doğruya en uzak kalır?"
+      options:
+        - {t: "MSE — ψ(r) = 2r sınırsız; büyük artıklı birkaç örnek doğruyu kendine çeker", ok: true, why: "MSE koşullu ortalamayı kestirir; ortalama aykırılara duyarlıdır."}
+        - {t: "MAE", why: "MAE koşullu medyanı kestirir; %10 aykırı medyanı çok az kaydırır."}
+        - {t: "Huber", why: "Büyük artıklarda Huber MAE gibi davranır, katkı ±δ ile sınırlı."}
+    presets:
+      - {name: "Temiz veri", params: {frac: 0, loss: 0}, note: "Aykırı yokken MSE en verimli kestiricidir (Gauss gürültüsü)."}
+      - {name: "%10 aykırı, MSE", params: {frac: 0.1, mag: 12, loss: 0}, note: "Doğru yukarı kaydı: b hatası büyük."}
+      - {name: "%10 aykırı, Huber", params: {frac: 0.1, mag: 12, loss: 2, delta: 1}, note: "Huber neredeyse gerçek doğruda."}
+      - {name: "%40 aykırı, MAE", params: {frac: 0.4, mag: 12, loss: 1}, note: "Dayanıklı kayıplar bile çoğunluğa yaklaşan bozulmada çekilmeye başlar."}
+      - {name: "Büyük δ", params: {frac: 0.1, mag: 12, loss: 2, delta: 5}, note: "δ artıkların çoğundan büyük olunca Huber MSE'ye döner."}
+    questions:
+      - q: "Huber'de δ'yı 0.1'e indirince ne olur?"
+        a: "Neredeyse tüm artıklar |r| > δ bölgesinde kalır: Huber ≈ δ·MAE gibi davranır. Dayanıklıdır ama gürültüsüz örneklerden gelen bilginin bir kısmını kullanmaz (verim kaybı)."
+      - q: "Aykırı değerler hep yukarı kaydırıldı. Simetrik (yarısı yukarı yarısı aşağı) olsaydı MSE ne yapardı?"
+        a: "Ortalama etkisi kabaca birbirini götürürdü (yan küçük), ama varyans artardı: doğru tohumdan tohuma daha çok oynardı. Tek yönlü bozulma en zararlı durumdur."
+    limits: "Uydurma IRLS ile yapılır (100 yineleme). MAE'nin çözümü tek olmayabilir; IRLS bunlardan birini bulur. Tek öznitelikli model."
