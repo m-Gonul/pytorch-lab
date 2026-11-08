@@ -217,3 +217,45 @@ whatif:
     a: "Katmanların bileşimi tek bir doğrusal dönüşümdür ($W_2W_1$): derinlik ifade gücü kazandırmaz (ama optimizasyon dinamiği yine ilginçtir)."
   - q: "Kayıp ortalama yerine toplam olsaydı?"
     a: "Tüm gradyanlar B kat büyür; aynı davranış için öğrenme oranı B'ye bölünmelidir. Batch boyu değişince ortalama kayıp daha kararlıdır."
+
+labs:
+  - id: l1
+    lab: slowlearn
+    title: "Doymuş çıkış: kuadratik maliyet mi, çapraz entropi mi?"
+    goal: |
+      Tek bir sigmoid nöron, girdi x = 1, hedef y = 0. Başlangıçta w₀ = b₀ = 2 ise çıkış ≈ 0.98: çok emin ve çok yanlış. Aynı η ile iki maliyetin öğrenmesini karşılaştır; sağda BP1'in verdiği çıkış hatası δᴸ.
+    predict:
+      q: "w₀ = b₀ = 2 (a₀ ≈ 0.98, y = 0). İlk epoch'larda hangi maliyet daha hızlı öğrenir?"
+      options:
+        - {t: "Çapraz entropi: δᴸ = a − y ≈ 0.98, MSE'de ise δᴸ = (a − y)σ′(z) ≈ 0.017", ok: true, why: "σ′(4) = σ(4)(1 − σ(4)) ≈ 0.0177: MSE'nin öğrenme sinyali ~55 kat küçük."}
+        - {t: "MSE: hata büyükken kare daha büyük ceza verir", why: "Ceza büyük ama gradyanı σ′ ile çarpılıyor; doymuş nöronda σ′ ≈ 0."}
+        - {t: "İkisi aynı", why: "BP1'deki ∂C/∂a terimi maliyetten maliyete değişir."}
+    presets:
+      - {name: "Kötü başlangıç", params: {w0: 2, b0: 2, eta: 0.15, T: 300}, note: "MSE'de uzun bir plato; CE hemen iner."}
+      - {name: "İyi başlangıç", params: {w0: 0.6, b0: 0.9, eta: 0.15, T: 300}, note: "a₀ ≈ 0.82: doyma yok, iki maliyet de makul hızda."}
+      - {name: "Daha da kötü", params: {w0: 3, b0: 3, eta: 0.15, T: 600}, note: "z = 6, σ′ ≈ 0.0025: MSE yüzlerce epoch neredeyse kıpırdamaz."}
+    questions:
+      - q: "MSE'nin platosundan sonra öğrenme neden aniden hızlanıyor?"
+        a: "a, 1'den uzaklaşıp orta bölgeye girince σ′(z) büyür (en çok a = 0.5'te, 1/4); δᴸ artar. Sonra a → 0'a yaklaşırken σ′ yine küçülür."
+      - q: "Bu sorun gizli katmanlarda da var mı? Çapraz entropi orada da çözer mi?"
+        a: "Var (BP2'deki σ′(zˡ) çarpanı) ve çapraz entropi orada çözmez — yalnız çıkış katmanındaki σ′'yi sadeleştirir. Gizli katmanlar için doymayan aktivasyonlar ve iyi başlatma gerekir."
+    limits: "Tek nöron, tek örnek, tam gradyan. η aynı alındı; adil karşılaştırma için her maliyette η ayrıca ayarlanabilir, ama doyma bölgesindeki fark ayardan büyüktür."
+  - id: l2
+    lab: mlpmoons
+    title: "BP1–BP4 ile eğitilen MLP: aktivasyon ve derinlik"
+    goal: |
+      Aynı ağ (M3.1'deki deney), bu kez dört denklemin gözüyle. Sigmoid aktivasyonla derinliği artırınca aynı adım sayısında öğrenmenin nasıl yavaşladığını izle (BP2'deki σ′ ≤ 1/4 çarpanları).
+    predict:
+      q: "3 gizli katman, sigmoid, 300 adım. tanh'lı aynı ağa göre ne beklersin?"
+      options:
+        - {t: "Belirgin daha yüksek kayıp: σ′ ≤ 1/4 ve sıfır merkezli olmayan çıktılar ilk katmanların öğrenmesini yavaşlatır", ok: true, why: "BP2 her katmanda en fazla 1/4'lük bir çarpan ekler; ayrıca tüm girdiler pozitif olduğu için ağırlık gradyanları aynı işaretli (BP4)."}
+        - {t: "Aynı", why: "Aktivasyonun türevi BP2'de doğrudan çarpan olarak görünür."}
+        - {t: "Daha hızlı", why: "tanh'ın türevi en fazla 1, sigmoid'inki 1/4."}
+    presets:
+      - {name: "tanh, 2 × 12", params: {depth: 2, width: 12, act: 0, steps: 300}, note: "Hızlı yakınsama."}
+      - {name: "sigmoid, 3 × 12", params: {depth: 3, width: 12, act: 2, steps: 300}, note: "Aynı bütçede çok daha yüksek kayıp."}
+      - {name: "ReLU, 3 × 12", params: {depth: 3, width: 12, act: 1, steps: 300}, note: "ReLU'nun türevi 0 ya da 1: aktif yollarda gradyan sönmez."}
+    questions:
+      - q: "Sigmoid ağında η'yı büyütmek sorunu çözer mi?"
+        a: "Kısmen hızlandırır ama son katmanlar (gradyanı büyük olanlar) kararsızlaşabilir; ilk ve son katmanların gradyan ölçeği arasındaki fark (koşul sorunu) kalır."
+    limits: "100 örnek, tam batch, momentum 0.9. Katman başına gradyan normları için M3.5'teki başlatma deneyine bak."
