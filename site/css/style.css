@@ -490,6 +490,7 @@ aside.box > .box-head { cursor: default; }
 .lab-iss.warn { background: var(--marker-soft); }
 .lab-iss.error { background: var(--bad-bg); color: var(--bad); }
 .lab-out.stale { opacity: 0.35; }
+.plot-wide { grid-column: 1 / -1; }
 .lab-plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px 18px; margin: 8px 0; }
 .lab-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .lab-plot { margin: 0; }

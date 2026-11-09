@@ -192,3 +192,98 @@ pitfalls:
 whatif:
   - q: "MLP genişliği 4d yerine 8/3·d ve SwiGLU olsaydı?"
     a: "Üç matris (geçitli) ile parametre sayısı ≈ aynı kalır; LLaMA ailesinin tercihi, aynı bütçede biraz daha iyi."
+
+labs:
+  - id: l1
+    lab: gptcount
+    title: "GPT'yi saymak: parametreler, FLOP'lar, bağlam"
+    goal: |
+      Model boyu, blok sayısı, sözlük ve bağlam uzunluğundan parametreleri bileşen bileşen say: gömme, dikkat ($4d^2+4d$), MLP ($8d^2+5d$), LayerNorm ($4d$). Token başına ileri geçiş FLOP'unu iki parçaya ayır: parametreli matris çarpımları $\approx 2N$ ve nedensel dikkat $2LTd$. Bağlam uzadıkça hangisinin baskınlaştığını gör.
+    predict:
+      q: "GPT-2 small'da (d = 768, L = 12, V = 50 257) parametrelerin yaklaşık ne kadarı gömmelerde (wte + wpe)?"
+      options:
+        - {t: "%5'ten az", why: "V·d = 38.6 milyon: 124 milyonun azımsanamayacak bir parçası."}
+        - {t: "Yaklaşık üçte biri", ok: true, why: "wte 38.6M + wpe 0.8M ≈ 39.4M; toplamın %32'si. Büyük modellerde bu pay hızla küçülür."}
+        - {t: "Yarıdan fazlası", why: "Bloklar 12 × 7.09M = 85M tutar."}
+    presets:
+      - {name: "GPT-1 (2018)", params: {d: 768, L: 12, V: 40478, T: 512, r: 4, tie: 1}, note: "≈ 116.5 milyon; makalede '117M'."}
+      - {name: "GPT-2 small", params: {d: 768, L: 12, V: 50257, T: 1024, r: 4, tie: 1}, note: "124 439 808 — el hesabındaki sayı."}
+      - {name: "GPT-2 XL", params: {d: 1600, L: 48, V: 50257, T: 1024, r: 4, tie: 1}, note: "≈ 1.56 milyar ('1.5B')."}
+      - {name: "GPT-3 175B", params: {d: 12288, L: 96, V: 50257, T: 2048, r: 4, tie: 1}, note: "≈ 174.6 milyar; parametrelerin %99'dan fazlası bloklarda."}
+      - {name: "Uzun bağlam", params: {d: 768, L: 12, T: 65536}, note: "Küçük modelde 64K bağlamda dikkat FLOP'u 2N'yi geçiyor."}
+      - {name: "Bağlama yok", params: {tie: 0}, note: "Ayrı çıkış matrisi: +38.6M parametre, aynı FLOP."}
+    questions:
+      - q: "Weight tying neden parametreyi azaltır ama FLOP'u azaltmaz?"
+        a: "Aynı V × d matris hem gömme araması hem çıkış izdüşümü için kullanılır: saklanan sayı yarıya iner. Ama logit'leri hesaplamak hâlâ her token için V × d'lik bir matris–vektör çarpımıdır (2Vd FLOP); arama ise çarpım değil indekslemedir."
+      - q: "d'yi iki katına çıkarınca blok parametreleri kaç katına çıkar? L'yi iki katına çıkarınca?"
+        a: "Blok parametreleri ≈ 12·L·d²: d'yi ikiye katlamak ≈ 4 kat, L'yi ikiye katlamak 2 kat. Gömmeler yalnız d ile doğrusal büyür."
+    limits: "Sayım GPT-2 düzenidir (bias'lı Linear'lar, öğrenilen mutlak konum gömmesi, GELU MLP). Modern modellerde bias yok, RMSNorm, SwiGLU (3 matris) ve RoPE (konum parametresi yok) kullanılır; oranlar biraz değişir. FLOP sayımı softmax, LN, aktivasyon gibi eleman bazlı işlemleri ihmal eder."
+  - id: l2
+    lab: sampler
+    title: "Sıcaklık, top-k ve top-p: bir sonraki token nasıl seçilir?"
+    goal: |
+      Model her adımda sözlük üzerinde bir olasılık dağılımı verir; metin bu dağılımdan seçilen token'larla büyür. Sıcaklık $\tau$ logit'leri $z/\tau$ yapar; top-k en olası $k$ token dışındakileri, top-p (nucleus) birikimli olasılığı $p$'yi aşan en küçük küme dışındakileri atar. Dönüştürülmüş dağılımı, ondan çekilen örneklerin sıklığını ve entropiyi izle.
+    predict:
+      q: "τ = 0.5'te en olası token'ın olasılığı (τ = 1'de 0.34) ne olur?"
+      options:
+        - {t: "0.17'ye düşer", why: "τ < 1 logit farklarını büyütür; en büyüğün payı artar."}
+        - {t: "≈ 0.54'e çıkar", ok: true, why: "Logit farkları iki katına çıkar; olasılıklar p_i^2 ile orantılı hâle gelir ve yeniden normalize edilir."}
+        - {t: "1 olur", why: "Bu yalnız τ → 0 limitinde (açgözlü seçim)."}
+    presets:
+      - {name: "Model dağılımı", params: {tau: 1, k: 12, p: 1, n: 2000}, note: "Hiçbir dönüşüm yok; sıklıklar olasılıklara yakın."}
+      - {name: "Açgözlü (τ → 0)", params: {tau: 0.05, k: 12, p: 1}, note: "Hep 'üstüne': deterministik ama tekrara eğilimli."}
+      - {name: "Sıcak ve kesmesiz", params: {tau: 3, k: 12, p: 1, n: 2000}, note: "Anlamsız adaylar (mavi, uçtu) ≈ %4 pay alıyor (τ = 1'de ≈ %0.1)."}
+      - {name: "Sıcak + top-p 0.9", params: {tau: 3, k: 12, p: 0.9}, note: "Çeşitlilik kalıyor ama en kötü kuyruk kesiliyor."}
+      - {name: "top-k = 3", params: {tau: 1, k: 3, p: 1}, note: "Yalnız üç aday; dağılım hep 3 token'a kesilir, model emin olsa da olmasa da."}
+    questions:
+      - q: "Sıcaklık iki token arasındaki olasılık oranını nasıl değiştirir?"
+        a: "p_i/p_j = exp((z_i − z_j)/τ). τ'yu yarıya indirmek oranın karesini alır; τ → ∞'da oran 1'e (düzgün dağılım), τ → 0'da ∞'a (argmax) gider. Sıcaklık sıralamayı asla değiştirmez."
+      - q: "Top-k ve top-p'yi birlikte kullanınca hangi sıra uygulanır ve neden önemli?"
+        a: "Bu deneyde (ve Hugging Face'te) sıcaklık → top-k → top-p. Top-p eşiği sıcaklıktan sonraki olasılıklarla hesaplandığı için aynı p, farklı τ'da farklı sayıda token tutar."
+    limits: "Tek adım ve sabit, elle seçilmiş 12 logit. Gerçek üretimde her seçim sonraki dağılımı değiştirir; tekrar cezası, min-p, ışın araması (M4.13) gibi başka kurallar da vardır."
+  - id: l3
+    lab: lnplace
+    title: "LayerNorm nereye? Post-LN, Pre-LN ve artık akış"
+    goal: |
+      Aynı rastgele başlatılmış artık yığını üç düzenle kur: orijinal Transformer'daki Post-LN $x\leftarrow\mathrm{LN}(x+F(x))$, GPT-2'deki Pre-LN $x\leftarrow x+F(\mathrm{LN}(x))$ ve LN'siz $x\leftarrow x+F(x)$. Katman başına gradyan normunu ve artık akışın büyüklüğünü ölç; çıkış izdüşümünü GPT-2 gibi $1/\sqrt{L}$ ile küçült.
+    predict:
+      q: "Pre-LN'de (standart başlatma) 48 bloktan sonra artık akışın RMS'i girdiye göre kaç kat olur?"
+      options:
+        - {t: "≈ 1 kat (LN tutar)", why: "Pre-LN'de LN akışın kendisine değil, dalın girdisine uygulanır; akış normalize edilmez."}
+        - {t: "≈ 7 kat", ok: true, why: "Her blok varyansı ≈ 1 olan bağımsız bir katkı ekler: Var ≈ L + 1, RMS ≈ √49 = 7."}
+        - {t: "Binlerce kat", why: "Bu LN'siz yığının davranışı: dal girdisi normalize edilmediği için katkılar akışla birlikte büyür."}
+    presets:
+      - {name: "Post-LN, 24 blok", params: {arch: 0, L: 24, ps: 0}, note: "Akış sabit; son blok gradyanı büyük ve L'den bağımsız."}
+      - {name: "Pre-LN, 48 blok", params: {arch: 1, L: 48, ps: 0}, note: "Akış ≈ 7 kat büyüyor; son blok gradyanı küçülüyor (≈ 1/√L)."}
+      - {name: "Pre-LN + 1/√L", params: {arch: 1, L: 48, ps: 1}, note: "GPT-2 başlatması: akış ≈ √2 kat, gradyan profili dengeli."}
+      - {name: "LN yok", params: {arch: 2, L: 24, ps: 0}, note: "Akış ve gradyanlar üstel patlıyor."}
+      - {name: "LN yok + 1/√L", params: {arch: 2, L: 48, ps: 1}, note: "Küçük dallarla LN'siz yığın da kararlı başlıyor."}
+    questions:
+      - q: "Pre-LN'de son bir LayerNorm (ln_f) neden gerekir?"
+        a: "Akış normalize edilmeden büyüdüğü (≈ √L) ve blokların katkılarının toplamı olduğu için, çıkış katmanına girmeden önce ölçeği sabitlemek gerekir. Post-LN'de her bloğun sonu zaten LN'dir."
+      - q: "Grafikte ölçülen şey eğitimin kararlılığı mı?"
+        a: "Hayır: yalnız başlangıçtaki gradyan büyüklükleri ve akış ölçeği. Xiong ve ark. (2020) ve Liu ve ark. (2020), Post-LN'in büyük öğrenme oranıyla ısınmasız ıraksadığını eğitim deneyleriyle gösterir; buradaki profil bu davranışın başlangıç koşuludur."
+    limits: "Dikkat alt-katmanı yok (yalnız MLP dalları), d = 32, batch 8, kayıp rastgele bir yönle iç çarpım, eğitim yok. Gerçek Transformer'da her blokta iki dal (dikkat + MLP) vardır; GPT-2 bu yüzden 1/√(2L) kullanır."
+  - id: l4
+    lab: kvcache
+    title: "KV önbelleği: hesaptan kazan, bellekle öde"
+    goal: |
+      Otoregresif üretimde yeni her token için tüm öneki yeniden işlemek ile geçmişin K ve V'sini saklayıp yalnız yeni token'ı işlemek arasındaki toplam FLOP farkını ve önbelleğin belleğini hesapla. K/V başlarını paylaşmanın (MQA/GQA) önbelleği nasıl küçülttüğünü gör.
+    predict:
+      q: "GPT-2 small, 1024 token'lık bağlam, fp16, batch 1: K/V önbelleği ne kadar tutar?"
+      options:
+        - {t: "≈ 1.5 MiB", why: "Bu tek bir katmanın tek K'sı bile değil; katman ve K+V çarpanlarını unutma."}
+        - {t: "≈ 36 MiB", ok: true, why: "2 (K, V) × 12 katman × 1024 token × 768 × 2 bayt = 36 MiB."}
+        - {t: "≈ 250 MiB", why: "Bu, ağırlıkların fp16 boyutu (124M × 2 bayt)."}
+    presets:
+      - {name: "GPT-2 small", params: {d: 768, L: 12, h: 12, kv: 12, P: 64, n: 960, B: 1, bits: 0}, note: "Önbellek 36 MiB; önbelleksiz üretim yüzlerce kat fazla iş."}
+      - {name: "Büyük batch, uzun bağlam", params: {d: 4096, L: 32, h: 32, kv: 32, P: 2048, n: 1024, B: 32, bits: 0}, note: "7B ölçeğinde: önbellek (≈ 48 GiB) ağırlıkların ≈ 4 katı."}
+      - {name: "GQA (8 K/V başı)", params: {d: 4096, L: 32, h: 32, kv: 8, P: 2048, n: 1024, B: 32, bits: 0}, note: "Önbellek 4 kat küçük (LLaMA-2 70B ve sonrası gibi)."}
+      - {name: "MQA (1 K/V başı)", params: {d: 4096, L: 32, h: 32, kv: 1, P: 2048, n: 1024, B: 32, bits: 0}, note: "32 kat küçük; kalite kaybı GQA'dan biraz fazla."}
+      - {name: "Tek token", params: {P: 64, n: 1}, note: "İlk token için iki yöntem aynı işi yapar (prefill)."}
+    questions:
+      - q: "Önbellek neden yalnız K ve V'yi saklar, Q'yu saklamaz?"
+        a: "Yeni token'ın çıktısı yalnız kendi sorgusuna ve geçmişin tüm K, V'sine bağlıdır. Eski sorgular yalnız eski token'ların çıktıları için gerekiyordu; nedensel maske yüzünden o çıktılar değişmez, bir daha hesaplanmaz."
+      - q: "Önbellekle de adım başına maliyet neden bağlamla büyür?"
+        a: "Yeni sorgu t anahtarın hepsiyle çarpılır ve t değer toplanır: adım başına 4·L·t·d FLOP ve tüm önbelleğin bellekten okunması. Önbellek karesel yeniden hesaplamayı kaldırır, dikkatin doğrusal maliyetini değil."
+    limits: "FLOP sayımı yaklaşık (V = 50 257 sabit, eleman bazlı işlemler yok); gerçek hız çoğu kez FLOP'la değil bellek bant genişliğiyle sınırlıdır. Sayfalı önbellek (vLLM), kayan pencere, önbellek nicemleme gibi teknikler hesaba katılmadı."

@@ -149,7 +149,7 @@ function mount(sec, spec, cfg) {
     if (!A.out || (B && !B.out)) { out.classList.add("stale"); return; }
     out.classList.remove("stale");
     const plots = A.out.plots.map((P, i) => {
-      if (!B) return plot(P, P.size || {});
+      if (!B) return P.wide ? `<div class="plot-wide">${plot(P, P.size || {})}</div>` : plot(P, P.size || {});
       const Q = B.out.plots[i];
       if (P.img || P.side) return `<div class="lab-pair">${plot({ ...P, title: "A · " + (P.title || "") }, { w: 320, h: 260 })}${plot({ ...Q, title: "B · " + (Q.title || "") }, { w: 320, h: 260 })}</div>`;
       const ser = [...P.series.map((s) => ({ ...s, name: s.name ? "A: " + s.name : s.name })), ...Q.series.map((s, k) => ({ ...s, c: s.c ?? k, dash: true, name: s.name ? "B: " + s.name : s.name }))];
