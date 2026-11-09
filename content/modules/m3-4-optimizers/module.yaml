@@ -148,6 +148,27 @@ labs:
         a: "Bağımsız gürültü için $\\mathrm{Var}(m)=(1-\\beta)^2\\sum_k\\beta^{2k}\\sigma^2=\\frac{(1-\\beta)^2}{1-\\beta^2}\\sigma^2=\\frac{1-\\beta}{1+\\beta}\\sigma^2$."
     limits: "Gürültü bağımsız Gauss; gerçek gradyan gürültüsü ilişkili ve durağan değildir."
 
+  - id: l3
+    lab: lrsched
+    title: "Öğrenme oranı takvimleri: ısınma, kosinüs, 1cycle, plato"
+    goal: |
+      Gürültülü, kötü koşullu bir kuadratikte SGD + momentum. Sol: seçilen takvimin ηₜ eğrisi; orta: kayıp; sağ: aynı tohum ve η₀ ile tüm takvimlerin son %10'luk dilimdeki ortalama kaybı.
+    predict:
+      q: "Gürültü σ = 0.3 iken sabit η'ya göre azalan bir takvim ne kazandırır?"
+      options:
+        - {t: "Sonda daha küçük adımlar gürültü topunu daraltır: son kayıp belirgin düşer", ok: true, why: "Gürültü topunun büyüklüğü ∝ η: η'yı sona doğru küçültmek kaybı düşürür."}
+        - {t: "Hiçbir şey; optimum aynı", why: "Optimum aynı ama sabit η ile ona yakınsanmaz, etrafında dolaşılır."}
+        - {t: "Daha kötü: küçük η yavaş", why: "Başta büyük η ile ilerleyip sonra küçültmek iki dünyanın iyisini alır."}
+    presets:
+      - {name: "Gürültülü, kosinüs", params: {kind: 4, eta: 0.1, warm: 0.05, noise: 0.3, kappa: 100}, note: "Kosinüs sonda η'yı sıfıra yaklaştırır."}
+      - {name: "Gürültülü, sabit", params: {kind: 0, eta: 0.1, noise: 0.3, kappa: 100}, note: "Kayıp bir tabanda dalgalanıyor."}
+      - {name: "Gürültüsüz, sabit", params: {kind: 0, eta: 0.1, noise: 0, kappa: 100}, note: "Gürültü yokken sabit η en iyisi olabilir: azaltmak yalnız yavaşlatır."}
+      - {name: "1cycle", params: {kind: 5, eta: 0.2, noise: 0.3, kappa: 100}, note: "Önce artan, sonra azalan η."}
+      - {name: "Plato", params: {kind: 6, eta: 0.1, noise: 0.3, kappa: 100}, note: "İyileşme durunca yarıya: gürültülü kayıpta erken ve sık tetiklenebilir."}
+    questions:
+      - q: "Sağdaki sıralama η₀ değişince neden değişiyor?"
+        a: "Her takvimin 'iyi' η₀ aralığı farklı: üstel ve parçalı takvimler büyük η₀'ı tolere eder, sabit takvim etmez. Takvimleri karşılaştırırken her biri için η₀'ı ayrı ayarlamak gerekir."
+    limits: "İki boyutlu gürültülü kuadratik; derin ağların keskinlik (sharpness) değişimleri, ısınmanın asıl faydası ve Adam'la etkileşim burada görünmez."
 practice:
   - id: p1
     type: çözülmüş
