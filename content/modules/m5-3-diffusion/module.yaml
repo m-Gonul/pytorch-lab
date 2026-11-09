@@ -121,6 +121,26 @@ labs:
         a: "ᾱ_T büyür (≈ 0.13): son x_T hâlâ sinyal içerir ama örnekleme saf gürültüden başlar. DDPM'de T küçültülünce β_T büyütülür (M8.2'de 0.05)."
     limits: "Tek bir 1B sinyal; ε her ayar değişiminde aynı tohumla yeniden çekilir."
 
+  - id: l2
+    lab: diff1d
+    title: "Kâhin gürültü tahminiyle DDPM ve DDIM: adım sayısı ve takvim"
+    goal: |
+      Veri iki tepeli bir Gauss karışımı; bu durumda en iyi gürültü tahmini E[ε | x_t] kapalı formdadır (kâhin). Eğitim hatası olmadan DDPM ve DDIM örnekleyicilerini çalıştır. Adım sayısı, takvim ve T değişince örneklerin dağılımının veriye ne kadar uyduğunu ölç; 12 örneğin gürültüden veriye yörüngesini izle.
+    predict:
+      q: "Kâhin ε ile DDIM'i yalnız 3 adımla çalıştırırsan örneklerin ne kadarı bir tepenin yakınına düşer?"
+      options:
+        - {t: "Neredeyse hepsi: kâhin kusursuz", why: "Kâhin her adımda doğru ε'yu verir ama büyük adımlarda x̂₀ tahmini iki tepe arasında kalır."}
+        - {t: "Yaklaşık yarısı", ok: true, why: "Ölçülen: 3 adımda %48.7, 5 adımda %86.7, 20 adımda %99.4 (DDPM 200 adımda %99.9)."}
+        - {t: "Hiçbiri", why: "Bir kısmı yine tepelere düşer."}
+    presets:
+      - {name: "DDPM, T = 200", params: {sampler: 0, T: 200, sched: 0, m: 2, w: 0.3, n: 1000}, note: "Sol tepe oranı 0.308 (hedef 0.3); örneklerin %99.9'u bir tepenin yakınında."}
+      - {name: "DDIM, 20 adım", params: {sampler: 1, steps: 20, T: 200}, note: "20 ağ değerlendirmesiyle %99.4: DDPM'nin 200 adımına yakın."}
+      - {name: "DDIM, 3 adım", params: {sampler: 1, steps: 3, T: 200}, note: "Örneklerin yalnız %48.7'si tepelerde; sol tepe oranı 0.17'ye düşüyor."}
+      - {name: "Kısa zincir, kosinüs", params: {sampler: 0, T: 20, sched: 1}, note: "Kosinüs takvimiyle 20 adımlık DDPM bile tepeleri buluyor (%99.9)."}
+    questions:
+      - q: "Kâhin varken DDIM neden az adımda bozuluyor?"
+        a: "Her adımda x̂₀ = (x_t − √(1−ᾱ)ε̂)/√ᾱ, x_t'ye göre E[x₀|x_t] tahminidir. Gürültü yüksekken bu tahmin iki tepenin ağırlıklı ortalamasıdır. Büyük bir adım bu ortalamayı doğrudan düşük gürültüye taşır ve örnek tepelerin arasında kalır. Küçük adımlarda belirsizlik kademeli çözülür."
+    limits: "Tek boyut ve kapalı form kâhin; gerçek ağlar kâhinin yaklaşığıdır ve hataları da katılır. Doğrusal takvimde β_T = min(0.5, 0.02·1000/T) olarak T'ye göre ölçeklenir."
 practice:
   - id: p1
     type: çözülmüş
