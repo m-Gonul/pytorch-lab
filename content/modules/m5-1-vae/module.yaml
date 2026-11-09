@@ -192,3 +192,65 @@ whatif:
     a: "KL'nin −ln σ² terimi büyür; yeniden yapılandırma deterministik AE'ye yaklaşır ama ceza çok artar. Denge, bilgi miktarını (bit) belirler."
   - q: "Gizli boyut 2'den 200'e çıkarsa?"
     a: "Kullanılmayan boyutlar önsele çöker (KL ≈ 0, 'etkin olmayan birimler'); etkin boyut sayısı verinin karmaşıklığı ve β tarafından belirlenir."
+
+labs:
+  - id: l1
+    lab: klasym
+    title: "KL'nin iki yönü: moment eşleme ve tepe arama"
+    goal: |
+      İki tepeli bir dağılıma tek bir Gauss uydur. İleri KL(p‖q)'nün kapalı form çözümünü (ortalama ve varyans eşleme) ters KL(q‖p)'nin ızgara ya da yerel inişle bulunan çözümüyle karşılaştır. Tepelerin uzaklığı, genişliği ve ağırlığı değişince iki çözümün nasıl davrandığını izle.
+    predict:
+      q: "Eşit ağırlıklı, iyi ayrık iki tepe. Ters KL(q‖p)'yi en küçükleyen Gauss nereye yerleşir?"
+      options:
+        - {t: "İki tepenin ortasına, ikisini de örterek", why: "Bu ileri KL'nin çözümüdür (moment eşleme)."}
+        - {t: "Tepelerden birinin üstüne", ok: true, why: "q'nun olasılık verdiği yerde p küçükse ceza büyüktür; tek tepeye oturan q için KL(q‖p) ≈ log(1/0.5) = 0.693 (ölçülen 0.693–0.70)."}
+        - {t: "Rastgele bir yere", why: "Ters KL'nin iki yerel minimumu var ama ikisi de tepelerin üstünde."}
+    presets:
+      - {name: "Ayrık eşit tepeler", params: {m: 2.5, s: 0.6, w: 0.5, start: 0}, note: "İleri çözüm μ = 0, σ = 2.57; ters çözüm tepelerden birinde (σ ≈ 0.65), KL(q‖p) ≈ 0.70. İleri çözümün ters KL'si 14.1."}
+      - {name: "Ağır sol tepe", params: {w: 0.8, start: 0}, note: "Ters KL büyük tepeyi seçiyor: KL(q‖p) = 0.23 ≈ log(1/0.8)."}
+      - {name: "Yanlış başlangıç", params: {w: 0.8, start: 1}, note: "Sağ (hafif) tepeden başlayan gradyan inişi orada kalıyor: KL(q‖p) = 1.61 ≈ log(1/0.2). Ters KL dışbükey değil."}
+      - {name: "Örtüşen tepeler", params: {m: 0.5, w: 0.5, start: 0}, note: "p neredeyse tek tepeli: iki yön de μ ≈ 0, σ ≈ 0.78 civarında çözüm veriyor."}
+    questions:
+      - q: "VAE'nin ELBO'su neden ters KL'yi kullanır, ileriyi değil?"
+        a: "ELBO = log p(x) − KL(q‖p(z|x)) özdeşliği ters yönü verir ve beklenti q altında alındığı için q'dan örnekleyerek kestirilebilir. İleri KL(p(z|x)‖q) gerçek posteriordan örnek gerektirirdi; o hesaplanamıyor."
+    limits: "Tek boyut ve tek Gauss q; KL'ler 600 noktalı ızgarada sayısal integralle hesaplanıyor. Ters KL çözümü 0.1'lik ızgarada ya da sonlu farklı gradyan inişiyle bulunuyor."
+  - id: l2
+    lab: gradest
+    title: "Örnekleme içinden gradyan: reparametrizasyon ve skor fonksiyonu"
+    goal: |
+      ∂/∂μ E_{z~N(μ,σ²)}[f(z)] gradyanını n örnekle iki yoldan kestir: reparametrizasyon (f'nin türevi) ve skor fonksiyonu (f'nin değeri × log-yoğunluğun türevi). 400 tekrarda kestiricilerin ortalamasını (yanlılık) ve standart sapmasını (gürültü) karşılaştır; türevlenemeyen bir f'de ne olduğunu gör.
+    predict:
+      q: "f(z) = 1[z > 0] (basamak) için reparametrizasyon kestiricisi ne verir?"
+      options:
+        - {t: "Gerçek gradyanı, gürültüyle", why: "Basamağın türevi neredeyse her yerde 0'dır; yol türevi her örnekte 0 verir."}
+        - {t: "Her zaman 0", ok: true, why: "Ölçülen: 0 ± 0; gerçek gradyan 0.352. Skor fonksiyonu 0.357 ± 0.20 ile doğru."}
+        - {t: "Sonsuz", why: "Türev 0 noktasında tanımsız ama örnek tam 0'a düşmez."}
+    presets:
+      - {name: "f = z²", params: {f: 0, mu: 0.5, sigma: 1, n: 10, base: 0}, note: "Gerçek 1.0. Reparametrizasyon 1.016 ± 0.638, skor 1.074 ± 1.54: skor kestiricisi 2.4 kat gürültülü."}
+      - {name: "Basamak", params: {f: 2, mu: 0.5, sigma: 1, n: 10}, note: "Reparametrizasyon 0 ± 0 (yanlış); skor 0.357 ± 0.20 (gerçek 0.352)."}
+      - {name: "Taban çizgisi işe yarıyor", params: {f: 0, mu: 2, sigma: 1, n: 10, base: 1}, note: "μ = 2: skor std'si 3.17'den 2.23'e iniyor; ama örnek ortalaması aynı örneklerden geldiği için ortalama 4 yerine 3.71 ((n−1)/n yanlılığı)."}
+      - {name: "Taban çizgisi işe yaramıyor", params: {f: 1, mu: 0.5, sigma: 1, n: 10, base: 1}, note: "f = sin z: taban çizgisi std'yi 0.183'ten 0.203'e çıkarıyor."}
+    questions:
+      - q: "Skor fonksiyonu kestiricisi neden yansızdır?"
+        a: "∇_μ E_q[f] = ∫ f ∇_μ q = ∫ f q ∇_μ log q = E_q[f ∇_μ log q]; Gauss için ∇_μ log q = (z − μ)/σ². Sabit bir b için E_q[b ∇ log q] = b ∇ ∫ q = 0, bu yüzden sabit taban çizgisi yanlılık getirmez."
+    limits: "Tek boyut, analitik gerçek gradyan; R = 400 tekrar. Gerçek VAE'de f bir sinir ağı ve z yüksek boyutludur; skor kestiricisinin varyansı boyutla hızla büyür."
+  - id: l3
+    lab: betavae
+    title: "Doğrusal β-VAE: hangi gizil boyutlar çöker?"
+    goal: |
+      Doğrusal kodlayıcı ve kod çözücülü, Gauss olabilirlikli bir VAE'nin analitik optimumunda gizil boyutların hangilerinin kullanıldığını gör. Veri özdeğerleri, gözlem gürültüsü σ², KL ağırlığı β ve gizil boyut k değiştikçe aktif boyut sayısını, boyut başına KL'yi ve modellenen sinyal varyansını ölç.
+    predict:
+      q: "β = 1, σ² = 0.02 ve özdeğerler 0.7'nin kuvvetleriyken k = 8 gizil boyutun kaçı kullanılır? β'yı 10'a çıkarınca?"
+      options:
+        - {t: "8 ve 8", why: "Eşik βσ² = 0.2'ye çıkınca küçük özdeğerli yönler eşiğin altında kalır."}
+        - {t: "8 ve 5", ok: true, why: "λ_8 = 0.7⁷ = 0.082 > 0.02, ama β = 10'da eşik 0.2 ve yalnız ilk 5 özdeğer (0.24'e kadar) aşıyor."}
+        - {t: "1 ve 0", why: "β = 1'de eşik çok düşük."}
+    presets:
+      - {name: "Standart VAE (β = 1)", params: {beta: 1, s2: 0.02, rho: 0.7, k: 8}, note: "8 aktif boyut, toplam KL 10.65 nat, sinyal varyansının %89.7'si modelleniyor."}
+      - {name: "β-VAE (β = 10)", params: {beta: 10, s2: 0.02, rho: 0.7, k: 8}, note: "Eşik 0.2: 5 aktif boyut, KL 2.24 nat, modellenen varyans %53."}
+      - {name: "Tam çöküş", params: {beta: 50, s2: 0.02, rho: 0.7, k: 8}, note: "Eşik 1.0 en büyük özdeğere eşit: hiçbir boyut kullanılmıyor."}
+      - {name: "Bol boyut, küçük β", params: {beta: 0.2, s2: 0.02, rho: 0.7, k: 16}, note: "16 boyutun hepsi aktif, KL 22.8 nat."}
+    questions:
+      - q: "Gözlem gürültüsünü (σ²) büyütmek neden β'yı büyütmekle aynı etkiyi yapar?"
+        a: "Gauss olabilirlikte yeniden yapılandırma terimi 1/(2σ²) ile ölçeklenir; amacı σ² ile çarpınca terimler arasındaki tek oran βσ² kalır. Eşik de yalnız bu çarpıma bağlıdır."
+    limits: "Doğrusal model ve kapalı form optimum; gerçek (doğrusal olmayan) VAE'lerde çöküş optimizasyon dinamiğine de bağlıdır. Özdeğerler sentetik bir geometrik dizi."
