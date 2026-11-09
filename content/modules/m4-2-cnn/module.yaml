@@ -191,3 +191,48 @@ pitfalls:
 whatif:
   - q: "Artık bloğun iki yolu farklı kanal sayısına sahipse?"
     a: "Atlama yoluna 1 × 1 konvolüsyon (adımlıysa adımlı) eklenir: izdüşüm kısayolu."
+
+labs:
+  - id: l1
+    lab: rfcalc
+    title: "Alıcı alan: teorik büyüme ve etkin (gradyan) profil"
+    goal: |
+      Giriş katmanı, aşama sayısı, aşama başına konvolüsyon ve çekirdek boyunu seç. Teorik alıcı alanın katman katman r ← r + (k − 1)·j ile nasıl büyüdüğünü, havuzlamadan sonra her katmanın neden daha çok eklediğini ve son katmanın merkez nöronunun gradyanının girdide nasıl dağıldığını (etkin alıcı alan) gör.
+    predict:
+      q: "Aşama başına konvolüsyon sayısını artırınca etkin alanın (±2σ) teorik alana oranı ne olur?"
+      options:
+        - {t: "Artar", why: "Teorik alan katman sayısıyla doğrusal, etkin genişlik yaklaşık karekökle büyür."}
+        - {t: "Azalır", ok: true, why: "Örneğin 5 aşamada aşama başına 1 → 4 konvolüsyon: oran %80'den %37'ye iniyor."}
+        - {t: "Değişmez", why: "Gauss benzeri profilin genişliği alandan yavaş büyür."}
+    presets:
+      - {name: "ResNet benzeri giriş", params: {k0: 7, s0: 2, stages: 4, convs: 2, k: 0, dil: 0}, note: "7×7/2 giriş + 4 aşama: teorik alan 141 piksel, son harita 14 × 14."}
+      - {name: "VGG benzeri", params: {k0: 3, s0: 1, stages: 5, convs: 2, k: 0, dil: 0}, note: "Yalnız 3×3: 282 piksel; etkin genişlik ≈ %61."}
+      - {name: "Derin aşamalar", params: {k0: 3, s0: 1, stages: 5, convs: 4, k: 0, dil: 0}, note: "Teorik alan 530 (girdiden büyük!), etkin ±2σ genişliği yalnız ≈ 198 piksel."}
+      - {name: "5×5 çekirdek", params: {k: 1}, note: "Aynı katman sayısında alan ≈ 2 kat (261)."}
+      - {name: "Genişleme", params: {dil: 1}, note: "Her aşamanın son konvolüsyonu d = 2: parametre eklemeden alan 141 → 201."}
+    questions:
+      - q: "Havuzlamadan sonra gelen bir 3×3 konvolüsyon neden havuzlamadan öncekinden daha fazla alan ekler?"
+        a: "Ekleme (k − 1)·j; her 2×2 havuzlama j'yi ikiye katlar. Örneğin j = 8'de bir 3×3 katman 16 piksel ekler, j = 1'de yalnız 2."
+    limits: "1-B kesit, tek tip pozitif ağırlıklı doğrusal katmanlar (doğrusalsızlık yok); etkin alan başlangıçtaki rastgele olmayan bir ağın profili. Gerçek eğitilmiş ağlarda profil veriye ve öğrenilen ağırlıklara bağlıdır."
+  - id: l2
+    lab: resgrad
+    title: "Düz ağ vs artık ağ: gradyan katmanlardan nasıl geçer?"
+    goal: |
+      Aynı ağırlıklarla düz bir ağı ve artık (residual) ağı karşılaştır. Düz ağda gradyan katman katman Jacobian'larla çarpılır ve başlatma ölçeği 1'den biraz saparsa üstel olarak söner ya da patlar; artık ağda kimlik yolu gradyanı ilk katmana çarpansız taşır. Artık dalın ölçeği α'nın ileri geçişteki varyans birikimini nasıl belirlediğini gör.
+    predict:
+      q: "30 katman, ReLU, başlatma çarpanı 0.8. Düz ağda ilk katmanın gradyan normu son katmanınkinin kabaca kaçta biri olur?"
+      options:
+        - {t: "≈ 1 (dengeli)", why: "Çarpan 0.8 her katmanda gradyanı ≈ 0.8 ile ölçekler."}
+        - {t: "≈ 10⁻³–10⁻⁴", ok: true, why: "0.8³⁰ ≈ 10⁻³; sonlu genişlik dalgalanmalarıyla tohum 1'de 4·10⁻⁴. Artık ağda oran ≈ 1.3."}
+        - {t: "≈ 10³", why: "Çarpan 1'den küçük: sönme, patlama değil."}
+    presets:
+      - {name: "Sönme", params: {L: 30, act: 1, c: 0.8, alpha: 0.2}, note: "Düz ağ: oran ≈ 4·10⁻⁴; artık ağ ≈ 1.3."}
+      - {name: "Patlama", params: {L: 30, act: 1, c: 1.3, alpha: 0.2}, note: "Düz ağ: oran ≈ 900; artık ağ ≈ 2.6."}
+      - {name: "Doğru başlatma", params: {L: 30, act: 1, c: 1, alpha: 0.2}, note: "He başlatmasıyla bile 32 nöron genişlikte düz ağın oranı 0.04–0.4 arasında dalgalanıyor (sonlu genişlik etkisi)."}
+      - {name: "α = 1", params: {alpha: 1}, note: "Standart toplama, normalizasyonsuz: her blok varyans ekliyor, 30 blokta RMS ≈ 1500 — BN ya da ölçekleme gerekli."}
+      - {name: "α = 0", params: {alpha: 0}, note: "Her blok tam kimlik: gradyan değişmeden geçiyor (Fixup'ın başlangıcı)."}
+      - {name: "60 katman", params: {L: 60}, note: "Düz ağ oranı ≈ 10⁻⁷; artık ağ ≈ 2."}
+    questions:
+      - q: "Artık ağda gradyan neden hiç sönmüyor ama α = 1'de aktivasyonlar büyüyor?"
+        a: "Jacobian I + α·∂F: kimlik terimi gradyanı korur. Ama ileri geçişte h_{l+1} = h_l + αF(h_l) her blokta bağımsız bir terim ekler; varyanslar toplanır (yaklaşık (1 + α²·c)^L gibi büyür). BatchNorm, Fixup ya da α ≈ 1/√L bunu dengeler."
+    limits: "Tam bağlı bloklar (konvolüsyon değil), 32 nöron genişlik, 8 örnek, normalizasyon yok, rastgele doğrusal kayıp yönü; yalnız başlangıç anı (eğitim yok)."
