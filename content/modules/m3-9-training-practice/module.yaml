@@ -185,3 +185,68 @@ pitfalls:
 whatif:
   - q: "Aynı deneyi farklı tohumlarla tekrarlayınca sonuç ±2 puan değişiyorsa?"
     a: "Karşılaştırmalar en az 3–5 tohumla ortalama ± std ve eşleştirilmiş bootstrap ile raporlanmalı (M8.2 x3); tek koşuluk 1 puanlık 'iyileşme' gürültü olabilir."
+
+labs:
+  - id: l1
+    lab: capcurve
+    title: "Teşhis: öğrenme eğrisi ve kapasite eğrisi"
+    goal: |
+      Aynı veri üreticisinde model genişliğini (p) ve veri miktarını (n) değiştir. Eğitim ve doğrulama hatasının birbirine ve gürültü tabanına göre konumundan yanlılık mı, varyans mı olduğunu oku; öğrenme eğrisinin "daha çok veri yardım eder mi?" sorusuna verdiği cevabı gör.
+    predict:
+      q: "p = 4 nöronla eğitim ve doğrulama hatası ikisi de ≈ 0.2 (σ² = 0.09). Veriyi 40'tan 400'e çıkarmak ne yapar?"
+      options:
+        - {t: "Doğrulama hatasını gürültü tabanına indirir", why: "Model kapasitesi yetmiyor: eğitim hatası bile yüksek. Veri yanlılığı azaltmaz."}
+        - {t: "Pek bir şey değiştirmez", ok: true, why: "Yüksek yanlılık: öğrenme eğrisi zaten düzleşmiş. Kapasiteyi artırmak (p ↑) gerekiyor."}
+        - {t: "Aşırı uyumu artırır", why: "Daha çok veri aşırı uyumu azaltır, artırmaz."}
+    presets:
+      - {name: "Eksik uyum", params: {p: 4, n: 40, lam: 0.001}, note: "Eğitim ≈ doğrulama ≈ 0.2 > σ²: yüksek yanlılık. Öğrenme eğrisi sağda düz."}
+      - {name: "Aşırı uyum", params: {p: 120, n: 20, lam: 1.0e-6}, note: "Eğitim ≈ 0.004, doğrulama 1'in üstünde: 20 noktaya 120 nöron, neredeyse düzenlileştirme yok."}
+      - {name: "Aynı model, çok veri", params: {p: 120, n: 400, lam: 1.0e-6}, note: "400 örnekte aynı büyük model dengeli: varyans sorunu veriyle çözüldü."}
+      - {name: "Aynı model, güçlü ridge", params: {p: 120, n: 20, lam: 1}, note: "Veri az ama λ büyük: aşırı uyum bastırılıyor (bedeli biraz yanlılık)."}
+      - {name: "Dengeli", params: {p: 16, n: 40, lam: 0.001}, note: "Orta kapasite: eğitim hatası σ²'ye yakın, fark küçük (tohuma göre sınırda)."}
+    questions:
+      - q: "Kapasite eğrisinde doğrulama hatası neden p büyüdükçe önce azalıp sonra artıyor?"
+        a: "Küçük p'de yanlılık baskın; p büyüdükçe yanlılık düşer ama sabit n = 40 veride varyans artar. Burada son katmanda hafif ridge olduğu için M3.8'deki keskin çift iniş tepesi görünmez; λ'yı 10⁻⁶'ya indirip n'yi küçültürsen p ≈ n civarında yükseliş belirginleşir."
+    limits: "Tek boyutlu girdi, rastgele ReLU gizli katmanı sabit, yalnız çıktı katmanı (kapalı biçimde, ridge ile) eğitiliyor; 4 rastgele çekilişin ortalaması, 200 doğrulama noktası. Teşhis etiketi σ²/2 eşikli kaba bir kuraldır; sınırda tohuma göre değişir."
+  - id: l2
+    lab: leakage
+    title: "Veri sızıntısı: rapor edilen ve gerçek doğruluk"
+    goal: |
+      Aynı veride iki değerlendirme protokolü: biri sızdırıyor, biri sızdırmıyor. Rapor edilen doğruluğun gerçek (yeni veride ölçülen) doğruluktan ne kadar saptığını gör.
+    predict:
+      q: "Etiketler tamamen rastgele, 1000 gürültü öznitelikten tüm veriye bakarak en iyi 20'si seçiliyor, sonra 5-katlı CV. CV doğruluğu ne çıkar?"
+      options:
+        - {t: "≈ %50", why: "Doğru protokolde öyle. Ama seçim test katlarının etiketlerini de görmüş."}
+        - {t: "%80'in üstünde", ok: true, why: "Tohum 1'de %95. Seçilen öznitelikler şans eseri tüm etiketlerle (test katları dahil) ilişkili."}
+        - {t: "%50'nin belirgin altında", why: "Doğru protokolde %40 gibi değerler gürültüyle görülebilir ama beklenen değer %50."}
+    presets:
+      - {name: "Grup sızıntısı", params: {mode: 0, G: 40, m: 6, sw: 0.1}, note: "Rastgele bölme %100, grup bölmesi ≈ %81, gerçek ≈ %76: rastgele bölme hastayı tanımayı ölçüyor."}
+      - {name: "Dağınık gruplar", params: {mode: 0, sw: 1}, note: "Grup içi yayılım büyük: kardeşler artık birbirine yakın değil, sızıntı azalıyor."}
+      - {name: "Grup başına tek örnek", params: {mode: 0, m: 1}, note: "Sızacak kardeş yok: iki protokol istatistiksel olarak eşdeğer."}
+      - {name: "Öznitelik seçimi", params: {mode: 1, n: 40, d: 1000, k: 20}, note: "Yanlış protokol %95, doğru protokol ≈ %40–60 (şans)."}
+      - {name: "Az öznitelik", params: {mode: 1, d: 100, k: 20}, note: "d küçülünce sızıntı zayıflıyor ama yine %80 civarında sahte doğruluk."}
+    questions:
+      - q: "Grup bölmesinin sonucu neden gerçek doğruluktan biraz farklı?"
+        a: "Test kümesi yalnız ≈ 8 hastanın örneklerinden oluşuyor; kestirim gürültülü. Pratikte GroupKFold ile tüm katların ortalaması alınır. Sistematik bir yanlılık yok; rastgele bölmenin farkı ise sistematik."
+    limits: "İki boyutlu yapay gruplar ve 1-NN; öznitelik seçiminde en yakın merkez sınıflandırıcı. Gerçek sızıntılar çoğu zaman daha sinsidir (yakın kopyalar, zamana bağlı öznitelikler); zaman sızıntısı bu deneyde yok."
+  - id: l3
+    lab: classweight
+    title: "Dengesiz sınıflar: sınıf ağırlığı karar sınırını nasıl kaydırır?"
+    goal: |
+      Azınlık sınıfına w ağırlığı ver ve ağırlıklı çapraz entropiyle lojistik regresyon eğit. Sabit terimin ≈ log w kaydığını, karar sınırının paralel kaydığını, recall'un artıp precision ve kalibrasyonun bozulduğunu gör; çıkarımda log w'yi geri çıkarınca ne olduğuna bak.
+    predict:
+      q: "π = %5, ters frekans ağırlığı w = 19. Öğrenilen sabit terim yaklaşık ne kadar kayar?"
+      options:
+        - {t: "≈ 19", why: "Ağırlık logit'i çarpmaz; olabilirlik oranını çarpar."}
+        - {t: "≈ log 19 ≈ 2.94", ok: true, why: "logit q* = logit p + log w. Ölçülen kayma ≈ 3.07."}
+        - {t: "Kaymaz, yalnız eğim değişir", why: "Doğru belirlenmiş modelde eğimler değişmez; değişen sabit terimdir."}
+    presets:
+      - {name: "Ağırlıksız", params: {pi: 0.05, wmode: 0, corr: 0}, note: "Doğruluk %96 ama azınlık recall'u yalnız ≈ 0.32."}
+      - {name: "Ters frekans", params: {pi: 0.05, wmode: 1, corr: 0}, note: "Recall 0.32 → 0.84, precision 0.69 → 0.23, dengeli doğruluk 0.66 → 0.84, ham doğruluk 0.96 → 0.85. Ortalama tahmin olasılığı 0.24 — gerçek π 0.05."}
+      - {name: "Ters frekans + düzeltme", params: {pi: 0.05, wmode: 1, corr: 1}, note: "log w çıkarılınca kalibrasyon geri geliyor ama karar da ağırlıksız modele dönüyor: bu modelde ağırlık = eşik kaydırma."}
+      - {name: "Ilımlı ağırlık w = 5", params: {pi: 0.05, wmode: 2, w: 5, corr: 0}, note: "Arada bir nokta: recall ≈ 0.61, precision ≈ 0.42."}
+      - {name: "Çok nadir sınıf", params: {pi: 0.01, wmode: 1, corr: 0}, note: "π = %1: ağırlıksız model azınlığın %89'unu kaçırıyor; ağırlıklı model yakalıyor ama precision %5."}
+    questions:
+      - q: "Ağırlıklandırma ile eşiği 0.5'ten π'ye düşürmek bu deneyde neden neredeyse aynı sonucu veriyor?"
+        a: "Model doğru belirlenmiş (eşit kovaryanslı Gauss → lojistik): ağırlık yalnız logit'e sabit log w ekliyor. 0.5 eşiğinde logit + log w > 0 ⇔ p > 1/(1 + w), w = (1 − π)/π için p > π."
+    limits: "İki boyutlu, eşit kovaryanslı iki Gauss sınıfı; 3000 eğitim, 20 000 test örneği; Newton yöntemiyle tam çözüm (SGD değil). Ağırlıklandırmanın eşik kaydırmanın ötesindeki etkisi kapasitesi sınırlı ya da yanlış belirlenmiş modellerde ortaya çıkar."
