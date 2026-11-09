@@ -741,3 +741,6 @@ button.cv-c { cursor: pointer; }
 .bp-c4 { background: color-mix(in srgb, var(--c-a) 10%, transparent); } .bp-c5 { background: color-mix(in srgb, var(--c-b) 10%, transparent); }
 .bp-best td { font-weight: 700; background: color-mix(in srgb, var(--c-q) 20%, transparent); }
 .bp-m { font-family: var(--mono); font-size: 0.78rem; margin: 4px 0; padding-left: 1.6em; }
+/* attnviz (M4.6) */
+.at-t td { min-width: 3.2em; }
+.at-t tr.at-sel th, .at-t tr.at-sel td { outline: 2px solid var(--c-q); outline-offset: -2px; }

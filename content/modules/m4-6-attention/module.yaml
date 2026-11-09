@@ -105,6 +105,48 @@ labs:
       - q: "Entropi–d_k grafiğinde ölçekli eğri neden yatay?"
         a: "Ölçekli skorların dağılımı d_k'dan bağımsız (std 1); dolayısıyla softmax dağılımı da d_k'dan bağımsız."
     limits: "Rastgele q, k; eğitilmiş modellerde q ve k ilişkilidir ve normları öğrenilir (QK-norm gibi teknikler bu yüzden var)."
+  - id: l2
+    lab: attnviz
+    title: "Dikkat matrisi, satır satır: sorgu, skor, maske, ağırlıklı toplam"
+    goal: |
+      Küçük bir cümlede elle tasarlanmış sorgu/anahtar/değer vektörleriyle ölçekli nokta çarpımı dikkatini hesapla. Bir sorguya tıkla: skorlar, softmax ağırlıkları ve çıktının hangi değerlerden karıştığı görünür. Nedensel ve dolgu maskelerini, ölçeklemeyi ve sıcaklığı değiştir.
+    predict:
+      q: "Dolgu maskesi kapalıyken &lt;pad&gt; tokenı ne olur?"
+      options:
+        - {t: "Hiçbir etkisi olmaz, anahtarı sıfır vektör", ok: false, why: "Anahtar sıfırsa skoru 0 olur — −∞ değil; softmax'ta e⁰ = 1 pay alır."}
+        - {t: "Her sorgudan bir miktar ağırlık alıp çıktıları kirletir", ok: true, why: "Skor 0, diğer skorlarla yarışır; maske −∞ ile tam 0 yapar."}
+        - {t: "Softmax tanımsız olur", why: "Yalnız tüm skorlar −∞ olursa (tamamen maskeli satır) sorun çıkar."}
+    presets:
+      - {name: "Kodlayıcı öz-dikkati", params: {q: 0, causal: 0, pad: 1, sq: 1, temp: 1}, note: "'Kraliçe' en çok 'Krallık'ı' ve 'Birleşik'e bakıyor (yer arıyor)."}
+      - {name: "Nedensel maske", params: {q: 4, causal: 1, pad: 1}, note: "'ziyaret' yalnız kendinden öncekilere bakabiliyor; üst üçgen sıfır."}
+      - {name: "Dolgu maskesi kapalı", params: {q: 0, pad: 0}, note: "Dolgu tokenı her satırdan pay alıyor."}
+      - {name: "Sert dikkat (τ = 0.2)", params: {q: 0, temp: 0.2}, note: "Dağılım argmax'a yaklaşıyor: neredeyse tek bir tokena bakıyor."}
+      - {name: "Düz dikkat (τ = 10)", params: {q: 0, temp: 10}, note: "Ağırlıklar eşitleniyor: çıktı tüm değerlerin ortalamasına yaklaşıyor."}
+    questions:
+      - q: "&lt;pad&gt; satırı (dolgu tokenının kendi sorgusu) neden önemsiz?"
+        a: "Sorgusu sıfır: tüm skorları eşit, ağırlıkları düzgün. Ama dolgu konumlarının çıktısı kayıpta da maskelendiği için hiçbir şeyi etkilemez."
+    limits: "4 boyutlu, elle tasarlanmış ve yorumlanabilir Q/K/V; tek baş. Gerçek modelde Q, K, V öğrenilen izdüşümlerdir ve boyutları yorumlanamaz."
+  - id: l3
+    lab: onlinesoftmax
+    title: "Çevrimiçi softmax: tam matrisi tutmadan tam sonuç"
+    goal: |
+      Bir sorgunun T skorunu B'lik bloklar hâlinde işle; koşan maksimum ve paydayı her blokta yeniden ölçekleyerek güncelle. Sonucun tam softmax'la (yuvarlama dışında) aynı olduğunu, belleğin T × T yerine T × B olduğunu ve max çıkarmayan saf softmax'ın büyük skorlarda taştığını gör.
+    predict:
+      q: "Blok boyunu 32'den 1'e indirirsen sonuç nasıl değişir?"
+      options:
+        - {t: "Yaklaşıklık hatası büyür", why: "Çevrimiçi softmax yaklaşık değil: her blok boyunda aynı sonucu verir."}
+        - {t: "Sonuç aynı kalır", ok: true, why: "Yeniden ölçekleme kesin bir cebirsel eşitlik; yalnız işlem sırası (ve yuvarlama) değişir."}
+        - {t: "Sonuç ıraksar", why: "Her adımda max çıkarıldığı için sayılar sınırlı kalır."}
+    presets:
+      - {name: "Varsayılan", params: {T: 256, B: 32, sc: 3, tr: 80}, note: "8 blok; fark ≈ 10⁻¹⁵."}
+      - {name: "Büyük skorlar", params: {sc: 1000}, note: "exp(1000) taşar: saf softmax NaN; çevrimiçi ve kararlı sürüm sorunsuz."}
+      - {name: "Blok boyu 1", params: {B: 1}, note: "Tamamen akış hâlinde (her anahtar tek tek): sonuç yine aynı."}
+      - {name: "Uzun bağlam", params: {T: 4096, B: 128}, note: "Tam matris 16.7 milyon skor; blok tamponu 0.5 milyon."}
+    questions:
+      - q: "Baskın skor dizinin sonundaysa (tr = 100) koşan çıktı neden son bloğa kadar yanlış görünür?"
+        a: "Koşan çıktı, o ana kadarki blokların softmax ortalamasıdır; baskın anahtar henüz görülmediği için ağırlıkları yanlıştır. Baskın blok gelince m sıçrar, eski toplamlar e^(m − m′) ile küçülür ve sonuç doğruya oturur. Ara sonuçlar anlamsızdır; yalnız son sonuç doğrudur."
+    limits: "Tek sorgu, skaler değerler, CPU'da JavaScript. Gerçek FlashAttention sorgu bloklarını da paralel işler, Q·Kᵀ'yi blok blok hesaplar ve geri geçişte P'yi yeniden hesaplar."
+
 
 practice:
   - id: p1
