@@ -197,3 +197,97 @@ pitfalls:
 whatif:
   - q: "Pencere boyu 2'den 10'a çıkarsa?"
     a: "Küçük pencere sözdizimsel/işlevsel benzerlik (aynı rolde kelimeler), büyük pencere konusal benzerlik yakalar."
+
+labs:
+  - id: l1
+    lab: sgnsgrad
+    title: "SGNS kaybı ve gradyanı: bir pozitif, k negatif, 2-B vektörler"
+    goal: |
+      Tek bir (merkez, bağlam) çifti ve en fazla iki negatif örnek için skip-gram + negatif örnekleme kaybını ve gradyanlarını hesapla. Vektörleri değiştirerek gradyanın merkez vektörünü pozitif bağlama doğru nasıl çektiğini, negatiflerden nasıl ittiğini gör. Ardından gradyan inişiyle ya yalnız merkez vektörünü ya da (word2vec'teki gibi) üç vektörü birden güncelle.
+    predict:
+      q: "Negatif örnek yokken (k = 0) yalnız pozitif terimi en küçüklersen vektörlere ne olur?"
+      options:
+        - {t: "u_o ve v_c aynı noktaya yakınsar, kayıp 0 olur", why: "Kayıp −log σ(u_o·v_c), ancak iç çarpım sonsuza giderken 0'a yaklaşır; aynı noktada durmak yetmez."}
+        - {t: "Normları sınırsız büyür; kayıp 0'a yaklaşır ama ulaşmaz", ok: true, why: "'Negatifsiz yozlaşma' senaryosunda 200 adımda ‖v_c‖ 1'den 4.6'ya çıkıyor, kayıp 0.010. Bütün vektörler bu şekilde büyüyüp hizalanırsa her kelime her kelimeye benzer olur; negatifler bunu engeller."}
+        - {t: "Hiçbir şey: gradyan sıfırdır", why: "σ(1) − 1 = −0.27 ≠ 0."}
+    presets:
+      - {name: "Varsayılan 2-B sahne", params: {vx: -0.5, vy: 1, ox: 1, oy: 0.5, k: 2, n1x: -1, n1y: 0.5, n2x: 0.5, n2y: -1, lr: 0.5, steps: 30, upd: 1}, note: "v_c, negatif u_1'e yakın başlıyor: J = 2.258, ∂J/∂v_c = (−1.120, −0.107). 30 adımda J = 0.014, cos(v_c, u_o) = 0.97. Yalnız v_c güncellenirse aynı sürede J = 0.384."}
+      - {name: "Ders el hesabı", params: {vx: 1, vy: 0, ox: 1, oy: 0, k: 2, n1x: 0, n1y: 0, n2x: -1, n2y: 0, steps: 0, upd: 1}, note: "1-B el hesabının 2-B gömülmüş hâli: J = 1.3197, ∂J/∂v_c = (−0.538, 0), ∂J/∂u_o = −0.269. Modülün el hesabı alanlarıyla aynı sayılar."}
+      - {name: "Sıfır vektörlü negatif", params: {vx: 1, vy: 0, ox: 1, oy: 0, k: 2, n1x: 0, n1y: 0, n2x: -1, n2y: 0, steps: 200, upd: 0}, note: "Yalnız v_c güncellenince kayıp 0.703'te kalıyor: u_1 = 0 olduğu için o terim sabit log 2 = 0.693 katkı veriyor ve gradyan üretmiyor. 'üçü birden' seçince u_1 v_c'nin tersine kayıyor ve taban kalkıyor (200 adımda 0.0013)."}
+      - {name: "Negatifsiz yozlaşma", params: {vx: 1, vy: 0, ox: 1, oy: 0, k: 0, steps: 200, upd: 0}, note: "k = 0: 200 adımda J 0.313'ten 0.010'a iniyor ama ‖v_c‖ 4.6'ya büyüyor. Kayıp yalnız büyüyerek azalabiliyor."}
+      - {name: "Ters yönden başla", params: {vx: -1, vy: 0.5, ox: 1, oy: 1, k: 1, n1x: -1, n1y: 1, steps: 60, upd: 1}, note: "v_c başta negatifin yanında, pozitiften uzak: J = 2.68. 60 adımda J = 0.0053 ve cos(v_c, u_o) = 0.92. Pozitif u_o da v_c'ye doğru dönüyor."}
+    questions:
+      - q: "Gradyan formülünde bir negatifin itme gücünü ne belirler?"
+        a: "σ(u_k·v_c): modelin o gürültü kelimesine verdiği 'gerçek' olasılığı. Zaten ayrılmış (σ ≈ 0) bir negatif neredeyse hiç gradyan vermez. Bu yüzden rastgele ve kolay negatiflerin çoğu boşa gider; zor negatif seçme (hard negative mining) yöntemleri bu gözleme dayanır."
+      - q: "Neden u_o ve u_k de güncellenmelidir? Yalnız v_c'yi eğitsek ne olurdu?"
+        a: "Çıktı vektörleri sabit kalsaydı, her kelimenin girdi vektörü sabit (rastgele) bir bağlam uzayına göre konumlanırdı: bağlam kelimeleri arasındaki benzerlik hiç öğrenilmezdi. 'Sıfır vektörlü negatif' senaryosu bir sonucunu gösteriyor: sıfır olan bir u_k hiç düzelmez ve kayba sabit log 2 katar."
+    limits: "Tek çift, en fazla iki negatif, 2 boyut, sabit öğrenme oranlı tam gradyan. Gerçek eğitimde negatifler her adımda yeniden çekilir, milyonlarca çift aynı vektörleri paylaşır ve öğrenme oranı doğrusal azalır."
+  - id: l2
+    lab: noisedist
+    title: "Gürültü dağılımı ve sık kelime alt-örneklemesi (Zipf sözlüğü)"
+    goal: |
+      Frekansları Zipf yasasına (f ∝ sıra^−s) uyan bir sözlükte iki word2vec ayarını ölç. Gürültü üssü α, negatif örneklerin sık ve nadir kelimeler arasında nasıl paylaştırıldığını belirler. Alt-örnekleme eşiği t ile formül (makale ya da word2vec.c kodu), metinden hangi tokenların atılacağını belirler.
+    predict:
+      q: "V = 10 000, s = 1: en sık 10 kelime tokenların ≈ %30'unu oluşturuyor. α = 0.75 ile negatif örneklerin yüzde kaçı bu 10 kelimeden gelir?"
+      options:
+        - {t: "≈ %30 (frekansla aynı)", why: "Bu α = 1'de olur."}
+        - {t: "≈ %10", ok: true, why: "Ölçülen %10.3: 3/4 kuvveti sık kelimelerin payını üçte birine indiriyor, kuyruğun (sıra > 1000) payını %23.5'ten %47.9'a çıkarıyor."}
+        - {t: "≈ %0.1", why: "Bu α = 0 (düzgün dağılım) olur: 10/10 000."}
+    presets:
+      - {name: "word2vec varsayılanları", params: {V: 10000, s: 1, alpha: 0.75, form: 1, tl: -5}, note: "Makale formülü, t = 10⁻⁵: tokenların %80'i atılıyor, en sık 10 kelimenin payı %29.9'dan %2.5'e iniyor."}
+      - {name: "Düzgün gürültü", params: {alpha: 0}, note: "α = 0: en sık 10 kelime negatiflerin yalnız %0.1'i. 've', 'bir' gibi kelimeler neredeyse hiç negatif olmuyor; model onları her şeye 'benzer' bulabilir."}
+      - {name: "Ham unigram", params: {alpha: 1}, note: "α = 1: negatiflerin %29.9'u en sık 10 kelimeden. Sıra > 1000 kuyruğun negatiflerdeki payı %23.5: nadir kelimeler az ceza alıyor."}
+      - {name: "Kod formülü", params: {form: 2, tl: -5}, note: "word2vec.c formülü aynı t'de %74 atıyor (makale %80). Tam tutulma f ≤ 2.618 t'de başlıyor; makalede f ≤ t."}
+      - {name: "Kodun varsayılan eşiği", params: {form: 2, tl: -3}, note: "t = 10⁻³ (word2vec.c ve Gensim varsayılanı) çok daha yumuşak: tokenların %28'i atılıyor (aynı t ile makale formülü %34), en sık kelime 0.109 olasılıkla tutuluyor."}
+    questions:
+      - q: "Alt-örnekleme olasılıkları neden kelime türüne değil frekansa bağlı? 've' gibi bir işlev kelimesi nadir olsaydı ne olurdu?"
+        a: "Yöntem anlamı bilmez, yalnız frekansı görür. Fikir şudur: çok sık bir kelimenin her ek geçişi, bağlam dağılımı hakkında çok az yeni bilgi taşır. Nadir bir işlev kelimesi atılmazdı, ama nadir olduğu için zaten az pencereye girerdi."
+      - q: "Etkin frekansın √(t·f) olması, eğitimin hangi kelimelere daha çok zaman ayırması anlamına gelir?"
+        a: "f > t olan kelimelerin token payı karekökle sıkışır; f ≤ t olanlar olduğu gibi kalır. Toplam token sayısı düştüğü için aynı epoch'ta orta ve düşük frekanslı kelimelerin göreli güncelleme payı artar ve eğitim kısalır (2013b, Tablo 1: NEG-5 38 dk → 14 dk)."
+    limits: "Frekanslar ideal Zipf; gerçek derlemlerde baş kısım daha düz, kuyruk daha dik olabilir. Grafikte gösterilen yalnız beklenen değerler; örnekleme gürültüsü yok. Alt-örneklemenin pencereyi örtük genişletme etkisi burada görünmez."
+  - id: l3
+    lab: pmisvd
+    title: "SGNS'in optimumu kaydırılmış PMI mi? Beklenen kaybı doğrudan en küçükle"
+    goal: |
+      Sentetik derlemin skip-gram çift sayımlarından SGNS'in beklenen amacını tam batch Adam ile en küçükle. Öğrenilen w·c değerlerini, her hücre bağımsız seçilebilseydi elde edilecek optimum x* = log(#(w,c) / (k·#(w)·P_n(c))) ile karşılaştır. α = 1 için bu PMI − log k'dır. Boyut d'yi küçülterek rank kısıtının ne zaman devreye girdiğini, SPPMI matrisinin tekil değer spektrumuyla birlikte izle.
+    predict:
+      q: "d = 2'de öğrenilen w·c ile x* arasındaki korelasyon ne olur?"
+      options:
+        - {t: "≈ 1: SGNS her zaman PMI'yi bulur", why: "Bu ancak d, matrisin rankına yetiyorsa geçerli."}
+        - {t: "≈ 0.8: kaba bir yaklaşım", ok: true, why: "Ölçülen 0.81. Rank-2 bir matris 29 ranklı SPPMI'yi taşıyamaz; d = 16'da 0.99, d = 32'de 1.00."}
+        - {t: "≈ 0: ilişki kalmaz", why: "Ağırlıklı düşük-rank yaklaşım yine de en büyük yapıyı yakalar."}
+    presets:
+      - {name: "Varsayılan (d = 8, k = 5)", params: {d: 8, k: 5, alpha: 0, win: 2, iters: 400, n: 1500}, note: "corr = 0.962, RMS fark 0.217; rank(SPPMI) = 29, rank-8 SVD enerjinin %91.6'sını tutuyor."}
+      - {name: "Yeterli boyut", params: {d: 32, iters: 1500}, note: "d = 32 ≥ rank: corr = 1.000, RMS fark 0.003, kayıp alt sınıra (1.790) iniyor. Levy–Goldberg sonucunun koşulu sağlanıyor."}
+      - {name: "Dar boyut", params: {d: 2}, note: "d = 2: corr = 0.814, RMS fark 0.661; kayıp 2.288 (alt sınır 1.790)."}
+      - {name: "α = 0.75", params: {alpha: 1, d: 32, iters: 1500}, note: "Hedef x* ile corr = 1.000, ama ham PMI − log k ile 0.994: düzleştirilmiş gürültü hedefi hafifçe kaydırıyor."}
+      - {name: "Büyük k", params: {k: 15}, note: "log 15 = 2.7 kaydırması çoğu PMI'yi sıfırın altına itiyor: SPPMI'nin rankı 6'ya düşüyor, d = 8 yetiyor ama corr 0.922 (400 adım yetmiyor)."}
+    questions:
+      - q: "Gözlenmeyen çiftlerde (sayım 0) öğrenilen w·c neden çok negatif?"
+        a: "Bu hücrelerde yalnız negatif terim var: k·#(w)·P_n(c)·softplus(x). Bu terim x → −∞'da 0'a iner. Sayım tabanlı karşılığı PMI = −∞ olduğu için SPPMI bu hücreleri 0'a kırpar."
+      - q: "SGNS ile SPPMI + SVD neden aynı gömmeleri vermez?"
+        a: "İkisi de aynı matrisi hedefler ama farklı kayıpla. SVD tüm hücrelere eşit ağırlıklı kare hata uygular; SGNS ise her hücreyi sayımıyla orantılı lojistik kayıpla ağırlıklandırır ve kırpma yapmaz. Ayrıca SVD vektörleri U√Σ biçiminde bölüşülür; SGNS'te bölüşüm optimizasyonun sonucudur."
+    limits: "Beklenen kayıp tam batch en küçükleniyor: stokastik örnekleme, dinamik pencere ve alt-örnekleme yok. Sözlük ≈ 50 kelime ve derlem yapay. Sayılar tohum 1 içindir; başka tohumlarda birkaç binde bir oynar."
+  - id: l4
+    lab: w2vlab
+    title: "word2vec'i eğit: PCA görünümü ve analoji sorguları"
+    goal: |
+      Yapısı bilinen sentetik bir Türkçe derlemde (insanlar: cinsiyet × statü × yaş; şehir–ülke–dil üçlüleri) SGNS eğit. Vektörleri PCA ile 2-B'de gör ve a − b + c analojilerini 16 boyutta kosinüsle sorgula. Boyut, pencere, k, epoch, α ve alt-örneklemeyi değiştirip analojilerin ne zaman ortaya çıktığını ve ne zaman bozulduğunu ölç.
+    predict:
+      q: "Boyutu d = 16'dan d = 4'e indirirsen beş hazır analojiden kaçı doğru kalır?"
+      options:
+        - {t: "Beşi de: 4 boyut yeter", why: "Varlıklar 5 ayrı özellikle (cinsiyet, statü, yaş, şehir/ülke, dil) tanımlanıyor."}
+        - {t: "Biri", ok: true, why: "Ölçülen: yalnız madrid − ispanya + almanya → berlin doğru; d = 2'de hiçbiri, d = 8'de beşi de doğru."}
+        - {t: "Hiçbiri", why: "Bu d = 2'de olur."}
+    presets:
+      - {name: "Varsayılan (d = 16)", params: {d: 16, win: 3, k: 5, ep: 6, alpha: 0.75, sub: 0, a: kral, b: adam, c: kadın, show: 0}, note: "Beş hazır analojinin beşi de doğru, kosinüs ≈ 0.99."}
+      - {name: "d = 2", params: {d: 2, win: 3, k: 5, ep: 6, alpha: 0.75, sub: 0, a: kral, b: adam, c: kadın, show: 0}, note: "Analojilerin hepsi bozuluyor: 2 boyutta birçok vektör aynı yöne düşüyor ve yanlış kelimeler de kosinüs ≈ 1.00 alıyor."}
+      - {name: "d = 4", params: {d: 4, win: 3, k: 5, ep: 6, alpha: 0.75, sub: 0, a: madrid, b: ispanya, c: almanya, show: 0}, note: "Beşten yalnız biri (berlin) doğru. kral − adam + kadın → taht."}
+      - {name: "Zayıf eğitim", params: {d: 16, win: 3, k: 1, ep: 1, alpha: 0, sub: 0, a: paris, b: fransa, c: italya, show: 0}, note: "k = 1, α = 0, 1 epoch: kral − adam + kadın hâlâ kraliçe buluyor ama paris − fransa + italya → italyanca (roma değil)."}
+      - {name: "Başkent ilişkisi", params: {d: 16, win: 3, k: 5, ep: 6, alpha: 0.75, sub: 0, a: paris, b: fransa, c: italya, show: 1}, note: "paris − fransa + italya ≈ roma (kosinüs 0.99). 'tüm kelimeler' görünümünde bağlam kelimeleri de çiziliyor."}
+    questions:
+      - q: "Neden 2-B PCA çiziminde çiftleri birleştiren çizgiler tam paralel görünmüyor da analoji yine doğru çıkıyor?"
+        a: "Analoji 16 boyutta hesaplanıyor; PCA yalnız en büyük iki varyans yönünü gösterir. Paralellik geri kalan 14 boyutta da olabilir. İzdüşüm bunu bozar."
+      - q: "Gerçek metinde analojiler neden bu kadar temiz çıkmaz?"
+        a: "Burada her varlık yalnız kendi özelliklerine özgü bağlam kelimeleriyle geçiyor. Gerçek metinde ilişkiler gürültülü, kelimeler çok anlamlı, frekanslar Zipf dağılımlı. Ayrıca analoji testi girdi kelimelerini hariç tutmasa çoğu zaman b'nin kendisi dönerdi."
+    limits: "≈ 50 kelimelik yapay sözlük, 1 500 cümle, tarayıcıda saf JS SGD. Alt-örnekleme eşiği bu küçük derleme uygun olsun diye t = 10⁻² seçildi (gerçekte 10⁻⁵–10⁻³). Sonuçlar tohum 1 içindir."

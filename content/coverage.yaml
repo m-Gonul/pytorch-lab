@@ -47,8 +47,8 @@ groups:
         topics: "one-hot, OOV kovaları, gömme katmanı, word2vec (skip-gram, CBOW, negatif örnekleme), alt-kelime gömmeleri"
         pages: [m4-12-word2vec, m4-5-embed-bpe]
         status: genis
-        gap: "Kaynaktaki California housing örneği (kategorik öznitelik gömme) bizde metin örneğiyle işleniyor."
-        done: "—"
+        gap: "Slayt 8–9'daki 2-B gömme çizimi ve slayt 13'teki PCA şekli görüntü olduğu için metne dökülemedi; içerikleri metinden ve 2013b makalesinin Şekil 2 açıklamasından yeniden kuruldu. Karakter düzeyi gömmeler ve BPE (slayt 17–18) M4.5'te, bağlamsal gömmeler (slayt 19) M4.16'da."
+        done: "M4.5: California housing ocean_proximity gömme deneyi, one-hot geometrisi (slayttaki 'uzaklık 2' → √2 düzeltildi). M4.12 konu anlatımı: OOV karma çakışma türetimi, one-hot + biassız katman = embedding (20 × 10), dağılımsal hipotez ve tarihçe, skip-gram/CBOW, tam softmax gradyanı ve maliyeti, dinamik pencere ağırlığı, hiyerarşik softmax (toplam 1 kanıtı, Huffman ≈ entropi), SGNS gradyan türetimi, gürültü dağılımı, alt-örnekleme (makale ve word2vec.c formülleri, φ²t eşiği), SGNS = PMI − log k türetimi, GloVe ve fastText, 3CosAdd/3CosMul ve hariç tutma tuzağı, yanlılık; sgnsgrad, noisedist, pmisvd, w2vlab deneyleri, 3 şekil. Slayt düzeltmeleri: 'Milokov' → Mikolov, 'capitol' → capital; Öklid uzaklığı iddiasına kosinüs notu."
       - src: "contextualizedEmbeddings — Bağlamsal gömmeler"
         topics: "ELMo, GPT-1/2/3, BERT, BART, InstructGPT/RLHF, ChatGPT"
         pages: [m4-16-pretrained-lm]
