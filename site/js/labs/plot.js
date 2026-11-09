@@ -77,7 +77,7 @@ export function plot(P, opt = {}) {
   }
   // işaret çizgileri
   for (const m of P.marks || []) {
-    if (m.x != null && m.x >= x0 && m.x <= x1) g += `<line class="mark" x1="${sx(m.x)}" x2="${sx(m.x)}" y1="${T}" y2="${T + ih}"/><text class="mk" x="${sx(m.x) + 4}" y="${T + 12}">${esc(m.label || "")}</text>`;
+    if (m.x != null && m.x >= x0 && m.x <= x1) { const lb = esc(m.label || ""), right = sx(m.x) + 4 + (m.label || "").length * 7 > L + iw; g += `<line class="mark" x1="${sx(m.x)}" x2="${sx(m.x)}" y1="${T}" y2="${T + ih}"/><text class="mk" x="${right ? sx(m.x) - 4 : sx(m.x) + 4}" y="${T + 12}"${right ? ' text-anchor="end"' : ""}>${lb}</text>`; }
     if (m.y != null && (!P.ylog || m.y > 0) && m.y >= y0 && m.y <= y1) g += `<line class="mark" x1="${L}" x2="${L + iw}" y1="${sy(m.y)}" y2="${sy(m.y)}"/><text class="mk" x="${L + iw - 4}" y="${sy(m.y) - 4}" text-anchor="end">${esc(m.label || "")}</text>`;
   }
   // seriler

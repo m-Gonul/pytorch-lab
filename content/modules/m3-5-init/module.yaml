@@ -115,7 +115,7 @@ labs:
         a: "Geri geçişte de aynı ağırlıklar (transpozları) ve aynı φ' çarpanları uygulanır; ileri yöndeki varyans çarpanı geri yönde de görülür (n_in = n_out iken)."
       - q: "N(0, 0.01²) neden 'küçük ve güvenli' değil?"
         a: "Her katman varyansı n·10⁻⁴ ≈ 0.006 ile çarpar: sinyal birkaç katmanda sayısal sıfıra iner, tüm nöronlar aynı davranır."
-    limits: "Rastgele Gauss girdi, eğitim yok (yalnız başlangıç anı); BN/artık bağlantı yok. Bunlar korunum koşulunu kendiliğinden sağlar (M3.6, M4.8)."
+    limits: "Rastgele Gauss girdi, eğitim yok (yalnız başlangıç anı); BN/artık bağlantı yok. Bunlar korunum koşulunu kendiliğinden sağlar (M3.6; artık bağlantılar M4.2)."
 
   - id: l2
     lab: actfun

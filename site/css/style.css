@@ -702,3 +702,13 @@ p code, li code, td code { overflow-wrap: anywhere; }
 .eg-e input { width: min(26em, 70vw); font-family: var(--mono); } .eg-v input { width: min(22em, 70vw); font-family: var(--mono); }
 .eg-svg { min-width: 560px; }
 .bc-in { width: 9em; font-family: var(--mono); } .bc-tbl td.bc-pad { color: var(--ink-3); } .bc-tbl td.bc-exp { color: var(--c-b); font-weight: 600; } .bc-tbl tr.bc-res td { background: color-mix(in srgb, var(--c-p) 12%, transparent); }
+/* normaxes (M3.6) */
+.nx-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 8px 0; }
+@media (max-width: 620px) { .nx-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.nx-cap { font-size: 0.8rem; color: var(--ink-2); margin: 0 0 3px; text-align: center; }
+.nx-cells { display: grid; gap: 2px; }
+.nx-c { font-family: var(--mono); font-size: 0.68rem; padding: 4px 0; border: 1px solid var(--line); border-radius: 3px; color: var(--ink); cursor: pointer; min-width: 0; }
+.nx-c.grp { border: 2px solid var(--c-p); padding: 3px 0; }
+.nx-c.sel { outline: 3px solid var(--c-q); outline-offset: 1px; }
+.nx-c:focus-visible { outline: 3px solid var(--ink); }
+.nx-read p { margin: 6px 0; }

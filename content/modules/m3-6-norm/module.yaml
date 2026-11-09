@@ -126,6 +126,55 @@ labs:
       - q: "B = 2 iken neden çıktı yalnız ±1 civarında?"
         a: "İki sayıyı kendi ortalamaları ve (yanlı) std'leriyle normalize edersen her zaman −1 ve +1 elde edersin; x'in büyüklüğü kaybolur."
     limits: "Tek özellik, Gauss veri; ε = 10⁻⁵. Gerçek ağda BN'in etkisi optimizasyon manzarasını da değiştirir (M3.6 anlatımı)."
+  - id: l2
+    lab: normdeep
+    title: "20 katman, kötü başlatma: normalizasyon katman katman ne değiştirir?"
+    goal: |
+      Normalizasyonsuz derin ağda başlatma çarpanının küçük bir sapması 20 katmanda üstel olarak büyür. Normalizasyon katmanı her katmanda ölçeği sıfırlar: aktivasyon std'si başlatmadan bağımsız olur. Ama gradyanların katmanlar arasındaki dengesi yönteme göre değişir — BN'li düz derin ağda ilk katmanlar çok büyük gradyan alır.
+    predict:
+      q: "BatchNorm açıkken başlatma çarpanını 0.6'dan 3'e çıkarırsan (5 kat) ne olur?"
+      options:
+        - {t: "Aktivasyon std'leri aynı kalır, tüm gradyan normları 5 kat küçülür", ok: true, why: "BN(cWx) = BN(Wx): çıktı ağırlık ölçeğine değişmez, ∇L(cW) = ∇L(W)/c. Deneyde gradyan normları tam 3/0.6 = 5 oranında küçülüyor."}
+        - {t: "Aktivasyon std'leri 5 kat büyür", why: "BN her katmanda yeniden standartlaştırır; std çarpandan bağımsız."}
+        - {t: "Hiçbir şey değişmez", why: "İleri geçiş değişmez ama gradyanlar ağırlık ölçeğiyle ters orantılı değişir — etkin öğrenme oranı bu yüzden ‖W‖²'ye bağlı."}
+    presets:
+      - {name: "Sönen sinyal", params: {norm: 0, scale: 0.6}, note: "Her katman varyansı 0.36 ile çarpar: 20 katmanda std ≈ 0.6²⁰ ≈ 4·10⁻⁵. Gradyanların mutlak ölçeği de 10⁻⁴ civarında."}
+      - {name: "Patlayan sinyal", params: {norm: 0, scale: 1.5}, note: "Çarpan 1.5: son katman std'si binler mertebesinde."}
+      - {name: "BatchNorm", params: {norm: 1, scale: 0.6}, note: "Std her katmanda ≈ 0.6 (ReLU'dan sonra). İlk/son gradyan oranı ≈ 40–60: düz derin BN ağının bilinen gradyan patlaması."}
+      - {name: "BN, çarpan 3", params: {norm: 1, scale: 3}, note: "Std aynı; gradyan normları tam 5 kat küçük — ölçek değişmezliği."}
+      - {name: "BN, 40 katman", params: {norm: 1, L: 40}, note: "İlk/son oranı binlerce: derinlikle üstel büyüme (Yang ve ark. 2019). Artık bağlantılar bu yüzden gerekli."}
+      - {name: "LayerNorm, 40 katman", params: {norm: 2, L: 40}, note: "Aynı derinlikte oran ≈ 1–3: örnek başına normalizasyonda dengesizlik çok daha ılımlı."}
+      - {name: "RMSNorm", params: {norm: 3, scale: 0.6}, note: "Ortalama çıkarılmadan da ölçek düzeliyor."}
+    questions:
+      - q: "Normalizasyonsuz ağda 'ilk/son oranı' ≈ 1.3 — yani gradyanlar dengeli mi?"
+        a: "Oran dengeli ama mutlak ölçek 10⁻⁴ (sönme) ya da 10⁴ (patlama): öğrenme oranını buna göre seçmek gerekir ve her başlatmada başka bir değer gerekir. Normalizasyon mutlak ölçeği başlatmadan bağımsız kılar."
+      - q: "BN çarpan 0.6 ve 3'te gradyan oranı neden tamamen aynı?"
+        a: "Ölçek değişmezliği tüm katmanlara aynı 1/c çarpanını uygular; ileri geçiş ve gradyanların yönü değişmez, yalnız büyüklüğü."
+    limits: "48 nöronlu tam bağlı katmanlar, rastgele Gauss girdi ve rastgele bir doğrusal kayıp yönü; tek bir başlangıç anı (eğitim yok), γ = 1, β = 0, ε = 10⁻⁵, artık bağlantı yok. B ≤ 4'te BN istatistikleri yozlaşır, ölçümler tohuma göre çok değişir."
+  - id: l3
+    lab: normaxes
+    title: "Hangi hücreler aynı μ ve σ'yı paylaşıyor?"
+    goal: |
+      BN, LN, IN, GN ve RMSNorm aynı üç adımı yapar; fark yalnız istatistiğin hangi eleman kümesinden alındığıdır. Gerçek bir (4, 6, 4) tensörde bir hücre seç, grubunu gör ve normalize sonrası neyin silindiğini karşılaştır.
+    predict:
+      q: "(N, C, H·W) = (4, 6, 4) tensöründe BatchNorm kaç ayrı (μ, σ) çifti hesaplar?"
+      options:
+        - {t: "6", ok: true, why: "Kanal başına bir çift; her biri 4 × 4 = 16 elemandan."}
+        - {t: "4", why: "Örnek başına bir çift LayerNorm'dur."}
+        - {t: "24", why: "Örnek × kanal başına bir çift InstanceNorm'dur."}
+        - {t: "96", why: "Her eleman kendi istatistiğine sahip olsaydı normalizasyon her şeyi 0 yapardı."}
+    presets:
+      - {name: "BatchNorm", params: {kind: 0, view: 1}, note: "Kanal ortalamaları 0'a iniyor; ama örnek 3'ün değerleri hâlâ çok daha geniş yayılıyor (örnekler arası ölçek korunur)."}
+      - {name: "LayerNorm", params: {kind: 1, view: 1}, note: "Her örneğin std'si 1; kanal 3 hâlâ hep pozitif, kanal 4 hep negatif (kanallar arası fark korunur)."}
+      - {name: "InstanceNorm", params: {kind: 2, view: 1}, note: "Her örnek × kanal satırı ayrı standartlaştırılır: kanal kaymaları da örnek ölçekleri de silinir."}
+      - {name: "GroupNorm G = 1 → LayerNorm", params: {kind: 3, G: 1, view: 1}, note: "Tek grup: LayerNorm ile aynı gruplar."}
+      - {name: "GroupNorm G = 6 → InstanceNorm", params: {kind: 3, G: 6, view: 1}, note: "Kanal başına grup: InstanceNorm ile aynı gruplar."}
+      - {name: "RMSNorm", params: {kind: 4, view: 1}, note: "LN eksenleri ama ortalama çıkarılmaz: her örnekte ortalama kare 1, ama normalize değerlerin ortalaması ≈ 0.24 (0 değil) ve std ≈ 0.97. Kanal 3 ve 4'ün farkı LN'dekine çok yakın."}
+    questions:
+      - q: "Batch boyu 1'e düşerse hangi yöntemler aynı hesabı yapmaya devam eder?"
+        a: "LN, IN, GN ve RMSNorm — istatistikleri tek bir örneğin içinden alınır. BN'in kanal başına grubu tek örneğin konumlarına daralır (CNN'de InstanceNorm'a benzer); tam bağlı katmanda tek elemana iner ve varyans 0 olur."
+    limits: "Küçük, deterministik bir örnek tensör (kanal başına kayma + örnek başına ölçek). γ = 1, β = 0; BN eğitim modunda (batch istatistikleri)."
+
 
 practice:
   - id: p1
