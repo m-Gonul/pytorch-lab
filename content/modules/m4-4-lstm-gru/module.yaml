@@ -187,3 +187,47 @@ pitfalls:
 whatif:
   - q: "Unutma kapısı kaldırılırsa (ilk LSTM sürümü)?"
     a: "c_t = c_{t−1} + i ⊙ c̃: bellek hiç silinmez, uzun akışlarda c sınırsız büyür; Gers ve ark. (2000) unutma kapısını bu yüzden ekledi."
+
+labs:
+  - id: l1
+    lab: gatemem
+    title: "Kapılar elle: yaz, tut, oku"
+    goal: |
+      Skaler bir LSTM hücresinde kapıları zaman içinde elle aç kapa. Yazma penceresinde f ≈ 0, i ≈ 1; tutarken f ≈ 1, i ≈ 0; okumada o = 1. Hücre durumunun tutma sırasında yalnız f ile çarpıldığını, giriş kapısı sızdırırsa gürültünün belleğe karıştığını ve bağlı kapıların (GRU) 'yazmadan önce sil' ilkesini gör.
+    predict:
+      q: "Tutarken f = 0.98. 30 adım sonra yazılan değerin kabaca ne kadarı kalır (gürültüyü yok say)?"
+      options:
+        - {t: "≈ %98", why: "0.98 her adımda çarpılır, bir kez değil."}
+        - {t: "≈ %55", ok: true, why: "0.98³⁰ ≈ 0.55. Yarılanma süresi ln ½ / ln 0.98 ≈ 34 adım."}
+        - {t: "≈ %0", why: "f ≈ 1'de bellek yavaş söner."}
+    presets:
+      - {name: "İyi bellek", params: {fh: 0.98, ih: 0.05, oh: 0.1, coupled: 0}, note: "Okumada c ≈ 0.48 (yazılan 0.83'ün ≈ yarısı + biraz gürültü)."}
+      - {name: "Mükemmel tutma", params: {fh: 1, ih: 0, noise: 0.5, coupled: 0}, note: "f = 1, i = 0: değer olduğu gibi korunuyor (orijinal 1997 LSTM'inin 'sabit hata karuseli')."}
+      - {name: "Unutkan", params: {fh: 0.9}, note: "Yarılanma 6.6 adım: 30 adımda neredeyse hiçbir şey kalmıyor."}
+      - {name: "Sızdıran giriş", params: {ih: 0.3}, note: "Tutma sırasındaki gürültü belleğe karışıyor: okunan değer artık yazılanı temsil etmiyor."}
+      - {name: "Bağlı kapılar (GRU)", params: {coupled: 1}, note: "i = 1 − f: tutarken yazma otomatik kapanıyor."}
+    questions:
+      - q: "Çıkış kapısı kapalıyken (o ≈ 0) bellek neden kaybolmuyor?"
+        a: "o yalnız h_t = o·tanh(c_t) okumasını etkiler; c_t'nin güncellemesine katılmaz. Bellek c'de durur, yalnız dışarıya gösterilmez."
+    limits: "Skaler hücre; kapı değerleri elle ve zamana göre sabit parçalı. Gerçek LSTM'de kapılar x_t ve h_{t−1}'den öğrenilir ve vektördür; burada 'girdi gürültüsü' deterministik bir dalga."
+  - id: l2
+    lab: lstmgrad
+    title: "Gradyan kaç adım geriye ulaşır? Düz RNN, LSTM, GRU"
+    goal: |
+      Aynı boyut ve ölçeklerle rastgele başlatılmış üç hücrede ‖∂h_T/∂x_{T−k}‖'yı gecikme k'ya göre ölç. Unutma kapısı bias'ı (LSTM) ya da güncelleme kapısı bias'ı (GRU) büyüdükçe kapılı hücrelerin uzun mesafe gradyanının nasıl arttığını gör. Geri geçişler sayısal farkla doğrulanmıştır.
+    predict:
+      q: "T = 100, b_f = 3 (f ≈ 0.95). 50 adım öncesine ulaşan göreli gradyan için hangisi doğru?"
+      options:
+        - {t: "Düz RNN ≈ LSTM", why: "RNN'de her adımda matris çarpanı; LSTM'in hücre yolunda yalnız f."}
+        - {t: "LSTM ≈ 10⁻¹–10⁻², düz RNN ≈ 10⁻¹⁰", ok: true, why: "Tohum 1'de LSTM 0.04, GRU 0.04, düz RNN 2.5·10⁻¹⁰."}
+        - {t: "LSTM'de gradyan patlar", why: "f < 1 olduğu sürece doğrudan yol sönümlü; kapılar doyumlu."}
+    presets:
+      - {name: "Varsayılan (b_f = 1)", params: {bf: 1}, note: "PyTorch varsayılanından (≈ 0) iyi, ama 50 adımda yine 10⁻⁶ civarı."}
+      - {name: "b_f = 0 (PyTorch varsayılanı gibi)", params: {bf: 0}, note: "f ≈ 0.5: LSTM bile düz RNN'den pek iyi değil."}
+      - {name: "b_f = 3", params: {bf: 3}, note: "f ≈ 0.95: uzun mesafe gradyanı 10⁴–10⁸ kat büyük."}
+      - {name: "b_f = −2", params: {bf: -2}, note: "Hücre hızla unutuyor: LSTM düz RNN'den bile kötü."}
+      - {name: "Küçük girdi", params: {xs: 0.2}, note: "Düz RNN'de tanh doymuyor: gradyan daha uzun yaşıyor (ama yine üstel sönüm)."}
+    questions:
+      - q: "Neden b_f'yi çok büyük (ör. 10) yapmak da iyi bir fikir değil?"
+        a: "f ≈ 1 sabitlenir: hücre neredeyse hiç unutamaz ve yeni bilgiyi yazmak için giriş kapısının eskiyi bastırması gerekir; durum sınırsız birikebilir (tanh(c) doyar, çıktı gradyanı söner). Unutma da öğrenilmesi gereken bir yetenektir."
+    limits: "Rastgele, eğitilmemiş ağırlıklar; tek örnek, tek rastgele geri yön; gizli boyut ≤ 48. Eğitim sırasında kapılar veriye göre değişir; burada yalnız başlangıçtaki eğilim ölçülüyor."
