@@ -54,7 +54,7 @@ groups:
         pages: [m4-16-pretrained-lm]
         status: genis
         gap: "—"
-        done: "Softmax sıcaklığı deneyi (örnekleme çeşitliliği)."
+        done: "Softmax sıcaklığı deneyi (örnekleme çeşitliliği). M4.16 konu anlatımı (tüm slaytlar): ELMo biLM amacı ve katman karışımı, GPT-1 (ince ayar, yardımcı LM kaybı, girdi dönüşümleri), BERT (çift yönlü dikkatte sonraki token amacının neden kopyalamaya dönüştüğü türetimi, MLM 80/10/10, NSP, parametre sayımı), BART gürültüleri, GPT-2/3 (12Ld² türetimi, bağlam içi öğrenme), RLHF ve Bradley–Terry, KL cezalı optimumun ve DPO kaybının türetimi, best-of-n; noiselab ve rlhfdpo deneyleri, 3 şekil. Slayt düzeltmeleri: ELMo girdisi karakter CNN'i (word2vec değil); GPT-1 ≈ 117M (110M BERT-base); ChatGPT 30 Kasım 2022 (modülün giriş metni de düzeltildi); 'GPT-5 olacak' sayfası eskimiş (Ağustos 2025'te yayımlandı); GPT-1'in 'üretken model olarak tasarlanmadığı' iddiasına nüans; BERT'in yılı (arXiv 2018)."
       - src: "Alıştırmalar ex1 (2) – ex6 (1)"
         topics: "MLPRegressor ile fonksiyon yaklaşımı; BP denklemleriyle bias/ağırlık güncellemesi; doğrusal sınıflandırıcı; Keras MLP; FC vs CNN verimliliği (Fashion-MNIST); RNN ile zaman serisi tahmini"
         pages: [m3-8-perceptron, m3-2-mlp-backprop, m1-4-logreg, m3-9-training-practice, m4-2-cnn, m4-11-timeseries]

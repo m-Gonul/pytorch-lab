@@ -1,5 +1,55 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 4
+
+Faz 4'ün (derin öğrenme mimarileri) 16 modülünün hepsine tam konu anlatımı yazıldı. Kaynak, Derin Öğrenme dersinin ch_14, ch_15, ch_16, ch_17 (Faz 5'e kalan kısmı hariç), embeddings_updated ve contextualizedEmbeddings slaytlarıdır. Slaytların her maddesi yeniden yazıldı. Orijinal makalelerdeki (Sutskever 2014, Bahdanau 2015, Luong 2015, Vaswani 2017, Mikolov 2013a/b, Levy–Goldberg 2014, GloVe, fastText, ViT, ELMo, GPT-1, BERT, InstructGPT, DPO …) sayılar makale metinlerinden doğrulandı ve daha ayrıntılı türetimler eklendi.
+
+| modül | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|
+| M4.1 konvolüsyon | 2 | conv2dviz, convcost, im2colviz, poolshift | kaymaya eşdeğişirlik, çıktı boyu, col2im eşleniği, max havuz geri geçişi |
+| M4.2 CNN mimarileri | 3 | rfcalc, resgrad | küçük çekirdek eşdeğerliği, alıcı alan yinelemesi, artık yolun gradyanı |
+| M4.3 RNN | 2 | rnnunroll, bpttsum | BPTT, kesilmiş BPTT, doğrusal rekürsiyonun paralel taraması |
+| M4.4 LSTM / GRU | 2 | gatemem, lstmgrad | hücre yolu gradyanı ve sabit hata karuseli, PyTorch ağırlık düzeni |
+| M4.5 embedding ve BPE | 3 | embedgeom, bpeviz | one-hot geometrisi, embedding = one-hot × W, bigram = sayım MLE'si |
+| M4.6 dikkat | 3 | attnviz, onlinesoftmax (+ attnscale) | √d_k ölçeklemesi, çevrimiçi softmax |
+| M4.7 GPT | 4 | gptcount, sampler, lnplace, kvcache | parametre/FLOP sayımı, Pre-LN akışı, KV önbelleği |
+| M4.8 CNN blokları | 4 | blockcost, sepkernel, camviz | 1×1 darboğaz, derinlemesine ayrılabilir oran 1/C_out + 1/K², SVD ile ayrılabilirlik, CAM |
+| M4.9 tespit | 4 | nmsviz, apcurve, anchorkm | √w kaybı, yoğun katman = valid konvolüsyon, AP zarfı, RoI seviye ataması |
+| M4.10 bölütleme | 4 | tconv1d, upsample2d, segmetrics | 2× bilineer çekirdek, transposed konvolüsyonun dört görünümü, U-Net 572 → 388, Dice = 2J/(1 + J) |
+| M4.11 zaman serisi | 3 | armasim, tsforecast, wavenetrf | AR durağanlığı ve varyans, Yule–Walker, fark almanın eğilimi silmesi, WaveNet alıcı alanı |
+| M4.12 word2vec | 3 | sgnsgrad, noisedist, pmisvd, w2vlab | OOV çakışma beklentisi, tam softmax gradyanı, dinamik pencere ağırlığı, SGNS gradyanları, alt-örneklemenin √(tf) sıkıştırması, SGNS = PMI − log k, GloVe amacı, 3CosAdd |
+| M4.13 seq2seq | 4 | padwaste, sampledsm, beamlab, alignattn | öğretmen zorlaması = MLE, maskeli kayıp ortalamaları, örneklenmiş softmax'ın log(m·q) düzeltmesi, hata birikimi ε·T(T+1)/2, Bahdanau/Luong denklemleri |
+| M4.14 Transformer | 3 | maskviz, posenc, noamlr, labelsmooth | Tablo 1 karmaşıklıkları, −∞ maskeleme, base parametre sayımı, permütasyon eş-değişkenliği, P_(p+k) = R_k P_p, √d ölçeği, Noam tepesi, etiket yumuşatma optimumu |
+| M4.15 ViT | 2 | patchviz, posinterp, swinreach | yama embedding'i = adımı P konvolüsyon, ViT-B/16 sayımı, interpolasyon koordinatı, Swin maliyeti |
+| M4.16 ön eğitimli LM | 3 | noiselab, rlhfdpo (+ softmaxT) | biLM amacı, çift yönlü dikkatte kopyalama sorunu, BERT sayımı, 12Ld², Bradley–Terry, KL cezalı optimum, DPO kaybı |
+
+- **Faz 4'te toplam 51 deney**; her birinin hazır senaryo notlarındaki sayılar Node'da ölçülerek yazıldı. Elle yazılan gradyanlar (alignattn, sgnsgrad, pmisvd) sayısal türevle doğrulandı.
+- **Deney sonucuna göre düzeltilen ya da eklenen anlatımlar:**
+  - M4.13: örneklenmiş softmax'ta yalnız log q düzeltmesi (ek x3'teki biçim) sık bir hedefte yanlılığı m büyüdükçe sıfıra indirmiyordu (en sık hedefte 0.13'te takıldı). Doğru düzeltme log(m·q) olarak türetildi, deneye seçenek olarak eklendi (yanlılık 0.015).
+  - M4.13: beam deneyinin ilk sürümünde T'de kesilen hipotezler tamamlanmış sayılıyordu ve beam "kesin optimumu geçiyordu". Son adımda yalnız EOS'a izin verilerek beam ile Viterbi aynı kurala bağlandı.
+  - M4.14: "yalnız sinüs" seçeneği tüm vektörde konumları hâlâ ayırt ediyordu (en yakın iki konumun uzaklığı 2.84, sin + cos'ta 3.71). Not, asıl kaybın tek frekanstaki yansıma konumu ve iç çarpımın p'ye bağlı hâle gelmesi olduğunu söyleyecek biçimde yeniden yazıldı.
+  - M4.14: etiket yumuşatma deneyinde iki rejim ölçüldü. Düz CE iyi kalibre iken yumuşatma NLL'yi kötüleştiriyor (0.125 → 0.331); aşırı uyumda iyileştiriyor (13.0 → 4.1). Not ölçülen ortalama güvene göre dinamik.
+  - M4.12: alt-örneklemede makaledeki formül ile word2vec.c'deki formülün farkı ve atmanın başladığı φ²t eşiği türetildi.
+- **Ders slaytlarındaki hatalar (anlatımda "Kaynak düzeltmesi" kutusuyla):**
+  - M4.2: AlexNet'in "%17'ye karşı %26" sonucu iki ayrı sonucun karışımı (ILSVRC-2012: %15.3 / %26.2); LRN hiperparametreleri makaleyle uyuşmuyor.
+  - M4.5: one-hot uzaklığı 2 değil √2 (2, karesi).
+  - M4.7: zaman çizelgesi ("ChatGPT-1/2/3" → GPT-1/2/3; GPT-3.5'in parametre sayısı açıklanmadı; Mistral ve Qwen 2023; Gemma 3 Mart 2025; "Antropic", "Opes" yazımları); LayerNorm'un öğrenilen parametreleri ortalama/std değil d boyutlu γ, β.
+  - M4.8: "ayrılabilir konvolüsyonu varsayılan kullan" önerisine koşullar (FLOP ≠ süre); Inception (3a) "159K" = 163 328/1024.
+  - M4.9: `MeanIoU` bölütleme ölçütüdür; YOLOv3'e atfedilen "5 kutu + hücre başına 20 sınıf" düzeni v1/v2 karışımı; lojistik yalnız merkez ofsetlerinde; k-means uzaklığı 1 − IoU; çok ölçekli eğitim 320–608; "25 fps" genel değil.
+  - M4.10: "batch > 4 ise BN" kuralına GN makalesinin sayılarıyla not.
+  - M4.11: ARMA tarihçesi (Wold 1938, Whittle 1951, Box–Jenkins 1970); deterministik mevsimsellik durağanlığı bozar.
+  - M4.12: "Milokov" / "Tomaš" → Tomáš Mikolov; "capitol" → capital; Öklid uzaklığı iddiasına kosinüs notu.
+  - M4.13: dolgu örneği [7, 12, 5, 40] için "84 gerçek / 76 dolgu (%50)" → 64 / 96 (%60); "tek nöronlu yoğun katman" hizalama modeli kod çözücü durumunu softmax'ta sadeleştirir (türetim + deney: α satırları özdeş); "negative sampling (or sampled softmax)" iki ayrı yöntem; Luong'un concat sonucu basitleştirilmiş bir uygulamaya ait.
+  - M4.14: dikkat tablosunda 0.88 → 0.87 ve 0.94 → 0.95; "38 kelime arayla her zaman aynı" → dalga boyu 37.97, yaklaşık; "yalnız sinüsle 25 ve 35 ayırt edilemez" slaytın parametreleriyle tutmuyor (25 / 32); "slayt 120" atfı → 58; "keyfi uzun cümlelere genişler" → makale "izin verebilir" diyor.
+  - M4.16: ELMo'nun girdisi karakter CNN'i (word2vec değil); GPT-1 ≈ 117M (110M BERT-base'in); ChatGPT 30 Kasım 2022; "GPT-5 olacak" sayfası eskimiş (Ağustos 2025'te yayımlandı).
+- **Diğer düzeltmeler:**
+  - M4.9 `intro.md` ve el hesabı etiketi (YOLO sürümleri).
+  - M4.16 `intro.md`'deki "ChatGPT (Aralık 2022)".
+  - Yanlışlıkla commit'lenmiş `undefined/` dizini (M3.6 ekran görüntüleri) kaldırıldı.
+- **CI eşikleri:** M4.8 `d.check.py` (`cnn2 > fc3 + 0.05`, `cnn2 > fc1 − 0.01`) ve M4.10 `d.check.py` (U-Net mIoU > bilineer + 0.05) iş parçacığı sayısına duyarlıydı: aynı tohumla 1 ve 4 iş parçacığında U-Net 0.807 / 0.722. Eşikler gevşetildi; hata mesajları ölçülen değeri içeriyor.
+- **Erişim sınırı:** slaytlardaki şekiller (mimari çizimler, PCA ve konum kodlaması görselleri, dikkat haritaları, GPT-3 grafikleri) metne dökülemedi; içerikleri slayt metninden ve orijinal makalelerin şekil açıklamalarından yeniden kuruldu.
+- **Kalan:** Faz 5–11 konu anlatımları; Faz 5–11 modüllerine pratik kartları; kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 2 ve Faz 3
 
 Aynı düzen (problem → sezgi → tanım → koşullu türetim → sayısal örnek → şekil → deney → PyTorch karşılığı → özet) Faz 2 (klasik ML) ve Faz 3'ün (sinir ağı temelleri) 17 modülüne uygulandı. Faz 3'te ders slaytlarının (Derin Öğrenme, bölüm 10–11) her maddesi anlatıma işlendi; slaytta olmayan ama açık kaynaklarda (orijinal makaleler, Goodfellow ve ark., CS231n) daha ayrıntılı bulunan türetimler eklendi.

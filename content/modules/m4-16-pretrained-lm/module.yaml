@@ -126,6 +126,52 @@ labs:
         a: "Monoton artar; yalnız T → ∞ limitinde (ya da tüm logitler eşitse) ln K olur."
     limits: "Sabit, yapay logit dizisi; gerçek modellerde top-k/top-p ile kuyruk ayrıca kesilir."
 
+  - id: l2
+    lab: noiselab
+    title: "Ön eğitim amaçlarının gürültüleri: MLM, BART, ELECTRA"
+    goal: |
+      Aynı Türkçe paragrafı BERT'in maskeli dil modeli (80/10/10), BART'ın beş gürültü fonksiyonu ve ELECTRA'nın değiştirilmiş token tespiti ile boz. Bozulmuş metni, bozulan token sayısını ve kaybın dizinin ne kadarından sinyal aldığını karşılaştır.
+    predict:
+      q: "BERT'in MLM'sinde (p = 0.15) kaybın sinyal aldığı konumların oranı nedensel dil modelininkinin kaçta kaçıdır?"
+      options:
+        - {t: "Aynı: her konum tahmin edilir", why: "Yalnız seçilen %15 konumda kayıp hesaplanır."}
+        - {t: "≈ 0.15", ok: true, why: "Seçilmeyen konumlar kayba girmez; bu örnekte 32 konumdan 4'ü (%12.5). ELECTRA'da ayırt edici her konumda karar verir: 32/32."}
+        - {t: "≈ 0.5", why: "NSP'deki %50 ile karıştırılmamalı."}
+    presets:
+      - {name: "BERT MLM", params: {mode: 0, p: 0.15}, note: "4 token seçildi (beklenti 4.05); kayıp 32 konumun 4'ünde."}
+      - {name: "Yüksek maskeleme", params: {mode: 0, p: 0.4}, note: "p = 0.4: daha çok sinyal, ama bağlam azalır; tahmin edilecek kelimenin komşuları da maskeli."}
+      - {name: "BART metin doldurma", params: {mode: 3, p: 0.3, lam: 3}, note: "Poisson(3) uzunluklu aralıklar tek <mask> ile değişir; bozulmuş dizi kısalır, model eksik token sayısını da tahmin etmeli."}
+      - {name: "Cümle karıştırma", params: {mode: 4}, note: "Beş cümlenin sırası karışıyor; kelimeler tam ama söylem yapısı bozuk."}
+      - {name: "ELECTRA", params: {mode: 6, p: 0.15, gacc: 0.3}, note: "Üretecin önerdiği tokenlar seçilen konumlara konuyor; ayırt edici 32 konumun hepsinde gerçek/değiştirilmiş kararı veriyor."}
+    questions:
+      - q: "Metin doldurmada aralığın tamamı neden tek bir <mask> ile değiştirilir?"
+        a: "Böylece model yalnız eksik kelimeleri değil kaç kelimenin eksik olduğunu da tahmin etmek zorunda kalır. Her token için ayrı maske koymak (BERT) uzunluk bilgisini ele verir."
+      - q: "ELECTRA'da üreteç doğru tokenı önerirse o konum nasıl etiketlenir, neden?"
+        a: "'Özgün' olarak etiketlenir. Ayırt edicinin görevi 'bu token bu bağlamda doğru mu?' sorusudur; üreteç doğru tokenı bulduysa o konumda bozulma yoktur."
+    limits: "Tek bir kısa paragraf; ELECTRA'nın üreteci burada rastgele bir sözlük örneği (gerçekte küçük bir MLM). Sinyal oranı, kaybın hangi konumlarda hesaplandığını sayar; konum başına bilgi miktarı amaçlar arasında farklıdır."
+  - id: l3
+    lab: rlhfdpo
+    title: "KL cezalı optimum, best-of-n ve DPO"
+    goal: |
+      K olası yanıtlı tam izlenebilir bir oyuncakta referans politika ve gerçek ödül rastgele seçilir. KL cezalı amacın kapalı form optimumunu, best-of-n seçimini ve Bradley–Terry ile etiketlenmiş tercih çiftlerinde eğitilen DPO politikasını ödül–KL düzleminde karşılaştır.
+    predict:
+      q: "DPO'yu 300 yerine 3000 tercih çiftiyle eğitirsen öğrenilen politika KL cezalı optimum π*'a ne kadar yaklaşır?"
+      options:
+        - {t: "Değişmez: DPO kapalı form çözümü zaten kullanır", why: "Kapalı form gerçek ödül için geçerli; DPO ödülü sonlu tercihlerden örtük kestirir."}
+        - {t: "Çok yaklaşır", ok: true, why: "Ölçülen KL(π_DPO‖π*): 300 çiftte 0.56, 3000 çiftte 0.005."}
+        - {t: "Uzaklaşır: daha çok veri aşırı uyum demektir", why: "Daha çok veri, ödül farklarının kestirimini iyileştirir."}
+    presets:
+      - {name: "Varsayılan", params: {K: 12, sharp: 1, beta: 0.5, n: 4, N: 300, steps: 800}, note: "π*: E[r] 1.68, KL 1.40; best-of-4: 1.01, KL 0.62; DPO: 1.38, KL 1.36; KL(π_DPO‖π*) = 0.56."}
+      - {name: "Bol tercih verisi", params: {N: 3000}, note: "DPO π*'a yakınsıyor: E[r] 1.68, KL(π_DPO‖π*) = 0.005."}
+      - {name: "Az veri", params: {N: 20}, note: "20 çift: DPO KL'si 1.93'e çıkıyor ama ödülü 1.28'de kalıyor (KL(π_DPO‖π*) = 1.33): az görülen yanıtlara gürültülü ağırlık."}
+      - {name: "Küçük β", params: {beta: 0.1}, note: "π* çok sivri (KL 2.58, E[r] 2.02); 300 çiftle DPO bu hedefin çok uzağında (KL(π_DPO‖π*) = 5.9)."}
+      - {name: "Best-of-64", params: {n: 64}, note: "Best-of-64: E[r] 2.02, KL 2.56 (sınır log 64 − 63/64 = 3.17). Eğitim yok, ama her istemde 64 kat çıkarım."}
+    questions:
+      - q: "DPO kaybında bölüşüm fonksiyonu Z neden hiç hesaplanmaz?"
+        a: "Örtük ödül r = β log(π/π_ref) + β log Z'dir; Bradley–Terry yalnız iki yanıtın ödül farkına bağlı olduğu için β log Z farkta sadeleşir."
+      - q: "Best-of-n ile KL cezalı optimum aynı KL bütçesinde neden farklı ödül verir?"
+        a: "KL cezalı optimum, verilen KL'de beklenen ödülü en büyükleyen dağılımdır (tanımı gereği sınırın üstündedir). Best-of-n basit bir seçim kuralıdır; ödül–KL düzleminde sınırın altında ama ona yakın kalır ve eğitim gerektirmez."
+    limits: "Tek istem, K ayrık yanıt, tablo politikası; gerçek dil modellerinde yanıt uzayı üstel büyüklüktedir ve politika bir ağ olduğu için π* tam temsil edilemeyebilir. Gerçek ödül biliniyor; RLHF'nin ödül modeli hatası (sömürü) burada modellenmiyor."
 practice:
   - id: p1
     type: çözülmüş
