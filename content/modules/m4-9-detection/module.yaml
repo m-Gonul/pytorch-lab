@@ -40,7 +40,7 @@ hand:
         - {id: kept, label: "NMS (eşik 0.5): (0,0,10,10) 0.9 · (1,1,11,11) 0.8 · (20,20,30,30) 0.7 · (8,8,18,18) 0.6 · (21,19,31,29) 0.5 — kaç kutu kalır?", answer: 3}
     - title: "YOLO"
       fields:
-        - {id: nout, label: "YOLOv3 tarzı çıktı: 13 × 13 ızgara, hücre başına 5 kutu (4 koordinat + nesnellik) + 20 sınıf → toplam sayı", answer: 7605}
+        - {id: nout, label: "Ders slaytındaki düzen: 13 × 13 ızgara, hücre başına 5 kutu (4 koordinat + nesnellik) + hücre başına 20 sınıf → toplam sayı", answer: 7605}
         - {id: cx, label: "416 × 416 görüntü, 13 × 13 ızgara, hücre (satır 4, sütun 7), $t_x=0$: kutu merkezinin x'i (piksel)", answer: 240}
         - {id: area, label: "Çapa 100 piksel yüksek, 50 geniş; ağ $t_h=\\ln 1.5$, $t_w=\\ln 0.9$ tahmin ediyor: kutu alanı", answer: 6750}
     - title: "AP — skora göre sıralı tespitler: D D Y D Y Y D Y (D = doğru), toplam 5 gerçek nesne"
@@ -220,3 +220,70 @@ pitfalls:
 whatif:
   - q: "NMS'siz, uçtan uca bir dedektör mümkün mü?"
     a: "DETR: tahminler ile gerçek kutular arasında Macar eşlemesi (birebir) kayıpla eğitilir; tekrar eden tahminler cezalandırıldığı için NMS gerekmez."
+
+labs:
+  - id: l1
+    lab: nmsviz
+    title: "NMS: yinelenen kutuları silmek, yakın nesneleri korumak"
+    goal: |
+      Her nesnenin çevresinde birkaç gürültülü tespit ve rastgele yanlış pozitifler içeren bir sahnede açgözlü NMS'i ve Soft-NMS'i uygula. Bastırmadan önce ve sonra tek görüntülük AP@0.5'i ölç; NMS'in IoU eşiğini taradığında AP'nin nasıl değiştiğini ve sahne kalabalıklaştıkça en iyi eşiğin nereye kaydığını gör.
+    predict:
+      q: "Sahne çok kalabalıkken (nesneler birbirine yaslanmış) NMS IoU eşiğini 0.5'ten 0.2'ye indirirsen ne olur?"
+      options:
+        - {t: "AP artar: daha çok yineleme silinir", why: "Yinelemeler zaten 0.5'te çoğunlukla siliniyor; düşük eşik başka bir şeyi de siliyor."}
+        - {t: "AP düşer: yakın duran farklı nesnelerin kutuları birbirini siler", ok: true, why: "İki gerçek nesnenin kutuları arasındaki IoU 0.2'yi aşınca düşük skorlu olan bastırılır: recall kaybı."}
+        - {t: "Değişmez", why: "Eşik, hangi kutuların 'aynı nesne' sayılacağını doğrudan belirler."}
+    presets:
+      - {name: "Seyrek sahne", params: {n: 6, crowd: 0, fp: 8, method: 0, thr: 0.5, smin: 0.3}, note: "Nesneler ayrık: geniş bir eşik aralığı iyi çalışıyor."}
+      - {name: "Kalabalık, düşük eşik", params: {n: 10, crowd: 0.9, method: 0, thr: 0.2}, note: "Yakın nesneler birbirini siliyor: recall düşüyor."}
+      - {name: "Yüksek eşik", params: {n: 6, crowd: 0.3, method: 0, thr: 0.85}, note: "Yinelenen kutular hayatta kalıyor: precision düşüyor."}
+      - {name: "Soft-NMS", params: {n: 10, crowd: 0.9, method: 1, sigma: 0.5, smin: 0.05}, note: "Kutular silinmiyor, skorları küçülüyor."}
+      - {name: "Skor eşiği yok", params: {smin: 0, method: 0, thr: 0.5}, note: "Yanlış pozitifler sıralamanın sonuna yığılıyor."}
+    questions:
+      - q: "NMS neden her sınıf için ayrı uygulanır?"
+        a: "Farklı sınıflardan iki nesne (ör. bisiklet ve üzerindeki insan) yüksek IoU ile üst üste binebilir; sınıflar karıştırılırsa biri diğerini siler. torchvision.ops.batched_nms bunu kutuları sınıf başına büyük bir ofsetle kaydırarak tek çağrıda yapar (ek x3)."
+      - q: "Açgözlü NMS'in en kötü durum karmaşıklığı nedir ve Fast NMS bunu nasıl değiştirir?"
+        a: "n kutuda O(n²) IoU hesabı ve sıralı bir döngü. Fast NMS (YOLACT) tüm IoU matrisini bir kerede hesaplar ve bir kutuyu, kendisinden yüksek skorlu herhangi bir kutuyla IoU'su eşiği aşıyorsa siler (zaten silinmiş kutuların bastırmasına da izin vererek): paralel, biraz daha agresif."
+    limits: "Tek görüntü, tek sınıf, sentetik kutular; tespit skorları IoU'ya bağlı bir kuralla üretiliyor. Gerçek AP birçok görüntü ve sınıf üzerinden hesaplanır."
+  - id: l2
+    lab: apcurve
+    title: "Precision–recall eğrisinden AP: zarf, 11 nokta, tüm noktalar"
+    goal: |
+      Doğru ve yanlış tespitlerin skorlarını iki normal dağılımdan üret, skora göre sırala ve her eşikte precision ile recall'u hesapla. Ham eğriyi, "en az bu recall'daki en yüksek precision" zarfını ve bu zarfın üç özetini (11 nokta, tüm noktalar, 101 nokta) karşılaştır.
+    predict:
+      q: "Nesnelerin %30'u hiç tespit edilmiyorsa (diğer her şey mükemmel) tüm noktalı AP en fazla kaç olabilir?"
+      options:
+        - {t: "1", why: "Bulunamayan nesneler recall'u sınırlar; tavanın ötesinde precision 0 sayılır."}
+        - {t: "≈ 0.7", ok: true, why: "Recall 0.7'de kesilir; zarfın altındaki alan en fazla 0.7 × 1."}
+        - {t: "≈ 0.5", why: "Mükemmel sıralamayla tavan kadar alan elde edilir."}
+    presets:
+      - {name: "Ders örneği gibi", params: {nGT: 20, miss: 0.1, nFP: 30, sep: 1.5}, note: "Testere dişli ham eğri, onu kapsayan zarf."}
+      - {name: "Mükemmel ayrışma", params: {sep: 5, miss: 0, nFP: 30}, note: "Tüm doğrular yanlışlardan önce: AP = 1."}
+      - {name: "Az tespit", params: {nGT: 4, miss: 0, nFP: 3, sep: 1}, note: "Birkaç tespitte 11 noktalı ve tüm noktalı AP birkaç puan ayrışabiliyor (tohumu değiştir)."}
+      - {name: "Yüksek recall tavanı kaybı", params: {miss: 0.5, sep: 3}, note: "Ayrışma iyi ama nesnelerin yarısı yok: AP ≈ 0.5."}
+    questions:
+      - q: "Slayttaki örnek: 10% recall'da %90, 20% recall'da %96 precision. 10% recall için AP hangi değeri kullanır?"
+        a: "%96: en az %10 recall veren tüm eşikler içindeki en yüksek precision. Recall'u ve precision'ı birlikte artıran bir eşik varken düşük olanı seçmek anlamsızdır."
+      - q: "Neden yanlış pozitif sayısı artınca AP düşer ama doğruluk (accuracy) gibi bir ölçüt tanımlanamaz?"
+        a: "Tespitte 'gerçek negatif' sayılamaz (görüntüde nesne olmayan sonsuz sayıda kutu vardır); bu yüzden TN içermeyen precision ve recall kullanılır."
+    limits: "Skorlar iki normal dağılımdan; eşleştirme (IoU) adımı yok, her tespitin doğru/yanlış olduğu baştan belli. Tek sınıf."
+  - id: l3
+    lab: anchorkm
+    title: "Çapa kutuları: k-means'te hangi uzaklık?"
+    goal: |
+      Sentetik bir eğitim kümesinin kutu boyutlarını (küçük nesneler, yayalar, arabalar, büyük nesneler) k-means ile kümele. Öklid uzaklığını YOLOv2'nin $d=1-\mathrm{IoU}$ uzaklığıyla karşılaştır; ölçüt, her kutunun en iyi çapasıyla ortalama IoU'su.
+    predict:
+      q: "Büyük nesneler sıkken Öklid uzaklığıyla bulunan çapalar en çok hangi kutulara kötü hizmet eder?"
+      options:
+        - {t: "Büyük kutulara", why: "Öklid uzaklığında büyük kutuların farkları büyük sayılır; merkezler onlara çekilir."}
+        - {t: "Küçük kutulara", ok: true, why: "Merkezler büyük kutuların geniş dağılımına harcanır; çok sayıdaki küçük kutu az sayıda (ya da tek) çapayla temsil edilir."}
+        - {t: "Hiçbirine; uzaklık önemli değil", why: "Küçük kutuların ortalama IoU'su farkı gösteriyor."}
+    presets:
+      - {name: "YOLOv2 ayarı", params: {k: 5, d: 1, mix: 1, n: 600}, note: "1 − IoU, k = 5."}
+      - {name: "Öklid, büyük nesneler sık", params: {k: 3, d: 0, mix: 3}, note: "Küçük kutuların ortalama IoU'su belirgin biçimde düşüyor."}
+      - {name: "Çok çapa", params: {k: 9, d: 1}, note: "Ortalama IoU artıyor (YOLOv3 9 çapa kullanır: 3 ölçek × 3)."}
+      - {name: "Tek çapa", params: {k: 1, d: 1}, note: "Tek bir 'ortalama' kutu: hiçbir türe iyi uymuyor."}
+    questions:
+      - q: "Neden çapa boyutları değil, ölçek faktörlerinin logaritması tahmin edilir?"
+        a: "e^t her zaman pozitiftir (geçerli boyut), t = 0 çapanın kendisidir, ve log ölçekte 2 kat büyük ile 2 kat küçük simetriktir. Ayrıca kayıp görece hataları cezalandırır."
+    limits: "Dört türden log-normal sentetik kutular; k-means++ başlatma ve 60 iterasyon. Gerçek veri kümelerinde (COCO) dağılım çok daha geniş ve kuyrukludur."
