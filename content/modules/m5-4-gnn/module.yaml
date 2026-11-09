@@ -93,3 +93,140 @@ homework:
     accept:
       - "GAT, GCN'e yakın ya da üstün doğruluk."
       - "Attention dağılımlarının analizi."
+
+labs:
+  - id: l1
+    lab: oversmooth
+    title: "Yayılım ve aşırı düzleşme: Âᵏ X topluluk grafında"
+    goal: |
+      150 düğümlü, 3 topluluklu bir stokastik blok modelinde düğüm özellikleri gürültülü topluluk göstergeleridir. Eğitimsiz yayılım Âᵏ X'i k = 0..K için uygula; topluluk başına birkaç etiketle en yakın merkez sınıflandırıcısının doğruluğunu, topluluklar arası/içi uzaklık oranını ve özelliklerin toplam yayılımını ölç. Yayılım matrisini (simetrik, ortalama, öz-döngüsüz) ve graf yapısını değiştir.
+    predict:
+      q: "Varsayılan ayarda (p_in = 0.1, p_out = 0.01, gürültü σ = 2) doğruluk k ile nasıl değişir?"
+      options:
+        - {t: "Sürekli artar: daha çok yayılım daha çok bilgi", why: "Çok adımda topluluklar arası kenarlar da karışır."}
+        - {t: "Önce artar, sonra düşer", ok: true, why: "Ölçülen (tohum 1): k = 0'da 0.34, k = 9'da 0.91, k = 30'da 0.39."}
+        - {t: "Hiç değişmez", why: "Yayılım komşuların gürültüsünü ortalar."}
+    presets:
+      - {name: "Varsayılan", params: {pin: 0.1, pout: 0.01, noise: 2, norm: 0, K: 30, m: 3}, note: "0.34 → 0.91 (k = 9) → 0.39 (k = 30); özelliklerin yayılımı başlangıcın %1.2'sine iniyor."}
+      - {name: "Ayrık topluluklar", params: {pout: 0}, note: "Topluluklar arası kenar yok: yayılım toplulukları karıştıramaz, k = 30'da doğruluk 1.0."}
+      - {name: "Zayıf topluluk yapısı", params: {pout: 0.05}, note: "En iyi doğruluk 0.52 (k = 4); sonra 0.36'ya iniyor."}
+      - {name: "Ortalama toplayıcı", params: {norm: 1}, note: "Özellikler neredeyse çöküyor (yayılım 0.002) ama k = 30'da doğruluk 0.93: kalan küçük farklar ikinci özvektör yönünde."}
+      - {name: "Az gürültü", params: {noise: 0.5}, note: "Yayılımsız 0.78; en iyi 0.97 (k = 3)."}
+    questions:
+      - q: "Simetrik ve ortalama normalizasyonun limitleri neden farklı?"
+        a: "Ortalama yayılım D̃⁻¹Ã satır-stokastiktir; Pᵏ her düğüme aynı vektörü (durağan dağılımla ağırlıklı ortalama) verir. Simetrik Â'da limit u₁(u₁ᵀX), u₁ ∝ √d̃: düğümler aynı vektörün derece kökü katlarına gider. İkisinde de topluluk bilgisi yalnız |λ₂|ᵏ hızıyla sönen terimlerde kalır."
+    limits: "Ağırlık ve aktivasyon yok (yalnız Âᵏ X); sınıflandırıcı en yakın merkez. Gerçek GCN'de öğrenilen W ve doğrusal olmayanlık bu dinamiği değiştirir ama düzleşme eğilimi sürer. Sonuçlar tohuma göre değişir."
+  - id: l2
+    lab: wltest
+    title: "1-WL testi: toplam, ortalama ve maks toplayıcıların ayırt etme gücü"
+    goal: |
+      Başlangıçta özdeş özellikli iki graf için Weisfeiler–Lehman renk yenilemesini çalıştır. Toplam (çoklu küme), ortalama ve maks toplayıcılarıyla hangi graf çiftlerinin ayrıştığını, ayrışmanın kaçıncı turda olduğunu gör.
+    predict:
+      q: "Özellikler özdeşken bir yıldız (merkez + 4 yaprak) ile 5 düğümlü bir yolu ortalama toplayıcılı bir GNN ayırabilir mi?"
+      options:
+        - {t: "Evet, ilk katmanda: dereceler farklı", why: "Ortalama, komşu sayısını değil yalnız komşu dağılımını görür; herkes aynı renkteyse dağılım her yerde aynıdır."}
+        - {t: "Hayır", ok: true, why: "Ortalama ve maks, renk histogramlarını hiç ayırmıyor; toplam (1-WL, GIN) ilk turda ayırıyor."}
+        - {t: "Ancak 3 katmandan sonra", why: "Ortalamada renkler hiç bölünmez."}
+    presets:
+      - {name: "Altıgen / iki üçgen", params: {pair: 0, agg: 0, iters: 5}, note: "Toplam bile ayıramıyor: iki graf da 2-düzenli. 1-WL'nin bilinen sınırı."}
+      - {name: "Yıldız / yol, toplam", params: {pair: 1, agg: 0, iters: 1}, note: "İlk turda ayrışıyor (derece 4 / 1 / 2)."}
+      - {name: "Yıldız / yol, ortalama", params: {pair: 1, agg: 1, iters: 5}, note: "Hiç ayrışmıyor: tek renk."}
+      - {name: "İki ağaç, toplam", params: {pair: 2, agg: 0, iters: 3}, note: "Derece dizileri aynı; 2. turda ayrışıyor."}
+    questions:
+      - q: "Düğümlere rastgele ya da benzersiz kimlik özelliği eklemek WL sınırını aşar mı?"
+        a: "Ayırt etme gücünü artırır (her düğüm farklı başlar), ama permütasyon değişmezliğini bozar: aynı graf farklı kimliklerle farklı çıktılar verebilir. Rastgele özellikler eğitim/test arasında genelleme sorunları yaratır; daha ilkeli yollar alt graf sayımı ya da k-WL tabanlı mimarilerdir."
+    limits: "Yalnız renk yenileme (sonsuz hassasiyetli toplayıcı varsayımı); gerçek GNN'lerde sonlu boyutlu gömmeler ve öğrenilen fonksiyonlar 1-WL'den de zayıf kalabilir."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Yol grafında GCN katmanı
+    goal: Normalize komşuluk matrisini elle kurmak
+    needs: Komşuluk ve derece matrisi
+    q: |-
+      Yol grafı 1 – 2 – 3, $\mathbf X=(1,2,3)^\top$, $W=1$. $\hat{\mathbf A}=\tilde{\mathbf D}^{-1/2}(\mathbf A+\mathbf I)\tilde{\mathbf D}^{-1/2}$ ve $\hat{\mathbf A}\mathbf X$'i hesapla.
+    solution: |-
+      Öz-döngülerle dereceler $\tilde d=(2,3,2)$. $\hat A_{ij}=1/\sqrt{\tilde d_i\tilde d_j}$ (kenar ya da öz-döngü varsa): $\hat A_{11}=\hat A_{33}=0.5$, $\hat A_{22}=0.333$, $\hat A_{12}=\hat A_{23}=0.408$, $\hat A_{13}=0$.
+
+      $H_1=0.5\cdot1+0.408\cdot2=1.316$; $H_2=0.408\cdot1+0.333\cdot2+0.408\cdot3=2.300$; $H_3=0.408\cdot2+0.5\cdot3=2.316$.
+
+      Uçlardaki düğümler komşularına doğru çekildi; ortadaki düğüm kendi değerini (öz-döngü sayesinde) korudu.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Yoğun matris mi, kenar listesi mi?
+    goal: Seyrek gösterimin bellek kazancını hesaplamak
+    needs: COO kenar listesi
+    q: |-
+      1 milyon düğümlü, ortalama derecesi 10 olan yönsüz bir graf. Yoğun float32 komşuluk matrisi kaç GB'tır (1 GB = 10⁹ bayt)?
+    answer: 4000.0
+    calc: "1e6**2*4/1e9"
+    tol: 1e-6
+    mistakes:
+      - {answer: 0.08, msg: "Bu kenar listesinin boyutu (2 × 10⁷ int32 ≈ 0.08 GB); soru yoğun matrisi soruyor."}
+      - {answer: 1000.0, msg: "float32 dört bayttır."}
+    hints:
+      - "$N^2$ hücre × 4 bayt."
+    solution: |-
+      $10^{12}\cdot4=4\cdot10^{12}$ bayt = 4000 GB. Kenar listesi: $2\cdot E$ tamsayı, yönsüz kenarlar iki yönde ($E=10^7$): $2\cdot10^7\cdot4$ bayt ≈ 0.08 GB. Bu yüzden GNN'ler yayılımı scatter-add ile yapar.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Aşırı düzleşmenin hızı
+    goal: İkinci özdeğerin rolünü görmek
+    needs: $\hat{\mathbf A}^k\mathbf X=\mathbf u_1\mathbf u_1^\top\mathbf X+\sum_{i\ge2}\lambda_i^k\cdots$
+    q: |-
+      Bir grafta $|\lambda_2|=0.9$. Topluluk bilgisini taşıyan terimin büyüklüğü kaç adımda başlangıcın %1'inin altına iner (en küçük tam sayı $k$)?
+    answer: 44.0
+    calc: "math.ceil(math.log(0.01)/math.log(0.9))"
+    mistakes:
+      - {answer: 43.0, msg: "0.9⁴³ = 0.0108 > 0.01; bir adım daha gerekir."}
+      - {answer: 10.0, msg: "0.9¹⁰ = 0.35; çok daha fazla adım gerekir."}
+    hints:
+      - "$0.9^k<0.01\\iff k>\\ln0.01/\\ln0.9$."
+    solution: |-
+      $\ln0.01/\ln0.9=43.7$ ⇒ $k=44$. Güçlü topluluk yapısı (λ₂ ≈ 1) düzleşmeyi yavaşlatır; zayıf yapı (λ₂ küçük) hızlandırır.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Molekül sınıflandırmada toplayıcı
+    goal: Toplayıcıyı görevin yapısına göre seçmek
+    needs: WL testi
+    q: |-
+      Atom türleri tek-sıcak özellik olan küçük moleküllerde toksisite tahmin edeceksin. Bir karbonun iki mi üç mü hidrojen komşusu olduğu önemli. Hangi toplayıcı?
+    choices:
+      - {t: "Ortalama (GCN tarzı)", why: "{H, H} ile {H, H, H} aynı ortalamayı verir: sayı bilgisi kaybolur."}
+      - {t: "Maks", why: "Maks yalnız kümeyi görür: {H} ile {H, H, H} aynıdır."}
+      - {t: "Toplam (GIN tarzı) ve graf düzeyinde toplam okuma", ok: true, why: "Toplam çoklu kümelerde enjektiftir; sayılar korunur."}
+    hints:
+      - "Ortalama ve maks çoklu kümedeki tekrarları görür mü?"
+    solution: |-
+      Toplam, komşu sayısını korur ve 1-WL kadar güçlü olabilir (GIN). Ortalama, düğüm derecesinin önemsiz olduğu ve ölçeğin değiştiği (çok farklı dereceli sosyal ağlar) durumlarda daha kararlı olabilir; seçim görevin "sayma" gerektirip gerektirmediğine bağlıdır.
+  - id: p5
+    type: açıkla
+    level: 3
+    title: Neden 64 katmanlı GCN değil?
+    goal: Derin GNN'lerin sorunlarını açıklamak
+    needs: Aşırı düzleşme
+    q: |-
+      CNN'lerde derinlik genellikle yardım ederken GCN'lerde 2–3 katmandan sonra başarım neden düşer? Üç neden ve birer çare say.
+    rubric:
+      - "Aşırı düzleşmeyi (Âᵏ'nin baskın özvektöre yakınsaması) açıkladım; çare: artık bağlantı, PairNorm, JKNet ya da APPNP"
+      - "Aşırı sıkışmayı (oversquashing: üstel büyüyen komşuluğun sabit boyutlu vektöre sığması) belirttim; çare: graf yeniden bağlama ya da graf Transformer"
+      - "Eğitim zorluğunu (çok parametre, az etiket, aşırı uyum) belirttim; çare: dropout, ağırlık paylaşımı"
+    hints:
+      - "L katmanda bir düğümün alıcı alanında kaç düğüm vardır?"
+    solution: |-
+      (1) Aşırı düzleşme: temsiller birbirine yaklaşır. (2) Aşırı sıkışma (Alon ve Yahav 2021): L-atlamalı komşuluk üstel büyür ama bilgi sabit boyutlu bir vektörden geçmek zorundadır; uzak ilişkiler kaybolur. (3) Yarı denetimli ayarda az etiketle çok parametre aşırı uyuma yol açar. Çareler: artık/atlamalı bağlantılar, normalizasyon, yayılım ile dönüşümü ayırmak (APPNP, SGC), graf yeniden bağlama, graf Transformer'ları.
+pitfalls:
+  - wrong: "Yönsüz bir grafta her kenarı kenar listesine bir kez yazmak yeter."
+    right: "Mesaj geçişi yönlüdür (kaynak → hedef); yönsüz kenarlar iki yönde listelenmelidir, aksi hâlde bilgi tek yöne akar."
+  - wrong: "Öz-döngü eklemek gereksiz bir hile."
+    right: "Öz-döngü düğümün kendi özelliğini korur ve yeniden normalize edilmiş Â'nın özdeğerlerini (−1, 1]'e çeker; olmadan düğüm kendini unutur."
+  - wrong: "Daha çok GCN katmanı her zaman daha geniş bağlam ve daha iyi sonuç demektir."
+    right: "Katmanlar arttıkça temsiller düzleşir; tipik GCN 2–3 katmanlıdır."
+whatif:
+  - q: "Graf tam (her düğüm her düğüme bağlı) olsaydı?"
+    a: "Â her düğüme aynı ortalamayı verir: bir katmanda tam düzleşme. Öğrenilen dikkatle (GAT/Transformer) ağırlıklar farklılaşır; Transformer bu durumun dikkatli hâlidir."
+  - q: "Düğümlerin özelliği yoksa (yalnız yapı)?"
+    a: "Sabit özellik (ör. 1) ya da derece, rastgele yürüyüş ve Laplasyen özvektörleri gibi yapısal özellikler kullanılır; ortalama toplayıcı sabit özellikle hiçbir şey ayıramaz (l2)."
