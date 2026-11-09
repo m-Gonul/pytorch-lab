@@ -199,3 +199,73 @@ pitfalls:
 whatif:
   - q: "Marj γ çok küçükse?"
     a: "Sınır (R/γ)² büyür: neredeyse ayrılamaz veride yakınsama çok yavaş."
+
+labs:
+  - id: l1
+    lab: perceptron2d
+    title: "Perceptron: hata yap, ağırlığı düzelt — Novikoff sınırı ve ayrılamaz veri"
+    goal: |
+      Her hatalı örnekte w ← w + y·φ(x). Ayrılabilir veride algoritma sonlu sayıda hatadan sonra durur ve hata sayısı (R/γ)² ile sınırlıdır; ayrılamaz veride hiç durmaz. Doğru öznitelik dönüşümüyle XOR ve halka verisi de doğrusal ayrılabilir hâle gelir.
+    predict:
+      q: "Boşluğu (γ) yarıya indirirsen Novikoff sınırı (R/γ)² nasıl değişir?"
+      options:
+        - {t: "2 katına çıkar", why: "Sınır γ'nın karesiyle ters orantılı."}
+        - {t: "≈ 4 katına çıkar", ok: true, why: "(R/(γ/2))² = 4(R/γ)². Deneyde boşluk 0.1 → 0.02 iken sınır 206'dan 721'e çıkıyor (veri de değiştiği için tam 25 kat değil)."}
+        - {t: "Değişmez, yalnız örnek sayısına bağlıdır", why: "Sınır örnek sayısından ve boyuttan bağımsızdır; yalnız R ve γ'ya bağlıdır."}
+    presets:
+      - {name: "Ayrılabilir", params: {data: 0, feat: 0, gam: 0.1}, note: "Tohum 1: 21 güncellemede, 7. epoch'ta hatasız. Sınır ≈ 206 — çok gevşek."}
+      - {name: "Dar boşluk", params: {data: 0, feat: 0, gam: 0.02}, note: "γ küçüldü: sınır ≈ 720, hata sayısı 31'e çıktı."}
+      - {name: "Ters etiketler", params: {data: 1, feat: 0}, note: "%6 etiket ters: ayrılamaz. 50 epoch'ta ≈ 900 güncelleme, doğruluk %80'ler: son ağırlık rastgele bir an."}
+      - {name: "XOR, doğrusal", params: {data: 2, feat: 0}, note: "Hiçbir doğru XOR'u ayıramaz: perceptron hiç yakınsamıyor."}
+      - {name: "XOR + x₁x₂", params: {data: 2, feat: 1}, note: "Üçüncü öznitelik x₁x₂ ile 2. epoch'ta hatasız; orijinal uzayda sınır eksenlere yapışık bir hiperbol."}
+      - {name: "Halka + x₁² + x₂²", params: {data: 3, feat: 2}, note: "Yarıçap özniteliğiyle ayrılabilir: sınır bir çember."}
+      - {name: "Halka + x₁x₂", params: {data: 3, feat: 1}, note: "Yanlış dönüşüm işe yaramaz: dönüşümü veriye göre seçmek gerekir — MLP'nin gizli katmanı bunu öğrenir."}
+    questions:
+      - q: "Neden öğrenme oranı ayarı yok?"
+        a: "w₀ = 0 iken her güncelleme η ile çarpılır; w = η·(η = 1 ile elde edilen w). Tüm ağırlıklar aynı pozitif sayıyla ölçeklenir, sgn(wᵀx) değişmez: tahminler ve hata sayısı η'dan bağımsızdır."
+      - q: "Ayrılabilir veride bile neden bulunan sınır 'ortada' değil?"
+        a: "Perceptron ilk hatasız ayırıcıda durur; marjı en büyüklemeye çalışmaz. En büyük marjlı sınır SVM'nin hedefidir (M2.3)."
+    limits: "İki boyutlu yapay veri, bias öznitelik olarak (sabit 1); örnekler her epoch karıştırılır. γ, veriyi üreten ayırıcının marjıdır — en büyük marj daha büyük olabilir, dolayısıyla gösterilen sınır geçerli ama daha gevşek bir üst sınırdır."
+  - id: l2
+    lab: reluapprox
+    title: "Evrensel yaklaşım, elle: menteşeler (genişlik) ve katlamalar (derinlik)"
+    goal: |
+      Genişlik modunda K ReLU menteşesiyle bir fonksiyonu parçalı doğrusal ara değerle; hatanın K² ile azaldığını gör. Derinlik modunda çadır haritasının L katlı bileşkesinin 2L nöronla 2ᴸ parça ürettiğini, tek katmanın bunun için üstel genişlik istediğini gör.
+    predict:
+      q: "sin(2πx) için K = 8'den K = 16'ya çıkınca en büyük hata kabaca ne olur?"
+      options:
+        - {t: "Yarıya iner", why: "Hata h² ile orantılı: h yarıya inince hata dörde bölünür."}
+        - {t: "Dörde bölünür", ok: true, why: "Ölçülen 0.070 → 0.019 (≈ 3.7 kat); sınır max|f″|/(8K²)."}
+        - {t: "Değişmez", why: "Sürekli ve pürüzsüz fonksiyonda hata K ile azalır."}
+    presets:
+      - {name: "sin, K = 8", params: {mode: 0, tg: 0, K: 8}, note: "En büyük hata ≈ 0.070, sınır ≈ 0.077."}
+      - {name: "Gauss tepesi, K = 4", params: {mode: 0, tg: 1, K: 4}, note: "Az menteşe dar bir tepeyi kaçırır: hata 0.115. K = 16'da 0.041."}
+      - {name: "x², K = 4", params: {mode: 0, tg: 2, K: 4}, note: "f″ = 2 sabit: hata tam sınırda, 2/(8·16) = 0.0156."}
+      - {name: "Basamak", params: {mode: 0, tg: 4, K: 32}, note: "Süreksiz: en büyük hata K arttıkça ≈ 1'de kalıyor. Teorem sürekli fonksiyonlar içindir."}
+      - {name: "Derinlik L = 3", params: {mode: 1, L: 3}, note: "6 nöron, 3 katman: 8 parça, 7 kırılma. Tek katman en az 7 nöron ister."}
+      - {name: "Derinlik L = 8", params: {mode: 1, L: 8}, note: "16 nöron, 256 parça. Tek katman en az 255 nöron."}
+    questions:
+      - q: "|x − 0.3| için hata neden K = 10'da sıfır, K = 8'de değil?"
+        a: "Kırık nokta 0.3 bir düğüme (k/10) denk gelirse parçalı doğrusal ara değerleme fonksiyonu tam üretir; denk gelmezse hata yalnız kırığı içeren aralıkta kalır ve ∝ 1/K azalır."
+    limits: "Tek boyutlu girdi, eşit aralıklı düğümler, ağırlıklar elle inşa edilmiş (eğitim yok). Yüksek boyutta gereken nöron sayısı genelde boyutla üstel büyür; teorem gradyan inişinin bu çözümü bulacağını söylemez."
+  - id: l3
+    lab: ddescent
+    title: "Çift iniş: öznitelik sayısı veri sayısını geçerken"
+    goal: |
+      En küçük normlu en küçük kareler, öznitelik sayısı p arttıkça: önce klasik U eğrisi, p = n'de tepe (ağırlık normu patlar), sonra aşırı parametreli bölgede yeniden iniş. Ridge λ'yı büyüt ve tepenin kaybolduğunu gör.
+    predict:
+      q: "n = 20 örnekle test hatası en kötü hangi p'de olur?"
+      options:
+        - {t: "p = 1 (en basit model)", why: "Basit model yanlıdır ama tepe yapmaz."}
+        - {t: "p ≈ 20", ok: true, why: "Ara değerleme eşiği: Φ kare ve kötü koşullu, ‖w‖ patlıyor. Tohum 1'de test MSE ≈ 124."}
+        - {t: "p = 300 (en çok parametre)", why: "En küçük normlu çözüm p büyüdükçe düzgünleşir; bu modelde en iyi test hatası burada."}
+    presets:
+      - {name: "En küçük norm", params: {lam: 1.0e-9}, note: "Tepe p = n'de; p = 300'de test MSE ≈ 0.017, klasik bölgenin en iyisi (≈ 0.16) çok daha kötü."}
+      - {name: "Hafif ridge", params: {lam: 0.01}, note: "Tepe 124'ten ≈ 0.27'ye iniyor."}
+      - {name: "Güçlü ridge", params: {lam: 0.3}, note: "Tepe yok: eğri tekdüze azalıyor."}
+      - {name: "Gürültülü öznitelikler", params: {nu: 1}, note: "Öznitelikler gizli faktörleri daha kötü taşıyor; klasik bölge neredeyse hiç öğrenemiyor, tepe daha yüksek, ama p büyüdükçe yine iniyor."}
+      - {name: "n = 40", params: {n: 40}, note: "Tepe p = 40'a kayıyor: tepenin yeri parametre/veri oranıyla belirlenir."}
+    questions:
+      - q: "p > n'de eğitim hatası neden ≈ 0?"
+        a: "p > n iken Φw = y'yi tam sağlayan çözümler vardır (gürültü dahil her nokta ezberlenir); en küçük normlu olanı seçilir. Test hatasının yine de düşmesi, ezberin zararsız olabildiğini gösterir (benign overfitting)."
+    limits: "Doğrusal model, gizli faktör sayısı 5, toplam 300 öznitelik, 6 veri setinin ortalaması, 300 test örneği. Derin ağlardaki çift iniş (model boyutu ve epoch ekseninde) benzer ama daha karmaşık bir olgudur; ikinci inişin birincinin altına inip inmemesi veri modeline bağlıdır."
