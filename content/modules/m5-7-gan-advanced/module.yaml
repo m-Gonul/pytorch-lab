@@ -105,3 +105,151 @@ homework:
     accept:
       - "Kaba katmanlarda karıştırma pozu/şekli, ince katmanlarda rengi/dokuyu değiştirir."
       - "w uzayında PPL, z uzayındakinden düşük."
+
+labs:
+  - id: l1
+    lab: fidis
+    title: "IS ile FID: neyi görürler, neyi görmezler?"
+    goal: |
+      10 sınıflı sentetik bir öznitelik uzayında (ilk iki boyut sınıfı belirler, kalanlar sınıf içi değişim) üreticiyi üç yoldan boz: sınıf düşür (mod çöküşü), sınıf içi çeşitliliği azalt, örnekleri sınıflar arasına çek. IS ile FID'in her bozulmaya tepkisini karşılaştır; öznitelik boyutu ve örnek sayısıyla FID'in yanlılığını ölç.
+    predict:
+      q: "Üretici her sınıftan tek bir 'mükemmel' örnek üretiyor (sınıf içi yayılım 0). IS gerçek veriye göre nasıl çıkar?"
+      options:
+        - {t: "Daha düşük: çeşitlilik kaybolduğu için", why: "IS'in çeşitlilik terimi yalnız sınıf dağılımı p(y)'ye bakar; 10 sınıf dengeli olduğu sürece H(y) en büyüktür."}
+        - {t: "Daha yüksek", ok: true, why: "Her örnek tek sınıfa tam güvenle atanır (H(y|x) ≈ 0) ve sınıflar dengelidir: IS 9.78, gerçek veri 8.44. IS gerçek veriye bakmadığı için sınıf içi çeşitliliğin kaybını ödüllendirir."}
+        - {t: "Aynı", why: "Gerçek veride sınıflar örtüştüğü için p(y|x) daha belirsizdir."}
+    presets:
+      - {name: "İyi üretici", params: {modes: 10, spread: 1, pull: 0, d: 8, N: 1000}, note: "IS 8.44 / 8.44, FID 0.11 (gerçek–gerçek tabanı 0.06)."}
+      - {name: "Sınıf başına tek örnek", params: {spread: 0}, note: "IS 9.78, gerçek veriden yüksek. FID 6.0: sınıf içi değişimin yaşadığı 6 boyutta kovaryans sıfıra inmiş."}
+      - {name: "Aynısı, d = 2", params: {spread: 0, d: 2}, note: "FID yalnız 0.017 (taban 0.025): iki boyutta kovaryansın çoğu sınıflar arası yayılım; tek Gauss özeti sınıf içi çeşitlilik kaybını görmüyor."}
+      - {name: "Mod çöküşü (5 sınıf)", params: {modes: 5}, note: "IS 4.51, FID 4.8: ikisi de görüyor."}
+      - {name: "Tek sınıf", params: {modes: 1}, note: "IS 1.26 (en düşük 1), FID 14.05."}
+      - {name: "Bulanık örnekler", params: {pull: 0.5}, note: "Örnekler merkeze çekildi: IS 6.61, FID 2.41."}
+      - {name: "Yüksek boyut, az örnek", params: {d: 32, N: 100}, note: "Üretici kusursuz, ama FID 6.67 ve gerçek–gerçek FID 6.03: değer neredeyse tamamen kestirim yanlılığı. N = 3000'de 0.23 / 0.21."}
+    questions:
+      - q: "IS neden 1 ile sınıf sayısı C arasında kalır?"
+        a: "IS = exp(H(y) − E H(y|x)) = exp I(x; y). Karşılıklı bilgi negatif olamaz (IS ≥ 1) ve H(y) ≤ log C'yi aşamaz (IS ≤ C). En büyük değer, her örnek tek sınıfa kesin atanıp sınıflar dengeli olduğunda gelir; bu, sınıf başına tek örnekle de sağlanır."
+      - q: "İki makale FID'leri farklı N'lerle raporlamış. Karşılaştırılabilir mi?"
+        a: "Hayır. FID yanlıdır; yanlılık N azaldıkça (ve boyut arttıkça) büyür. Aynı N, aynı öznitelik çıkarıcı ve aynı ön işlemle hesaplanmalı; ya da FID∞ gibi düzeltilmiş kestirim kullanılmalıdır (ek x2)."
+    limits: "Sentetik öznitelikler; sınıflandırıcı Bayes sonsalı. Gerçek Inception öznitelikleri 2048 boyutludur ve sınıflar bu kadar düzgün ayrılmaz."
+  - id: l2
+    lab: trunclab
+    title: "Kırpma hilesi: kalite ile çeşitliliğin değiş tokuşu"
+    goal: |
+      Çember üzerinde K modlu bir veri ve gizil uzayın kuyruklarında bozulan kusurlu bir üretici. Gizil kodları ψ ile ortalamaya çekince kesinliğin (üretilenlerin gerçek veri yüzeyine düşen oranı) arttığını, geri çağırmanın (gerçek verinin kapsanan oranı) ve kapsanan mod sayısının azaldığını izle. FID'in kusuru ne kadar az gördüğüne dikkat et.
+    predict:
+      q: "ψ = 0.3 ile kırpınca 8 moddan kaçı kapsanmaya devam eder?"
+      options:
+        - {t: "8: kırpma yalnız kaliteyi artırır", why: "Kırpma tüm gizil kodları daraltır; modu seçen boyut da daralır."}
+        - {t: "≈ 5", ok: true, why: "Ölçülen: 5 / 8, geri çağırma 0.64, kesinlik 0.99. Kodlar ortalamaya yığılınca uçtaki modlar hiç üretilmez."}
+        - {t: "1", why: "Bu ψ çok daha küçükken olur (ψ = 0.2'de 3 mod)."}
+    presets:
+      - {name: "Kırpma yok", params: {psi: 1, gam: 1, K: 8, k: 3, N: 600}, note: "Kesinlik 0.84, geri çağırma 0.98, 8 / 8 mod. FID 0.013: kusurlu üreticiye rağmen çok düşük."}
+      - {name: "Hafif kırpma (ψ = 0.7)", params: {psi: 0.7}, note: "Kesinlik 0.94, geri çağırma 0.98: kuyruk örnekleri gitti, çeşitlilik neredeyse aynı. Pratikte seçilen bölge budur."}
+      - {name: "Güçlü kırpma (ψ = 0.3)", params: {psi: 0.3}, note: "Kesinlik 0.99 ama geri çağırma 0.64 ve 5 / 8 mod; FID 2.85."}
+      - {name: "Kusursuz üretici", params: {gam: 0}, note: "Kesinlik 0.96, geri çağırma 0.97 (sonlu örneklem). Kırpmanın burada kazandıracağı kalite yok, yalnız çeşitlilik kaybettirir: ψ = 0.5'te geri çağırma 0.73."}
+      - {name: "Çok kusurlu", params: {gam: 2}, note: "Kesinlik 0.72; FID 0.015 ile kusursuz üreticiyle (0.014) neredeyse aynı."}
+      - {name: "ψ > 1", params: {psi: 1.5}, note: "Kesinlik 0.67, geri çağırma 0.997: kuyruklar abartılıyor."}
+      - {name: "k = 1", params: {k: 1}, note: "Kesinlik 0.59, geri çağırma 0.76: k-NN bilyeleri küçülünce iki ölçüt de katılaşır; k bir hiperparametredir (makalede 3)."}
+    questions:
+      - q: "StyleGAN neden kırpmayı z yerine w uzayında yapar?"
+        a: "z'nin ortalaması (0) z → görüntü eşlemesi bükük olduğu için anlamlı bir 'ortalama görüntü'ye karşılık gelmeyebilir. w uzayı daha ayrıktır ve w̄ (eğitimde w'lerin hareketli ortalaması) gerçekçi bir ortalama yüz üretir; w'yi ona doğru çekmek özellikleri daha düzgün azaltır. Bu deneyde mod doğrudan z₁'den seçildiği için kırpma modları keskin biçimde düşürüyor."
+    limits: "2-B yapay veri; üreticinin kusuru elle tanımlı. k-NN ölçütleri aykırı üretilen örneklerin büyük bilyeleri yüzünden geri çağırmayı abartabilir (K = 3, ψ = 0.4: 2 / 3 mod ama geri çağırma 0.9); yoğunluk/kapsama ölçütleri (Naeem ve ark. 2020) bunu düzeltir."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Fréchet uzaklığı, köşegen kovaryans
+    goal: FID formülünü elle uygulamak
+    needs: Köşegen matrislerde karekök eleman eleman
+    q: |-
+      $\boldsymbol\mu_r=(0,0)$, $\boldsymbol\mu_g=(1,1)$, $\boldsymbol\Sigma_r=\mathrm{diag}(1,4)$, $\boldsymbol\Sigma_g=\mathrm{diag}(4,4)$. Fréchet uzaklığı?
+    solution: |-
+      Ortalama terimi $1+1=2$. Kovaryanslar köşegen olduğu için her eksen $(\sigma_r-\sigma_g)^2$ katkı verir: $(1-2)^2+(2-2)^2=1$. Toplam $\mathbf 3$.
+
+      Kontrol: $\mathrm{tr}(\Sigma_r+\Sigma_g)=5+8=13$, $(\Sigma_r\Sigma_g)^{1/2}=\mathrm{diag}(2,4)$, $13-2\cdot6=1$.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Inception Score
+    goal: IS'i karşılıklı bilgi olarak hesaplamak
+    needs: $\mathrm{IS}=\exp(H(y)-\mathbb E H(y\mid x))$
+    q: |-
+      Dört sınıf. Üretilen örneklerin her biri bir sınıfa tam güvenle atanıyor ($p(y\mid x)$ tek sıcak), ama örneklerin yarısı sınıf 0, yarısı sınıf 1. IS?
+    answer: 2.0
+    calc: "exp(log(2) - 0)"
+    tol: 1e-6
+    mistakes:
+      - {answer: 4.0, msg: "Sınıf dağılımı dört sınıfa değil iki sınıfa yayılıyor: H(y) = log 2."}
+      - {answer: 1.0, msg: "H(y|x) = 0 ama H(y) = log 2 > 0."}
+    hints:
+      - "Her örnekte $H(y\\mid x)=0$; $p(y)=(0.5,0.5,0,0)$."
+    solution: |-
+      $H(y)=\log2$, $\mathbb EH(y\mid x)=0$, $\mathrm{IS}=e^{\log2}=2$. İki sınıfa çökmüş (mod çöküşü) ama örnekleri keskin bir üretici: IS, kapsanan sınıf sayısını doğrudan verir.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Eşitlenmiş öğrenme oranı
+    goal: Çalışma anı ölçeğini hesaplamak
+    needs: $c=\sqrt{2/\text{fan\_in}}$
+    q: |-
+      3 × 3 çekirdekli, 512 giriş kanallı bir konvolüsyon. Eşitlenmiş öğrenme oranında ağırlıklar çalışma anında hangi $c$ ile çarpılır? (fan_in = giriş kanalı × çekirdek alanı)
+    answer: 0.020833333333333332
+    calc: "sqrt(2/(512*9))"
+    tol: 1e-6
+    mistakes:
+      - {answer: 0.0625, msg: "Çekirdek alanı unutuldu: fan_in = 512 · 9 = 4608."}
+      - {answer: 0.014731391274719739, msg: "He kazancı √2'dir; c = √(2 / fan_in)."}
+    hints:
+      - "fan_in = 512 · 9 = 4608."
+    solution: |-
+      $c=\sqrt{2/4608}=1/48\approx0.0208$. Adam altında saklanan ağırlık her adımda $\approx\eta$ değişir; etkin ağırlık $c\eta$ değişir ve göreli değişim $\eta$ olur, her katmanda aynı.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: FID düştü ama örnekler tekdüze
+    goal: Ölçütün neyi kaçırdığını tanımak
+    needs: IS, FID, kesinlik/geri çağırma
+    q: |-
+      Kırpmayı ψ = 1'den 0.6'ya indirince bir yüz modelinin FID'i 8.1'den 7.6'ya düşüyor ve örnekler daha temiz görünüyor; ama arkadaşınız örneklerin "hep aynı yüze benzediğini" söylüyor. Hangi ölçümü eklemek bu ödünleşimi ayrıştırır?
+    choices:
+      - {t: "Inception Score", why: "IS gerçek veriye bakmaz ve sınıf içi çeşitlilik kaybını görmez; yüzlerde tek sınıf olduğu için zaten anlamsızdır."}
+      - {t: "Kesinlik ve geri çağırma (k-NN, öznitelik uzayında)", ok: true, why: "Kesinlik kaliteyi, geri çağırma çeşitliliği ayrı ölçer; kırpma birincisini artırıp ikincisini düşürür."}
+      - {t: "Daha çok örnekle FID", why: "Yanlılığı azaltır ama tek sayı yine iki etkiyi karıştırır."}
+    hints:
+      - "FID tek bir sayı; iki ayrı etkiyi birleştiriyor olabilir mi?"
+    solution: |-
+      FID, kalite artışı ile çeşitlilik kaybını tek bir sayıda toplar; net etki küçük bir iyileşme gibi görünebilir. Kynkäänniemi ve ark. (2019) kesinlik/geri çağırması bunları ayırır: kırpma kesinliği artırır, geri çağırmayı düşürür (deney 2).
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Demodülasyon çıkış ölçeğini 1 yapar
+    goal: StyleGAN2 normalizasyonunu türetmek
+    needs: Bağımsız değişkenlerin toplamının varyansı
+    q: |-
+      Girdi aktivasyonları $x_{i,k}$ (kanal $i$, çekirdek altındaki konum $k$) bağımsız, ortalaması 0, varyansı 1. Modüle edilmiş ağırlıklarla çıkış $y_j=\sum_{i,k}w'_{ijk}x_{i,k}$. $w''_{ijk}=w'_{ijk}/\sqrt{\sum_{i,k}w'^2_{ijk}}$ ile çıkışın varyansının 1 olduğunu göster.
+    rubric:
+      - "Bağımsızlık ve sıfır ortalamayla Var(y_j) = Σ w'² Var(x) yazdım"
+      - "Var(x) = 1 ile Var(y_j) = Σ_{i,k} w'²_{ijk} buldum"
+      - "w'' ile bölünce varyansın 1 olduğunu gösterdim"
+      - "Bunun gerçek aktivasyonları değil beklentiyi normalize ettiğini (AdaIN'den farkı) belirttim"
+    hints:
+      - "Bağımsız değişkenlerin doğrusal birleşiminin varyansı katsayıların karelerinin ağırlıklı toplamıdır."
+    solution: |-
+      $\mathrm{Var}(y_j)=\sum_{i,k}w'^2_{ijk}\mathrm{Var}(x_{i,k})=\sum_{i,k}w'^2_{ijk}$. $w''$ ile bu toplam 1'e bölünür ve $\mathrm{Var}(y_j)=1$ olur. Bu normalizasyon istatistiksel varsayıma dayanır; gerçek aktivasyonlar normalize edilmez, bu yüzden AdaIN'in silip üreticinin damla kusuruyla geri kaçırmaya çalıştığı göreli büyüklük bilgisi korunur.
+pitfalls:
+  - wrong: "Ayırıcının kaybı düşüyorsa GAN iyi gidiyordur."
+    right: "GAN kayıpları bir oyunun anlık durumudur; iyi ya da kötü örneklerle aynı kayıp değerleri görülebilir. Eğitim örneklere bakarak ve FID / kesinlik–geri çağırma ile izlenir."
+  - wrong: "Yüksek IS, gerçek veriye yakın örnekler demektir."
+    right: "IS gerçek veriye hiç bakmaz; sınıf başına tek mükemmel örnekle gerçek veriden yüksek çıkabilir. FID ya da kesinlik/geri çağırma gerçek veriyle karşılaştırır."
+  - wrong: "Farklı çalışmaların FID değerleri doğrudan karşılaştırılabilir."
+    right: "FID örnek sayısına, öznitelik çıkarıcının sürümüne ve görüntü yeniden boyutlandırma ayrıntılarına bağlıdır. Aynı ayarlarla hesaplanmamış değerler karşılaştırılmamalıdır."
+  - wrong: "DCGAN'da BN her katmana konmalıdır."
+    right: "Üretici çıkışı ve ayırıcı girişi hariç tutulur; Radford ve ark. tüm katmanlara BN koymanın örnek salınımına ve kararsızlığa yol açtığını bildirir."
+whatif:
+  - q: "StyleGAN'da gürültü girdileri kapatılsaydı?"
+    a: "Makaledeki deneyde görüntüler hâlâ yüzdür ama saç, sakal ve cilt dokusu gibi stokastik ayrıntılar 'boyanmış', tekdüze görünür. Gürültü yalnız ince ayrıntıyı etkiler; kimliği ve pozu stiller belirler."
+  - q: "Stil karıştırma hiç kullanılmasaydı?"
+    a: "Ağ komşu düzeylerin stillerinin ilişkili olduğunu öğrenebilir; bir düzeydeki stili değiştirmek başka düzeylerdeki özellikleri de etkiler. Karıştırma, her stilin yalnız kendi düzeyinin özelliklerini kontrol etmesini (yerellik) teşvik eder."
+  - q: "ProGAN'da yumuşak geçiş yerine yeni katman doğrudan eklenseydi?"
+    a: "Yeni, rastgele başlatılmış katman iyi eğitilmiş düşük çözünürlüklü ağın çıktısını bir anda bozar; ayırıcı ve üretici büyük bir şok yaşar ve önceki aşamanın kazanımları kaybolabilir. α'yı 0'dan 1'e yavaşça artırmak bu şoku yumuşatır."
