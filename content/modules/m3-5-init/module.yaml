@@ -117,6 +117,28 @@ labs:
         a: "Her katman varyansı n·10⁻⁴ ≈ 0.006 ile çarpar: sinyal birkaç katmanda sayısal sıfıra iner, tüm nöronlar aynı davranır."
     limits: "Rastgele Gauss girdi, eğitim yok (yalnız başlangıç anı); BN/artık bağlantı yok. Bunlar korunum koşulunu kendiliğinden sağlar (M3.6, M4.8)."
 
+  - id: l2
+    lab: actfun
+    title: "Aktivasyonlar: şekil, türev ve girdi dağılımına göre davranış"
+    goal: |
+      Sol: seçilen aktivasyon f(z) ve türevi f′(z). Sağ: z ~ N(μ, σ²) girdiler için f(z)'nin histogramı. Tablo; çıktının ortalamasını (sıfır merkezli mi?), ikinci moment oranını (ileri geçişte ne kadar ölçek kaybı), türevin ortalamasını ve karesini (geri geçişteki çarpan) ve türevi ≈ 0 olan oranı verir.
+    predict:
+      q: "ReLU, z ~ N(0, 1). E[f(z)²]/E[z²] ne çıkar ve He başlatmasıyla ilişkisi nedir?"
+      options:
+        - {t: "≈ 0.5: negatif yarı sıfırlanıyor; He'nin Var(w) = 2/n'deki 2 bunu telafi eder", ok: true, why: "Simetrik z için E[ReLU(z)²] = ½E[z²]."}
+        - {t: "≈ 1", why: "Bu, doğrusal aktivasyon ya da SELU için."}
+        - {t: "≈ 0.25", why: "0.25, sigmoid türevinin en büyük değeri."}
+    presets:
+      - {name: "Sigmoid", params: {k: 0, mu: 0, sd: 1}, note: "Ortalama 0.5, E[f′²] ≈ 0.045: gradyan varyansı katman başına ~20 kat küçülür."}
+      - {name: "Doymuş tanh", params: {k: 1, mu: 0, sd: 4}, note: "Büyük σ: çıktılar ±1'e yığılır, türevin ortalaması küçük."}
+      - {name: "Ölü ReLU", params: {k: 2, mu: -2, sd: 1}, note: "Ön-aktivasyonlar çoğunlukla negatif: nöronların ~%98'i sıfır gradyan alıyor."}
+      - {name: "Leaky ReLU kurtarır", params: {k: 3, alpha: 0.2, mu: -2, sd: 1}, note: "Negatif tarafta eğim 0.2: gradyan hiç tam sıfırlanmaz."}
+      - {name: "SELU sabit noktası", params: {k: 5, mu: 0, sd: 1}, note: "Ortalama ≈ 0, ikinci moment ≈ 1: öz-normalizasyon."}
+      - {name: "GELU", params: {k: 6, mu: 0, sd: 1}, note: "Pürüzsüz, negatif tarafta küçük çukur; Transformer varsayılanı."}
+    questions:
+      - q: "ELU'da α = 1 seçmenin özel anlamı ne?"
+        a: "z = 0'da türev iki taraftan da 1 olur: fonksiyon her yerde pürüzsüz (türevlenebilir), gradyan inişi z = 0 çevresinde sıçramaz."
+    limits: "20 000 örnekle Monte Carlo tahmini; tek bir katmanın girdisi bağımsız Gauss varsayılır. Gerçek ağlarda ön-aktivasyonlar ilişkili ve Gauss olmayabilir."
 practice:
   - id: p1
     type: çözülmüş
