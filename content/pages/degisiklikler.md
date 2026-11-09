@@ -1,5 +1,51 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 2 ve Faz 3
+
+Aynı düzen (problem → sezgi → tanım → koşullu türetim → sayısal örnek → şekil → deney → PyTorch karşılığı → özet) Faz 2 (klasik ML) ve Faz 3'ün (sinir ağı temelleri) 17 modülüne uygulandı. Faz 3'te ders slaytlarının (Derin Öğrenme, bölüm 10–11) her maddesi anlatıma işlendi; slaytta olmayan ama açık kaynaklarda (orijinal makaleler, Goodfellow ve ark., CS231n) daha ayrıntılı bulunan türetimler eklendi.
+
+| modül | bölüm | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|---|
+| M2.1 k-NN | 8 | 1 | 2-B karar bölgeleri, yüksek boyutta uzaklıkların yoğunlaşması | Voronoi, Cover–Hart sınırı R* ≤ R₁ₙₙ ≤ 2R*(1 − R*), uzaklıkların göreli yayılımının 1/√d ile daralması |
+| M2.2 Naive Bayes | 10 | 0 | Gauss NB ve kalibrasyon, yüksek boyutta NB vs LR öğrenme eğrisi | ortak varyansta doğrusal sınır, Laplace düzeltmesi |
+| M2.3 SVM | 8 | 1 | dual koordinat inişiyle 2-B SVM | marj = 2/‖w‖, KKT ve destek vektörleri, hinge kaybı |
+| M2.4 karar ağacı | 7 | 2 | eksene paralel bölmeler ve derinlik | Gini/entropi kazancı, bölme seçimi |
+| M2.5 topluluklar | 7 | 1 | adım adım gradient boosting, bagging varyansı | ρσ² + (1 − ρ)σ²/B, pseudo-residual = negatif gradyan |
+| M2.6 PCA / SVD | 8 | 0 | 2-B PCA, kuvvet iterasyonu, SVD ile görüntü sıkıştırma | en büyük varyans yönü (Lagrange), Eckart–Young |
+| M2.7 k-means | 8 | 1 | k seçimi (dirsek, siluet) + mevcut k-means | Lloyd adımlarının türetimi ve sonluluğu |
+| M2.8 GMM / EM | 9 | 1 | 2-B EM, olabilirliğin monotonluğu | ELBO alt sınırı, E/M adımları, k-means'in sert limiti |
+| M3.1 micrograd | 7 | 0 | ifade grafiği (kendi ifadeni yaz, adım adım geri), 2 ay verisinde MLP | yerel türevler, topolojik sıra, gradyan biriktirme |
+| M3.2 MLP ve geri yayılım | 7 | 1 | doyan aktivasyonla yavaş öğrenme | δ özyinelemesi, CE + sigmoid'de σ′'nin sadeleşmesi |
+| M3.3 tensör autograd | 7 | 0 | yayın (broadcast) görselleştirici, ileri vs ters mod maliyeti | VJP olarak geri kurallar, unbroadcast |
+| M3.4 optimizer'lar | 10 | 0 | öğrenme oranı takvimleri (+ mevcut 2-B optimizer, EMA) | momentum, Nesterov, AdaGrad/RMSProp/Adam yanlılık düzeltmesi, AdamW |
+| M3.5 başlatma ve aktivasyon | 5 | 0 | aktivasyon istatistikleri (+ mevcut başlatma × aktivasyon) | Glorot/He varyans korunumu, SELU sabit noktası |
+| M3.6 normalizasyon | 11 | 3 | 20 katmanda normalizasyon (aktivasyon std'si ve gradyan normu), BN/LN/IN/GN/RMSNorm eksen gezgini (+ mevcut BN gürültüsü) | ölçek değişmezliği ve etkin öğrenme oranı, BN geri geçişi, BN katlama |
+| M3.7 düzenlileştirme | 9 | 2 | dropout + weight decay + early stopping + MC dropout bandı, gradyan kırpma (değer vs norm) | early stopping ≈ L2 (α ≈ 1/ηt), inverted dropout momentleri, doğrusal modelde dropout = veriye uyarlanmış L2, alpha dropout afin düzeltmesi |
+| M3.8 perceptron | 13 | 3 | perceptron + Novikoff sınırı + öznitelik dönüşümü, ReLU menteşeleri ve çadır haritası, çift iniş | Novikoff kanıtı, XOR'un ayrılamazlığı, perceptron = perceptron kriterinin SGD'si, ara değerleme hatası max|f″|/(8K²), derinlikle 2ᴸ parça |
+| M3.9 eğitim pratiği | 9 | 2 | öğrenme ve kapasite eğrileri, veri sızıntısı (grup, öznitelik seçimi), sınıf ağırlıkları | ağırlıklı CE'nin logit'i log w kaydırması |
+
+- **30 yeni etkileşimli deney** (toplam 71). Her birinin iddiaları birkaç tohumla sayısal olarak doğrulandıktan sonra yazıldı; doğrulanamayan iddialar metinden çıkarıldı (aşağıda).
+- **Deney sonucuna göre düzeltilen anlatımlar:**
+  - M2.2: "az veride Naive Bayes lojistik regresyondan iyidir" iddiası 2-B deneyde görünmüyordu. İddia kaldırıldı; yerine kalibrasyon grafiği ve iddianın gerçekten geçerli olduğu yüksek boyutlu bir deney eklendi.
+  - M3.6: normalizasyon deneyinin ilk notu "gradyanlar katmanlar boyunca dengelenir" diyordu. Ölçüm, artıksız derin BN ağında ilk katmanların gradyanının 20 katmanda ≈ 40×, 40 katmanda binlerce kat büyük olduğunu gösterdi (Yang ve ark. 2019 ile uyumlu); not ve anlatım buna göre düzeltildi.
+  - M3.9: gruplu teşhis eşiği tek tohumda yanıltıcı etiketler veriyordu; σ²/2 eşikli kurala geçildi ve deneyin sınırlarına yazıldı.
+- **Ders slaytlarındaki hatalar (anlatımda kutuyla belirtildi):**
+  - BN katlama formülü σ + ε değil √(σ² + ε) olmalı; sabit bir kanalda iki ifade 300 kat ayrışır.
+  - 200×200 RGB görüntü sayısı 40 000 × 256³ değil (256³)^40 000 = 2^960 000.
+  - 138 milyon parametre VGG-19'un değil VGG-16'nın; VGG-19 ≈ 144 milyon.
+  - MLE "tüm tutarlı kestiriciler arasında en düşük MSE" değil, asimptotik olarak verimlidir.
+  - PReLU'nun eğimi hiperparametre değil, öğrenilen bir parametredir.
+  - "Geri geçiş = güncelleme adımı" değil: geri geçiş gradyanları hesaplar, güncellemeyi optimizer yapar.
+- **Diğer düzeltmeler:**
+  - M2.6: sıkıştırma oranı ≈ %67 olarak düzeltildi.
+  - M2.4: "kesin içbükey" ifadesi düzeltildi.
+  - M3.1: ifade ayrıştırıcısının yanıltıcı hata mesajı ("'*' tanımsız") düzeltildi.
+  - M3.4: log eksende çubuklar görünmüyordu.
+  - M3.2 ve M3.5: artık bağlantılara (ResNet) yapılan çapraz başvuru yanlış modüle (M4.8) gidiyordu; M4.2'ye çevrildi.
+  - SVM, k-means Voronoi ve EM alt sınır şekilleri kesin hesapla yeniden çizildi.
+  - Grafiklerde sağ kenara yakın işaret etiketleri kesiliyordu; artık sola dönüyor.
+- **Kalan:** Faz 4–11 konu anlatımları (sırayla); Faz 5–11'in kalan modüllerine pratik kartları; kapsam tablosunun güncellenmesi.
+
 ## 2026-11 (3. tur) · Tam konu anlatımları (Faz 0 ve Faz 1)
 
 Geri bildirim: modül girişleri kısa bir özetten ibaretti. Her modüle artık aşamalardan **önce** gelen, slayt düzeyinde ya da daha ayrıntılı bir **Konu anlatımı** bölümü ekleniyor (sayfadaki "§ Konu anlatımı", içindekiler ve okuma süresiyle). Her anlatım aynı düzeni izler: problem → sezgi → kesin tanım → türetim/kanıt (koşullarıyla, açılır kutuda) → sayısal örnek → şekil → etkileşimli deney → yanılgılar → PyTorch karşılığı → özet tablosu → kaynaklar.

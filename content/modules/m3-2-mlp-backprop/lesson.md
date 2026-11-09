@@ -64,7 +64,7 @@ Dört denklem yalnız bir hesap yöntemi değil, öğrenmenin **ne zaman yavaşl
 3. **BP2: doymuş gizli nöronlar da yavaş öğrenir.** $\delta^l_j$'de $\sigma'(z^l_j)$ çarpanı var: doymuş bir nörona giren tüm ağırlıklar yavaş öğrenir — $\sum_nw^{l+1}_{nj}\delta^{l+1}_n$ bunu telafi edecek kadar büyük değilse.
 4. **Kararsız gradyanlar.** BP2'yi katmanlar boyunca açınca **çarpanların çarpımı** çıkar:
 $$\delta^l=\mathrm{diag}(\sigma'(z^l))(W^{l+1})^\top\,\mathrm{diag}(\sigma'(z^{l+1}))(W^{l+2})^\top\cdots\delta^L.$$
- Her çarpan tipik olarak 1'den küçükse (sigmoid'de $\sigma'\le\frac14$) ilk katmanların gradyanı üstel olarak **söner**; büyükse **patlar**. Derin ağlarda ilk katmanlar çok yavaş öğrenir (Glorot ve Bengio 2010). Çareler M3.5 (başlatma, aktivasyon), M3.6 (normalizasyon) ve M4.8 (artık bağlantılar) konularıdır.
+ Her çarpan tipik olarak 1'den küçükse (sigmoid'de $\sigma'\le\frac14$) ilk katmanların gradyanı üstel olarak **söner**; büyükse **patlar**. Derin ağlarda ilk katmanlar çok yavaş öğrenir (Glorot ve Bengio 2010). Çareler M3.5 (başlatma, aktivasyon), M3.6 (normalizasyon) ve M4.2 (artık bağlantılar, ResNet) konularıdır.
 
 ::lab l1
 
