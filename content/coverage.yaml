@@ -232,6 +232,7 @@ groups:
       - src: "Dosovitskiy ve ark. 2021 — ViT"
         pages: [m4-15-vit]
         status: genis
+        done: "M4.15 konu anlatımı: yöntem denklemleri, Tablo 1–2 ve Tablo 5 (veri ölçeği şekli), yama embedding'i = konvolüsyon türetimi, ViT-B/16 parametre sayımı, konum ablasyonu (Ek D.4), [class] ile GAP (Ek D.3), konum interpolasyonu türetimi, endüktif yanlılık, Şekil 7 bulguları, maskeli yama tahmini (79.9), eğitim tarifi; DeiT ve Swin (maliyet türetimi); patchviz, posinterp, swinreach deneyleri; ch_16 slayt 89–92 (görsel dikkat, ViT)."
       - src: "Lin ve ark. 2017 — Feature Pyramid Networks"
         pages: [m4-9-detection]
         status: genis

@@ -192,3 +192,70 @@ pitfalls:
 whatif:
   - q: "Konum gömmeleri kaldırılırsa?"
     a: "Model yama torbasına döner; ViT makalesinde bu ImageNet doğruluğunu birkaç puan düşürdü (yamalar içerikten kısmen konum ipucu taşır)."
+
+labs:
+  - id: l1
+    lab: patchviz
+    title: "Yamalara bölmek: dizi uzunluğu, maliyet ve yama torbası"
+    goal: |
+      Bir görüntüyü P × P'lik yamalara böl. Yama sayısının, dizi uzunluğunun ve yama embedding'i parametresinin P ile nasıl değiştiğini, bir katmandaki dikkat ve MLP hesabının oranını (T/4D) ölç. Konum embedding'i olmayan bir ViT'in gördüğü karıştırılmış yamaları göster.
+    predict:
+      q: "224 × 224 görüntüde yama boyunu 16'dan 2'ye indirirsen (D = 768) dikkat/MLP hesap oranı ne olur?"
+      options:
+        - {t: "Değişmez: ikisi de token sayısıyla büyür", why: "MLP T ile doğrusal, dikkat T² ile büyür."}
+        - {t: "≈ 0.06'dan ≈ 4'e çıkar", ok: true, why: "T = 197 → 12 545; oran T/(4D) = 0.064 → 4.08. Dikkat baskın hâle gelir."}
+        - {t: "Azalır", why: "Daha küçük yama daha çok token demektir."}
+    presets:
+      - {name: "ViT-B/16 (224, P = 16)", params: {H: 3, P: 3, D: 768, C: 3, shuf: 0}, note: "196 yama, 197 token, yama embedding'i 590 592 parametre; dikkat/MLP = 0.064."}
+      - {name: "Piksel düzeyine yakın (P = 2)", params: {H: 3, P: 0, D: 768, C: 3, shuf: 0}, note: "12 545 token; dikkat/MLP = 4.08. Katman başına dikkat ≈ 2.4·10¹¹ çarpma-toplama."}
+      - {name: "Yama torbası", params: {H: 1, P: 2, D: 768, C: 3, shuf: 1}, note: "Konumsuz bir ViT için karıştırılmış görüntü özgün görüntüyle aynıdır: yalnız yama içi düzen kalır."}
+      - {name: "Büyük yama (ViT-B/32)", params: {H: 3, P: 4, D: 768, C: 3, shuf: 0}, note: "224 / 32: 49 yama, 50 token; dikkat/MLP = 0.016. Ucuz ama kaba: makalede ViT-B/32 ImageNet-21k ön eğitimiyle 81.3, B/16 84.0."}
+    questions:
+      - q: "Yama embedding'i neden bir konvolüsyon olarak yazılabilir?"
+        a: "Her yamaya aynı E matrisi uygulanır (ağırlık paylaşımı) ve yamalar örtüşmeden ızgarayı kaplar: çekirdek boyu = adım = P olan bir Conv2d tam olarak budur."
+      - q: "Konumsuz ViT bir görüntüyü nasıl hâlâ kısmen tanıyabilir?"
+        a: "Her yamanın içindeki P × P'lik düzen korunur; yerel doku ve renk istatistikleri sınıf hakkında bilgi taşır. Makaledeki ablasyonda konumsuz ViT-B/16 0.614, 1-B konumlu 0.642 aldı."
+    limits: "Görüntü sentetik bir sahne; hesap sayıları tek katman ve yalnız çarpma-toplama (softmax, LN, GELU hariç)."
+  - id: l2
+    lab: posinterp
+    title: "Çözünürlük değişince konum embedding'lerini taşımak"
+    goal: |
+      g × g ızgarada öğrenilmiş (burada pürüzsüz bir 2-B alanla temsil edilen) konum embedding'lerini g' × g' ızgaraya bilineer, en yakın komşu ve ham sıra yöntemleriyle taşı. Görüntüdeki aynı yere karşılık gelen ideal embedding'e kosinüs benzerliğini ve seçilen bir yamanın benzerlik haritasını karşılaştır.
+    predict:
+      q: "14 × 14'ten 24 × 24'e taşırken yeni k. konuma eski k. embedding'i verirsen (ham sıra) ideal embedding'e ortalama kosinüs ne olur?"
+      options:
+        - {t: "≈ 0.98: embedding'ler zaten benzer", why: "Satır uzunluğu 14'ten 24'e değiştiği için aynı indis görüntünün başka bir yerine düşer."}
+        - {t: "≈ 0.15", ok: true, why: "Ölçülen 0.147 (bilineer 0.998, en yakın 0.981): 2-B yapı tamamen bozuluyor."}
+        - {t: "Tam 0", why: "Bazı konumlar tesadüfen yakın düşer."}
+    presets:
+      - {name: "224 → 384 (bilineer)", params: {g: 14, G: 24, method: 0, D: 64, ref: 0.3}, note: "Ortalama kosinüs 0.998, en kötü konum 0.985."}
+      - {name: "En yakın komşu", params: {g: 14, G: 24, method: 1}, note: "Ortalama 0.981, en kötü 0.934: bloklu kopyalar."}
+      - {name: "Ham sıra (yanlış)", params: {g: 14, G: 24, method: 2}, note: "Ortalama 0.147; benzerlik haritası parçalanıyor."}
+      - {name: "Çok kaba ön eğitim ızgarası", params: {g: 4, G: 24, method: 0}, note: "4 × 4'ten 24 × 24'e: bilineer bile 0.87; az örnekten çok ayrıntı üretilemiyor."}
+    questions:
+      - q: "Sabit 2-B sin-cos embedding'lerinde (MAE) interpolasyon gerekir mi?"
+        a: "Hayır: fonksiyon her ızgara için yeniden hesaplanabilir. Ama ızgaranın neyi temsil ettiği (görüntü kesri mi, mutlak yama indisi mi) tutarlı seçilmeli; indisle hesaplanırsa büyük ızgarada model hiç görmediği konum değerleriyle karşılaşır."
+    limits: "Gerçek öğrenilmiş embedding'ler bu kadar pürüzsüz değildir; ideal karşılaştırma burada tanımlı, gerçek modelde değil. Sonuç ince ayardan sonra modelin doğruluğuyla ölçülür."
+  - id: l3
+    lab: swinreach
+    title: "CNN, ViT ve Swin: erişim ve dikkat maliyeti"
+    goal: |
+      Bir çıktı yamasını L katman sonra hangi girdi yamalarının etkileyebildiğini 3 × 3 konvolüsyon, küresel öz-dikkat (ViT), kaydırılmış pencere (Swin) ve kaydırmasız pencere için hesapla. Katman başına dikkat maliyetini küresel ve pencere biçimlerinde karşılaştır.
+    predict:
+      q: "16 × 16 yama ızgarasında 4 × 4 pencere ve her ikinci katmanda kaydırma ile, bir çıktı tüm ızgaraya kaç katmanda ulaşır?"
+      options:
+        - {t: "1", why: "Bu ViT'in küresel dikkatidir."}
+        - {t: "5", ok: true, why: "Ölçülen erişim 16, 64, 144, 196, 256: 5. katmanda tüm ızgara. 3 × 3 CNN aynı konumdan 9 katmanda ulaşıyor."}
+        - {t: "Hiçbir zaman", why: "Bu kaydırmasız pencerede olur."}
+    presets:
+      - {name: "Swin, 2 katman", params: {model: 2, g: 16, M: 4, L: 2, pos: 0.4, C: 96}, note: "64 girdi (%25); tüm ızgara 5. katmanda. Dikkat maliyeti 2.2·10⁷ yerine 10⁷."}
+      - {name: "CNN, 8 katman", params: {model: 0, g: 16, L: 8, pos: 0.4}, note: "Alıcı alan (2L + 1)²: 8 katmanda 225 girdi, tüm ızgara 9. katmanda."}
+      - {name: "ViT", params: {model: 1, g: 16}, note: "İlk katmanda tüm 256 girdi."}
+      - {name: "Kaydırmasız pencere", params: {model: 3, g: 16, M: 4, pos: 0.4}, note: "Erişim 16'da kalıyor: pencereler yalıtılmış."}
+      - {name: "Swin ölçeği (32, M = 8)", params: {model: 2, g: 32, M: 8, L: 4, C: 96}, note: "4 katmanda 784 / 1024; küresel dikkat 2.4·10⁸, pencere 5·10⁷ çarpma-toplama."}
+    questions:
+      - q: "Swin'in kaydırılmış pencerelerinde neden maske gerekir?"
+        a: "Görüntü döngüsel kaydırıldığında (torch.roll) karşı kenardaki bölgeler aynı pencereye düşer; orijinal görüntüde komşu olmadıkları için birbirlerine bakmamaları gerekir. Maske bu çiftleri −∞ yapar ve pencere sayısını artırmadan doğru sonucu verir (ek x3)."
+      - q: "Büyük erişim tek başına iyi bir model demek midir?"
+        a: "Hayır. Erişim yalnız hangi girdinin etkileyebileceğini söyler; CNN'in yerellik varsayımı az veride daha iyi genelleme sağlar. ViT küresel erişimi kullanmayı veriden öğrenmek zorundadır."
+    limits: "Erişim ikili (etkiler / etkilemez); etkinin büyüklüğü, öğrenilmiş dikkatin gerçekte ne kadar yerel olduğu (ortalama dikkat uzaklığı) burada yok. Swin'de yama birleştirme (hiyerarşi) modellenmiyor."
