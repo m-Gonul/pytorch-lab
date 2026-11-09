@@ -97,3 +97,139 @@ homework:
     accept:
       - "Kapalı form gradyan = sonlu farklar (10⁻⁶ içinde)."
       - "Uyumlu yaklaşım yansız, uyumsuz bir yaklaşım yanlı."
+
+labs:
+  - id: l1
+    lab: bellman2
+    title: "İki durumlu MDP: değer iterasyonu ve γ-büzülme"
+    goal: |
+      İki durum (A, B) ve iki eylem (kal, geç) olan bir MDP'de değer iterasyonunu çalıştır. Kesin çözümü dört deterministik politikanın değerlerinden (I − γP_π)⁻¹r_π ile bul, iterasyon hatasının γᵏ sınırının altında kaldığını gör. İndirim, kayma olasılığı ve ödüllerle en iyi politikanın nasıl değiştiğini izle.
+    predict:
+      q: "γ = 0.9 iken hatanın %1'e inmesi için kaç iterasyon gerekir (en kötü durum sınırıyla)?"
+      options:
+        - {t: "≈ 10", why: "0.9¹⁰ = 0.35."}
+        - {t: "≈ 44", ok: true, why: "0.9ᵏ < 0.01 ⇔ k > ln 0.01 / ln 0.9 = 43.7. γ = 0.99'da ≈ 459 adım gerekir."}
+        - {t: "≈ 1000", why: "Bu γ = 0.995 civarında olur."}
+    presets:
+      - {name: "Ders el hesabı", params: {gamma: 0.5, slip: 0, rAs: 0, rAg: 1, rBs: 2, rBg: 0, iters: 20}, note: "V*(A) = 3, V*(B) = 4: A'da 'geç', B'de 'kal'. Modülün el hesabı alanlarıyla aynı."}
+      - {name: "Varsayılan", params: {gamma: 0.9, slip: 0.1, rAs: 1, rAg: 0, rBs: 0, rBg: 2, iters: 60}, note: "En iyi politika A'da kal, B'de geç: V* = (10.9, 11.9); 60 adımda hata 0.02."}
+      - {name: "Uzak görüşlü (γ = 0.99)", params: {gamma: 0.99, iters: 60}, note: "V* ≈ (110, 111); 60 adımda hata hâlâ 60: büzülme yavaş."}
+      - {name: "Ödül değişimi", params: {gamma: 0.9, rAs: 3, iters: 60}, note: "r(A, kal) = 3 ile V*(A) = 29.1 > V*(B) = 28.1: politika aynı ama değerlerin sırası değişti."}
+    questions:
+      - q: "Değer iterasyonunda açgözlü politika, değerler yakınsamadan optimal olabilir mi?"
+        a: "Evet. Politika, Q değerlerinin sıralamasına bağlıdır; sıralama değerlerin kendisinden çok daha önce doğru olabilir. Politika iterasyonu (M11.3) bu gözlemi kullanır ve genellikle çok daha az iterasyonda biter."
+    limits: "İki durum, iki eylem, bilinen model. Gerçek RL'de model bilinmez; aynı Bellman denklemleri örneklerden kestirilir (Faz 11)."
+  - id: l2
+    lab: reinforce
+    title: "REINFORCE ve stokastik en iyi politika: kısa koridor"
+    goal: |
+      Sutton ve Barto'nun eylemleri yer değiştirmiş kısa koridorunda politika tek bir sayıdır, P(sağ). Kesin J(p)'yi doğrusal sistemden hesapla ve REINFORCE'un bu stokastik optimuma yakınsamasını izle. Taban çizgisinin gradyan gürültüsüne etkisini ölç.
+    predict:
+      q: "Bu koridorda en iyi P(sağ) nedir?"
+      options:
+        - {t: "1: hep sağa git", why: "İkinci durumda sağ, ajanı geri gönderir; p = 1 hedefe hiç ulaşmaz (J = −∞)."}
+        - {t: "≈ 0.59", ok: true, why: "Kesin değer J(p) = (2p − 4)/(p(1 − p)); maksimum p ≈ 0.59, J ≈ −11.66."}
+        - {t: "0.5: rastgele", why: "J(0.5) = −12, optimumdan biraz kötü."}
+    presets:
+      - {name: "Taban çizgili", params: {alpha: 0.002, base: 1, episodes: 1000, theta0: -1.5, runs: 20}, note: "20 çalıştırma ortalamasında P(sağ) = 0.569, J = −11.67; gradyanın ortalama karesi 304."}
+      - {name: "Taban çizgisiz", params: {alpha: 0.002, base: 0, episodes: 1000, theta0: -1.5, runs: 20}, note: "P(sağ) = 0.567; gradyanın ortalama karesi 764: taban çizgisi gürültüyü ≈ 2.5 kat azaltıyor."}
+      - {name: "Büyük adım, taban çizgisiz", params: {alpha: 0.01, base: 0}, note: "Ortalama kare 1241; çalıştırmalar arasında daha çok saçılma."}
+      - {name: "Sağdan başla", params: {theta0: 2}, note: "σ(2) = 0.88'den başlayıp 0.58'e iniyor."}
+    questions:
+      - q: "Bu ortamda tüm ödüller negatif. Taban çizgisi olmadan REINFORCE neden yine de öğrenebiliyor?"
+        a: "Her bölümde seçilen eylemlerin olasılığı düşürülür, ama kısa (iyi) bölümlerde bu itme daha zayıftır. Beklentide fark doğru yönü verir; yalnız tek tek güncellemeler çok gürültülüdür. Taban çizgisi 'beklenenden iyi/kötü' ayrımını doğrudan yapar."
+    limits: "Tek parametreli politika, γ = 1, bölüm en fazla 200 adım. R çalıştırmanın ortalaması gösteriliyor; tek bir çalıştırma çok daha gürültülüdür."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bellman denkleminin matris çözümü
+    goal: Politika değerini doğrusal sistemle bulmak
+    needs: Matris tersi
+    q: |-
+      İki durum; politika her durumda "kal" seçiyor. A'da kalınca ödül 1, B'de kalınca ödül 2, geçiş deterministik, γ = 0.5. $\mathbf V^\pi$'yi $(\mathbf I-\gamma\mathbf P_\pi)^{-1}\mathbf r_\pi$ ile bul.
+    solution: |-
+      $\mathbf P_\pi=\mathbf I$ (iki durum da kendinde kalıyor), $\mathbf r_\pi=(1,2)$. $(\mathbf I-0.5\mathbf I)^{-1}=2\mathbf I$, dolayısıyla $\mathbf V^\pi=(2,4)$.
+
+      Kontrol: A'da sonsuza kadar 1 ödül, $1+0.5+0.25+\dots=1/(1-0.5)=2$. Neumann serisi $\sum_k(\gamma\mathbf P)^k\mathbf r$ tam olarak bu toplamı yapar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: İndirimli getiri
+    goal: Getiriyi hesaplamak
+    needs: Geometrik toplam
+    q: |-
+      Ödüller sırasıyla 0, 0, 10 (sonra bölüm biter), γ = 0.9. $G_0$?
+    answer: 8.1
+    calc: "0+0.9*0+0.81*10"
+    tol: 1e-6
+    mistakes:
+      - {answer: 10.0, msg: "İndirim unutuldu: 10 ödülü iki adım sonra geliyor."}
+      - {answer: 9.0, msg: "Ödül iki adım sonra: γ² = 0.81."}
+    hints:
+      - "$G_0=r_1+\\gamma r_2+\\gamma^2r_3$."
+    solution: |-
+      $0+0.9\cdot0+0.81\cdot10=8.1$. İndirim, gecikmeli ödülü bugüne taşırken küçültür.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Softmax politikasının skor fonksiyonu
+    goal: ∇log π'yi hesaplamak
+    needs: $\nabla_\theta\log\mathrm{softmax}(\theta)_a=\mathbf e_a-\boldsymbol\pi$
+    q: |-
+      Üç eylem, $\theta=(0,0,\ln2)$, yani $\pi=(0.25,0.25,0.5)$. Eylem 2 (üçüncü) seçildi, getiri $G=4$, taban çizgisi $b=2$. Gradyanın $\theta_2$ bileşeni?
+    answer: 1.0
+    calc: "(4-2)*(1-0.5)"
+    tol: 1e-6
+    mistakes:
+      - {answer: 2.0, msg: "Taban çizgisi çıkarılmalı: G − b = 2, sonra (1 − π₂) = 0.5 ile çarp."}
+      - {answer: -1.0, msg: "Seçilen eylemin bileşeni 1 − π_a'dır (pozitif)."}
+    hints:
+      - "$(G-b)(1-\\pi_2)$."
+    solution: |-
+      $(4-2)(1-0.5)=1$. Diğer bileşenler $(G-b)(-\pi_j)=-0.5$: seçilen eylemin olasılığı artar, diğerlerininki azalır.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Politika deterministikleşti
+    goal: Erken yakınsamayı tanımak
+    needs: REINFORCE
+    q: |-
+      REINFORCE eğitiminde politika birkaç yüz bölümde tek bir eyleme %99.9 olasılık veriyor ve getiri bir platoda kalıyor; başka eylemler hiç denenmiyor. Ne yapılır?
+    choices:
+      - {t: "Öğrenme oranını artır", why: "Daha da hızlı deterministikleşir."}
+      - {t: "Entropi bonusu ekle ve/veya öğrenme oranını düşür; taban çizgisi kullan", ok: true, why: "Entropi terimi dağılımın erken çökmesini cezalandırır; keşif sürer."}
+      - {t: "γ'yı 1'e çıkar", why: "Keşifle ilgili değil."}
+    hints:
+      - "Olasılığı 0 olan bir eylemin gradyanı ne olur?"
+    solution: |-
+      Politika gradyanı yalnız örneklenen eylemlerden öğrenir; bir eylemin olasılığı sıfıra yaklaşınca artık denenmez ve iyi olsa bile fark edilmez. `loss -= β·H(π)` ile entropi bonusu, daha küçük adımlar ve varyansı düşüren taban çizgisi standart çarelerdir.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Taban çizgisi yanlılık getirmez
+    goal: E[∇log π · b] = 0'ı göstermek
+    needs: Olasılıkların toplamı 1
+    q: |-
+      $b(s)$ eyleme bağlı değilse $\mathbb E_{a\sim\pi_\theta(\cdot\mid s)}[\nabla_\theta\log\pi_\theta(a\mid s)\,b(s)]=0$ olduğunu kanıtla.
+    rubric:
+      - "b(s)'yi beklentinin dışına çıkardım"
+      - "∇log π = ∇π/π ile toplamı Σ_a ∇π(a|s)'ye çevirdim"
+      - "Türev ile toplamı yer değiştirip ∇Σ_a π(a|s) = ∇1 = 0 sonucuna vardım"
+      - "Taban çizgisi eyleme bağlı olsaydı argümanın bozulacağını belirttim"
+    hints:
+      - "$\\pi\\nabla\\log\\pi=\\nabla\\pi$."
+    solution: |-
+      $\mathbb E_a[\nabla\log\pi(a|s)\,b(s)]=b(s)\sum_a\pi(a|s)\frac{\nabla\pi(a|s)}{\pi(a|s)}=b(s)\nabla\sum_a\pi(a|s)=b(s)\nabla1=0$. Eyleme bağlı bir $b(s,a)$ toplamın dışına çıkamaz ve yanlılık getirir (bu yüzden Q'ya bağlı kontrol değişkenleri ayrıca düzeltilir).
+pitfalls:
+  - wrong: "REINFORCE kaybında taban çizgisine de gradyan akabilir."
+    right: "Taban çizgisi (ör. değer ağı) ayrıca eğitilir; politika kaybında `.detach()` edilmelidir, yoksa politika kaybı taban çizgisini bozar."
+  - wrong: "En iyi politika her zaman deterministiktir."
+    right: "Tam gözlenebilir MDP'lerde deterministik bir en iyi politika vardır; durumlar ayırt edilemiyorsa (kısmi gözlem, paylaşılan özellikler) en iyi politika stokastik olabilir (kısa koridor)."
+  - wrong: "Politika gradyanı ortamın modelini (P) gerektirir."
+    right: "∇log p(τ) yalnız politika terimlerini içerir; geçiş olasılıkları türevde kaybolur. Yöntem modelsizdir."
+whatif:
+  - q: "γ = 0 olsaydı?"
+    a: "Ajan yalnız anlık ödüle bakar (miyop); problem her durumda bir haydut problemine indirgenir. Değer iterasyonu tek adımda yakınsar."
+  - q: "Ödüllerin hepsine sabit bir c eklersek?"
+    a: "Bölüm uzunluğu sabitse en iyi politika değişmez; değişken uzunluklu bölümlerde c > 0 uzun bölümleri, c < 0 kısa bölümleri ödüllendirir. REINFORCE'ta taban çizgisi sabit kaymayı emer."
