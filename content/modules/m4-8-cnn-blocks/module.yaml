@@ -199,3 +199,74 @@ pitfalls:
 whatif:
   - q: "Gruplu konvolüsyonda grup sayısı = kanal sayısı olursa?"
     a: "Derinlemesine konvolüsyon elde edilir; grup sayısı 1 standart konvolüsyondur — ResNeXt ikisinin arasıdır."
+
+labs:
+  - id: l1
+    lab: blockcost
+    title: "Beş blok, aynı girdi/çıktı: parametre, MAC ve aritmetik yoğunluk"
+    goal: |
+      Aynı $C_{in}\to C_{out}$ dönüşümünü yapan standart konvolüsyonu, grup konvolüsyonunu, derinlemesine ayrılabilir bloğu, ResNet darboğazını ve MobileNetV2 ters artığını karşılaştır. Parametreyi ve çarpma–toplama sayısını (MAC) say; kaba bir bellek trafiği modeliyle her bloğun FLOP/bayt oranını (aritmetik yoğunluk) hesapla ve bir GPU'nun "sırt noktası" ile kıyasla.
+    predict:
+      q: "C_in = 128, C_out = 256, 3×3: derinlemesine ayrılabilir blok standart konvolüsyonun MAC'inin yaklaşık ne kadarını yapar?"
+      options:
+        - {t: "Yarısını", why: "Oran 1/C_out + 1/K² ≈ 0.004 + 0.111."}
+        - {t: "≈ %11.5'ini", ok: true, why: "1/256 + 1/9 = 0.115: yaklaşık 8.7 kat az. K² terimi baskın, C_out büyük olduğu sürece oran ≈ 1/K²."}
+        - {t: "≈ %1'ini", why: "Kanal karışımı (1×1) hâlâ C_in·C_out MAC yapıyor."}
+    presets:
+      - {name: "Ders örneği (128 → 256, 3×3)", params: {Cin: 128, Cout: 256, K: 3, H: 28, g: 32, r: 4, t: 6}, note: "Ayrılabilir 8.7 kat az MAC; ama derinlemesine katmanın yoğunluğu ≈ 2 FLOP/B."}
+      - {name: "ResNet-50 aşama 3 darboğazı", params: {Cin: 512, Cout: 512, K: 3, H: 28, r: 4, g: 32}, note: "Darboğaz standardın ≈ %12'si; ResNeXt (g = 32) aynı bütçeyle daha çok dal."}
+      - {name: "MobileNetV2 tipik blok", params: {Cin: 32, Cout: 32, K: 3, H: 56, t: 6, g: 1, r: 4}, note: "Dar girdi/çıktı, 6 kat geniş derinlemesine ara katman: standart 32 → 32'den bile ucuz değil ama 192 kanallı temsili ucuza işliyor."}
+      - {name: "Girdi katmanı (C_in = 3)", params: {Cin: 3, Cout: 32, K: 3, H: 224, g: 1}, note: "Uyarıya bak: 3 kanallık girdide derinlemesine konvolüsyon neredeyse işe yaramaz."}
+      - {name: "Büyük çekirdek 7×7", params: {Cin: 256, Cout: 256, K: 7, H: 14, g: 32}, note: "K büyüdükçe ayrılabilirliğin kazancı artar (≈ 1/K²): ConvNeXt'in 7×7 derinlemesine katmanları."}
+    questions:
+      - q: "Grup konvolüsyonunda g = C_in = C_out olursa ne elde edilir?"
+        a: "Derinlemesine konvolüsyon: her çıktı kanalı yalnız bir girdi kanalına bağlı. PyTorch'ta nn.Conv2d(C, C, K, groups=C)."
+      - q: "MAC'i 9 kat azaltan bir blok GPU'da neden 9 kat hızlanmayabilir?"
+        a: "Derinlemesine katman her ağırlığı ve her aktivasyonu az sayıda çarpmada kullanır: aritmetik yoğunluğu düşüktür, süreyi bellek trafiği belirler (roofline modeli). Ayrıca çekirdek başlatma ve ara aktivasyonları belleğe yazma gibi sabit maliyetler küçük katmanlarda oransal olarak büyür."
+    limits: "Bias, BN, aktivasyon ve artık toplama sayılmadı; bellek modeli her katmanın girdisini, ağırlığını ve çıktısını bir kez okuyup yazdığını varsayar (önbellek yeniden kullanımı, birleştirilmiş çekirdekler ve batch yok). Sırt noktası tek bir örnek donanım değeridir."
+  - id: l2
+    lab: sepkernel
+    title: "Hangi çekirdek ayrılabilir? SVD ile rank"
+    goal: |
+      Bir $K\times K$ çekirdek iki 1-B çekirdeğin dış çarpımıysa (rank 1) önce dikey sonra yatay konvolüsyonla $K^2$ yerine $2K$ çarpımla uygulanır. SVD her çekirdeği rank-1 terimlerin toplamına ayırır; tekil değerlere bakarak çekirdeğin rankını ve rank-$r$ yaklaşıklığın hatasını ölç.
+    predict:
+      q: "Gauss'un Laplace'ı (LoG, kenar ve leke bulucu) kaç rank-1 terimle tam yazılır?"
+      options:
+        - {t: "1 — Gauss ayrılabilir, türevi de", why: "Laplace iki ikinci türevin toplamıdır; toplam ayrılabilirliği bozar."}
+        - {t: "2", ok: true, why: "∇²G = G''(x)G(y) + G(x)G''(y): iki ayrılabilir terimin toplamı."}
+        - {t: "K (tam rank)", why: "Yapısı çok daha basit."}
+    presets:
+      - {name: "Gauss", params: {type: 0, K: 7, sig: 1.2, rk: 1}, note: "Tek tekil değer: tam ayrılabilir. g(x, y) = g(x)·g(y)."}
+      - {name: "Sobel benzeri", params: {type: 2, K: 5, rk: 1}, note: "Düzleştirme ⊗ türev: rank 1 (slayttaki [1, 2, 1] örneğinin genellemesi)."}
+      - {name: "LoG, rank 1", params: {type: 3, K: 9, sig: 1.5, rk: 1}, note: "Tek terim yetmez; ikinci tekil değer büyük."}
+      - {name: "LoG, rank 2", params: {type: 3, K: 9, sig: 1.5, rk: 2}, note: "İki terimle tam."}
+      - {name: "Disk", params: {type: 4, K: 9, rk: 2}, note: "Dairesel çekirdekler ayrılabilir değil; birkaç terim kaba bir yaklaşıklık."}
+      - {name: "Rastgele", params: {type: 5, K: 5, rk: 1}, note: "Öğrenilmiş filtreler genelde tam ranklıdır: uzamsal ayrılabilirlik bir kısıt, bedava değil."}
+    questions:
+      - q: "Inception-v3'ün 7×7'yi 1×7 + 7×1 ile değiştirmesi hangi varsayımı yapar?"
+        a: "Öğrenilmiş 7×7 filtrelerin rank 1 olduğunu (ya da aradaki doğrusalsızlık ve birden çok kanal sayesinde bu kısıtın zararsız olduğunu). Parametre 49'dan 14'e iner; kısıt eğitimle uyum sağlanarak telafi edilir."
+      - q: "Derinlemesine ayrılabilir konvolüsyon bu SVD anlamında bir ayrışım mı?"
+        a: "Hayır: o kanal ve uzay boyutlarını ayırır (her kanalda bir K×K uzamsal filtre, sonra 1×1 kanal karışımı). Buradaki uzamsal ayrılabilirlik ise tek bir K×K çekirdeği iki 1-B çekirdeğe ayırır. İkisi de bir 'ayrılabilirlik' kısıtı, farklı eksenlerde."
+    limits: "Tek kanallı, sabit çekirdekler. SVD AᵀA'nın özdeğerleriyle hesaplandığı için 10⁻⁷·σ₁ altındaki tekil değerler sayısal gürültüdür."
+  - id: l3
+    lab: camviz
+    title: "GAP + doğrusal katman = nesneyi bulan bir harita (CAM)"
+    goal: |
+      Sabit konvolüsyon filtreleri + ReLU'nun üstüne küresel ortalama havuzlama ve bir softmax sınıflandırıcı koy; yalnız "bu görüntüde hangi çubuk var" etiketiyle eğit. Sonra sınıf aktivasyon haritasını $\mathrm{CAM}_c(x,y)=\sum_k w_{ck}f_k(x,y)$ çiz: model konum etiketi görmediği hâlde nesneyi yerelleştirir.
+    predict:
+      q: "Görüntüde hem dikey hem yatay bir çubuk varsa \"dikey çubuk\" sınıfının CAM'i nerede parlar?"
+      options:
+        - {t: "İki çubukta da eşit", why: "Yatay çizgi filtresinin dikey sınıf ağırlığı negatif ya da küçük."}
+        - {t: "Yalnız dikey çubuğun üzerinde", ok: true, why: "CAM_c, c sınıfının skoruna piksel piksel katkıdır; dikey sınıf için yalnız dikey çizgi öznitelikleri pozitif katkı verir."}
+        - {t: "Görüntünün ortasında", why: "GAP konumdan bağımsızdır ama haritanın kendisi değildir."}
+    presets:
+      - {name: "İki nesne", params: {cls: 1, px: 7, py: 15, dis: 1, noise: 0.3, n: 150, filt: 0}, note: "Her sınıfın haritası kendi nesnesini gösteriyor."}
+      - {name: "Tek nesne", params: {cls: 0, px: 12, py: 8, dis: 0}, note: "Harita çubuğun üzerinde; tepe merkezden 1–2 piksel uzakta (çubuk boyunca)."}
+      - {name: "Az veri, gürültülü", params: {n: 20, noise: 0.8}, note: "Doğruluk düşüyor, haritalar dağınık."}
+      - {name: "Rastgele filtreler", params: {filt: 1, n: 150, noise: 0.3}, note: "Öznitelikler yönelime az seçici: hem doğruluk hem yerelleştirme bozuluyor. Gerçek ağda filtreler de öğrenilir."}
+    questions:
+      - q: "Logit'in CAM'in ortalaması olduğunu göster."
+        a: "logit_c = Σ_k w_ck·(1/HW)Σ_{x,y} f_k(x,y) + b_c = (1/HW)Σ_{x,y} Σ_k w_ck f_k(x,y) + b_c = ortalama(CAM_c) + b_c. Toplamların yer değiştirmesi; GAP ve doğrusal katman doğrusal olduğu için kesin bir eşitlik."
+      - q: "Düzleştir + tam bağlı katman kullansaydık CAM tanımlanabilir miydi?"
+        a: "Doğrudan değil: FC her pikselin her kanalına ayrı ağırlık verir; 'kanal başına bir ağırlık' yapısı kaybolur. Grad-CAM bu durumda kanal ağırlıklarını gradyanların uzamsal ortalamasıyla tanımlar."
+    limits: "Filtreler sabit (öğrenilmiyor), tek konvolüsyon katmanı, 24×24 sentetik görüntüler. Gerçek CNN'lerde son haritalar düşük çözünürlüklüdür ve CAM büyütülerek kaba bir yerelleştirme verir."
