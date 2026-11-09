@@ -207,3 +207,70 @@ pitfalls:
 whatif:
   - q: "Kod çözücüde transposed conv yerine çift doğrusal yukarı örnekleme + 3 × 3 konv kullanılırsa?"
     a: "Dama tahtası artefaktı kaybolur, parametre sayısı benzer; çoğu modern U-Net bunu kullanır (M8.2 U-Net'i de öyle)."
+
+labs:
+  - id: l1
+    lab: tconv1d
+    title: "Transposed convolution'ın üç yüzü, sayısal olarak"
+    goal: |
+      Aynı 1-B transposed convolution'ı üç yoldan hesapla ve sonuçların eşit olduğunu doğrula: (1) her girdi örneği çekirdeği kendisiyle ölçekleyip çıkışa saçar, (2) girdiye $s-1$ sıfır ekle, $k-1-p$ dolgula, ters çevrilmiş çekirdekle normal konvolüsyon yap, (3) aynı ayarlı normal konvolüsyonun matrisinin devriği $C^\top$. Her çıkış konumuna kaç girdinin katkı yaptığını say: $k$, $s$'nin katı değilse dama tahtası.
+    predict:
+      q: "Girdi sabit (hepsi 1), çekirdek düz (hepsi 1), k = 3, s = 2: iç bölgede çıkış neye benzer?"
+      options:
+        - {t: "Sabit", why: "Bazı konumlara iki girdinin çekirdeği düşüyor, bazılarına bir."}
+        - {t: "1, 2, 1, 2, … dönüşümlü", ok: true, why: "k/s = 1.5: çıkış konumlarına dönüşümlü 2 ve 1 katkı düşer. Dama tahtası artefaktının 1-B hâli."}
+        - {t: "Kenarlara doğru artan", why: "Kenarlarda katkı daha az, ama iç bölge periyodik."}
+    presets:
+      - {name: "El hesabı", params: {n: 3, k: 3, s: 2, p: 0, op: 0, ker: 1, inp: 1}, note: "x = [1, 2, 3], w = [1, 1, 1]: çıkış [1, 1, 3, 2, 5, 3, 3]. (El hesabı alanındaki w = [1, 2, 1] ile 4. indeks 5.)"}
+      - {name: "Dama tahtası", params: {n: 8, k: 3, s: 2, p: 0, ker: 1, inp: 0}, note: "k = 3, s = 2: 2-1-2-1 deseni."}
+      - {name: "Bilineer 2× (k = 4)", params: {n: 8, k: 4, s: 2, p: 1, ker: 0, inp: 0}, note: "k = 2s, p = s/2: iç bölgede sabit girdi sabit kalır — kusursuz 2× bilineer interpolasyon."}
+      - {name: "output_padding", params: {n: 5, k: 3, s: 2, p: 1, op: 1, ker: 2, inp: 2}, note: "Adım 2'li konvolüsyon 10 ve 9 uzunluğu aynı 5'e indirir; ters yönde hangisinin isteneceğini output_padding seçer."}
+      - {name: "Adım 1", params: {n: 6, k: 3, s: 1, p: 0, ker: 2, inp: 2}, note: "Tam dolgulu normal konvolüsyon: boyut k − 1 büyür."}
+    questions:
+      - q: "Çıkış boyu formülünü (n − 1)s − 2p + k saçma görünümünden türet."
+        a: "Son girdi örneği (indeks n − 1) çekirdeği (n − 1)s konumundan başlatır ve k uzunluğunda yayar: tam çıkış (n − 1)s + k. Dolgu p, normal konvolüsyonda girdiye eklenen p'nin karşılığı olarak çıkışın iki ucundan kırpılır: −2p."
+      - q: "Neden 'dekonvolüsyon' adı yanlıştır?"
+        a: "Dekonvolüsyon, bir konvolüsyonun etkisini geri almak (ters işlem) demektir. Transposed conv tersini değil devriğini uygular: CᵀC ≠ I. Yalnız boyutları (ve bağlantı desenini) tersine çevirir."
+    limits: "1-B, tek kanal, bias yok, genişletme (dilation) yok. 2-B'de her eksen ayrı ayrı aynı kuralla çalışır; katkı sayıları çarpılır."
+  - id: l2
+    lab: upsample2d
+    title: "Büyütme yöntemleri ve dama tahtası artefaktı"
+    goal: |
+      Düşük çözünürlüklü bir görüntüyü f kat büyüt: en yakın komşu, bilineer interpolasyon, bilineer çekirdekle başlatılmış transposed conv ve çekirdek boyu adıma bölünmeyen bir transposed conv. Gerçek yüksek çözünürlüklü görüntüye göre hatayı ölç; dama tahtası desenini gör.
+    predict:
+      q: "Bilineer çekirdekli transposed conv (k = 2f, s = f, p = f/2) bilineer interpolasyondan nerede farklıdır?"
+      options:
+        - {t: "Her yerde biraz", why: "İç bölgede ağırlıklar bilineer interpolasyonun ağırlıklarıyla aynı."}
+        - {t: "Yalnız görüntünün en dış kenarında", ok: true, why: "Kenarda saçılan katkılardan biri eksik kalır (görüntü dışı sıfır sayılır); F.interpolate kenar pikselini tekrarlar."}
+        - {t: "Hiçbir yerde", why: "RMSE'lerin tüm görüntü ve iç bölge için farkına bak."}
+    presets:
+      - {name: "Dama tahtası (f = 4)", params: {scene: 0, n: 8, f: 1, m: 3}, note: "k = 5, s = 4: ızgara biçiminde parlak çizgiler."}
+      - {name: "Bilineer conv = interpolasyon", params: {scene: 2, n: 8, f: 1, m: 2}, note: "İç bölgede RMSE interpolasyonla aynı; kenar şeridi koyu."}
+      - {name: "En yakın komşu", params: {scene: 1, n: 8, f: 2, m: 0}, note: "8 kat büyütmede basamaklar."}
+      - {name: "Büyük çarpan", params: {scene: 0, n: 6, f: 2, m: 1}, note: "Bilineer interpolasyon ×8'de çok bulanık: slayttaki '×4–×8'e kadar iş görür' gözlemi."}
+    questions:
+      - q: "Dama tahtasından kaçınmak için iki tasarım seçeneği söyle."
+        a: "(1) Çekirdek boyunu adımın katı seç (k = 2s gibi); (2) önce en yakın komşu ya da bilineer interpolasyonla büyütüp sonra normal bir konvolüsyon uygula (resize-conv). Alt-piksel konvolüsyonu (PixelShuffle) da uygun başlatmayla (ICNR) artefaktı azaltır."
+    limits: "Tek kanal, sabit (öğrenilmemiş) çekirdekler; gerçek görüntü yerine analitik sahneler. Öğrenilen yukarı örnekleme katmanları ayrıntıyı atlama bağlantılarından da alır."
+  - id: l3
+    lab: segmetrics
+    title: "Piksel doğruluğu, IoU, mIoU, Dice: aynı tahmin, farklı sayılar"
+    goal: |
+      Gerçek maske bir disk; tahmin kaydırılmış, ölçeklenmiş ve sınırı gürültülü bir disk. Dört ölçütü birlikte hesapla; nesne küçüldükçe piksel doğruluğunun neden anlamsızlaştığını ve Dice ile IoU'nun neden aynı sıralamayı verdiğini gör.
+    predict:
+      q: "64 × 64 görüntüde yarıçapı 3 piksel olan bir nesne, 4 piksel kaydırılarak tahmin ediliyor. Piksel doğruluğu ve IoU yaklaşık kaç?"
+      options:
+        - {t: "Doğruluk ≈ %50, IoU ≈ 0.5", why: "Nesne görüntünün %1'inden az; arka plan pikselleri doğruluğu yukarı çeker."}
+        - {t: "Doğruluk ≈ %99, IoU ≈ 0.15", ok: true, why: "Yanlış piksellerin sayısı görüntüye göre çok az, ama nesneye göre çok fazla."}
+        - {t: "Doğruluk ≈ %99, IoU ≈ 0.9", why: "4 piksellik kayma, 6 piksel çaplı bir nesneyi neredeyse ıskalatır."}
+    presets:
+      - {name: "Küçük nesne, küçük kayma", params: {R: 3, dx: 4, sc: 1, noise: 0}, note: "Doğruluk %98.8, IoU 0.14."}
+      - {name: "Büyük nesne, aynı kayma", params: {R: 20, dx: 4, sc: 1, noise: 0}, note: "Aynı 4 piksel, IoU ≈ 0.78."}
+      - {name: "Aşırı büyük tahmin", params: {R: 10, dx: 0, sc: 1.6, noise: 0}, note: "Gerçek nesnenin hepsi kapsanıyor (FN = 0) ama FP çok: IoU = 1/1.6² ≈ 0.39."}
+      - {name: "Pürüzlü sınır", params: {R: 15, dx: 0, sc: 1, noise: 0.4}, note: "Merkez ve boyut doğru, sınır gürültüsü IoU'yu düşürüyor."}
+    questions:
+      - q: "Dice = 2J/(1 + J) eşitliğini türet."
+        a: "a = TP, b = FP + FN dersek J = a/(a + b), D = 2a/(2a + b). b = a(1 − J)/J yerine konursa D = 2J/(2J + 1 − J) = 2J/(1 + J). Tekdüze artan bir fonksiyon: iki tahmini sıralarken aynı sonucu verirler, ama ortalamaları farklı sıralayabilir."
+      - q: "mIoU neden sınıf sayısı arttıkça ön plan başarısını daha iyi yansıtır?"
+        a: "mIoU tüm sınıfların IoU'sunun eşit ağırlıklı ortalamasıdır. İki sınıfta yüksek arka plan IoU'su ortalamanın yarısıdır; 21 sınıfta (VOC) yalnız 1/21'i. Ayrıca mIoU genelde tüm görüntüler üzerinde biriktirilmiş TP/FP/FN'den hesaplanır, görüntü başına değil."
+    limits: "İki sınıf, tek görüntü, sentetik disk maskeler. Gerçek değerlendirmede ölçüler veri kümesi boyunca biriktirilir ve 'yok sayılan' (ignore) piksel etiketleri vardır."
