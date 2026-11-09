@@ -122,6 +122,49 @@ labs:
       - q: "Gradyan kırpma kaybolan gradyanı çözer mi?"
         a: "Hayır. Kırpma yalnız büyük normu sınırlar (patlamaya karşı); sönen gradyanı büyütmez. Kaybolmaya karşı çözüm mimari: kapılar, artık yollar, uygun başlatma."
     limits: "Rastgele, eğitilmemiş W ve tek bir rastgele geri yön. Eğitim sırasında W değişir; LSTM'de f de girdiye bağlıdır (burada sabit)."
+  - id: l2
+    lab: rnnunroll
+    title: "Tek rekürent nöron, zamanda açılmış: bellek, kararlılık, IIR"
+    goal: |
+      h_t = φ(w_x·x_t + w_h·h_{t−1} + b) — aynı üç parametre her adımda. Dürtüye yanıt belleğin ne kadar sürdüğünü gösterir; doğrusal durumda bu yanıt geometrik dizidir (IIR süzgeç) ve |w_h| = 1 kararlılık sınırıdır. ReLU ile tanh'ın patlama karşısındaki farkını gör.
+    predict:
+      q: "Aktivasyon yok (doğrusal), w_h = 0.8, dürtü girdisi: iz kaç adımda %1'in altına iner?"
+      options:
+        - {t: "≈ 5", why: "0.8⁵ ≈ 0.33 — hâlâ büyük."}
+        - {t: "≈ 21", ok: true, why: "0.8ᵏ < 0.01 ⇔ k > ln 0.01 / ln 0.8 ≈ 20.6."}
+        - {t: "Hiç inmez", why: "|w_h| < 1: geometrik dizi söner."}
+    presets:
+      - {name: "Doğrusal, kararlı", params: {inp: 0, act: 2, wh: 0.8, wx: 1, b: 0}, note: "İz 21 adımda %1'e iniyor; kesikli çizgi w_x·w_hᵗ kuramı."}
+      - {name: "Doğrusal, kararsız", params: {inp: 0, act: 2, wh: 1.1, wx: 1, b: 0}, note: "|w_h| > 1: durum her adımda %10 büyüyor."}
+      - {name: "ReLU, w_h = 1.1", params: {inp: 1, act: 1, wh: 1.1, wx: 1, b: 0}, note: "Basamak girdisiyle ReLU durumu sınırsız büyüyor: RNN'lerde ReLU'nun riski."}
+      - {name: "tanh, w_h = 1.5", params: {inp: 1, act: 0, wh: 1.5, wx: 1, b: 0}, note: "Aynı büyük ağırlık, ama tanh durumu (−1, 1)'de tutuyor."}
+      - {name: "Salınım", params: {inp: 0, act: 2, wh: -0.8, wx: 1, b: 0}, note: "Negatif w_h: işaret her adımda değişiyor."}
+      - {name: "Sinüse yanıt", params: {inp: 2, act: 0, wh: 0.6, wx: 1, b: 0}, note: "Aynı frekansta, gecikmeli ve genliği değişmiş bir çıktı (alçak geçiren süzgeç gibi)."}
+    questions:
+      - q: "Tek nöronlu bu RNN'in 3 parametresi var; 50 adımlık pencereyi gören doğrusal model kaç parametre ister?"
+        a: "51 (her adım için bir ağırlık + bias). Ders slaytındaki karşılaştırma: tek nöronlu basit RNN çok az parametreyle doğrusal modeli geçemedi; derin RNN geçti (M4.11)."
+    limits: "Tek nöron, elle seçilen ağırlıklar (eğitim yok). Çok nöronlu katmanda w_h yerine W_h matrisi ve onun öz değerleri belirleyicidir."
+  - id: l3
+    lab: bpttsum
+    title: "BPTT: paylaşılan ağırlığın gradyanı adımların toplamıdır"
+    goal: |
+      Skaler bir RNN, kayıp yalnız son adımda. ∂L/∂w her adımın katkısının toplamı; katkılar geriye doğru w·(1 − h²) ile çarpılarak küçülür ya da korunur. Kesilmiş BPTT yalnız son k adımı toplar: hangi koşulda doğruya yakın, hangi koşulda yanlı?
+    predict:
+      q: "w = 1, u = 0.05 (küçük girdi, tanh neredeyse doğrusal), T = 40, k = 10. Kesilmiş gradyan tam gradyandan ne kadar sapar?"
+      options:
+        - {t: "%1'den az", why: "Çarpan ≈ w·1 = 1: uzak adımların katkısı sönmüyor."}
+        - {t: "Onlarca yüzde", ok: true, why: "Tohum 1'de %57: kesilen 30 adımın katkısı büyük."}
+        - {t: "Tam olarak aynı", why: "k = T olmadıkça kesilen adımların katkısı kaybolur."}
+    presets:
+      - {name: "Sönen katkılar", params: {w: 0.5, u: 0.5, k: 10}, note: "Çarpan ≈ 0.5: kesilmiş BPTT neredeyse tam (hata %0.003)."}
+      - {name: "Uzun bellek", params: {w: 1, u: 0.05, k: 10}, note: "Çarpan ≈ 1: kesmek gradyanın yarısını kaybettiriyor."}
+      - {name: "Doyma", params: {w: 1.5, u: 0.5, k: 10}, note: "w büyük ama tanh doyuyor, (1 − h²) küçük: katkılar yine sönüyor."}
+      - {name: "Tam pencere", params: {w: 1, u: 0.05, k: 40}, note: "k = T: kesilmiş = tam."}
+    questions:
+      - q: "Sayısal kontrol satırı neden tam BPTT ile aynı?"
+        a: "Merkezi fark (L(w + ε) − L(w − ε))/2ε gerçek türevi O(ε²) hatayla kestirir; BPTT'nin analitik toplamı doğruysa ikisi çakışır. Kesilmiş BPTT ise bilinçli olarak farklı bir (yanlı) büyüklük hesaplar."
+    limits: "Skaler durum, tek kayıp terimi (son adım), rastgele Gauss girdiler. Gerçek kesilmiş BPTT'de kayıp birçok adımda ve gradyan her pencerede ayrı hesaplanır."
+
 
 practice:
   - id: p1
