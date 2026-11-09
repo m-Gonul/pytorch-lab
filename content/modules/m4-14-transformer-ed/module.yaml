@@ -206,3 +206,91 @@ pitfalls:
 whatif:
   - q: "Konum kodlaması tamamen kaldırılırsa?"
     a: "Kodlayıcı kelime torbasına döner (M4.6 P6); kod çözücü nedensel maske sayesinde sırayı kısmen çıkarabilir ama zayıf."
+
+labs:
+  - id: l1
+    lab: maskviz
+    title: "Dikkat maskeleri ve çok katmanlı erişim"
+    goal: |
+      Transformer'daki üç maskeyi (kodlayıcı dolgusu, kod çözücü nedensel + dolgu, çapraz dikkat) ve uzun bağlam için önerilen maske ailesini (kayan pencere, önek-LM, seyrek stride) izin matrisi olarak çiz. Bir konumun birkaç katman sonra hangi girdilerden etkilenebildiğini erişim matrisi (A ∨ I)^L ile gör.
+    predict:
+      q: "Pencere w = 3 olan kayan pencere maskesiyle 4 katman sonra son konum kaç girdiden etkilenebilir?"
+      options:
+        - {t: "3", why: "Bu tek katmanda görülen anahtar sayısı."}
+        - {t: "9", ok: true, why: "Her katman erişimi w − 1 = 2 konum geriye uzatır: 1 + 4·2 = 9 (ölçülen)."}
+        - {t: "Tümü (12)", why: "Bu, stride'lı seyrek maskede 2 katmanda olur."}
+    presets:
+      - {name: "Kod çözücü öz-dikkati", params: {kind: 1, T: 12, tpad: 2}, note: "75 izinli çift: nedensel üçgenin 78 çiftinden, dolgu anahtarlarına giden 3 tanesi çıkarılmış."}
+      - {name: "Ders el hesabı (T = 4)", params: {kind: 1, T: 4, tpad: 0}, note: "Nedensel maske T(T+1)/2 = 10 çifte izin verir."}
+      - {name: "Çapraz dikkat", params: {kind: 2, T: 12, S: 9, spad: 2}, note: "12 × 9 matriste 84 izinli çift: her sorgu 7 gerçek kaynak tokenının hepsine bakar."}
+      - {name: "Kayan pencere, 4 katman", params: {kind: 3, T: 12, w: 3, L: 4}, note: "Tek katmanda 3 anahtar, 4 katmanda erişim 9 girdi: 1 + L(w − 1)."}
+      - {name: "Seyrek stride", params: {kind: 5, T: 12, w: 3, L: 2}, note: "Yerel 3 + her 3. konum: satır başına en fazla 6 anahtar, ama 2 katmanda son konum 12 girdinin hepsine erişiyor."}
+    questions:
+      - q: "Kod çözücü öz-dikkatinde dolgu konumlarının sorgu satırları neden tamamen yasaklanmaz?"
+        a: "Tamamen yasak bir satırın softmax'ı 0/0 olur (NaN). Dolgu sorguları normal hesaplanır; çıktıları kayıpta maskelendiği için öğrenmeyi etkilemez."
+      - q: "Nedensel maske neden yalnız kod çözücüde gerekir?"
+        a: "Kod çözücü üretim yapar ve çıkarımda geleceği göremez; eğitim aynı koşulu taklit etmelidir. Kaynak cümle ise baştan tamamen bilinir; kodlayıcı her kelimeyi her yöne bakarak kodlayabilir (çift yönlü)."
+    limits: "Maskeler ikili; erişim yalnız 'etkileyebilir mi' sorusunu yanıtlar, etkinin büyüklüğünü değil. Dolgu hep dizinin sonunda varsayıldı."
+  - id: l2
+    lab: posenc
+    title: "Sinüzoidal konum kodlaması: dalga boyları, döndürme, yalnız sinüs"
+    goal: |
+      Konum kodlamasının ısı haritasını çiz, bir boyut çiftinin sinüs ve kosinüs dalgalarını ve dalga boyunu oku. P_p · P_(p+k) iç çarpımının yalnız k'ya bağlı olduğunu iki farklı p için gör. 'Yalnız sinüs' seçeneğiyle hangi özelliğin kaybolduğunu ölç.
+    predict:
+      q: "d = 512'de boyut 100–101 çiftinin dalga boyu kaç konumdur?"
+      options:
+        - {t: "Tam 38", why: "Slayt böyle anlatıyor, ama 2π·10000^(100/512) tam sayı değil."}
+        - {t: "≈ 37.97", ok: true, why: "2π / ω = 2π·10000^0.1953 = 37.969; p = 22 ve 60 yalnız yaklaşık aynı değerleri alır."}
+        - {t: "≈ 100", why: "Dalga boyu boyut indisiyle doğrusal değil, geometrik büyür."}
+    presets:
+      - {name: "Slayttaki çift (22 ve 60)", params: {d: 512, n: 128, base: 10000, pair: 50, p: 22, k: 38, mode: 0}, note: "Dalga boyu 37.969; boyut 100–101'de (−0.4786, −0.8781) ve (−0.483, −0.8756): yaklaşık aynı ama tam değil. Tüm vektörler arasındaki uzaklık 15.3."}
+      - {name: "Yalnız sinüs: 25 ve 32", params: {d: 512, n: 128, base: 10000, pair: 50, p: 25, k: 7, mode: 1}, note: "Boyut 100'de sin değerleri −0.839 ve −0.835: bu frekansta ayırt edilemez. İç çarpım eğrileri artık p'ye bağlı."}
+      - {name: "Küçük d", params: {d: 128, n: 128, base: 10000, pair: 25, p: 22, k: 38, mode: 0}, note: "d = 128'de aynı indisli çiftin dalga boyu 229: indis/d oranı belirleyici."}
+      - {name: "Küçük taban", params: {d: 128, n: 128, base: 100, pair: 25, p: 22, k: 38, mode: 0}, note: "Taban 100: en uzun dalga boyu 585 konum; uzun dizilerde yavaş boyutlar konumları ayırmaya yetmez."}
+    questions:
+      - q: "Neden sinüs VE kosinüs? Yalnız sinüs, farklı frekanslarla da her konuma benzersiz bir vektör vermez mi?"
+        a: "Çoğunlukla verir (en yakın iki konumun uzaklığı sin + cos'ta 3.71, yalnız sinüste 2.84; d = 512). Kaybolan, göreli konumun doğrusal yapısıdır: (sin, cos) çifti çember üzerinde bir noktadır ve k kaydırma bir döndürmedir. Yalnız sinüste P_(p+k), P_p'nin konumdan bağımsız doğrusal bir fonksiyonu değildir ve iç çarpım p'ye de bağlıdır."
+      - q: "RoPE bu fikri nasıl kullanır?"
+        a: "Konumu eklemek yerine sorgu ve anahtar vektörlerinin her çiftini pω açısıyla döndürür. Döndürmeler birbirini götürdüğü için q_p · k_(p+k) yalnız k'ya bağlı bir döndürmeyle değişir: skor doğrudan göreli konuma bağlı olur (ek x1)."
+    limits: "Yalnız kodlamanın kendi geometrisi gösteriliyor; modelin bu bilgiyi nasıl kullandığı (dikkat skorlarına etkisi) burada yok."
+  - id: l3
+    lab: noamlr
+    title: "Noam takvimi ve ısınma + kosinüs"
+    goal: |
+      Transformer'ın öğrenme oranı takvimini (d^−0.5 · min(s^−0.5, s·w^−1.5)) çiz. d ve ısınma uzunluğunun tepe değeri nasıl belirlediğini, aynı tepe ve ısınmayla kosinüs takvimine göre farkı gör.
+    predict:
+      q: "Isınmayı 4000'den 16 000 adıma çıkarırsan Noam'ın tepe öğrenme oranı ne olur?"
+      options:
+        - {t: "Aynı kalır, yalnız daha geç ulaşılır", why: "Tepe d^−0.5 · w^−0.5'tir: w'ye bağlıdır."}
+        - {t: "Yarıya iner", ok: true, why: "w dört katına çıkınca w^−0.5 yarıya iner: 6.99·10⁻⁴ → 3.49·10⁻⁴."}
+        - {t: "Dört katına çıkar", why: "Isınma uzadıkça doğrusal artışın eğimi de küçülür."}
+    presets:
+      - {name: "Makale (base)", params: {d: 512, w: 4000, f: 1, S: 100000, floor: 0.1}, note: "Tepe 6.99·10⁻⁴ (adım 4000); 100 000 adımda 1.4·10⁻⁴. Σ lr: Noam 23.8, kosinüs 38.3."}
+      - {name: "Uzun ısınma", params: {w: 16000}, note: "Tepe yarıya iniyor (3.49·10⁻⁴)."}
+      - {name: "Büyük model", params: {d: 4096, w: 4000}, note: "d = 4096: tepe 2.5·10⁻⁴; büyük modeller daha küçük lr alır."}
+    questions:
+      - q: "Noam takviminde 'factor' neden genellikle eklenir?"
+        a: "Takvim tepe değeri d ve w'den kendiliğinden belirler; bu değer her model ve batch boyu için en iyi olmayabilir. Çarpan, takvimin biçimini koruyarak ölçeğini ayarlar (Annotated Transformer'da 1–2)."
+    limits: "Takvimler yalnız çiziliyor; eğitim kararlılığına etkileri için M4.7'deki lnplace deneyine bak."
+  - id: l4
+    lab: labelsmooth
+    title: "Etiket yumuşatma: NLL, kalibrasyon ve logit aralığı"
+    goal: |
+      Yüksek boyutlu, az örnekli bir sınıflandırma probleminde doğrusal softmax modelini düz çapraz entropiyle ve yumuşatılmış hedefle eğit. Test doğruluğunu, yumuşatılmamış NLL'yi (perpleksitenin logu), beklenen kalibrasyon hatasını (ECE) ve en büyük iki logit arasındaki farkı karşılaştır.
+    predict:
+      q: "Varsayılan ayarda (kümeler iyi ayrık) ε = 0.1 test NLL'yi nasıl etkiler?"
+      options:
+        - {t: "İyileştirir: yumuşatma her zaman kalibrasyonu düzeltir", why: "Düz CE zaten iyi kalibre ise yumuşatma güveni gereğinden çok düşürür."}
+        - {t: "Kötüleştirir", ok: true, why: "Ölçülen: NLL 0.125 → 0.331, ECE 0.016 → 0.140; ortalama güven 0.97'den 0.79'a iniyor, doğruluk 0.93. Model eksik güvenli hâle geliyor (makaledeki 'perpleksiteyi kötüleştirir' gözlemi)."}
+        - {t: "Etkilemez", why: "Hedef dağılım değiştiği için optimum logitler değişir."}
+    presets:
+      - {name: "İyi ayrık kümeler (varsayılan)", params: {eps: 0.1, V: 5, D: 40, n: 120, sep: 0.6, iters: 300}, note: "Düz CE iyi kalibre (ECE 0.016); ε = 0.1 NLL'yi 0.125'ten 0.331'e çıkarıyor, logit farkı 8.2 → 2.3."}
+      - {name: "Zor problem, aşırı uyum", params: {eps: 0.1, sep: 0.1}, note: "Ayrışma 0.1: test doğruluğu ≈ 0.28 (rastgele 0.2) ama düz CE eğitim kümesini ezberleyip aşırı güvenli: NLL 13.0, ECE 0.66. ε = 0.1: NLL 4.13, ECE 0.51."}
+      - {name: "Orta zorluk", params: {eps: 0.1, sep: 0.3}, note: "Ayrışma 0.3: NLL 2.36 → 1.24, ECE 0.29 → 0.15; yumuşatma yardım ediyor."}
+      - {name: "Güçlü yumuşatma", params: {eps: 0.3, sep: 0.6}, note: "ε = 0.3: logit farkı 1.47'ye iniyor (optimum sınır 2.54), NLL 0.52."}
+    questions:
+      - q: "Yumuşatılmış hedefle optimum logit farkı neden sonlu?"
+        a: "Optimumda p = q; q_y / q_k = (1 − ε + ε/V)/(ε/V) sonlu olduğu için z_y − z_k = log((1 − ε + ε/V)/(ε/V)) de sonludur. One-hot hedefte q_k = 0 olduğundan oran sonsuzdur."
+      - q: "Etiket yumuşatma BLEU'yu iyileştirip perpleksiteyi kötüleştirebiliyorsa, hangisine bakmalı?"
+        a: "Perpleksite, modelin gerçek dağılıma verdiği olasılığı ölçer; yumuşatma olasılıkları bilerek düzleştirdiği için onu cezalandırır. BLEU ise argmax/beam çıktısının kalitesini ölçer. Çeviri hedefse BLEU (ya da COMET); olasılıkların kendisi kullanılacaksa (yeniden sıralama, damıtma) yumuşatma dikkatle seçilmeli."
+    limits: "Doğrusal model ve Gauss kümeleri; Transformer'daki etkiler (BLEU, beam ile etkileşim) burada yok. Sonuçlar tohum 1 içindir; diğer tohumlarda sayılar oynuyor (ör. varsayılanda NLL 0.33–0.40)."
