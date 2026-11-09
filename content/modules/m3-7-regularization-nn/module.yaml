@@ -196,3 +196,49 @@ whatif:
     a: "Varyans terimi zaten küçüldüğü için genelde daha az düzenlileştirme gerekir; büyük dil modelleri çoğu zaman dropout'suz eğitilir."
   - q: "Gradyan kırpma bir düzenlileştirme midir?"
     a: "Doğrudan değil: amacı optimizasyonu kararlı tutmaktır (patlayan gradyan). Yan etkisi olarak büyük adımları sınırladığı için dinamiği değiştirir."
+
+labs:
+  - id: l1
+    lab: dropfit
+    title: "12 gürültülü nokta, 64 nöron: dropout, weight decay ve early stopping"
+    goal: |
+      Parametresi verisinden çok olan bir ağ gürültüyü ezberler: eğitim hatası gürültü tabanının (σ²) altına iner, doğrulama hatası yükselir. Üç çareyi tek tek ve birlikte aç; hangisinin doğrulama hatasını ne kadar düşürdüğünü ve fonksiyonun şeklini nasıl değiştirdiğini gör.
+    predict:
+      q: "Düzenlileştirme yokken eğitim MSE'si gürültü varyansının (σ² = 0.0625) çok altına iniyor. Doğrulama MSE'si için ne beklersin?"
+      options:
+        - {t: "Eğitim MSE'si kadar küçük", why: "Doğrulama verisinde gürültü yeni ve bağımsızdır; σ²'nin altına inemez."}
+        - {t: "σ²'nin belirgin üstünde, en iyi değerinin de üstünde", ok: true, why: "Ezberlenen gürültü yeni noktalarda hata olarak geri döner: tohum 1'de son doğrulama MSE'si ≈ 0.22, early stopping'in bulduğu en iyi değer ≈ 0.09."}
+        - {t: "Tam σ²", why: "σ² ancak gerçek fonksiyonu kusursuz öğrenen bir modelin ulaşabileceği tabandır."}
+    presets:
+      - {name: "Düzenlileştirme yok", params: {p: 0, wd: 0}, note: "Eğitim MSE ≈ 8·10⁻⁴ ≪ σ²; doğrulama 0.22. Early stopping'in seçtiği ağ (adım ≈ 100) doğrulamada ≈ 0.09."}
+      - {name: "Dropout 0.3", params: {p: 0.3, wd: 0}, note: "Eğitim MSE ≈ 0.03 (σ²'ye yakın), doğrulama ≈ 0.076. Mor MC dropout bandı noktaların seyrek olduğu yerlerde genişliyor."}
+      - {name: "Weight decay 0.15", params: {p: 0, wd: 0.15}, note: "‖w‖ 40'tan ≈ 15'e iniyor, doğrulama ≈ 0.12: yardımcı ama bu problemde dropout ve early stopping kadar değil."}
+      - {name: "Çok fazla dropout", params: {p: 0.7}, note: "Eğitim MSE ≈ σ², doğrulama 0.12 — 0.3'ten kötü: düzenlileştirme fazla, ağ eksik uyuyor."}
+      - {name: "Çok veri", params: {n: 80, p: 0, wd: 0}, note: "80 örnekte düzenlileştirme olmadan da doğrulama ≈ 0.085: veri en iyi düzenlileştiricidir."}
+      - {name: "Kısa eğitim", params: {T: 300, p: 0, wd: 0}, note: "300 adımda durmak (elle early stopping) doğrulamayı 0.11'e indiriyor."}
+    questions:
+      - q: "Dropout açıkken eğitim kaybı neden düzenlileştirmesiz durumdan çok daha yüksek kalıyor?"
+        a: "Eğitimde her adımda farklı bir alt ağ görülüyor; tek bir alt ağa göre ezber yapılamıyor. Grafikteki eğitim kaybı eval modunda (tüm ağ) ölçülüyor; yine de ağ gürültünün ayrıntılarını öğrenmemiş."
+      - q: "Tohumu değiştir: sıralama hep aynı mı?"
+        a: "6 tohumda (1–6) dropout 0.2–0.4 ve weight decay 0.15 her seferinde düzenlileştirmesiz son ağdan iyi çıktı; ama aralarındaki sıra tohuma göre değişiyor. Küçük veride tek bir koşudan genelleme yapma."
+    limits: "Tek girdili, tek gizli katmanlı (tanh) ağ; tam-batch Adam (η = 0.01); doğrulama 120 gürültülü nokta. MC bandı 40 maskeyle; gerçek bir güven aralığı değil. Gerçek ağlarda düzenlileştiricilerin etkisi mimariye ve veriye bağlıdır."
+  - id: l2
+    lab: clipvec
+    title: "Değere göre mi, norma göre mi kırpmalı?"
+    goal: |
+      Aynı gradyanı iki yöntemle kırp: değere göre kırpma her bileşeni ayrı keser (kare bölge), norma göre kırpma tüm vektörü ölçekler (daire). Hangisinin yönü koruduğunu ve hangi bileşenlerin kaybolduğunu gör.
+    predict:
+      q: "g = (0.9, 100), c = 1. Değere göre kırpılmış vektörün yönü ne kadar döner?"
+      options:
+        - {t: "Hiç dönmez", why: "Yalnız ikinci bileşen kesilir; birinci aynı kalır → oran değişir."}
+        - {t: "≈ 41°", ok: true, why: "(0.9, 1.0) köşegene yakın: 89.5° − 48.0° ≈ 41.5°."}
+        - {t: "≈ 90°", why: "İki bileşen de pozitif kalır; dönüş 90°'den küçüktür."}
+    presets:
+      - {name: "Ders örneği", params: {g1: 0.9, g2: 100, c: 1}, note: "Değere göre (0.9, 1.0): yön ≈ 41° döndü. Norma göre (0.009, 0.99996): yön aynı, birinci bileşen neredeyse yok."}
+      - {name: "Eşiğin altında", params: {g1: 0.5, g2: -0.3, c: 1}, note: "‖g‖ < c ve |gᵢ| < c: iki yöntem de hiçbir şey yapmaz."}
+      - {name: "İki büyük bileşen", params: {g1: 50, g2: -80, c: 1}, note: "Değere göre (1, −1): oranı 50:80 olan vektör 1:1'e döndü (≈ 13°). Norma göre yön aynı."}
+      - {name: "Gevşek eşik", params: {g1: 0.9, g2: 100, c: 50}, note: "Değere göre yalnız 100 → 50 (yön ≈ 0.5° döner), norma göre ×0.5."}
+    questions:
+      - q: "Değere göre kırpma hangi durumda yönü korur?"
+        a: "Hiçbir bileşen eşiği aşmıyorsa (hiç kırpma yok) ya da tüm bileşenlerin mutlak değeri eşit ve hepsi eşiği aşıyorsa. Genelde büyük bileşenleri küçüklere doğru eşitler."
+    limits: "İki boyutlu tek bir gradyan; gerçek ağlarda milyonlarca bileşen ve global norm (tüm parametreler birlikte) kullanılır. Kırpmanın eğitim dinamiğine etkisi burada gösterilmiyor."
