@@ -145,3 +145,116 @@ labs:
       - q: "Tek Gauss'luk üreteç neden bazen ortada geniş bir Gauss'ta, bazen bir tepede kalıyor?"
         a: "İki farklı yerel denge vardır. Ortadan başlayan üreteç iki tepeden de eşit gradyan alır ve genişleyerek ikisini örter. Bir tepeye yakın başlayan üreteç o tepeden güçlü, diğerinden hiç gradyan almaz (ayırt edicinin gradyanı yereldir) ve oraya kilitlenir."
     limits: "Üreteç yalnız ortalama ve std öğrenebilir (tek tepeli); gerçek GAN'larda üreteç çok tepeli dağılımları temsil edebilir ve mod çöküşü daha karmaşık biçimlerde görülür. RBF ayırt edici [−6, 6] dışını göremez; üretecin std'si 0.05–7.4 aralığında kırpılır."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: En iyi ayırt edici ve JS
+    goal: GAN'ın hangi ıraksamayı küçülttüğünü türetmek
+    needs: KL ıraksaması, tek değişkenli optimizasyon
+    q: |-
+      Sabit bir üreteç için $V(D,G)=\mathbb E_{p_d}[\log D]+\mathbb E_{p_g}[\log(1-D)]$'yi en büyükleyen $D^*$'ı bul ve $V(D^*,G)$'yi JS ıraksamasıyla yaz.
+    solution: |-
+      $V=\int[p_d\log D+p_g\log(1-D)]dx$; $D$ her noktada serbest olduğu için integrandı nokta nokta en büyükle. $a\log y+b\log(1-y)$'nin türevi $a/y-b/(1-y)=0$ ⇒ $y=a/(a+b)$: $D^*=\frac{p_d}{p_d+p_g}$.
+
+      Yerine koy, $m=\frac{p_d+p_g}2$: $V(D^*,G)=\mathbb E_{p_d}\log\frac{p_d}{2m}+\mathbb E_{p_g}\log\frac{p_g}{2m}=-\log4+\mathrm{KL}(p_d\|m)+\mathrm{KL}(p_g\|m)=-\log4+2\,\mathrm{JS}(p_d\|p_g)$.
+
+      Sonuç: en iyi ayırt edici karşısında üreteç JS'yi küçültür; minimum $p_g=p_d$, $D^*=\frac12$, $V=-\log4$. Varsayım: $D$'nin sonsuz kapasitesi.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Doyumun büyüklüğü
+    goal: İki üreteç kaybının gradyanını karşılaştırmak
+    needs: $\partial_a\log(1-\sigma(a))=-\sigma(a)$, $\partial_a(-\log\sigma(a))=-(1-\sigma(a))$
+    q: |-
+      Eğitimin başında ayırt edici sahtelere $D(G(z))=0.01$ veriyor. Doyumsuz kaybın logit gradyanının büyüklüğü, minimaks kaybınkinin kaç katıdır?
+    answer: 99.0
+    calc: "0.99/0.01"
+    tol: 1e-6
+    mistakes:
+      - {answer: 0.010101010101010102, msg: "Oranı ters aldın: doyumsuz kaybın gradyanı 1 − D, minimaksınki D."}
+      - {answer: 1.0, msg: "İki kaybın gradyanları farklı: biri D, diğeri 1 − D."}
+    hints:
+      - "Minimaks: |∂/∂a| = D; doyumsuz: |∂/∂a| = 1 − D."
+    solution: |-
+      $(1-0.01)/0.01=99$. Üreteç en kötüyken (D ≈ 0) minimaks kayıp neredeyse hiç sinyal vermez; doyumsuz kayıp en güçlü sinyali verir. Sabit noktaları aynıdır.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Dengede değer fonksiyonu
+    goal: Global optimumu sayısal okumak
+    needs: P1
+    q: |-
+      $p_g=p_{\text{veri}}$ olduğunda $V(D^*,G)$ kaç (doğal log)?
+    answer: -1.3862943611198906
+    calc: "-math.log(4)"
+    tol: 1e-4
+    mistakes:
+      - {answer: 0.0, msg: "JS = 0 ama sabit terim −log 4 kalır."}
+      - {answer: -0.6931471805599453, msg: "Bu −log 2: iki terimin her biri log ½, toplam −log 4."}
+    hints:
+      - "D* = ½ iken log ½ + log ½."
+    solution: |-
+      $D^*=\frac12$: $\log\frac12+\log\frac12=-\log4=-1.386$. Eğitimde ayırt edicinin BCE kaybı (ortalama) $\log2=0.693$ civarında dolaşıyorsa denge yakınındayız demektir; 0'a iniyorsa ayırt edici kazanıyor.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Ayırt edici kaybı sıfıra indi
+    goal: Eğitim eğrilerinden bozulmayı tanımak
+    needs: Doyum, eğitim döngüsü
+    q: |-
+      Birkaç yüz adımdan sonra ayırt edicinin kaybı ≈ 0, üretecin kaybı sürekli artıyor ve örnekler gürültü gibi. Ne olmuş olabilir, ilk ne denenir?
+    choices:
+      - {t: "Üreteç çok güçlü; üretecin öğrenme oranını artır", why: "Tablo tersini söylüyor: ayırt edici sahteleri kusursuz ayırıyor."}
+      - {t: "Ayırt edici kazandı; üreteç gradyan alamıyor. Doyumsuz kayıp, gradyan cezası (R1/WGAN-GP), ayırt edicinin öğrenme oranını ya da adım sayısını düşürmek", ok: true, why: "D ≈ 0 iken minimaks kayıp doyar; dağılımlar örtüşmüyorsa JS log 2'de sabittir."}
+      - {t: "Normal; sabırla bekle", why: "Ayırt edici mükemmel olduğunda dengeye doğru hareket edecek bir sinyal yok."}
+    hints:
+      - "Dengede ayırt edicinin BCE'si kaç olmalı?"
+    solution: |-
+      Dengede $D=\frac12$ ve BCE ≈ log 2. Kayıp 0 ise ayırt edici sahteleri tamamen ayırıyor: dağılımlar örtüşmüyor ya da üreteç geride kaldı. Doyumsuz kayıp, R1/WGAN-GP cezası, spektral normalizasyon (M5.7) ve ayırt edicinin öğrenme oranını düşürmek ilk denenecekler.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Ayırt edici adımında unutulan detach
+    goal: Eğitim döngüsündeki gradyan akışını izlemek
+    needs: Eğitim döngüsü
+    q: |-
+      Bir öğrenci ayırt edici adımını şöyle yazmış: `loss_d = bce(D(x), 1) + bce(D(G(z)), 0); loss_d.backward(); optD.step()`. Sonra üreteç adımında `optG.zero_grad()` çağırmadan `loss_g.backward(); optG.step()` yapıyor. Sorun nedir?
+    choices:
+      - {t: "Sorun yok: optD yalnız D'yi günceller", why: "Güncelleme doğru ama gradyanlar G'nin .grad'ına da birikti."}
+      - {t: "D(G(z)) ayırt edici adımında detach edilmediği için G'nin parametrelerine de ayırt edicinin kaybından gradyan birikiyor; zero_grad olmadan bu yanlış yönlü gradyan üretecin adımına karışıyor", ok: true, why: "Ayırt edici kaybı G için ters işaretlidir (G sahteleri gerçek gibi göstermek ister)."}
+      - {t: "BCE yerine MSE kullanılmalı", why: "Kayıp seçimi bu hatayla ilgili değil."}
+    hints:
+      - "loss_d.backward() hangi parametrelerin .grad'ını doldurur?"
+    solution: |-
+      Ayırt edici adımında sahteleri `G(z).detach()` ile geçir (hem hesap tasarrufu hem doğru gradyan). Her adımın başında kendi optimizer'ının `zero_grad()`'ını çağır. Aksi hâlde G, ayırt edicinin kaybını küçültme yönünde (yani daha kolay ayırt edilecek yönde) itilir.
+  - id: p6
+    type: açıkla
+    level: 3
+    title: Neden Wasserstein?
+    goal: JS doyumunu ve WGAN'ın çözümünü açıklamak
+    needs: JS, Wasserstein-1
+    q: |-
+      Gerçek görüntüler ve başlangıçtaki üretecin örnekleri yüksek boyutta örtüşmeyen ince yüzeyler üzerindeyse, JS tabanlı GAN neden zorlanır? WGAN-GP bunu nasıl çözer?
+    rubric:
+      - "Örtüşmeyen desteklerde JS'nin log 2'de sabit olduğunu, üretecin konumuna göre gradyanının sıfır olduğunu söyledim"
+      - "W1'in iki dağılım arasındaki uzaklıkla düzgün arttığını (ör. iki nokta kütlesi arasında |θ|) belirttim"
+      - "Kantorovich–Rubinstein dualitesiyle eleştirmenin 1-Lipschitz bir fonksiyon olduğunu açıkladım"
+      - "Gradyan cezasının gerçek–sahte arası doğrularda gradyan normunu 1'e çektiğini ve ağırlık kırpmaya göre avantajını söyledim"
+    hints:
+      - "δ₀ ile δ_θ arasındaki JS, θ = 1 ve θ = 10 için aynı mı?"
+    solution: |-
+      Destekler ayrıksa $m=p/2$ olduğundan JS = log 2, θ'dan bağımsız: en iyi ayırt edici karşısında üreteç yön bilgisi almaz. $W_1(\delta_0,\delta_\theta)=|\theta|$: uzaklıkla artar. WGAN'da eleştirmen $\mathbb E_{\text{veri}}f-\mathbb E_gf$'yi en büyükler ve 1-Lipschitz tutulur. WGAN-GP bunu $\lambda\,\mathbb E(\|\nabla f(\hat x)\|-1)^2$ ile yapar ($\hat x$ gerçek ile sahte arasında rastgele); ağırlık kırpma kapasiteyi bozar ve kırpma eşiğine çok duyarlıdır.
+pitfalls:
+  - wrong: "Ayırt edicinin kaybı ne kadar düşükse eğitim o kadar iyi gidiyor."
+    right: "Dengede ayırt edici kararsızdır (BCE ≈ log 2). Kayıp sıfıra iniyorsa ayırt edici kazanmıştır ve üreteç sinyal alamıyor olabilir."
+  - wrong: "Eğitim döngüsündeki üreteç adımı minimaks amacın aynısıdır."
+    right: "Sahteleri 1 etiketiyle sınıflandırmak −log D(G(z))'yi küçültür: doyumsuz kayıp. Minimaks log(1 − D(G(z))) başta doyar."
+  - wrong: "GAN kaybı düşünce örnekler de iyileşir; kaybı izlemek yeter."
+    right: "GAN kayıpları birbirine görelidir ve kaliteyle zayıf ilişkilidir. Örnekleri gözle ve FID gibi ölçütlerle (M5.7) izlemek gerekir."
+whatif:
+  - q: "Ayırt edici her adımda optimuma kadar eğitilirse (k → ∞)?"
+    a: "Kuramsal olarak üreteç JS'yi küçültür; ama dağılımlar örtüşmüyorsa JS doyar ve minimaks kayıpla gradyan söner. Pratikte k = 1–5 ve doyumsuz kayıp kullanılır; WGAN'da eleştirmen için k = 5 tipiktir."
+  - q: "Üreteç ve ayırt edici aynı öğrenme oranını değil, ayırt edici daha büyük öğrenme oranını kullanırsa (TTUR)?"
+    a: "Heusel ve ark. (2017) iki zaman ölçekli güncellemeyle yerel Nash dengesine yakınsamayı gösterdi; ayırt edici hızlı, üreteç yavaş öğrenir. Ayırt edici çok hızlıysa yine doyum riski vardır."
