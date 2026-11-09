@@ -745,3 +745,10 @@ button.cv-c { cursor: pointer; }
 /* attnviz (M4.6) */
 .at-t td { min-width: 3.2em; }
 .at-t tr.at-sel th, .at-t tr.at-sel td { outline: 2px solid var(--c-q); outline-offset: -2px; }
+/* word2vec deneyi (M4.12) */
+.wv-wrap { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px; align-items: start; margin: 8px 0; }
+@media (max-width: 680px) { .wv-wrap { grid-template-columns: minmax(0, 1fr); } }
+.wv-svg { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--bg-2, transparent); }
+.wv-svg .wv-t { font-size: 11px; fill: var(--ink); } .wv-svg .wv-dim { fill: var(--ink-2); font-size: 9px; }
+.wv-svg .wv-a { fill: var(--c-a); } .wv-svg .wv-b { fill: var(--c-b); } .wv-svg .wv-p { fill: var(--c-p); } .wv-svg .wv-q { fill: var(--c-q); } .wv-svg .wv-o { fill: var(--ink-2); opacity: 0.6; }
+.wv-svg .wv-pair { stroke: var(--ink-2); stroke-dasharray: 3 3; stroke-width: 1; }
