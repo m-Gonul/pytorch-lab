@@ -102,3 +102,46 @@ homework:
     accept:
       - "Mini-batch ayrımı mod sayısını belirgin artırır."
       - "Tekniklerin birleşimi tohumlar arası varyansı azaltır."
+
+labs:
+  - id: l1
+    lab: diracgan
+    title: "Dirac GAN: eşzamanlı adım ıraksar, dönüşümlü döner, R1 yakınsatır"
+    goal: |
+      Veri tek bir noktada, üreteç tek bir noktada, ayırt edici doğrusal: GAN oyununun en basit hâli. Eşzamanlı ve dönüşümlü gradyan adımlarını, minimaks ve doyumsuz üreteç kaybını, R1 gradyan cezasını faz düzleminde karşılaştır ve dengeye uzaklığı ölç.
+    predict:
+      q: "Ceza yokken, eşzamanlı gradyan adımlarıyla (θ, ψ) dengeye ne olur?"
+      options:
+        - {t: "Yavaşça yakınsar", why: "Dengenin yakınında dinamik saf dönmedir; eşzamanlı adımın özdeğer modülü 1'den büyüktür."}
+        - {t: "Sarmal çizerek uzaklaşır", ok: true, why: "Modül √(1 + η²/4) > 1: 400 adımda (η = 0.2) uzaklık 1'den 3.1'e çıkıyor."}
+        - {t: "Hemen dengeye atlar", why: "Gradyan adımı dönme bileşenini sönümlemez."}
+    presets:
+      - {name: "Eşzamanlı (ıraksar)", params: {upd: 0, loss: 0, gamma: 0, lr: 0.2, steps: 400, th0: 1}, note: "Uzaklık 1 → 3.1."}
+      - {name: "Dönüşümlü (döner)", params: {upd: 1, loss: 0, gamma: 0, lr: 0.2, steps: 400, th0: 1}, note: "Uzaklık 1 → 0.99: kapalı eğri üzerinde dönüyor."}
+      - {name: "R1 cezası", params: {upd: 0, loss: 0, gamma: 0.3, lr: 0.2, steps: 400, th0: 1}, note: "γ = 0.3: 400 adımda uzaklık 4·10⁻⁵: yakınsıyor."}
+      - {name: "Doyumsuz kayıp", params: {upd: 0, loss: 1, gamma: 0, lr: 0.2, steps: 400, th0: 1}, note: "Uzaklık ≈ 0.63'te bir çevrimde kalıyor: dengede aynı Jacobian, denge dışında farklı dinamik."}
+    questions:
+      - q: "Dönüşümlü adımların özdeğer modülü neden tam 1'dir?"
+        a: "Doğrusallaştırılmış sistemde dönüşümlü güncelleme matrisi (θ, ψ) sırasıyla [[1 − η²/4, −η/2], [η/2, 1]] olur; determinantı 1'dir. Gerçel olmayan özdeğer çifti için iki özdeğerin modülü eşittir ve çarpımları 1 olduğundan modül 1'dir: hacim korunur, yörünge kapalıdır."
+    limits: "Tek noktalı veri ve üreteç, doğrusal ayırt edici; gerçek GAN'larda çok boyutlu ve doğrusal olmayan dinamik. Sonuçlar yerel (dengeye yakın) analizle uyumlu, uzak bölgelerde farklılaşabilir."
+  - id: l2
+    lab: gan1d
+    title: "1-B GAN: tek tepeye kilitlenme, örtme ve doyum"
+    goal: |
+      İki tepeli bir veri dağılımına karşı tek Gauss'luk bir üreteci, RBF öznitelikli bir lojistik ayırt ediciyle gerçekten eğit. Üretecin başlangıç noktasına, kayıp türüne ve ayırt edicinin gücüne göre bir tepeye mi kilitlendiğini yoksa iki tepeyi geniş bir Gauss'la mı örttüğünü gör; minimaks ve doyumsuz kaybın gradyan büyüklüklerini karşılaştır.
+    predict:
+      q: "Üreteç verinin uzağında başlarsa (μ₀ = 5, tepeler ±1) ve ayırt edici güçlüyse, minimaks kayıpla üretecin ilk gradyanları nasıldır?"
+      options:
+        - {t: "Büyük: üreteç kötü olduğu için güçlü sinyal alır", why: "Minimaks kaybın logit gradyanı D(G(z))'dir; D sahteleri kolayca reddettiğinde ≈ 0."}
+        - {t: "Çok küçük", ok: true, why: "Ölçülen |∂L/∂logit|: ilk 20 yinelemede minimaksta 0.056, doyumsuz kayıpta 0.845. 300 yinelemede minimaks üreteç μ = 1.96'da kalırken doyumsuz kayıpla μ ≈ 0."}
+        - {t: "Sıfır", why: "Tam sıfır değil, ama çok küçük."}
+    presets:
+      - {name: "Ortadan başla (örtme)", params: {loss: 1, k: 1, m: 2.5, w: 0.5, lrd: 0.3, lrg: 0.1, T: 800, mu0: 0}, note: "Üreteç N(−0.2, 2.97²): iki tepeyi tek geniş Gauss'la örtüyor (veri std 2.55)."}
+      - {name: "Bir tepeye yakın başla (çöküş)", params: {loss: 1, k: 1, m: 2.5, w: 0.5, mu0: 4}, note: "Üreteç N(2.48, 0.49²): sağ tepeye kilitlendi, sol tepe hiç üretilmiyor."}
+      - {name: "Ağır sol tepe", params: {loss: 1, m: 2.5, w: 0.8, mu0: 0}, note: "Ortadan başlasa da N(−2.51, 0.49²): ağır tepeye yerleşiyor."}
+      - {name: "Doyum: minimaks", params: {loss: 0, k: 5, lrd: 2, mu0: 5, m: 1, T: 300}, note: "İlk 20 yinelemede gradyan 0.056; 300 yinelemede μ = 1.96, s = 2.45: üreteç veriye ulaşamadı."}
+      - {name: "Doyum yok: doyumsuz kayıp", params: {loss: 1, k: 5, lrd: 2, mu0: 5, m: 1, T: 300}, note: "Aynı ayar, doyumsuz kayıp: ilk gradyan 0.845; μ = 0.03, s = 1.07 (veri std 1.12)."}
+    questions:
+      - q: "Tek Gauss'luk üreteç neden bazen ortada geniş bir Gauss'ta, bazen bir tepede kalıyor?"
+        a: "İki farklı yerel denge vardır. Ortadan başlayan üreteç iki tepeden de eşit gradyan alır ve genişleyerek ikisini örter. Bir tepeye yakın başlayan üreteç o tepeden güçlü, diğerinden hiç gradyan almaz (ayırt edicinin gradyanı yereldir) ve oraya kilitlenir."
+    limits: "Üreteç yalnız ortalama ve std öğrenebilir (tek tepeli); gerçek GAN'larda üreteç çok tepeli dağılımları temsil edebilir ve mod çöküşü daha karmaşık biçimlerde görülür. RBF ayırt edici [−6, 6] dışını göremez; üretecin std'si 0.05–7.4 aralığında kırpılır."
