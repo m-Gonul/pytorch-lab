@@ -752,3 +752,6 @@ button.cv-c { cursor: pointer; }
 .wv-svg .wv-t { font-size: 11px; fill: var(--ink); } .wv-svg .wv-dim { fill: var(--ink-2); font-size: 9px; }
 .wv-svg .wv-a { fill: var(--c-a); } .wv-svg .wv-b { fill: var(--c-b); } .wv-svg .wv-p { fill: var(--c-p); } .wv-svg .wv-q { fill: var(--c-q); } .wv-svg .wv-o { fill: var(--ink-2); opacity: 0.6; }
 .wv-svg .wv-pair { stroke: var(--ink-2); stroke-dasharray: 3 3; stroke-width: 1; }
+
+/* sayfa tablolarında (değişiklik günlüğü vb.) dar ekranda yatay kaydırma */
+.prose table { display: block; max-width: 100%; overflow-x: auto; }
