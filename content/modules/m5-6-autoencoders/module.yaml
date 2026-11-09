@@ -105,3 +105,149 @@ homework:
     accept:
       - "Derin AE 2B'de sınıfları PCA'dan belirgin daha iyi ayırır."
       - "30 boyutta yeniden yapılandırma hatası PCA'dan düşük."
+
+labs:
+  - id: l1
+    lab: dae1d
+    title: "En iyi gürültü giderici: E[x | x′] ve Tweedie skoru"
+    goal: |
+      İki tepeli 1-B bir veride (x′ = gürültülü girdi, metindeki x̃), kare hatayla eğitilmiş sonsuz kapasiteli bir gürültü giderici otomatik kodlayıcının optimumunu kesin hesapla: r*(x′) = E[x | x′]. Artığın σ² · skor'a eşit olduğunu (Tweedie) ve iki tepenin ortasında çıktının ortalamaya (bulanığa) düştüğünü gör.
+    predict:
+      q: "Tepeler ±2'de, eşit ağırlıklı. Gürültülü girdi tam ortada (x′ = 0) olursa en iyi gürültü gidericinin çıktısı nedir?"
+      options:
+        - {t: "+2 ya da −2: en yakın tepeye gider", why: "İki tepe eşit uzaklıkta ve eşit olası; MSE'yi en küçükleyen tahmin birini seçmez."}
+        - {t: "0: iki tepenin ortalaması", ok: true, why: "E[x | x′ = 0] = 0.5·(−2) + 0.5·(+2) ölçeğinde bir ortalamadır; verinin hiç bulunmadığı bir yerdir. MSE'li gürültü gidericilerin bulanıklığı buradan gelir."}
+        - {t: "x′'nin kendisi; gürültü giderici değiştirmez", why: "Sonuç burada sayısal olarak 0 çıkar ama sebep özdeşlik değil simetridir; sol tepenin ağırlığını 0.8 yap ve çıktının −0.96'ya kaydığını gör."}
+    presets:
+      - {name: "Varsayılan", params: {sig: 0.6, m: 2, s: 0.3, w: 0.5, n: 400}, note: "Gürültülü örneklerin hatası 0.392 (≈ σ² = 0.36), en iyi gürültü gidericiden sonra 0.0714. Artık ile σ²·skor arasındaki en büyük fark 10⁻¹⁵ (yuvarlama hatası)."}
+      - {name: "Az gürültü", params: {sig: 0.1}, note: "Hata 0.0109 → 0.0096: r* neredeyse özdeşlik, yalnız yerel yapı. Difüzyonun son adımları böyledir."}
+      - {name: "Çok gürültü", params: {sig: 3}, note: "Hata 9.79 → 2.78: r* her şeyi veri ortalamasına çeker; iki tepe artık ayırt edilemez. Difüzyonun ilk adımları böyledir."}
+      - {name: "Dengesiz tepeler", params: {w: 0.8}, note: "Sol tepe %80: r*(0) = −0.96. Belirsiz noktada çıktı olası tepeye kayar; skor da o yöne işaret eder."}
+      - {name: "Örtüşen tepeler", params: {m: 1, s: 0.5}, note: "Tepeler örtüşünce gürültü giderme zorlaşır: hata 0.392 → 0.253."}
+    questions:
+      - q: "Gerçek bir DAE (sonlu kapasite, sonlu veri) bu optimumu öğrenir mi?"
+        a: "Ancak yaklaşık olarak. Optimum, veri dağılımına göre tanımlanır; ağ yeterli kapasite ve veriyle buna yaklaşır. Tweedie bağıntısı yine de 'iyi eğitilmiş bir DAE'nin artığı skora yaklaşır' anlamına gelir (Alain ve Bengio 2014), skor tabanlı üretim bunu kullanır."
+      - q: "Neden yalnız tek bir σ yetmez, difüzyon birçok σ kullanır?"
+        a: "Küçük σ'da skor yalnız verinin çok yakınında doğru kestirilir (uzakta hiç örnek yok); büyük σ'da her yerde tanımlıdır ama ayrıntıyı bulanıklaştırır. Gürültü düzeylerini büyükten küçüğe sırayla kullanmak ikisinin iyi yanını birleştirir (M5.3)."
+    limits: "Veri 1-B Gauss karışımı; optimum kapalı formdan, eğitim yok. Gerçek DAE bu fonksiyona yalnız yaklaşır."
+  - id: l2
+    lab: sparsecode
+    title: "Seyrek kod: L1 ile L2, aşırı tam sözlük"
+    goal: |
+      64 örnekli bir sinyali 128 atomluk (aşırı tam) bir sözlükle açıkla. L1 cezası (FISTA, yumuşak eşikleme) birkaç atomlu seyrek bir kod, L2 cezası (ridge) ise neredeyse tüm atomlara yayılan yoğun bir kod verir. λ, gürültü ve atomlar arası uzaklıkla seyrek kurtarmanın ne zaman başarılı olduğunu izle.
+    predict:
+      q: "Gerçek kodda 4 etkin atom var. L2 cezasıyla bulunan kodda kaç katsayı sıfırdan farklı (|z| > 0.001) olur?"
+      options:
+        - {t: "≈ 4", why: "L2 küçültür ama sıfırlamaz; enerji birbirine benzeyen komşu atomlara yayılır."}
+        - {t: "≈ 15", why: "Bu L1 kodunun sayısı (varsayılanda 15)."}
+        - {t: "128'e yakın", ok: true, why: "Varsayılanda 120. L2'nin çözümü (DᵀD + 2λI)⁻¹Dᵀx'tir; hiçbir bileşeni tam sıfırlayan bir mekanizma yoktur."}
+    presets:
+      - {name: "Varsayılan (L1)", params: {k: 4, gap: 8, lam: 0.05, noise: 0.05, pen: 0, iters: 800}, note: "L1: 15 etkin katsayı, en büyük 4 katsayının 4'ü de gerçek atomlarda; temiz sinyale hata 4.6·10⁻⁴. L2: 120 katsayı, hata 9.7·10⁻⁴."}
+      - {name: "Aynı veri, L2", params: {pen: 1}, note: "120 katsayı; en büyük 4 katsayıdan yalnız 1'i gerçek atomda. Kod yoğun, yorumlanamaz."}
+      - {name: "Büyük λ", params: {lam: 0.5}, note: "L1: yalnız 6 katsayı ama hata 0.0157 (L2: 0.0021). Katsayılar λ kadar küçüldüğü için genlik düşük kalır: L1'in yanlılığı."}
+      - {name: "Küçük λ", params: {lam: 0.005}, note: "L1: 42 katsayı; ceza zayıfladıkça kod yoğunlaşır."}
+      - {name: "Yakın atomlar", params: {gap: 0}, note: "Gerçek atomlar üst üste binebilir: en büyük 4 katsayının hiçbiri gerçek atomlarda değil, ama hata yine küçük (6·10⁻⁴). Sözlük yüksek tutarlılıkta; aynı sinyali açıklayan farklı seyrek kodlar var."}
+      - {name: "Az FISTA adımı", params: {iters: 20}, note: "20 adımda 46 katsayı: yakınsamamış çözüm henüz seyrek değil. Seyreklik optimumun özelliğidir, ara adımların değil."}
+      - {name: "Gürültülü, λ ayarlı", params: {noise: 0.2, lam: 0.15}, note: "σ = 0.2: λ = 0.05'te 36 katsayı ve 1 doğru atom; λ = 0.15 ile 17 katsayı, 3 doğru atom, hata 0.0071 (L2: 0.0102)."}
+    questions:
+      - q: "Seyrek otomatik kodlayıcıdaki L1 cezası bu deneydeki sözlük öğrenmeden nasıl farklıdır?"
+        a: "Burada sözlük sabit, kod bir optimizasyonla bulunuyor. Seyrek AE'de kod, kodlayıcı ağın tek ileri geçişiyle üretilir ve sözlük (kod çözücü) birlikte öğrenilir. Kodlayıcı bu optimizasyonun bir yaklaşığıdır; LISTA (Gregor ve LeCun 2010) ISTA adımlarını doğrudan ağ katmanlarına açar."
+    limits: "Sabit Gauss tümseği sözlüğü, tek sinyal. 'Gerçek desteğe düşen' sayımı ±1 konum toleranslıdır; L2 için 'sıfırdan farklı' eşiği 0.001."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bağlı ağırlıklarla parametre sayısı
+    goal: Ağırlık bağlamanın kazancını hesaplamak
+    needs: Doğrusal katman parametresi = girdi × çıktı + çıktı
+    q: |-
+      Simetrik yığılmış AE: 100 → 20 → 100 (tek gizli katman, biaslar dahil). Bağsız ve bağlı parametre sayısı?
+    solution: |-
+      Bağsız: $(100\cdot20+20)+(20\cdot100+100)=2020+2100=4120$. Bağlı: kod çözücünün ağırlığı $\mathbf W^\top$, yalnız 100 bias'ı yeni: $2020+100=2120$.
+
+      Oran $4120/2120\approx1.94$: kazanç bias'lar yüzünden tam 2 değil.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Yumuşak eşikleme
+    goal: L1 yakınsal adımını uygulamak
+    needs: $\mathrm{sign}(u)\max(|u|-\lambda,0)$
+    q: |-
+      $u=(0.8,\,-0.3,\,0.05,\,-1.2)$, $\lambda=0.25$. Yumuşak eşiklemeden sonra sıfırdan farklı bileşenlerin mutlak değerlerinin toplamı?
+    answer: 1.55
+    calc: "(0.8-0.25)+(0.3-0.25)+0+(1.2-0.25)"
+    tol: 1e-6
+    mistakes:
+      - {answer: 2.0, msg: "Sert eşikleme yapılmış (|u| > λ olanlar aynen tutulmuş): 0.8 + 0.3 + 1.2. Yumuşak eşikleme kalanları da λ kadar küçültür."}
+      - {answer: 1.5, msg: "−0.3 de eşiği geçiyor: |−0.3| − 0.25 = 0.05."}
+    hints:
+      - "Önce hangi bileşenlerin |u| > 0.25 olduğunu bul."
+    solution: |-
+      $(0.55,\,-0.05,\,0,\,-0.95)$; toplam $0.55+0.05+0.95=1.55$. $0.05$ tam sıfır oldu; büyük bileşenler $\lambda$ kadar küçüldü (yanlılık).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Doğrusal DAE'nin küçültmesi
+    goal: Gürültünün düzenlileştirme etkisini sayıyla görmek
+    needs: $\mathbf W^*=\boldsymbol\Sigma(\boldsymbol\Sigma+\sigma^2\mathbf I)^{-1}$
+    q: |-
+      Veri kovaryansının bir özdeğeri $\lambda=3$, bozma gürültüsü $\sigma=1$. Doğrusal gürültü giderici AE o özyöndeki bileşeni hangi katsayıyla çarpar?
+    answer: 0.75
+    calc: "3/(3+1)"
+    tol: 1e-6
+    mistakes:
+      - {answer: 1.0, msg: "Gürültü yokken (σ = 0) özdeşlik; gürültüyle küçültme var."}
+      - {answer: 0.25, msg: "Bu σ²/(λ + σ²), atılan kısım."}
+    hints:
+      - "Özyönlerde matrisler köşegendir: $\\lambda/(\\lambda+\\sigma^2)$."
+    solution: |-
+      $3/(3+1)=0.75$. Küçük özdeğerli (gürültüye göre zayıf) yönler daha çok bastırılır, ridge regresyonla aynı biçim.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Mükemmel yeniden yapılandırma, işe yaramaz kod
+    goal: Kısıtsız AE'nin kopyalamasını tanımak
+    needs: Eksik/aşırı tamamlanmış AE
+    q: |-
+      784 → 1000 → 784 bir AE (kod girdiden büyük, başka kısıt yok) eğitim ve testte neredeyse sıfır yeniden yapılandırma hatası veriyor; ama kodlar üzerinde eğitilen doğrusal sınıflandırıcı ham piksellerden daha iyi değil. Ne olmuş olabilir?
+    choices:
+      - {t: "Eğitim yetersiz; daha uzun eğit", why: "Hata zaten sıfıra yakın; sorun eğitimde değil."}
+      - {t: "Ağ özdeşliği öğrendi; kısıt ekle (gürültü, seyreklik ya da dar kod)", ok: true, why: "Aşırı tamamlanmış ve kısıtsız AE girdiyi koda kopyalayabilir; yararlı öznitelik öğrenmeye zorlanmaz."}
+      - {t: "Öğrenme oranı fazla büyük", why: "Büyük öğrenme oranı düşük hatayla değil kararsızlıkla kendini gösterir."}
+    hints:
+      - "Kod katmanı 1000 birimse girdiyi saklamak için yer var mı?"
+    solution: |-
+      Kısıtsız aşırı tamamlanmış AE için özdeşlik (ya da ona yakın bir şey) bir çözümdür ve düşük hata yararlı temsil anlamına gelmez. Gürültü giderme (DAE), L1/KL seyreklik ya da dar bir kod katmanı ağı veri yapısını öğrenmeye zorlar.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Tweedie formülü
+    goal: DAE artığının skor olduğunu göstermek
+    needs: Gauss yoğunluğunun türevi, koşullu beklenti
+    q: |-
+      $\tilde x=x+\sigma\varepsilon$, $\varepsilon\sim\mathcal N(0,1)$, $p_\sigma(\tilde x)=\int p(x)\,\mathcal N(\tilde x;x,\sigma^2)\,dx$. $\mathbb E[x\mid\tilde x]=\tilde x+\sigma^2\frac{d}{d\tilde x}\log p_\sigma(\tilde x)$ olduğunu kanıtla.
+    rubric:
+      - "Gauss yoğunluğunun x′'ye göre türevini N · (x − x′)/σ² olarak yazdım"
+      - "Türevi integralin içine aldım"
+      - "Bayes kuralıyla p(x)N(x′; x, σ²)/p_σ(x′) = p(x | x′) olduğunu kullandım"
+      - "Her iki yanı p_σ'ya bölüp log-türeve çevirdim"
+    hints:
+      - "$\\frac{d}{d\\tilde x}\\mathcal N(\\tilde x;x,\\sigma^2)=\\mathcal N(\\tilde x;x,\\sigma^2)\\frac{x-\\tilde x}{\\sigma^2}$."
+    solution: |-
+      $p_\sigma'(\tilde x)=\int p(x)\mathcal N(\tilde x;x,\sigma^2)\frac{x-\tilde x}{\sigma^2}dx$. İki yanı $p_\sigma(\tilde x)$'e bölünce sağda $p(x\mid\tilde x)$ ağırlıklı bir ortalama kalır: $\frac{p_\sigma'}{p_\sigma}=\frac{\mathbb E[x\mid\tilde x]-\tilde x}{\sigma^2}$. Sol yan $\frac{d}{d\tilde x}\log p_\sigma$'dır; düzenleyince sonuç çıkar. Kare hatayla eğitilmiş en iyi gürültü giderici tam olarak $\mathbb E[x\mid\tilde x]$ olduğu için artığı skoru verir.
+pitfalls:
+  - wrong: "Yeniden yapılandırma hatası ne kadar düşükse otomatik kodlayıcı o kadar iyi temsil öğrenmiştir."
+    right: "Kısıtsız ya da çok güçlü bir AE özdeşliği (ya da her girdiyi bir indekse eşlemeyi) öğrenebilir. Temsilin kalitesi aşağı akış görevinde (sınıflandırma, anomali tespiti) ölçülmelidir."
+  - wrong: "Bağlı ağırlıklı AE'de kod çözücü bias'ı da kodlayıcıdan alınır."
+    right: "Yalnız ağırlık matrisi paylaşılır (Wᵀ); bias'ların boyutu farklıdır (kod çözücü bias'ı çıktı boyutunda), ayrı parametredir."
+  - wrong: "Seyrek AE için L2 cezası da iş görür."
+    right: "L2 tüm kodları orantılı küçültür, sıfırlamaz; seyreklik L1'in köşesinden (yumuşak eşikleme) ya da KL ile ortalama aktivasyonu hedefe çekmekten gelir."
+  - wrong: "MSE ile eğitilmiş gürültü giderici belirsiz bir girdide olası temiz örneklerden birini seçer."
+    right: "Koşullu ortalamayı verir; birden çok olası temiz örnek varsa ortalamaları, verinin hiç bulunmadığı bulanık bir noktadır. Keskin örnek için üretken model (difüzyon, GAN) gerekir."
+whatif:
+  - q: "Gürültü giderici AE'de σ → 0 olsaydı?"
+    a: "Bozma kalkar ve sıradan (kısıtsız) AE'ye dönülür; aşırı tamamlanmış bir ağ yine özdeşliği öğrenebilir. Küçük σ'da DAE, kodlayıcının Jacobian'ını cezalandıran büzüşen AE'ye benzer bir düzenlileştirme yapar."
+  - q: "Seyrek AE'de KL cezasının hedefi ρ = 0.5 olsaydı?"
+    a: "Sigmoid kodlarda ortalama aktivasyonun 0.5 olması seyreklik değildir; ceza seyreklik yerine 'yarı yarıya etkin' kodları isterdi. Seyreklik için ρ küçük (0.01–0.1) seçilir."
+  - q: "Doğrusal AE'ye derinlik eklesek (doğrusal katmanlar)?"
+    a: "Doğrusal katmanların bileşimi yine doğrusaldır; en iyi çözüm aynı PCA alt uzayıdır. Doğrusal olmayan aktivasyon olmadan derinlik temsil gücü katmaz (optimizasyon dinamiğini değiştirir ama)."
