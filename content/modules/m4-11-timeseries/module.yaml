@@ -196,3 +196,69 @@ pitfalls:
 whatif:
   - q: "φ = 1 olursa?"
     a: "Birim kök: rastgele yürüyüş, varyans t ile büyür, durağan değil; fark alınınca beyaz gürültü olur (ARIMA'nın I'sı)."
+
+labs:
+  - id: l1
+    lab: armasim
+    title: "ARMA süreci: ACF, PACF, durağanlık ve fark alma"
+    goal: |
+      $y_t=\phi_1y_{t-1}+\phi_2y_{t-2}+\epsilon_t+\theta_1\epsilon_{t-1}$ sürecinden bir seri üret. Örnek otokorelasyonu (ACF) ve kısmi otokorelasyonu (PACF) kuramsal değerlerle karşılaştır; AR polinomunun köklerine bakarak durağanlığı denetle; seriye eğilim ekleyip fark alarak durağanlaştır; Yule–Walker kestirimini gerçek katsayılarla kıyasla.
+    predict:
+      q: "Saf AR(2) sürecinde (θ₁ = 0) PACF'ın görünümü nasıldır?"
+      options:
+        - {t: "Yavaşça söner", why: "Bu ACF'ın tipik davranışı."}
+        - {t: "İki gecikmeden sonra (bant içinde) kesilir", ok: true, why: "k > p için kısmi otokorelasyon kuramsal olarak 0'dır: y_{t−k}'nin, aradaki gecikmeler bilindikten sonra ek bilgisi yoktur."}
+        - {t: "Her gecikmede 1'e yakındır", why: "Bu durağan olmayan (eğilimli) bir serinin ACF'ı."}
+    presets:
+      - {name: "El hesabı AR(2)", params: {phi1: 0.6, phi2: 0.3, theta: 0, trend: 0, d: 0, n: 2000}, note: "ρ₁ = 0.857, ρ₂ = 0.814; PACF 2'den sonra kesiliyor."}
+      - {name: "Salınımlı AR(2)", params: {phi1: 1, phi2: -0.7, theta: 0, n: 1000}, note: "Karmaşık kökler: ACF sönümlü salınım yapıyor (durağan ama 'döngüsel')."}
+      - {name: "MA(1)", params: {phi1: 0, phi2: 0, theta: 0.8, n: 1000}, note: "ACF bir gecikmeden sonra kesiliyor, PACF sönüyor; Yule–Walker AR(2) yanlış model."}
+      - {name: "Rastgele yürüyüş", params: {phi1: 1, phi2: 0, theta: 0, d: 0, n: 400}, note: "Kök tam birim çemberde: durağan değil. d = 1 ile beyaz gürültüye döner."}
+      - {name: "Karesel eğilim", params: {phi1: 0.5, phi2: 0, trend: 2, d: 1}, note: "Bir fark yetmiyor; d = 2'yi dene."}
+    questions:
+      - q: "AR(1) sürecinde (φ = 0.8, σ² = 1) durağan varyansı türet."
+        a: "Durağanlıkta Var(y_t) = Var(y_{t−1}) = γ₀. y_t = φy_{t−1} + ε_t ve ε_t geçmişten bağımsız: γ₀ = φ²γ₀ + σ² → γ₀ = σ²/(1 − φ²) = 1/0.36 ≈ 2.78. |φ| ≥ 1 ise pozitif çözüm yoktur: süreç durağan değildir."
+      - q: "Örnek ACF'ı bandın dışına çıkan ama kuramsal ACF'ı sıfır olan gecikmeler neden olabilir?"
+        a: "Bant, gerçek korelasyon 0 iken her gecikme için %95'lik aralıktır; 20 gecikmede ortalama bir tanesi şans eseri dışarı çıkar. Ayrıca örnek otokorelasyonlar birbiriyle ilişkilidir: bir sapma komşu gecikmelere yayılır."
+    limits: "Gaussian beyaz gürültü, 200 adımlık ısınma sonrası; Yule–Walker yalnız AR(2) için. Gerçek model seçimi AIC/BIC ve artık testleri (Ljung–Box) de kullanır."
+  - id: l2
+    lab: tsforecast
+    title: "Naif tahmin, doğrusal model ve çok adımlı tahminin iki yolu"
+    goal: |
+      Ders alıştırmasının sentetik serilerinde (iki rastgele sinüs + gürültü) naif tahmini ve son k değere bakan doğrusal modeli karşılaştır. Çok adımlı tahmini iki yolla yap: tek adımlık modeli kendi tahminiyle besleyerek (yinelemeli) ve her ufuk için ayrı model eğiterek (doğrudan). Hatanın ufukla nasıl büyüdüğünü izle.
+    predict:
+      q: "Ufuk büyüdükçe naif tahminin MSE'si nasıl değişir?"
+      options:
+        - {t: "Sabit kalır", why: "Seri değiştikçe 'son değer' gerçekten uzaklaşır."}
+        - {t: "Hızla büyür; 10 adımda bir adımlık hatanın on katından fazla", ok: true, why: "Sinüsler 10 adımda büyük ölçüde değişir; son değer artık iyi bir tahmin değildir."}
+        - {t: "Küçülür", why: "Gelecek uzaklaştıkça belirsizlik artar."}
+    presets:
+      - {name: "Tek adım (Géron)", params: {k: 50, H: 1, noise: 0.1, N: 500}, note: "Naif ≈ 0.020, doğrusal ≈ 0.003 (Géron: 0.020 ve 0.004)."}
+      - {name: "10 adım", params: {k: 50, H: 10, noise: 0.1, N: 500}, note: "Naif ≈ 0.25 (Géron: 0.223); doğrusal ≈ 0.017 (Géron: 0.0188)."}
+      - {name: "Kısa pencere", params: {k: 3, H: 10}, note: "Üç değer iki sinüsü ayırt etmeye yetmiyor."}
+      - {name: "Az veri", params: {N: 30, k: 50}, note: "51 parametre, 30 seri: doğrusal model aşırı uyuyor."}
+      - {name: "Gürültüsüz", params: {noise: 0, k: 50}, note: "Hata neredeyse sıfıra iniyor; kalan, frekansların seriden seriye değişmesinden."}
+    questions:
+      - q: "Yinelemeli tahmin neden hata biriktirir, doğrudan tahmin neden biriktirmez?"
+        a: "Yinelemelide h. adımın girdisi önceki tahminleri içerir; onların hataları girdiye karışır ve model eğitimde hiç görmediği (hatalı) girdilerle çalışır (maruz kalma yanlılığı). Doğrudan tahminde her ufkun modeli yalnız gerçek gözlemleri görür; bedeli her ufuk için ayrı parametre ve ufuklar arası tutarlılığın garanti olmaması."
+    limits: "Yalnız doğrusal modeller (RNN'ler d aşamasında, PyTorch'ta); her seri bağımsız ve aynı üreteçten. Gerçek serilerde eğilim, mevsimsellik ve dağılım kayması vardır."
+  - id: l3
+    lab: wavenetrf
+    title: "WaveNet'in alıcı alanı: genişletmeyle üstel büyüme"
+    goal: |
+      Nedensel 1-B konvolüsyon yığınında son çıktının hangi geçmiş adımlara bağlı olduğunu bağımlılık grafiğini izleyerek say ve $1+\sum_l(k-1)d_l$ formülüyle karşılaştır. Genişletmesiz, ikiye katlanan (WaveNet) ve sabit genişletmeyi karşılaştır; aynı alıcı alanı tek bir konvolüsyonla elde etmenin parametre bedelini hesapla.
+    predict:
+      q: "k = 2, genişletmeler 1, 2, …, 512 (10 katman), iki blok: alıcı alan?"
+      options:
+        - {t: "1 024", why: "Bu tek bloğun alıcı alanı."}
+        - {t: "2 047", ok: true, why: "1 + 2·(1 + 2 + … + 512) = 1 + 2·1023."}
+        - {t: "2 048", why: "Bloklar birbirine eklenirken '1' iki kez sayılmaz."}
+    presets:
+      - {name: "WaveNet bloğu ×2", params: {k: 2, L: 10, B: 2, scheme: 1}, note: "2 047 adım; tek bir konvolüsyonla ≈ 50 kat parametre."}
+      - {name: "Géron'un küçük WaveNet'i", params: {k: 2, L: 4, B: 2, scheme: 1}, note: "1, 2, 4, 8 iki kez: 31 adım."}
+      - {name: "Genişletmesiz", params: {k: 2, L: 8, B: 1, scheme: 0}, note: "8 katman yalnız 9 adım görüyor."}
+      - {name: "Izgaralanma", params: {k: 3, L: 4, B: 1, scheme: 2, c: 3}, note: "Sabit c = 3: alıcı alanın içinde görülmeyen adımlar."}
+    questions:
+      - q: "'causal' dolgu ile 'same' dolgu arasındaki fark nedir ve neden tahminde önemlidir?"
+        a: "'same' dolgu girdiyi iki yana eşit dolgular: çıktı t, t'den sonraki girdilere de bakar (geleceği görür). 'causal' dolgunun tamamı sola konur ((k − 1)·d sıfır): çıktı t yalnız t ve öncesine bağlıdır. Eğitimde hedefler girdinin kaydırılmışı olduğundan, geleceği gören model sızıntıyla öğrenir ve üretimde çöker."
+    limits: "Yalnız bağımlılık yapısı; WaveNet'in geçitli aktivasyonları, artık ve atlama bağlantıları, μ-law nicemlemesi hesaba katılmadı."
