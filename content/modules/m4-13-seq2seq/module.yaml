@@ -197,3 +197,97 @@ pitfalls:
 whatif:
   - q: "Kaynak cümle ters çevrilip verilirse (attention'sız modelde)?"
     a: "İlk hedef kelimeler ilk kaynak kelimelere zaman olarak yaklaşır, gradyan yolu kısalır; Sutskever ve ark. bunun BLEU'yu belirgin artırdığını buldu."
+
+labs:
+  - id: l1
+    lab: padwaste
+    title: "Dolgu israfı: rastgele batch, tam sıralama ve kovalama"
+    goal: |
+      Değişken uzunluklu cümleleri batch'lere koyunca her batch en uzun cümlesine kadar doldurulur. Uzunluk dağılımını ve batch boyunu seç, üç stratejinin dolgu oranını ölç. Kovalama parçası büyüdükçe israfın rastgele batch'ten tam sıralamaya nasıl indiğini izle.
+    predict:
+      q: "Log-normal uzunluklar (ortalama 20), B = 64. Rastgele batch'lerde dolgulu tensör hücrelerinin yaklaşık ne kadarı dolgu olur?"
+      options:
+        - {t: "≈ %10", why: "Bu, kovalamayla bile zor ulaşılan bir oran."}
+        - {t: "≈ %35", why: "64 cümlelik bir batch'te en uzun cümle genelde ortalamanın 3–4 katıdır."}
+        - {t: "≈ %75", ok: true, why: "Ölçülen %74: batch başına en uzun cümle ortalama 78 token, ortalama cümle 20 token. Gerçek token başına 3.9 hücre hesaplanıyor."}
+    presets:
+      - {name: "Kovalama (varsayılan)", params: {n: 5000, dist: 0, mean: 20, spread: 0.6, B: 64, strat: 2, chunk: 20}, note: "İsraf %20.4. Aynı veride rastgele batch %73.6, tümünü sıralamak %4.1."}
+      - {name: "Rastgele batch", params: {strat: 0}, note: "İsraf %74.2; gerçek token başına 3.88 hücre hesaplanıyor."}
+      - {name: "Tümünü sırala", params: {strat: 1}, note: "İsraf %4.1, ama batch'lerin bileşimi her epoch aynı."}
+      - {name: "Uzun kuyruk", params: {strat: 2, spread: 1.2}, note: "σ = 1.2: kovalanmış batch'lerde bile israf %63 (rastgele %91). Birkaç çok uzun cümle kendi parçalarındaki batch'leri şişiriyor."}
+      - {name: "Küçük batch", params: {strat: 2, B: 4}, note: "B = 4: israf %8.3; rastgele batch'lerde %41. Dolgu batch içindeki uzunluk farkından gelir."}
+    questions:
+      - q: "Parça boyu 1 olduğunda kovalama neden rastgele batch'le aynı sonucu verir?"
+        a: "Parça = 1 batch: her parça kendi içinde sıralanır ama aynı cümleler aynı batch'te kalır; batch'in en uzun cümlesi değişmez."
+      - q: "Maskeleme dolgunun hesap maliyetini kaldırır mı?"
+        a: "Hayır. Maske sonucu yok sayar ama dolgu hücreleri yine hesaplanır. Maliyeti gerçekten kaldırmak için pack_padded_sequence (RNN), değişken uzunluklu dikkat çekirdekleri ya da dizileri uç uca ekleyip blok-köşegen maske kullanmak gerekir."
+    limits: "Uzunluklar sentetik dağılımlardan; maliyet hücre sayısıyla ölçülüyor (gerçek GPU süresi ayrıca çekirdek verimine bağlıdır). Batch'lerin homojenleşmesinin eğitim kalitesine etkisi burada ölçülmüyor."
+  - id: l2
+    lab: sampledsm
+    title: "Örneklenmiş softmax: yanlılık, düzeltme ve örnek sayısı"
+    goal: |
+      Büyük bir çıktı sözlüğünde çapraz entropinin gizli duruma göre gradyanını, hedef + m örnek üzerinden kestir. Öneri dağılımını (düzgün ya da Zipf) ve logitlerden çıkarılan düzeltmeyi (hiç, log q, log(m·q)) değiştir. 120 farklı örnek kümesinin ortalama gradyanının tam gradyandan ne kadar saptığını ölç.
+    predict:
+      q: "Zipf öneri dağılımıyla örnekleyip hiçbir düzeltme yapmazsan, m'yi 50'den 2000'e çıkarmak yanlılığı nasıl etkiler?"
+      options:
+        - {t: "Sıfıra indirir", why: "Örnekler sık kelimelere doğru eğilimli kalır; m büyüdükçe bu eğilim daha kesin kestirilir, ama ortadan kalkmaz."}
+        - {t: "Değiştirmez ya da biraz artırır", ok: true, why: "Ölçülen: göreli yanlılık m = 50'de 0.58, m = 2000'de 0.63. Düzeltme yoksa kestirici yanlış bir dağılıma yakınsar."}
+        - {t: "Varyansı artırır", why: "Varyans m ile azalır; sorun yanlılık."}
+    presets:
+      - {name: "log(m·q) düzeltmesi", params: {V: 5000, m: 50, prop: 1, corr: 2, t: 30}, note: "Yanlılık 0.024, tek kümenin göreli hatası 0.23, kosinüs 0.97; maliyet 98 kat düşük."}
+      - {name: "Düzeltme yok", params: {V: 5000, m: 50, prop: 1, corr: 0, t: 30}, note: "Yanlılık 0.60: gradyanın 'beklenen çıktı' kısmı sık kelimelere doğru kayıyor."}
+      - {name: "Sık hedef, log q", params: {V: 5000, m: 50, prop: 1, corr: 1, t: 1}, note: "Hedef en sık kelime (p_t = 0.11): log q düzeltmesiyle yanlılık 0.12 ve m = 2000'de bile 0.13. Hedef terimi m kat küçük kalıyor."}
+      - {name: "Sık hedef, log(m·q)", params: {V: 5000, m: 50, prop: 1, corr: 2, t: 1}, note: "Aynı hedef, log(m·q): yanlılık 0.026, m = 2000'de 0.015."}
+      - {name: "Düzgün öneri", params: {V: 5000, m: 50, prop: 0, corr: 2, t: 30}, note: "Düzgün q ile yanlılık 0.17: önem ağırlıkları çok değişken, model olasılığı yüksek kelimeler nadiren çekiliyor."}
+    questions:
+      - q: "Öneri dağılımı neden model dağılımına yakın olmalı?"
+        a: "Önem örneklemesinin varyansı, ağırlıkların (e^{z_s}/q_s) ne kadar dalgalandığına bağlıdır. q, model olasılığı yüksek kelimelere de yüksek olasılık verirse ağırlıklar dengelidir; düzgün q nadiren önemli kelimeleri çeker ve çektiğinde onlara dev ağırlık verir."
+      - q: "Çıkarımda neden yine tam softmax gerekir?"
+        a: "Çıkarımda doğru kelime bilinmez ve sözlüğün tamamı üzerinde bir dağılım (ya da en azından argmax) gerekir; örneklenmiş kayıp yalnız eğitim gradyanını ucuzlatır."
+    limits: "Tek bir gizli durum ve sabit, rastgele bir çıktı matrisi; modelin logitleri Zipf benzeri bir önyargı + rastgele terim. Gerçek eğitimde W ve h birlikte değişir ve örnekler genellikle batch içinde paylaşılır."
+  - id: l3
+    lab: beamlab
+    title: "Açgözlü, beam ve kesin arama: arama hatası ve kısa çıktı yanlılığı"
+    goal: |
+      Rastgele bigram dil modellerinde açgözlü çözümlemeyi, k genişlikli beam search'ü ve kesin aramayı (bigram modelde Viterbi ile) karşılaştır. Beam genişledikçe en olası diziyi kaçırma oranının nasıl düştüğünü, ama çıktıların nasıl kısaldığını ölç; uzunluk normalizasyonu α ile dengele.
+    predict:
+      q: "Beam genişliğini 5'ten 30'a çıkarınca (α = 0) ortalama çıktı uzunluğu ne olur?"
+      options:
+        - {t: "Uzar: daha çok aday daha iyi çeviri demektir", why: "Daha geniş arama, modelin skoruna göre daha iyi diziyi bulur; bu modeller kısa dizilere daha yüksek olasılık veriyor."}
+        - {t: "Kısalır", ok: true, why: "Ölçülen: 4.37 → 1.85 token (EOS dahil); boş çıktı oranı %35 → %38. k = 30'da beam kesin optimumu buluyor ve modellerin %38'inde optimum boş dizi."}
+        - {t: "Değişmez", why: "Arama genişledikçe sonuç modelin gerçek optimumuna yaklaşır; o da kısa."}
+    presets:
+      - {name: "Beam k = 5", params: {V: 12, sharp: 2, eos: 0, T: 15, k: 5, alpha: 0}, note: "Arama hatası %26.7, ortalama uzunluk 4.37, boş çıktı %35. Kesin optimum modellerin %38.3'ünde boş dizi."}
+      - {name: "Açgözlü", params: {k: 1, alpha: 0}, note: "Açgözlü modellerin %78.3'ünde optimumu kaçırıyor; çıktılar uzun (10.5 token) ve ortalama log p −10.1 (kesin optimum −2.55)."}
+      - {name: "Geniş beam", params: {k: 30, alpha: 0}, note: "k = 30: arama hatası 0, uzunluk 1.85, boş çıktı %38.3 (kesin optimumla aynı)."}
+      - {name: "Uzunluk normalizasyonu", params: {k: 30, alpha: 0.7}, note: "α = 0.7: uzunluk 5.77, boş çıktı %11.7. Beam bu skorla da optimumu %11.7 oranında kaçırıyor."}
+      - {name: "Seyrek EOS", params: {k: 5, alpha: 0, eos: -2}, note: "EOS logit'i −2: açgözlü ve beam uzun dizilere gidiyor (k = 5'te 11.4 token, arama hatası %73), ama kesin optimum yine modellerin %33'ünde boş dizi."}
+    questions:
+      - q: "k = 1 beam neden açgözlü çözümlemeyle aynıdır?"
+        a: "Her adımda tek hipotez tutulur ve onun tüm uzantılarından en olası olanı seçilir; bu tam olarak açgözlü kuraldır."
+      - q: "Kesin arama neden gerçek NMT modellerinde yapılamaz da burada yapılabiliyor?"
+        a: "Bigram modelde bir sonraki token yalnız bir öncekine bağlıdır; aynı tokenda biten önekler arasından yalnız en iyisini tutmak yeterlidir (Viterbi, O(T·V²)). RNN ve Transformer'ın durumu tüm öneke bağlıdır, bu indirgeme yoktur; Stahlberg ve Byrne kesin aramayı dal-sınır budamasıyla ve çok pahalı biçimde yaptı."
+    limits: "Bigram modeller rastgele: dil yapısı yok, yalnız olasılık profili. 'Arama hatası', beam'in aynı skor fonksiyonuyla kesin optimumdan düşük skor bulmasıdır. Son adımda (T) yalnız EOS'a izin veriliyor."
+  - id: l4
+    lab: alignattn
+    title: "Dikkat skorlarıyla hizalama öğrenmek: nokta, genel, toplamsal, tek nöron"
+    goal: |
+      Kaynak tokenların bir permütasyonla hedefe kopyalandığı bir görevde küçük bir dikkat modelini tarayıcıda eğit. Kodlayıcı yalnız token + konum, kod çözücü yalnız adım bilgisi taşıyor: hangi kaynağın okunacağını bulmak tamamen dikkatin işi. Dört skor fonksiyonunu karşılaştır, öğrenilen α haritasını gör.
+    predict:
+      q: "Slayttaki tarifteki gibi 'tek nöronlu' skor e = a·s_t + b·h_i ile model özdeşlik hizalamasını (y_t = x_t) öğrenebilir mi?"
+      options:
+        - {t: "Evet: özdeşlik en kolay hizalama", why: "Özdeşlik de adım t'de t. konumu okumayı gerektirir; α'nın t'ye bağlı olması gerekir."}
+        - {t: "Hayır: α her adımda aynı olur", ok: true, why: "a·s_t terimi softmax'ta sadeleşir. Ölçülen: α satırları arası std 0.000, doğruluk 0.34 (rastgele 0.10), hizalama doğruluğu 0.17 = 1/n."}
+        - {t: "Ancak d büyükse", why: "Boyut, a·s_t'nin i'ye bağlı olmamasını değiştirmez."}
+    presets:
+      - {name: "Bahdanau, ters hizalama", params: {kind: 2, task: 1, n: 6, V: 10, d: 12, steps: 300, lr: 0.03}, note: "Token ve hizalama doğruluğu 1.00; α haritası ters köşegen."}
+      - {name: "Tek nöron (tanh'sız)", params: {kind: 3, task: 1, n: 6, V: 10, d: 12, steps: 300, lr: 0.03}, note: "Doğruluk 0.34, hizalama 0.17, α satırları özdeş (std 0.000): her adım aynı karışımı okuyor."}
+      - {name: "Nokta, rastgele permütasyon", params: {kind: 0, task: 4, n: 6, V: 10, d: 12, steps: 300, lr: 0.03}, note: "Parametresiz nokta skoru da rastgele bir permütasyonu tam öğreniyor (1.00): Q[t]·P[i] konumları eşleştiriyor."}
+      - {name: "Dar nokta skoru", params: {kind: 0, task: 1, n: 6, V: 10, d: 4, steps: 300, lr: 0.03}, note: "d = 4 < n = 6: hizalama 0.97 ama token doğruluğu 0.84. Aynı 4 boyut hem token kimliğini hem konumu taşımak zorunda."}
+      - {name: "Çok dar", params: {kind: 2, task: 1, n: 6, V: 10, d: 2, steps: 300, lr: 0.03}, note: "d = 2: doğruluk 0.27. İki boyut 10 tokenı ayırt etmeye yetmiyor, hizalama doğru olsa bile kopyalanan içerik kayboluyor."}
+    questions:
+      - q: "Toplamsal skorda tanh neden gerekli? W₁h + W₂s'yi doğrudan v ile çarpsak ne olur?"
+        a: "vᵀ(W₁h + W₂s) = (W₁ᵀv)ᵀh + (W₂ᵀv)ᵀs: yine 'tek nöron' biçimine indirgenir; s'ye bağlı terim softmax'ta sadeleşir. Doğrusal olmayan katman, s ile h'nin çarpımsal etkileşimini sağlar."
+      - q: "Nokta skoru parametresiz olduğu hâlde neden öğrenebiliyor?"
+        a: "Skoru belirleyen vektörlerin kendisi (E, P, Q) öğreniliyor: model Q[t]'yi P[π(t)]'ye benzeyecek biçimde ayarlıyor. 'Genel' skordaki W, kodlayıcı ve kod çözücü uzayları farklıyken bu eşlemeyi ayrı bir matrise bırakır."
+    limits: "Kodlayıcı bağlamsız (RNN yok), kod çözücü önceki tokenı görmüyor; görev saf hizalama + kopyalama. Batch 16, Adam, tam gradyan elle türetildi (sayısal türevle 1e−10 düzeyinde doğrulandı). Sonuçlar tohum 1 içindir."

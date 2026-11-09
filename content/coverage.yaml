@@ -35,8 +35,8 @@ groups:
         topics: "kodlayıcı–kod çözücü NMT, çift yönlü RNN, beam search, Bahdanau/Luong attention, Transformer, konum kodlaması, ViT"
         pages: [m4-13-seq2seq, m4-6-attention, m4-7-transformer, m4-14-transformer-ed, m4-15-vit]
         status: genis
-        gap: "—"
-        done: "√d_k ölçekleme deneyi (softmax doyması ve entropi)."
+        gap: "Slayt 5–6 (LLM zaman çizelgesi görseli), 7–11 ve 31–44'teki mimari çizimler görüntü olduğu için metne dökülemedi; içerikleri slayt metninden ve orijinal makalelerden (Sutskever 2014, Bahdanau 2015, Luong 2015) yeniden kuruldu."
+        done: "√d_k ölçekleme deneyi (softmax doyması ve entropi). M4.13 konu anlatımı (slayt 2–44): öğretmen zorlaması = MLE türetimi, kaynak ters çevirme (Sutskever sayıları), maskeli kayıp ortalamaları, kovalama, örneklenmiş softmax ve log(m·q) düzeltmesinin türetimi, maruz kalma yanlılığında O(εT²) birikim türetimi, zamanlanmış örnekleme takvimleri, çift yönlü RNN (h_n tuzağı), beam search (slayt sayılarıyla ağaç, batch'li uygulama, uzunluk normalizasyonu, boş çeviri), Bahdanau ve Luong tam denklemleri, BLEU; padwaste, sampledsm, beamlab, alignattn deneyleri, 4 şekil. Slayt düzeltmeleri: dolgu sayımı 84/76 → 64/96 (%60); 'tek nöronlu yoğun katman' hizalama modeli adımdan bağımsız α verir (türetim + deney); 'negative sampling (or sampled softmax)' ayrımı; Luong'un concat karşılaştırması için nüans (basitleştirilmiş uygulama, Britz 2017)."
       - src: "ch_17 — Üretken modeller"
         topics: "AE ailesi (yığılmış, bağlı ağırlık, gürültü giderici, seyrek), VAE ve maliyet türetimi, KL, GAN ve maliyet türetimi, DCGAN, mod çöküşü, StyleGAN, DDPM"
         pages: [m5-6-autoencoders, m5-1-vae, m5-2-gan, m5-7-gan-advanced, m5-3-diffusion, m5-8-diffusion-guidance]
