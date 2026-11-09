@@ -194,3 +194,45 @@ pitfalls:
 whatif:
   - q: "Birleştirme sayısı 0 olursa? Sonsuz olursa?"
     a: "0: karakter (byte) düzeyi. Çok büyük: neredeyse kelime düzeyi; sık kelimeler tek token, nadirler yine parçalanır."
+
+labs:
+  - id: l1
+    lab: embedgeom
+    title: "Bir kategorik özniteliğin embedding'i eğitimle nasıl düzenlenir?"
+    goal: |
+      ocean_proximity benzeri 5 kategori, 2-B embedding, iki hedef (fiyat, kıyıya yakınlık). Rastgele başlayan vektörlerin eğitimle benzer kategorileri yaklaştırıp farklı olanları uzaklaştırdığını ve nadir bir kategorinin az güncelleme aldığını gör.
+    predict:
+      q: "ISLAND örneklerin yalnız %0.2'si. Eğitimden sonra ISLAND'ın embedding'i için ne beklersin?"
+      options:
+        - {t: "Diğerleri kadar iyi yerleşir", why: "Gradyan yalnız batch'te görülen satırlara düşer; ISLAND nadiren görülür."}
+        - {t: "Başlangıç noktasına yakın kalır", ok: true, why: "Çok az güncelleme alır: nadir tokenların embedding'leri de bu yüzden zayıf öğrenilir."}
+        - {t: "Sıfıra gider", why: "Sıfıra çeken bir terim (ör. weight decay) yok."}
+    presets:
+      - {name: "Varsayılan", params: {epochs: 8, lr: 0.05, init: 0.5, noise: 0.3, island: 0.002}, note: "NEAR OCEAN ile NEAR BAY arası 0.32 → 0.12; NEAR BAY ile INLAND arası 1.29 → 1.59."}
+      - {name: "Çok kısa eğitim", params: {epochs: 0.05}, note: "Neredeyse hiç güncelleme yok: embedding'ler rastgele başlangıçlarında."}
+      - {name: "ISLAND sık", params: {island: 0.1}, note: "%9 payla ISLAND da yerine oturuyor."}
+      - {name: "Küçük öğrenme oranı", params: {lr: 0.005}, note: "Düzenlenme yavaş: 8 epoch'ta yarı yolda."}
+    questions:
+      - q: "Eğitim sonrası embedding'lerin eksenlerinin bir anlamı var mı?"
+        a: "Hayır: model yalnız W·e'yi gördüğü için e'nin herhangi bir tersinir doğrusal dönüşümü W ile telafi edilebilir. Anlamlı olan göreli konumlar (benzerlerin yakınlığı), eksen yönleri değil."
+    limits: "Yapay hedefler, 5 kategori, doğrusal model, mini-batch SGD. Gerçek kelime embedding'leri yüz binlerce token ve yüzlerce boyutla, dil modelleme gibi görevlerle öğrenilir."
+  - id: l2
+    lab: bpeviz
+    title: "BPE adım adım: birleştir, tekrarla, kodla"
+    goal: |
+      Derlemdeki en sık komşu sembol çiftini birleştir ve tekrarla. Çift sıklık tablosunu, öğrenilen birleştirme listesini ve kelimelerin tokenlarını her adımda gör; kendi derlemini yaz; öğrenilen birleştirmelerle görülmemiş bir kelimeyi kodla.
+    predict:
+      q: "low 5, lower 2, newest 6, widest 3. İlk birleştirme hangisi olur?"
+      options:
+        - {t: "l + o", why: "l-o çifti 5 + 2 = 7 kez."}
+        - {t: "e + s", ok: true, why: "newest (6) ve widest (3): 9 kez. (s, t) ve (t, ␣) da 9; eşitlikte ilk görülen seçilir."}
+        - {t: "w + e", why: "lower (2) ve newest (6): 8 kez."}
+    presets:
+      - {name: "Sennrich, 3 birleştirme", params: {corpus: 0, k: 3, test: "lowest"}, note: "es, est, est␣: kelime sonu eki 'est' tek token oldu."}
+      - {name: "Sennrich, 10 birleştirme", params: {corpus: 0, k: 10, test: "lowest"}, note: "low␣ · low e r ␣ · newest␣ · wi d est␣; 'lowest' → low + est␣."}
+      - {name: "Türkçe, 12 birleştirme", params: {corpus: 1, k: 12, test: "evlerden"}, note: "ev, kitap, lar, de␣: kökler ve ekler kendiliğinden ayrışıyor; 'evlerden' görülmemiş ama 'evler' + parçalar."}
+      - {name: "Tekrar eden heceler", params: {corpus: 2, k: 4, test: "ananas"}, note: "'an' ve 'ana' gibi alt dizgiler önce birleşiyor."}
+    questions:
+      - q: "Birleştirme sayısını artırmanın bedeli nedir?"
+        a: "Sözlük büyür (embedding matrisi ve softmax katmanı büyür), nadir tokenlar az örnekle öğrenilir; karşılığında diziler kısalır (daha az hesap, daha uzun bağlam). Pratik sözlükler 30–200 bin token civarındadır."
+    limits: "Karakter düzeyi BPE, küçük derlem, eşitlikte ilk görülen çift. Üretim tokenleştiricileri bayt düzeyinde çalışır, ön bölme kuralları (boşluk, noktalama, sayılar) uygular ve milyonlarca kelimelik derlemle eğitilir."
