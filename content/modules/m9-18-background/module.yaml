@@ -98,3 +98,168 @@ homework:
       - "Anlamsal ağın çalışmadığı karelerde son kararların piksel başına yeniden kullanımı."
     accept:
       - "k = 1, 2, 5 için F ve FPS tablosu; anlamsal bilginin hayalet ve gölge hatalarını azalttığını gösteren örnekler."
+
+labs:
+  - id: l1
+    lab: bgsub
+    title: "Dört arka plan modeli aynı sahnede: kare farkı, üstel ortalama, GMM, ViBe"
+    goal: |
+      Dokulu arka plan, salınan bir ağaç bölgesi, yürüyen bir nesne ve kare 20'de gelip 90'da duran ikinci bir nesne içeren 160 karelik yapay videoda dört yöntemin ön plan maskelerini yer gerçeğiyle karşılaştır. Kesinlik, duyarlılık, F1, ağaç bölgesindeki yanlış ön plan oranı ve duran nesnenin ne kadarının ön plan kaldığını ölç; dinamik arka plan, aydınlatma, titreme ve gürültüyü değiştir.
+    predict:
+      q: "Hangi yöntem salınan ağaç bölgesinde en az yanlış ön plan üretir?"
+      options:
+        - {t: "ViBe", why: "ViBe %9.3: sabit R ile salınımın uç değerleri bazen örneklerin dışında kalıyor."}
+        - {t: "GMM", ok: true, why: "%0.6: salınımın iki kipi ayrı Gauss bileşenleri olarak öğreniliyor. Ama α = 0.02 ile yavaş yürüyen nesneyi de kısmen arka plana katıyor (duyarlılık 0.52); F1'de ViBe önde."}
+        - {t: "Üstel ortalama", why: "%44: tek ortalama iki kipin arasına düşüyor."}
+    presets:
+      - {name: "ViBe", params: {meth: 3, R: 0.08, phi: 16, dyn: 1, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "F1 0.83; ağaçta %9.3; duran nesne ön plan kalıyor (0.999)."}
+      - {name: "Kare farkı", params: {meth: 0, T: 0.08, dyn: 1, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "F1 0.04: yalnız kenarlar."}
+      - {name: "Üstel ortalama", params: {meth: 1, T: 0.08, alpha: 0.02, dyn: 1, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "F1 0.42; ağaçta %44."}
+      - {name: "GMM, α = 0.02", params: {meth: 2, alpha: 0.02, dyn: 1, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "Ağaçta %0.6; duran nesne arka plana karıştı (0.09)."}
+      - {name: "GMM, α = 0.002", params: {meth: 2, alpha: 0.002, dyn: 1, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "F1 0.76; ağaçta %6.5; duran nesnenin 0.76'sı ön plan."}
+      - {name: "ViBe φ = 1", params: {meth: 3, R: 0.08, phi: 1, dyn: 1, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "F1 0.88; duran nesnenin yarısı arka plana karıştı."}
+      - {name: "ViBe, dar R", params: {meth: 3, R: 0.03, phi: 16, dyn: 1, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "F1 0.44: gürültü ve salınım ön plan sayılıyor."}
+      - {name: "Durgun arka plan", params: {meth: 3, R: 0.08, phi: 16, dyn: 0, illum: 0.1, jit: 0, noise: 0.02, show: 120}, note: "ViBe F1 0.98."}
+      - {name: "Güçlü aydınlatma değişimi", params: {meth: 3, R: 0.08, phi: 16, dyn: 1, illum: 0.4, jit: 0, noise: 0.02, show: 120}, note: "F1 0.28: sabit R örneklerin yenilenmesinden hızlı değişime yetişemiyor."}
+      - {name: "Kamera titremesi", params: {meth: 3, R: 0.08, phi: 16, dyn: 1, illum: 0.1, jit: 1, noise: 0.02, show: 120}, note: "F1 0.73: komşu örnekler kaymaların bir kısmını yakalıyor."}
+    questions:
+      - q: "GMM'de α'yı 0.02'den 0.002'ye indirmek F1'i artırıyor ama ağaçtaki yanlış ön planı %0.6'dan %6.5'e çıkarıyor. Neden ikisi birlikte değişiyor?"
+        a: "α hem yeni kiplerin ağırlık kazanma hızını hem de arka plan bileşenlerinin uyum hızını belirler. Küçük α ile yürüyen nesnenin geçici değerleri arka plan bileşeni olacak ağırlığa ulaşamaz (duyarlılık artar), ama ağacın ikinci kipi de yavaş öğrenilir ve uzun süre ön plan sayılır. Tek bir öğrenme oranı iki farklı zaman ölçeğine aynı anda uyamaz."
+    limits: "64 × 64, 160 kare yapay video; gri seviye; GMM K = 3, ρ ≈ α/w; ViBe N = 20, #min = 2; F1 kare 30–159 üzerinde, son işlem (morfoloji) yok."
+  - id: l2
+    lab: vibeghost
+    title: "ViBe: hayalet sönümlemesi ve hafızasız güncellemenin örnek ömrü"
+    goal: |
+      Model, ortasında bir nesne bulunan ilk kareden başlatılıyor; nesne üçüncü karede ayrılıyor. Geride kalan hayaletin uzamsal yayılımla nasıl eridiğini izle ve modelde kalan başlangıç örneklerinin oranını ((N − 1)/N)^(ut/φ) kuramıyla karşılaştır (u = 1 yayılımsız, u = 2 yayılımla).
+    predict:
+      q: "Uzamsal yayılım kapatılırsa hayalete ne olur?"
+      options:
+        - {t: "Daha hızlı söner; komşular karışmaz", why: "Hayaletin içindeki pikseller ön plan sayıldığı için kendi modellerini hiç güncellemez."}
+        - {t: "Hiç sönmez", ok: true, why: "Tutucu güncellemede kilitlenme: 300 karede yarıya bile inmiyor. Yayılımla 126. karede yarıya iniyor."}
+        - {t: "Aynı hızda söner", why: "Hayaleti eriten tek mekanizma, kenardaki arka plan piksellerinin değerlerini içeri taşıyan yayılım."}
+    presets:
+      - {name: "Ders değerleri", params: {N: 20, min: 2, R: 0.08, phi: 16, diff: 1, show: 60}, note: "Hayalet 126. karede yarıya; kalma oranı 0.151 (kuram 0.147)."}
+      - {name: "Yayılımsız", params: {N: 20, min: 2, R: 0.08, phi: 16, diff: 0, show: 60}, note: "Hayalet kalıcı; kalma oranı 0.391 (kuram 0.383)."}
+      - {name: "φ = 4", params: {N: 20, min: 2, R: 0.08, phi: 4, diff: 1, show: 60}, note: "34. karede yarıya, 96. karede %5'in altında."}
+      - {name: "φ = 1", params: {N: 20, min: 2, R: 0.08, phi: 1, diff: 1, show: 20}, note: "11. karede yarıya: hızlı, ama duran nesneleri de hızla yutar."}
+      - {name: "φ = 64", params: {N: 20, min: 2, R: 0.08, phi: 64, diff: 1, show: 60}, note: "Hayalet kalıcı; kalma oranı 0.622."}
+      - {name: "#min = 1", params: {N: 20, min: 1, R: 0.08, phi: 16, diff: 1, show: 60}, note: "62. karede yarıya: tek bir arka plan örneği yetiyor."}
+      - {name: "#min = 5", params: {N: 20, min: 5, R: 0.08, phi: 16, diff: 1, show: 60}, note: "Hayalet 300 karede yarıya inmiyor."}
+    questions:
+      - q: "#min'i 2'den 1'e indirmek hayaleti neden iki kat hızlı eritiyor ve bunun bedeli ne?"
+        a: "Hayaletin içindeki bir piksel, yayılımla modeline tek bir gerçek arka plan örneği girdiğinde arka plan sayılır; #min = 2'de iki örnek gerekir ve bunun olasılığı çok daha düşüktür. Bedel: gürültülü ya da dinamik bölgelerde tek bir rastgele benzer örnek de pikseli arka plan yapar, ön plan nesnelerinin parçaları kaybolur (duyarlılık düşer)."
+    limits: "48 × 48, 300 kare; tek bir başlatma hayaleti; kuram sınır etkilerini ve yayılımın arka plan olmayan komşulardan gelmemesini yok sayar."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: ViBe sınıflandırması
+    goal: Yarıçap içindeki örnekleri saymak
+    needs: $|v-s|<R$, $\#_{\min}$
+    q: |-
+      Örnekler $[50,62,71,90,55,58]$, güncel değer 60, $R=8$, $\#_{\min}=2$. Sınıf? Döngü kaç karşılaştırmadan sonra durur?
+    solution: |-
+      $|60-50|=10$ (hayır), $|60-62|=2$ (evet, sayı 1), $|60-71|=11$, $|60-90|=30$, $|60-55|=5$ (evet, sayı 2): $\#_{\min}$'e ulaşıldı, döngü 5. karşılaştırmada durur; 58 hiç sınanmaz. Arka plan. Sonra $1/\phi$ olasılıkla rastgele bir örnek 60 ile değiştirilir ve ayrı bir çekilişle $1/\phi$ olasılıkla bir komşunun modeline 60 yazılır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: ViBe örneklerinin ortalama ömrü
+    goal: Hafızasız güncellemenin hızını hesaplamak
+    needs: Silinme olasılığı kare başına $u/(N\phi)$
+    q: |-
+      $N=25$, $\phi=8$, uzamsal yayılım açık. Bir arka plan örneğinin modelde ortalama kaç kare kaldığı?
+    answer: 100
+    calc: "25*8/2"
+    tol: 0
+    mistakes:
+      - {answer: 200, msg: "Bu yayılımsız ömür: yayılım güncelleme hızını iki katına çıkarır."}
+      - {answer: 25, msg: "φ unutuldu: güncelleme her karede değil, 1/φ olasılıkla."}
+    hints:
+      - "Kare başına silinme olasılığı $2/(N\\phi)$; üstel dağılımın ortalaması bunun tersidir."
+    solution: |-
+      $N\phi/2=100$ kare (yarı ömür $\approx69$).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Üstel ortalamanın yarı ömrü
+    goal: Geometrik azalmayı yorumlamak
+    needs: $(1-\alpha)^t=0.5$
+    q: |-
+      $\alpha=0.05$ ile bir değerin arka plan ortalamasındaki ağırlığı kaç karede yarıya iner?
+    answer: 13.513407
+    calc: "math.log(0.5)/math.log(0.95)"
+    tol: 0.001
+    mistakes:
+      - {answer: 20, msg: "1/α ortalama yaştır (yaklaşık), yarı ömür değil."}
+      - {answer: 13.862944, msg: "0.693/α yaklaşımı; kesin değer ln 0.5 / ln 0.95."}
+    hints:
+      - "$t=\\ln0.5/\\ln(1-\\alpha)$."
+    solution: |-
+      $-0.6931/-0.05129=13.51$ kare.
+  - id: p4
+    type: hesap
+    level: 2
+    title: GMM'de arka plan bileşenleri
+    goal: w/σ sıralaması ve T eşiğini uygulamak
+    needs: $w/\sigma$ sırası, $\sum w>T$
+    q: |-
+      Bir pikselin bileşenleri: $w=(0.5,0.3,0.2)$, $\sigma=(2,6,1)$; $T=0.6$. Arka plan sayılan bileşenlerin toplam ağırlığı?
+    answer: 0.7
+    calc: "0.5+0.2"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.8, msg: "Yalnız w'ye göre sıralandı; ölçüt w/σ: (0.25, 0.05, 0.2)."}
+      - {answer: 0.5, msg: "0.5 < T = 0.6: eşiği geçene kadar devam edilir."}
+    hints:
+      - "$w/\\sigma=(0.25,0.05,0.2)$: sıra 1, 3, 2."
+    solution: |-
+      Sıra: bileşen 1 (0.25), bileşen 3 (0.2), bileşen 2 (0.05). Toplam 0.5 < 0.6, sonra 0.7 > 0.6: arka plan = {1, 3}, ağırlık 0.7. Geniş ve seyrek görülen bileşen 2 ön plandır.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Otoparkta hayalet
+    goal: Tutucu güncelleme ve yayılımın sonuçlarını yorumlamak
+    needs: Hayalet, yayılım, φ
+    q: |-
+      Bir otopark kamerasında ViBe çalışıyor. Bir araç park ediyor, 40 dakika sonra maskeden kayboluyor; araç ayrıldığında boş park yeri birkaç dakika boyunca araç biçiminde "ön plan" görünüyor. En iyi açıklama?
+    choices:
+      - {t: "Gölge tespiti eksik", why: "Gölge aracın yanında olur, boş yerin tamamında değil."}
+      - {t: "Yayılım, duran aracı yavaş yavaş arka plan modeline kattı; araç gidince modelde araç değerleri kaldı ve boş zemin hayalet olarak göründü; aynı yayılım bu hayaleti de kenarlardan eritiyor", ok: true, why: "Duran nesnenin emilmesi ve hayaletin sönmesi aynı mekanizmanın iki yüzü."}
+      - {t: "Kamera titriyor", why: "Titreme bütün karede dağınık yanlış ön plan üretir, araç biçiminde değil."}
+    hints:
+      - "Araç neden önce kayboldu?"
+    solution: |-
+      Uygulamaya göre seçim: park eden aracın ön plan kalması isteniyorsa φ büyütülür ya da ön plan kenarlarında yayılım engellenir (ViBe+); hayaletlerin hızlı sönmesi isteniyorsa φ küçültülür. İkisini birden sağlamak için nesne düzeyinde bilgi (izleme ya da anlamsal bölütleme, RT-SBS) gerekir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Doğrusal özyinelemenin taranabilirliği
+    goal: Bileşim işleminin birleşmeli olduğunu göstermek
+    needs: Afin fonksiyonların bileşimi
+    q: |-
+      $f_t(B)=a_tB+b_t$ ve $(a_2,b_2)\circ(a_1,b_1)=(a_2a_1,a_2b_1+b_2)$ olsun. (a) Bu işlemin $f_2\circ f_1$'e karşılık geldiğini ve birleşmeli olduğunu gösterin. (b) Önek bileşiminin $B_0$'a uygulanmasının $B_t$'yi verdiğini ve sabit $a$ için $B_t=a^tB_0+\sum_ka^{t-k}b_k$ olduğunu gösterin.
+    rubric:
+      - "$f_2(f_1(B))=a_2a_1B+a_2b_1+b_2$ hesabını yaptım"
+      - "Birleşmeliliği fonksiyon bileşiminin birleşmeliliğinden ya da doğrudan iki tarafı açarak gösterdim"
+      - "Tümevarımla önek bileşiminin $(\\prod a,\\sum_k(\\prod_{j>k}a_j)b_k)$ olduğunu gösterdim"
+      - "Birleşmeliliğin paralel taramayı (sırayı değil gruplamayı serbest bırakarak) mümkün kıldığını açıkladım"
+    hints:
+      - "Afin fonksiyonların bileşimi yine afindir."
+    solution: |-
+      (a) Fonksiyon bileşimi birleşmelidir; çift gösterimi bunun bir temsilidir. İki taraf da $(a_3a_2a_1,a_3a_2b_1+a_3b_2+b_3)$ verir. (b) $t=1$ için açık; $t\to t+1$: $(a_{t+1},b_{t+1})\circ(A_t,C_t)=(a_{t+1}A_t,a_{t+1}C_t+b_{t+1})$. Sabit $a$ için $A_t=a^t$, $C_t=\sum_ka^{t-k}b_k$. Birleşmelilik, çiftleri herhangi bir ağaç düzeninde birleştirmeye izin verir: derinlik $\lceil\log_2T\rceil$.
+pitfalls:
+  - wrong: "ViBe parametresiz olduğu için ayarlanacak bir şey yoktur."
+    right: "\"Parametresiz\" modelin biçimini anlatır (yoğunluk yerine örnekler). N, R, #min ve φ sonucu belirgin değiştirir (lab l1: R = 0.03'te F1 0.44, 0.08'de 0.83)."
+  - wrong: "Tutucu (yalnız arka planda) güncelleme her zaman daha iyidir."
+    right: "Ön planın modele karışmasını önler ama yanlış ön plan bölgeleri hiç güncellenmez: kilitlenme ve kalıcı hayaletler. ViBe'nin uzamsal yayılımı bu kilitlenmeyi çözer (lab l2: yayılımsız hayalet kalıcı)."
+  - wrong: "Kare farkı hareketli nesnelerin tamamını bulur."
+    right: "Yalnız değişen pikselleri bulur: tekdüze nesnenin içi ve duran nesne kaybolur (lab l1: F1 0.04)."
+  - wrong: "ViBe'de en eski örneği değiştirmek (FIFO) daha doğru bir zaman penceresi verir."
+    right: "FIFO sabit bir pencere (Nφ kare) verir ve o süreden eski her şeyi unutur. Rastgele yer değiştirme üstel bir ömür dağılımı verir: model aynı bellekle hem yakın hem uzak geçmişi temsil eder."
+whatif:
+  - q: "Kamera sabit değil, yavaşça dönen bir PTZ kamera olsaydı?"
+    a: "Bütün piksel modelleri sahnenin farklı noktalarını karşılaştırır ve kare neredeyse tamamen ön plan olur. Önce küresel hareket kestirilip (M9.17: öznitelik + RANSAC ile homografi) kareler hizalanmalı, modeller kamerayla birlikte bükülmeli; görüş alanına yeni giren bölgeler yeniden başlatılmalı."
+  - q: "Odadaki ışık bir anda açılsaydı?"
+    a: "Bütün kare ön plan olur ve tutucu güncelleme yalnız yayılım ve rastgele eşleşmelerle yavaşça toparlanır. Pratik çözümler: ön plan oranı bir eşiği (ör. %70) aşınca modeli yeniden başlatmak, ya da sınıflandırmadan önce küresel kazancı normalize etmek (karenin ortanca parlaklığını modelinkine eşlemek)."
+  - q: "Gürültülü bir gece (IR) kamerasında aynı R kullanılsa?"
+    a: "Gürültü std'si R'ye yaklaşınca arka plan piksellerinin çoğu ön plan sayılır (lab l1: dar R'de F1 0.44). R gürültüyle ölçeklenmeli; PBAS gibi yöntemler R'yi ve güncelleme oranını her piksel için örnekler arasındaki ortalama uzaklığa göre uyarlar."
