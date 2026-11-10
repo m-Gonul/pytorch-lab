@@ -93,3 +93,143 @@ homework:
     accept:
       - "Her optimizasyon adımında ölçülen hızlanma ve trafik azalması tablosu."
       - "Düşük doluluk + yüksek ILP'nin yüksek doluluktan hızlı olabildiği bir örnek."
+
+labs:
+  - id: l1
+    lab: coalesce
+    title: "Bellek birleştirme: bir warp kaç sektör getirir?"
+    goal: |
+      Bir warp'ın 32 thread'inin eriştiği adresleri 32 baytlık sektörlere düşür. Adım, başlangıç kayması ve eleman boyuyla getirilen bayt ile gereken baytın oranını (verim) izle. Aynı deneyde N elemanlık bir dizi için block sayısını ve sınır kontrolüne takılan thread'leri hesapla.
+    predict:
+      q: "fp32, thread'ler arası adım 32 eleman. Verim ne olur?"
+      options:
+        - {t: "%100", why: "Yalnız adım 1'de."}
+        - {t: "%50", why: "Bu adım 2."}
+        - {t: "%12.5", ok: true, why: "Her thread ayrı bir sektöre düşer: 32 sektör × 32 bayt = 1024 bayt getirilir, 128 bayt kullanılır."}
+    presets:
+      - {name: "Birleşik", params: {stride: 1, offset: 0, es: 2, N: 1000, bd: 3}, note: "fp32: 4 sektör, verim %100. Izgara: 4 block, 24 boşta thread (el hesabı)."}
+      - {name: "Adım 2", params: {stride: 2}, note: "8 sektör, verim %50."}
+      - {name: "Sütun okuma", params: {stride: 32}, note: "32 sektör, verim %12.5: satır-ana matriste sütun boyunca thread atamak."}
+      - {name: "Hizasız", params: {offset: 1}, note: "5 sektör, verim %80."}
+      - {name: "fp64, adım 4", params: {es: 3, stride: 4}, note: "32 sektör, verim %25."}
+    questions:
+      - q: "Satır-ana bir matrisin transpozesini yazan bir çekirdek, okumayı da yazmayı da nasıl birleşik yapar?"
+        a: "Bir tile'ı satır boyunca (birleşik) shared memory'ye okur, shared memory içinde indeksleri değiştirerek okur ve çıktıya yine satır boyunca (birleşik) yazar. Shared memory'de banka çakışmalarını önlemek için tile'a bir sütun dolgu eklenir (T × (T + 1))."
+    limits: "Yalnız sektör sayımı; önbellek, banka çakışmaları ve işlem sayısı modellenmedi. Sektör boyu 32 bayt (NVIDIA'nın yeni mimarileri)."
+  - id: l2
+    lab: tilecount
+    title: "Döşenmiş matris çarpımı: okumaları say"
+    goal: |
+      n × n matris çarpımında global bellek okumalarını naif çekirdek ve T × T döşemeyle karşılaştır (küçük n'de döngüyle sayılır). Shared memory kullanımını, thread sınırını ve tile'ın aritmetik yoğunluğunu (T / eleman boyu) donanımın dirsek noktasıyla karşılaştır.
+    predict:
+      q: "fp32'de, thread başına bir çıktıyla (T ≤ 32), A100'ün fp32 dirseğine (≈ 10 FLOP/bayt) ulaşılabilir mi?"
+      options:
+        - {t: "Evet, T = 32 ile", why: "T = 32'de yoğunluk 32/4 = 8 < 10."}
+        - {t: "Hayır; yazmaç döşemesi gerekir", ok: true, why: "T ≥ 40 gerekir ama 1024 thread sınırı T'yi 32'de tutar. Her thread birden çok çıktı biriktirirse etkin tile büyür."}
+        - {t: "Döşeme yoğunluğu değiştirmez", why: "Yoğunluk T ile doğrusal artar."}
+    presets:
+      - {name: "El hesabı", params: {logn: 2, logT: 1, es: 1, smem: 48, ridge: 10}, note: "4 × 4, T = 2: 64 okuma (naif 128)."}
+      - {name: "Naif", params: {logn: 2, logT: 0}, note: "128 okuma."}
+      - {name: "T = 32", params: {logn: 5, logT: 5}, note: "32 kat az okuma, 8 KiB shared memory, 1024 thread; yoğunluk 8 < 10."}
+      - {name: "T = 64", params: {logn: 10, logT: 6}, note: "4096 thread gerekir (sınır 1024): yazmaç döşemesi olmadan yapılamaz; yoğunluk 16."}
+      - {name: "bf16, tensör çekirdeği dirseği", params: {es: 0, logT: 5, ridge: 150}, note: "Yoğunluk 16, dirsek 150: tensör çekirdeklerini doyurmak için çok daha büyük etkin tile'lar gerekir."}
+    questions:
+      - q: "Shared memory döşemesi okumaları T kat azaltıyorsa neden T'yi olabildiğince büyütmüyoruz?"
+        a: "Üç sınır var: block başına thread (1024), block başına shared memory (2T² × eleman boyu) ve doluluk: büyük tile'lı block'lar SM başına daha az block çalıştırabilir, gecikme gizlenemez. Hızlı çekirdekler bu yüzden orta boy shared tile'ları yazmaç döşemesiyle birleştirir."
+    limits: "Global okuma sayımı; önbellek isabetleri, birleşme ve hesap süresi modellenmedi. n, T'ye bölünür."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Izgara boyutu
+    goal: Block sayısını ve global indeksi hesaplamak
+    needs: ⌈N / blockDim⌉
+    q: |-
+      $N=5000$ elemanlı bir vektör, `blockDim.x = 128`. Kaç block gerekir, kaç thread boşta kalır, `blockIdx.x = 10`, `threadIdx.x = 100` hangi elemanı işler?
+    solution: |-
+      $\lceil5000/128\rceil=40$ block, $40\cdot128=5120$ thread, $120$ boşta. İndeks $10\cdot128+100=1380$.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Döşenmiş okumalar
+    goal: 2n³/T formülünü uygulamak
+    needs: Döşeme
+    q: |-
+      $n=256$, $T=16$. Global okuma sayısı (eleman)?
+    answer: 2097152
+    calc: "2*256**3/16"
+    tol: 0
+    mistakes:
+      - {answer: 33554432, msg: "Bu naif sayı: 2n³."}
+      - {answer: 131072, msg: "T² ile değil T ile bölünür."}
+    hints:
+      - "$2n^3/T$."
+    solution: |-
+      $2\cdot256^3/16=2\,097\,152$; naife göre 16 kat az.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Adımlı erişimin verimi
+    goal: Sektör sayımını uygulamak
+    needs: 32 baytlık sektörler
+    q: |-
+      bf16 (2 bayt), adım 4 eleman, hizalı. Bir warp kaç sektör getirir?
+    answer: 8
+    calc: "32*4*2/32"
+    tol: 0
+    mistakes:
+      - {answer: 2, msg: "Bu adım 1: 64 bayt = 2 sektör."}
+      - {answer: 32, msg: "Thread'ler arası boşluk 8 bayt; dört thread bir sektörü paylaşır."}
+    hints:
+      - "Adresler 0, 8, 16, …, 248."
+    solution: |-
+      Adres aralığı 0–255 bayt: 8 sektör. Gereken 64 bayt, getirilen 256: verim %25 (= 1/adım).
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Çekirdek bazen yanlış sonuç veriyor
+    goal: Sınır kontrolü ve bitişiklik hatasını tanımak
+    needs: TORCH_CHECK, sınır kontrolü
+    q: |-
+      Kendi yazdığınız bir CUDA uzantısı `x` için doğru, ama `x.T` (transpoze görünüm) verilince yanlış sonuç veriyor. Neden ve düzeltme?
+    choices:
+      - {t: "CUDA transpozeyi desteklemez", why: "Destekler; sorun bellek düzeni."}
+      - {t: "x.T bitişik değil; data_ptr satır-ana düzen varsayıyor. TORCH_CHECK(x.is_contiguous()) ekle ya da sarmalayıcıda x.contiguous() çağır", ok: true, why: "Görünüm aynı depoyu farklı adımlarla okur."}
+      - {t: "Sınır kontrolü eksik", why: "Boyutlar aynı; sorun adımlar."}
+    hints:
+      - "x.T.stride() nedir?"
+    solution: |-
+      Transpoze görünüm verinin kopyasını almaz; yalnız adımları değiştirir. Ham işaretçiyle satır-ana indeksleme yanlış elemanları okur. Girdileri denetlemek (TORCH_CHECK) ya da contiguous() ile kopyalamak gerekir.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Tile'ın aritmetik yoğunluğu
+    goal: T / e formülünü türetmek
+    needs: FLOP ve bayt sayımı
+    q: |-
+      T × T döşemeli matris çarpımında bir block'un bir k adımında yaptığı FLOP'u ve taşıdığı baytı say; yoğunluğun $T/e$ olduğunu ve global okumaların $2n^3/T$ olduğunu göster.
+    rubric:
+      - "Adım başına 2T² eleman (iki tile) yüklendiğini yazdım"
+      - "Adım başına T² çıktının her biri için T çarpma-toplama: 2T³ FLOP"
+      - "Oranı 2T³ / (2T² e) = T / e olarak buldum"
+      - "Block × adım sayısıyla toplam okumayı (n/T)² · (n/T) · 2T² = 2n³/T olarak çarptım"
+    hints:
+      - "Block sayısı $(n/T)^2$, adım sayısı $n/T$."
+    solution: |-
+      Adım başına $2T^2$ eleman, $2T^3$ FLOP: $\frac{2T^3}{2T^2e}=T/e$. Toplam okuma $(n/T)^3\cdot2T^2=2n^3/T$. İkisi de T ile doğrusal: tile büyüdükçe her yüklenen eleman daha çok kullanılır.
+pitfalls:
+  - wrong: "Daha çok thread her zaman daha hızlıdır."
+    right: "Thread başına iş çok azsa ek yük baskın olur; bellek bağımlı bir çekirdek bant genişliğiyle sınırlıdır. Hız, birleşik erişim ve veri yeniden kullanımından gelir."
+  - wrong: "Block'lar sırayla çalışır, bir block diğerinin sonucunu okuyabilir."
+    right: "Block'lar bağımsızdır ve herhangi bir sırada çalışabilir; block'lar arası iletişim ancak çekirdek sınırında (ya da atomiklerle) mümkündür."
+  - wrong: "data_ptr ile her tensör satır-ana okunabilir."
+    right: "Görünümler (transpoze, dilim) bitişik olmayabilir; adımları dikkate almak ya da contiguous() ile kopyalamak gerekir."
+  - wrong: "CUDA çekirdeği bir hata verdiyse hata o satırda görünür."
+    right: "Çekirdekler eşzamansız başlar; hata sonraki bir eşzamanlamada (ör. .item() ya da .cpu()) görünür. CUDA_LAUNCH_BLOCKING=1 hata ayıklamada yardımcı olur."
+whatif:
+  - q: "blockDim 32'nin katı olmasaydı (ör. 100)?"
+    a: "Warp'lar 32'şer gruplanır; son warp 4 thread'le çalışır ama bir warp'lık kaynak tutar. Doluluk ve verim düşer; blockDim genellikle 32'nin katı seçilir."
+  - q: "Shared memory'ye yükledikten sonra __syncthreads() unutulsaydı?"
+    a: "Bazı thread'ler tile tam yüklenmeden hesaba başlar ve henüz yazılmamış (ya da önceki adımın) değerleri okur: sonuç rastgele yanlış olur, yarış durumu."
+  - q: "Aynı çekirdek bf16 yerine fp32 ile çalışsaydı?"
+    a: "Taşınan bayt iki katına çıkar; bellek bağımlıysa süre de yaklaşık iki katına çıkar. Tensör çekirdekleri bf16'da çok daha yüksek tepe verir; fp32'de (tf32 kapalıysa) CUDA çekirdekleriyle sınırlı kalınır."
