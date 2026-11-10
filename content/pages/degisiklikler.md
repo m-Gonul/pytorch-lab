@@ -1,5 +1,21 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 8
+
+Faz 8'in iki proje modülüne tam konu anlatımı yazıldı. İkisi de önceki fazların araçlarını tek bir çalışan sistemde birleştiriyor; anlatım projenin her adımını (bütçe, biçim, eğitim, değerlendirme, profil) gerekçeleriyle veriyor.
+
+| modül | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|
+| M8.1 mini-LLM | 2 | budget, mfu | 6ND (ileri 2N, geri 4N), Chinchilla eş-FLOP eğrisi, ters cevabın gerekçesi, sabit tahmin tabanı (1.766 nat/konum), ısınma + kosinüs, MFU |
+| M8.2 bitirme projesi | 2 | emalab, pairboot | difüzyon U-Net'inin parçaları, EMA penceresi 1/(1 − β), CFG'nin NFE maliyeti, Dice, eşleştirilmiş bootstrap'ın varyans kazancı √(1 − ρ) |
+
+- **Ölçümle düzeltilen ya da anlatıma giren sonuçlar:**
+  - M8.1: Chinchilla yaklaşım 3 katsayılarının "her ölçekte daha büyük model önerdiği" ilk notu yanlıştı; 10⁷ parametrede biraz büyük, Chinchilla bütçesinde (6·10²³ FLOP) 3.2·10¹⁰ ile daha küçük çıktı (makale yaklaşım 3 için 40 milyar bildirir). Not ölçeğe göre koşullu yazıldı. MFU deneyinde GPT-2 small yapılandırması N ≈ 1.243·10⁸ veriyor (gerçek 124 439 808).
+  - M8.2: EMA deneyinde "yarı yola gecikme" ilk tanımı (0.5 eşiği) büyük β'da anlamsızdı; sıçrama anındaki değerden ölçülecek biçimde değiştirildi ve gecikmenin parametrenin kendi yavaşlığından ve EMA'dan gelen iki parçası ayrı yazıldı.
+  - M8.1 Şekil 1'de tırnaksız bir SVG özniteliği satırları kesiyordu (ekran görüntüsünde fark edildi).
+- **Bilinen belirsizlik:** sunucudaki başsız tarayıcıda Literata yazı tipi yüklenemediği için birleştirici aksanlı harfler (x̂, θ̄) eski deneylerin bazı etiketlerinde kutu olarak görünüyor; şekillerde aksan ayrı glif olarak bindirildi, deney metinlerinde gerçek tarayıcılarda sorun olmaması beklenir ama doğrulanmadı.
+- **Kalan:** Faz 9–11 konu anlatımları (BİL 467, BİL 455, YAP 446 kaynaklarıyla); pratik kartları; kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 7
 
 Faz 7'nin (donanım, ölçekleme ve dağıtım) 6 modülünün hepsine tam konu anlatımı yazıldı. Ders arşivinde bu konulara slayt yok; kaynaklar PMPP, GPU MODE dersleri, Triton eğitimleri, orijinal makaleler (Micikevicius ve ark. 2018/2022, Kalamkar ve ark. 2019, Rajbhandari ve ark. 2020, Li ve ark. 2020, Zhao ve ark. 2023, Jacob ve ark. 2018, Dettmers ve ark. 2022, Frantar ve ark. 2022, Han ve ark. 2015) ve PyTorch belgeleridir. Davranış iddiaları PyTorch 2.15'te çalıştırılarak doğrulandı (ör. torch.export'un veriye bağlı if'te GuardOnDataDependentSymNode vermesi, jit.trace'in sessizce yanlış graf üretmesi).

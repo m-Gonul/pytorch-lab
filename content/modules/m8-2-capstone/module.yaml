@@ -100,3 +100,142 @@ homework:
     accept:
       - "Kural tabanlı yapılandırma elle ayarlanmış taban çizgisine yakın ya da üstün."
       - "Her ablasyon için güven aralıklı fark."
+
+labs:
+  - id: l1
+    lab: emalab
+    title: "EMA ağırlıkları: pencere, gürültü ve gecikme"
+    goal: |
+      Gürültülü bir SGD yörüngesinin EMA'sını farklı β değerleriyle izle. Etkin pencereyi (1/(1 − β)), gürültünün ne kadar bastırıldığını, hedef sıçradığında EMA'nın ne kadar geç yetiştiğini ve 0'dan başlatmanın yanlılığını gör.
+    predict:
+      q: "β = 0.995 iken EMA'nın etkin penceresi kaç adımdır?"
+      options:
+        - {t: "995", why: "Pencere 1/(1 − β)'dır."}
+        - {t: "200", ok: true, why: "1/0.005 = 200; 200 adım önceki ağırlığın payı ≈ 1/e."}
+        - {t: "5", why: "Bu (1 − β)'nın 1000 katı."}
+    presets:
+      - {name: "β = 0.995", params: {beta: 2, sigma: 0.3, tau: 300, jump: 2500, init: 0, T: 4000}, note: "Pencere 200; std 0.302 → 0.020; sıçramadan sonra yarı yola 402 adım (parametrenin kendi yarı ömrü 208, EMA'nınki 139)."}
+      - {name: "β = 0.9", params: {beta: 0}, note: "Pencere 10; std 0.063: gürültü az bastırılıyor; gecikme 149 adım (çoğu parametrenin kendisinden)."}
+      - {name: "β = 0.999", params: {beta: 3}, note: "Pencere 1000; gecikme 1122 adım."}
+      - {name: "β = 0.9999, kısa eğitim", params: {beta: 4}, note: "Pencere 10 000 > 4000 adım: EMA başlangıç ağırlıklarından kurtulamıyor ve sıçramaya yetişemiyor."}
+      - {name: "0'dan düzeltmesiz", params: {init: 1, beta: 3}, note: "İlk ≈ 1000 adım 0'a doğru yanlı; yanlılık düzeltmesi (init 2) bunu giderir."}
+    questions:
+      - q: "Difüzyon eğitiminde β neden genellikle 0.999–0.9999 gibi büyük seçilir?"
+        a: "Eğitim yüz binlerce adım sürer; pencere eğitimin küçük bir kesridir ve SGD gürültüsü örnek kalitesini belirgin bozar. Kısa eğitimlerde (bu modüldeki gibi) daha küçük β (0.99) gerekir, yoksa EMA eğitilmemiş erken ağırlıkları taşır."
+    limits: "Tek parametre, birinci dereceden yaklaşma + Gauss gürültüsü; gerçek ağırlık yörüngeleri çok boyutlu ve ilişkilidir."
+  - id: l2
+    lab: pairboot
+    title: "Eşleştirilmiş bootstrap: iki modelin farkı gerçek mi?"
+    goal: |
+      Aynı test örneklerinde iki modelin örnek başı skorlarını (ortak zorluk ρ) üret. Ortalama farkın güven aralığını eşleştirilmiş ve eşleştirilmemiş bootstrap ile hesapla; ilişkinin ve örnek sayısının aralık genişliğine etkisini gör.
+    predict:
+      q: "ρ = 0.9 iken eşleştirilmiş aralık eşleştirilmemişe göre yaklaşık kaç kat dardır?"
+      options:
+        - {t: "Aynı", why: "Ortak zorluk farkta yok olur."}
+        - {t: "≈ 0.3 kat genişlikte", ok: true, why: "√(1 − 0.9) = 0.32; ölçülen 0.38."}
+        - {t: "≈ 0.1 kat", why: "Oran √(1 − ρ), 1 − ρ değil."}
+    presets:
+      - {name: "Varsayılan", params: {n: 100, delta: 0.02, sigma: 0.15, rho: 0.9, B: 2000}, note: "Eşleştirilmiş [0.016, 0.045] 0'ı dışlıyor; eşleştirilmemiş [−0.008, 0.069] içeriyor."}
+      - {name: "İlişkisiz skorlar", params: {rho: 0}, note: "İki yöntem aynı genişlikte (oran 1.04): eşleştirmenin kazancı ortak zorluktan gelir."}
+      - {name: "Az örnek", params: {n: 30}, note: "Eşleştirilmiş [−0.005, 0.038]: gerçek fark var ama 30 örnek ayırt etmeye yetmiyor."}
+      - {name: "Fark yok", params: {delta: 0}, note: "Eşleştirilmiş [−0.005, 0.025] 0'ı içeriyor: doğru sonuç."}
+    questions:
+      - q: "Yüzdelik bootstrap aralığı ne zaman yanıltıcı olabilir?"
+        a: "Çok az örnekte, çarpık dağılımlarda ya da sınırlı ölçütlerde (Dice 1'e yakınken) yüzdelik aralığın kapsaması %95'ten sapabilir; BCa gibi düzeltilmiş aralıklar kullanılır. Ayrıca bootstrap yalnız test örneklemi belirsizliğini ölçer, eğitim tohumu belirsizliğini ölçmez."
+    limits: "Normal skorlar, sabit ilişki; Dice gibi sınırlı ölçütlerin çarpıklığı modellenmedi."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Zaman embedding'i
+    goal: Sinüzoidal kodlamayı hesaplamak
+    needs: $\omega_i=10000^{-i/(d/2)}$
+    q: |-
+      $d=4$, $t=10$. Embedding vektörü $[\sin(\omega_0t),\sin(\omega_1t),\cos(\omega_0t),\cos(\omega_1t)]$ nedir?
+    solution: |-
+      $\omega_0=1$, $\omega_1=10000^{-1/2}=0.01$. $[\sin10,\sin0.1,\cos10,\cos0.1]=[-0.544,\ 0.0998,\ -0.839,\ 0.995]$. Yüksek frekans $t$'nin küçük değişimlerini, düşük frekans büyük ölçeği kodlar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: EMA payı
+    goal: Geometrik ağırlıkları hesaplamak
+    needs: $(1-\beta)\beta^k$
+    q: |-
+      $\beta=0.99$. 100 adım önceki ağırlığın EMA'daki payı $\beta^{100}$ (yaklaşık)?
+    answer: 0.36603234127322926
+    calc: "0.99**100"
+    tol: 1e-6
+    mistakes:
+      - {answer: 0.01, msg: "Bu tek bir adımın payı (1 − β)."}
+      - {answer: 0.99, msg: "100 kez çarpılır."}
+    hints:
+      - "Pencere 1/(1 − β) = 100 adım; payı ≈ 1/e."
+    solution: |-
+      $0.99^{100}\approx0.366\approx1/e$: pencere uzunluğunda geriye gidince pay $1/e$'ye iner.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Dice
+    goal: Örtüşme ölçütünü hesaplamak
+    needs: $2|P\cap G|/(|P|+|G|)$
+    q: |-
+      Tahmin 50 piksel, gerçek 30 piksel, kesişim 20. Dice?
+    answer: 0.5
+    calc: "2*20/(50+30)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.3333333333333333, msg: "Bu IoU: 20/(50 + 30 − 20) = 20/60."}
+      - {answer: 0.4, msg: "Pay 2 · kesişim."}
+    hints:
+      - "$2\\cdot20/80$."
+    solution: |-
+      $40/80=0.5$; IoU $=20/60=0.333$. Dice $=2J/(1+J)$ (M4.10).
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Örnekler gürültülü, eğitim kaybı iyi
+    goal: EMA'nın rolünü tanımak
+    needs: EMA
+    q: |-
+      Difüzyon modelinin eğitim kaybı düzgün azalıyor ama ham ağırlıklarla üretilen örnekler lekeli ve tutarsız. Sınıf doğruluğu da beklenenden düşük. İlk deneme?
+    choices:
+      - {t: "Öğrenme oranını artırmak", why: "Gürültüyü artırır."}
+      - {t: "Örneklemeyi EMA ağırlıklarıyla yapmak (eğitim süresine uygun β ile)", ok: true, why: "SGD'nin son adım gürültüsü örneklerde birikir; EMA bunu ortalar."}
+      - {t: "DDIM adımını azaltmak", why: "Kaliteyi düşürür."}
+    hints:
+      - "Ağırlıklardaki küçük gürültü 25 adımlık örneklemede nasıl birikir?"
+    solution: |-
+      Örnekleme ağı onlarca kez ardışık uygular; ağırlıklardaki gürültü her adımda hataya dönüşür. EMA ağırlıkları bu gürültüyü ortalar ve örnek kalitesini belirgin artırır.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Eşleştirmenin varyans kazancı
+    goal: Var(d̄) formülünü türetmek
+    needs: Kovaryans
+    q: |-
+      $(a_i,b_i)$ bağımsız çiftler, $\mathrm{Var}(a)=\mathrm{Var}(b)=\sigma^2$, $\mathrm{Corr}(a,b)=\rho$. $\mathrm{Var}(\bar d)=2\sigma^2(1-\rho)/n$ olduğunu ve eşleştirilmemiş tahminin varyansının $2\sigma^2/n$ olduğunu göster.
+    rubric:
+      - "Var(b − a) = Var(a) + Var(b) − 2Cov(a, b) yazdım"
+      - "Cov = ρσ² ile 2σ²(1 − ρ) buldum"
+      - "Ortalamada n'ye böldüm"
+      - "Eşleştirilmemişte iki ortalamanın bağımsız yeniden örneklendiğini, kovaryans teriminin kaybolduğunu belirttim"
+    hints:
+      - "$\\mathrm{Var}(X-Y)=\\mathrm{Var}X+\\mathrm{Var}Y-2\\mathrm{Cov}(X,Y)$."
+    solution: |-
+      $\mathrm{Var}(d_i)=2\sigma^2-2\rho\sigma^2$; bağımsız çiftlerin ortalaması: $2\sigma^2(1-\rho)/n$. Ayrı ayrı yeniden örneklenen ortalamalar bağımsızdır: $\sigma^2/n+\sigma^2/n$. Oran $1-\rho$, std oranı $\sqrt{1-\rho}$.
+pitfalls:
+  - wrong: "Difüzyon U-Net'inde BatchNorm da kullanılabilir."
+    right: "Her örnek farklı gürültü düzeyindedir; batch istatistikleri anlamsız ve eğitim/çıkarım arasında tutarsızdır. GroupNorm kullanılır."
+  - wrong: "EMA bozunması ne kadar büyükse o kadar iyi."
+    right: "Pencere eğitim süresine göre seçilmeli; çok büyük β kısa eğitimde erken (kötü) ağırlıkları taşır."
+  - wrong: "FID tek başına raporlanabilir."
+    right: "Gerçek–gerçek taban çizgisiyle, aynı örnek sayısıyla ve sınıf doğruluğuyla birlikte raporlanmalıdır."
+  - wrong: "İki modelin ortalama skoru farklıysa daha yüksek olan daha iyidir."
+    right: "Fark, test örneklemi ve eğitim tohumu gürültüsünün içinde olabilir; eşleştirilmiş güven aralığı ve birkaç tohumla tekrar gerekir."
+whatif:
+  - q: "Öz-dikkat 16 × 16 çözünürlükte de kullanılsaydı?"
+    a: "256 konum, skor matrisi 65 536 eleman: 4 × 4'teki 256'nın 256 katı. Küçük görüntüde mümkün ama büyük görüntülerde bellek ve süre karesel büyür; bu yüzden düşük çözünürlüklerde kullanılır."
+  - q: "Artık blokların ikinci konvolüsyonu sıfır başlatılmasaydı?"
+    a: "Başlangıçta her blok girdiye rastgele bir fonksiyon ekler; derin U-Net'te çıktının ölçeği büyür ve ilk adımlar kararsız olur. Sıfır başlatma her bloğu başta özdeşlik yapar."
+  - q: "Segmentasyonda yalnız Dice kaybı kullanılsaydı?"
+    a: "Örtüşme doğrudan en büyüklenir, ama boş (lezyonsuz) görüntülerde ve küçük nesnelerde gradyan gürültülüdür; olasılıklar kalibre olmaz. BCE + Dice bu yüzden yaygındır."
