@@ -97,3 +97,185 @@ homework:
       - "CIFAR-10'da GFNet ve ViT doğrulukları ±2 puan içinde; GFNet FLOP'ları daha düşük."
       - "Token sayısı 64 → 1024 için süre grafiği."
       - "Öğrenilen süzgeçlerin genlik spektrumları: sığ katmanlarda yüksek frekans ağırlıklı mı?"
+
+labs:
+  - id: l1
+    lab: circconv
+    title: "Dairesel konvolüsyon ve dolgu"
+    goal: |
+      Uzunluğu A olan bir diziyle uzunluğu B olan bir çekirdeği hem doğrudan (doğrusal) hem de P noktalı DFT'lerin çarpımıyla (dairesel) konvolüsyona sok. P'yi değiştirerek sarmalanmanın ne zaman başladığını, hangi örneklerin nereye eklendiğini ve genlik spektrumlarını gör.
+    predict:
+      q: "A = 24, B = 12 için dairesel sonucun doğrusal sonuçla aynı olması için en küçük P kaçtır?"
+      options:
+        - {t: "24", why: "f'nin uzunluğu yetmez: konvolüsyon A + B − 1 uzunluğundadır; 11 örnek sarmalanır."}
+        - {t: "35", ok: true, why: "A + B − 1 = 35; P = 35'te en büyük fark 4·10⁻¹⁵."}
+        - {t: "64", why: "Yeter ama gereğinden büyük; 2'nin kuvveti FFT için uygundur, doğruluk için şart değil."}
+    presets:
+      - {name: "P = A", params: {A: 24, B: 12, kind: 0, P: 24}, note: "11 örnek sarmalanıyor, en büyük fark 0.60."}
+      - {name: "P = 30", params: {P: 30}, note: "5 örnek sarmalanıyor, fark 0.34."}
+      - {name: "P = A + B − 1", params: {P: 35}, note: "Aynı sonuç (fark 4·10⁻¹⁵)."}
+      - {name: "Çok kısa P", params: {P: 8}, note: "P dizilerden bile kısa: diziler DFT'den önce katlanıyor, sonuç tamamen bozuluyor (fark 2.3)."}
+      - {name: "Gauss çekirdek", params: {kind: 1, P: 24}, note: "Hata 0.70, kutudakinden (0.60) bile büyük: sarmalanma çekirdeğin biçimine değil uzunluk kuralına bağlıdır."}
+    questions:
+      - q: "FFT için 2'nin kuvveti olan bir P seçmek doğruluğu etkiler mi?"
+        a: "Hayır. P ≥ A + B − 1 olan her P aynı (doğru) sonucu verir; fazladan sıfırlar sona eklenir. 2'nin kuvveti yalnız hız içindir; modern FFT kütüphaneleri küçük asal çarpanlı uzunlukları da hızlı hesaplar (cv2.getOptimalDFTSize)."
+    limits: "1-B; doğrudan DFT (O(P²)) kullanılıyor ki P her değeri alabilsin."
+  - id: l2
+    lab: freqfilt
+    title: "İdeal, Butterworth ve Gauss: halkalanma ve dolgu"
+    goal: |
+      64 × 64'lük bir görüntüyü Gonzalez'in hattıyla (dolgu, merkezleme, DFT, H ile çarpım, ters DFT, kırpma) süz. Üç süzgeç türünü alçak ve yüksek geçiren olarak dene; korunan güç oranını, karenin içindeki halkalanmayı ve dolgunun sol kenara etkisini ölç; spektrumda süzgecin maskesini gör.
+    predict:
+      q: "Aynı D₀ = 20'de karenin içindeki en büyük sapma (halkalanma) hangi süzgeçte en büyüktür?"
+      options:
+        - {t: "Gauss", why: "0.008: dürtü yanıtında negatif lob yok."}
+        - {t: "İdeal", ok: true, why: "0.134: keskin kesim → negatif loblu sinc dürtü yanıtı."}
+        - {t: "Butterworth n = 2", why: "0.046: geçiş yumuşak."}
+    presets:
+      - {name: "İdeal AG", params: {type: 0, hp: 0, D0: 20, pad: 1}, note: "α = %93.5, halka 0.134."}
+      - {name: "Butterworth n = 2", params: {type: 1, n: 2}, note: "α = %89.9, halka 0.046."}
+      - {name: "Butterworth n = 10", params: {type: 1, n: 10}, note: "İdeale yaklaşıyor: halka 0.125."}
+      - {name: "Gauss AG", params: {type: 2}, note: "α = %88.8, halka 0.008."}
+      - {name: "Dar ideal", params: {type: 0, D0: 8}, note: "α = %80.6, halka 0.302: halkalar genişliyor."}
+      - {name: "Dolgusuz", params: {type: 2, D0: 8, pad: 0}, note: "Sağdaki parlak şerit sol kenara sarmalanıyor: sol kenar +0.259 (dolgulu: −0.052)."}
+      - {name: "İdeal YG", params: {type: 0, hp: 1, D0: 20}, note: "Kenarlar kalıyor, ama yanlarında halkalar."}
+    questions:
+      - q: "Gauss alçak geçiren aynı D₀'da ideal süzgeçten daha az güç bıraktığı hâlde (α %88.8'e %93.5) neden çoğu zaman tercih edilir?"
+        a: "Kaybettiği güç yüksek frekanslara yumuşakça yayılmıştır ve uzaysal dürtü yanıtının negatif lobu yoktur: halka ve yapay kenar üretmez. İdealin fazladan bıraktığı güç ise keskin kesimin yarattığı sinc salınımlarıyla birlikte gelir; görsel olarak daha kötüdür."
+    limits: "64 × 64 yapay sahne; dolgu yalnız sıfır; süzgeçler dairesel simetrik."
+  - id: l3
+    lab: deconv
+    title: "Ters süzgeç ve Wiener: bulanıklığı geri almak"
+    goal: |
+      Frekansta Gauss bir H ile bulanıklaştırılıp beyaz gürültü eklenmiş görüntüyü dört yolla geri kazan: tam ters süzgeç, yarıçapla sınırlı ters süzgeç, sabit K'lı Wiener ve gerçek spektrumları kullanan "kâhin" Wiener. PSNR'ı ve radyal kazanç eğrilerini karşılaştır.
+    predict:
+      q: "σ = 0.01 gürültüde tam ters süzgeç PSNR'ı nasıl değiştirir (girdi 20.5 dB)?"
+      options:
+        - {t: "Artırır (≈ 25 dB)", why: "Gürültü yoksa öyle olurdu; burada yüksek frekanslarda 1/H ≈ 167."}
+        - {t: "Çökertir (≈ 5 dB)", ok: true, why: "4.76 dB: büyütülmüş gürültü görüntüyü örtüyor."}
+        - {t: "Değiştirmez", why: "Her frekans 1/H ile büyütülüyor."}
+    presets:
+      - {name: "Tam ters", params: {Db: 10, noise: 0.01, m: 0}, note: "20.5 → 4.76 dB."}
+      - {name: "Gürültüsüz ters", params: {m: 0, noise: 0}, note: "Kusursuz geri kazanım (250 dB, kayan nokta hatası)."}
+      - {name: "Sınırlı ters, D_c = 22", params: {m: 1, Dc: 22}, note: "23.1 dB; D_c = 26'da 21.0'a düşüyor."}
+      - {name: "Wiener K = 0.01", params: {m: 2, K: 0.01}, note: "23.6 dB: en iyi sabit K civarı."}
+      - {name: "Wiener K çok küçük", params: {m: 2, K: 0.0001}, note: "13.2 dB: ters süzgece yaklaşıyor."}
+      - {name: "Kâhin Wiener", params: {m: 3}, note: "27.2 dB: frekansa göre değişen NSR'ın değeri."}
+    questions:
+      - q: "Kâhin Wiener neden sabit K'lı Wiener'den 3.6 dB daha iyi?"
+        a: "Görüntü spektrumu düşük frekanslarda çok güçlü, yüksek frekanslarda zayıftır: S_η/S_f frekansla on binlerce kat değişir. Tek bir K ya düşük frekansları gereksiz yere bastırır ya da yüksek frekanslarda gürültüyü geçirir; frekansa bağlı NSR ikisini de doğru dengeler. Pratikte S_f, doğal görüntülerin yaklaşık 1/f² güç yasasıyla modellenebilir."
+    limits: "Dairesel bulanıklık (görüntü periyodik sayılıyor); H tam biliniyor (kör ters evrişim değil); beyaz Gauss gürültü."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Küçük bir DFT
+    goal: Tanımı elle uygulamak
+    needs: $F(u)=\sum_xf(x)e^{-j2\pi ux/M}$
+    q: |-
+      $f=[1,1,0,0]$. $F(u)$, $u=0..3$, ve genlik spektrumu?
+    solution: |-
+      $e^{-j2\pi u/4}=(-j)^u$. $F(0)=2$, $F(1)=1-j$, $F(2)=1-1=0$, $F(3)=1+j$. Genlik $[2,\sqrt2,0,\sqrt2]$: eşlenik simetri ($F(3)=\overline{F(1)}$) ve $u=2$'de sıfır (iki örneklik kutunun sinc'inin sıfırı).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Dolgu boyutu
+    goal: P ≥ A + B − 1 kuralını uygulamak
+    needs: Doğrusal konvolüsyonun uzunluğu
+    q: |-
+      600 × 800 görüntü, 41 × 41 çekirdek. Sarmalanmasız FFT konvolüsyonu için en küçük P × Q'da kaç örnek var?
+    answer: 537600
+    calc: "(600+41-1)*(800+41-1)"
+    tol: 0
+    mistakes:
+      - {answer: 480000, msg: "Dolgusuz: sarmalanma olur."}
+      - {answer: 1920000, msg: "Bu P = 2M, Q = 2N; güvenli ama en küçük değil."}
+    hints:
+      - "P = 640, Q = 840."
+    solution: |-
+      $P=640$, $Q=840$, $PQ=537600$; $P=2M$, $Q=2N$ seçimi 1 920 000 örnekle 3.6 kat fazla hesap yapar.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Butterworth kazancı
+    goal: Formülü uygulamak
+    needs: $H=1/(1+(D/D_0)^{2n})$
+    q: |-
+      $n=2$, $D=2D_0$. Kazanç? (4 basamak)
+    answer: 0.0588
+    calc: "round(1/(1+2**4), 4)"
+    tol: 0.0001
+    mistakes:
+      - {answer: 0.2, msg: "Üs 2n = 4, 2 değil."}
+      - {answer: 0.5, msg: "Bu D = D₀'daki kazanç."}
+    hints:
+      - "$(D/D_0)^{2n}=2^4=16$."
+    solution: |-
+      $1/(1+16)=0.0588$. Gauss'ta aynı noktada $e^{-2}=0.135$, idealde 0.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Wiener kazancı
+    goal: Ters süzgeçle karşılaştırmak
+    needs: $W=H/(H^2+K)$ (gerçel H)
+    q: |-
+      $H=0.02$, $K=0.001$. Wiener kazancı? (2 basamak)
+    answer: 14.29
+    calc: "round(0.02/(0.02**2+0.001), 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 50.0, msg: "Bu ters süzgeç 1/H."}
+      - {answer: 20.0, msg: "H² = 0.0004 unutulmuş: 0.02/0.001."}
+    hints:
+      - "$H^2=0.0004$."
+    solution: |-
+      $0.02/0.0014=14.29$: ters süzgecin 50'si yerine. $H^2\ll K$ olan daha yüksek frekanslarda kazanç $H/K$'ya, yani sıfıra gider.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Bulanıklaştırınca kenarlarda dalgalar
+    goal: Halkalanmayı tanımak
+    needs: İdeal süzgecin dürtü yanıtı
+    q: |-
+      Bir öğrenci bir görüntüyü FFT'de merkezden 30 frekans örneği dışını sıfırlayarak bulanıklaştırıyor. Nesne kenarlarının iki yanında açık-koyu ince dalgalar beliriyor. Neden ve nasıl giderilir?
+    choices:
+      - {t: "Dolgu yapılmamış: sarmalanma", why: "Sarmalanma karşı kenardan sızma yapar; kenarlara paralel halkalar değil."}
+      - {t: "İdeal (kutu) süzgeç: dürtü yanıtı negatif loblu sinc, Gibbs halkaları; Gauss ya da düşük dereceli Butterworth kullanılmalı", ok: true, why: "Lab l2: ideal 0.134, Gauss 0.008."}
+      - {t: "Faz bozulmuş", why: "Gerçel, simetrik H faz eklemez."}
+    hints:
+      - "Frekanstaki keskin kesimin uzaydaki karşılığı nedir?"
+    solution: |-
+      Frekansta dikdörtgen, uzayda sinc'tir; sinc'in negatif lobları kenarlarda aşma ve salınım yapar. Geçişi yumuşatan bir süzgeç (Gauss, Butterworth n ≤ 2) bunu giderir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Parseval ve öteleme
+    goal: İki temel özelliği kanıtlamak
+    needs: Ortogonallik
+    q: |-
+      (a) $\sum_x|f(x)|^2=\frac1M\sum_u|F(u)|^2$ (Parseval) olduğunu göster. (b) $f(x-x_0)$'ın DFT'sinin $F(u)e^{-j2\pi ux_0/M}$ olduğunu ve genlik spektrumunun değişmediğini göster. (c) (a)'dan, Gonzalez'in güç oranı α'nın neden uzayda da bir enerji oranı olduğunu çıkar.
+    rubric:
+      - "|F|² = F·F̄ yazıp çift toplamı ortogonallikle tek toplama indirdim"
+      - "Öteleme için indis değişkeni değiştirip periyodiklikle toplam aralığını korudum"
+      - "|e^{−jθ}| = 1 ile genliğin değişmediğini belirttim"
+      - "α'yı süzülmüş görüntünün enerjisinin özgününkine oranı olarak yorumladım (H gerçel)"
+    hints:
+      - "$\\sum_ue^{j2\\pi u(x-x')/M}=M\\,\\delta(x-x')$."
+    solution: |-
+      (a) $\sum_u|F|^2=\sum_u\sum_x\sum_{x'}f(x)\overline{f(x')}e^{-j2\pi u(x-x')/M}=M\sum_x|f(x)|^2$. (b) $\sum_xf(x-x_0)e^{-j2\pi ux/M}$'de $x'=x-x_0$: $e^{-j2\pi ux_0/M}F(u)$; genlik $|F|$. (c) $\sum|HF|^2/\sum|F|^2$, Parseval'le $\sum|g|^2/\sum|f|^2$'ye eşittir: α, süzgecin bıraktığı uzamsal enerjinin yüzdesidir.
+pitfalls:
+  - wrong: "FFT ile konvolüsyon, doğrudan konvolüsyonla her zaman aynı sonucu verir."
+    right: "DFT çarpımı dairesel konvolüsyondur; P ≥ A + B − 1 dolgusu olmadan kuyruk başa sarmalanır."
+  - wrong: "np.fft.fft2'nin çıktısında DC terimi görüntünün ortasındadır."
+    right: "Sol üst köşededir (F[0, 0]); merkezlemek için np.fft.fftshift ya da girdiyi (−1)^(x+y) ile çarpmak gerekir."
+  - wrong: "Ters süzgeç, H biliniyorsa bulanıklığı tam geri alır."
+    right: "Yalnız gürültüsüz durumda. Gürültüde N/H terimi H'nin küçük olduğu frekanslarda patlar; sınırlı ters süzgeç ya da Wiener gerekir."
+  - wrong: "Genlik spektrumu görüntünün yapısını taşır, faz önemsizdir."
+    right: "Kenarların ve nesnelerin konumu fazdadır; bir görüntünün genliği ile ötekinin fazından kurulan görüntü, fazı verene benzer."
+whatif:
+  - q: "Görüntü yerine çekirdek frekansta 2-B ayrılabilir seçilse?"
+    a: "H(u, v) = H₁(u)H₂(v) ise uzaysal dürtü yanıtı da ayrılabilir: aynı süzgeç iki 1-B konvolüsyonla uzayda da ucuzca uygulanabilir. Dairesel simetrik süzgeçlerden yalnız Gauss ayrılabilirdir."
+  - q: "Wiener'de K yerine frekansa bağlı K(u, v) = c·D²(u, v) kullanılsa?"
+    a: "Doğal görüntülerin gücü yaklaşık 1/D² ile düştüğü için S_η/S_f ∝ D²'dir: bu seçim kâhin Wiener'e çok yaklaşır. Kısıtlı en küçük kareler süzgecinin Laplasyen terimi (|P|² ∝ D⁴) de benzer bir frekans ağırlığı yapar."
+  - q: "Bulanıklık H bilinmeseydi?"
+    a: "Kör ters evrişim gerekir: H ve F birlikte kestirilir (ör. yinelemeli Richardson–Lucy, ya da kenarlardan PSF kestirimi). Problem iyi tanımlı değildir; ön bilgi (pozitiflik, seyreklik, düzgünlük) ve düzenleme şarttır."
