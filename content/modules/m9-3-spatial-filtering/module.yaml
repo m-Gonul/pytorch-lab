@@ -95,3 +95,142 @@ homework:
       - "$\\sigma\\ge2$ için iç bölgede `cv2.GaussianBlur` ile en büyük fark < 1 gri seviye (8 bit)."
       - "Süre $\\sigma=4$ ile $\\sigma=64$ arasında %20'den fazla değişmiyor."
       - "Üç kutu filtresi yaklaşımı için hata ve süre raporlanmış."
+
+labs:
+  - id: l1
+    lab: smoothcmp
+    title: "Kutu, Gauss ve medyan: hangi gürültüde hangisi?"
+    goal: |
+      Basamak kenarları ve ince bir çizgi içeren bir sinyale Gauss, tuz-biber ya da karışık gürültü ekle; kutu, Gauss, medyan ve ağırlıklı medyan süzgeçlerini MSE, kenar yayma genişliği ve ince çizginin korunmasıyla karşılaştır.
+    predict:
+      q: "%10 tuz-biber gürültüsünde 5'lik pencereyle en düşük MSE'yi hangisi verir?"
+      options:
+        - {t: "Gauss", why: "Doğrusal süzgeçler darbeleri komşulara yayar: 0.014."}
+        - {t: "Medyan", ok: true, why: "0.006: darbeler sıralamanın uçlarına düşer ve hiç seçilmez; kenarlar da yayılmaz."}
+        - {t: "Kutu", why: "0.015."}
+    presets:
+      - {name: "Tuz-biber, medyan", params: {f: 2, k: 5, noise: 1}, note: "MSE 0.052 → 0.006; kenar yayılmıyor (0); ama 2 örnek genişliğindeki çizgi siliniyor (tepe 0)."}
+      - {name: "Tuz-biber, kutu", params: {f: 0, k: 5}, note: "MSE 0.015; kenar 4 örneğe yayılıyor; çizgi 0.24'e iniyor."}
+      - {name: "Ağırlıklı medyan", params: {f: 3, k: 5, w: 3}, note: "Çizgi korunuyor (0.6) ama bazı darbeler de kalıyor: MSE 0.019."}
+      - {name: "Gauss gürültüsü, Gauss süzgeç", params: {f: 1, sigma: 1.5, noise: 0}, note: "MSE 0.0069 → 0.0037; bu gürültüde doğrusal süzgeç iyi."}
+      - {name: "Büyük kutu", params: {f: 0, k: 9, noise: 0}, note: "Kenar 8 örneğe yayılıyor, çizgi 0.17'ye iniyor."}
+    questions:
+      - q: "Medyan süzgeci neden ince bir çizgiyi tamamen siler?"
+        a: "Çizgi pencerenin yarısından dar olduğunda pencerede çizgi pikselleri azınlıktadır; medyan çoğunluğun (arka plan) değerini seçer. k × k'lık medyan, alanı k²/2'den küçük yapıları siler."
+    limits: "1-B sinyal; 2-B'de kenarların yönü ve köşeler ayrıca etkilenir."
+  - id: l2
+    lab: padmodes
+    title: "Kenar dolgusu: sıfır, kopyalama, yansıtma, dairesel"
+    goal: |
+      Bir satırın sol kenarına kutu süzgeci uygula ve beş dolgu modunda çıkışın kenarda nasıl saptığını gör. Sıfır dolgunun koyu şeridini, dairesel dolgunun karşı kenardan sızan değerlerini ve yansıtmanın kenardaki küçük eğim yanlılığını karşılaştır.
+    predict:
+      q: "Parlak (0.8) bir kenarda 9'luk kutu süzgeci sıfır dolguyla kullanılırsa ilk birkaç piksel ne olur?"
+      options:
+        - {t: "Değişmez", why: "Dolgu sıfırları ortalamaya girer."}
+        - {t: "Belirgin kararır (≈ −0.23)", ok: true, why: "Penceredeki dolgu sıfırları ortalamayı düşürür; kopyalama ve yansıtmada sapma ≈ 0."}
+        - {t: "Aydınlanır", why: "Dışarısı 0, yani karanlık."}
+    presets:
+      - {name: "Sıfır dolgu", params: {m: 0, k: 9, slope: 0.005}, note: "Kenar sapması −0.225."}
+      - {name: "REFLECT_101", params: {m: 3}, note: "−0.006: eğimli kenarda küçük bir yanlılık."}
+      - {name: "Dairesel", params: {m: 4}, note: "−0.17: sağ kenarın karanlık değerleri sola sızıyor."}
+      - {name: "Düz kenar, kopyalama", params: {m: 1, slope: 0}, note: "Sapma 0."}
+    questions:
+      - q: "CNN'lerde neden genellikle sıfır dolgu kullanılır, bu bir sorun mu?"
+        a: "Basittir ve ağ kenarları ayırt etmeyi öğrenebilir (sıfırlar konum bilgisi taşır). Ama kenar piksellerinin istatistikleri farklıdır; büyük çekirdeklerde ya da görüntü sentezinde yansıtma dolgusu daha az yapay kenar üretir."
+    limits: "1-B, tek kenar, kutu süzgeci."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Korelasyon ve konvolüsyon
+    goal: Döndürmenin etkisini görmek
+    needs: 180° döndürme
+    q: |-
+      $f=[0,0,1,0,0]$, $w=[1,2,4]$ (merkez 2). Merkez konumda korelasyon ve konvolüsyon ve bütün çıkışlar?
+    solution: |-
+      Korelasyon çıkışı $[0,4,2,1,0]$ (dürtüde ters çevrilmiş çekirdek), konvolüsyon $[0,1,2,4,0]$ (kopya). Merkezde ikisi de 2.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Ayrılabilirlik kazancı
+    goal: mn/(m + n) formülünü uygulamak
+    needs: $C=mn/(m+n)$
+    q: |-
+      15 × 15'lik ayrılabilir bir çekirdek için kazanç?
+    answer: 7.5
+    calc: "15*15/(15+15)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 225.0, msg: "Bu doğrudan işlem sayısı (mn)."}
+      - {answer: 30.0, msg: "Bu ayrılmış işlem sayısı (m + n)."}
+    hints:
+      - "$225/30$."
+    solution: |-
+      $225/30=7.5$; kare $m\times m$ çekirdekte $C=m/2$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: İntegral görüntüyle kutu toplamı
+    goal: Dört aramayı uygulamak
+    needs: $S=A(y_2,x_2)-A(y_1-1,x_2)-A(y_2,x_1-1)+A(y_1-1,x_1-1)$
+    q: |-
+      İntegral görüntüde $A(4,4)=200$, $A(1,4)=60$, $A(4,1)=50$, $A(1,1)=15$. Satır 2–4, sütun 2–4 kutusunun toplamı?
+    answer: 105
+    calc: "200-60-50+15"
+    tol: 0
+    mistakes:
+      - {answer: 75, msg: "A(1,1) geri eklenmeli: iki kez çıkarıldı."}
+      - {answer: 90, msg: "İşaretler: + A(4,4) − A(1,4) − A(4,1) + A(1,1)."}
+    hints:
+      - "Sol üst köşe iki kez çıkarıldı."
+    solution: |-
+      $200-60-50+15=105$.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Bulanıklaştırılmış görüntüde koyu çerçeve
+    goal: Dolgu etkisini tanımak
+    needs: Kenar dolgusu
+    q: |-
+      Elle yazılmış bir 21 × 21 kutu süzgeci, sonuç görüntünün kenarlarında yaklaşık 10 piksellik koyu bir çerçeve bırakıyor. Neden, nasıl düzeltilir?
+    choices:
+      - {t: "Süzgeç normalize edilmemiş", why: "Normalize olmasa bütün görüntü parlardı."}
+      - {t: "Sıfır dolgu: kenara yakın pencerelerde dışarıdaki sıfırlar ortalamaya giriyor; kopyalama ya da yansıtma dolgusu kullanılmalı", ok: true, why: "Çerçeve genişliği yarıçap kadar (10 piksel)."}
+      - {t: "Kutu süzgeci ayrılabilir değil", why: "Ayrılabilirdir; sorun kenarlarda."}
+    hints:
+      - "Çerçeve genişliği neye eşit?"
+    solution: |-
+      Çekirdek yarıçapı 10: kenardan 10 pikselden yakın her çıkış, pencerede dolgu değerleri görür. Sıfır dolgu onları karartır; `BORDER_REFLECT_101` ya da `REPLICATE` bu yanlılığı büyük ölçüde giderir.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Gauss'un ayrılabilirliği ve konvolüsyonu
+    goal: İki Gauss'un konvolüsyonunun Gauss olduğunu göstermek
+    needs: Üstel fonksiyonun özellikleri, Fourier dönüşümü
+    q: |-
+      (a) $G_\sigma(s,t)$'nin ayrılabilir olduğunu, (b) iki 1-B Gauss'un konvolüsyonunun varyansları toplanmış bir Gauss olduğunu göster. Bu, art arda iki Gauss bulanıklaştırmanın tek bir Gauss'a eşit olması için ne anlama gelir?
+    rubric:
+      - "e^{−(s²+t²)/2σ²} = e^{−s²/2σ²}e^{−t²/2σ²} yazdım"
+      - "Fourier dönüşümünün Gauss olduğunu ve konvolüsyonun çarpıma dönüştüğünü kullandım"
+      - "Frekanstaki çarpımın üslerinin toplandığını, yani σ² + σ²'nin toplandığını gösterdim"
+      - "σ₁ ve σ₂ ile art arda bulanıklaştırmanın √(σ₁² + σ₂²) ile tek bulanıklaştırmaya eşit olduğunu belirttim"
+    hints:
+      - "$\\mathcal F\\{e^{-x^2/2\\sigma^2}\\}\\propto e^{-\\sigma^2\\omega^2/2}$."
+    solution: |-
+      (a) Üstelin çarpım özelliği. (b) Dönüşümler $e^{-\sigma_1^2\omega^2/2}e^{-\sigma_2^2\omega^2/2}=e^{-(\sigma_1^2+\sigma_2^2)\omega^2/2}$: varyansı $\sigma_1^2+\sigma_2^2$ olan bir Gauss'un dönüşümü. İki kez σ = 1 ile bulanıklaştırmak bir kez σ = √2 ile bulanıklaştırmaya eşittir; ölçek uzayı ve görüntü piramitleri (M9.14) bu özelliğe dayanır.
+pitfalls:
+  - wrong: "cv2.filter2D konvolüsyon yapar."
+    right: "Korelasyon yapar; gerçek konvolüsyon için çekirdeği çevirip çapayı ayarlamak gerekir. Simetrik çekirdeklerde fark yoktur."
+  - wrong: "Medyan süzgeci her gürültüde en iyisidir."
+    right: "Darbe gürültüsünde üstündür; Gauss gürültüsünde doğrusal süzgeçler (Gauss) genellikle daha düşük MSE verir ve medyan ince yapıları siler."
+  - wrong: "Büyük kutu süzgeci hep pahalıdır."
+    right: "İntegral görüntü ya da kayan toplamla piksel başına maliyet çekirdek boyundan bağımsızdır."
+  - wrong: "Çekirdeği normalize etmek yalnız bir görüntüleme kolaylığıdır."
+    right: "Normalize edilmemiş bir alçak geçiren çekirdek görüntünün ortalama parlaklığını değiştirir (yanlılık); katsayılar toplamı 1 olmalıdır."
+whatif:
+  - q: "Gauss çekirdeği ±1σ'da kesilseydi?"
+    a: "Çekirdek bir kutuya benzer: frekans yanıtında yan loblar oluşur ve bulanıklaştırma izotropik olmaz. Kesme en az ±3σ olmalıdır."
+  - q: "Medyan yerine ortalama ile medyanın karışımı (alfa-kırpılmış ortalama) kullanılsa?"
+    a: "Sıralanmış değerlerin uçlarından d/2'şer tanesi atılıp kalanların ortalaması alınır: karışık (Gauss + darbe) gürültüde ikisinin de güçlü yanlarını birleştirir (M9.5)."
+  - q: "Kutu süzgeci art arda üç kez uygulansa?"
+    a: "Üç kutunun konvolüsyonu parçalı ikinci derece bir çekirdektir ve Gauss'a çok yakındır (merkezi limit). Bu, Gauss bulanıklaştırmayı integral görüntüyle hızlıca yaklaştırmanın bir yoludur."
