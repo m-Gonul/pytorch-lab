@@ -76,3 +76,144 @@ homework:
     accept:
       - "Gradyanlar standart geri yayılımla eşleşir."
       - "Derinliğe göre bellek grafiği: tersinir ağda sabit."
+
+labs:
+  - id: l1
+    lab: fdcheck
+    title: "gradcheck neden float64 ister? Sonlu farkın hata eğrisi"
+    goal: |
+      Merkezi ve ileri farkın hatasını adım h'ye karşı float32 ve float64'te çiz. Sağ kolda kesme hatası (h² ya da h), sol kolda yuvarlama hatası (u/h) baskındır. Ölçülen en iyi h'yi kuramla (u^(1/3), √u) karşılaştır ve PyTorch'un varsayılan eps = 10⁻⁶ adımında doğru türevin bile reddedilip reddedilmediğini gör.
+    predict:
+      q: "float32'de, eps = 10⁻⁶ ile exp'in x = 1'deki türevi merkezi farkla hesaplanırsa göreli hata kabaca ne olur?"
+      options:
+        - {t: "≈ 10⁻¹²", why: "Bu float64'te bile olmaz; kesme hatası h²/6 ≈ 10⁻¹³ ama yuvarlama hatası baskın."}
+        - {t: "≈ 10⁻⁵", why: "Bu float32'nin en iyi h'deki (≈ 4·10⁻³) hatası."}
+        - {t: "≈ 10⁻² ile 10⁻¹", ok: true, why: "Yuvarlama hatası u·|f|/h ≈ 6·10⁻⁸ · 2.7 / 10⁻⁶ ≈ 0.16 mertebesinde. gradcheck doğru türevi reddeder."}
+    presets:
+      - {name: "float32, merkezi", params: {fn: 0, x0: 1, kind: 0, prec: 0, rtol: 0.001}, note: "En küçük hata 2.1·10⁻⁶, h = 0.0032'de (kuram 0.0039). eps = 10⁻⁶'da gradcheck kalır."}
+      - {name: "float64, merkezi", params: {prec: 1}, note: "En küçük hata 1.2·10⁻¹¹, h = 3·10⁻⁶'da (kuram 5·10⁻⁶). gradcheck geçer."}
+      - {name: "float32, ileri fark", params: {kind: 1}, note: "En iyi hata 2.5·10⁻⁴: merkezi farktan 100 kat kötü (√u'ya karşı u^(2/3))."}
+      - {name: "float64, ileri fark", params: {kind: 1, prec: 1}, note: "En iyi h = 10⁻⁸ = √u, hata 2.4·10⁻⁹."}
+      - {name: "Toleransı gevşetmek", params: {rtol: 0.1}, note: "rtol = 0.1 ile float32'de geçer, ama bu tolerans gerçek hataları da gizler."}
+    questions:
+      - q: "Sol koldaki (küçük h) eğri neden düzgün değil, testere dişi gibi?"
+        a: "Yuvarlama hatası, x ± h'nin ve f değerlerinin float ızgarasına nasıl düştüğüne bağlıdır; h küçüldükçe f(x+h) − f(x−h) farkı birkaç ULP'lik bir tam sayı katı olur ve 2h'ye bölünce sıçramalar görülür. Hata sınırı u|f|/h bir zarftır."
+    limits: "float32 benzetimi her ara sonucu Math.fround ile yuvarlar; gerçek float32 çekirdekleri (ör. FMA) biraz farklı sonuç verebilir. Tek değişkenli fonksiyonlar."
+  - id: l2
+    lab: stelab
+    title: "Straight-through estimator: nicemlenmiş ağırlığı eğitmek"
+    goal: |
+      Tek ağırlıklı bir modeli (ŷ = q(w)·x) b bitlik nicemlenmiş ağırlıkla eğit. Gerçek türevle (0) ağırlığın hiç hareket etmediğini, STE ile en yakın ızgara noktasına ulaştığını, hedef iki ızgara noktası arasındaysa gizli ağırlığın eşik etrafında salındığını ve |a| > 1'de kırpmalı STE'nin gizli ağırlığı nasıl tuttuğunu gör.
+    predict:
+      q: "Gerçek türev (∂q/∂w = 0) kullanılırsa 100 adım sonra w ne olur?"
+      options:
+        - {t: "Hedefe en yakın ızgara noktasına gider", why: "Gradyan sıfır olduğu için hiç hareket etmez."}
+        - {t: "Başlangıç değerinde kalır (−0.5)", ok: true, why: "round parçalı sabit: türevi neredeyse her yerde 0. Kayıp 0.403'te takılı."}
+        - {t: "Iraksar", why: "Güncelleme sıfır."}
+    presets:
+      - {name: "STE, 2 bit", params: {bits: 2, a: 0.6, est: 0, lr: 0.5, steps: 100, w0: -0.5}, note: "Izgara {−1, −0.5, 0, 0.5, 1}; q(w) 0.5'e ulaşıyor (kayıp tabanı 0.0033), ama w 0.75 eşiği etrafında salınıyor: son 20 adımda q 8 kez değişti."}
+      - {name: "Gerçek türev", params: {est: 1}, note: "w = −0.5'te kaldı, kayıp 0.403."}
+      - {name: "Küçük öğrenme oranı", params: {lr: 0.05}, note: "100 adımda w = 0.483, q = 0.5; henüz salınım yok (eşiğe ulaşmadı)."}
+      - {name: "4 bit", params: {bits: 4}, note: "Δ = 0.125; q = 0.625, taban 2.1·10⁻⁴; salınım sürüyor."}
+      - {name: "|a| > 1, düz STE", params: {a: 1.3}, note: "q 1'de doyuyor ama gradyan sıfırlanmadığı için gizli w 10.5'e kaçtı."}
+      - {name: "|a| > 1, kırpmalı STE", params: {a: 1.3, est: 2}, note: "w = 1.1'de duruyor: |w| > 1 olunca gradyan kesiliyor."}
+    questions:
+      - q: "Salınım neden zararlı olabilir, kayıp zaten tabanda değil mi?"
+        a: "Bu tek parametreli örnekte ortalama kayıp tabana yakındır. Gerçek ağlarda eğitimin son adımında q'nun hangi tarafta kaldığı rastgeledir; ayrıca BN istatistikleri salınan ağırlıklarla toplanır ve çıkarımda tutarsız kalır. Nagel ve ark. (2022) salınımı söndürme ya da ağırlığı dondurma önerir."
+    limits: "Tek ağırlık, tam batch gradyan inişi; x ∈ [−1, 1] düzgün ızgara, E[x²] = 1/3."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir Function'ın backward'ı
+    goal: grad_output ile çarpmayı unutmamak
+    needs: VJP
+    q: |-
+      `forward(ctx, x)`: `y = x**3`, `ctx.save_for_backward(x)`. Kayıp $L=\sum_i 2y_i$ ve $x=(1,-2)$. backward'a gelen `g` nedir, doğru dönüş nedir?
+    solution: |-
+      $g=\partial L/\partial\mathbf y=(2,2)$. Doğru dönüş $g\cdot3x^2=(6,24)$. Yalnız `3*x**2` = $(3,12)$ döndürmek, kayıp tam olarak $\sum y$ olduğunda doğru görünür ama burada yanlıştır; gradcheck $L=\sum y$ ile değil, rastgele bir $\bar{\mathbf y}$ ile test eder.
+  - id: p2
+    type: hesap
+    level: 1
+    title: log-sum-exp gradyanı
+    goal: lse'nin gradyanının softmax olduğunu kullanmak
+    needs: $\partial\,\mathrm{lse}/\partial x_j=e^{x_j-\mathrm{lse}}$
+    q: |-
+      $\mathbf x=(0,\ln3)$. $\partial\,\mathrm{lse}/\partial x_1$?
+    answer: 0.25
+    calc: "1/(1+3)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.75, msg: "Bu ikinci bileşen: e^{ln 3}/(1 + 3)."}
+      - {answer: 1.3862943611198906, msg: "Bu lse'nin kendisi: ln 4."}
+    hints:
+      - "$e^0=1$, $e^{\\ln3}=3$."
+    solution: |-
+      softmax $=(1,3)/4$; birinci bileşen $0.25$. lse $=\ln4$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Sonlu farkın en iyi adımı
+    goal: Kesme ve yuvarlama hatasını dengelemek
+    needs: $E(h)=\frac{h^2}6|f'''|+\frac{u|f|}h$
+    q: |-
+      $|f'''|=|f|=1$, $u=10^{-16}$. $E(h)$'yi en küçükleyen $h$ (yaklaşık)?
+    answer: 6.694329500821695e-06
+    calc: "(3*1e-16)**(1/3)"
+    tol: 1e-7
+    mistakes:
+      - {answer: 1e-08, msg: "Bu ileri farkın √u kuralı."}
+      - {answer: 4.641588833612779e-06, msg: "Türevi sıfırla: h/3 = u/h² → h³ = 3u."}
+    hints:
+      - "$E'(h)=h/3-u/h^2=0$."
+    solution: |-
+      $h^3=3u$, $h=(3\cdot10^{-16})^{1/3}\approx6.7\cdot10^{-6}$. PyTorch'un eps = 10⁻⁶ değeri bu mertebededir.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: gradcheck float32'de kalıyor
+    goal: Hatanın kaynağını ayırt etmek
+    needs: Sonlu fark hatası
+    q: |-
+      Özel bir Function için `gradcheck(fn, (x,))` float32 girdiyle "Jacobian mismatch" veriyor; sayısal ve analitik değerler %1–10 farklı. Aynı test float64'te geçiyor. Sonuç?
+    choices:
+      - {t: "backward hatalı", why: "float64'te geçiyor; analitik formül doğru."}
+      - {t: "Test float32'de anlamsız: eps = 10⁻⁶'da yuvarlama hatası ≈ u/h ≈ 0.06; float64 sonucu geçerli", ok: true, why: "PyTorch belgeleri gradcheck'i float64 ile çalıştırmayı söyler."}
+      - {t: "eps'i 10⁻¹⁰'a düşür", why: "Yuvarlama hatası u/h ile büyür; daha kötü olur."}
+    hints:
+      - "Hangi terim h küçüldükçe büyür?"
+    solution: |-
+      float32'de $u\approx6\cdot10^{-8}$; $u/h$ eps = 10⁻⁶'da %6 civarıdır. Function float32'de kullanılacak olsa bile gradcheck float64 girdilerle yapılır; float32 doğruluğu ayrıca toleranslı bir karşılaştırmayla sınanır.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Birleşik CE'nin gradyanı
+    goal: p − y formülünü türetmek
+    needs: lse gradyanı
+    q: |-
+      $\ell(\mathbf z)=-\log\mathrm{softmax}(\mathbf z)_y$ için $\nabla_{\mathbf z}\ell=\mathbf p-\mathbf e_y$ olduğunu ve $\sum_j\partial\ell/\partial z_j=0$ olduğunu göster.
+    rubric:
+      - "ℓ = −z_y + lse(z) yazdım"
+      - "lse'nin gradyanını softmax olarak kullandım"
+      - "Gradyan bileşenlerinin toplamının Σp − 1 = 0 olduğunu gösterdim"
+      - "Sıfır toplamın, logitlere sabit eklemenin kaybı değiştirmemesinin sonucu olduğunu belirttim"
+    hints:
+      - "$\\ell(\\mathbf z+c\\mathbf 1)=\\ell(\\mathbf z)$."
+    solution: |-
+      $\ell=-z_y+\mathrm{lse}(\mathbf z)$; $\partial/\partial z_j=-\mathbb 1[j=y]+p_j$. Toplam $\sum_jp_j-1=0$. Bu, $\ell$'in $\mathbf 1$ yönünde sabit olmasının (logitlere sabit eklemek softmax'ı değiştirmez) türevdeki karşılığıdır.
+pitfalls:
+  - wrong: "backward yerel türevi döndürür."
+    right: "backward, gelen grad_output ile çarpılmış VJP'yi döndürür; yalnız yerel türevi döndürmek kayıp tam o çıktı olmadıkça yanlıştır."
+  - wrong: "Tensörleri ctx.x = x diye saklamak da olur."
+    right: "save_for_backward sürüm denetimi yapar ve referans döngüsünü önler; tensörleri öznitelik olarak saklamak hem in-place hatalarını gizler hem bellek sızıntısına yol açabilir."
+  - wrong: "gradcheck'ten geçmeyen bir STE hatalıdır."
+    right: "STE ve GRL bilerek gerçek türevden farklıdır; gradcheck'te kalmaları beklenir."
+  - wrong: "Özel Function her zaman daha hızlıdır."
+    right: "Python düzeyindeki bir Function ek yük getirir ve torch.compile'ın birleştirmesini engelleyebilir. Kazanç (bellek, kararlılık, birleşik çekirdek) ölçülerek gösterilmelidir."
+whatif:
+  - q: "backward bir girdi için yanlış şekilli tensör döndürseydi?"
+    a: "Motor, dönen gradyanın girdiyle aynı şekilde (ya da ona yayınlanabilir) olmasını denetler ve hata verir. Yayın (broadcast) yapılmış bir girdide gradyan yayın boyutları boyunca toplanmalıdır."
+  - q: "STE'de geri geçişte özdeşlik yerine round'un 'yumuşak' bir yaklaşığının türevini kullansak?"
+    a: "Bu da bir tahmincidir; sıcaklıkla keskinleşen bir sigmoid/tanh yaklaşığı daha az yanlı ama başta daha çok sönümlü gradyan verir. Gumbel-softmax (ayrık örnekleme için) aynı fikrin olasılıksal biçimidir."
+  - q: "GRL'nin λ'sı eğitim boyunca sabit yerine 0'dan 1'e artırılsa?"
+    a: "Ganin ve Lempitsky tam olarak bunu yapar: başta alan sınıflandırıcısının gürültülü sinyali öznitelikleri bozmasın diye λ küçük başlar ve bir takvimle büyür."
