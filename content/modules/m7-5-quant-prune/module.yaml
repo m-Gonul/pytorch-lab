@@ -100,3 +100,145 @@ homework:
     accept:
       - "Kazanan biletler %10–20 yoğunlukta orijinal doğruluğa ulaşır."
       - "Rastgele yeniden başlatma aynı seyreklikte belirgin kötü."
+
+labs:
+  - id: l1
+    lab: quantlab
+    title: "Nicemleme: bit sayısı, ölçek kapsamı ve aykırı değerler"
+    goal: |
+      Satırları farklı ölçekli, bir oranda aykırı değer içeren bir ağırlık matrisini 2–8 bitte tensör, kanal ya da grup başına ölçekle nicemle. Ağırlık ve çıktı hatasını, ölçeklerin bit maliyetini ve simetrik/afin şemanın tek işaretli veride farkını gör.
+    predict:
+      q: "4 bit, %0.2 aykırı değer (× 10). Tensör başına ölçekten 64'lük grup başına ölçeğe geçince hata nasıl değişir?"
+      options:
+        - {t: "Az değişir (≈ %10)", why: "Aykırı değerler tek bir ölçeği bütün matris için bozuyor."}
+        - {t: "≈ 4 kat azalır (0.69 → 0.16)", ok: true, why: "Bir aykırı değer yalnız kendi grubunu bozar; bedeli 0.25 bit/ağırlık."}
+        - {t: "Artar", why: "Daha küçük bloklar daha iyi uyar."}
+    presets:
+      - {name: "4 bit, g = 64", params: {bits: 4, gran: 2, g: 3, scheme: 0, data: 0, out: 0.002, F: 10, spread: 1}, note: "Hata 0.155 (çıktı 0.158), 4.25 bit/ağırlık."}
+      - {name: "Tensör başına", params: {gran: 0}, note: "Hata 0.694: tek ölçek."}
+      - {name: "Kanal başına", params: {gran: 1}, note: "Hata 0.268, 4.06 bit/ağırlık."}
+      - {name: "Aykırı değer yok", params: {out: 0}, note: "Grup 0.105, kanal 0.122, tensör 0.348."}
+      - {name: "ReLU verisi, simetrik", params: {data: 1, scheme: 0}, note: "Hata 0.137: negatif kodlar boşa gidiyor."}
+      - {name: "ReLU verisi, afin", params: {data: 1, scheme: 1}, note: "Hata 0.075 (zero-point'in bit payıyla 4.5 bit/ağırlık)."}
+      - {name: "8 bit, tensör başına", params: {bits: 8, gran: 0}, note: "Hata 0.063; kanal 0.016, grup 0.009."}
+    questions:
+      - q: "Grup boyunu 8'e indirmek neden her zaman iyi değil?"
+        a: "Hata azalır ama ölçeklerin bit payı 16/8 = 2 bit/ağırlık olur: 4 bitlik nicemleme etkin olarak 6 bit olur. Aynı bit bütçesiyle daha çok bit kullanmak (ör. 5 bit, g = 64) genellikle daha iyidir."
+    limits: "Sentetik ağırlıklar; ölçekler fp16 sayılıyor; nicemleme sonrası ince ayar ya da GPTQ yok."
+  - id: l2
+    lab: prunelab
+    title: "Budama: yapısız, satır başına, 2:4 ve nöron"
+    goal: |
+      Ağırlık matrisini büyüklüğe göre budayıp çıktı hatasını seyrekliğe göre ölç. Yapısız (global), satır başına, 2:4 yapılı ve bütün nöronu atan budamayı karşılaştır; ağırlık dağılımının (Gauss, Laplace, aykırılı) etkisini gör.
+    predict:
+      q: "Laplace ağırlıklar, %50 seyreklik. Hangi yöntem en az çıktı hatası verir?"
+      options:
+        - {t: "Nöron budama", why: "Bütün satırları atmak en kaba yöntemdir: 0.50."}
+        - {t: "2:4", why: "Her 4'lük grupta 2 değeri zorla atar: 0.29."}
+        - {t: "Yapısız global", ok: true, why: "Tam olarak en küçük %50'yi atar: 0.16."}
+    presets:
+      - {name: "Yapısız, %50", params: {sp: 0.5, m: 0, dist: 1, rowsp: 0.5}, note: "Çıktı hatası 0.164, atılan enerji 0.025 (≈ hatanın karesi)."}
+      - {name: "2:4", params: {m: 2}, note: "Hata 0.285: aynı seyreklik ama yapı zorunluluğu."}
+      - {name: "Nöron budama", params: {m: 3}, note: "Hata 0.497: atılan enerji 0.245."}
+      - {name: "Gauss ağırlıklar", params: {dist: 0}, note: "Yapısız %50'de hata 0.236: kuyruk hafif, enerji daha eşit dağılmış."}
+      - {name: "%90 yapısız", params: {sp: 0.9}, note: "Hata 0.563."}
+    questions:
+      - q: "Budamadan sonra ince ayar neden kaybın çoğunu geri kazandırır?"
+        a: "Kalan ağırlıklar, atılanların katkısını telafi edecek biçimde yeniden ayarlanabilir; çıktı hatası yalnız budamanın kendisinin değil, kalan ağırlıkların ona uyumunun da fonksiyonudur. Bu deney ince ayarsız durumu, yani üst sınırı gösteriyor."
+    limits: "Rastgele bağımsız girdiler; ince ayar yok; tek katman."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Simetrik int8
+    goal: Ölçeği ve kodları hesaplamak
+    needs: s = max|x| / 127
+    q: |-
+      $\mathbf x=(-0.4,\ 1.27,\ 0.3)$. Simetrik int8 ölçeği ve kodlar? $0.3$ geri açılınca ne olur?
+    solution: |-
+      $s=1.27/127=0.01$; $\mathbf q=(-40,127,30)$; $\hat x_3=30\cdot0.01=0.3$ (tam). Ölçek en büyük mutlak değere göre seçildiği için $1.27$ tam 127'ye düşer.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Afin zero-point
+    goal: z'yi hesaplamak
+    needs: s = (max − min)/255, z = round(−min/s)
+    q: |-
+      Afin uint8, aralık $[0,\ 6]$ (ReLU6 çıktısı). Zero-point?
+    answer: 0
+    calc: "round(0/(6/255))"
+    tol: 0
+    mistakes:
+      - {answer: 128, msg: "Bu simetrik aralık için; min = 0 olduğu için z = 0."}
+      - {answer: 255, msg: "z, gerçek 0'ın kodudur: −min/s."}
+    hints:
+      - "$-\\min/s=0$."
+    solution: |-
+      $z=0$; bütün 256 kod $[0,6]$'ya ayrılır, adım $6/255\approx0.0235$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Grup başına bit maliyeti
+    goal: Ölçeklerin payını hesaplamak
+    needs: b + 16/g
+    q: |-
+      4 bit, $g=32$, fp16 ölçek. 7 milyar parametrelik modelin ağırlıkları kaç GB (10⁹ bayt)?
+    answer: 3.9375
+    calc: "7e9*(4+16/32)/8/1e9"
+    tol: 1e-6
+    mistakes:
+      - {answer: 3.5, msg: "Ölçekleri unutma: 4 + 16/32 = 4.5 bit/ağırlık."}
+      - {answer: 14.0, msg: "Bu fp16."}
+    hints:
+      - "$7\\cdot10^9\\cdot4.5/8$ bayt."
+    solution: |-
+      $4.5$ bit/ağırlık, $7\cdot10^9\cdot4.5/8=3.94\cdot10^9$ bayt; fp16'nın (14 GB) 3.6 kat küçüğü.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: int8 sonrası doğruluk çöktü
+    goal: Aktivasyon aykırılıklarını tanımak
+    needs: LLM.int8
+    q: |-
+      13 milyar parametrelik bir dil modelini ağırlık ve aktivasyonları tensör başına int8'e nicemleyince perplexity patlıyor; 1 milyar parametrelik modelde aynı yöntem sorunsuz. Olası neden ve çare?
+    choices:
+      - {t: "int8 büyük modeller için yetersiz bit", why: "Ağırlık-yalnız int8 büyük modellerde de iyi çalışır."}
+      - {t: "Büyük modellerde birkaç aktivasyon boyutu sistematik aykırı değerler alıyor ve tensör başına ölçeği bozuyor; o boyutları fp16'da tutmak (LLM.int8) ya da aykırılığı ağırlığa aktarmak (SmoothQuant)", ok: true, why: "Dettmers ve ark. bu boyutların ≈ 6.7 milyar parametrenin üstünde belirdiğini gösterdi."}
+      - {t: "Budama gerekir", why: "Sorun nicemleme ölçeği."}
+    hints:
+      - "Ölçek neye göre seçiliyor?"
+    solution: |-
+      Tek bir büyük aktivasyon boyutu tensör başına ölçeği belirler; diğer boyutlar birkaç koda sıkışır. Aykırı boyutları ayrı tutmak, aktivasyonu kanal başına ölçeklemek ya da yalnız ağırlıkları nicemlemek çözümdür.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Budamada büyüklük ölçütü
+    goal: En küçük |w|'leri atmanın neden optimal olduğunu göstermek
+    needs: Bağımsız girdiler
+    q: |-
+      $x$'in bileşenleri bağımsız, ortalaması 0, varyansı 1 ise $\mathbb E\|(W-\tilde W)x\|^2=\|W-\tilde W\|_F^2$ olduğunu ve $k$ ağırlık sıfırlanacaksa bu hatayı en küçükleyen seçimin en küçük $k$ tane $|w|$ olduğunu göster.
+    rubric:
+      - "E[x xᵀ] = I ile E‖Dx‖² = tr(DᵀD) = ‖D‖_F² yazdım"
+      - "D = W − W̃'nın yalnız sıfırlanan konumlarda sıfırdan farklı olduğunu belirttim"
+      - "Hatanın sıfırlanan ağırlıkların kareleri toplamı olduğunu yazdım"
+      - "Bu toplamın en küçük k kare (en küçük |w|) seçildiğinde en küçük olduğunu gösterdim"
+    hints:
+      - "$\\mathbb E[x^\\top D^\\top Dx]=\\mathrm{tr}(D^\\top D\\,\\mathbb E[xx^\\top])$."
+    solution: |-
+      $\mathbb E\|Dx\|^2=\mathrm{tr}(D^\top D)=\|D\|_F^2=\sum_{(i,j)\in\text{atılan}}w_{ij}^2$. $k$ terimlik bir kareler toplamı, en küçük $k$ kare seçildiğinde en küçüktür. Girdiler ilişkiliyse $\mathbb E[xx^\top]=\Sigma\ne I$ ve ölçüt $w^2\Sigma_{jj}$'ye (OBD) ya da tam Hessian'a (OBS, SparseGPT) dönüşür.
+pitfalls:
+  - wrong: "8 bitlik nicemleme modeli her zaman 4 kat hızlandırır."
+    right: "Bellek ve bant kazancı 4 kat (fp32'ye göre); hız, donanımın int8 çekirdeklerine ve işlemin bellek bağımlı olup olmadığına bağlıdır. Ağırlık-yalnız nicemlemede hesap yine fp16'da yapılır."
+  - wrong: "Simetrik ve afin şema aynı hatayı verir."
+    right: "Tek işaretli verilerde (ReLU sonrası) simetrik şema kodların yarısını boşa harcar; afin şema bütün aralığı kullanır."
+  - wrong: "Yapısız %50 seyreklik matris çarpımını iki kat hızlandırır."
+    right: "Düzensiz sıfırlar donanımda genellikle hız getirmez; 2:4 gibi yapılı seyreklik ya da çok yüksek seyreklik gerekir."
+  - wrong: "Grup boyu ne kadar küçükse o kadar iyi."
+    right: "Hata azalır ama ölçeklerin bit payı (16/g) artar; aynı bit bütçesinde orta grup boyları (64–128) en iyisidir."
+whatif:
+  - q: "Nicemlemede kırpma (clipping) eşiği max|x| yerine daha küçük seçilseydi?"
+    a: "Aralık daralır, ızgara incelir ve çoğu değerin hatası azalır; kırpılan büyük değerlerin hatası artar. Dağılım ağır kuyrukluysa en iyi eşik max'tan küçüktür (yüzdelik ya da MSE'yi en küçükleyen eşik)."
+  - q: "Budama ve nicemleme birlikte uygulansa?"
+    a: "Deep Compression (Han ve ark.) budama + nicemleme + Huffman kodlamayla modelleri 35–49 kat küçülttü. Sıra önemlidir: önce budayıp ince ayar, sonra nicemleme genellikle daha iyi sonuç verir."
+  - q: "Aktivasyonlar 4 bite indirilse?"
+    a: "Aktivasyonlarda aykırı boyutlar ve girdiye bağlı değişen aralık 4 biti çok zorlaştırır; bu yüzden yaygın düzen ağırlık 4 bit, aktivasyon 16 bit (W4A16) ya da 8 bittir (W8A8)."
