@@ -78,3 +78,141 @@ homework:
     accept:
       - "Doğru sonuç; büyük kare matrislerde cuBLAS'ın makul bir yüzdesi."
       - "Swizzle'ın L2 isabetine/performansa etkisi ölçülmüş."
+
+labs:
+  - id: l1
+    lab: tritongrid
+    title: "Program ızgarası ve maskeler"
+    goal: |
+      Vektör toplama ve matris çarpımı için Triton grid'ini hesapla: program sayısı, program başına K adımı, kenar tile'larındaki maskeli şeritler. Blok boyunun maske verimini ve dolgu yüzünden yapılan fazladan işi nasıl değiştirdiğini gör.
+    predict:
+      q: "C 70 × 40, K = 50, BM = BN = BK = 16. Kaç program çalışır?"
+      options:
+        - {t: "12", why: "Bu ⌊70/16⌋ · ⌊40/16⌋ = 4 · 2 olurdu; kenarlar için yukarı yuvarlanır."}
+        - {t: "15", ok: true, why: "cdiv(70, 16) · cdiv(40, 16) = 5 · 3."}
+        - {t: "60", why: "K boyutu program sayısını değil, program başına adımı belirler (4 adım)."}
+    presets:
+      - {name: "El hesabı (matmul)", params: {op: 1, M: 70, N: 40, K: 50, B: 1, BK: 1}, note: "5 × 3 = 15 program, 4 K adımı; C maske verimi 0.73, yapılan iş gerekenin 1.76 katı."}
+      - {name: "El hesabı (vektör)", params: {op: 0, M: 1000, B: 5}, note: "4 program, sonuncusunda 232 geçerli eleman, verim 0.98."}
+      - {name: "Büyük, tam bölünen", params: {op: 1, M: 1024, N: 1024, K: 1024, B: 4, BK: 2}, note: "8 × 8 = 64 program, 32 K adımı, verim 1."}
+      - {name: "Büyük blok, küçük matris", params: {op: 1, M: 70, N: 40, K: 50, B: 3, BK: 1}, note: "BM = 64: 2 program, verim 0.34, iş 3.7 kat."}
+    questions:
+      - q: "Kenar tile'larındaki fazladan iş neden sonucu bozmaz?"
+        a: "Maskeli yüklemeler other = 0 verir; sıfır satır/sütunlar iç çarpıma katkı yapmaz ve maskeli tl.store dolgu konumlarına yazmaz. Bedel yalnız boşa harcanan hesaptır."
+    limits: "Yalnız sayım; çekirdek süresi, doluluk ve tensör çekirdeği hizalaması modellenmedi."
+  - id: l2
+    lab: l2swizzle
+    title: "Gruplu program sırası ve L2 yeniden kullanımı"
+    goal: |
+      Matmul programlarının satır-ana ve GROUP_M'li gruplu sırasını karşılaştır. Aynı anda çalışan bir dalganın kaç A ve B tile'ı istediğini sayarak DRAM trafiğini tahmin et; Triton eğitimindeki 9 × 9 örneğini (90'a karşı 54) yeniden üret.
+    predict:
+      q: "9 × 9 blokluk matrislerde ilk 9 çıktı tile'ı için 3'lü gruplu sırada kaç tile okunur?"
+      options:
+        - {t: "90", why: "Bu satır-ana sıra: A'dan 9, B'den 81."}
+        - {t: "54", ok: true, why: "3 satır bloğu × 9 + 3 sütun bloğu × 9 = 27 + 27."}
+        - {t: "18", why: "Her blok K boyunca 9 tile içerir."}
+    presets:
+      - {name: "Eğitimdeki örnek", params: {Mb: 9, Nb: 9, Kb: 9, G: 3, W: 9}, note: "İlk dalga 90'a karşı 54; toplam 810'a karşı 486."}
+      - {name: "Satır-ana", params: {G: 1}, note: "810 tile."}
+      - {name: "Büyük matris, A100 benzeri dalga", params: {Mb: 32, Nb: 32, Kb: 32, G: 8, W: 108}, note: "Satır-ana 11 520, GROUP_M = 8 ile 7 584 tile (%34 az)."}
+      - {name: "Grup ≥ satır sayısı", params: {G: 9}, note: "Sütun-ana sıraya dönüşür: yine 810."}
+    questions:
+      - q: "Bu model neden yalnız bir tahmindir?"
+        a: "Dalgalar arası L2 yeniden kullanımını, L2 kapasitesini, programların gerçekte eşzamanlı başlamamasını ve donanım zamanlayıcısını yok sayar. Ama sıranın yönünü (hangi sıranın daha az DRAM trafiği yaptığı) doğru gösterir."
+    limits: "Dalga içi tam paylaşım, dalgalar arası sıfır paylaşım varsayımı."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Grid ve maske
+    goal: Program sayısını ve son programı hesaplamak
+    needs: cdiv
+    q: |-
+      $N=3000$, `BLOCK = 1024`. Kaç program çalışır, son programda kaç şerit maskelidir?
+    solution: |-
+      $\lceil3000/1024\rceil=3$ program; son program $3000-2048=952$ eleman işler, $1024-952=72$ şerit maskeli.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Softmax'ın BLOCK'u
+    goal: next_power_of_2 kuralını uygulamak
+    needs: 2'nin kuvveti
+    q: |-
+      Satırları 769 sütunlu bir matrisin satır softmax'ı için `BLOCK` kaçtır?
+    answer: 1024
+    calc: "2**10"
+    tol: 0
+    mistakes:
+      - {answer: 512, msg: "BLOCK ≥ sütun sayısı olmalı."}
+      - {answer: 769, msg: "BLOCK bir tl.constexpr ve 2'nin kuvveti olmalı."}
+    hints:
+      - "769'dan büyük ya da eşit en küçük 2'nin kuvveti."
+    solution: |-
+      $2^{10}=1024$; 255 konum maskeli ($-\infty$).
+  - id: p3
+    type: hesap
+    level: 1
+    title: Gruplu sıranın kazancı
+    goal: İlk dalganın tile okumasını saymak
+    needs: Satır ve sütun blokları
+    q: |-
+      $C$ 8 × 8 blok, K 8 blok. İlk 16 çıktı tile'ı 4'lü gruplu sırada (4 satır bloğu × 4 sütun bloğu) hesaplanırsa kaç tile okunur?
+    answer: 64
+    calc: "(4+4)*8"
+    tol: 0
+    mistakes:
+      - {answer: 80, msg: "Bu satır-ana sıra: 16 tile 2 tam satırdır, (2 + 8) · 8 = 80."}
+      - {answer: 8, msg: "Her blok K boyunca 8 tile."}
+    hints:
+      - "(satır blokları + sütun blokları) × K blokları."
+    solution: |-
+      $(4+4)\cdot8=64$. Satır-ana sırada 16 tile 2 tam satırdır: $(2+8)\cdot8=80$.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Softmax çekirdeği NaN veriyor
+    goal: other değerinin önemini tanımak
+    needs: Maskeler
+    q: |-
+      Kendi softmax çekirdeğiniz sütun sayısı 2'nin kuvveti olan matrislerde doğru, diğerlerinde bazı satırlarda yanlış. Maskeli yükleme `other=0.0` ile yapılıyor. Sorun?
+    choices:
+      - {t: "BLOCK çok küçük", why: "BLOCK ≥ sütun sayısı zaten."}
+      - {t: "Maskeli konumlar 0 olarak max'a ve exp toplamına giriyor; other=-inf olmalı", ok: true, why: "Tüm değerleri negatif bir satırda max = 0 olur; dolgu konumları e^(0 − max) toplama eklenir."}
+      - {t: "tl.store maskesiz", why: "Yazma maskesi doğru olsa da hata hesapta."}
+    hints:
+      - "Dolgu konumları exp'ten sonra ne katkı yapar?"
+    solution: |-
+      Dolgu konumları 0 ise $e^{0-\max}>0$ paydaya eklenir ve satır negatifse max'ı da değiştirir. `other=-inf` ile dolgu konumları max'ı etkilemez ve exp'te 0 olur.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Birleşik softmax'ın trafiği
+    goal: 2N ile 6N'yi türetmek
+    needs: Okuma ve yazma sayımı
+    q: |-
+      N elemanlık satırlar için birleşik softmax'ın 2N, dört ayrı çekirdekle (max, exp(x − max), sum, bölme) 6N eleman trafiği yaptığını göster; satır başına skaler ara sonuçların (max, toplam) payını ihmal et.
+    rubric:
+      - "Birleşik çekirdekte bir okuma ve bir yazma saydım"
+      - "max çekirdeğini N okuma olarak saydım"
+      - "exp çekirdeğini N okuma + N yazma, sum çekirdeğini N okuma saydım"
+      - "Bölme çekirdeğini N okuma + N yazma saydım ve toplamı 6N buldum"
+    hints:
+      - "Her ayrı çekirdek girdisini bellekten okumak zorunda."
+    solution: |-
+      Ayrı: max ($N$), exp ($N$ + $N$), sum ($N$), bölme ($N$ + $N$) = $6N$. Birleşik: $N$ okuma, $N$ yazma = $2N$. Bellek bağımlı olduğu için beklenen hız kazancı ≈ 3.
+pitfalls:
+  - wrong: "Triton'da her program bir thread'dir."
+    right: "Her program bir veri bloğunu işleyen vektör programıdır; blok derleyici tarafından birçok thread'e (num_warps) dağıtılır."
+  - wrong: "Maskeli yüklemelerde other değeri önemsizdir."
+    right: "Maskeli şeritler sonraki hesaba girer; other işlemin etkisiz elemanı olmalıdır (toplamda 0, max/softmax'ta −∞)."
+  - wrong: "BLOCK herhangi bir sayı olabilir."
+    right: "tl.arange'in uzunluğu derleme zamanı sabiti ve 2'nin kuvveti olmalıdır; şekil ondan küçükse maske kullanılır."
+  - wrong: "TRITON_INTERPRET=1 ile ölçülen süreler GPU'yu temsil eder."
+    right: "Yorumlayıcı NumPy ile CPU'da çalışır; yalnız doğruluk içindir."
+whatif:
+  - q: "Matmul'de birikim fp16'da yapılsaydı?"
+    a: "K büyüdükçe küçük katkılar büyük toplamın yanında yuvarlanıp kaybolur (M7.3); hata K ile birikir. tl.dot bu yüzden fp32 birikimle kullanılır ve sonuç sonda dönüştürülür."
+  - q: "Softmax satırı SRAM'e sığmayacak kadar uzun olsaydı?"
+    a: "Satır bloklar hâlinde iki ya da bir geçişte dolaşılır: çevrimiçi softmax ile koşan max ve yeniden ölçeklenen toplam tutulur; ikinci geçiş normalize edip yazar. Trafik 2N'den 3N'ye çıkar ama hâlâ 6N'den azdır."
+  - q: "Gruplu sıra yerine programlar rastgele sırayla çalışsaydı?"
+    a: "Dalga içindeki programlar C'nin dağınık bölgelerinden gelir; A ve B tile'ları neredeyse hiç paylaşılmaz ve DRAM trafiği paylaşımsız üst sınıra yaklaşır."
