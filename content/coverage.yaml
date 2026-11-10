@@ -122,7 +122,7 @@ groups:
         pages: [m9-15-matching]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M9.15 konu anlatımı bütün slaytları (1–27) işliyor: örüntüler ve üç amaç, korelasyonla şablon eşleme ve genlik sorunu, korelasyon katsayısı (aralık ve kazanç/ofset değişmezliğinin türetimi, SSD bağı), mekanik ve dolgu, FFT/integral görüntü hızlandırması, SIFT eşleştirme (best-bin-first, Lowe oran testi), devre kartı örneği ve tekrar eden yapılar, izleyiciler ve zorluklar, DCF ve dairesellik, MOSSE türetimi ve PSR, DCF'nin sınırları, CSRT'nin uzamsal ve kanal güvenilirliği; modül hedefleri için homografi, DLT ve Hartley normalizasyonu, RANSAC ve iterasyon formülü, panorama hattı eklendi; ncclab (cv2.matchTemplate ile 10⁻⁵ içinde aynı), ransaclab (kuram ve 1000 denemelik deney) ve mossetrack deneyleri."
       - src: "lect_20 — Görüntü kalitesi"
         topics: "MSE, PSNR, SSIM (parlaklık/kontrast/yapı karşılaştırmaları)"
         pages: [m9-13-quality]

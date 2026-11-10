@@ -105,3 +105,186 @@ homework:
     accept:
       - "6 görüntülük dizide gözle görülür dikiş ve hayalet olmadan panorama."
       - "Çift başına RANSAC içerdeğer sayıları tablosu ve `cv2.Stitcher` çıktısıyla yan yana görsel."
+
+labs:
+  - id: l1
+    lab: ncclab
+    title: "Ham korelasyon, SSD ve normalize korelasyon katsayısı"
+    goal: |
+      Bir şablonun iki kopyasını (biri aydınlatması değişmiş bölgede) ve parlak düz bir çeldirici kare içeren sahnede ham korelasyon, SSD ve korelasyon katsayısı γ ile şablon eşleme yap. Eşleme haritasını, bulunan konumu ve iki kopyadaki değerleri karşılaştır. γ, cv2.matchTemplate(TM_CCOEFF_NORMED) ile 10⁻⁵ içinde aynı.
+    predict:
+      q: "Ham korelasyon (Σ w·f) en büyük değerini nerede alır?"
+      options:
+        - {t: "Özgün kopyada", why: "Kopyada değer 42; parlak düz kare daha büyük çarpım veriyor (60)."}
+        - {t: "Parlak çeldirici karenin yakınında", ok: true, why: "Ham korelasyon genliğe duyarlı: düz ama parlak bir bölge şablonla büyük çarpım verir."}
+        - {t: "Aydınlatması değişmiş kopyada", why: "Orada kazanç 0.6, değer daha da küçük (32)."}
+    presets:
+      - {name: "Ham korelasyon", params: {m: 0, gain: 0.6, bias: 0.1, dist: 0.9, noise: 0.03}, note: "En iyi konum çeldiricinin yakınında: yanlış."}
+      - {name: "Çeldiricisiz", params: {m: 0, dist: 0.3}, note: "Ham korelasyon da özgün kopyayı buluyor."}
+      - {name: "SSD", params: {m: 1}, note: "Özgün kopya −0.13, değişmiş kopya −2.83: aydınlatma cezalandırılıyor."}
+      - {name: "NCC", params: {m: 2}, note: "İki kopya 0.991 ve 0.977: kazanç ve ofset affediliyor."}
+      - {name: "NCC, sert aydınlatma", params: {m: 2, gain: 0.3, bias: 0.3}, note: "Değişmiş kopya 0.917: kazanç azaldıkça gürültünün göreli payı artıyor."}
+      - {name: "NCC, güçlü gürültü", params: {m: 2, noise: 0.15}, note: "0.83 ve 0.69: hâlâ doğru yer."}
+    questions:
+      - q: "γ kazanca tam değişmezse, sert aydınlatmada (kazanç 0.3) değişmiş kopyanın γ'sı neden 0.98'den 0.92'ye düşüyor?"
+        a: "Gürültü aydınlatmadan sonra eklenmiyor; sahne gürültüsü kazançla birlikte küçülmüyor (sabit σ). Kazanç sinyali küçültünce sinyal/gürültü oranı düşer ve normalize vektörler arasındaki açı büyür. γ kazancı affeder, ama gürültüye göre zayıflayan sinyali affedemez."
+    limits: "72 × 72 yapay sahne, 11 × 11 şablon; ölçek ve dönme değişimi yok."
+  - id: l2
+    lab: ransaclab
+    title: "RANSAC: iterasyon formülü, eşik ve aykırı değerler"
+    goal: |
+      Aykırı değer oranı ε olan noktalara RANSAC ile doğru uydur ve bütün noktalara en küçük karelerle karşılaştır. Gerçekleşen içerdeğer oranından hesaplanan kuramsal başarı olasılığını, aynı N ile 1000 bağımsız denemenin deneysel oranıyla karşılaştır; eşik t'nin ve N'nin etkisini gör.
+    predict:
+      q: "ε = 0.5 nominal oranla N = 17 seçiliyor (p = 0.99 için). Bu örnekte gerçekleşen içerdeğer oranı 0.37 ise başarı olasılığı ne olur?"
+      options:
+        - {t: "≈ 0.99", why: "Bu nominal w = 0.5 içindir."}
+        - {t: "≈ 0.91", ok: true, why: "Kuram 0.914, deney 0.898: gerçek w düşük olduğu için 32 iterasyon gerekirdi."}
+        - {t: "≈ 0.5", why: "17 iterasyon yine de çoğu zaman temiz bir örnek bulur."}
+    presets:
+      - {name: "Varsayılan", params: {n: 100, eps: 0.5, sn: 0.1, t: 0.3, N: 17}, note: "Kuram 0.914, deney 0.898; RANSAC hatası 0.04, EKK 2.36."}
+      - {name: "Az iterasyon", params: {N: 3}, note: "Kuram 0.352, deney 0.331."}
+      - {name: "%80 aykırı, N = 113", params: {eps: 0.8, N: 113}, note: "Gerçek w = 0.17: kuram 0.957, deney 0.944; 166 gerekirdi."}
+      - {name: "Aykırı yok", params: {eps: 0}, note: "RANSAC ve EKK aynı: hata 0.016."}
+      - {name: "Dar eşik", params: {t: 0.05}, note: "Yalnız 19 içerdeğer: model daha az destekle seçiliyor."}
+      - {name: "Geniş eşik", params: {t: 2}, note: "64 içerdeğer: bazı aykırılar da katılıyor, hata 0.10."}
+      - {name: "Çok nokta", params: {n: 300}, note: "Gerçek w 0.467, nominal 0.5'e yakın: kuram 0.984, deney 0.993."}
+    questions:
+      - q: "Neden RANSAC son modeli tek bir minimal örnekten değil, bütün içerdeğerlerden yeniden kestirir?"
+        a: "Minimal örnek (2 ya da 4 nokta) gürültülüdür; içerdeğerlerin hepsiyle en küçük kareler gürültüyü ortalar. RANSAC'ın görevi aykırıları ayıklamaktır; içerdeğerler bulunduktan sonra en iyi kestirici yine en küçük karelerdir."
+    limits: "Doğru modeli (s = 2); homografi için s = 4 ve N çok daha büyür (Şekil 1)."
+  - id: l3
+    lab: mossetrack
+    title: "MOSSE izleyici, PSR ve sabit şablon"
+    goal: |
+      60 karelik yapay bir videoda dokusu dönen, aydınlatması değişen ve kısmen örtülen bir hedefi MOSSE ile izle; sabit şablonlu bir NCC izleyiciyle karşılaştır. Öğrenme oranı η, düzenleme λ, örtme ve PSR ile güncellemeyi durdurma eşiğinin etkisini merkez hatası ve PSR eğrileriyle ölç.
+    predict:
+      q: "Varsayılan sahnede sabit şablonlu NCC izleyicinin ortalama hatası nedir (MOSSE 0.7 piksel)?"
+      options:
+        - {t: "≈ 1 piksel", why: "Görünüş değişmeseydi öyle olurdu (yalnız örtmeli sahnede 1.4)."}
+        - {t: "≈ 24 piksel", ok: true, why: "Doku döndükçe ilk karedeki şablon artık eşleşmiyor; 60 karenin 41'inde 8 pikselden fazla sapma."}
+        - {t: "≈ 0.5 piksel", why: "Sabit şablon görünüş değişimine uyum sağlamaz."}
+    presets:
+      - {name: "Varsayılan", params: {eta: 0.125, lam: 100, speed: 1, occ: 1, morph: 0.5, light: 0.4, noise: 0.02, gate: 0}, note: "MOSSE 0.70, NCC 24 piksel."}
+      - {name: "Güncellemesiz MOSSE", params: {eta: 0}, note: "34 piksel: sabit süzgeç de görünüşü izleyemiyor."}
+      - {name: "Yalnız örtme", params: {morph: 0, light: 0}, note: "MOSSE örtücüyü öğreniyor: 7.0 piksel (NCC 1.4)."}
+      - {name: "Örtme + PSR eşiği", params: {morph: 0, light: 0, gate: 6}, note: "Düşük güvende güncelleme durunca 2.8 piksel."}
+      - {name: "Eşik, değişen görünüş", params: {gate: 6}, note: "8.4 piksel: eşik güncellemeyi gereğinden sık durduruyor."}
+      - {name: "Düzenlemesiz", params: {lam: 0.01}, note: "Bu sahnede yine 0.74; ama η = 0 ile durgun hedefte λ = 0.01 izleyiciyi kaybettiriyor."}
+    questions:
+      - q: "PSR eşiği neden hem iyileştirebiliyor hem kötüleştirebiliyor?"
+        a: "PSR, hem örtmede hem de görünüşün hızla değiştiği karelerde düşer. Örtmede güncellemeyi durdurmak örtücünün öğrenilmesini önler; ama görünüş değişirken durdurmak süzgeci eski görünüşte bırakır ve hedef kaybedilir. Eşik, uyum ile sağlamlık arasında bir ödünleşimdir; CSRT gibi yöntemler bu yüzden güvenilirliği piksel ve kanal düzeyinde modeller."
+    limits: "96 × 96, 60 kare yapay video; gri seviye MOSSE (ölçek kestirimi yok); NCC izleyici ±10 piksel arama, sabit şablon."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Korelasyon katsayısı
+    goal: γ'yı elle hesaplamak
+    needs: Ortalama çıkarma, normalizasyon
+    q: |-
+      $w=[0,2,4]$, pencere $f=[10,14,18]$. Ham korelasyon ve γ?
+    solution: |-
+      Ham: $0+28+72=100$. Ortalamalar 2 ve 14: $a=[-2,0,2]$, $b=[-4,0,4]$; $a\cdot b=16$, $\|a\|=\sqrt8$, $\|b\|=\sqrt{32}$: $\gamma=16/16=1$. Pencere şablonun $2w+10$'udur: kazanç ve ofset γ'yı değiştirmez.
+  - id: p2
+    type: hesap
+    level: 1
+    title: RANSAC iterasyonu
+    goal: Formülü uygulamak
+    needs: $N=\lceil\log(1-p)/\log(1-w^s)\rceil$
+    q: |-
+      Homografi ($s=4$), içerdeğer oranı 0.6, $p=0.99$. $N$?
+    answer: 34
+    calc: "math.ceil(math.log(0.01)/math.log(1-0.6**4))"
+    tol: 0
+    mistakes:
+      - {answer: 11, msg: "Bu s = 2 için (doğru)."}
+      - {answer: 72, msg: "Bu w = 0.5 için."}
+    hints:
+      - "$0.6^4=0.1296$."
+    solution: |-
+      $\log0.01/\log0.8704=33.1\to34$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Homografinin etkisi
+    goal: Homojen koordinatlarla nokta eşlemek
+    needs: $\mathbf x'\sim\mathbf H\mathbf x$, sonra bölme
+    q: |-
+      $\mathbf H=\begin{bmatrix}2&0&10\\0&2&0\\0&0.01&1\end{bmatrix}$, nokta $(20,100)$. $y'$?
+    answer: 100
+    calc: "(0*20+2*100+0)/(0*20+0.01*100+1)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 200, msg: "Homojen bölme unutuldu: payda 0.01 · 100 + 1 = 2."}
+      - {answer: 25, msg: "x′'yi değil y′'yi sordu: x′ = 50/2 = 25."}
+    hints:
+      - "Payda $h_{31}x+h_{32}y+h_{33}=2$."
+    solution: |-
+      $y'=200/2=100$, $x'=(40+10)/2=25$.
+  - id: p4
+    type: hesap
+    level: 2
+    title: MOSSE güncellemesi
+    goal: Üstel ortalamayı uygulamak
+    needs: $A_t=\eta G\bar F+(1-\eta)A_{t-1}$
+    q: |-
+      Tek bir frekansta (gerçel) $A_{t-1}=6$, $B_{t-1}=4$; yeni karede $F=1$, $G=4$; $\eta=0.2$, $\lambda=0$. Güncel $\bar H=A_t/B_t$?
+    answer: 1.6471
+    calc: "round((0.2*4*1+0.8*6)/(0.2*1*1+0.8*4), 4)"
+    tol: 0.0001
+    mistakes:
+      - {answer: 4.0, msg: "Bu yalnız yeni karenin süzgeci (G/F); geçmiş ağırlıklı ortalamaya girer."}
+      - {answer: 1.5, msg: "Bu eski süzgeç (6/4)."}
+    hints:
+      - "$A_t=0.8+4.8=5.6$, $B_t=0.2+3.2=3.4$."
+    solution: |-
+      $5.6/3.4=1.6471$: eski (1.5) ile yeni (4) arasında, eskiye yakın. Pay ve payda ayrı ortalandığı için bu, süzgeçlerin doğrudan ortalaması değildir.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Panoramada hayalet görüntü
+    goal: Eşleştirme hatasının kaynağını bulmak
+    needs: Oran testi, RANSAC eşiği
+    q: |-
+      İki fotoğraftan panorama kurarken birleşim bölgesinde bina pencereleri çift görünüyor; findHomography 200 eşleşmenin 40'ını içerdeğer sayıyor. Pencereler tekrar eden bir desen. En olası neden ve çözüm?
+    choices:
+      - {t: "Harmanlama yanlış", why: "Harmanlama çift görüntüyü yumuşatır ama yanlış homografiyi düzeltmez."}
+      - {t: "Tekrar eden pencereler yanlış ama tutarlı eşleşmeler üretiyor; oran testini sıkılaştır (0.7), eşleşmeleri benzersizlik ve karşılıklılık ile süz, RANSAC eşiğini ve N'yi gözden geçir", ok: true, why: "Ders örneğindeki özdeş konnektörler gibi: tekrar eden yapılar oran testini zorlar."}
+      - {t: "Homografi yerine afin kullanmak", why: "Model gücünü azaltmak hatalı eşleşmeleri düzeltmez."}
+    hints:
+      - "Tekrar eden yapılar oran testinde neden zorlanır?"
+    solution: |-
+      Özdeş pencerelerde en yakın iki komşu benzer uzaklıktadır ve oran testi bazılarını geçirebilir; bir pencere dizisi kaydırılmış ama tutarlı bir homografiyi destekleyebilir. Daha sıkı oran, çift yönlü eşleşme ve yeterli N ile RANSAC; gerekirse eşleşmeleri görüntünün farklı bölgelerine yayılmaya zorlamak.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: MOSSE'nin kapalı çözümü
+    goal: Frekansta en küçük kareleri çözmek
+    needs: Parseval, karmaşık türev
+    q: |-
+      $\sum_i\|f_i\star h-g_i\|^2+\lambda\|h\|^2$'yi en küçükleyen süzgecin frekans uzayında $\bar H=\frac{\sum_iG_i\bar F_i}{\sum_iF_i\bar F_i+\lambda}$ olduğunu göster. Neden her frekansın ayrı çözüldüğünü açıkla.
+    rubric:
+      - "Parseval ile uzamsal toplamı frekans toplamına çevirdim (sabit çarpan dışında)"
+      - "Korelasyonun frekansta F ⊙ H̄ çarpımı olduğunu kullandım"
+      - "Amacın frekanslar üzerinde ayrık terimlerin toplamı olduğunu ve her frekansın bağımsız en küçüklendiğini belirttim"
+      - "H̄'ye (ya da H'ye) göre karmaşık türevi sıfırlayıp kapalı biçimi buldum"
+    hints:
+      - "$\\partial|a\\bar H-b|^2/\\partial H=\\bar a(a\\bar H-b)$ (Wirtinger)."
+    solution: |-
+      Parseval: $\|f\star h-g\|^2\propto\sum_\omega|F\bar H-G|^2$; düzenleme $\lambda\sum|H|^2$. Amaç $\sum_\omega\bigl[\sum_i|F_i\bar H-G_i|^2+\lambda|\bar H|^2\bigr]$ biçimindedir: her $\omega$ ayrı bir terimdir ve bağımsız en küçüklenir. Türev $\sum_i\bar F_i(F_i\bar H-G_i)+\lambda\bar H=0$ → kapalı biçim. Bu yüzden MOSSE eğitimi piksel sayısında doğrusal (FFT ile $N\log N$) sürededir.
+pitfalls:
+  - wrong: "Ham korelasyonun en büyük değeri en iyi eşleşmedir."
+    right: "Yalnız genlik sabitse. Parlak bölgeler büyük çarpım verir; korelasyon katsayısı (TM_CCOEFF_NORMED) kullanılmalı."
+  - wrong: "RANSAC'ta iterasyon sayısını aykırı oranının nominal tahminine göre seçmek yeter."
+    right: "Gerçekleşen içerdeğer oranı daha düşükse başarı olasılığı düşer (lab l2'de 0.99 yerine 0.91). Uyarlamalı RANSAC N'yi bulunan en iyi içerdeğer oranına göre günceller."
+  - wrong: "Homografi için 3 nokta eşi yeter."
+    right: "8 serbestlik vardır: en az 4 eş (üçü doğrudaş olmamalı); 3 eş ancak afin dönüşümü belirler."
+  - wrong: "MOSSE'nin λ'sı küçük bir sayısal koruma terimidir, değeri önemsizdir."
+    right: "λ, |F|² ile aynı ölçekte olmalıdır; aksi hâlde süzgeç neredeyse bir ters süzgeçtir ve eğitim örneklerine aşırı uyar."
+whatif:
+  - q: "Şablon eşlemede hedef 20° dönmüş ya da 1.5 kat büyümüş olsaydı?"
+    a: "γ hızla düşer: şablon eşleme dönme ve ölçeğe değişmez değildir. Çözümler: şablonun döndürülmüş/ölçeklenmiş sürümleriyle arama (maliyet çarpılır), log-polar dönüşüm ya da değişmez öznitelikler (SIFT) + homografi."
+  - q: "RANSAC yerine bütün eşleşmelere Huber gibi sağlam bir kayıp kullanılsa?"
+    a: "Az aykırıda iyi çalışır, ama aykırı oranı %50'yi aşınca M-kestiriciler çöker (kırılma noktası); RANSAC yüksek aykırı oranlarını kaldırabilir ama iterasyon sayısı büyür. Pratikte RANSAC ile başlangıç + sağlam kayıpla iyileştirme birlikte kullanılır."
+  - q: "MOSSE'de istenen çıktı G Gauss tepe yerine tek bir dürtü olsa?"
+    a: "Süzgeç, örneklerdeki küçük kaymalara karşı aşırı keskin olur ve yanıt kararsızlaşır; Gauss tepe, hedefin yakın komşu konumlarını da kısmen kabul ederek süzgeci düzgünleştirir. σ'yı büyütmek sağlamlığı artırır ama konum hassasiyetini düşürür."
