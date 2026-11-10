@@ -123,3 +123,165 @@ homework:
     accept:
       - "OpenCV SIFT anahtar noktalarının %70'inden fazlasıyla 1.5 piksel içinde örtüşme."
       - "Döndürülmüş + ölçeklenmiş görüntü çiftinde OpenCV SIFT'e yakın doğru eşleşme oranı."
+
+labs:
+  - id: l1
+    lab: dogscale
+    title: "Ölçek uzayında DoG uç noktaları: küçük bir SIFT dedektörü"
+    goal: |
+      Std'si 2, 3.5 ve 6 olan üç Gauss leke ve bir dikdörtgen içeren sahnede oktav başına s + 3 Gauss görüntüsü, DoG ve 26 komşulu uç nokta arama ile anahtar noktaları bul; kontrast eşiği ve kenar oranı r ile elemeleri say. Lekelerde bulunan ölçekleri, ölçek-normalize ve ham Laplasyen eğrisini, girdiyi 2 kat büyütmenin ve sahneyi büyütmenin (ölçek kovaryansı) etkisini gör.
+    predict:
+      q: "Girdi büyütülmeden (Lowe'un 2× adımı olmadan) std'si 2 olan en küçük leke bulunur mu?"
+      options:
+        - {t: "Evet, σ = 2.02'de", why: "DoG'un mutlak değeri en alt düzeyde (σ = 1.6) daha büyük; uç nokta ölçek aralığının dışında kalıyor."}
+        - {t: "Hayır", ok: true, why: "26 komşulu karşılaştırma alt düzeyde yapılamıyor. 2× büyütmeyle σ < 1.6 ölçekleri de taranıyor ve leke σ = 1.6'da bulunuyor."}
+        - {t: "Yalnız kontrast eşiği 0'sa", why: "Sorun kontrast değil, ölçek aralığı."}
+    presets:
+      - {name: "Varsayılan (2× büyütme)", params: {s: 3, c: 0.01, r: 10, z: 1, noise: 0.01, dbl: 1}, note: "43 aday: 25 kontrast, 4 kenar elendi, 14 kaldı. Leke ölçekleri 1.6, 3.2, 5.08."}
+      - {name: "Büyütmesiz", params: {dbl: 0}, note: "En küçük leke kayıp; 28 aday, 10 nokta."}
+      - {name: "Sahne × 1.5", params: {z: 1.5}, note: "Ölçekler 2.54, 5.08, 8.06: hepsi 1.59 katı (ızgara nicemlemesiyle)."}
+      - {name: "Sahne × 0.7", params: {z: 0.7}, note: "Ölçekler 1.27, 2.02, 4.03."}
+      - {name: "s = 1", params: {s: 1}, note: "Kaba ölçek ızgarası: 64 aday, 43'ü kenar testiyle eleniyor; iki leke aynı ölçeğe (3.2) düşüyor."}
+      - {name: "Yüksek kontrast eşiği", params: {c: 0.04}, note: "Yalnız 3 nokta kalıyor."}
+      - {name: "Gürültü", params: {noise: 0.05}, note: "25 nokta: gürültü sahte uçlar ekliyor; en küçük leke 2.02'de."}
+    questions:
+      - q: "Normalize edilmemiş ∇²L neden ölçek seçemez, σ² çarpanı neyi düzeltir?"
+        a: "Gauss türevlerinin genliği σ büyüdükçe azalır (∇²G ∝ 1/σ⁴ · σ² alan): ham yanıt σ ile monoton düşer ve tepe yapmaz. σ² ile çarpmak türevleri ölçeğe göre normalize eder; böylece yanıt, yapının boyutuna eşit σ'da tepe yapar (Gauss leke için σ = t)."
+    limits: "96 × 96 yapay sahne; alt piksel Taylor enterpolasyonu yok; kontrast eşiği ham D değerinde; 4 oktav."
+  - id: l2
+    lab: hoglab
+    title: "HOG: hücre, bölme, blok normalizasyonu ve aydınlatma"
+    goal: |
+      64 × 128 pencerede yapay bir yaya silueti için HOG betimleyicisini hesapla (scikit-image ile 10⁻⁷ düzeyinde aynı). Hücre boyutunu, bölme sayısını, işaretli/işaretsiz yönü ve blok normalizasyonunu değiştir; aydınlatma kazancı ve gölge rampası altında betimleyicinin özgüne kosinüs benzerliğini ve doğrusal bir şablon puanının oranını ölç.
+    predict:
+      q: "Kazanç 0.6, gölge 0.5. Normalizasyon olmadan doğrusal şablon puanı (w·d) özgününün kaç katı olur?"
+      options:
+        - {t: "≈ 1", why: "Bu kosinüs benzerliği (0.978): kosinüs ölçeği zaten affeder."}
+        - {t: "≈ 0.45", ok: true, why: "Gradyanlar kazançla ve gölgeyle ölçeklenir; L2-Hys ile oran 0.97'ye çıkıyor."}
+        - {t: "≈ 0", why: "Yapı korunuyor, yalnız ölçek değişiyor."}
+    presets:
+      - {name: "Dalal–Triggs", params: {cell: 1, bins: 1, signed: 0, norm: 2, gain: 0.6, shadow: 0.5, noise: 0.01}, note: "3780 boyut; kosinüs 0.972, puan oranı 0.972."}
+      - {name: "Normalizasyonsuz", params: {norm: 0}, note: "Kosinüs 0.978 ama puan oranı 0.45."}
+      - {name: "Yalnız kazanç", params: {norm: 0, shadow: 0}, note: "Kosinüs 1.000, puan oranı 0.600: tam kazanç kadar."}
+      - {name: "Sert aydınlatma", params: {norm: 2, gain: 0.3, shadow: 0.8}, note: "L2-Hys: 0.91; normalizasyonsuz puan oranı 0.18."}
+      - {name: "4 × 4 hücre", params: {cell: 0}, note: "16 740 boyut."}
+      - {name: "16 × 16 hücre", params: {cell: 2}, note: "756 boyut; kaba ama aydınlatmaya daha az duyarlı (0.992)."}
+      - {name: "İşaretli, 18 bölme", params: {bins: 2, signed: 1}, note: "7560 boyut."}
+    questions:
+      - q: "Blok normalizasyonu neden kosinüs benzerliğini biraz düşürebiliyor, buna rağmen neden kullanılır?"
+        a: "Normalizasyon her bloğu aynı boya getirir: zayıf gradyanlı düz bloklar da güçlü bloklar kadar ağırlık kazanır. Gölge rampası düz arka planda gerçek bir yatay gradyan eklediği için bu bloklar değişir. Ama sınıflandırıcı için asıl önemli olan puanın yerel kontrastla ölçeklenmemesidir; normalizasyonsuz bir SVM'nin eşiği aydınlatmaya bağlı kalırdı."
+    limits: "Tek yapay pencere; aydınlatma modeli çarpımsal (kazanç × rampa); bölmeler arası enterpolasyon yok (skimage gibi); SVM yok, şablon olarak özgün betimleyici."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Ölçek uzayı tablosu
+    goal: k ve σ'ları hesaplamak
+    needs: $k=2^{1/s}$, oktav başına $s+3$
+    q: |-
+      $s=3$, $\sigma_0=1.6$. $k$, birinci oktavın σ'ları ve ikinci oktavın ilk σ'sı?
+    solution: |-
+      $k=2^{1/3}=1.26$. Altı görüntü: 1.6, 2.02, 2.54, 3.2, 4.03, 5.08; oktav görüntüsü (yukarıdan üçüncü) 3.2 = 2σ₀. İkinci oktav bu görüntünün 2 ile alt örneklenmesiyle başlar; görüntü koordinatlarında σ yine 1.6, özgün görüntüye göre 3.2.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kenar testi
+    goal: Tr²/Det'i eşikle karşılaştırmak
+    needs: $(r+1)^2/r$
+    q: |-
+      $D_{xx}=8$, $D_{yy}=3$, $D_{xy}=2$, $r=10$. $\operatorname{Tr}^2/\operatorname{Det}$? (3 basamak)
+    answer: 6.05
+    calc: "round((8+3)**2/(8*3-2**2), 3)"
+    tol: 0.001
+    mistakes:
+      - {answer: 5.042, msg: "Det = D_xx D_yy − D_xy² = 20, 24 değil."}
+      - {answer: 12.1, msg: "Bu eşik (r + 1)²/r."}
+    hints:
+      - "Tr = 11, Det = 20."
+    solution: |-
+      $121/20=6.05<12.1$: nokta kenar değil, tutulur.
+  - id: p3
+    type: hesap
+    level: 1
+    title: SURF süzgeç boyutu
+    goal: Süzgeç boyutundan ölçeğe geçmek
+    needs: $\sigma=1.2\cdot L/9$
+    q: |-
+      SURF'te 51 × 51 kutu süzgeci hangi σ'ya karşılık gelir? (2 basamak)
+    answer: 6.8
+    calc: "round(1.2*51/9, 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 5.67, msg: "Oran 9'a göre: 51/9 = 5.67, ama 1.2 ile çarpılmalı."}
+      - {answer: 61.2, msg: "1.2 · 51 değil, 1.2 · (51/9)."}
+    hints:
+      - "9 × 9 ↔ 1.2."
+    solution: |-
+      $1.2\cdot51/9=6.8$.
+  - id: p4
+    type: hesap
+    level: 2
+    title: HOG boyutu
+    goal: Örtüşen blokları saymak
+    needs: Blok sayısı × hücre/blok × bölme
+    q: |-
+      48 × 96 pencere, 8 × 8 hücre, 2 × 2 blok (adım 1 hücre), 9 bölme. Boyut?
+    answer: 1980
+    calc: "(48//8-1)*(96//8-1)*4*9"
+    tol: 0
+    mistakes:
+      - {answer: 2592, msg: "Bu hücre sayısı × 4 × 9; bloklar (6 − 1)(12 − 1) = 55."}
+      - {answer: 648, msg: "Bu yalnız hücre histogramları (72 × 9); bloklar örtüşür ve her hücre birden çok kez sayılır."}
+    hints:
+      - "Hücre ızgarası 6 × 12, blok ızgarası 5 × 11."
+    solution: |-
+      $55\cdot36=1980$.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Küçük görüntüde SIFT eşleşmesi yok
+    goal: Ölçek ve kontrastın etkisini tanımak
+    needs: Kontrast eşiği, ölçek aralığı
+    q: |-
+      Yarı boyuta küçültülmüş bir görüntünün alt görüntüsü, özgün görüntüyle SIFT ile hiç eşleşmiyor (ders örneği). Hangisi en olası çözümdür?
+    choices:
+      - {t: "r'yi 2'ye indirmek", why: "Bu daha çok noktayı kenar sayıp eler."}
+      - {t: "Görüntüyü hafifçe aydınlatmak / karşıtlığını artırmak (ya da histogram belirtmeyle sorguya benzetmek): küçültmeyle zayıflayan D değerleri kontrast eşiğini yeniden geçer", ok: true, why: "Derste gamma ile aydınlatınca 7 eşleşme (biri yanlış) bulundu."}
+      - {t: "128 yerine 64 boyutlu betimleyici", why: "Sorun anahtar nokta bulunamaması."}
+    hints:
+      - "Küçültme ince ayrıntıyı ve DoG genliğini azaltır."
+    solution: |-
+      Küçültmede ayrıntı kaybolur, DoG değerleri düşer ve eşiği geçen nokta sayısı azalır. Karşıtlık iyileştirme (gamma, histogram belirtme) noktaları geri getirir; kütüphane eşiğini düşürmek de bir seçenektir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Isı denklemi ve DoG
+    goal: DoG ≈ (k − 1)σ²∇²G'yi türetmek
+    needs: Kısmi türevler
+    q: |-
+      (a) $G=\frac1{2\pi\sigma^2}e^{-r^2/2\sigma^2}$ için $\partial G/\partial\sigma=\sigma\nabla^2G$ olduğunu göster. (b) Buradan $G(k\sigma)-G(\sigma)\approx(k-1)\sigma^2\nabla^2G$'yi çıkar. (c) Yaklaşımın hatasının $k$'ye nasıl bağlı olduğunu (Taylor'un bir sonraki terimiyle) söyle.
+    rubric:
+      - "∂G/∂σ = (r²/σ³ − 2/σ)G hesapladım"
+      - "∇²G = (r² − 2σ²)/σ⁴ · G (M9.6) ile çarpıp σ∇²G'ye eşit olduğunu gösterdim"
+      - "Sonlu farkla G(kσ) − G(σ) ≈ (kσ − σ)∂G/∂σ yazdım"
+      - "Hatanın (k − 1)² mertebesinde olduğunu ve k → 1'de sıfıra gittiğini belirttim"
+    hints:
+      - "Ön çarpan $1/\\sigma^2$'nin türevini de unutma."
+    solution: |-
+      (a) $\partial_\sigma G=G\,(-2/\sigma+r^2/\sigma^3)=\sigma\cdot\frac{r^2-2\sigma^2}{\sigma^4}G=\sigma\nabla^2G$. (b) $G(k\sigma)-G(\sigma)\approx(k-1)\sigma\,\partial_\sigma G=(k-1)\sigma^2\nabla^2G$. (c) Bir sonraki terim $\frac12(k-1)^2\sigma^2\partial^2_\sigma G$'dir: göreli hata $(k-1)$ ile orantılıdır; $k=\sqrt2$'de (k − 1 = 0.41) Şekil 1'deki %40'lık fark bunun sonucudur.
+pitfalls:
+  - wrong: "SIFT anahtar noktaları ölçek uzayında yalnız 8 komşuyla karşılaştırılır."
+    right: "26 komşuyla: aynı DoG görüntüsündeki 8 ve üstteki ve alttaki ölçekteki 9'ar komşu. Bu yüzden oktavın ilk ve son DoG'unda uç nokta aranamaz."
+  - wrong: "Kütüphaneler arasında SIFT eşikleri aynı anlama gelir."
+    right: "Lowe'un 0.03'ü [0, 1] görüntü ve alt piksel D içindir; OpenCV contrastThreshold'u katman sayısına böler ve farklı ölçekte uygular. Eşikler doğrudan taşınamaz."
+  - wrong: "HOG'da blok normalizasyonu her zaman benzerliği artırır."
+    right: "Doğrusal sınıflandırıcının puanını aydınlatmadan bağımsız kılar; ama zayıf blokları güçlendirdiği için gölge gibi gerçek gradyanlar düz bölgelerde betimleyiciyi değiştirebilir (lab l2)."
+  - wrong: "SURF, Gauss yerine kutu süzgeci kullandığı için SIFT'ten her zaman kötüdür."
+    right: "Bay ve ark.'ın ölçümlerinde tekrarlanabilirlikte yaklaşır ya da geçer; asıl fark hızdır ve o da gerçekleştirime bağlıdır."
+whatif:
+  - q: "SIFT'te Gauss pencerenin σ'sı bölge boyunun yarısı yerine çok büyük seçilse?"
+    a: "Kenardaki gradyanlar da merkezdekiler kadar ağırlık alır: anahtar noktanın küçük kaymaları betimleyiciyi daha çok değiştirir (piksellerin alt bölgeler arasında geçişi). Ağırlık bu ani değişimleri yumuşatmak içindir."
+  - q: "HOG'da işaretsiz yerine işaretli yön kullanılsa?"
+    a: "Açık zemin üzerindeki koyu bir nesneyle koyu zemin üzerindeki açık bir nesne farklı betimlenir. Yayalarda giysi ve arka plan rengi rastgele olduğu için işaretsiz yön daha iyidir (Dalal–Triggs); araç gibi tutarlı karşıtlıklı nesnelerde işaretli yön yararlı olabilir."
+  - q: "SIFT betimleyicisi 0.2'de kırpılmasa?"
+    a: "Doygunluk ya da yansımadan doğan tek bir güçlü kenar vektöre egemen olur; doğrusal olmayan aydınlatma değişimlerinde eşleşme bozulur. 0.2 eşiği büyüklüklerin göreli önemini azaltıp yön dağılımını öne çıkarır."

@@ -110,7 +110,7 @@ groups:
         pages: [m9-14-features]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M9.14 konu anlatımı üç dersin bütün slaytlarını işliyor: lect_13 SIFT (değişmezlik, ana fikir, ölçek uzayı ve Gauss, oktavlar ve k = 2^{1/s}, s + 3 görüntü, oktav görüntüsü, örnek tablo, DoG ve ısı denklemi türetimi, 26 komşulu uç nokta, Taylor ile alt piksel, kontrast eşiği, kenar testi türetimi, yön histogramı ve %80 kuralı, 128 boyutlu betimleyici, iki aşamalı normalizasyon, özet ve ders eşleştirme sonuçları), lect_17 SURF (üç adım, hız, Fast-Hessian, kutu süzgeçleri ve 0.9 ağırlığı, süzgeç büyüterek ölçek uzayı, Haar yön ataması, 64 boyutlu betimleyici, U-SURF, son notlar ve diğer dedektörler), lect_HoG (tarihçe, ana fikir, dört adım, 3780 boyut, OpenCV örneği, artı ve eksiler); dogscale ve hoglab (skimage ile 10⁻⁷ düzeyinde aynı) deneyleri. Slayt notları: Gauss'un tekliği kuramsal; DoG ≈ (k − 1)σ²∇²G yaklaşım; SIFT histogramı iki bölmeye paylaştırır; Frobenius normu karekökle; HoG'da ikinci maske G_y ve L2-Hys; patent durumu."
       - src: "lect_14, lect_15, lect_16 — CLAHE, bilateral, NLM"
         topics: "AHE/CLAHE ve enterpolasyon; bilateral süzgeç parametreleri, ince çizgileri geçme, yineleme; NLM ağırlıkları"
         pages: [m9-12-edge-preserving, m9-2-intensity-histogram]
