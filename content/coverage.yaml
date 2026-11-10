@@ -80,7 +80,7 @@ groups:
         pages: [m9-5-restoration]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M9.5 konu anlatımı bütün slaytları (1–63) işliyor: iyileştirme ve restorasyon farkı, bozulma modeli g = h ⊛ f + η, gürültü kaynakları, beyaz gürültü ve bağımsızlık varsayımları, altı PDF ve momentleri (türetimli), tuz-biber yoğunluğu ve momentleri, hangi gürültü nerede, en büyük entropi, histograma etkisi ve moment yöntemiyle kestirim, aritmetik/geometrik ortalama (Gonzalez'den harmonik ve kontraharmonik eklendi), medyan ve tekrarlı geçiş, uyarlamalı ortalama (Lee/LMMSE türetimi), oranın kırpılması ve σ_η² yanlış kestirimi, uyarlamalı medyan (Seviye A/B, analiz, z_xy seçeneğinin tuzağı, artımlı medyan), gürültü giderme notları, PSNR; noisepdf ve denoise2d deneyleri. Slayt notları: Erlang z ≥ 0 ve a > 0 (z ≥ a, a > b değil); tuz-biber momentlerinde K = V; slayt 56'da tuz ve biber yer değiştirmiş; kırpma süzgeci doğrusal olmayan yapmaz, zaten değildir."
       - src: "lect_6 (1), lect_7 (1) — Kenar ve köşe"
         topics: "türev, Sobel/Prewitt/Kirsch, LoG, Canny, Harris–Stephens"
         pages: [m9-6-edges, m9-7-corners]

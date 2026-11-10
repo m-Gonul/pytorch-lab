@@ -97,3 +97,166 @@ homework:
       - "σ = 25'te test PSNR'ı Gauss bulanıklaştırmadan en az 3 dB, NLM'den en az 0.5 dB yüksek."
       - "Residual (gürültü tahmini) ve doğrudan (temiz görüntü tahmini) çıkış karşılaştırması raporlanmış."
       - "BN'li ve BN'siz eğitim eğrileri karşılaştırılmış."
+
+labs:
+  - id: l1
+    lab: noisepdf
+    title: "Gürültü PDF'leri ve düz bir şeritten parametre kestirimi"
+    goal: |
+      Altı gürültü türünden birini seç. Üç gri seviyeli bir desenin histogramında PDF'in biçiminin her seviyenin çevresinde nasıl belirdiğini gör; düz bir şeritten moment yöntemiyle parametreleri kestir ve şerit büyüklüğünün kestirim hatasına etkisini ölç.
+    predict:
+      q: "Erlang gürültüsünde a = 0.2 sabitken b'yi 1'den 12'ye çıkarırsan şeridin histogramı neye benzer?"
+      options:
+        - {t: "Üstel kalır", why: "b = 1 üsteldir; b büyüdükçe biçim değişir."}
+        - {t: "Simetrik, Gauss'a benzer bir tepeye", ok: true, why: "Erlang b tane üstelin toplamıdır; merkezi limit teoremiyle Gauss'a yaklaşır (ortalama b/a, varyans b/a²)."}
+        - {t: "Düzgün", why: "Toplam düzgüne yaklaşmaz."}
+    presets:
+      - {name: "Rayleigh", params: {t: 1, ra: 0, rb: 800, n: 2000}, note: "Kuram z̄ = 25.1, σ² = 171.7; kestirim b = 809, a ≈ 0."}
+      - {name: "Üstel = Erlang b = 1", params: {t: 2, ea: 0.2, eb: 1}, note: "z̄ = 5, σ² = 25: tek parametre."}
+      - {name: "Erlang b = 12", params: {t: 2, ea: 0.5, eb: 12}, note: "z̄ = 24, σ² = 48; histogram Gauss'a benziyor, b kestirimi 12."}
+      - {name: "Az örnek", params: {t: 1, n: 30}, note: "30 örnekte a = −1.3, b = 853: tohumu değiştir, kestirimin ne kadar oynadığını gör."}
+      - {name: "Güçlü Gauss, kırpma", params: {t: 0, sig: 40}, note: "Desen piksellerinin %7.9'u 0–255 dışına taşıp kırpılıyor: histogramın uçlarında yapay yığılmalar."}
+      - {name: "Tuz-biber", params: {t: 5, ps: 0.05, pp: 0.05}, note: "Uçlarda iki çubuk; şerit (V = 128) ortalaması 127.95, varyansı ≈ 1626."}
+    questions:
+      - q: "Rayleigh gürültüsünde a parametresini histogramdan doğrudan okumak neden zordur, moment yöntemi neden işe yarar?"
+        a: "Yoğunluk a'da sıfırdan başlar ve tepeye doğru yavaşça yükselir; az örnekte en küçük değer a'nın epey üstünde kalır. Ortalama ve varyans bütün örnekleri kullanır: b = 4σ²/(4 − π), a = z̄ − √(πb/4)."
+    limits: "Gürültü desene bağımsız eklenir; şerit seviyesi bilinir varsayılıyor (sensör kalibrasyonu). Gerçek görüntülerde düz bölge bulmak ve kırpma ayrı sorunlardır."
+  - id: l2
+    lab: denoise2d
+    title: "Ortalama, medyan ve uyarlamalı süzgeçler: PSNR karşılaştırması"
+    goal: |
+      Dikdörtgenler, rampa, ince çizgiler ve noktalar içeren 80 × 80'lik bir deseni Gauss, tuz-biber, tek kutuplu ya da karışık gürültüyle boz. Yedi süzgeci (aritmetik, geometrik, harmonik, kontraharmonik, medyan, uyarlamalı ortalama, uyarlamalı medyan) aynı girdide PSNR, düz bölge ve kenar bölgesi PSNR'ıyla karşılaştır.
+    predict:
+      q: "σ = 20 Gauss gürültüsünde 3 × 3 aritmetik ortalama PSNR'ı nasıl değiştirir (girdi 22.2 dB)?"
+      options:
+        - {t: "Belirgin artırır (≈ 27 dB)", why: "Düz bölgede öyle (31.5 dB), ama bu desende kenar çok."}
+        - {t: "Biraz düşürür (21.9 dB)", ok: true, why: "İnce çizgi ve noktalar bulanıklaşıyor: kenar bölgesi 22.3 → 17.3 dB. Uyarlamalı ortalama 27.4 dB veriyor."}
+        - {t: "Değiştirmez", why: "Gürültü azalır ama kenarlar bulanıklaşır; ikisi eşit değil."}
+    presets:
+      - {name: "Tuz-biber P = 0.1, medyan", params: {nt: 1, P: 0.1, f: 4, k: 0, passes: 1}, note: "15.2 → 22.5 dB; düz bölge kusursuz, kenar bölgesi 17.6 dB. Uyarlamalı medyan 24.6 dB."}
+      - {name: "P = 0.5, uyarlamalı medyan", params: {nt: 1, P: 0.5, f: 6, smax: 2}, note: "Medyan 13.6 dB'ye düşerken uyarlamalı medyan 20.3 dB."}
+      - {name: "Biber, kontraharmonik Q = 1.5", params: {nt: 2, P: 0.1, f: 3, Q: 1.5}, note: "20.1 dB; aynı gürültüde Q = −1.5 7.6 dB'ye çöker."}
+      - {name: "Tuz, kontraharmonik Q = −1.5", params: {nt: 3, P: 0.1, f: 3, Q: -1.5}, note: "20.4 dB; harmonik ortalama da 20.9 dB ile iyi."}
+      - {name: "Gauss σ = 20, uyarlamalı ortalama", params: {nt: 0, sig: 20, f: 5, k: 0, nef: 1}, note: "22.2 → 27.4 dB: en iyisi."}
+      - {name: "σ_η² 5 kat fazla", params: {nt: 0, sig: 20, f: 5, nef: 5}, note: "25.6 dB: oran çoğu yerde 1'e kırpılıyor, kenarlar bulanıklaşıyor (kenar bölgesi 21.6 dB)."}
+      - {name: "σ_η² 5 kat az", params: {nt: 0, sig: 20, f: 5, nef: 0.2}, note: "23.6 dB: düzeltme küçük kalıyor, düz bölge 24 dB."}
+    questions:
+      - q: "Uyarlamalı medyan Gauss gürültüsünde neden yalnız sınırlı bir iyileşme veriyor (σ = 20'de 23.4 dB)?"
+        a: "Seviye B, uç değer olmayan her pikseli olduğu gibi bırakır. Gauss gürültüsünde piksellerin çoğu pencerenin min'i ya da max'ı değildir, yani dokunulmaz; süzgeç yalnız uç değerleri düzeltir."
+      - q: "Medyanı iki kez uygulamak P = 0.1'de neden kazanç sağlamıyor (22.5 → 22.4 dB)?"
+        a: "Bu yoğunlukta ilk geçiş darbelerin neredeyse hepsini siler; ikinci geçiş yalnız ince çizgileri ve köşeleri daha da aşındırır. Tekrarlı geçiş, yoğun gürültüde ilk geçişten kalan darbeler için anlamlıdır (P = 0.25'te 20.1 → 21.4 dB, 3 geçiş)."
+    limits: "Tek bir yapay desen; PSNR kenar ağırlığına çok duyarlı. Kenarlar kopyalanarak dolduruluyor. Merkez ağırlıklı medyan ve alfa-kırpılmış ortalama yok."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Uyarlamalı medyanı elle çalıştırmak
+    goal: İki seviyeyi sırayla uygulamak
+    needs: Seviye A ve B
+    q: |-
+      3 × 3 pencere $\{0,0,0,0,255,0,0,0,0\}$ (merkez 255), $S_{\max}=3$. Uyarlamalı medyan çıkışı nedir? $S_{\max}$ daha büyük ve 5 × 5 pencerede değerler $\{0\times20, 255, 40\times4\}$ olsaydı?
+    solution: |-
+      3 × 3: $z_{\min}=z_{\text{med}}=0$, $z_{\max}=255$: Seviye A bozulur; pencere büyütülemez, çıkış $z_{\text{med}}=0$ (darbe silindi). 5 × 5: sıralı 25 değerin 13.'sü 0'dır; $z_{\min}=z_{\text{med}}=0$ yine A bozulur; $S_{\max}$'a ulaşılınca çıkış 0. Tek bir parlak darbe her durumda medyanla silinir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Rayleigh momentleri
+    goal: Ortalama formülünü uygulamak
+    needs: $\bar z=a+\sqrt{\pi b/4}$
+    q: |-
+      Rayleigh gürültüsü $a=5$, $b=400$. Ortalama $\bar z$? (2 basamak)
+    answer: 22.72
+    calc: "round(5 + sqrt(pi*400/4), 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 319.16, msg: "Karekök unutuldu: a + πb/4."}
+      - {answer: 17.72, msg: "a kayması eklenmeli."}
+    hints:
+      - "$\\sqrt{100\\pi}\\approx17.72$."
+    solution: |-
+      $\bar z=5+\sqrt{100\pi}=5+17.72=22.72$; varyans $400(4-\pi)/4=85.84$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Moment yöntemiyle Erlang
+    goal: Parametreleri ortalama ve varyanstan çözmek
+    needs: $\bar z=b/a$, $\sigma^2=b/a^2$
+    q: |-
+      Düz bir şeritte gürültünün örnek ortalaması 30, varyansı 150. Erlang modeli için $b$ (tamsayıya yuvarla)?
+    answer: 6
+    calc: "round(30**2/150)"
+    tol: 0
+    mistakes:
+      - {answer: 0.2, msg: "Bu a = z̄/σ²."}
+      - {answer: 5, msg: "b = z̄²/σ² = 900/150."}
+    hints:
+      - "$a=\\bar z/\\sigma^2$, $b=\\bar z\\,a$."
+    solution: |-
+      $a=30/150=0.2$, $b=\bar z^2/\sigma^2=900/150=6$.
+  - id: p4
+    type: hesap
+    level: 2
+    title: PSNR kazancı
+    goal: MSE ile PSNR arasındaki ilişkiyi kullanmak
+    needs: $\mathrm{PSNR}=10\log_{10}(255^2/\mathrm{MSE})$
+    q: |-
+      Bir süzgeç MSE'yi 400'den 64'e indiriyor. PSNR kaç dB artar? (2 basamak)
+    answer: 7.96
+    calc: "round(10*log10(400/64), 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 6.25, msg: "Bu MSE oranı; dB için 10 log₁₀ al."}
+      - {answer: 15.92, msg: "Güç oranında 20 değil 10 log₁₀ kullanılır (MSE zaten karesel)."}
+    hints:
+      - "Fark $10\\log_{10}(400/64)$."
+    solution: |-
+      $10\log_{10}6.25=7.96$ dB; 255'e bağlı değildir.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Uyarlamalı ortalama her yerde bulanıklaştırıyor
+    goal: σ_η² kestiriminin etkisini tanımak
+    needs: Oranın kırpılması
+    q: |-
+      Uyarlamalı ortalama süzgeci uygulanan bir görüntü, aynı boyutta bir kutu süzgecinin sonucuna neredeyse eşit çıkıyor; kenarlar da bulanık. En olası neden?
+    choices:
+      - {t: "Pencere çok küçük", why: "Küçük pencere daha az bulanıklaştırır."}
+      - {t: "σ_η² fazla büyük kestirilmiş: oran çoğu yerde 1'e kırpılıyor ve çıkış yerel ortalamaya eşit", ok: true, why: "Lab l2'de 5 kat fazla kestirim kenar bölgesi PSNR'ını düşürüyor."}
+      - {t: "σ_η² fazla küçük kestirilmiş", why: "O durumda çıkış girdiye benzerdi, bulanık değil."}
+    hints:
+      - "Oran 1 olunca formül neye indirgenir?"
+    solution: |-
+      Oran 1'e kırpılınca $\hat f=\bar z_S$, yani kutu süzgeci. Gürültü varyansı düz bir şeritten yeniden kestirilmeli.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Uyarlamalı ortalama, yerel LMMSE kestiricisidir
+    goal: Formülü en küçük kare ölçütünden türetmek
+    needs: Beklenen değer, bağımsızlık
+    q: |-
+      $g=f+\eta$; pencere içinde $f$'nin ortalaması $m$, varyansı $\sigma_f^2$; $\eta$ bağımsız, sıfır ortalamalı, varyansı $\sigma_\eta^2$. $\hat f=m+\alpha(g-m)$ biçimindeki kestiricilerden $\mathbb E[(\hat f-f)^2]$'yi en küçükleyen $\alpha$'yı bul ve uyarlamalı ortalama formülünü elde et.
+    rubric:
+      - "f̂ − f = (α − 1)(f − m) + αη yazdım"
+      - "Bağımsızlıkla hatayı (α − 1)²σ_f² + α²σ_η² olarak açtım"
+      - "Türevi sıfırlayıp α = σ_f²/(σ_f² + σ_η²) buldum"
+      - "σ_S² = σ_f² + σ_η² ve m ≈ z̄_S ile f̂ = g − (σ_η²/σ_S²)(g − z̄_S) elde ettim"
+    hints:
+      - "Çapraz terim $\\mathbb E[(f-m)\\eta]=0$."
+    solution: |-
+      Hata $(\alpha-1)^2\sigma_f^2+\alpha^2\sigma_\eta^2$; türev $2(\alpha-1)\sigma_f^2+2\alpha\sigma_\eta^2=0$ → $\alpha=\sigma_f^2/(\sigma_f^2+\sigma_\eta^2)=1-\sigma_\eta^2/\sigma_S^2$. Yerine koyunca $\hat f=g-\frac{\sigma_\eta^2}{\sigma_S^2}(g-\bar z_S)$. En küçük hata $\sigma_f^2\sigma_\eta^2/\sigma_S^2$'dir: düz bölgede ($\sigma_f^2\to0$) sıfıra, kenarda ($\sigma_f^2\gg\sigma_\eta^2$) $\sigma_\eta^2$'ye gider.
+pitfalls:
+  - wrong: "Tuz-biber gürültüsü toplamsal bir gürültüdür, g = f + η."
+    right: "Pikselin yerine geçer: bozulan piksel 0 ya da 255 olur, özgün değer tamamen kaybolur. Bu yüzden doğrusal süzgeçler değil sıra istatistikleri işe yarar."
+  - wrong: "Geometrik ortalama aritmetikten her zaman iyidir."
+    right: "Ayrıntıyı biraz daha iyi korur, ama penceredeki tek bir 0 çıkışı 0 yapar: biber gürültüsünde kullanılamaz."
+  - wrong: "Kontraharmonik süzgeç tuz ve biberi aynı anda temizler."
+    right: "Q > 0 yalnız biberi, Q < 0 yalnız tuzu siler; yanlış işaret sonucu çok kötüleştirir."
+  - wrong: "PSNR yükseldiyse görüntü daha iyi görünür."
+    right: "PSNR piksel farkını ölçer; parlaklık kayması ya da küçük bir öteleme PSNR'ı çok düşürür, bulanıklık ise görece az cezalandırılabilir. Yapısal ölçütlerle birlikte bakılmalı."
+whatif:
+  - q: "Uyarlamalı medyanın Seviye B'sinde z_xy yerine her zaman z_med verilse?"
+    a: "Darbe olmayan pikseller de medyanla değiştirilir: standart medyan gibi ince ayrıntıyı aşındırır, sadece pencere büyütme avantajı kalır."
+  - q: "Gürültü sinyale bağlı olsaydı (Poisson, foton gürültüsü)?"
+    a: "Varyans yoğunlukla artar; sabit σ_η² varsayan uyarlamalı ortalama parlak bölgelerde az, karanlıkta fazla düzeltir. Anscombe dönüşümü (2√(x + 3/8)) varyansı yaklaşık sabitler; sonra Gauss gürültüsü için tasarlanmış süzgeç uygulanır."
+  - q: "Yalnız biber gürültüsü varken maks süzgeci kullanılsa?"
+    a: "Maks süzgeci 0'ları siler (pencerede bir temiz piksel yeterli), ama parlak nesneleri büyütür ve karanlık ince yapıları yok eder; kontraharmonik Q > 0 aynı işi daha yumuşak yapar."
