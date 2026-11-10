@@ -110,3 +110,120 @@ labs:
       - {name: "Germe vs HE", params: {m: 2, clip: 1, B: {m: 3}}, note: "A şekli korur, B dağılımı düzgünleştirir."}
       - {name: "Gürültülü düz alan", params: {m: 3, noise: 0.06}, note: "HE gürültüyü de gerer: düz bölgeler 'kumlu' — CLAHE'nin kırpma motivasyonu."}
     limits: "Sentetik 96 × 72 görüntü, 256 seviye."
+  - id: l2
+    lab: histmatch
+    title: "Histogram eşleme: istenen dağılıma götürmek"
+    goal: |
+      Sentetik bir görüntünün (karanlık, düşük karşıtlıklı ya da iki tepeli) yoğunluk dağılımını, istenen bir dağılıma (düzgün, Gauss ya da iki tepeli) z = G⁻¹(T(r)) eşlemesiyle götür. Çıkış histogramının istenene ne kadar yaklaştığını, kullanılan seviye sayısını ve eşleme eğrisini gör.
+    predict:
+      q: "İstenen dağılım düzgün seçilirse histogram eşleme neye dönüşür?"
+      options:
+        - {t: "Özdeşliğe", why: "Girdi düzgün değilse değiştirir."}
+        - {t: "Histogram eşitlemeye", ok: true, why: "G düzgün dağılımda özdeşliktir; z = T(r)."}
+        - {t: "Karşıtlık germeye", why: "Germe doğrusaldır; eşitleme CDF'yi kullanır."}
+    presets:
+      - {name: "Karanlık → Gauss", params: {src: 0, tgt: 1, mu: 128, sd: 40, N: 10000}, note: "Ortalama 39.9 → 129.3, std 17.8 → 39.2; KS uzaklığı 0.021."}
+      - {name: "Karanlık → düzgün", params: {tgt: 0}, note: "Eşitleme: std 73.9; kullanılan seviye 106 → 81 (birleşmeler)."}
+      - {name: "Düşük karşıtlık", params: {src: 1}, note: "63 seviye geniş bir aralığa yayılıyor: KS 0.047, histogramda dişler."}
+      - {name: "İki tepeli → iki tepeli", params: {src: 2, tgt: 2}, note: "Ortalama 91.9 → 129.4; 172 seviyenin 115'i kalıyor."}
+    questions:
+      - q: "Eşleme neden histogramı tam istenen biçime getiremez?"
+        a: "Aynı girdi seviyesindeki bütün pikseller aynı çıkışa gider; bir kova bölünemez, yalnız birleştirilebilir. Tam eşleme için eşit değerli pikselleri komşuluk ortalaması gibi ikincil bir ölçütle sıralayıp bölmek gerekir (tam histogram eşleme)."
+    limits: "Sentetik piksel örneklemi (uzamsal yapı yok); 256 seviye."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Gama düzeltmesi
+    goal: Ekran gamasını telafi etmek
+    needs: $s=r^{1/\gamma}$
+    q: |-
+      Bir ekranın $\gamma=2.2$. Normalize $r=0.25$ değerinin ekranda doğru parlaklıkta görünmesi için ekrana hangi değer gönderilmeli?
+    solution: |-
+      Ekran $v^{2.2}$ gösterir; $v^{2.2}=0.25$ için $v=0.25^{1/2.2}=0.25^{0.4545}\approx0.533$. Düzeltme, koyu tonları yukarı çeker; ekranın kuvvet yanıtı onları geri indirir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Ders formülüyle eşitleme
+    goal: Ayrık CDF dönüşümünü uygulamak
+    needs: $s_k=\mathrm{round}((L-1)\sum_{j\le k}p_j)$
+    q: |-
+      $L=4$, 100 piksel, sayımlar $(50, 30, 15, 5)$. $s_1$?
+    answer: 2
+    calc: "round(3*80/100)"
+    tol: 0
+    mistakes:
+      - {answer: 3, msg: "Birikimli: (50 + 30)/100 = 0.8; 3 · 0.8 = 2.4."}
+      - {answer: 1, msg: "Bu yalnız p₁ · 3 = 0.9'un yuvarlanmışı; birikimli toplam kullanılır."}
+    hints:
+      - "$3\\cdot0.8=2.4$."
+    solution: |-
+      $s=(1.5, 2.4, 2.85, 3)$ → $(2, 2, 3, 3)$. Hem $r_0$ hem $r_1$ 2'ye düşer: eşitleme seviyeleri birleştirir.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Log dönüşümü
+    goal: c sabitini ve çıkışı hesaplamak
+    needs: $c=255/\ln256$
+    q: |-
+      $s=c\ln(1+r)$, $c=255/\ln256$. $r=63$ için $s$ (en yakın tamsayı)?
+    answer: 191
+    calc: "round(255/log(256)*log(64))"
+    tol: 0
+    mistakes:
+      - {answer: 63, msg: "Dönüşüm uygulanmamış."}
+      - {answer: 128, msg: "ln 64 / ln 256 = 6/8 = 0.75; 255 · 0.75 ≈ 191."}
+    hints:
+      - "$\\ln64/\\ln256=0.75$."
+    solution: |-
+      $255\cdot\ln64/\ln256=255\cdot0.75=191.25\to191$: girdinin alt çeyreği çıkışın dörtte üçüne yayılıyor.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Eşitleme sonrası kumlu gökyüzü
+    goal: Eşitlemenin gürültüyü germesini tanımak
+    needs: CDF dönüşümünün eğimi
+    q: |-
+      Düz, hafif gürültülü bir gökyüzü içeren bir fotoğrafa histogram eşitleme uygulanınca gökyüzü kumlu ve lekeli görünüyor. Neden, ne yapılır?
+    choices:
+      - {t: "Eşitleme hatalı uygulandı", why: "Doğru uygulanınca da olur."}
+      - {t: "Gökyüzü dar bir yoğunluk aralığında çok piksel içerir; CDF orada çok dik ve gürültüyü de geriyor. CLAHE (kırpma) ya da daha yumuşak bir eğri kullanılır", ok: true, why: "Dönüşümün eğimi (L − 1)·p(r)'dir; dolu kovalarda büyüktür."}
+      - {t: "Görüntü 8 bitten az", why: "İlgisiz."}
+    hints:
+      - "ds/dr neye eşit?"
+    solution: |-
+      $ds/dr=(L-1)p_r(r)$: çok dolu kovaların çevresinde eğim büyüktür ve küçük gürültü farkları büyük yoğunluk farklarına dönüşür. CLAHE histogramı bir sınırda kırparak eğimi sınırlar.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Eşitlemenin idempotentliği (sürekli)
+    goal: Eşitlenmiş görüntüyü yeniden eşitlemenin bir şey değiştirmediğini göstermek
+    needs: CDF dönüşümü
+    q: |-
+      Sürekli durumda eşitlenmiş bir görüntüye histogram eşitlemeyi tekrar uygulamanın özdeşlik olduğunu göster.
+    rubric:
+      - "Eşitlenmiş görüntünün PDF'sinin 1/(L − 1) olduğunu kullandım"
+      - "İkinci dönüşümü (L − 1)∫₀ˢ 1/(L − 1) dw olarak yazdım"
+      - "Sonucun s olduğunu buldum"
+      - "Ayrık durumda bunun neden yalnız yaklaşık doğru olduğunu (birleşmiş seviyeler) belirttim"
+    hints:
+      - "Düzgün dağılımın CDF'si doğrusaldır."
+    solution: |-
+      $T_2(s)=(L-1)\int_0^s\frac1{L-1}dw=s$. Ayrık durumda eşitlenmiş histogram tam düz olmadığı için ikinci uygulama küçük değişiklikler yapabilir, ama seviyeler zaten birleşmiş olduğundan yeni bir yayılma olmaz.
+pitfalls:
+  - wrong: "Histogram eşitleme her zaman düz histogram verir."
+    right: "Yalnız sürekli durumda; ayrık durumda kovalar birleşir ama bölünemez, histogram yalnız genişler."
+  - wrong: "8 bitlik görüntüde L = 255'tir."
+    right: "L seviye sayısıdır: 256; aralık [0, L − 1] = [0, 255]."
+  - wrong: "Monoton artan bir dönüşüm değerleri azaltamaz."
+    right: "Azaltabilir (γ > 1); monotonluk yalnız sıranın korunmasını, yani yoğunlukların ters dönmemesini garanti eder."
+  - wrong: "Görüntü dosyasındaki piksel değerleri doğrusal ışık şiddetidir."
+    right: "Çoğu görüntü (sRGB) gama kodludur; doğrusal ışıkla hesap (ör. bulanıklaştırma, harmanlama) için önce gama çözülmelidir."
+whatif:
+  - q: "Eşitleme her renk kanalına ayrı uygulanırsa?"
+    a: "Kanalların göreli oranları değişir ve renk tonları kayar. Genellikle yalnız parlaklık kanalı (ör. HSV'nin V'si ya da Lab'ın L'si) eşitlenir (M9.9)."
+  - q: "Görüntü tek renkli (bütün pikseller aynı) olsaydı?"
+    a: "Ders formülü bütün pikselleri 255'e götürür; OpenCV varyantında pay ve payda sıfırdır, görüntü olduğu gibi döndürülür (aşama b bu durumu ayrıca ele alır)."
+  - q: "Log dönüşümünde c = 1 seçilseydi?"
+    a: "8 bitte en büyük çıkış ln 256 ≈ 5.5 olurdu: görüntü neredeyse siyah. c, çıkışın tam aralığı kullanacağı biçimde (255 / ln 256) seçilir."
