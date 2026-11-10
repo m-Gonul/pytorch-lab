@@ -102,3 +102,164 @@ homework:
       - "Aynı ağda L2 regresyon ve sınıflandırma çıktılarının görsel karşılaştırması."
       - "Ortalama doygunluk (HSV S) tablosu: sınıflandırma > regresyon."
       - "Annealed mean sıcaklığının (T = 1, 0.38, 0) etkisi gösterilmiş."
+
+labs:
+  - id: l1
+    lab: colorconv
+    title: "Bir renk, altı model; HSI'da düzenleme"
+    goal: |
+      R, G, B değerlerini seç ve rengin HSI, HSV, CMY/CMYK, YCbCr ve CIE L*a*b* karşılıklarını gör (L*a*b* scikit-image ile birebir). HSI'da tonu döndür, doygunluğu ve yoğunluğu ölçekle; sonucu RGB'ye geri çevir ve yoğunluk eksenine dik düzlemde rengin nasıl döndüğünü izle.
+    predict:
+      q: "Gri bir renk (128, 128, 128) için Gonzalez formülü hangi tonu verir?"
+      options:
+        - {t: "0°", why: "Pay ve payda sıfır; ε yüzünden kesir 0 olur ve arccos 0 = 90°."}
+        - {t: "90°", ok: true, why: "Formülün yan ürünü: gri rengin tonu tanımsızdır (S = 0) ve ton döndürmek rengi değiştirmez."}
+        - {t: "Tanımsız hata verir", why: "ε bölmeyi korur; sonuç bir sayıdır ama anlamsızdır."}
+    presets:
+      - {name: "Turuncu, ton +120°", params: {R: 204, G: 102, B: 51, dh: 120, sk: 1, ik: 1}, note: "HSI 19.11°, 0.5714, 0.4667; +120° ile (51, 204, 102): yeşilimsi."}
+      - {name: "Gri", params: {R: 128, G: 128, B: 128, dh: 120}, note: "H = 90° (anlamsız), S = 0; düzenleme rengi değiştirmiyor."}
+      - {name: "Yoğunluk × 1.8", params: {R: 204, G: 102, B: 51, dh: 0, ik: 1.8}, note: "(255, 184, 92): R 1'i aştı ve kırpıldı; HSI'nın her noktası küpte değil."}
+      - {name: "Doygunluğu sıfırla", params: {R: 204, G: 102, B: 51, dh: 0, sk: 0}, note: "Renk aynı yoğunlukta griye iner: düzlemde merkeze çekilir."}
+      - {name: "Saf kırmızı", params: {R: 255, G: 0, B: 0, dh: 0}, note: "HSI 0°, 1, 0.333; YCbCr Cr = 255.5: 8 bitte 255'e doyar."}
+    questions:
+      - q: "Turuncu renk için HSI tonu 19.11°, HSV tonu 20° çıkıyor. Hangisi yanlış?"
+        a: "İkisi de doğru, tanımları farklı: HSI tonu yoğunluk eksenine dik düzlemdeki izdüşümün kırmızı eksenle açısıdır; HSV tonu altıgen koninin kenarı boyunca doğrusal interpolasyondur. İkisi yalnız ana ve ara renklerde (0°, 60°, 120°, …) çakışır."
+    limits: "Tek renk; L*a*b* sRGB ve D65 varsayıyor; YCbCr OpenCV'nin 8 bit katsayılarıyla; kırpma dışında gamut eşlemesi yok."
+  - id: l2
+    lab: colorproc
+    title: "Bileşen mi, vektör mü? Eşitleme, düzleştirme, gradyan, bölütleme"
+    goal: |
+      Toplamsal karışan üç diskli bir sahnede dört deneyi yap: histogram eşitleme ve k × k ortalamayı RGB kanallarına ayrı ayrı ya da yalnız HSI yoğunluğuna uygula ve ortalama ton değişimini ölç; kanal Sobel toplamıyla Di Zenzo vektör gradyanını karşılaştır; gölgeli kırmızı bir diski Öklid küresi, Mahalanobis elipsoidi ve kutuyla bölütleyip yanındaki turuncu çeldiriciye karşı kesinlik ve duyarlılığı ölç.
+    predict:
+      q: "Bölütlemede Öklid küresinin eşiğini 3'ten 4'e çıkarınca ne olur?"
+      options:
+        - {t: "Duyarlılık artar, kesinlik düşer: turuncu çeldirici sızar", ok: true, why: "Kesinlik 0.961'den 0.764'e iniyor; küre bütün yönlerde eşit tolerans verdiği için gölge yönünde genişlerken turuncuya da uzanır."}
+        - {t: "İkisi de artar", why: "Sızıntı kesinliği düşürür."}
+        - {t: "Hiçbir şey değişmez", why: "Eşik kürenin yarıçapıdır."}
+    presets:
+      - {name: "HE, kanallar ayrı", params: {mode: 0, how: 0, noise: 0.03}, note: "Ortalama ton değişimi 12.2°: renkler kayıyor."}
+      - {name: "HE, yalnız I", params: {mode: 0, how: 1}, note: "Ton değişimi 5.3° (kırpma ve gürültüden); diskler aydınlanıyor, renkleri korunuyor; ama koyu zeminin renk gürültüsü görünür hâle geliyor."}
+      - {name: "5 × 5 ortalama, kanallar", params: {mode: 1, how: 0, k: 1}, note: "Sınırlarda ara renkler: ton değişimi 36.6°."}
+      - {name: "5 × 5 ortalama, yalnız I", params: {mode: 1, how: 1, k: 1}, note: "Ton korunuyor (0.04°); iki yöntemin farkı 8.3 gri seviye."}
+      - {name: "Renk gradyanı", params: {mode: 2}, note: "Ders örneği: kanal toplamı (d) ve (h)'de 3, Di Zenzo √3 ve √2. Görüntüde ilinti 0.986."}
+      - {name: "Öklid küresi, D₀ = 3", params: {mode: 3, seg: 0, D0: 3}, note: "Kesinlik 0.961, duyarlılık 0.964."}
+      - {name: "Mahalanobis, D₀ = 4", params: {mode: 3, seg: 1, D0: 4}, note: "0.998 / 0.998: elipsoit gölge yönünde uzun, turuncuya doğru dar."}
+      - {name: "Kutu, D₀ = 3", params: {mode: 3, seg: 2, D0: 3}, note: "1 / 1: bu sahnede kanallar eksen hizalı yayıldığı için kutu da iyi; D₀ = 4'te kesinlik 0.939."}
+    questions:
+      - q: "Kutu bu sahnede neden Mahalanobis kadar iyi, hangi durumda geride kalır?"
+        a: "Kırmızı diskin gölgelenmesi ağırlıkla R kanalını değiştiriyor: yayılma neredeyse R eksenine hizalı ve kutu bunu kanal std'leriyle yakalıyor. Yayılma eksenlere çapraz olsaydı (ör. R ve G birlikte değişen bir yüzey) kutu elipsoidin köşelerini de kapsar ve çeldiricileri içeri alırdı; kovaryanstaki çapraz terimleri yalnız Mahalanobis kullanır."
+    limits: "Tek yapay sahne; HSI'dan dönüşte kırpma; Di Zenzo Sobel türevleriyle; bölütleme örnekleri gerçek bölgeden (her 7. piksel)."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: RGB'den HSI'ya
+    goal: Formülleri adım adım uygulamak
+    needs: θ, S, I formülleri
+    q: |-
+      RGB = (0.2, 0.6, 0.4). H, S, I?
+    solution: |-
+      Pay $\frac12[(0.2-0.6)+(0.2-0.4)]=-0.3$; payda $\sqrt{0.16+(-0.2)(0.2)}=\sqrt{0.12}=0.3464$; $\theta=\arccos(-0.866)=150°$. $B\le G$, $H=150°$ (yeşil ile camgöbeği arası). $S=1-3\cdot0.2/1.2=0.5$, $I=0.4$.
+  - id: p2
+    type: hesap
+    level: 1
+    title: CMYK
+    goal: K ve M′ hesaplamak
+    needs: $K=\min(C,M,Y)$, $M'=(M-K)/(1-K)$
+    q: |-
+      RGB = (0.3, 0.6, 0.8) için CMYK'nın $M'$ bileşeni?
+    answer: 0.25
+    calc: "((1-0.6)-(1-0.8))/(1-(1-0.8))"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.4, msg: "Bu CMY'deki M; CMYK için K çıkarılıp (1 − K) ile bölünmeli."}
+      - {answer: 0.2, msg: "M − K'yı (1 − K) = 0.8'e bölmeyi unuttun."}
+    hints:
+      - "C, M, Y = 0.7, 0.4, 0.2; K = 0.2."
+    solution: |-
+      $M'=(0.4-0.2)/(1-0.2)=0.25$; aynı biçimde $C'=0.625$, $Y'=0$, $K=0.2$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: YCbCr
+    goal: Işıklılık ve renk farkı
+    needs: $Y=0.299R+0.587G+0.114B$, $C_b=0.564(B-Y)+128$
+    q: |-
+      RGB = (50, 100, 200). $C_b$? (2 basamak)
+    answer: 186.4
+    calc: "round(0.564*(200-(0.299*50+0.587*100+0.114*200))+128, 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 96.45, msg: "Bu Y."}
+      - {answer: 58.4, msg: "128 kayması eklenmeli."}
+    hints:
+      - "$Y=14.95+58.7+22.8=96.45$."
+    solution: |-
+      $Y=96.45$, $C_b=0.564\cdot103.55+128=58.40+128=186.40$: mavi ağırlıklı bir renk, $C_b$ 128'in epey üstünde.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Di Zenzo büyüklüğü
+    goal: G matrisinin en büyük özdeğerini almak
+    needs: "$F^2$ = $\\mathbf G$'nin en büyük özdeğeri"
+    q: |-
+      Bir pikselde R, G, B'nin $(\partial_x,\partial_y)$ türevleri $(1,0)$, $(0,1)$, $(1,1)$. Di Zenzo $F$? (3 basamak)
+    answer: 1.732
+    calc: "round(math.sqrt(0.5*((2+2)+math.sqrt((2-2)**2+4*1**2))), 3)"
+    tol: 0.001
+    mistakes:
+      - {answer: 3.414, msg: "Bu kanal büyüklüklerinin toplamı (1 + 1 + √2)."}
+      - {answer: 2.0, msg: "g_xy = 1 unutulmuş: F² = (4 + 2)/2 = 3."}
+    hints:
+      - "$g_{xx}=2$, $g_{yy}=2$, $g_{xy}=1$."
+    solution: |-
+      $F^2=\frac12(4+\sqrt{0+4})=3$, $F=\sqrt3\approx1.732$; en büyük değişim 45° yönünde. Kanal toplamı 3.414 yanıltıcı biçimde büyük.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Renkli fotoğrafta histogram eşitleme
+    goal: Bileşen bazlı işlemin renk kaydırmasını tanımak
+    needs: Kanal bazlı ve yoğunluk bazlı eşitleme
+    q: |-
+      Bir öğrenci karanlık bir gün batımı fotoğrafına `cv2.equalizeHist`'i B, G, R kanallarına ayrı ayrı uyguluyor. Gökyüzü yeşilimsi-mor bir renge dönüyor. Neden ve ne yapmalı?
+    choices:
+      - {t: "equalizeHist renkli görüntüde çalışmaz", why: "Her kanalda çalışır; sorun kanalların farklı dönüşüm alması."}
+      - {t: "Her kanal kendi histogramına göre farklı bir dönüşüm alır, R:G:B oranları ve ton değişir; yalnız ışıklılığı (Y ya da HSI I) eşitlemeli", ok: true, why: "Lab l2: ayrı kanallarda ton değişimi 12.2°, yalnız I'da 5.3°."}
+      - {t: "Görüntü BGR değil RGB okunmalı", why: "Kanal sırası eşitlemenin ton kaydırmasını açıklamaz."}
+    hints:
+      - "Gün batımında R kanalının histogramı G ve B'ninkinden çok farklıdır."
+    solution: |-
+      Bağımsız eşitleme her kanalı kendi CDF'iyle esnetir: gün batımında az kullanılan G ve B kanalları en çok esner ve renk dengesi bozulur. YCrCb'ye geçip yalnız Y'yi eşitlemek (ya da HSI'da I'yı) tonu korur; gerekirse ardından doygunluk biraz artırılır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Ortalama süzgeci bileşen bazlıdır, medyan değildir
+    goal: Eşdeğerlik koşullarını sınamak
+    needs: Eşdeğerliğin iki koşulu
+    q: |-
+      (a) Komşuluk ortalamasının vektör ve bileşen bazlı uygulamalarının aynı sonucu verdiğini göster. (b) Kanal bazlı medyanın penceredeki hiçbir piksele ait olmayan bir renk üretebileceğini bir örnekle göster. (c) Vektör medyanının (uzaklıklar toplamını en küçükleyen pencere vektörü) bu sorunu neden yaşamadığını açıkla.
+    rubric:
+      - "Ortalamanın doğrusallığı ve bileşenlerin bağımsızlığıyla (1/K)Σc = [(1/K)ΣR, (1/K)ΣG, (1/K)ΣB] yazdım"
+      - "Üç piksellik bir örnek kurdum: ör. (1,0,0), (0,1,0), (0.9,0.9,0.9) → kanal medyanı (0.9,0.9,0) pencerede yok"
+      - "Medyanın sıralamaya dayandığını, vektörlerin doğal bir sırası olmadığını belirttim"
+      - "Vektör medyanının çıkışının tanım gereği pencere elemanlarından biri olduğunu söyledim"
+    hints:
+      - "Medyanı her kanal kendi sırasıyla seçer."
+    solution: |-
+      (a) Toplama ve skalerle çarpma bileşen bazlıdır. (b) (1,0,0), (0,1,0), (0.9,0.9,0.9): R medyanı 0.9, G medyanı 0.9, B medyanı 0 → (0.9,0.9,0) sarı; pencerede sarı yok. (c) Vektör medyanı $\arg\min_{\mathbf c_i}\sum_j\|\mathbf c_i-\mathbf c_j\|$ pencere vektörleri arasından seçilir. Uzaklık toplamları: kırmızı ve yeşil için $\sqrt2+1.277=2.691$, açık gri için $2\cdot1.277=2.554$: çıkış (0.9, 0.9, 0.9), penceredeki gerçek bir renk.
+pitfalls:
+  - wrong: "OpenCV görüntüleri RGB sırasıyla okur."
+    right: "cv2.imread BGR sırası verir; matplotlib ve PyTorch modelleri genellikle RGB bekler. cv2.cvtColor(img, cv2.COLOR_BGR2RGB) unutulursa kırmızı ve mavi yer değiştirir."
+  - wrong: "OpenCV'nin HSV tonu 0–360 aralığındadır."
+    right: "8 bitlik görüntülerde 0–179'dur (derece/2); float görüntülerde 0–360. Eşikler buna göre seçilmeli."
+  - wrong: "Renkli görüntüde her işlem kanallara ayrı ayrı uygulanabilir."
+    right: "Yalnız işlem doğrusal ve bileşenlerden bağımsızsa (ortalama, Laplasyen). Histogram eşitleme, medyan ve gradyan büyüklüğü bileşen bazlı uygulanınca farklı (çoğu zaman yanlış) sonuç verir."
+  - wrong: "HSI'da ton her renk için tanımlıdır."
+    right: "Griler (S = 0) için tanımsızdır; formülün verdiği değer (90°) anlamsızdır. Düşük doygunluklu piksellerde ton gürültüye çok duyarlıdır; bölütlemede doygunluk maskesi bu yüzden kullanılır."
+whatif:
+  - q: "Renk bölütlemesi RGB yerine L*a*b*'de yapılsa?"
+    a: "L*a*b* algısal olarak (yaklaşık) düzgün olduğu için Öklid uzaklığı algılanan renk farkına daha yakındır; aydınlatma değişimleri büyük ölçüde L*'de toplanır, a*b* düzleminde bölütleme gölgelere daha dayanıklıdır."
+  - q: "Mahalanobis'te kovaryans çok az örnekle kestirilse?"
+    a: "C tekile yakın olur ve C⁻¹ bazı yönlerde aşırı büyür: elipsoit o yönlerde çok incelir ve gürültülü pikselleri dışarıda bırakır. Küçük bir köşegen düzenleme (C + εI) ya da daha çok örnek gerekir."
+  - q: "Kanal bazlı medyan yerine vektör medyanı kullanılsa maliyet ne olur?"
+    a: "k × k pencerede her piksel için k² vektörün birbirine uzaklıkları gerekir: O(k⁴) işlem (kanal medyanında O(k² log k)). Bu yüzden yaklaşık (sıralamaya dayalı ya da azaltılmış) vektör medyanları kullanılır."

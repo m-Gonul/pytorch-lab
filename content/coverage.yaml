@@ -98,7 +98,7 @@ groups:
         pages: [m9-9-color]
         status: genis
         gap: "Metamerizm ve trikromatik katsayılar yalnız adıyla geçiyordu."
-        done: "M9.9'a metamerizm ve trikromatik katsayılar tanım kutusu eklendi."
+        done: "M9.9'a metamerizm ve trikromatik katsayılar tanım kutusu eklendi. M9.9 konu anlatımı bütün slaytları (1–154) işliyor: rengin iki kullanım nedeni, sahte ve tam renk, Newton ve tayf, ışınım/ışıklılık/parlaklık, koniler, CIE ana renkleri ve ana renk yanılgısı, ışık ve pigment ana renkleri, CRT/LCD/plazma, ton/doygunluk/parlaklık, trikromatik katsayılar, metamerizm, renklilik diyagramı (karışım doğrusu, üçgen), gamut ve sRGB, renk modelleri, RGB küpü ve piksel derinliği, planar/interleaved bellek, CMY/CMYK, HSI geometrisi ve dönüşümleri (ton formülünün türetimi, gride ton tanımsızlığı), HSI düzenleme, YCbCr, CIE L*a*b* ve kalibrasyon, ton aralığı, sahte renk (dilimleme, üç bağımsız dönüşüm, çok bantlı), bileşen/vektör eşdeğerliğinin iki koşulu, renk dönüşümleri, küp ve küre dilimleme, ton düzeltme, HSI histogram eşitleme, düzleştirme ve keskinleştirme farkı, Öklid/Mahalanobis/kutu bölütleme, Di Zenzo gradyanı (özdeğer türetimi), renkli gürültü ve vektör medyanı; colorconv ve colorproc deneyleri. Slayt notları: X, Y, Z hayali ana renklerdir; b* sarı–mavi eksenidir; Kasson–Plouffe 1992; bileşen ortalamasında üç değer toplanmaz."
       - src: "lect_12 (1) — Segmentasyon"
         topics: "nokta/çizgi algılama, k-means, süper pikseller (SLIC), eşikleme (Otsu)"
         pages: [m9-11-segmentation, m2-7-kmeans]
