@@ -90,3 +90,142 @@ homework:
     accept:
       - "vmap'li örnek başı gradyanlar döngüyle aynı, çok daha hızlı."
       - "ε–doğruluk ödünleşim grafiği."
+
+labs:
+  - id: l1
+    lab: jaccost
+    title: "jacfwd mı jacrev mi? Jacobian'ı iki yoldan hesaplamak"
+    goal: |
+      İki gizli katmanlı bir tanh MLP'nin (Rⁿ → Rᵐ) Jacobian'ını hem n JVP (ileri mod) hem m VJP (ters mod) ile gerçekten hesapla. İki sonucun aynı olduğunu, işlem sayısının (1 + n)F ile (1 + m)F olarak ayrıldığını ve ters modun aktivasyonları sakladığını gör.
+    predict:
+      q: "n = 8 girdi, m = 64 çıktı. Hangisi daha ucuz?"
+      options:
+        - {t: "jacrev: ters mod her zaman daha ucuz", why: "Yalnız çıktı az olduğunda; burada 65 VJP gerekir."}
+        - {t: "jacfwd", ok: true, why: "9 geçiş eşdeğeri (29 952 işlem) ve 65 (216 320 işlem)."}
+        - {t: "Eşit", why: "Yalnız n = m iken."}
+    presets:
+      - {name: "Uzun Jacobian (n < m)", params: {n: 8, m: 64, h: 32}, note: "jacfwd 29 952, jacrev 216 320 işlem; fark 5.6·10⁻¹⁶."}
+      - {name: "Skaler kayıp (m = 1)", params: {n: 64, m: 1}, note: "jacrev 6 208, jacfwd 201 760: gradyan için ters mod 32 kat ucuz."}
+      - {name: "Kare (n = m)", params: {n: 32, m: 32}, note: "İkisi de 101 376 işlem."}
+      - {name: "Geniş girdi", params: {n: 128, m: 2}, note: "jacrev 15 552, jacfwd 668 736."}
+    questions:
+      - q: "jacrev'in işlem sayısı jacfwd'ninkine eşitken neden yine de daha çok bellek ister?"
+        a: "VJP'ler tanh'ın türevini ileri geçişin aktivasyonlarından okur; bu aktivasyonlar m VJP boyunca saklanmalıdır. JVP ise teğeti değerle birlikte taşır ve bir katmanı geçince değeri atabilir."
+    limits: "Sayım çarpma–toplama üzerinden; tanh ve toplama gibi eleman bazlı işlemler sayılmadı. vmap'li jacfwd birincil değeri bir kez hesaplar varsayımı."
+  - id: l2
+    lab: dpsgd
+    title: "DP-SGD: örnek başı kırpma ve gürültü"
+    goal: |
+      2-B lojistik regresyonu aynı tohumla sıradan SGD ve DP-SGD ile eğit. Örnek başı gradyan normlarının dağılımını ve kırpma eşiğini, gürültünün ortalamadaki payının σC/B olduğunu ve aykırı örneklerin iki yöntemi nasıl farklı etkilediğini gör.
+    predict:
+      q: "Verinin %30'u ters etiketli ve uzaktaysa 300 adımdan sonra test doğrulukları ne olur?"
+      options:
+        - {t: "İkisi de ≈ 0.93", why: "SGD aykırı örneklerin büyük gradyanlarına karşı korumasız."}
+        - {t: "SGD çöker (≈ 0.4), DP-SGD ≈ 0.93", ok: true, why: "Kırpma her örneğin katkısını C ile sınırlar; aykırı örnekler güncellemeyi ele geçiremez."}
+        - {t: "DP-SGD gürültü yüzünden daha kötü", why: "Bu problemde gürültünün bedeli küçük, kırpmanın kazancı büyük."}
+    presets:
+      - {name: "Varsayılan", params: {C: 1, sigma: 1, B: 64, lr: 0.5, steps: 300, out: 0.05}, note: "SGD 0.937, DP-SGD 0.934. Son 50 adımda örneklerin 0.077'si kırpılıyor. Doğruluk dalgalanması SGD 0.023, DP-SGD 0.0008: SGD'yi aykırı örnekler sarsıyor."}
+      - {name: "%30 aykırı", params: {out: 0.3}, note: "SGD 0.400, DP-SGD 0.933; kırpılan oran 0.29."}
+      - {name: "Aykırı yok", params: {out: 0}, note: "SGD 0.934, DP-SGD 0.936; kırpılan oran 0.035."}
+      - {name: "Küçük batch, büyük gürültü", params: {C: 10, sigma: 4, B: 8}, note: "σC/B = 5: SGD 0.817, DP-SGD 0.843; iki yöntem de çok dalgalı (0.22 / 0.15)."}
+      - {name: "C çok küçük", params: {C: 0.02}, note: "Örneklerin %98'i kırpılıyor: güncelleme yönü korunuyor ama büyüklüğü C'ye iniyor; bu kolay problemde yine 0.934."}
+    questions:
+      - q: "Batch ortalamasını kırpmak (sıradan gradyan kırpması) neden gizlilik vermez?"
+        a: "Gizlilik tek bir örneğin etkisini sınırlamayı ister. Ortalamanın normu küçük olsa bile içindeki tek bir örnek ortalamayı çok değiştirebilir (el örneği: ortalama 0, örnekler ±4). Duyarlılığı sınırlamak için her örnek ayrı kırpılmalıdır."
+    limits: "Gizlilik bütçesi (ε, δ) hesaplanmıyor; 2-B, doğrusal model. Gerçek ağlarda gürültü her parametreye eklendiği için doğruluk bedeli çok daha büyüktür."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Dual sayılarla türev
+    goal: İleri modu elle uygulamak
+    needs: $\varepsilon^2=0$
+    q: |-
+      $f(x)=x^2\sin x$'in $x=\pi/2$'deki türevini dual sayılarla hesapla.
+    solution: |-
+      $x=\pi/2+\varepsilon$. $x^2=\pi^2/4+\pi\varepsilon$; $\sin x=\sin(\pi/2)+\cos(\pi/2)\varepsilon=1+0\cdot\varepsilon$. Çarpım: $\pi^2/4+(\pi\cdot1+\frac{\pi^2}4\cdot0)\varepsilon$. Türev $\pi\approx3.1416$. Kontrol: $f'=2x\sin x+x^2\cos x=\pi$.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Hangi mod kaç geçiş?
+    goal: Maliyet asimetrisini sayıya dökmek
+    needs: jacfwd (1 + n)F, jacrev (1 + m)F
+    q: |-
+      $f:\mathbb R^{1000}\to\mathbb R^{10}$. Tam Jacobian için jacfwd'nin jacrev'e oranı (geçiş eşdeğeri) kaçtır?
+    answer: 91.0
+    calc: "(1+1000)/(1+10)"
+    tol: 0.01
+    mistakes:
+      - {answer: 100.0, msg: "İleri geçişin kendisini de say: (1 + n)/(1 + m)."}
+      - {answer: 0.011, msg: "Oran ters: jacfwd daha pahalı."}
+    hints:
+      - "$(1+1000)/(1+10)$."
+    solution: |-
+      $1001/11=91$. Çıktı az olduğu için ters mod 91 kat ucuz.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Hessian-vektör çarpımı
+    goal: Hv'yi yönlü türev olarak hesaplamak
+    needs: $\mathbf H\mathbf v=\frac d{d\epsilon}\nabla f(\mathbf x+\epsilon\mathbf v)$
+    q: |-
+      $f(\mathbf x)=x_1^2x_2+x_2^3$, $\mathbf x=(1,1)$, $\mathbf v=(0,1)$. $\mathbf H\mathbf v$'nin ikinci bileşeni?
+    answer: 6.0
+    calc: "6*1"
+    tol: 1e-9
+    mistakes:
+      - {answer: 2.0, msg: "Bu birinci bileşen: ∂²f/∂x₁∂x₂ = 2x₁."}
+      - {answer: 8.0, msg: "∂²f/∂x₂² = 6x₂; v yalnız ikinci yönde."}
+    hints:
+      - "$\\partial^2f/\\partial x_2^2=6x_2$."
+    solution: |-
+      $\mathbf H=\begin{bmatrix}2x_2&2x_1\\2x_1&6x_2\end{bmatrix}=\begin{bmatrix}2&2\\2&6\end{bmatrix}$; $\mathbf H\mathbf v=(2,6)$.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: vmap hatası
+    goal: vmap'in sınırını tanımak
+    needs: Batch kuralları
+    q: |-
+      `vmap(lambda x: x if x.sum() > 0 else -x)(X)` "data-dependent control flow" hatası veriyor. Ne yapılır?
+    choices:
+      - {t: "vmap yerine for döngüsü kullan", why: "Çalışır ama vmap'in amacı kaybolur."}
+      - {t: "Koşulu tensör işlemine çevir: torch.where(x.sum() > 0, x, -x)", ok: true, why: "İki dal da hesaplanır, eleman bazlı seçilir; batch kuralı vardır."}
+      - {t: "x.sum().item() ile karşılaştır", why: ".item() de vmap altında desteklenmez."}
+    hints:
+      - "Batch'teki her örnek farklı dala gidebilir."
+    solution: |-
+      vmap tüm batch'i tek bir çağrıyla işler; örneklere göre farklı Python dalları izlenemez. `torch.where` iki dalı da hesaplayıp örnek başına seçer.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Doğrusal katmanda örnek başı gradyan normu
+    goal: Matrisi kurmadan normu hesaplamak
+    needs: Dış çarpım, Frobenius normu
+    q: |-
+      $\mathbf z_i=\mathbf W\mathbf x_i$ ve $\bar{\mathbf z}_i=\partial\ell_i/\partial\mathbf z_i$ ise $\|\partial\ell_i/\partial\mathbf W\|_F=\|\bar{\mathbf z}_i\|\,\|\mathbf x_i\|$ olduğunu göster.
+    rubric:
+      - "∂ℓᵢ/∂W = z̄ᵢ xᵢᵀ olduğunu türettim"
+      - "Frobenius normunun karesini Σ_{a,b} z̄_{ia}² x_{ib}² olarak yazdım"
+      - "Toplamı (Σ z̄²)(Σ x²) çarpımına ayırdım"
+      - "Bunun DP-SGD'de B × parametre matrisi kurmadan kırpma ölçeğini verdiğini belirttim"
+    hints:
+      - "Dış çarpımın elemanları $\\bar z_{a}x_{b}$'dir."
+    solution: |-
+      $z_{ia}=\sum_bW_{ab}x_{ib}$ ⇒ $\partial\ell_i/\partial W_{ab}=\bar z_{ia}x_{ib}$. $\|\cdot\|_F^2=\sum_{a,b}\bar z_{ia}^2x_{ib}^2=\big(\sum_a\bar z_{ia}^2\big)\big(\sum_bx_{ib}^2\big)$. Karekök alınınca sonuç çıkar. Opacus'un "ghost clipping" tekniği bu özdeşliği kullanır.
+pitfalls:
+  - wrong: "vmap bir Python döngüsünü hızlandırır."
+    right: "vmap döngü kurmaz; her işlemin batch kuralını kullanarak tek bir batch'lenmiş çağrı üretir. Bu yüzden veri bağımlı kontrol akışı ve .item() desteklenmez."
+  - wrong: "Ters mod her zaman ileri moddan ucuzdur."
+    right: "Yalnız çıktı girdiden azsa. Girdi az, çıktı çoksa (n < m) ileri mod daha az geçiş ister ve ara değer saklamaz."
+  - wrong: "DP-SGD'de batch gradyanını kırpmak yeter."
+    right: "Gizlilik tek bir örneğin etkisini sınırlamayı ister; kırpma örnek başına yapılmalıdır."
+  - wrong: "Hessian-vektör çarpımı için Hessian'ı kurmak gerekir."
+    right: "Hv, gradyanın v yönündeki JVP'sidir; maliyeti bir gradyanın sabit katıdır ve n × n matris hiç oluşmaz."
+whatif:
+  - q: "grad(f), f bir vektör döndürürse?"
+    a: "Hata verir: grad skaler çıktı ister. Vektör çıktı için vjp (bir u ile) ya da jacrev kullanılır."
+  - q: "Örnek başı gradyanları vmap yerine B ayrı backward ile alsak?"
+    a: "Sonuç aynıdır ama B kez geri geçiş ve B kez Python ek yükü olur; küçük modellerde bile on kat yavaş olabilir. vmap tek bir batch'lenmiş geri geçiş yapar."
+  - q: "HVP'yi ters-üstüne-ters (create_graph=True) ile hesaplasak?"
+    a: "Sonuç aynıdır. İlk geri geçişin grafı saklanır, bu yüzden bellek forward-over-reverse'tekinden fazladır. ileri mod desteklenmeyen işlemlerde bu yol gerekebilir."
