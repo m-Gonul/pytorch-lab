@@ -110,3 +110,162 @@ homework:
     accept:
       - "Gradyanlar sonlu farklarla ve sıralı sürümle (float64) uyumlu."
       - "L = 16 384'te GPU'da sıralıdan ≥ 10× hızlı."
+
+labs:
+  - id: l1
+    lab: scanalgo
+    title: "Naif, Kogge–Stone ve Brent–Kung: iş, adım ve yarış tehlikesi"
+    goal: |
+      Bölüm boyu n için üç paralel tarama algoritmasının adım başına toplama sayısını, toplam işini ve adım sayısını sıralı taramayla karşılaştır. Kogge–Stone'un yerinde, tek bariyerli sürümünde thread'ler bir adım içinde rastgele sırayla çalışınca yazma-sonrası-okuma tehlikesinin çıktıyı nasıl bozduğunu gör.
+    predict:
+      q: "512 öğelik bir bölümde Kogge–Stone sıralı taramanın kaç katı toplama yapar?"
+      options:
+        - {t: "≈ 1 (iş verimli)", why: "Bu Brent–Kung'a daha yakın (≈ 2)."}
+        - {t: "≈ 8", ok: true, why: "n log₂n − (n − 1) = 4097, sıralı 511: 8.02 kat. Ama 9 adımda biter."}
+        - {t: "≈ 256", why: "Bu naif yöntemin mertebesi (n/2)."}
+    presets:
+      - {name: "Kogge–Stone, 16", params: {alg: 1, logn: 4, safe: 0}, note: "49 toplama, 4 adım."}
+      - {name: "Brent–Kung, 16", params: {alg: 2, logn: 4}, note: "26 toplama, 7 adım."}
+      - {name: "Naif, 16", params: {alg: 0, logn: 4}, note: "120 toplama, 15 adım."}
+      - {name: "Kogge–Stone, yarış", params: {alg: 1, logn: 4, safe: 1}, note: "Rastgele sırada her çalıştırma yanlış."}
+      - {name: "Kogge–Stone, 512", params: {alg: 1, logn: 9, safe: 0}, note: "4097 toplama: sıralının 8 katı."}
+      - {name: "Brent–Kung, 1024", params: {alg: 2, logn: 10}, note: "2036 toplama, 19 adım."}
+    questions:
+      - q: "Brent–Kung kuramsal olarak çok daha iş verimliyken neden küçük bölümlerde Kogge–Stone sıkça daha hızlıdır?"
+        a: "Bir bloğun thread'leri zaten ayrılmıştır; boşta kalan thread enerji harcamasa da yer tutar ve iş azlığı süreyi kısaltmaz. Süreyi adım sayısı ve her adımın bariyeri belirler: Kogge–Stone log₂n, Brent–Kung 2 log₂n − 1 adım. Ayrıca Brent–Kung'da etkin thread'ler hızla azalır ve son adımlar tek warp'ta ayrışır. İş verimliliği, kaynakların paylaşıldığı (büyük girdiler, enerji kısıtı, çok blok) durumlarda öne çıkar."
+    limits: "Yalnız tek bölüm; toplama sayısı ve adım; WAR yarışı adım içinde tamamen rastgele thread sırasıyla modelleniyor (gerçek GPU'da warp içi okumalar yazmalardan önce)."
+  - id: l2
+    lab: linrec
+    title: "Doğrusal özyineleme: sıralı döngü, paralel tarama ve kümülatif çarpım"
+    goal: |
+      x_t = a_t x_{t−1} + b_t özyinelemesini fp32'de üç yolla hesapla: sıralı döngü, (a, b) çiftlerinin afin bileşimiyle Kogge–Stone taraması ve kümülatif çarpımla kapalı biçim. float64 başvurusuna göre hataları, adım sayılarını ve kapalı biçimin hangi koşulda taştığını gör.
+    predict:
+      q: "1024 adım ve a_t ≈ 0.9 ile kümülatif çarpımlı kapalı biçim (x_t = P_t Σ b_k / P_k) fp32'de ne verir?"
+      options:
+        - {t: "Sıralı döngü kadar doğru", why: "P_t = Π a ≈ 10⁻⁴⁷, fp32'nin aralığının altında."}
+        - {t: "Taşar (∞ / NaN)", ok: true, why: "1/P_k fp32'de taşıyor; afin bileşim taraması ise 10⁻⁷ düzeyinde hata veriyor."}
+        - {t: "Biraz daha az doğru (10⁻⁵)", why: "Sorun yavaş hata birikimi değil, aralık dışına çıkmak."}
+    presets:
+      - {name: "Varsayılan", params: {logT: 10, abar: 0.9, aspr: 0.05}, note: "Sıralı 3.4·10⁻⁷, tarama 4.9·10⁻⁷, kapalı biçim taşıyor."}
+      - {name: "a = 1 (birikimli toplam)", params: {logT: 10, abar: 1, aspr: 0}, note: "Πa = 1: üç yöntem de çalışıyor."}
+      - {name: "Kısa dizi", params: {logT: 4, abar: 0.9, aspr: 0.05}, note: "Πa = 0.18: kapalı biçim de çalışıyor."}
+      - {name: "Hızlı unutma", params: {logT: 10, abar: 0.5, aspr: 0.05}, note: "Kapalı biçim hemen çöküyor."}
+      - {name: "Uzun dizi", params: {logT: 14, abar: 0.95, aspr: 0.05}, note: "16 384 adım, tarama 14 adımda; hata 10⁻⁶."}
+    questions:
+      - q: "Afin bileşim taraması neden kümülatif çarpımlı kapalı biçimin taşma sorununu yaşamıyor?"
+        a: "Tarama her konumda (A, B) = (Πa, Σ…) çiftini birleştirir; A çarpımı küçülse bile yalnız B'nin hesabında sınırlı bir sayıyla çarpılır ve hiçbir yerde ona bölünmez. Kapalı biçim ise b_k / P_k ile bölme yapar: P_k sıfıra yaklaştıkça bölüm taşar, sonra P_t ile çarpılsa da bilgi kaybolmuştur. Durum uzay modellerinin paralel taramaları (Mamba) bu yüzden bileşim işleciyle, çoğu zaman log uzayında çalışır."
+    limits: "Tek boyutlu skaler özyineleme; fp32 her işlemde Math.fround ile yuvarlanıyor; tarama Kogge–Stone sırasında; başvuru float64 sıralı döngü."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Kapsayıcı ve dışlayıcı tarama
+    goal: İki biçimi ve dönüşümü uygulamak
+    needs: Toplama, birim eleman 0
+    q: |-
+      $x=[2,0,5,1,3]$ için kapsayıcı ve dışlayıcı toplam taramasını ve aralarındaki dönüşümü yazın.
+    solution: |-
+      Kapsayıcı $[2,2,7,8,11]$; dışlayıcı $[0,2,2,7,8]$. Kapsayıcıdan dışlayıcıya: sağa kaydır, başa 0 koy. Dışlayıcıdan kapsayıcıya: sola kaydır, sona $8+3=11$ ekle (son dışlayıcı + son girdi).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kogge–Stone'un işi
+    goal: İş formülünü uygulamak
+    needs: $n\log_2n-(n-1)$
+    q: |-
+      64 öğelik bir bölümde Kogge–Stone kaç toplama yapar?
+    answer: 321
+    calc: "64*6-63"
+    tol: 0
+    mistakes:
+      - {answer: 120, msg: "Bu Brent–Kung: 2n − 2 − log₂n."}
+      - {answer: 63, msg: "Bu sıralı taramanın (n − 1) işi."}
+    hints:
+      - "$\\sum_s(n-s)$, $s=1,2,\\dots,32$."
+    solution: |-
+      $64\cdot6-63=321$; sıralının 5.1 katı, ama 6 adım.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Akış sıkıştırmada hedef konum
+    goal: Dışlayıcı taramayı uygulamak
+    needs: Bayraklar, dışlayıcı tarama
+    q: |-
+      $x=[0,4,0,0,9,1,7,0]$'ın sıfır olmayan öğeleri sıkıştırılıyor. İndeks 6'daki öğe (7) çıktıda hangi konuma yazılır?
+    answer: 3
+    calc: "sum([0,1,0,0,1,1])"
+    tol: 0
+    mistakes:
+      - {answer: 4, msg: "Bu kapsayıcı tarama değeri; konum dışlayıcı taramadır (0'dan başlar)."}
+      - {answer: 6, msg: "Bu girdideki indeksi."}
+    hints:
+      - "Bayraklar $[0,1,0,0,1,1,1,0]$; indeks 6'dan önceki bayrakların toplamı."
+    solution: |-
+      Önceki seçilenler 4, 9, 1: konum 3. Çıktı $[4,9,1,7]$.
+  - id: p4
+    type: hesap
+    level: 1
+    title: Hiyerarşik taramanın ikinci düzeyi
+    goal: Blok toplamı dizisinin boyunu bulmak
+    needs: N / bölüm boyu
+    q: |-
+      $2^{24}$ öğe, Brent–Kung ile 2048 öğelik bölümler. Blok toplamları dizisi S kaç öğedir? Tek bir bloğa sığar mı?
+    answer: 8192
+    calc: "2**24//2048"
+    tol: 0
+    mistakes:
+      - {answer: 16384, msg: "Bu 1024 öğelik bölümler için."}
+      - {answer: 4096, msg: "Bölüm 2048 öğedir (1024 thread × 2)."}
+    hints:
+      - "$2^{24}/2^{11}$."
+    solution: |-
+      $2^{13}=8192$ > 2048: S tek bloğa sığmaz; S'ye aynı yöntem bir kez daha uygulanır (4 blokluk ikinci düzey, sonra 4 öğelik üçüncü düzey).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Arada bir yanlış çıkan tarama
+    goal: WAR tehlikesini tanımak
+    needs: Kogge–Stone, bariyer, geçici değişken
+    q: |-
+      Bir öğrencinin Kogge–Stone çekirdeği her yinelemede `__syncthreads(); if (tid >= stride) XY[tid] += XY[tid - stride];` yapıyor. Küçük girdilerde doğru, büyük bloklarda arada bir yanlış sonuç veriyor. Neden?
+    choices:
+      - {t: "Paylaşımlı bellek bank çakışması", why: "Bank çakışması yavaşlatır, sonucu değiştirmez."}
+      - {t: "Yazma-sonrası-okuma yarışı: bir thread XY[tid]'yi, başka bir thread o konumu eski değer olarak okumadan güncelleyebiliyor; okuma ile yazma arasında ikinci bir bariyer (geçici değişkenle) ya da çift tampon gerekir", ok: true, why: "Büyük bloklarda farklı warp'lar farklı anlarda ilerler ve yarış ortaya çıkar."}
+      - {t: "Toplamada taşma", why: "Taşma deterministik olurdu."}
+    hints:
+      - "Thread 6, ikinci yinelemede hangi XY[4]'ü okumalı?"
+    solution: |-
+      Bir warp'ın içinde okumalar yazmalardan önce yapıldığı için 32'den küçük bloklarda hata görünmeyebilir; farklı warp'lar arasında zamanlamaya bağlı olarak ortaya çıkar. `float t = XY[tid - stride] + XY[tid]; __syncthreads(); XY[tid] = t;` ya da iki tamponlu sürüm.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Kogge–Stone işinin türetimi
+    goal: Toplam toplama sayısını kanıtlamak
+    needs: Geometrik toplam
+    q: |-
+      $n=2^L$ öğelik bir bölümde Kogge–Stone'un toplam toplama sayısının $n\log_2n-(n-1)$ olduğunu ve $n\to\infty$'da sıralı taramaya oranının $\log_2n$ gibi büyüdüğünü gösterin.
+    rubric:
+      - "Adım s'de toplama yapan thread sayısının n − s olduğunu gösterdim"
+      - "s'nin 1, 2, …, n/2 değerlerini (L terim) aldığını belirttim"
+      - "Σ(n − s) = nL − (n − 1) toplamını hesapladım"
+      - "Oranı (nL − n + 1)/(n − 1) ≈ L − 1 = Θ(log n) olarak buldum (512'de 8.02)"
+    hints:
+      - "$\\sum_{k=0}^{L-1}2^k=2^L-1=n-1$."
+    solution: |-
+      $\sum_{k=0}^{L-1}(n-2^k)=nL-(n-1)$; sıralı $n-1$ ile oran $\frac{nL}{n-1}-1\approx L-1$, yani $\Theta(\log n)$ (512 öğede 8.02).
+pitfalls:
+  - wrong: "Kogge–Stone'u yerinde, her yinelemede tek bir __syncthreads() ile yazmak yeterlidir."
+    right: "Okuma ve yazma arasında başka bir thread eski değeri henüz okumamış olabilir (WAR). Toplam önce geçici değişkene alınıp ikinci bir bariyerden sonra yazılmalı ya da çift tampon kullanılmalı."
+  - wrong: "Domino (tek geçişli) taramada blok i, blockIdx.x = i ile sol komşusunu güvenle bekleyebilir."
+    right: "Blokların zamanlanma sırası güvence değildir: bekleyen bloklar SM'leri doldurup komşuyu hiç zamanlatmayabilir (kilitlenme). Blok sırası başlangıçta atomik bir sayaçtan alınmalı."
+  - wrong: "x_t = a_t x_{t−1} + b_t kümülatif çarpım ve bölmeyle kapalı biçimde paralel hesaplanabilir; sayısal olarak taramayla aynıdır."
+    right: "Πa küçülünce 1/P_k fp32'de taşar (lab l2: 1024 adımda a ≈ 0.9 ile ∞). (a, b) çiftlerinin afin bileşimiyle tarama kararlıdır."
+  - wrong: "Kogge–Stone her durumda Brent–Kung'dan iyidir (ya da tersi)."
+    right: "Kogge–Stone daha az adım, Brent–Kung daha az iş yapar. Küçük bölümlerde ve bol kaynakta Kogge–Stone, kaynak ve enerji kısıtında Brent–Kung öne çıkar; gerçek kütüphaneler ikisini ve warp shuffle'ı birleştirir."
+whatif:
+  - q: "İşleç değişmeli değilse (ör. afin bileşim ya da matris çarpımı)?"
+    a: "Tarama birleşmeli olmayı ister, değişmeliliği istemez; ama sıra korunmalıdır. Kogge–Stone güncellemesi XY[i] = XY[i − s] ⊕ XY[i] biçiminde (sol işlenen önce) yazılmalı; Brent–Kung'da da aynı yön gözetilmeli. Toplamada yazılan XY[i] += XY[i − s] alışkanlığı sırayı ters çevirir ve değişmeli olmayan işleçte yanlış sonuç verir."
+  - q: "n 2'nin kuvveti değilse?"
+    a: "Bölüm, birim elemanla (toplamada 0) bir sonraki 2'nin kuvvetine doldurulur ya da yükleme/yazmada sınır denetimi yapılır. Birim eleman dolgusu sonucu değiştirmez; hiyerarşik taramada yalnız son bölüm eksik kalır."
+  - q: "Taban sıralamasında her bit için bir sıkıştırma yerine 4 bitlik gruplar kullanılsa?"
+    a: "Geçiş sayısı b'den b/4'e iner (32 bit için 8 geçiş), ama her geçişte 16 kutulu bir sayma ve 16 kutunun taraması gerekir. Daha az global bellek geçişi genellikle daha hızlıdır; GPU taban sıralamaları (CUB) geçiş başına 4–8 bit kullanır."

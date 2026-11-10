@@ -161,7 +161,7 @@ practice:
     needs: $\eta=\eta_{\min}+\frac12(\eta_{\max}-\eta_{\min})(1+\cos\pi p)$
     q: |-
       Isınma 200, toplam 2200, $\eta_{\max}=3\cdot10^{-3}$, $\eta_{\min}=3\cdot10^{-4}$. Adım 1700'de $\eta$?
-    answer: 0.000695
+    answer: 0.00069541
     calc: "3e-4 + 0.5*(3e-3-3e-4)*(1+cos(pi*0.75))"
     tol: 1e-6
     mistakes:
