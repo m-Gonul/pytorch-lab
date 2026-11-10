@@ -80,3 +80,147 @@ homework:
     accept:
       - "İki yöntemin hipergradyanları uyumlu."
       - "Öğrenilmiş takvim grafiği ve bellek karşılaştırması."
+
+labs:
+  - id: l1
+    lab: autogradsim
+    title: "Motorun içi: dallanma, hook, birikim ve sürüm sayacı"
+    goal: |
+      El hesabındaki grafı (c = ab, d = c + a, L = d²) motorun kurallarıyla çalıştır. a'ya gelen iki gradyanın toplandığını, c'deki bir hook'un yalnız kendi yolunu etkilediğini, zero_grad yapılmayınca .grad'ın biriktiğini ve hangi in-place işlemin hata verdiğini gör. Tüm sonuçlar PyTorch 2.x ile aynıdır.
+    predict:
+      q: "L hesaplandıktan sonra c.add_(1) çağrılıyor, sonra L.backward(). Ne olur?"
+      options:
+        - {t: "RuntimeError: c in-place değiştirildi", why: "Hata yalnız değiştirilen tensörü saklamış bir düğüm varsa çıkar; c'yi saklayan düğüm yok."}
+        - {t: "Hata yok, gradyanlar değişmez (64, 32)", ok: true, why: "Mul a ve b'yi, Pow d'yi saklar, Add hiçbir şey saklamaz. c'nin sürümü artar ama kimse onu kontrol etmez."}
+        - {t: "Hata yok ama gradyanlar c + 1'e göre hesaplanır", why: "Gradyanlar saklanan a, b, d'den hesaplanır; c'nin yeni değeri kullanılmaz."}
+    presets:
+      - {name: "El hesabı", params: {a: 2, b: 3, h: 1, calls: 1, inpl: 0}, note: "L = 64, a.grad = 48 + 16 = 64, b.grad = 32."}
+      - {name: "Hook ×2", params: {h: 2}, note: "a.grad = 112, b.grad = 64: yalnız c'den geçen yol ikiye katlandı."}
+      - {name: "Hook ×0", params: {h: 0}, note: "c yolu kesildi: a.grad = 16 (yalnız doğrudan yol), b.grad = 0. Gradyanı bir dalda durdurmak için detach'in hook'la yapılmış hâli."}
+      - {name: "zero_grad yok, 3 çağrı", params: {calls: 3}, note: "a.grad 64, 128, 192: AccumulateGrad toplar."}
+      - {name: "c.add_(1)", params: {inpl: 1}, note: "Hata yok, gradyanlar aynı."}
+      - {name: "d.add_(1)", params: {inpl: 2}, note: "RuntimeError: PowBackward0 d'yi saklamıştı (sürüm 0), şimdi sürüm 1."}
+      - {name: "Yaprağı değiştirmek", params: {inpl: 3}, note: "RuntimeError: gradyan isteyen yaprak yerinde değiştirilemez; güncelleme no_grad içinde yapılır."}
+    questions:
+      - q: "Motor neden a'nın AccumulateGrad düğümünü Mul'dan gelen 48'i alır almaz çalıştırmaz?"
+        a: "Bağımlılık sayısı 2'dir; düğüm ancak tüm tüketicilerinden gelen katkılar girdi tamponunda toplanınca hazır olur. Aksi hâlde .grad'a iki ayrı ekleme yapılır (sonuç aynı olurdu ama ara düğümlerde, ör. hook'lu bir düğümde, hook toplam yerine parçalara uygulanır ve sonuç değişir)."
+    limits: "Beş düğümlü sabit graf; hata metinleri PyTorch'unkilerin kısaltılmışıdır."
+  - id: l2
+    lab: savedmem
+    title: "Aktivasyon belleği: hangi tensörler saklanır?"
+    goal: |
+      Pre-LN bir MLP bloğunda (LN → Linear(d, 4d) → aktivasyon → [Dropout] → Linear(4d, d)) her düğümün sakladığı tensörleri say ve aynı depoyu paylaşanları bir kez say. Aktivasyon belleğini parametre + gradyan + Adam belleğiyle karşılaştır; aktivasyon türünün, dropout'un ve bf16 paketlemenin etkisini gör.
+    predict:
+      q: "ReLU yerine GELU kullanınca bir bloğun aktivasyon belleği nasıl değişir?"
+      options:
+        - {t: "Değişmez: ikisi de 4d boyutlu bir tensör saklar", why: "GELU girdisini saklar, ikinci Linear GELU'nun çıktısını saklar: iki ayrı tensör."}
+        - {t: "6d'den 10d'ye çıkar (satır başına)", ok: true, why: "ReLU'nun çıktısı ile ikinci Linear'ın girdisi aynı depodur; GELU'da değildir. CPU'da saved_tensors_hooks ile ölçüldü."}
+        - {t: "Yarıya iner", why: "Tersine artar."}
+    presets:
+      - {name: "Varsayılan (ReLU)", params: {N: 8192, d: 1024, L: 24, act: 0, drop: 0, dt: 0}, note: "Satır başına 6d; 24 katmanda 4.50 GiB aktivasyon, parametre + grad + Adam 3.00 GiB."}
+      - {name: "GELU", params: {act: 2}, note: "10d: 7.50 GiB."}
+      - {name: "Dropout", params: {drop: 1}, note: "14d (her iki aktivasyonda): 10.5 GiB. Maske float32 (CPU'da ölçülen)."}
+      - {name: "Dropout, bool maske", params: {drop: 1, mask: 1}, note: "Maske 1 bayt: 8.25 GiB. (CUDA'daki birleşik dropout çekirdeği maskeyi bool saklar.)"}
+      - {name: "bf16 paketleme", params: {dt: 1}, note: "2.25 GiB: yarıya iner, ileri geçiş değişmez."}
+      - {name: "Küçük batch", params: {N: 512}, note: "0.28 GiB: parametre ve optimizasyon durumu baskın. Aktivasyonlar N ≈ 5466 satırda onları geçer."}
+    questions:
+      - q: "Dikkat bloğunu da hesaba katsaydık en büyük ek terim ne olurdu?"
+        a: "Dikkat olasılıkları: her başlık için T × T'lik softmax çıktısı (ve dropout maskesi) saklanır; satır başına h·T eleman, yani dizi uzunluğuyla karesel büyür. FlashAttention bu matrisi hiç saklamaz, geri geçişte bloklar hâlinde yeniden hesaplar (M6.4)."
+    limits: "Yalnız MLP yarısı; dikkat, gömme ve kayıp katmanı dahil değil. Parametre durumu fp32 Adam (16 bayt/parametre); karışık hassasiyette farklıdır."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Dallanan bir graf
+    goal: Toplanan gradyanları elle izlemek
+    needs: Çok değişkenli zincir kuralı
+    q: |-
+      $x=3$; $u=x^2$, $v=2x$, $L=uv$. $\partial L/\partial x$?
+    solution: |-
+      $L=2x^3$, $L'=6x^2=54$. Graf üzerinden: $\bar u=v=6$, $\bar v=u=9$. $x$'in iki çocuğu var: $\bar x=\bar u\cdot2x+\bar v\cdot2=6\cdot6+9\cdot2=36+18=54$. Motor bu iki katkıyı `AccumulateGrad(x)`'te toplar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Saklanan bayt
+    goal: Hangi tensörlerin saklandığını saymak
+    needs: Saklama tablosu
+    q: |-
+      `y = torch.sigmoid(x @ W).sum()`, `x` (32, 256), `W` (256, 512), fp32. Geri geçiş için **ek** bellek (W hariç, zaten parametre) kaç bayt? (`sum` yalnız şekli saklar.)
+    answer: 98304
+    calc: "4*(32*256 + 32*512)"
+    tol: 0
+    mistakes:
+      - {answer: 622592, msg: "W parametredir; matmul onu saklar ama ek bellek değildir."}
+      - {answer: 32768, msg: "sigmoid çıktısını (32 × 512) da saklar."}
+    hints:
+      - "matmul: x ve W; sigmoid: çıktısı (32, 512)."
+    solution: |-
+      $x$: $32\cdot256\cdot4=32\,768$; sigmoid çıktısı: $32\cdot512\cdot4=65\,536$. Toplam $98\,304$ bayt.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Hook ve iki yol
+    goal: Hook'un yalnız kendi yolunu etkilediğini görmek
+    needs: Tensor hook'u
+    q: |-
+      $a=1$, $b=2$; $c=ab$, $d=c+a$, $L=d^2$. $c$'ye gradyanı 3 ile çarpan bir hook var. `a.grad`?
+    answer: 42.0
+    calc: "3*(2*3)*2 + 2*3"
+    tol: 1e-9
+    mistakes:
+      - {answer: 54.0, msg: "Hook a'nın doğrudan yolunu (Add'den gelen) etkilemez."}
+      - {answer: 36.0, msg: "Doğrudan yol unutuldu: 2d = 6 da eklenir."}
+      - {answer: 18.0, msg: "Hook uygulanmamış: c yolu 6 · 2 = 12, toplam 18."}
+    hints:
+      - "$c=2$, $d=3$, $\\bar d=6$; c yolu: $3\\cdot6\\cdot b$; doğrudan: $6$."
+    solution: |-
+      $c=2$, $d=3$, $\bar d=2d=6$. Add bunu $c$'ye ve $a$'ya iletir. Hook $\bar c$'yi $18$ yapar; Mul'dan $\bar a=18\cdot b=36$. Add'den doğrudan $6$. Toplam $42$; hook'suz $12+6=18$ olurdu.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: inplace=True hatası
+    goal: Sürüm hatasının kaynağını bulmak
+    needs: Saklama tablosu, sürüm sayacı
+    q: |-
+      `h = torch.sigmoid(z); h = nn.ReLU(inplace=True)(h); loss = h.sum(); loss.backward()` çalıştırınca "modified by an inplace operation … output 0 of SigmoidBackward0" hatası alınıyor. Neden, ve en ucuz düzeltme ne?
+    choices:
+      - {t: "ReLU in-place her zaman hatalıdır; inplace=False yap", why: "Girdisi Linear çıktısı olsaydı hata olmazdı."}
+      - {t: "Sigmoid türevi için kendi çıktısını sakladı; ReLU onu yerinde değiştirdi. inplace=False yap (ya da ReLU'yu kaldır: sigmoid çıktısı zaten pozitif)", ok: true, why: "Sürüm 0'da saklanan çıktı sürüm 1 oldu."}
+      - {t: "loss.sum() skaler değil", why: "Skaler."}
+    hints:
+      - "Sigmoid'in türevi $\\sigma(1-\\sigma)$: neyi saklar?"
+    solution: |-
+      SigmoidBackward0 çıktısını saklar. In-place ReLU aynı tensörü değiştirince sürüm artar ve geri geçiş durur. Sigmoid çıktısı zaten (0, 1)'de olduğu için ReLU burada etkisizdir; kaldırmak ya da inplace=False yapmak yeter.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Ters modun maliyeti
+    goal: Skaler kayıpta ters modun neden tercih edildiğini göstermek
+    needs: VJP, JVP
+    q: |-
+      $f=f_K\circ\dots\circ f_1$, $f_k:\mathbb R^{n}\to\mathbb R^{n}$ (son katman $\mathbb R^n\to\mathbb R$), her $f_k$'nın Jacobian'ıyla bir vektörü çarpmak $O(n^2)$. Tam gradyanı ileri modla hesaplamanın $O(Kn^3)$, ters modla $O(Kn^2)$ olduğunu göster.
+    rubric:
+      - "İleri modun bir geçişte Jacobian'ın bir sütununu (J u) verdiğini belirttim"
+      - "Gradyanın n sütun (n geçiş) gerektirdiğini ve her geçişin K tane O(n²) JVP olduğunu yazdım"
+      - "Ters modun tek geçişte u^T J (bir satır = gradyan) verdiğini ve K tane O(n²) VJP olduğunu yazdım"
+      - "Ters modun bedelinin ara değerleri saklamak (O(Kn) bellek) olduğunu belirttim"
+    hints:
+      - "Çıktı skaler: Jacobian 1 × n."
+    solution: |-
+      İleri mod $\mathbf J\mathbf e_i$'yi her $i$ için ayrı hesaplar: $n$ geçiş × $K$ JVP × $O(n^2)$ = $O(Kn^3)$. Ters mod $\mathbf 1^\top\mathbf J$'yi soldan çarparak tek geçişte verir: $K$ VJP × $O(n^2)$ = $O(Kn^2)$. VJP'ler ileri değerleri gerektirdiği için $K$ ara vektörün saklanması gerekir: $O(Kn)$ bellek. Aktivasyon belleğinin kaynağı budur.
+pitfalls:
+  - wrong: "Ara tensörlerin gradyanı hesaplanmaz, bu yüzden .grad'ları None'dır."
+    right: "Hesaplanır (zincir kuralı onlardan geçer) ama motor iletip atar. Görmek için retain_grad() ya da register_hook kullanılır."
+  - wrong: "In-place işlemler autograd'da her zaman yasaktır."
+    right: "Yalnız değiştirilen tensör bir düğüm tarafından saklanmışsa hata verir; ör. Linear çıktısındaki ReLU(inplace=True) güvenlidir."
+  - wrong: "Saklanan tensör, verinin bir kopyasıdır."
+    right: "Aynı depoya referanstır; bu yüzden aynı tensörü saklayan iki düğüm (ReLU ve sonraki Linear) belleği bir kez kullanır, ama tensör yerinde değişirse ikisi de etkilenir."
+  - wrong: "zero_grad unutulursa sadece biraz yanlış gradyan çıkar."
+    right: "Gradyanlar her adımda toplanır ve büyümeye devam eder; eğitim kısa sürede ıraksar. Bilinçli yapıldığında (gradyan biriktirme) adım sayısına bölmek gerekir."
+whatif:
+  - q: "retain_graph=True'yu hep açık bıraksak?"
+    a: "Doğruluk değişmez ama saklanan tensörler her yinelemede bir sonraki grafa kadar serbest bırakılmaz (graf referansı tutuldukça); aktivasyon belleği gereksiz yere uzun yaşar. Yalnız aynı graf üzerinden ikinci geri geçiş gerektiğinde kullanılmalıdır."
+  - q: "Hook gradyanı yerinde değiştirseydi (g.mul_(2))?"
+    a: "Hook'a gelen tensör başka düğümlerle paylaşılıyor olabilir; yerinde değiştirmek başka yolları da bozabilir. Belgeler hook'un yeni bir tensör döndürmesini ister."
+  - q: "Aynı modeli inference_mode altında çalıştırıp çıktıyı eğitimde kullanmaya çalışsak?"
+    a: "inference_mode tensörleri sürüm sayacı ve graf bilgisi olmadan yaratılır; autograd'a giren bir hesapta kullanılmaları hata verir. Eğitime girecek önbellekler no_grad ile hesaplanmalıdır."
