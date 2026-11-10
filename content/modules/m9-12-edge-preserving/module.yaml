@@ -117,3 +117,162 @@ labs:
       - {name: "σ_r < gürültü", params: {sr: 0.03, noise: 0.1}, note: "Hiç düzleştirmiyor."}
       - {name: "Yineleme", params: {it: 6, B: {it: 1}}, note: "Yinelemek düz bölgeleri iyice düzleştirir, eğimleri basamaklandırır (karikatür)."}
     limits: "1B sinyal; 2B'de aynı ilke, maliyet pencere alanıyla büyür."
+  - id: l2
+    lab: clahelab
+    title: "Global HE, AHE ve CLAHE: kazanç, gürültü ve döşeme sınırları"
+    goal: |
+      Karanlık ve parlak bölgelerde ±8 gri seviyelik ayrıntılar ve ortada düz, gürültülü bir bant içeren görüntüye global HE, döşemeli AHE ve CLAHE uygula. Ayrıntı karşıtlığını, düz banttaki gürültü büyümesini ve enterpolasyonsuz döşeme sınırlarındaki sıçramayı ölç; sol üst döşemenin dönüşüm fonksiyonunu gör. Gerçekleştirim cv2.createCLAHE ile karşılaştırıldı (en çok 1 gri seviye fark).
+    predict:
+      q: "Kırpmasız AHE (4 × 4) karanlık bölgedeki disk karşıtlığını 7.9'dan 101'e çıkarıyor. Düz banttaki gürültüye ne olur (girdi ≈ 2)?"
+      options:
+        - {t: "Değişmez", why: "Düz bantta histogram tek bir tepe: CDF orada çok dik."}
+        - {t: "≈ 24'e çıkar", ok: true, why: "Tepe dar bir aralığı geniş bir aralığa eşler; CLAHE (clip 2) bunu 5.2'de tutuyor."}
+        - {t: "Azalır", why: "Eşitleme gürültüyü azaltmaz."}
+    presets:
+      - {name: "Global HE", params: {m: 0, noise: 2}, note: "Disk karşıtlığı 46, gürültü 12."}
+      - {name: "AHE", params: {m: 1, g: 1, interp: 1}, note: "Karşıtlık 101 ama gürültü 24."}
+      - {name: "CLAHE clip 2", params: {m: 2, g: 1, clip: 2, interp: 1}, note: "Karşıtlık 20, gürültü 5.2."}
+      - {name: "CLAHE clip 8", params: {m: 2, clip: 8}, note: "Karşıtlık 50, gürültü 15: AHE'ye yaklaşıyor."}
+      - {name: "Enterpolasyonsuz", params: {m: 2, interp: 0}, note: "Döşeme sınırında sıçrama 6.4'ten 28'e."}
+      - {name: "8 × 8 döşeme", params: {m: 2, g: 2}, note: "Döşemeler disklerden küçük: karşıtlık 2.2'ye düşüyor."}
+    questions:
+      - q: "CLAHE'de clipLimit = 1 ne yapar, neden global HE'den bile az karşıtlık kazandırabilir?"
+        a: "Eşik ⌊alan/256⌋'ya, yani düz histogramın yüksekliğine iner: kırpılıp dağıtılan histogram neredeyse düzdür ve CDF neredeyse doğrusal (kimlik dönüşümüne yakın) olur. Kazanç her değerde ≈ 1 ile sınırlanır."
+    limits: "96 × 96 yapay görüntü; OpenCV kuralı (tek geçişli yeniden dağıtma); yansıtmalı kenar yerine kenar döşemesine sabitleme."
+  - id: l3
+    lab: nlmlab
+    title: "Gauss, bilateral ve non-local means: PSNR, doku ve yöntem gürültüsü"
+    goal: |
+      Çizgili doku, kare ve rampa içeren gürültülü bir sahneye Gauss, 2-B bilateral ve NLM uygula. PSNR'ı, doku karşıtlığının korunmasını ve temiz görüntüye uygulanınca kalan yöntem gürültüsünü (RMS ve görüntü) karşılaştır; NLM'nin yama, arama penceresi ve h parametrelerini ve hesap maliyetini incele.
+    predict:
+      q: "σ = 0.08 gürültüde (girdi 21.9 dB) hangi süzgeç en yüksek PSNR'ı verir?"
+      options:
+        - {t: "Gauss σ = 1", why: "22.3 dB: doku ve kenarlar da yumuşuyor."}
+        - {t: "Bilateral", why: "27.9 dB: iyi, ama yalnız tek piksel değerine bakıyor."}
+        - {t: "NLM", ok: true, why: "29.5 dB (3 × 3 yamayla 30.6): aynı fazdaki çizgiler uzakta da olsa birbirini ortalıyor."}
+    presets:
+      - {name: "Gauss", params: {m: 0, gs: 1, noise: 0.08}, note: "22.3 dB, doku 0.23."}
+      - {name: "Bilateral", params: {m: 1, ss: 1.5, sr: 0.15}, note: "27.9 dB, doku 0.40, yöntem gürültüsü 0.009."}
+      - {name: "NLM", params: {m: 2, P: 1, S: 2, h: 0.1}, note: "29.5 dB; maliyet Gauss'un 114 katı; yöntem gürültüsü 0.025 (rampada)."}
+      - {name: "NLM h büyük", params: {m: 2, h: 0.3}, note: "19.3 dB: farklı yamalar da benzer sayılıyor, görüntü bulanıklaşıyor."}
+      - {name: "NLM küçük pencere", params: {m: 2, S: 0}, note: "7 × 7 pencere: 28.4 dB, maliyet 4.7 kat az."}
+      - {name: "Yüksek gürültü, NLM", params: {m: 2, noise: 0.15, h: 0.18}, note: "22.7 dB (bilateral σ_r = 0.3: 22.1, Gauss: 21.4)."}
+    questions:
+      - q: "Bu sahnede bilateral'in yöntem gürültüsü neden NLM'ninkinden küçük, bu NLM'nin daha kötü bir süzgeç olduğunu mu gösterir?"
+        a: "Sahne parçalı sabit ve kenarları keskin: σ_r = 0.15 bütün kenarları dışladığı için bilateral temiz görüntüyü neredeyse hiç değiştirmiyor. NLM ise rampada eğim kadar farklı yamaları h'ye göre benzer sayıp rampayı hafifçe düzleştiriyor. Doğal görüntülerde ve gürültülü girdide asıl ölçüt PSNR ve yöntem gürültüsünün yapısızlığıdır; orada NLM üstündür."
+    limits: "48 × 48 yapay sahne; NLM yama uzaklığı ağırlıksız ortalama kare fark; bilateral pencere ±2σ_s."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bilateral ağırlıkları
+    goal: İki terimin çarpımını hesaplamak
+    needs: $w=e^{-d^2/2\sigma_s^2}e^{-\Delta I^2/2\sigma_r^2}$
+    q: |-
+      $\sigma_s=2$, $\sigma_r=0.1$. Merkez değeri 0.5. Komşu A: uzaklık 1, değer 0.52; komşu B: uzaklık 1, değer 0.8. Ağırlıklar?
+    solution: |-
+      Uzay terimi ikisinde $e^{-1/8}=0.882$. Değer terimi A: $e^{-0.0004/0.02}=0.980$, B: $e^{-0.09/0.02}=0.011$. $w_A=0.865$, $w_B=0.0098$: B kenarın öbür yanında, ortalamaya neredeyse girmez.
+  - id: p2
+    type: hesap
+    level: 1
+    title: OpenCV kırpma eşiği
+    goal: clipLimit'i tamsayı eşiğe çevirmek
+    needs: $\max(1,\lfloor\text{clip}\cdot\text{alan}/256\rfloor)$
+    q: |-
+      512 × 512 görüntü, 8 × 8 döşeme ızgarası, clipLimit = 3. Tamsayı eşik?
+    answer: 48
+    calc: "max(1, math.floor(3*(512//8)**2/256))"
+    tol: 0
+    mistakes:
+      - {answer: 3072, msg: "Alan döşemenin alanıdır (64 × 64 = 4096), görüntünün değil; ayrıca 256'ya bölünür."}
+      - {answer: 16, msg: "clipLimit = 1 için; 3 ile çarp."}
+    hints:
+      - "Döşeme 64 × 64 = 4096 piksel."
+    solution: |-
+      $\lfloor3\cdot4096/256\rfloor=48$: bir bölmede en çok 48 piksel; düz histogramda bölme başına 16 olurdu.
+  - id: p3
+    type: hesap
+    level: 1
+    title: CLAHE enterpolasyon ağırlığı
+    goal: Döşeme merkezlerine göre konum
+    needs: $f=x/t-0.5$, ağırlık $f-\lfloor f\rfloor$
+    q: |-
+      Döşeme genişliği 64, $x=100$. Sağdaki döşemenin LUT'unun ağırlığı?
+    answer: 0.0625
+    calc: "100/64-0.5-math.floor(100/64-0.5)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.5625, msg: "0.5 kayması unutulmuş: merkezler x = 32, 96, … ."}
+      - {answer: 0.9375, msg: "Bu soldaki döşemenin ağırlığı."}
+    hints:
+      - "Merkezler 32 ve 96; 100, 96'nın 4 piksel sağında."
+    solution: |-
+      $100/64-0.5=1.0625$: soldaki döşeme 1 (merkez 96) ağırlığı 0.9375, sağdaki (merkez 160) 0.0625.
+  - id: p4
+    type: hesap
+    level: 2
+    title: NLM maliyeti
+    goal: Arama penceresi ve yamanın etkisi
+    needs: Piksel başına (S² − 1) · P² çarpım
+    q: |-
+      1024 × 1024 görüntü, 7 × 7 yama, 21 × 21 arama penceresi. Toplam yama farkı terimi (milyar, 2 basamak)?
+    answer: 22.61
+    calc: "round(1024*1024*(21*21-1)*49/1e9, 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 0.46, msg: "Yama boyu (49) ile çarpılmadı."}
+      - {answer: 26.31, msg: "Arama penceresi 21² − 1 = 440, 512 değil."}
+    hints:
+      - "$1\\,048\\,576\\cdot440\\cdot49$."
+    solution: |-
+      $\approx2.26\cdot10^{10}$ işlem. Hızlı uygulamalar yama farkını bir kutu süzgeciyle (integral görüntü) her ofset için bir kez hesaplar: maliyet $P^2$'den bağımsız olur (aşama e).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: CLAHE'de gökyüzü kumlanıyor
+    goal: Kırpma eşiğini ayarlamak
+    needs: Kazanç = CDF eğimi
+    q: |-
+      Bir manzara fotoğrafına clipLimit = 20 ile CLAHE uygulanıyor. Ön plandaki ayrıntılar güzel çıkıyor ama düz gökyüzü kumlu, benekli bir görünüm alıyor. Neden ve ne yapılmalı?
+    choices:
+      - {t: "Döşeme ızgarası çok kaba", why: "Izgara gökyüzündeki gürültü büyütmesini açıklamaz."}
+      - {t: "Düz gökyüzü döşemelerinde histogram dar bir tepe; büyük eşik kırpmayı neredeyse kaldırıyor ve CDF dikleşip gürültüyü büyütüyor; clipLimit 2–4'e indirilmeli", ok: true, why: "Lab l2: clip 8'de gürültü 15, clip 2'de 5.2."}
+      - {t: "Enterpolasyon kapalı", why: "O, döşeme sınırlarında basamak yapar; benek değil."}
+    hints:
+      - "Kırpma neyin eğimini sınırlıyordu?"
+    solution: |-
+      Gürültü büyütmesi CDF'in eğimiyle orantılıdır; düz bölgenin dar histogram tepesi kırpılmadıkça eğim çok büyüktür. clipLimit'i küçültmek tepeyi keser, kazancı sınırlar.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Bilateral'in Gauss'a indirgenmesi ve normalizasyon
+    goal: Sınır durumlarını kanıtlamak
+    needs: Değer teriminin limitleri
+    q: |-
+      (a) $\sigma_r\to\infty$'da bilateral süzgecin Gauss bulanıklaştırmaya, (b) $\sigma_r\to0$'da (sürekli değerli, eşit değeri olmayan bir görüntüde) kimlik dönüşümüne indirgendiğini göster. (c) $W_{\mathbf p}$ olmadan sabit bir görüntünün neden değişeceğini açıkla.
+    rubric:
+      - "σ_r → ∞ için G_σr → 1 (sabit) ve W_p'nin uzay ağırlıklarının toplamına indiğini gösterdim"
+      - "σ_r → 0 için yalnız I_q = I_p olan terimlerin (q = p) kaldığını gösterdim"
+      - "Sabit I = c için Σ w·c / Σ w = c olduğunu, normalizasyonsuz ise Σw·c ≠ c olduğunu belirttim"
+      - "Ağırlıkların konuma bağlı olduğu için normalizasyonun her pikselde ayrı yapılması gerektiğini söyledim"
+    hints:
+      - "Gauss değer teriminin σ_r'ye göre limitlerine bak."
+    solution: |-
+      (a) $G_{\sigma_r}(\Delta)\to$ sabit, sadeleşir: $BF=\sum G_{\sigma_s}I_q/\sum G_{\sigma_s}$, Gauss bulanıklaştırma. (b) $\Delta\ne0$ için $G_{\sigma_r}(\Delta)/G_{\sigma_r}(0)\to0$: yalnız $q=p$ terimi kalır, $BF=I_p$. (c) Ağırlıklar konuma ve içeriğe bağlıdır; toplamları her pikselde farklıdır. $W_{\mathbf p}$ ile bölmek, ağırlıkların toplamını 1 yaparak sabit görüntüyü değiştirmemeyi (ortalama parlaklığı korumayı) garanti eder.
+pitfalls:
+  - wrong: "AHE her zaman global HE'den iyidir."
+    right: "Düz bölgelerde dar histogram CDF'i dikleştirir ve gürültüyü aşırı büyütür; kontrast sınırlama (CLAHE) olmadan çoğu zaman daha kötü görünür."
+  - wrong: "CLAHE'de döşeme ne kadar küçükse o kadar yerel ve iyi."
+    right: "Döşeme, korunmak istenen ayrıntıdan büyük olmalı; aksi hâlde ayrıntı döşemenin 'zemini' olur ve karşıtlık kaybolur (lab l2'de 8 × 8 ızgara)."
+  - wrong: "Bilateral süzgeç bir konvolüsyondur, FFT ile hızlandırılabilir."
+    right: "Ağırlıklar her pikselde içeriğe göre değişir; doğrusal ve uzayda değişmez değildir. Hızlandırmalar (bilateral ızgara, değer ekseninde ayrıklaştırma) farklı fikirlere dayanır."
+  - wrong: "NLM bütün görüntüyü tarar."
+    right: "Kavramsal olarak öyle; pratikte (OpenCV ve özgün uygulama) 21 × 21 gibi bir arama penceresi kullanılır, aksi hâlde maliyet piksel sayısının karesiyle büyür."
+whatif:
+  - q: "CLAHE renkli bir görüntünün RGB kanallarına ayrı ayrı uygulansa?"
+    a: "Her kanal farklı bir dönüşüm alır ve renkler kayar (M9.9). Doğrusu, görüntüyü L*a*b* (ya da YCrCb) uzayına çevirip yalnız açıklık kanalına uygulamaktır."
+  - q: "Bilateral'de değer ağırlığı gürültülü görüntü yerine önce bulanıklaştırılmış bir 'rehber' görüntüden hesaplansa?"
+    a: "Bu çapraz (joint) bilateral süzgeçtir: gürültü değer farklarını bozmadığı için kenar kararları daha güvenilir olur; flaşlı/flaşsız fotoğraf birleştirme ve derinlik haritası iyileştirmede kullanılır. Guided filter bunun hızlı, doğrusal bir akrabasıdır."
+  - q: "NLM'de yama yerine derin öznitelikler karşılaştırılsa?"
+    a: "Benzerlik yapısal (dönmüş, ölçeklenmiş) eşleşmeleri de yakalayabilir; non-local bloklar (Wang ve ark. 2018) bu fikri CNN katmanı olarak öğrenir ve öz-dikkatin (M4.13) görüntüdeki karşılığıdır."
