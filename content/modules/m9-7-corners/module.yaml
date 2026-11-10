@@ -100,3 +100,164 @@ homework:
       - "Sentetik test kümesinde σ = 0.2 gürültüde MagicPoint F1 > Harris F1 + 0.15."
       - "HPatches tekrarlanabilirlik tablosu (aydınlatma ve bakış açısı alt kümeleri ayrı)."
       - "Homografik uyarlama öncesi ve sonrası sözde etiketlerin görsel karşılaştırması."
+
+labs:
+  - id: l1
+    lab: harrisgeo
+    title: "Türev saçılımı, özdeğer elipsi ve R"
+    goal: |
+      Düz, kenar, köşe ya da tek parlak nokta içeren 15 × 15'lik bir yamada her pikselin (f_x, f_y) türevini çiz; Harris matrisinin özdeğerlerini, 2-std elipsini ve R = det − k·tr²'yi gör. Özdeğer düzleminde R = 0 sınırlarının k ile nasıl döndüğünü izle.
+    predict:
+      q: "Kenar yamasında k'yi 0.04'ten 0.01'e indirirsen R'nin işareti ne olur?"
+      options:
+        - {t: "Negatif kalır", why: "λ₂/λ₁ = 0.0185; k = 0.01'de R = 0 sınırı 0.0102'ye iner, oran sınırın üstünde kalır."}
+        - {t: "Pozitif olur: kenar köşe sayılır", ok: true, why: "R = −0.0019'dan +0.00068'e. Küçük k daha çok yamayı köşe sayar."}
+        - {t: "Sıfır olur", why: "R özdeğerlerden hesaplanır ve tam sıfır nadirdir."}
+    presets:
+      - {name: "Düz", params: {type: 0, noise: 0.02, win: 1, sw: 1.5, k: 0.04}, note: "λ = 0.0056, 0.0049: gürültüden gelen küçük, dairesel bulut."}
+      - {name: "Kenar 0°", params: {type: 1, th: 0}, note: "λ = 0.289, 0.0054; R = −0.0019."}
+      - {name: "Kenar 45°", params: {type: 1, th: 45}, note: "Elips döndü; λ₁ = 0.33 (ayrık türevin yön hatası), λ₂ yine küçük."}
+      - {name: "Köşe", params: {type: 2, th: 0}, note: "λ = 0.177, 0.093; R = +0.0135."}
+      - {name: "Tek nokta", params: {type: 3}, note: "λ = 0.183, 0.129; R = +0.0197: köşeden ayırt edilemiyor."}
+      - {name: "Kenar, k = 0.01", params: {type: 1, k: 0.01}, note: "R = +0.00068: kenar köşe sayılıyor."}
+    questions:
+      - q: "Köşe yamasında neden λ₂/λ₁ yalnız 0.52, 1'e yakın değil?"
+        a: "Gauss pencere köşenin merkezinde; iki kenarın her biri pencerenin yalnız yarısından geçer ve türevlerin çoğu sıfır (düz) bölgelerden gelir. Oran, iki kenarın penceredeki ağırlığına ve köşe açısına bağlıdır; 90° köşede iki kenar eşit ağırlıkta olsa oran 1'e yaklaşırdı."
+    limits: "Tek ölçekli yapay yama; türevler [−1, 0, 1]/2; elips ağırlıklı std'den."
+  - id: l2
+    lab: harrismap
+    title: "Harris ve Shi–Tomasi bir sahnede: k, T, pencere, gürültü, dönme"
+    goal: |
+      11 gerçek köşesi, köşesiz bir diski ve üç tek parlak noktası olan bir sahnede Harris'i (ya da Shi–Tomasi'yi) çalıştır. Kaç gerçek köşenin bulunduğunu (2.5 piksel tolerans), sahte tespitleri ve tek noktaları say; k, T, pencere σ, gürültü ve sahne dönmesinin etkisini ölç.
+    predict:
+      q: "Gürültü σ = 20'de T = 0.01 ile 43 sahte tespit var. T'yi 0.05'e çıkarınca ne olur?"
+      options:
+        - {t: "Gerçek köşeler de kaybolur", why: "11/11 köşe hâlâ bulunuyor: köşelerin R'si gürültününkinden çok büyük."}
+        - {t: "Sahte tespit 9'a iner, köşeler kalır", ok: true, why: "Slaytlardaki yüksek gürültü örneğinin sonucu: eşiği yükselt."}
+        - {t: "Değişmez", why: "Eşik yerel maksimumlardan hangilerinin kalacağını belirler."}
+    presets:
+      - {name: "Varsayılan", params: {mode: 0, k: 0.04, T: 0.01, sw: 1.5, noise: 5, th: 0}, note: "11/11 köşe, 3/3 tek nokta, 2 sahte."}
+      - {name: "Küçük k", params: {mode: 0, k: 0.01}, note: "Sahte tespit 9: kenarlar ve disk de pozitif R veriyor."}
+      - {name: "k sınıra yakın", params: {mode: 0, k: 0.24}, note: "7/11 köşe: yalnız λ₁ ≈ λ₂ olan yamalar pozitif kalıyor."}
+      - {name: "Shi–Tomasi", params: {mode: 1, T: 0.05}, note: "11/11 köşe, 4 sahte; k yok."}
+      - {name: "Güçlü gürültü, yüksek T", params: {mode: 0, noise: 20, T: 0.05}, note: "11/11 köşe, 9 sahte (T = 0.01'de 43)."}
+      - {name: "Sahne 30° dönük", params: {mode: 0, th: 30}, note: "11/11 köşe bulunuyor; eğik kenarların merdiven örneklenmesi 7 sahte tepe ekliyor."}
+      - {name: "Büyük pencere", params: {mode: 0, noise: 0, sw: 3}, note: "6/11: tepe köşenin içine kayıyor (sivri köşelerde 4 piksele kadar)."}
+    questions:
+      - q: "Üç tek parlak nokta neden her ayarda köşe sayılıyor, Harris'i bundan nasıl korursun?"
+        a: "Tek bir parlak piksel her yönde değişim üretir: iki büyük özdeğer, pozitif R. Harris tanımı gereği ayırt edemez. Önce medyan süzgeci (M9.5) ya da yanıtı birkaç ölçekte isteyen bir ölçek uzayı yaklaşımı bunları eler."
+    limits: "96 × 96 yapay sahne; kutu yerine Gauss pencere; 3 × 3 yerel maksimum; tolerans 2.5 piksel."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir kenarın Harris matrisi
+    goal: M'yi elle kurmak
+    needs: $\mathbf M=\sum w\mathbf A$
+    q: |-
+      Kutu pencerede 4 pikselin gradyanı $(f_x,f_y)=(10,0)$, kalanlarınki 0. $\mathbf M$, özdeğerler ve $k=0.04$ ile $R$?
+    solution: |-
+      $\mathbf M=\begin{bmatrix}400&0\\0&0\end{bmatrix}$, özdeğerler 400 ve 0, $\det=0$, $\operatorname{tr}=400$, $R=-0.04\cdot160000=-6400$: kenar (dikey bir kenar, normal $x$ yönünde).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Köşe yanıtı
+    goal: det ve iz ile R hesaplamak
+    needs: $R=\det\mathbf M-k\operatorname{tr}^2\mathbf M$
+    q: |-
+      $\mathbf M=\begin{bmatrix}6&2\\2&3\end{bmatrix}$, $k=0.05$. $R$?
+    answer: 9.95
+    calc: "(6*3-2*2) - 0.05*(6+3)**2"
+    tol: 1e-9
+    mistakes:
+      - {answer: 13.95, msg: "det = 18 − 4 = 14; köşegen dışı terimlerin çarpımı çıkarılmalı."}
+      - {answer: 13.55, msg: "tr² = 81, tr değil."}
+    hints:
+      - "det = 14, tr = 9."
+    solution: |-
+      $14-0.05\cdot81=9.95$: pozitif, köşe adayı.
+  - id: p3
+    type: hesap
+    level: 1
+    title: R = 0 sınırı
+    goal: Kenar/köşe sınır oranını bulmak
+    needs: $r_-=\frac{1-2k-\sqrt{1-4k}}{2k}$
+    q: |-
+      $k=0.06$ için, $\lambda_2/\lambda_1$ oranı hangi değerin altındayken $R<0$ olur? (4 basamak)
+    answer: 0.0685
+    calc: "round((1-2*0.06-math.sqrt(1-4*0.06))/(2*0.06), 4)"
+    tol: 0.0001
+    mistakes:
+      - {answer: 14.5982, msg: "Bu büyük kök (r₊ = 1/r₋)."}
+      - {answer: 0.06, msg: "Sınır k'ye yakın ama k değil."}
+    hints:
+      - "$\\sqrt{0.76}\\approx0.8718$."
+    solution: |-
+      $r_-=(0.88-0.87178)/0.12=0.0685$. $k=0.04$'te 0.0436 idi: $k$ büyüdükçe kenar kaması genişler.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Shi–Tomasi değeri
+    goal: Küçük özdeğeri hesaplamak
+    needs: $\lambda_{\min}=\frac{\operatorname{tr}}2-\sqrt{(\frac{\operatorname{tr}}2)^2-\det}$
+    q: |-
+      Vaka çalışmasının sağ bloğu $\mathbf M=\begin{bmatrix}4G&-G\\-G&4G\end{bmatrix}$. Shi–Tomasi yanıtı $\min(\lambda_1,\lambda_2)/G$?
+    answer: 3
+    calc: "4 - math.sqrt(16 - 15)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 5, msg: "Bu büyük özdeğer."}
+      - {answer: 12.44, msg: "Bu Harris R/G²."}
+    hints:
+      - "tr/2 = 4G, det = 15G²."
+    solution: |-
+      $4-\sqrt{16-15}=3$: $3G$. Sol blokta 0 olurdu (kenar).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Yıldızlı gökyüzü
+    goal: Harris'in tek noktalara yanıtını tanımak
+    needs: Özdeğer yorumu
+    q: |-
+      Bir gece fotoğrafında Harris, binaların köşelerinin yanı sıra gökyüzündeki her yıldıza da köşe diyor. Neden, ve hangi önlem en az köşe kaybıyla bunu azaltır?
+    choices:
+      - {t: "k çok büyük", why: "Büyük k sahte tespiti azaltır; artırmaz."}
+      - {t: "Tek parlak noktalar her yönde değişim üretir (iki büyük özdeğer); önce küçük bir medyan süzgeci ya da noktaların çevresinde düz bölge arayan bir ek ölçüt", ok: true, why: "Slaytın 'ne yazık ki tek parlak noktalar' notu ve lab l2'deki 3/3."}
+      - {t: "Gauss pencere yerine kutu kullanılmış", why: "Pencere biçimi bu davranışı değiştirmez."}
+    hints:
+      - "Tek bir parlak pikselin (f_x, f_y) saçılımı neye benzer?"
+    solution: |-
+      Parlak bir noktanın dört yanında da türev var: iki büyük özdeğer ve pozitif R. 3 × 3 medyan tek piksellik noktaları siler, köşeleri büyük ölçüde korur; köşeyi iki kenarın birleşimi olarak doğrulayan ek ölçütler de kullanılabilir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Förstner alt piksel köşe denklemi
+    goal: En küçük kareler çözümünü türetmek
+    needs: Gradyan ⊥ kenar, normal denklemler
+    q: |-
+      Köşe $\mathbf q$'nun çevresindeki her $\mathbf p$ için $\mathbf g_p^\top(\mathbf p-\mathbf q)=0$ olması istenir. $E(\mathbf q)=\sum_p(\mathbf g_p^\top(\mathbf p-\mathbf q))^2$'yi en küçükleyen $\mathbf q$'yu bul; matrisin ne zaman tekil olduğunu ve bunun geometrik anlamını açıkla.
+    rubric:
+      - "E'yi qᵀ(Σggᵀ)q − 2qᵀ(Σggᵀp) + sabit olarak açtım"
+      - "Gradyanı sıfırlayıp (Σggᵀ)q = Σggᵀp normal denklemlerini buldum"
+      - "Σggᵀ'nin bir Harris matrisi (kutu ağırlık) olduğunu belirttim"
+      - "Tekilliği (tek yönlü gradyan, kenar) kenar boyunca konumun belirsiz olmasıyla ilişkilendirdim"
+    hints:
+      - "$(\\mathbf g^\\top\\mathbf d)^2=\\mathbf d^\\top\\mathbf g\\mathbf g^\\top\\mathbf d$."
+    solution: |-
+      $E=\sum(\mathbf p-\mathbf q)^\top\mathbf g\mathbf g^\top(\mathbf p-\mathbf q)$; $\nabla_{\mathbf q}E=-2\sum\mathbf g\mathbf g^\top(\mathbf p-\mathbf q)=0$ → $(\sum\mathbf g\mathbf g^\top)\mathbf q=\sum\mathbf g\mathbf g^\top\mathbf p$. Sol matris pencere içindeki Harris matrisidir. Bütün gradyanlar aynı yöndeyse (kenar) rankı 1'dir: $\mathbf q$ kenar boyunca kaydırılınca $E$ değişmez, konum belirsizdir. Köşede iki yön olduğu için tersinir ve tek çözüm vardır.
+pitfalls:
+  - wrong: "Harris'te x ve y piksel koordinatlarıdır."
+    right: "C(x, y)'de x, y pencerenin kaymasıdır; türevler yama içindeki (s, t) noktalarında alınır."
+  - wrong: "R'yi hesaplamak için özdeğerler gerekir."
+    right: "det M ve tr M yeterlidir: özdeğerlerin çarpımı ve toplamı. R'nin varlık nedeni karekökten kaçınmaktır."
+  - wrong: "k ne kadar büyükse o kadar çok köşe bulunur."
+    right: "Tersi: k büyüdükçe R = 0 sınırı λ₁ = λ₂ çizgisine yaklaşır ve daha az yama köşe sayılır; k ≥ 0.25'te ideal köşe bile R ≤ 0 verir."
+  - wrong: "cv2.cornerHarris'in çıkışı doğrudan köşe listesidir."
+    right: "Her piksel için R haritasıdır; eşik ve yerel maksimum seçimi (NMS) ayrıca yapılmalı."
+whatif:
+  - q: "Ağırlık penceresi Gauss yerine kutu olsa ve görüntü 45° döndürülse?"
+    a: "Kutu pencere dönünce farklı pikselleri kapsar; M dönmeye tam değişmez olmaz, yanıtlar biraz değişir. Gauss pencere dairesel simetrik olduğu için özdeğerler (ayrık türev hatası dışında) korunur."
+  - q: "R yerine det M / tr M (Noble ölçüsü) kullanılsa?"
+    a: "k'ye gerek kalmaz; değer harmonik ortalamaya benzer (λ₁λ₂/(λ₁ + λ₂)) ve küçük özdeğere yakındır: Shi–Tomasi'ye benzer davranır."
+  - q: "Görüntü 2 kat büyütülse, aynı σ'yla Harris aynı köşeleri bulur mu?"
+    a: "Keskin köşeler büyük ölçüde evet, ama yuvarlatılmış köşeler küçük pencereye göre kenar gibi görünür ve kaybolabilir; ince ayrıntılar ise yeni köşeler doğurabilir. Ölçek değişmezliği için pencere boyutunun da aranması gerekir (Harris–Laplace, SIFT)."
