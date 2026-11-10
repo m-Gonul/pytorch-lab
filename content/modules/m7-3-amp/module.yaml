@@ -79,3 +79,163 @@ homework:
     accept:
       - "Kayıp ölçeklemesiz fp16'da sıfıra düşen gradyan oranı yüksek."
       - "Tekniklerle fp32'ye eşit doğruluk."
+
+labs:
+  - id: l1
+    lab: floatfmt
+    title: "Kayan nokta biçimleri: aralık, hassasiyet, kaybolan güncelleme"
+    goal: |
+      fp32, tf32, bf16, fp16 ve iki fp8 biçiminde bir sayının nasıl yuvarlandığını, komşu sayılar arası aralığı, taşma ve alt taşma sınırlarını gör. w = x'e küçük bir Δ eklemenin o biçimde temsil edilip edilmediğini (kaybolan güncelleme) dene.
+    predict:
+      q: "fp16'da w = 1'e Δ = 10⁻⁴ eklenirse sonuç ne olur?"
+      options:
+        - {t: "1.0001", why: "fp16'da 1'in üstündeki ilk sayı 1 + 2⁻¹⁰ ≈ 1.000977."}
+        - {t: "1", ok: true, why: "Δ, yarım aralıktan (≈ 4.9·10⁻⁴) küçük: güncelleme kaybolur."}
+        - {t: "1.000977", why: "En yakına yuvarlama 1'i seçer."}
+    presets:
+      - {name: "fp16, w = 1, Δ = 10⁻⁴", params: {f: 3, lx: 0, neg: 0, ld: -4}, note: "w + Δ = 1: kayboldu."}
+      - {name: "bf16, Δ = 10⁻²·⁵", params: {f: 2, lx: 0, ld: -2.5}, note: "bf16'da yarım aralık 0.0039; 0.0032'lik güncelleme de kayboluyor."}
+      - {name: "fp16 alt taşma", params: {f: 3, lx: -8}, note: "10⁻⁸ fp16'da 0'a yuvarlanıyor."}
+      - {name: "fp16 taşma", params: {f: 3, lx: 4.954}, note: "≈ 90 000 (300²) fp16'da taşıyor: ∞."}
+      - {name: "bf16'da aynı sayı", params: {f: 2, lx: 4.954}, note: "bf16'da taşmıyor ama yalnız 8 anlamlı bitle temsil ediliyor."}
+    questions:
+      - q: "bf16 ile fp16'nın göreli aralık eğrileri neden farklı biçimdedir?"
+        a: "Her biçimde normal bölgede ulp/|x| 2⁻ᵐ ile 2⁻ᵐ⁺¹ arasında testere dişi gibi değişir; fp16'nın eğrisi daha aşağıda (daha çok mantis) ama ±65 504 ve 6·10⁻⁵ civarında biter; bf16 daha yukarıda ama fp32 kadar geniş bir aralığı kapsar. Alt normal bölgede ulp sabitlenir ve göreli aralık hızla büyür."
+    limits: "Yalnız yuvarlama; NaN kodlamaları ve fp8'in doyurma davranışı kütüphaneye bağlıdır."
+  - id: l2
+    lab: lossscale
+    title: "Kayıp ölçekleme: alt taşma ve dinamik ölçek"
+    goal: |
+      Log-normal dağılan gradyan büyüklüklerinin ne kadarının fp16'da sıfıra indiğini ve ölçeklemenin dağılımı nasıl kaydırdığını gör. Dinamik ölçekleyicinin (taşmada atla ve yarıya indir, aralıkla iki katına çıkar) adımlar boyunca ölçeği nasıl ayarladığını ve kaç adımın atlandığını izle.
+    predict:
+      q: "Gradyanların medyanı 10⁻⁶, yayılım 1.2 (log₁₀). Ölçeksiz fp16'da gradyanların kabaca ne kadarı sıfıra iner?"
+      options:
+        - {t: "≈ %0", why: "Dağılımın sol kuyruğu 2⁻²⁵ ≈ 3·10⁻⁸'in altına iniyor."}
+        - {t: "≈ %10", ok: true, why: "Ölçülen 0.102; dinamik ölçekle 2.4·10⁻⁵'e iniyor."}
+        - {t: "≈ %50", why: "Medyan 10⁻⁶ sınırın 1.5 onluk üstünde."}
+    presets:
+      - {name: "Varsayılan", params: {mu: -6, s: 1.2, init: 16, interval: 200, spike: 0.005, steps: 2000}, note: "Ölçeksiz 0.102 sıfıra iniyor; ortalama ölçek 2^10.6 ile 2.4·10⁻⁵. 10 adım atlandı."}
+      - {name: "Çok küçük gradyanlar", params: {mu: -8}, note: "Ölçeksiz 0.654 kayboluyor; ölçekle 2.3·10⁻⁴."}
+      - {name: "Sıçrama yok", params: {spike: 0}, note: "Ölçek 2^18.4'e kadar büyüyor, 6 atlanan adım (başlangıçtaki ayar)."}
+      - {name: "Sık büyütme", params: {interval: 20}, note: "89 atlanan adım: ölçek sürekli sınırı yokluyor."}
+      - {name: "Büyük gradyanlar", params: {mu: -2, s: 1}, note: "Ortalama ölçek 2^3.9: büyük gradyanlar küçük bir ölçek gerektiriyor."}
+    questions:
+      - q: "Atlanan adımlar eğitimi bozar mı?"
+        a: "Az sayıdaysa hayır: o adımın gradyanı kullanılmaz, yalnız bir veri batch'i boşa gider. Sık atlama (çok kısa büyütme aralığı ya da gerçekten taşan gradyanlar) eğitimi yavaşlatır; bf16 bu sorunu tamamen ortadan kaldırır."
+    limits: "Gradyanlar log-normal varsayıldı; taşma yalnız en büyük gradyana bakarak modellendi; atlanan adımın optimizasyona etkisi modellenmedi."
+  - id: l3
+    lab: stochround
+    title: "Saf bf16 eğitim: en yakına ve stokastik yuvarlama"
+    goal: |
+      Ağırlığı bf16 (ya da fp16) tutulan tek parametreli bir modeli küçük bir öğrenme oranıyla eğit. En yakına yuvarlamanın ilk adımda takıldığını, stokastik yuvarlamanın fp32 yörüngesini beklentide izlediğini gör.
+    predict:
+      q: "bf16, w₀ = 10, w* = 9, η = 0.001. En yakına yuvarlamayla 3000 adım sonra w?"
+      options:
+        - {t: "≈ 9.05 (fp32 gibi)", why: "İlk güncelleme 0.001, ulp(10)/2 = 0.031'den çok küçük."}
+        - {t: "10", ok: true, why: "Her güncelleme 10'a geri yuvarlanıyor; stokastik yuvarlama 9.063, fp32 9.05."}
+        - {t: "9", why: "Hiç hareket etmiyor."}
+    presets:
+      - {name: "bf16, küçük η", params: {fmt: 0, w0: 10, target: 9, lr: 0.001, steps: 3000}, note: "En yakına 10'da takılı; stokastik 9.063, fp32 9.050."}
+      - {name: "fp16", params: {fmt: 1}, note: "fp16'da ulp(10) = 0.0078; yarım aralık 0.0039 > 0.001: yine takılıyor."}
+      - {name: "Büyük η", params: {lr: 0.05}, note: "En yakına 9.625'te takılıyor (güncellemeler küçülünce); stokastik ve fp32 9."}
+      - {name: "w₀ = 2", params: {w0: 2, target: 1}, note: "ulp(2) = 0.0156: en yakına 2'de takılı, stokastik 1.063."}
+    questions:
+      - q: "Stokastik yuvarlama yansızsa neden her yerde kullanılmıyor?"
+        a: "Rastgele sayı üretimi ve ek işlem maliyeti getirir; fp32 ana kopya varken gereksizdir. Ayrıca gürültü ekler; yansızlık beklentide geçerlidir, tek bir yörünge rastgeledir."
+    limits: "Tek parametre, ikinci dereceden kayıp, gradyan tam (gürültüsüz)."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Biçimin sınırları
+    goal: Üs ve mantis bitlerinden aralık ve hassasiyeti hesaplamak
+    needs: bias = 2^(e−1) − 1
+    q: |-
+      fp8 e5m2 için bias, en büyük sonlu değer ve eps nedir?
+    solution: |-
+      bias $=2^4-1=15$; en büyük $(2-2^{-2})\cdot2^{15}=1.75\cdot32768=57\,344$; eps $=2^{-2}=0.25$. Aralığı fp16 ile aynı, hassasiyeti çok düşük: gradyanlar için uygun (aralık önemli), aktivasyonlar için e4m3 tercih edilir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kaybolan güncelleme eşiği
+    goal: ulp/2 kuralını uygulamak
+    needs: Mantis biti
+    q: |-
+      bf16'da $w=4$. Kaybolmayan en küçük pozitif güncellemenin büyüklüğü (yaklaşık, ulp/2)?
+    answer: 0.015625
+    calc: "4*2**-7/2"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.0078125, msg: "Bu [1, 2) aralığının ulp/2'si değil ulp'si; w = 4'te aralık 4 kat büyük."}
+      - {answer: 0.03125, msg: "Bu ulp; yarısından büyük güncellemeler yukarı yuvarlanır."}
+    hints:
+      - "$[4,8)$'de ulp $=4\\cdot2^{-7}$."
+    solution: |-
+      ulp $=2^{2-7}=0.03125$, yarısı $0.015625$. Daha küçük güncellemeler kaybolur.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Kayıp ölçeği
+    goal: Alt taşmayı önleyen ölçeği seçmek
+    needs: fp16 en küçük alt normal 2⁻²⁴
+    q: |-
+      Gradyanların en küçüğü $10^{-9}$. Onu $2^{-24}$'ün üstüne çıkaran en küçük 2'nin kuvveti ölçeğin üssü $k$ ($S=2^k$)?
+    answer: 6
+    calc: "6"
+    tol: 0
+    mistakes:
+      - {answer: 5, msg: "2⁵ · 10⁻⁹ = 3.2·10⁻⁸ < 5.96·10⁻⁸."}
+      - {answer: 24, msg: "Bu, gradyanı 1 civarına taşırdı; gereken yalnız 2⁻²⁴'ün üstü."}
+    hints:
+      - "$2^k\\cdot10^{-9}>5.96\\cdot10^{-8}$ ⇒ $2^k>59.6$."
+    solution: |-
+      $2^6=64$: $6.4\cdot10^{-8}>5.96\cdot10^{-8}$. Pratikte ölçek bundan çok daha büyük seçilir (alt normal bölgede hassasiyet düşük).
+  - id: p4
+    type: yorumla
+    level: 2
+    title: fp16'da kayıp NaN oldu
+    goal: Taşmanın kaynağını bulmak
+    needs: autocast, aralık
+    q: |-
+      Kendi yazdığınız dikkat katmanı fp16 autocast altında birkaç bin adım sonra NaN veriyor; bf16'da sorun yok. Skorlar `q @ k.T` ile hesaplanıp `torch.exp(scores)` / toplam ile normalize ediliyor. Neden?
+    choices:
+      - {t: "fp16 matmul hatalı", why: "Matmul doğru; sorun sonraki adımda."}
+      - {t: "exp(skor) fp16'da 65 504'ü aşıyor (skor > 11): taşıyor; softmax'ı max çıkararak ve fp32'de yapmak gerekir", ok: true, why: "e^11.1 ≈ 66 000. F.softmax autocast'te fp32'de çalışır ve max'ı çıkarır."}
+      - {t: "Öğrenme oranı fazla büyük", why: "bf16'da aynı ayarla sorun yok."}
+    hints:
+      - "fp16'da e^x hangi x'te taşar?"
+    solution: |-
+      $\ln65504\approx11.09$: 11'den büyük bir skor exp'te taşar, sonra ∞/∞ = NaN. Elle yazılan exp autocast'in fp32 listesine girmiyor. `F.softmax` kullanmak (autocast fp32'de çalıştırır ve max'ı çıkarır) ya da max'ı çıkarmak çözümdür.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Bit hilesinin stokastik yuvarlama olduğu
+    goal: Carry olasılığının p olduğunu göstermek
+    needs: İkili gösterim
+    q: |-
+      Pozitif bir fp32 sayının bitleri $B=2^{16}H+L$ ($H$: üst 16 bit = bf16, $0\le L<2^{16}$). $U\sim$ Düzgün$\{0,\dots,2^{16}-1\}$ ile $(B+U)$'nun alt 16 bitini sıfırlamanın, $H$'yi $1-L/2^{16}$, $H+1$'i $L/2^{16}$ olasılıkla verdiğini ve bunun yansız SR olduğunu göster.
+    rubric:
+      - "Elde (carry) olmasının L + U ≥ 2^16 olayı olduğunu yazdım"
+      - "Bu olasılığın L / 2^16 olduğunu hesapladım"
+      - "Aynı binade içinde ardışık bit desenlerinin eşit aralıklı sayılar olduğunu ve L/2^16'nın (x − a)/(b − a) olduğunu belirttim"
+      - "Binade sınırında (H'nin mantisi taşarsa) üssün bir artmasının doğru sonraki sayıyı verdiğini belirttim"
+    hints:
+      - "$L+U\\ge2^{16}$ olayı."
+    solution: |-
+      Elde, $L+U\ge2^{16}$ olduğunda olur; $U$ düzgün olduğu için olasılık $L/2^{16}$. Bir binade içinde fp32 sayılar bit desenine göre eşit aralıklıdır; $H$ ve $H+1$ ardışık bf16 sayılardır ve $x$, $a=H$'den $L/2^{16}$ kesir kadar ileridedir. Böylece olasılık $(x-a)/(b-a)$'dır: SR. Mantis taşarsa elde üs alanına geçer ve tam olarak bir sonraki binadenin ilk sayısını verir.
+pitfalls:
+  - wrong: "bf16, fp16'dan her bakımdan iyidir."
+    right: "bf16 aralıkta iyidir, hassasiyette kötüdür (7'ye karşı 10 mantis biti); hassasiyet gerektiren birikimler fp32'de yapılmalıdır."
+  - wrong: "autocast parametreleri 16 bite çevirir."
+    right: "Parametreler fp32 kalır; autocast yalnız işlem anında 16 bitlik kopya kullanır ve gradyanlar fp32 parametrelerde birikir."
+  - wrong: "GradScaler ile gradyan kırpma doğrudan yapılabilir."
+    right: "Ölçeklenmiş gradyanlar S kat büyüktür; kırpmadan önce scaler.unscale_(opt) çağrılmalıdır."
+  - wrong: "Kayıp ölçekleme sonucu değiştirir."
+    right: "Geri geçiş doğrusaldır; S ile çarpıp fp32'de bölmek aynı gradyanı verir. Değişen yalnız yolda kaybolan küçük değerlerin kurtarılmasıdır."
+whatif:
+  - q: "Ölçek 2'nin kuvveti yerine 1000 seçilseydi?"
+    a: "Çarpma ve bölme mantisi de değiştirir; her gradyana iki ek yuvarlama hatası eklenir. 2'nin kuvveti yalnız üssü kaydırır ve kayıpsızdır (taşma ve alt taşma dışında)."
+  - q: "Birikim (matmul'ün iç toplamı) fp16'da yapılsaydı?"
+    a: "Binlerce terimin toplamında küçük terimler büyük kısmi toplamın yanında kaybolur; hata K ile büyür. Tensör çekirdekleri bu yüzden fp32 birikimle çalışır."
+  - q: "Saf bf16 eğitimde stokastik yuvarlama yerine Kahan toplama kullanılsaydı?"
+    a: "Her parametre için kaybolan kısmı tutan bir telafi terimi saklanır; güncellemeler kaybolmaz ama ek bir tensör (bf16'da 2 bayt) gerekir. SR ek bellek istemez, gürültü getirir."
