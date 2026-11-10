@@ -76,3 +76,144 @@ homework:
     accept:
       - "Graf kırılması ve koruma örnekleri açıklamalı."
       - "Füzyon kanıtı (üretilen çekirdek) ve hız tablosu."
+
+labs:
+  - id: l1
+    lab: roofline
+    title: "Roofline: bellek mi, hesap mı?"
+    goal: |
+      Bir işlemin aritmetik yoğunluğunu (FLOP / bayt) hesapla ve roofline üzerinde yerini bul. Eleman bazlı zincirin füzyonlu ve füzyonsuz hâllerini, matris çarpımını ve softmax'ı karşılaştır; tepe hız ve bant genişliğini değiştirerek dirsek noktasının nasıl kaydığını, küçük boyutta çekirdek başlatma ek yükünün nasıl baskın hâle geldiğini gör.
+    predict:
+      q: "A100 benzeri bir donanımda (312 TFLOP/s, 2 TB/s) 10⁶ elemanlık fp32 üç işlemlik eleman bazlı zincir tepe hızın yüzde kaçında çalışabilir?"
+      options:
+        - {t: "≈ %50", why: "Yoğunluk 0.125 FLOP/bayt; dirsek 156."}
+        - {t: "≈ %0.1", ok: true, why: "0.125 × 2 TB/s = 0.25 TFLOP/s; tepenin %0.08'i. Füzyonla yoğunluk 3 katına çıkar (%0.24)."}
+        - {t: "%100", why: "Bu hesap bağımlı işlemler için."}
+    presets:
+      - {name: "Zincir, füzyonsuz", params: {op: 0, k: 3, fused: 0, logN: 20, dt: 0, peak: 312, bw: 2, launch: 5}, note: "Yoğunluk 0.125, 0.25 TFLOP/s, ≈ 27.6 µs (3 çekirdek başlatma dahil)."}
+      - {name: "Zincir, füzyonlu", params: {fused: 1}, note: "Yoğunluk 0.375, ≈ 9.2 µs: bayt 3 kat azaldı, bir çekirdek."}
+      - {name: "Küçük tensör", params: {logN: 8}, note: "256 eleman: füzyonsuz 15 µs, füzyonlu 5 µs; neredeyse tamamı başlatma ek yükü."}
+      - {name: "Büyük matris çarpımı (bf16)", params: {op: 1, logN: 12, dt: 1}, note: "n = 4096: yoğunluk 1365 > 156, hesap bağımlı, tepe hızda."}
+      - {name: "Küçük matris çarpımı", params: {op: 1, logN: 6, dt: 0}, note: "n = 64: yoğunluk 10.7, bellek bağımlı (21 TFLOP/s)."}
+      - {name: "H100", params: {peak: 989, bw: 3.35}, note: "Dirsek 295 FLOP/bayt: daha çok işlem bellek bağımlı."}
+    questions:
+      - q: "Füzyon bellek bağımlı bir işlemi en fazla kaç kat hızlandırabilir?"
+        a: "Taşınan baytın azalma oranı kadar (ve kalkan çekirdek başlatmaları kadar). k işlemlik zincirde bu k'dır: her ara sonuç bir yazma ve bir okuma tasarrufu. Füzyon sonrası işlem hâlâ bellek bağımlıysa daha fazla kazanç ancak daha az bayt taşıyan bir veri tipiyle (bf16) gelir."
+    limits: "Basit roofline: önbellek, gecikme, çekirdek verimliliği ve örtüşme yok. Donanım değerleri yaklaşık veri sayfası değerleri."
+  - id: l2
+    lab: fusegroups
+    title: "Füzyon grupları ve taşınan bayt"
+    goal: |
+      Dört küçük grafta füzyon gruplarını üç kuralla kur: füzyon yok, aşama c'nin tek tüketici kuralı ve Inductor benzeri (yatay füzyon + indirgemeye katma). Her çekirdeğin okuduğu ve yazdığı değerleri, toplam trafiği ve kuralların nerede ayrıldığını gör.
+    predict:
+      q: "t = x·w; y = tanh(t) + exp(t). Aşama c kuralı t'yi neden ayrı bir çekirdekte bırakır?"
+      options:
+        - {t: "mul eleman bazlı değildir", why: "Eleman bazlıdır."}
+        - {t: "t'nin iki tüketicisi var; tek tüketici kuralı birleşmeye izin vermez", ok: true, why: "t belleğe yazılıp iki kez okunur: 20 MiB. Yatay füzyon tanh ve exp'i aynı çekirdekte hesaplayıp t'yi hiç yazmaz: 12 MiB."}
+        - {t: "exp pahalıdır", why: "Kural maliyete bakmıyor."}
+    presets:
+      - {name: "GELU benzeri zincir", params: {g: 0, rule: 1, logN: 20, dt: 0}, note: "Tek çekirdek, 8 MiB (füzyonsuz 60 MiB): 7.5 kat."}
+      - {name: "İki tüketici, aşama c", params: {g: 1, rule: 1}, note: "2 çekirdek, 20 MiB."}
+      - {name: "İki tüketici, Inductor", params: {g: 1, rule: 2}, note: "1 çekirdek, 12 MiB: x ve w okunur, y yazılır."}
+      - {name: "İndirgeme", params: {g: 2, rule: 2}, note: "exp toplamın çekirdeğine katılır, e yazılmaz: 16 MiB (aşama c 24, füzyonsuz 32)."}
+      - {name: "Ara çıktı", params: {g: 3, rule: 2}, note: "t döndürüldüğü için yazılmalı: 12 MiB (füzyonsuz 16)."}
+    questions:
+      - q: "İndirgemeden sonraki işlem (y = x + z) neden indirgemeyle aynı çekirdekte değil?"
+        a: "z, tüm elemanlar toplanmadan bilinmez; y'nin her elemanı z'ye bağlıdır. Satır kısaysa tek çekirdek bütün satırı tutup önce toplamı sonra y'yi hesaplayabilir (persistent reduction); uzun dizilerde bu iki geçiş, iki çekirdek demektir."
+    limits: "Küçük sabit graflar; skaler girdi ve sabitler trafiğe katılmıyor; toplamın çıktısı 1 eleman."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Aritmetik yoğunluk
+    goal: Bellek bağımlılığını sayıyla görmek
+    needs: FLOP / bayt
+    q: |-
+      bf16'da `y = x * 2 + 1` (N eleman). Füzyonsuz ve füzyonlu yoğunluk nedir? A100'ün dirseği ≈ 156.
+    solution: |-
+      2 FLOP/eleman. Füzyonsuz: iki çekirdek, her biri 2N·2 bayt → 8N bayt, yoğunluk 2N/8N = 0.25. Füzyonlu: 4N bayt, 0.5. İkisi de dirseğin 300 kat altında: bellek bağımlı, hız bant genişliğiyle sınırlı.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Füzyonun bayt kazancı
+    goal: El hesabını genellemek
+    needs: k çekirdek × 2N okuma/yazma
+    q: |-
+      fp32'de 5 eleman bazlı işlemlik bir zincir, N = 2·10⁶. Füzyonsuz toplam trafik kaç MB (10⁶ bayt)?
+    answer: 80.0
+    calc: "5*2*4*2"
+    tol: 1e-9
+    mistakes:
+      - {answer: 16.0, msg: "Bu füzyonlu trafik: bir okuma, bir yazma."}
+      - {answer: 40.0, msg: "Her çekirdek hem okur hem yazar: 2 · 4 bayt · N."}
+    hints:
+      - "$5\\cdot2\\cdot4\\cdot2\\cdot10^6$ bayt."
+    solution: |-
+      $5\cdot2\cdot4\cdot2\cdot10^6=80\cdot10^6$ bayt; füzyonlu $16\cdot10^6$; oran 5.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Conv + BN katlama
+    goal: Katlanmış bias'ı hesaplamak
+    needs: $b'=(b-\mu)s+\beta$
+    q: |-
+      $b=0$, $\mu=2$, $\sigma^2=0.25$, $\gamma=3$, $\beta=-1$, $\epsilon=0$. $b'$?
+    answer: -13.0
+    calc: "(0-2)*3/0.5 - 1"
+    tol: 1e-9
+    mistakes:
+      - {answer: -25.0, msg: "√0.25 = 0.5; s = 3/0.5 = 6, σ² ile bölünmez."}
+      - {answer: -1.0, msg: "μ katkısı unutuldu: (b − μ)s."}
+    hints:
+      - "$s=\\gamma/\\sqrt{\\sigma^2}=6$."
+    solution: |-
+      $s=6$; $b'=(0-2)\cdot6-1=-13$. Ağırlık da 6 ile çarpılır.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Derleme hızlandırmadı
+    goal: Graph break ve yeniden derlemeyi tanımak
+    needs: Dynamo, guard
+    q: |-
+      `torch.compile` sonrası eğitim adımı hızlanmadı; `TORCH_LOGS="recompiles"` her adımda yeniden derleme gösteriyor. Model değişken uzunluklu dizilerle çağrılıyor. Ne yapılır?
+    choices:
+      - {t: "mode='max-autotune' kullan", why: "Yeniden derlemeyi artırır, azaltmaz."}
+      - {t: "Dizileri birkaç sabit uzunluğa doldur (bucketing) ya da dynamic=True ile sembolik şekil kullan", ok: true, why: "Şekil guard'ı her yeni uzunlukta bozuluyor."}
+      - {t: "fullgraph=True ekle", why: "Graph break'leri hataya çevirir; şekil kaynaklı yeniden derlemeyi çözmez."}
+    hints:
+      - "Guard'lar neyi kontrol eder?"
+    solution: |-
+      Her yeni girdi şekli şekil guard'ını bozar ve yeniden derleme tetikler; derleme süresi kazancı yer. Uzunlukları birkaç kovaya yuvarlamak ya da dinamik şekillerle derlemek (bir kez sembolik graf) çözümdür.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Matris çarpımının yoğunluğu
+    goal: Roofline'da yerini türetmek
+    needs: FLOP ve bayt sayımı
+    q: |-
+      $m\times k$ ile $k\times n$ matrislerin çarpımının aritmetik yoğunluğunun $\frac{2mnk}{b(mk+kn+mn)}$ olduğunu ve kare durumda ($m=n=k$) $\frac{2n}{3b}$'ye indiğini göster. $m=1$ (matris–vektör) durumunu yorumla.
+    rubric:
+      - "FLOP'u 2mnk (çarpma + toplama) olarak saydım"
+      - "Baytı iki girdi ve bir çıktının boyutları toplamı × b olarak yazdım"
+      - "Kare durumda sadeleştirdim"
+      - "m = 1'de yoğunluğun ≈ 2/b'ye düştüğünü ve matris–vektör çarpımının bellek bağımlı olduğunu (LLM çözümlemesinde batch 1) belirttim"
+    hints:
+      - "$m=1$: $\\frac{2nk}{b(k+kn+n)}\\approx\\frac2b$."
+    solution: |-
+      FLOP $2mnk$, bayt $b(mk+kn+mn)$. Kare: $\frac{2n^3}{3bn^2}=\frac{2n}{3b}$. $m=1$: ağırlık matrisi ($kn$) baskın, yoğunluk ≈ 2/b (bf16'da ≈ 1): tamamen bellek bağımlı. Dil modellerinin token token üretimi bu yüzden bant genişliğiyle sınırlıdır ve batch'leme (birden çok isteği birlikte çözmek) yoğunluğu artırır.
+pitfalls:
+  - wrong: "Füzyon FLOP sayısını azalttığı için hızlandırır."
+    right: "FLOP aynı kalır; kazanç belleğe yazılmayan ara sonuçlardan (bayt) ve kalkan çekirdek başlatmalarından gelir."
+  - wrong: "torch.compile her modeli hızlandırır."
+    right: "Kazanç modele bağlıdır; büyük matris çarpımlarının baskın olduğu modellerde az, graph break ve yeniden derleme varsa sıfır ya da negatif olabilir. Isınmadan sonra ölçülmelidir."
+  - wrong: "Conv + BN katlama eğitimde de yapılabilir."
+    right: "Eğitimde BN batch istatistiklerini kullanır ve koşu istatistiklerini günceller; katlama yalnız eval modunda (sabit μ, σ²) doğrudur."
+  - wrong: "Graph break yalnız biraz yavaşlatır, sonucu değiştirmez."
+    right: "Sonuç aynıdır ama graf parçaları arasında füzyon olamaz ve aradaki kod eager çalışır; sık break'ler derlemenin bütün kazancını yok edebilir."
+whatif:
+  - q: "Bir modelin bütün işlemleri hesap bağımlı olsaydı?"
+    a: "Füzyonun kazandıracağı az şey olurdu; kazanç ancak daha hızlı çekirdek seçimi (max-autotune), daha düşük hassasiyet (bf16, fp8) ya da daha az ek yükten (CUDA graph'ları) gelir."
+  - q: "torch.where yerine pahalı iki dal (ör. iki ayrı alt ağ) olsaydı?"
+    a: "where iki dalı da hesapladığı için maliyet ikiye katlanır. torch.cond ya da yalnız o bölgeyi derleme dışında bırakmak (graph break'i kabul etmek) daha iyi olabilir."
+  - q: "FX ile katlanan model sonra eğitim moduna alınsa?"
+    a: "BN düğümü artık yok; model eğitimde normalizasyon yapmaz, katlanmış ağırlıklar sabit istatistiklere göre ölçeklenmiştir. Eğitime devam etmek için katlanmamış özgün model kullanılmalıdır."

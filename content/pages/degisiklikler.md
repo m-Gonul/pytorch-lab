@@ -1,5 +1,27 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 6
+
+Faz 6'nın (PyTorch'un içi) 5 modülünün hepsine tam konu anlatımı yazıldı. Ders arşivinde bu konulara slayt olmadığı için kaynaklar PyTorch belgeleri (BSD-3), JAX Autodiff Cookbook, orijinal makaleler (Chen ve ark. 2016, Korthikanti ve ark. 2022, Abadi ve ark. 2016, Ansel ve ark. 2024, Bengio ve ark. 2013, Ganin–Lempitsky 2015) ve **PyTorch 2.15'te yapılan ölçümlerdir**. Anlatımdaki her davranış iddiası (neyin saklandığı, hangi in-place işlemin hata verdiği, checkpoint'te BN'nin iki kez güncellenmesi, graph break sayısı) çalıştırılarak doğrulandı.
+
+| modül | şekil | deneyler | öne çıkan türetimler ve ölçümler |
+|---|---|---|---|
+| M6.1 autograd'ın içi | 2 | autogradsim, savedmem | VJP ve dallanmada toplama, bağımlılık sayan motor, saklanan tensör tablosu, aynı depo bir kez (ReLU 6d, GELU 10d, dropout 14d; ölçüldü) |
+| M6.2 özel Function | 2 | fdcheck, stelab | lse ve p − y gradyanları, sonlu farkın h²/6 + u/h hata analizi, STE ve GRL; birleşik CE yarı bellek (ölçüldü) |
+| M6.3 torch.func | 2 | jaccost, dpsgd | dual sayılarla JVP, (1 + n)F ile (1 + m)F, örnek başı gradyan = dış çarpım, DP-SGD, HVP = gradyanın JVP'si |
+| M6.4 bellek | 2 | ckptsim, accumlab | sbh(34 + 5as/h), √n checkpointing, n_j/N ve T_j/T biriktirme ölçekleri |
+| M6.5 torch.compile | 2 | roofline, fusegroups | roofline ve dirsek, füzyonun bayt kazancı, Conv + BN katlama, Dynamo / AOTAutograd / Inductor |
+
+- **Faz 6'da 10 yeni deney.** autogradsim'in sonuçları ve hata metinleri PyTorch'la birebir; jaccost Jacobian'ı iki yoldan gerçekten hesaplıyor (fark 10⁻¹⁶).
+- **Ölçümle düzeltilen ya da anlatıma giren sonuçlar:**
+  - M6.1: GELU + dropout bloğunun belleği ilk tahminde 18d'ydi; dropout'un çarpma düğümü yalnız maskeyi sakladığı için ölçüm 14d verdi.
+  - M6.2: "GRL'de girdiyi aynen döndürmek düğüm bağlamaz" iddiası PyTorch 2.x'te geçerli değil (iki biçim de aynı gradyanı verdi). Aşama e'nin "naif SiLU üç tensör saklar" ifadesine not eklendi: 3 referans ama 2 ayrı depo, kazanç yarı.
+  - M6.3: DP-SGD deneyinde gürültünün doğruluk dalgalanmasını artıracağı tahmin edilmişti; ölçümde SGD daha dalgalı çıktı (0.023'e karşı 0.0008), çünkü aykırı örneklerin büyük gradyanları kırpılıyor. %30 aykırı örnekte SGD 0.40, DP-SGD 0.93.
+  - M6.4: checkpoint içindeki BN'nin num_batches_tracked sayacı geri geçişten sonra 2 (koşu istatistikleri iki kez güncelleniyor).
+  - M6.5: softmax'ın füzyonsuz trafiği ilk sürümde 8N yazılmıştı; doğrusu 6N. torch.compile ile aşama e'deki fonksiyonda 1 graph break, 2 graf ölçüldü.
+- **Şekil yazım betiği:** alt simge dönüşümü kod tanımlayıcılarını (add_(1), no_grad, alt_katman) bozuyordu; kural tek harfli tabanlarla sınırlandı ve M4.14'teki "alt_katman(x)" düzeltildi.
+- **Kalan:** Faz 7–11 konu anlatımları; Faz 7–11 modüllerine pratik kartları; kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 5
 
 Faz 5'in (üretken modeller, graf ağları, pekiştirmeli öğrenmeye giriş) 8 modülünün hepsine tam konu anlatımı yazıldı. Kaynaklar Derin Öğrenme dersinin ch_17 slaytları (otomatik kodlayıcılar, VAE, GAN, difüzyon, yönlendirme; slayt 2–132'nin tamamı), YAP 446 lect_1 ve lect_8 (M5.5) ve orijinal makalelerdir. M5.4 için ders arşivinde GNN slaytı olmadığından açık literatür (Kipf–Welling 2017, Xu ve ark. 2019, Hamilton ve ark. 2017, Veličković ve ark. 2018) kullanıldı.
