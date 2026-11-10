@@ -109,3 +109,162 @@ homework:
       - "SSIM, MS-SSIM, PSNR ve LPIPS için 2AFC doğruluğu tablosu."
     accept:
       - "BAPPS doğrulamada LPIPS 2AFC skoru SSIM'den en az 5 puan yüksek."
+
+labs:
+  - id: l1
+    lab: eqmse
+    title: "Eşit MSE, farklı SSIM: Wang deneyini yeniden üretmek"
+    goal: |
+      Bir sahneye beş bozulma (kontrast germe, ortalama kaydırma, JPEG benzeri DCT nicemleme, Gauss bulanıklık, gürültü) uygula; her birinin gücü MSE tam hedef değere eşit olacak biçimde ayarlanıyor. Aynı PSNR'daki beş görüntünün SSIM'lerini, seçtiğin bozulmanın yerel SSIM haritasını ve pencere seçiminin etkisini gör. SSIM, scikit-image ile beş basamağa kadar aynı.
+    predict:
+      q: "MSE = 210'da (PSNR 24.9 dB) hangi bozulmanın SSIM'i en yüksektir?"
+      options:
+        - {t: "Gauss gürültüsü", why: "0.556: yapı rastgele bozuluyor."}
+        - {t: "Ortalama kaydırma", ok: true, why: "0.992: yalnız parlaklık terimi değişiyor, kontrast ve yapı aynen korunuyor."}
+        - {t: "JPEG benzeri", why: "0.551: 8 × 8 bloklarda yüksek frekanslar kayboluyor."}
+    presets:
+      - {name: "MSE 210, JPEG", params: {M: 210, kind: 2, win: 0}, note: "SSIM: germe 0.935, kaydırma 0.992, JPEG 0.551, bulanık 0.577, gürültü 0.556."}
+      - {name: "Kaydırma haritası", params: {M: 210, kind: 1}, note: "SSIM haritası neredeyse her yerde beyaz."}
+      - {name: "Küçük MSE", params: {M: 50}, note: "Hepsi yükseliyor ama sıralama benzer (0.98, 1.00, 0.86, 0.91, 0.80)."}
+      - {name: "Büyük MSE", params: {M: 500}, note: "Kaydırma hâlâ 0.98; gürültü 0.40."}
+      - {name: "9 × 9 kutu pencere", params: {win: 1}, note: "Alttaki üçünün sırası değişiyor: gürültü 0.634 en yüksek."}
+    questions:
+      - q: "Kontrast germenin SSIM'i neden kaydırmanınkinden düşük, oysa ikisi de yapıyı korur?"
+        a: "İkisi de s = 1'i korur. Kaydırma yalnız l'yi değiştirir ve parlaklık terimi göreli değişime bakar (ortalama 114.6 iken 14.5'lik kayma ≈ %13'lük bir göreli değişim). Germe ise σ_y'yi büyütür; c terimi 2σ_xσ_y/(σ_x² + σ_y²) ile standart sapmaların oranına duyarlıdır ve bu sahnede MSE 210 için germe oranı 1.51, yani %51'lik bir göreli değişimdir."
+    limits: "64 × 64 yapay sahne; JPEG yerine basit 8 × 8 DCT nicemleme; SSIM yalnız gri seviyede; kırpma yapılmıyor."
+  - id: l2
+    lab: ssimparts
+    title: "Parlaklık, kontrast, yapı: SSIM'in bileşenleri"
+    goal: |
+      Tek bir yamayı parlaklık kayması, kontrast çarpanı (negatifse ters yapı), bulanıklık ve gürültüyle boz; l, c, s bileşenlerini, SSIM'i, MSE ve PSNR'ı yan yana gör. Hangi bozulmanın hangi bileşeni etkilediğini ve MSE'nin neyi göremediğini ölç.
+    predict:
+      q: "Yalnız d = 30 parlaklık kayması: MSE 900 (PSNR 18.6 dB). SSIM kaçtır?"
+      options:
+        - {t: "≈ 0.3", why: "MSE'nin sezgisi; ama c ve s değişmiyor."}
+        - {t: "≈ 0.98", ok: true, why: "0.979: c = s = 1, yalnız l biraz düşüyor."}
+        - {t: "≈ 0.5", why: "Yapı tamamen korunuyor."}
+    presets:
+      - {name: "Gürültü 15", params: {d: 0, a: 1, b: 0, n: 15}, note: "l = 1, c = 0.990, s = 0.931 → SSIM 0.922, MSE 208."}
+      - {name: "Yalnız kayma", params: {d: 30, a: 1, b: 0, n: 0}, note: "SSIM 0.979, MSE 900."}
+      - {name: "Kontrast × 1.5", params: {d: 0, a: 1.5, b: 0, n: 0}, note: "Yalnız c düşüyor: 0.924."}
+      - {name: "Ters yapı", params: {d: 0, a: -1, b: 0, n: 0}, note: "s = −0.95, SSIM −0.95."}
+      - {name: "Bulanıklık", params: {d: 0, a: 1, b: 2, n: 0}, note: "c ve s birlikte düşüyor: SSIM 0.938, MSE 113."}
+      - {name: "Güçlü gürültü", params: {n: 40}, note: "SSIM 0.647."}
+    questions:
+      - q: "Ters yapıda (a = −1) neden s tam −1 değil −0.95?"
+        a: "s = (σ_xy + C₃)/(σ_xσ_y + C₃); ters yamada σ_xy = −σ_xσ_y ama payda ve paydaki C₃ (≈ 293) farkı yumuşatır: (−v + C₃)/(v + C₃) > −1. Yamanın varyansı büyüdükçe s −1'e yaklaşır."
+    limits: "Tek yama, tek pencere (global istatistik, yansız σ); 1-B sinyal."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Tek pencere SSIM
+    goal: Kapalı biçimi uygulamak
+    needs: SSIM kapalı biçimi
+    q: |-
+      $\mathbf x=[10,20,30,40]$, $\mathbf y=[20,40,60,80]$ ($C_1$, $C_2$ ihmal). l, c, s ve SSIM?
+    solution: |-
+      $\mu_x=25$, $\mu_y=50$: $l=2\cdot25\cdot50/(625+2500)=0.8$. $\sigma_y=2\sigma_x$: $c=2\cdot2/(1+4)=0.8$. $\mathbf y=2\mathbf x$, ilinti 1: $s=1$. SSIM = 0.64. MSE = $(100+400+900+1600)/4=750$.
+  - id: p2
+    type: hesap
+    level: 1
+    title: PSNR
+    goal: MSE'den PSNR'a geçmek
+    needs: $10\log_{10}(255^2/\mathrm{MSE})$
+    q: |-
+      8 bitlik bir görüntüde MSE = 210. PSNR (dB, 2 basamak)?
+    answer: 24.91
+    calc: "round(10*math.log10(255**2/210), 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 49.82, msg: "20 log₁₀ değil 10 log₁₀ (MSE zaten karesel)."}
+      - {answer: 23.18, msg: "R² = 255² = 65025."}
+    hints:
+      - "$65025/210=309.6$."
+    solution: |-
+      $10\log_{10}309.6=24.91$ dB: Wang'ın eşit MSE'li beş görüntüsünün ortak PSNR'ı.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Sabitler
+    goal: C₂'yi hesaplamak
+    needs: $C_2=(K_2L)^2$
+    q: |-
+      $K_2=0.03$, $L=255$. $C_2$? (2 basamak)
+    answer: 58.52
+    calc: "round((0.03*255)**2, 2)"
+    tol: 0.01
+    mistakes:
+      - {answer: 7.65, msg: "Kare alınmalı: (K₂L)²."}
+      - {answer: 1950.75, msg: "K₂ değil, K₂L'nin karesi: 0.03 · 255² değil."}
+    hints:
+      - "$0.03\\cdot255=7.65$."
+    solution: |-
+      $7.65^2=58.52$; $C_3=C_2/2=29.26$. [0, 1] aralığında görüntülerde $L=1$ ve $C_2=0.0009$ alınır.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Yalnız parlaklık değişimi
+    goal: Göreli değişime duyarlılığı görmek
+    needs: $l=(2\mu_x\mu_y+C_1)/(\mu_x^2+\mu_y^2+C_1)$
+    q: |-
+      $\mu_x=40$, $\mu_y=50$; $C_1$ ihmal. $l$? (4 basamak)
+    answer: 0.9756
+    calc: "round(2*40*50/(40**2+50**2), 4)"
+    tol: 0.0001
+    mistakes:
+      - {answer: 0.8, msg: "Bu μ_x/μ_y; formül 2ab/(a² + b²)."}
+      - {answer: 0.9988, msg: "Bu μ = 200 ve 210 için; aynı mutlak fark, göreli olarak küçük."}
+    hints:
+      - "$4000/4100$."
+    solution: |-
+      $4000/4100=0.9756$. Aynı 10'luk fark μ = 200 ve 210'da $l=0.9988$ verir: SSIM parlaklıkta göreli değişime bakar (Weber).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Süper çözünürlük raporu
+    goal: Ölçütleri birlikte yorumlamak
+    needs: PSNR ve SSIM'in sınırları
+    q: |-
+      İki süper çözünürlük ağı: A, PSNR 30.1 dB, SSIM 0.86; B, PSNR 28.9 dB, SSIM 0.89 ve görsel olarak daha keskin dokular. A'nın çıktıları bulanık görünüyor. Hangisi "daha iyi"?
+    choices:
+      - {t: "A, çünkü PSNR daha yüksek", why: "PSNR bulanıklığı görece az cezalandırır; MSE'yi küçültmenin en kolay yolu ortalama (bulanık) tahmindir."}
+      - {t: "Tek bir sayıyla söylenemez; A MSE'yi en küçüklemek için bulanık ortalama tahminlere kaymış, B yapıyı daha iyi koruyor. SSIM, algısal bir ölçüt ve görsel örneklerle birlikte raporlanmalı", ok: true, why: "Algı–bozulma ödünleşimi: MSE kaybıyla eğitilen ağlar bulanık çıktılar verir."}
+      - {t: "B, çünkü SSIM her zaman doğrudur", why: "SSIM de yanılabilir (kaymalar, renk)."}
+    hints:
+      - "MSE'yi en küçükleyen tahmin, olası yüksek çözünürlüklü görüntülerin ortalamasıdır."
+    solution: |-
+      MSE, olası çözümlerin ortalamasını ödüllendirir: bu ortalama bulanıktır. B daha keskin ama piksel düzeyinde daha az isabetli olabilir. İki ölçüt farklı şeyleri ölçer; görev ve kullanıcıya göre seçilir, algısal ölçütler (LPIPS) ve görsel karşılaştırma eklenir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: SSIM'in sınırlılığı ve tek en büyüğü
+    goal: Üç koşulu kanıtlamak
+    needs: AM-GM, Cauchy–Schwarz
+    q: |-
+      $C_1,C_2>0$ ve $C_3=C_2/2$ için (a) $l\le1$, $c\le1$ ve $s\le1$ olduğunu, (b) SSIM $=1\iff\mathbf x=\mathbf y$ olduğunu (negatif olmayan sinyaller) göster.
+    rubric:
+      - "l ve c için 2ab ≤ a² + b² eşitsizliğini kullandım; eşitlik a = b'de"
+      - "s için Cauchy–Schwarz ile |σ_xy| ≤ σ_xσ_y gösterdim; eşitlik y − μ_y = k(x − μ_x), k > 0'da"
+      - "Üçünün birden 1 olmasının μ_x = μ_y, σ_x = σ_y ve pozitif doğrusal ilişki demek olduğunu gösterdim"
+      - "Bunların birlikte y = x verdiğini (k = σ_y/σ_x = 1) çıkardım"
+    hints:
+      - "$l$ ve $c$ aynı biçimde: $\\frac{2ab+C}{a^2+b^2+C}$."
+    solution: |-
+      (a) $a^2+b^2-2ab=(a-b)^2\ge0$ ve iki tarafa aynı $C>0$ eklenir: $l,c\le1$, eşitlik $\mu_x=\mu_y$, $\sigma_x=\sigma_y$'de. Cauchy–Schwarz: $\sigma_{xy}\le\sigma_x\sigma_y$, dolayısıyla $s\le1$. (b) SSIM pozitif çarpanların çarpımı ve 1 ise (çarpanlar ≤ 1 olduğundan) her biri 1'dir: $\mu_x=\mu_y$, $\sigma_x=\sigma_y$ ve $\mathbf y-\mu_y=k(\mathbf x-\mu_x)$, $k=\sigma_y/\sigma_x=1$: $\mathbf y=\mathbf x$. Tersi açık.
+pitfalls:
+  - wrong: "PSNR'ı yüksek olan görüntü her zaman daha iyi görünür."
+    right: "PSNR piksel farkının enerjisini ölçer; eşit MSE'de bile görünüş çok farklı olabilir (parlaklık kayması neredeyse görünmez, bulanıklık belirgindir)."
+  - wrong: "SSIM'i hesaplarken pencere ve sabitlerin önemi yok."
+    right: "Pencere (11 × 11 Gauss mu, 7 × 7 kutu mu), σ'nın yansız mı olduğu, data_range ve K'lar sonucu değiştirir; karşılaştırmalarda aynı ayarlar raporlanmalı (lab l1'de 9 × 9 kutu sıralamayı değiştiriyor)."
+  - wrong: "SSIM [0, 1] aralığındadır."
+    right: "[−1, 1]: yapı ters çevrilince s negatif olur ve SSIM negatife düşebilir."
+  - wrong: "data_range'i vermeden float görüntüde skimage SSIM'i doğru hesaplar."
+    right: "Float girdide data_range açıkça verilmelidir (görüntüler [0, 1] ise 1); yanlış L, C₁ ve C₂'yi ve dolayısıyla sonucu değiştirir."
+whatif:
+  - q: "SSIM bir kayıp fonksiyonu olarak kullanılsa (1 − SSIM)?"
+    a: "Türevlenebilirdir ve yapıyı korumaya iter; ama düz bölgelerde gradyanı küçüktür ve renk/parlaklık kaymalarını az cezalandırır. Pratikte L1 ya da MSE ile karıştırılır (ör. 0.84·(1 − MS-SSIM) + 0.16·L1)."
+  - q: "Görüntü bir piksel kaydırılsa?"
+    a: "MSE ve SSIM ikisi de ciddi biçimde düşer: SSIM yamaların hizalı olduğunu varsayar. Karmaşık dalgacık SSIM'i (CW-SSIM) ya da derin öznitelik uzaklıkları küçük geometrik değişimlere daha dayanıklıdır."
+  - q: "Renkli görüntüde SSIM nasıl hesaplanır?"
+    a: "Genellikle yalnız ışıklılık (Y) kanalında ya da her kanalda ayrı hesaplanıp ortalanır (skimage channel_axis). Renk doğruluğu için ayrıca L*a*b* ΔE gibi ölçütler gerekir."

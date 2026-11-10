@@ -128,7 +128,7 @@ groups:
         pages: [m9-13-quality]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M9.13 konu anlatımı bütün slaytları (1–32) işliyor: öznel ve nesnel kalite, ölçütlerin üç rolü, tam/indirgenmiş/referanssız sınıflandırma, MSE ve PSNR ve kandırılmaları, SSIM'in motivasyonu, eşit MSE (210) deneyi ve ders SSIM değerleri, üç karşılaştırma ve koşullar, l/c/s fonksiyonları (Weber ve ilinti türetimi), birleştirme ve C3 = C2/2 kapalı biçimi, yerel pencere ve ortalama; kapsam için MS-SSIM, referanssız ölçütler ve SSIM'in sınırları eklendi; eqmse (scikit-image ile 5 basamak aynı) ve ssimparts deneyleri. Slayt notu: sınırlılık S < 1 değil S ≤ 1."
       - src: "lect_21, lect_22, lect_23, lect_LucasKanade — Video, hareket, FRUC, sabitleme"
         topics: "hareket kestirimi, blok eşleme, optik akış (LK, piramit), zamansal gürültü giderme, FRUC, video sabitleme (kamera hareketi, düzgünlük–sadakat, kırpma, rolling shutter, paralaks)"
         pages: [m9-17-motion]
