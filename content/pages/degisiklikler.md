@@ -1,5 +1,34 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 5
+
+Faz 5'in (üretken modeller, graf ağları, pekiştirmeli öğrenmeye giriş) 8 modülünün hepsine tam konu anlatımı yazıldı. Kaynaklar Derin Öğrenme dersinin ch_17 slaytları (otomatik kodlayıcılar, VAE, GAN, difüzyon, yönlendirme; slayt 2–132'nin tamamı), YAP 446 lect_1 ve lect_8 (M5.5) ve orijinal makalelerdir. M5.4 için ders arşivinde GNN slaytı olmadığından açık literatür (Kipf–Welling 2017, Xu ve ark. 2019, Hamilton ve ark. 2017, Veličković ve ark. 2018) kullanıldı.
+
+| modül | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|
+| M5.1 VAE | 3 | klasym, gradest, betavae | KL ≥ 0, ileri/ters KL, ELBO'nun iki türetimi, Gauss KL kapalı formu, reparametrizasyon, norm yoğunlaşması, doğrusal VAE çöküş eşiği |
+| M5.2 GAN | 3 | diracgan, gan1d | V(D, G) = negatif BCE, D* ve JS, doymayan kaybın gradyanı, Dirac GAN özdeğerleri, WGAN |
+| M5.3 difüzyon | 3 | diffsched, diff1d | varyansın 1'e yakınsaması, q(x_t | x₀) kısa yolu, NLL sınırının KL'lere ayrılması, q(x_{t−1} | x_t, x₀), L_simple, Tweedie |
+| M5.4 GNN | 2 | oversmooth, wltest | permütasyon eş-değişkenliği, GCN'in spektral türetimi ve yeniden normalizasyon, aşırı düzleşme, 1-WL üst sınırı, GIN |
+| M5.5 RL | 2 | bellman2, reinforce | Bellman denklemi ve (I − γP)⁻¹r, değer iterasyonunun γ-büzülmesi, politika gradyanı teoremi, taban çizgisinin yansızlığı |
+| M5.6 otomatik kodlayıcılar | 2 | dae1d, sparsecode | doğrusal AE = PCA, bağlı ağırlık sayımı, Tweedie (DAE artığı = σ²·skor), L1 yumuşak eşikleme, KL seyreklik |
+| M5.7 GAN II | 3 | fidis, trunclab | IS = exp I(x; y), 1-B Fréchet uzaklığı, eşitlenmiş öğrenme oranı, AdaIN, StyleGAN2 demodülasyonu |
+| M5.8 yönlendirme | 3 | cfg2d, guide1d | Bayes'ten sınıflandırıcı yönlendirmesi, CFG = kesin sınıflandırıcı yönlendirmesi, Gauss eğimi, SNR ve kosinüs takvimi |
+
+- **Faz 5'te 15 yeni deney** (cfg2d mevcuttu). Ön ayar notlarındaki bütün sayılar Node'da ölçüldü.
+- **Ölçümle ortaya çıkan ve anlatıma giren sonuçlar:**
+  - M5.7: 2 boyutlu öznitelik uzayında FID, sınıf başına tek örnek üreten bir üreticiyi neredeyse görmüyor (0.017; gerçek–gerçek tabanı 0.025). Sınıf içi değişim ayrı boyutlarda yaşayınca görüyor (6.0). Not iki durumu ayrı açıklıyor. Aynı deneyde IS bu üreticide gerçek veriden yüksek (9.78 > 8.44).
+  - M5.7: kusurlu üreticide kesinlik 0.96'dan 0.72'ye düşerken 2-B FID 0.014'ten 0.015'e çıkıyor; kesinlik/geri çağırmanın gerekçesi olarak verildi.
+  - M5.8: kesin skorlarla bile s = 3 CFG örneklerinin ortalaması 1.61, std'si 0.355; yönlendirmenin "hedeflediği" p(x)p(y|x)³ ise 1.11 / 0.522 (200 adımda aynı). CFG'nin eğik dağılımdan tam örneklemediği bir ayrıntı kutusuyla açıklandı.
+  - M5.6: seyrek kod deneyinde ISTA 800 adımda yakınsamıyordu (FISTA'ya geçildi); zıt işaretli yakın atomlar desteği bozduğu için "en küçük atom aralığı" kontrolü eklendi ve aralık 0'da kurtarmanın çöktüğü bir senaryo olarak gösterildi.
+  - M5.3: T = 20'de β = 1 sıfıra bölmeye yol açıyordu; β 0.5 ile sınırlandı. M5.2: doymayan kaybın işareti düzeltildi.
+- **Ders slaytlarındaki hatalar ve notlar (anlatımda "Kaynak düzeltmesi/notu" kutusuyla):**
+  - ch_17: kodlayıcı/kod çözücü parametre gösterimi literatürün tersi; Z ~ N(μx + μy, σy² + σy²) → σx² + σy²; "sinyal doğrusal azalır" → doğrusal olan β; iki ayrı Nichol–Dhariwal makalesi; "Detector network" → discriminator; "tek Nash dengesi" sonucunun koşulları (birkaç modülde); "Tero Kerras" → Karras; IS'in çeşitlilik ölçütü ortalama sınıf dağılımının entropisidir; ProGAN SWD kullanır, StyleGAN'a geçiş kitabın anlatı köprüsüdür; slayt 28'deki bağlı ağırlık gözlemi genel kural değildir; seyreklik için yalnız L1 vardı, KL eklendi; CFG "çapraz gömme uzayları" gerektirmez; slayt 131'deki "toplamı girdiden çıkar" kısaltması ve sınıflandırıcının gürültülü veride eğitilmesi gerekliliği.
+  - YAP 446: "Reinforced learning" → reinforcement; Atari ödülü skor değişimidir; 3³⁶¹ ≈ 1.74 × 10¹⁷²; "negatif pekiştirme" psikolojideki terimle uyuşmuyor.
+- **Şekillerde yazım düzeltmesi (tüm modüller):** 16 modülün şekillerinde SVG metnine düz yazılmış x_t, x_{t−1}, F_(m−1) gibi alt simgeler ve D^(−½) gibi üst simgeler gerçek alt/üst simgeye çevrildi. Yazı tipinde birleşik glifi olmayan aksanlı harfler (θ̂, x̂, X̃, D̃, h̄, w̄) kutu olarak çiziliyordu; aksan işareti harfin üstüne ayrı bir glif olarak bindirildi. Şekil altyazılarındaki alt simgeler `<sub>`'a çevrildi.
+- **Erişim sınırı:** slaytlardaki görüntüler (MNIST yeniden yapılandırmaları, GAN örnekleri, StyleGAN yüzleri, difüzyon örnekleri) metne dökülemedi.
+- **Kalan:** Faz 6–11 konu anlatımları; Faz 6–11 modüllerine pratik kartları; kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 4
 
 Faz 4'ün (derin öğrenme mimarileri) 16 modülünün hepsine tam konu anlatımı yazıldı. Kaynak, Derin Öğrenme dersinin ch_14, ch_15, ch_16, ch_17 (Faz 5'e kalan kısmı hariç), embeddings_updated ve contextualizedEmbeddings slaytlarıdır. Slaytların her maddesi yeniden yazıldı. Orijinal makalelerdeki (Sutskever 2014, Bahdanau 2015, Luong 2015, Vaswani 2017, Mikolov 2013a/b, Levy–Goldberg 2014, GloVe, fastText, ViT, ELMo, GPT-1, BERT, InstructGPT, DPO …) sayılar makale metinlerinden doğrulandı ve daha ayrıntılı türetimler eklendi.
