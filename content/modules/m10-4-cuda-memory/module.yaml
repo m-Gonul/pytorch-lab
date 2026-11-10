@@ -111,3 +111,191 @@ homework:
       - "Thread başına 1, 2, 4, 8 bağımsız yükleme; blok başına 64–1024 thread."
     accept:
       - "%25 dolulukla tepe verime yakın bir yapılandırma bulunur."
+
+labs:
+  - id: l1
+    lab: occupancy
+    title: "Doluluk hesaplayıcısı: thread, blok, yazmaç ve paylaşımlı bellek sınırları"
+    goal: |
+      G80'den H100'e altı mimaride, blok boyu, thread başına yazmaç ve blok başına paylaşımlı bellek seçimlerinin SM'de aynı anda kalabilen blok ve warp sayısını nasıl belirlediğini hesapla. Sınırlayan kaynağı bul; dolulukla yazmaç sayısı ve blok boyu arasındaki ilişkiyi eğrilerde gör.
+    predict:
+      q: "A100'de 256 thread'lik bloklar thread başına 64 yazmaç kullanırsa doluluk ne olur?"
+      options:
+        - {t: "%100", why: "Yazmaç dosyası 65 536: 64 × 256 = 16 384 yazmaçlık bloktan yalnız 4 tanesi sığar."}
+        - {t: "%50", ok: true, why: "SM'de 4 blok, 32/64 warp: sınırlayan yazmaç."}
+        - {t: "%25", why: "Bu 128 yazmaçta olur."}
+    presets:
+      - {name: "A100, 256 × 32 yazmaç", params: {arch: 4, T: 256, R: 32, S: 8}, note: "Doluluk %100."}
+      - {name: "A100, 64 yazmaç", params: {arch: 4, T: 256, R: 64, S: 8}, note: "%50 (yazmaç)."}
+      - {name: "A100, 128 yazmaç", params: {arch: 4, T: 256, R: 128, S: 8}, note: "%25."}
+      - {name: "A100, 48 KB paylaşımlı", params: {arch: 4, T: 256, R: 32, S: 48}, note: "%37.5 (paylaşımlı bellek)."}
+      - {name: "A100, 32 thread'lik bloklar", params: {arch: 4, T: 32, R: 32, S: 8}, note: "%31: blok sayısı ve bellek sınırı."}
+      - {name: "G80, 16 × 16", params: {arch: 0, T: 256, R: 10, S: 2}, note: "3 blok, %100 (ders örneği)."}
+      - {name: "G80, 8 × 8", params: {arch: 0, T: 64, R: 10, S: 2}, note: "8 blok sınırı: 512 thread, %66.7."}
+      - {name: "H100, 96 KB paylaşımlı", params: {arch: 5, T: 256, R: 32, S: 96}, note: "%25."}
+    questions:
+      - q: "Thread başına 128 yazmaç kullanan bir GEMM çekirdeğinin doluluğu %25. Bu çekirdek neden yine de çok hızlı olabilir?"
+        a: "Doluluk, gecikmeyi gizlemek için hazır warp sayısını belirler; ama her thread çok sayıda bağımsız işlem (yazmaç karosundaki onlarca FMA, birden çok bekleyen okuma) yürütüyorsa az warp'la da gecikme gizlenir (komut düzeyi paralellik). Yazmaçlar en hızlı bellektir: veriyi yazmaçta tekrar tekrar kullanmak paylaşımlı ve global bellek trafiğini azaltır. Bu yüzden en hızlı GEMM'ler bilinçli olarak düşük dolulukla çalışır."
+    limits: "Yazmaç ayırma: warp başına 256'lık birimler (G80/GT200'de blok başına 512); paylaşımlı bellek 256 baytlık birimler; çekirdeğin sistem paylaşımlı belleği ve kararlı L1/paylaşımlı bellek bölüşümü yok sayılıyor."
+  - id: l2
+    lab: bankconf
+    title: "Paylaşımlı bellekte bank çakışmaları"
+    goal: |
+      Bir warp'ın 32 thread'inin paylaşımlı bellek adreslerini 32 banka eşle ve çakışma derecesini (en kalabalık bankta farklı sözcük sayısı) say: adımlı 1-B erişim, 2-B karoda satır ve sütun okuma, dolgu, yayın, 8 ve 16 baytlık öğeler.
+    predict:
+      q: "float tile[32][32] karosunun bir sütunu bir warp tarafından okunursa kaç geçiş gerekir?"
+      options:
+        - {t: "1", why: "Sütundaki öğeler 128 bayt aralıklı: hepsi aynı bankta."}
+        - {t: "32", ok: true, why: "32 yollu çakışma; [32][33] dolgusuyla 1 geçiş."}
+        - {t: "2", why: "Bu adım 2'de olur."}
+    presets:
+      - {name: "Sütun, [32][32]", params: {pat: 2, W: 32, P: 0}, note: "32 geçiş."}
+      - {name: "Sütun, [32][33]", params: {pat: 2, W: 32, P: 1}, note: "1 geçiş: dolgu."}
+      - {name: "Satır okuma", params: {pat: 1, W: 32, P: 0}, note: "1 geçiş."}
+      - {name: "Adım 2", params: {pat: 0, s: 2}, note: "2 yollu."}
+      - {name: "Adım 3", params: {pat: 0, s: 3}, note: "Çakışmasız: tek adım."}
+      - {name: "Yayın", params: {pat: 3}, note: "1 geçiş."}
+      - {name: "double, ardışık", params: {pat: 4, s: 1}, note: "2 geçiş = ideal (yarım warp'lar)."}
+      - {name: "double, adım 2", params: {pat: 4, s: 2}, note: "4 geçiş: 2 yollu."}
+      - {name: "Sütun, [48][48]", params: {pat: 2, W: 48, P: 0}, note: "16 yollu: gcd(48, 32) = 16."}
+    questions:
+      - q: "Karo satır uzunluğu 48 iken sütun okuma neden 16 yollu çakışıyor ve en küçük dolgu ne olmalı?"
+        a: "Sütundaki ardışık öğeler 48 sözcük aralıklı; banklar 48·t mod 32 ile belirleniyor ve gcd(48, 32) = 16 olduğu için 32 thread yalnız 2 banka düşüyor (her bankta 16 farklı sözcük). Satır uzunluğunu tek sayı yapan en küçük dolgu (1 sözcük, 49) gcd'yi 1'e indirir ve çakışmayı kaldırır."
+    limits: "Maxwell ve sonrası: 32 bank × 4 bayt; 8/16 baytlık erişimlerde istek yarım/çeyrek warp'lara bölünüyor; Kepler'in 8 baytlık bank kipi modellenmiyor."
+  - id: l3
+    lab: divergence
+    title: "Warp ayrışması ve SIMT verimi"
+    goal: |
+      Bir bloğun warp'larında farklı dal desenlerinin (çift/tek thread, eşik, warp hizalı koşul, veriye bağlı koşul, değişken döngü) kaç warp'ı ayrıştırdığını ve SIMT verimini (yararlı thread·komut / 32 × yürütülen komut) hesapla.
+    predict:
+      q: "if (tid % 2 == 0) { 20 komut } else { 20 komut } bir blokta SIMT verimini ne yapar?"
+      options:
+        - {t: "%100: her thread 20 komut yürütüyor", why: "Her warp iki yolu da sırayla yürütüyor: 40 warp-komutu, yarısında thread'lerin yarısı maskeli."}
+        - {t: "%50", ok: true, why: "Bütün warp'lar ayrışıyor; koşulu (tid / 32) % 2'ye hizalamak %100 verir."}
+        - {t: "%25", why: "İki yol var, ikiden fazla değil."}
+    presets:
+      - {name: "Çift/tek", params: {pat: 0, T: 256, A: 20, B: 20}, note: "%50."}
+      - {name: "Warp hizalı", params: {pat: 2, T: 256, A: 20, B: 20}, note: "%100."}
+      - {name: "tid < 100", params: {pat: 1, T: 256, A: 20, B: 20, k: 100}, note: "1 warp ayrışıyor: %88.9."}
+      - {name: "tid < 96", params: {pat: 1, T: 256, A: 20, B: 20, k: 96}, note: "32'nin katı: %100."}
+      - {name: "Veriye bağlı, p = 0.5", params: {pat: 3, T: 256, A: 20, B: 20, p: 0.5}, note: "%50."}
+      - {name: "Veriye bağlı, p = 0.02", params: {pat: 3, T: 256, A: 20, B: 20, p: 0.02}, note: "%61.5: nadir koşul bile çoğu warp'ı ayrıştırıyor."}
+      - {name: "Değişken döngü, L = 32", params: {pat: 4, T: 256, A: 20, L: 32}, note: "%50: warp en uzun turu bekliyor."}
+    questions:
+      - q: "Koşul yalnız %2 olasılıkla doğruyken neden warp'ların çoğu ayrışıyor?"
+        a: "Bir warp'ın ayrışması için 32 thread'den birinin bile koşulu sağlaması yeter: P(en az biri) = 1 − 0.98³² ≈ 0.48. Nadir bir dal bile warp'ların yarısında pahalı yolu yürütür. Nadir durumları ayrı bir çekirdeğe ya da sona ertelemek (iş listesi), veriyi koşula göre sıralamak ya da gruplamak bu maliyeti azaltır."
+    limits: "Yol maliyetleri sabit; tahminleme, yeniden birleşme noktaları ve bağımsız thread zamanlamasının ayrıntıları modellenmiyor."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Thread indeksi ve warp
+    goal: 2-B bloktaki thread'in warp'ını bulmak
+    needs: tid = ty · Bx + tx
+    q: |-
+      16 × 16'lık bir blokta threadIdx = (x = 5, y = 3) olan thread'in doğrusal indeksi, warp'ı ve warp içindeki yeri (lane)?
+    solution: |-
+      $\text{tid}=3\cdot16+5=53$. Warp $\lfloor53/32\rfloor=1$, lane $53\bmod32=21$. Satırlar 16'şar thread olduğu için her warp iki satırı kapsar: warp 1 = satır 2 ve 3.
+  - id: p2
+    type: hesap
+    level: 1
+    title: CGMA tavanı
+    goal: Bant genişliğinin başarıma koyduğu sınırı hesaplamak
+    needs: GFLOPS ≤ BW / 4 × CGMA
+    q: |-
+      Bir GPU'nun global bellek bant genişliği 900 GB/s. CGMA'sı 2 olan bir fp32 çekirdek en çok kaç GFLOPS'a ulaşabilir (hesap tavanı daha yüksekse)?
+    answer: 450
+    calc: "900/4*2"
+    tol: 0
+    mistakes:
+      - {answer: 1800, msg: "Bayt değil float sayısı: 900 GB/s ÷ 4 bayt = 225 G float/s."}
+      - {answer: 225, msg: "CGMA 2: her erişim başına iki işlem."}
+    hints:
+      - "$900/4=225$ milyar float/s."
+    solution: |-
+      $225\cdot2=450$ GFLOPS. CGMA'yı artırmanın yolu veriyi paylaşımlı bellekte ya da yazmaçlarda yeniden kullanmaktır.
+  - id: p3
+    type: hesap
+    level: 2
+    title: Yazmaç sınırlı doluluk
+    goal: Doluluğu elle hesaplamak
+    needs: Warp başına 256'lık yazmaç birimi
+    q: |-
+      Bir SM'de 65 536 yazmaç ve en çok 2048 thread (64 warp) var. 256 thread'lik bloklar thread başına 48 yazmaç kullanıyor (paylaşımlı bellek ve blok sınırı sorun değil). Doluluk?
+    answer: 0.625
+    calc: "5*8/64"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.666667, msg: "65 536 / 48 / 2048 yaklaşımı: bloklar tam sayıdır."}
+      - {answer: 1, msg: "Thread sınırı 8 blok verir ama yazmaçlar 5 bloğa yetiyor."}
+    hints:
+      - "Blok başına 8 warp × 48 × 32 = 12 288 yazmaç; 65 536 / 12 288 = 5.33."
+    solution: |-
+      5 blok × 8 warp = 40 warp; $40/64=0.625$. 40 yazmaçta (10 240/blok) 6 blok, %75 olurdu.
+  - id: p4
+    type: hesap
+    level: 1
+    title: Adımlı erişimde bank çakışması
+    goal: Çakışma derecesini gcd ile bulmak
+    needs: $\gcd(s,32)$
+    q: |-
+      Bir warp'ın thread'leri paylaşımlı bellekte `A[12 * tid]`'e (float) erişiyor. Kaç yollu bank çakışması olur?
+    answer: 4
+    calc: "math.gcd(12,32)"
+    tol: 0
+    mistakes:
+      - {answer: 12, msg: "Adımın kendisi değil, 32 ile ortak böleni."}
+      - {answer: 1, msg: "12 çift: tek adımlar çakışmasızdır, çiftler değil."}
+    hints:
+      - "Bank = 12·t mod 32; kaç farklı bank var?"
+    solution: |-
+      $\gcd(12,32)=4$: 32 thread 8 banka düşer, her bankta 4 farklı sözcük. Bant genişliği 4 kat azalır.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Mucizevi hızda çekirdek
+    goal: Eşzamansız başlatmayı tanımak
+    needs: Çekirdek başlatma, eşzamanlama
+    q: |-
+      Bir öğrenci 4096 × 4096 matris çarpımı çekirdeğini `t0 = now(); kernel<<<g, b>>>(...); t1 = now();` ile ölçüyor ve 0.01 ms buluyor (tepe başarımın yüzlerce katı). Neden?
+    choices:
+      - {t: "GPU gerçekten bu kadar hızlı", why: "137 GFLOP'luk işi 0.01 ms'de yapmak 13 PFLOPS demek."}
+      - {t: "Çekirdek başlatması eşzamansız: t1, çekirdek bitmeden okundu; cudaDeviceSynchronize() ya da cudaEvent ile ölçmek gerekir", ok: true, why: "Başlatma yalnız işi kuyruğa koyar."}
+      - {t: "Derleyici çekirdeği sildi", why: "Çekirdek yine de çalışır; sorun ölçümde."}
+    hints:
+      - "<<<>>> ne zaman döner?"
+    solution: |-
+      Doğru ölçüm: bir ısınma çalıştırması, `cudaEventRecord(start)`, çekirdek, `cudaEventRecord(stop)`, `cudaEventSynchronize(stop)` ve `cudaEventElapsedTime`. İlk başlatma bağlam ve JIT maliyetini de içerebilir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Adımlı erişimin çakışma derecesi
+    goal: gcd formülünü kanıtlamak
+    needs: Modüler aritmetik
+    q: |-
+      32 bank ve 4 baytlık sözcüklerle thread $t\in\{0,\dots,31\}$, $A[s\cdot t]$'ye erişsin. Çakışma derecesinin (bir bankta toplanan farklı sözcük sayısı) $g=\gcd(s,32)$ olduğunu gösterin.
+    rubric:
+      - "Bankı $b(t)=s\\,t\\bmod32$ olarak yazdım"
+      - "$b(t)=b(t')\\iff32\\mid s(t-t')\\iff(32/g)\\mid(t-t')$ denkliğini gösterdim"
+      - "Dolayısıyla her bankta $32/(32/g)=g$ thread olduğunu ve bunların farklı sözcükler olduğunu ($s\\,t$ farklı) çıkardım"
+      - "Tek $s$ için $g=1$ (çakışmasız) sonucunu belirttim"
+    hints:
+      - "$32\\mid s\\,d\\iff(32/g)\\mid(s/g)\\,d$ ve $\\gcd(32/g,s/g)=1$."
+    solution: |-
+      Bkz. derste "Adımlı erişim ve dolgu" türetimi.
+pitfalls:
+  - wrong: "Çekirdeği ölçmek için başlatmanın öncesine ve sonrasına saat koymak yeter."
+    right: "Başlatma eşzamansızdır: saat çekirdek bitmeden okunur. cudaDeviceSynchronize() ya da cudaEvent çiftleri ve bir ısınma çalıştırması gerekir."
+  - wrong: "__syncthreads() bir if bloğunun içinde, yalnız koşulu sağlayan thread'ler için çağrılabilir."
+    right: "Bariyer bloktaki bütün thread'lerce yürütülmelidir; ayrışan koşul içinde tanımsız davranıştır (kilitlenebilir). Koşul bütün blok için aynı değilse bariyer koşulun dışına alınmalı."
+  - wrong: "Doluluk %100 olmalı; daha düşük doluluk her zaman yavaştır."
+    right: "Doluluk gecikme gizlemeye yardım eder ama hedef değildir; yazmaç karolu çekirdekler (GEMM) düşük dolulukla en hızlı olabilir. Gereken warp sayısı gecikme / bağımsız iş oranına bağlıdır (Little yasası)."
+  - wrong: "Tek büyük bir cudaMalloc bloğunu float ve float2 dizilerine bölmek, ayrı ayrı ayırmakla aynıdır."
+    right: "cudaMalloc 256 bayta hizalar, ama bloğun içindeki ikinci dizi 8 bayta hizalı olmayabilir; doğal hizalı olmayan 8/16 baytlık okumalar yanlış sonuç verir. Ofsetler elle hizalanmalı."
+whatif:
+  - q: "Volta öncesi için yazılmış, warp'ın kilitli adımda yürüdüğünü varsayan (__syncwarp'sız) bir indirgeme Ampere'de çalıştırılsa?"
+    a: "Bağımsız thread zamanlamasıyla warp'ın thread'leri kilitli adımda ilerlemeyebilir; paylaşımlı bellekte birbirinin yazdığını okuyan son adımlar eski değerleri görebilir ve sonuç yanlış çıkar. Çözüm: __syncwarp() eklemek ya da warp içi adımları __shfl_down_sync gibi açık maskeli işlemlerle yazmak (M10.5)."
+  - q: "Bir filtre katsayısı dizisi sabit bellekte ama her thread farklı bir indeksi okuyor olsaydı?"
+    a: "Sabit bellek isteği warp'taki farklı adres sayısı kadar ayrı isteğe bölünür; 32 farklı adres 32 kat yavaşlama demektir ve global bellekten (L1/L2 önbellekli) bile yavaş olabilir. Sabit bellek, bir warp'ın aynı adresi okuduğu (yayın) durumlar içindir; diğerlerinde __ldg ile salt okunur önbellek ya da paylaşımlı bellek kullanılır."
+  - q: "Uygulama yalnız sm_80 ikilisiyle (PTX olmadan) derlenip bir H100'de (9.0) çalıştırılsa?"
+    a: "İkili uyumluluk ana sürümler arasında yoktur ve JIT için PTX yoktur: çekirdek yüklenemez ('no kernel image is available'). code=compute_80 ile PTX gömülseydi sürücü onu 9.0 için derlerdi (çalışır, ama Hopper'a özgü özellikleri kullanmaz)."
