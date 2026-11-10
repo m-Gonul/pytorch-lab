@@ -64,7 +64,9 @@ export function plot(P, opt = {}) {
   if (P.img) {
     const c = document.createElement("canvas"); c.width = P.img.w; c.height = P.img.h;
     const ctx = c.getContext("2d"), im = ctx.createImageData(P.img.w, P.img.h);
-    for (let k = 0; k < P.img.w * P.img.h; k++) { const v = Math.max(0, Math.min(255, Math.round(P.img.data[k] * 255))); im.data.set([v, v, v, 255], 4 * k); }
+    const q8 = (v) => Math.max(0, Math.min(255, Math.round(v * 255)));
+    // img.rgb: data 3·w·h uzunluğunda [r, g, b, r, g, b, …] (0..1); yoksa gri seviye.
+    for (let k = 0; k < P.img.w * P.img.h; k++) { if (P.img.rgb) im.data.set([q8(P.img.data[3 * k]), q8(P.img.data[3 * k + 1]), q8(P.img.data[3 * k + 2]), 255], 4 * k); else { const v = q8(P.img.data[k]); im.data.set([v, v, v, 255], 4 * k); } }
     ctx.putImageData(im, 0, 0);
     g += `<image href="${c.toDataURL()}" x="${L}" y="${T}" width="${iw}" height="${ih}" preserveAspectRatio="none" style="image-rendering:pixelated"/>`;
   }

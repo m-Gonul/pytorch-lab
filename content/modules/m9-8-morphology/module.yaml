@@ -101,3 +101,167 @@ homework:
       - "Halka verisinde %98 üstü doğruluk ve karar sınırı görseli."
       - "Fashion-MNIST'te morfolojik ağ ve MLP doğruluk/parametre tablosu."
       - "Öğrenilen yapı elemanlarının görselleştirilmesi."
+
+labs:
+  - id: l1
+    lab: morphbin
+    title: "İkili morfoloji: erozyondan iskelete"
+    goal: |
+      Delikli bir dikdörtgen, ince köprülü iki disk, 1 piksellik çıkıntılı bir L ve küçük bir kare içeren 64 × 64'lük bir desene tuz-biber gürültüsü ekle. Sekiz işlemi (erozyon, genişleme, açma, kapama, açma + kapama, sınır, delik doldurma, iskelet) beş YE biçimi ve dört boyutla uygula; ön plan pikseli, bağlı bileşen, delik sayısı ve temiz desenden farkla ölç.
+    predict:
+      q: "%5 gürültüde açma + kapama (3 × 3 kare) temiz desenden farklı piksel sayısını 212'den kaça indirir, bileşen sayısı ne olur (temizde 5)?"
+      options:
+        - {t: "0 farkla 5 bileşen", why: "Köprü ve çıkıntı da 3 × 3'ten ince; açma onları da siler."}
+        - {t: "64 farkla 6 bileşen", ok: true, why: "Gürültü büyük ölçüde gidiyor ama 2 piksellik köprü kopuyor: iki disk ayrılıyor."}
+        - {t: "212'de kalır", why: "Açma tuzu, kapama biberi temizler."}
+    presets:
+      - {name: "Açma + kapama", params: {op: 4, shape: 0, n: 0, p: 0.05}, note: "Fark 212 → 64, bileşen 116 → 6, delik 35 → 1."}
+      - {name: "Yalnız açma", params: {op: 2, shape: 0, n: 0}, note: "Tuz gidiyor ama biber delikleri kalıyor: 11 delik, fark 125."}
+      - {name: "Yalnız kapama", params: {op: 3, shape: 0, n: 0}, note: "Biber kapanıyor ama tuz noktaları büyüyor: 59 bileşen, fark 289."}
+      - {name: "Artı YE", params: {op: 4, shape: 1, n: 0}, note: "Fark 81: artı köşeleri daha az aşındırır."}
+      - {name: "5 × 5 kare", params: {op: 4, shape: 0, n: 1}, note: "Fark 409: deliği ve ince yapıları da yok ediyor (delik 0)."}
+      - {name: "Temiz, sınır", params: {op: 5, shape: 0, n: 0, p: 0}, note: "Bir piksel kalın iç sınırlar."}
+      - {name: "Temiz, iskelet", params: {op: 7, shape: 0, n: 0, p: 0}, note: "158 piksel, 22 parça: Lantuéjoul iskeleti ayrık ızgarada bağlı değil."}
+      - {name: "Yatay çizgi YE ile açma", params: {op: 2, shape: 3, n: 2, p: 0}, note: "7 piksellik yatay çizgi: dikey ince yapılar (L'nin gövdesi 6 piksel geniş) kaybolur, fark 121."}
+    questions:
+      - q: "Delik doldurma neden gürültülü girdide ön plandaki biber noktalarını da dolduruyor, bu istenen bir şey mi?"
+        a: "Biber noktaları ön plan içinde, kenara değmeyen küçük arka plan bileşenleridir: tanım gereği deliktir. Gürültü için istenen sonuçtur, ama nesnenin gerçek delikleri de dolar; gerçek delikleri korumak için önce küçük bir kapama ya da boyut eşikli doldurma gerekir."
+    limits: "64 × 64 yapay desen; görüntü dışı arka plan sayılıyor (kenarda erozyon nesneyi aşındırır); 8-bağlı bileşen, 4-bağlı delik."
+  - id: l2
+    lab: morphgray
+    title: "Gri seviye: açma tepeleri kırpar, kapama çukurları doldurur"
+    goal: |
+      Yavaş değişen bir arka plan, genişliği 3, 7 ve 15 olan parlak tepeler ve genişliği 3 ve 9 olan koyu çukurlar içeren bir satır profiline erozyon, genişleme, açma, kapama, gradyan, top-hat, bottom-hat ve açma + kapama uygula. YE uzunluğunun hangi ayrıntıları sildiğini ve top-hat'in arka planı ne kadar iyi kestirdiğini ölç; düz olmayan bir kubbe YE'nin değer aralığını nasıl aştığını gör.
+    predict:
+      q: "L = 9'luk düz YE ile açmadan sonra genişliği 3, 7 ve 15 olan tepelerden hangileri kalır?"
+      options:
+        - {t: "Yalnız 15", ok: true, why: "YE 3 ve 7 genişlikli tepelere sığmaz ve onları kırpar (kalan 0 ve 0.04); 15'lik tepe korunur (0.98)."}
+        - {t: "7 ve 15", why: "7 < 9: YE sığmaz."}
+        - {t: "Hiçbiri", why: "15 > 9: YE sığar ve tepe korunur."}
+    presets:
+      - {name: "Açma L = 9", params: {op: 2, L: 9, nf: 0, noise: 0.01}, note: "Tepeler 0, 0.04, 0.98."}
+      - {name: "Açma L = 5", params: {op: 2, L: 5}, note: "Yalnız 3'lük tepe gidiyor; 7'lik tepe 0.99."}
+      - {name: "Kapama L = 9", params: {op: 3, L: 9}, note: "3'lük çukur doluyor, 9'luk çukur kalıyor (0.91)."}
+      - {name: "Top-hat L = 21", params: {op: 5, L: 21}, note: "Arka plan kestiriminin RMS hatası 0.049: en iyi aralık 17–21."}
+      - {name: "Top-hat L = 9", params: {op: 5, L: 9}, note: "RMS 0.098: 15'lik tepe arka plan sanılıyor."}
+      - {name: "Top-hat L = 41", params: {op: 5, L: 41}, note: "RMS 0.106: arka planın eğriliği izlenemiyor."}
+      - {name: "Kubbe erozyon", params: {op: 0, nf: 1, h: 0.3}, note: "Çıkış −0.187'ye iniyor: f'nin en küçük değeri 0.113."}
+      - {name: "Gradyan", params: {op: 4, L: 9}, note: "Geçişlerde tepe, düz bölgelerde sıfıra yakın."}
+    questions:
+      - q: "Top-hat'te L neden hem en geniş parlak ayrıntıdan büyük, hem de arka planın değişim ölçeğinden küçük olmalı?"
+        a: "Açma, L'den dar tepeleri kırpar: en geniş ayrıntıdan küçük bir L, o ayrıntıyı arka plan sanar ve top-hat'ten siler. Çok büyük bir L ise arka planın tümsek kısımlarına da sığamaz ve onları da kırpar: arka plan kestirimi aşağı kayar, top-hat'e arka plan sızar. Ölçümde RMS 9'da 0.098, 17–21'de 0.049, 41'de 0.106."
+    limits: "1-B profil; kenarlarda pencere görüntüyle sınırlanıyor; düz olmayan YE yalnız simetrik kubbe."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Erozyonu elle yapmak
+    goal: Tanımı satır satır uygulamak
+    needs: $A\ominus B=\{z\mid(B)_z\subseteq A\}$
+    q: |-
+      1-B: $A=\{2,3,4,5,8,9\}$ (dizin), $B=\{0,1\}$ (orijin 0). $A\ominus B$ ve $A\oplus B$?
+    solution: |-
+      Erozyon: $z$ ve $z+1$ ikisi de $A$'da olmalı: $\{2,3,4,8\}$. Genişleme: $\hat B=\{0,-1\}$, $(\hat B)_z=\{z,z-1\}$, $A$ ile kesişmeli: $z\in A$ ya da $z-1\in A$: $\{2,3,4,5,6,8,9,10\}$. Dikkat: genişleme sağa uzanır, çünkü $\hat B$ sola bakar ve $z-1\in A$ koşulu $z=6,10$'u ekler.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kare ve artıyla genişleme
+    goal: YE biçiminin sonuca etkisini saymak
+    needs: Genişlemenin geometrisi
+    q: |-
+      Büyük bir görüntüde 4 × 6'lık bir dikdörtgen $A$, 3 × 3'lük artı YE ile genişletiliyor. Sonuç kaç piksel?
+    answer: 44
+    calc: "6*8 - 4"
+    tol: 0
+    mistakes:
+      - {answer: 48, msg: "Bu 3 × 3 kareyle: artı köşeleri doldurmaz."}
+      - {answer: 24, msg: "Bu A'nın kendisi."}
+    hints:
+      - "Kareyle 6 × 8 = 48; artı dört köşe pikselini ekleyemez."
+    solution: |-
+      Kare: $(4+2)(6+2)=48$. Artı yalnız dik komşuları ekler, dört dış köşe eksik kalır: $44$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Gri seviye morfolojik gradyan
+    goal: Min ve max ile gradyan almak
+    needs: $g=(f\oplus b)-(f\ominus b)$, düz YE uzunluk 3
+    q: |-
+      $f=[10,10,40,90,90,90]$. İndis 2'de morfolojik gradyan?
+    answer: 80
+    calc: "max(10,40,90) - min(10,40,90)"
+    tol: 0
+    mistakes:
+      - {answer: 30, msg: "Bu f − erozyon (iç gradyan): 40 − 10. Morfolojik gradyan genişleme − erozyon."}
+      - {answer: 50, msg: "Bu genişleme − f (dış gradyan): 90 − 40."}
+    hints:
+      - "Pencere $[10,40,90]$."
+    solution: |-
+      $\max=90$, $\min=10$, $g=80$. İndis 3'te ($[40,90,90]$) 50; düz bölgede 0.
+  - id: p4
+    type: hesap
+    level: 2
+    title: İskelet adım sayısı
+    goal: Ardışık erozyon sayısını bulmak
+    needs: $S(A)=\bigcup_{k=0}^K S_k$, $K$ son boş olmayan erozyon
+    q: |-
+      11 × 11'lik dolu bir kare, 3 × 3 kare YE ile ardışık aşındırılıyor. $K$ (A'yı boş kümeye götürmeden önceki son adım)?
+    answer: 5
+    calc: "(11 - 1) // 2"
+    tol: 0
+    mistakes:
+      - {answer: 11, msg: "Her erozyon kenardan bir piksel yer: 11 → 9 → 7 …"}
+      - {answer: 6, msg: "6. erozyon boş kümeyi verir; K son boş olmayandır."}
+    hints:
+      - "Boyutlar 11, 9, 7, 5, 3, 1."
+    solution: |-
+      $A\ominus kB$ boyutu $11-2k$: $k=5$'te 1 × 1, $k=6$'da boş. $K=5$; iskeletin son parçası $S_5$ merkezdeki tek pikseldir.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Düzensiz aydınlatma
+    goal: Top-hat'in YE boyutunu seçmek
+    needs: Top-hat, açmanın geometrisi
+    q: |-
+      Bir mikroskop görüntüsünde 10–15 piksel çaplı parlak hücreler var, ama aydınlatma kenarlara doğru belirgin biçimde azalıyor. Global eşikleme kenardaki hücreleri kaçırıyor. Ne yaparsın?
+    choices:
+      - {t: "3 × 3 kapama, sonra eşik", why: "Kapama koyu ayrıntıları doldurur; aydınlatma eğimini gidermez."}
+      - {t: "Hücrelerden büyük (ör. 25–31 piksel) bir diskle top-hat, sonra global eşik", ok: true, why: "Açma hücreleri silip arka planı kestirir; f − açma arka planı çıkarır."}
+      - {t: "Görüntünün her yerine aynı eşiği uygulamaya devam et", why: "Sorun aydınlatma eğimi."}
+    hints:
+      - "Açma hangi ayrıntıları siler?"
+    solution: |-
+      YE'nin içine sığamadığı hücreler açmada kırpılır; açma yavaş değişen aydınlatmayı izler. $f-(f\circ b)$ hücreleri düz bir zemin üzerinde bırakır; sonra tek bir eşik yeter. YE çok büyük olursa aydınlatma eğriliği izlenemez (lab l2'de L = 41).
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Açmanın geometrik yorumu
+    goal: $(A\ominus B)\oplus B=\bigcup\{(B)_z\mid(B)_z\subseteq A\}$ eşitliğini kanıtlamak
+    needs: Erozyon ve genişleme tanımları
+    q: |-
+      $A\circ B=(A\ominus B)\oplus B$'nin, $B$'nin $A$'ya sığdığı bütün ötelemelerinin birleşimine eşit olduğunu kanıtla. Buradan $A\circ B\subseteq A$ ve idempotentliği çıkar.
+    rubric:
+      - "Genişlemeyi X ⊕ B = ∪_{x∈X} (B)_x (Minkowski toplamı) biçiminde yazdım"
+      - "X = A ⊖ B alıp x ∈ X ⇔ (B)_x ⊆ A eşdeğerliğini kullandım"
+      - "Birleşimin her parçası A'nın alt kümesi olduğundan A ∘ B ⊆ A sonucunu çıkardım"
+      - "İdempotentliği iki yönlü kapsama ile gösterdim"
+    hints:
+      - "$X\\oplus B=\\{x+b\\mid x\\in X,\\ b\\in B\\}$: yansıma tanımdaki $\\hat B$ ile birbirini götürür."
+    solution: |-
+      $z\in X\oplus B\Leftrightarrow(\hat B)_z\cap X\ne\varnothing\Leftrightarrow\exists x\in X,b\in B:\ x=z-b\Leftrightarrow z\in\bigcup_{x\in X}(B)_x$. $X=A\ominus B$ için $x\in X\Leftrightarrow(B)_x\subseteq A$, dolayısıyla $A\circ B=\bigcup\{(B)_x\mid(B)_x\subseteq A\}$. Her parça $A$'da: $A\circ B\subseteq A$. İdempotentlik metindeki türetim kutusundaki gibi.
+pitfalls:
+  - wrong: "Genişleme, yapı elemanını yansıtmadan kaydırıp örtüşmeye bakmaktır; OpenCV de kitapla aynı sonucu verir."
+    right: "Kitap tanımı B̂ kullanır; cv2.dilate yansıtmaz. Simetrik YE'de fark yok, asimetrik YE'de OpenCV'nin sonucu kitabın A ⊕ B̂'sidir."
+  - wrong: "Açmayı iki kez uygulamak daha çok gürültü siler."
+    right: "Açma idempotenttir: (A ∘ B) ∘ B = A ∘ B. Daha çok etki için daha büyük ya da farklı bir YE gerekir."
+  - wrong: "Erozyon ve genişleme birbirinin tersidir."
+    right: "İkilidirler (tümleme ve yansımaya göre), ters değil: genişlemeden sonra erozyon (kapama) genellikle A'yı geri vermez, küçük delikler kalıcı olarak kapanır."
+  - wrong: "Gri seviye erozyon her zaman görüntünün değer aralığında kalır."
+    right: "Düz YE'de kalır (min); düz olmayan YE'de f − b_N aralığın dışına çıkabilir (lab l2'de −0.187)."
+whatif:
+  - q: "Görüntü dışını arka plan yerine ön plan saysak erozyon kenarda ne yapar?"
+    a: "Kenara değen nesneler kenardan aşınmaz (dışarısı nesnenin devamı sayılır); genişlemede ise dışarıdan içeri ön plan sızar. scipy'de border_value, OpenCV'de borderType/borderValue bu seçimi yapar; erozyonda genellikle en büyük değer, genişlemede en küçük değer kullanılır ki kenar etkisiz kalsın."
+  - q: "İnceltme yerine Lantuéjoul iskeleti kullanılsa?"
+    a: "İskelet, nesneyi tam geri kurmaya yeter (S_k ⊕ kB birleşimi) ama ayrık ızgarada bağlı ve bir piksel kalın olmayabilir; şekil analizi ve budama için genellikle bağlılığı koruyan inceltme tercih edilir."
+  - q: "Morfolojik gradyan yerine Sobel büyüklüğü kullanılsa?"
+    a: "Sobel doğrusal ve gürültüye daha duyarlıdır, yön bilgisi de verir; morfolojik gradyan yönsüzdür, kenar kalınlığı YE boyutuyla belirlenir ve tek tek gürültü noktalarını YE boyutunda lekelere dönüştürür. Bölütlemede (havza, M9.11) morfolojik gradyan sık kullanılır."

@@ -92,7 +92,7 @@ groups:
         pages: [m9-8-morphology]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M9.8 konu anlatımı bütün slaytları (1–106) işliyor: morfolojinin amacı, ön/son işleme, ön plan ve arka plan (arka plan çıkarma bağlantısı), küme dili, nesneler ve YE'ler, umursamaz elemanlar, dikdörtgen diziye gömme ve dolgu, yansıma ve öteleme, erozyon (I ⊖ B ve ⊛ gösterimi), genişleme, ikilik ve kanıtı, açma ve kapama ve geometrik yorumları, ikilikleri, özellikleri (idempotentlik kanıtıyla), parmak izi gürültü giderici örneği, isabet-ıska (iki YE ve tek karışık YE, umursamaz elemanlar), temel algoritmalar (formüllerle), gri seviye düz ve düz olmayan erozyon/genişleme, ikilik, açma/kapama ve geometrik yorumu, özellikler, gradyan, top-hat, granülometri; morphbin ve morphgray deneyleri. Slayt notları: genişlemenin ikinci yazımı her z için doğru (anlamlı koşul ≠ ∅); kapamanın küme formülünde = ∅ olmalı; 'f'nin orijini' → b'nin orijini; OpenCV'nin yansıtmasız genişlemesi notu."
       - src: "lect_10_and_11 — Renk"
         topics: "renk temelleri, üç renk katsayıları, metamerizm, CIE, RGB/CMY/HSI/Lab, sahte renk, renk dilimleme, renk düzeltme, renkli gradyan"
         pages: [m9-9-color]
