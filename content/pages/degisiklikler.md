@@ -1,5 +1,27 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 7
+
+Faz 7'nin (donanım, ölçekleme ve dağıtım) 6 modülünün hepsine tam konu anlatımı yazıldı. Ders arşivinde bu konulara slayt yok; kaynaklar PMPP, GPU MODE dersleri, Triton eğitimleri, orijinal makaleler (Micikevicius ve ark. 2018/2022, Kalamkar ve ark. 2019, Rajbhandari ve ark. 2020, Li ve ark. 2020, Zhao ve ark. 2023, Jacob ve ark. 2018, Dettmers ve ark. 2022, Frantar ve ark. 2022, Han ve ark. 2015) ve PyTorch belgeleridir. Davranış iddiaları PyTorch 2.15'te çalıştırılarak doğrulandı (ör. torch.export'un veriye bağlı if'te GuardOnDataDependentSymNode vermesi, jit.trace'in sessizce yanlış graf üretmesi).
+
+| modül | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|
+| M7.1 CUDA | 2 | coalesce, tilecount | global indeks ve sınır kontrolü, adımlı erişimin verimi, döşemenin 2n³/T kuralı ve tile yoğunluğu T/e |
+| M7.2 Triton | 2 | tritongrid, l2swizzle | maske ve other, birleşik softmax 2N/6N, gruplu sıranın L2 paylaşımı (90 → 54) |
+| M7.3 karışık hassasiyet | 2 | floatfmt, lossscale, stochround | bitlerden aralık/eps, kaybolan güncelleme, kayıp ölçekleme, stokastik yuvarlamanın yansızlığı ve bit hilesi |
+| M7.4 dağıtık eğitim | 2 | ringar, zeromem | gradyan ortalaması = büyük batch, ring 2(N − 1)/N ve alt sınırı, ZeRO aşamaları ve 2Ψ/3Ψ |
+| M7.5 nicemleme ve budama | 2 | quantlab, prunelab | s²/12 hatası, ölçek kapsamı ve 16/g, int4 paketleme, budamada atılan enerji |
+| M7.6 dışa aktarma | 2 | tracetrap, batchserve | izlemenin kontrol akışını dondurması, torch.cond, sabit katlama, dinamik batch'lemenin kapasite sınırı |
+
+- **Faz 7'de 13 yeni deney.** l2swizzle Triton eğitimindeki 90/54 sonucunu birebir üretiyor; floatfmt bütün el hesabı alanlarını doğruluyor.
+- **Ölçümle düzeltilen ya da anlatıma giren sonuçlar:**
+  - M7.1: tilecount'ta shared memory sınırı kontrolü ilk sürümde çıktıyı etkilemiyordu (lab testi yakaladı); sınırın izin verdiği en büyük T eklendi. fp32'de thread başına bir çıktıyla tile yoğunluğunun A100 dirseğine ulaşamadığı (T ≤ 32 → 8 < 10) yazmaç döşemesinin gerekçesi olarak verildi.
+  - M7.3: stokastik yuvarlamanın ilk sürümü 2'nin kuvveti sınırlarında yanlış komşuyu seçebiliyordu; yeniden yazılıp 20 000 örnekle yansızlığı sınandı.
+  - M7.4: α–β modelinde küçük mesajlarda (1 MB, α = 100 µs, 16 işçi) merkezi yaklaşımın ring'den hızlı çıktığı görüldü; not koşullu yazıldı.
+  - M7.6: KaTeX `B_\max` yazımını reddetti (site testi yakaladı); `B_{\max}` olarak düzeltildi.
+- **Pratik kartlarında düzeltilen hesap hataları** (yayından önce): M7.4 p3 (ZeRO-2: 9.5 GB) ve M7.2 p3'teki yanlış-cevap mesajı.
+- **Kalan:** Faz 8–11 konu anlatımları; pratik kartları; kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 6
 
 Faz 6'nın (PyTorch'un içi) 5 modülünün hepsine tam konu anlatımı yazıldı. Ders arşivinde bu konulara slayt olmadığı için kaynaklar PyTorch belgeleri (BSD-3), JAX Autodiff Cookbook, orijinal makaleler (Chen ve ark. 2016, Korthikanti ve ark. 2022, Abadi ve ark. 2016, Ansel ve ark. 2024, Bengio ve ark. 2013, Ganin–Lempitsky 2015) ve **PyTorch 2.15'te yapılan ölçümlerdir**. Anlatımdaki her davranış iddiası (neyin saklandığı, hangi in-place işlemin hata verdiği, checkpoint'te BN'nin iki kez güncellenmesi, graph break sayısı) çalıştırılarak doğrulandı.

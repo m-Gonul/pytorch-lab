@@ -78,3 +78,142 @@ homework:
     accept:
       - "Dört çalışma zamanı için gecikme/verim tablosu."
       - "Füzyon ve düzen dönüşümü örnekleri."
+
+labs:
+  - id: l1
+    lab: tracetrap
+    title: "İzleme kontrol akışını dondurur"
+    goal: |
+      Kayıt tabanlı bir izleyiciyle f(x) = 2x (koşul doğruysa) / −x fonksiyonunu örnek bir girdiyle izle, sonra kaydedilen grafı rastgele test girdilerine uygula. Veriye bağlı, şekle bağlı ve sabit koşullarda yanlış çıktı oranını ölç.
+    predict:
+      q: "Koşul Σx > 0, izleme Σx₀ > 0 olan bir girdiyle yapıldı; test girdilerinin ortalaması 0. Kaydedilen graf test girdilerinin yaklaşık ne kadarında yanlış dalı uygular?"
+      options:
+        - {t: "≈ %0", why: "Graf koşulu hiç içermiyor; yalnız 2x dalını içeriyor."}
+        - {t: "≈ %50", ok: true, why: "Σx'in işareti testlerin yarısında negatif; ölçülen 0.498."}
+        - {t: "≈ %100", why: "Pozitif toplamlı girdilerde doğru."}
+    presets:
+      - {name: "Veriye bağlı, μ = 0", params: {kind: 0, x0: 1, n0: 2, mu: 0, N: 1000}, note: "Yanlış oranı 0.498."}
+      - {name: "Veriye bağlı, μ = 1", params: {mu: 1}, note: "0.038: test dağılımı izleme örneğine benziyorsa hata nadir ama sessiz."}
+      - {name: "Şekle bağlı", params: {kind: 1, n0: 2}, note: "n₀ = 2 ile −x dalı kaydedildi; n > 4 olan bütün girdilerde yanlış (oran 0.509)."}
+      - {name: "Sabit bayrak", params: {kind: 2}, note: "Yanlış oranı 0: dal girdiye bağlı değil."}
+    questions:
+      - q: "torch.export bu üç durumda ne yapar?"
+        a: "Veriye bağlı koşulda hata verir (GuardOnDataDependentSymNode) ve torch.cond ister. Şekle bağlı koşulda boyut dinamikse onu sembolik bir kısıta çevirir ya da (statikse) örnek şekle özelleşip guard ekler. Sabit bayrağı Python'da değerlendirip grafa yalnız alınan dalı koyar; bu doğrudur çünkü bayrak girdiye bağlı değildir."
+    limits: "Kayıt tabanlı oyuncak izleyici; gerçek izleyiciler (jit.trace) bazı durumlarda uyarı verir."
+  - id: l2
+    lab: batchserve
+    title: "Dinamik batch'leme: gecikme ve verim"
+    goal: |
+      Poisson isteklerle çalışan bir çıkarım sunucusunu benzet: batch süresi t(B) = t₀ + c·B, en büyük batch Bmax ve en uzun bekleme w. p50/p99 gecikmeyi, verimi, ortalama batch boyunu ve kapasite sınırını gör; batch'siz sunucuyla karşılaştır.
+    predict:
+      q: "t(1) = 5 ms, t(8) = 20 ms, λ = 300 istek/s. Batch'siz (Bmax = 1) sunucuda gecikme ne olur?"
+      options:
+        - {t: "≈ 5 ms", why: "Kapasite 1/5 ms = 200 istek/s < 300."}
+        - {t: "Kuyruk büyür; gecikme saniyelere çıkar", ok: true, why: "λ kapasiteyi aşıyor: 5 saniyelik benzetimde p50 1.35 s. Bmax = 8 ile kapasite 400, p99 39 ms."}
+        - {t: "≈ 20 ms", why: "Bu batch 8'in süresi."}
+    presets:
+      - {name: "Varsayılan", params: {lam: 300, Bmax: 8, wait: 5, t0: 2.86, c: 2.14, T: 5}, note: "p50 16.5 ms, p99 39.1 ms, verim 302 istek/s, ortalama batch 3.4, kullanım 0.90."}
+      - {name: "Batch'siz", params: {Bmax: 1}, note: "Kapasite 200 < 300: p50 1350 ms, p99 2560 ms ve büyüyor."}
+      - {name: "Düşük yük", params: {lam: 50}, note: "p50 10 ms (5 ms bekleme + 5 ms hesap), ortalama batch 1.3, kullanım 0.22."}
+      - {name: "Kapasiteye yakın", params: {lam: 380}, note: "p99 76.6 ms, ortalama batch 6.7, kullanım 0.99."}
+      - {name: "Beklemesiz", params: {wait: 0}, note: "p50 15 ms; batch'ler yalnız kuyrukta birikenlerden oluşuyor (ortalama 2.8)."}
+    questions:
+      - q: "Kullanım 1'e yaklaşırken p99 gecikme neden hızla büyür?"
+        a: "Kuyruk kuramında bekleme süresi 1/(1 − ρ) ile büyür; rastgele gelen istek kümeleri, boş kapasite kalmadığı için eritilemez. Pratikte sunucular kapasitenin %70–80'inde çalıştırılır ve gecikme hedefleri (SLO) p99 üzerinden konur."
+    limits: "Tek hızlandırıcı, doğrusal batch süresi, sonsuz kuyruk; ağ ve ön/son işleme süreleri yok."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Dosya boyutu
+    goal: Hassasiyetin boyuta etkisini hesaplamak
+    needs: Bayt/parametre
+    q: |-
+      25 milyon parametreli bir modelin fp32, fp16 ve int8 dosya boyutları?
+    solution: |-
+      fp32 $25\cdot10^6\cdot4=100$ MB, fp16 50 MB, int8 25 MB (ölçekler hariç). Tarayıcıda ONNX Runtime Web ile indirme süresi bu sayılarla orantılıdır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Batch'lemenin verimi
+    goal: Verim ve gecikmeyi karşılaştırmak
+    needs: verim = B / t(B)
+    q: |-
+      $t(B)=4+1.5B$ ms. Batch 16'nın verimi (örnek/s)?
+    answer: 571.4285714285714
+    calc: "16/((4+1.5*16)/1000)"
+    tol: 0.01
+    mistakes:
+      - {answer: 35.714285714285715, msg: "Bu batch başına verim (batch/s); B ile çarp."}
+      - {answer: 666.6666666666666, msg: "Sabit maliyeti unutma: t(16) = 28 ms."}
+    hints:
+      - "$t(16)=28$ ms."
+    solution: |-
+      $16/0.028=571$ örnek/s; batch 1'de $1/0.0055=182$. Her istek en az 28 ms bekler.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Kapasite sınırı
+    goal: Kararlılık koşulunu uygulamak
+    needs: λ < Bmax / t(Bmax)
+    q: |-
+      $t(B)=2+1B$ ms, $B_{\max}=32$. Sunucunun taşıyabileceği en büyük istek hızı (istek/s)?
+    answer: 941.1764705882352
+    calc: "32/((2+32)/1000)"
+    tol: 0.01
+    mistakes:
+      - {answer: 1000.0, msg: "Bu B → ∞ sınırı (1/c); Bmax = 32'de t₀ hâlâ pay alır."}
+      - {answer: 333.3333333333333, msg: "Bu batch 1'in kapasitesi."}
+    hints:
+      - "$32/0.034$."
+    solution: |-
+      $32/0.034=941$ istek/s; üstünde kuyruk sınırsız büyür.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Dışa aktarılan model bazen yanlış
+    goal: İzleme tuzağını tanımak
+    needs: jit.trace, torch.export
+    q: |-
+      `torch.jit.trace` ile dışa aktarılan bir model test kümesinin çoğunda doğru, ama kısa cümlelerde yanlış sonuç veriyor. Modelin forward'unda `if x.size(1) < 8: x = pad(x)` var. Ne oldu, nasıl düzeltilir?
+    choices:
+      - {t: "ONNX Runtime'da hata var", why: "Sorun dışa aktarmada."}
+      - {t: "İzleme uzun bir örnekle yapıldı; şekle bağlı dal dondu. torch.export ile Dim'li dinamik boyut ve gerekirse torch.cond kullanılmalı", ok: true, why: "jit.trace örnek şekilde alınmayan dalı kaydetmez."}
+      - {t: "Model eğitimde aşırı uydu", why: "Eager modda doğru çalışıyor."}
+    hints:
+      - "İzleme anındaki x.size(1) neydi?"
+    solution: |-
+      İzleme, örnek girdide `x.size(1) ≥ 8` olduğu için dolgu dalını hiç kaydetmedi. torch.export şekli sembolik tutar (Dim) ve koşulu ya grafa koyar ya da açıkça hata verir; sessiz yanlış graf üretmez.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Sabit katlamanın doğruluğu
+    goal: Hangi düğümlerin katlanabileceğini göstermek
+    needs: Saf fonksiyonlar
+    q: |-
+      Bir grafta bir düğümün bütün girdileri sabitse ve düğüm saf (yan etkisiz, deterministik) bir işlemse, düğümü bir kez hesaplayıp çıktısını sabit olarak saklamanın grafın anlamını değiştirmediğini ve bu işlemin tekrarlanarak (sabitlik yayılarak) bir sabit noktaya ulaştığını göster. Rastgele bir işlemde neden yapılamaz?
+    rubric:
+      - "Saf ve deterministik işlemin aynı girdilerde hep aynı çıktıyı verdiğini kullandım"
+      - "Katlanan düğümün çıktısının, çalışma anındaki her çağrıda aynı olacağını belirttim"
+      - "Katlamadan sonra yeni düğümlerin girdilerinin sabitleşebileceğini ve sürecin sonlu adımda durduğunu (düğüm sayısı azalır) gösterdim"
+      - "Rastgele (dropout, randn) ya da durumlu işlemlerde çıktının çağrıya bağlı olduğunu, katlamanın anlamı değiştireceğini belirttim"
+    hints:
+      - "Her katlama düğüm sayısını bir azaltır."
+    solution: |-
+      Saf, deterministik bir $f$ için $f(c_1,\dots,c_k)$ her çağrıda aynıdır; önceden hesaplamak gözlenebilir davranışı değiştirmez. Katlanan çıktı yeni bir sabit olur ve onu kullanan düğümler de katlanabilir hâle gelebilir; her adım düğüm sayısını azalttığı için süreç sonlu adımda durur. Rastgele ya da durumlu işlemlerde çıktı çağrıdan çağrıya değişir; katlamak onu tek bir örneğe dondurur.
+pitfalls:
+  - wrong: "torch.jit.trace kontrol akışını da kaydeder."
+    right: "Yalnız örnek girdide alınan yolu kaydeder; veriye ve şekle bağlı dallar donar. torch.export ise tam grafı ister ve yakalayamadığında hata verir."
+  - wrong: "Dışa aktarılan model her batch boyunda çalışır."
+    right: "Yalnız Dim ile dinamik işaretlenen boyutlar serbesttir; diğerleri örnek değere özelleşir ve guard'larla korunur."
+  - wrong: "Batch'leme her zaman daha iyidir."
+    right: "Verimi artırır ama her isteğin gecikmesini (bekleme + daha uzun batch süresi) artırır; gecikme hedefi (p99) ile birlikte ayarlanmalıdır."
+  - wrong: "ONNX'e aktarmak modeli otomatik hızlandırır."
+    right: "Taşınabilirlik sağlar; hız, çalışma zamanının optimizasyonlarına (füzyon, nicemleme, donanım arka ucu) bağlıdır."
+whatif:
+  - q: "Modelde Python'da bir sözlük önbelleği (her çağrıda güncellenen) olsaydı?"
+    a: "Dışa aktarılan graf yan etkisizdir; Python durumu grafa girmez. Önbellek ya açık bir girdi/çıktı tamponuna (register_buffer ve dönen yeni değer) çevrilmeli ya da dışa aktarılan grafın dışında tutulmalıdır."
+  - q: "Dinamik boyutun max'ı 1024 iken 2048'lik bir batch gelirse?"
+    a: "Guard bozulur: ExportedProgram girdiyi reddeder. Daha geniş bir aralıkla yeniden dışa aktarmak ya da girdiyi bölmek gerekir."
+  - q: "Sürekli batch'leme yerine sabit batch'lerle LLM sunulsa?"
+    a: "Batch'teki en uzun yanıt bitene kadar herkes bekler; kısa yanıtlar boşa yer tutar ve verim düşer. Sürekli batch'leme her adımda biten istekleri çıkarıp yenilerini ekler."
