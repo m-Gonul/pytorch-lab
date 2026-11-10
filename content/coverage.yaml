@@ -104,7 +104,7 @@ groups:
         pages: [m9-11-segmentation, m2-7-kmeans]
         status: genis
         gap: "—"
-        done: "k-means adım adım deneyi (başlatma, boş küme, amaç monotonluğu)."
+        done: "k-means adım adım deneyi (başlatma, boş küme, amaç monotonluğu). M9.11 konu anlatımı bütün slaytları (1–54) işliyor: bölütlemenin tanımı, süreksizlik ve benzerlik, tekil nokta (Laplasyen, eşik; 8a/6a sezgisi), çizgi (çift çizgi, pozitif kısım, yönlü Z1–Z4), k-means (amaç, NP-zorluk, Lloyd adımları, yakınsama türetimi, başlatma ve k-means++), GMM ve EM (formüller, k-means ile ilişkisi), süper pikseller (amaçlar, uygulama yeterliliği), SLIC (5-B gözlem, ızgara ve gradyan taşıma, 2s × 2s atama, güncelleme, son işleme, uzaklık ölçüsü, CIELAB ve bağlantı notu), SLIC + k-means; pointline, segcluster ve slic deneyleri. Slayt notları: amaç uzaklıkların değil karelerinin toplamı; slayt 54'te k ile c aynı sabit (k-means'in k'si değil)."
       - src: "lect_13 (1), lect_17, lect_HoG — SIFT, SURF, HOG"
         topics: "ölçek uzayı, DoG ekstremumları, alt piksel konum, kenar yanıtı eleme, yönelim, tanımlayıcı; Fast-Hessian, kutu süzgeçleri; HOG adımları"
         pages: [m9-14-features]

@@ -102,3 +102,185 @@ homework:
       - "Aynı süper piksel sayısında SSN'nin sınır yakalaması SLIC'ten yüksek (grafik: sayı 100–1000)."
       - "Yumuşak atamanın sıcaklığı (ölçek) için ablasyon."
       - "Bu modüldeki e aşamasının sert SLIC'iyle SSN'nin çıkarım süresi karşılaştırması."
+
+labs:
+  - id: l1
+    lab: pointline
+    title: "Tekil nokta ve çizgi tespiti"
+    goal: |
+      Gürültülü bir zeminde güçlü ve zayıf tekil noktalar, dört yönde 1 piksellik çizgiler ve bir basamak içeren sahnede 8-komşulu Laplasyenle nokta tespiti yap; çizgileri Laplasyenin mutlak değeriyle, yalnız pozitif kısmıyla ve yönlü Z₁–Z₄ çekirdekleriyle bul. Eşiğin noktaları çizgilerden nasıl ayırdığını ve çizgi kalınlığını ölç.
+    predict:
+      q: "Eşik en büyük yanıtın %70'indeyken (güçlü nokta 8a), aynı parlaklıktaki 1 piksellik çizginin pikselleri tespit edilir mi?"
+      options:
+        - {t: "Hepsi edilir", why: "Çizgi pikseli 6a verir: 8a'nın %75'i; ama çizgi parlaklığı noktalarınkinden düşük (0.4'e 0.5), yanıt 2.4 < 2.8."}
+        - {t: "Yalnız uçları", ok: true, why: "Uçta 7 komşu farklıdır (7a = 2.8): 4 uç pikseli eşiği geçiyor, çizgi gövdesi geçmiyor."}
+        - {t: "Hiçbiri", why: "Çizgi uçları 7a yanıt verir."}
+    presets:
+      - {name: "Güçlü noktalar", params: {mode: 0, T: 0.7, noise: 0.02}, note: "3/3 güçlü, 0/3 zayıf nokta; yalnız 4 çizgi ucu."}
+      - {name: "Zayıf noktalar için düşük eşik", params: {mode: 0, T: 0.2}, note: "Zayıfların 2/3'ü bulunuyor ama 92 çizgi pikseli ve gürültü de: 281 tespit."}
+      - {name: "Çizgi, mutlak değer", params: {mode: 1, T: 0.3}, note: "Dikey çizgi 1.74 piksel kalın: çift çizgi etkisi."}
+      - {name: "Çizgi, pozitif kısım", params: {mode: 2, T: 0.3}, note: "1.00 piksel: yalnız çizginin kendisi."}
+      - {name: "Z₁ yatay", params: {mode: 3, dir: 0, T: 0.5}, note: "Bulunma oranı 0°'de 1, diğer yönlerde 0."}
+      - {name: "Z₂ +45°", params: {mode: 3, dir: 1, T: 0.5}, note: "Yalnız köşegen çizgi."}
+    questions:
+      - q: "Yönlü bir çekirdek (ör. Z₁) neden öbür üç yöndeki 1 piksellik çizgilere sıfır yanıt verir?"
+        a: "Başka yöndeki bir çizgi çekirdeğin her satırından (ya da çapraz kesitinden) yalnız bir pikselden geçer ve o üç katsayı −1, 2, −1'dir: toplamları sıfır. Kendi yönündeki çizgi ise orta satırın üç katsayısının (2, 2, 2) hepsinden geçer ve 6a verir."
+    limits: "Yapay sahne; çizgiler tam 1 piksel ve ızgara yönlerinde; eşik en büyük yanıtın oranı."
+  - id: l2
+    lab: segcluster
+    title: "k-means, konumlu k-means ve GMM ile bölütleme"
+    goal: |
+      Gökyüzü gradyanı, kırmızı disk, yeşil kare ve gölgeli sarı üçgen içeren bir sahneyi RGB'de k-means, RGB + konumda k-means ya da tam kovaryanslı GMM (EM) ile bölütle. Rastgele başlatma ile k-means++'ı, k'yi ve gürültüyü değiştirerek saflığı, amaç fonksiyonunun iterasyonlarla düşüşünü ve gölgeli üçgenin kaç kümeye bölündüğünü ölç.
+    predict:
+      q: "k = 4, rastgele başlatma (tohum 1): saflık ne olur?"
+      options:
+        - {t: "%100", why: "k-means++ ile öyle."}
+        - {t: "%81: gökyüzü üç kümeye, nesneler tek kümeye", ok: true, why: "Başlangıç örneklerinin çoğu piksellerin %69'unu kaplayan gökyüzünden; k-means bu yerel minimumdan çıkamıyor (J = 212, k-means++'ta 68.3)."}
+        - {t: "%25", why: "Her küme en az bir bölgeyi doğru kapsıyor."}
+    presets:
+      - {name: "Rastgele başlatma", params: {meth: 0, k: 4, init: 0, noise: 0.04}, note: "Saflık %81, J = 212: kötü yerel minimum."}
+      - {name: "k-means++", params: {meth: 0, k: 4, init: 1}, note: "Saflık %100, J = 68.3, 6 iterasyon."}
+      - {name: "k = 3", params: {meth: 0, k: 3, init: 1}, note: "%90.8: iki bölge birleşmek zorunda."}
+      - {name: "Konum ağırlığı büyük", params: {meth: 1, init: 1, lam: 1.5}, note: "%78.1: kümeler renkten çok konuma göre."}
+      - {name: "GMM", params: {meth: 2, init: 1}, note: "%100, 4 EM iterasyonu."}
+      - {name: "Güçlü gürültü", params: {meth: 0, init: 1, noise: 0.12}, note: "%88.5; gölgeli üçgen iki kümeye bölünüyor."}
+    questions:
+      - q: "Görüntü bölütlemede neden asıl karar k'dir ve çoklu başlatma 'nadiren' yapılır, ama bu sahnede yine de gerekli oldu?"
+        a: "k bölge sayısını belirler; doğru k ile iyi başlatılmış tek bir koşu genellikle yeter. Ama bölge alanları çok dengesizse (burada gökyüzü %69) rastgele örnekler büyük bölgeden gelir ve k-means kötü bir yerel minimumda kalır. k-means++ ya da birkaç başlatmadan en düşük J'yi seçmek bu riski ucuzca giderir."
+    limits: "64 × 64 yapay sahne; saflık her kümeyi çoğunluk sınıfına sayar (k > 4'te yapay olarak yüksek); GMM k-means'ten başlatılıyor."
+  - id: l3
+    lab: slic
+    title: "SLIC süper pikselleri: kompaktlık ve sınıra yapışma"
+    goal: |
+      Yumuşak kenarlı ve zemine yakın renkte düşük karşıtlıklı bir disk içeren sahnede SLIC'i çalıştır. Süper piksel sayısını, renk ölçeği c'yi ve iterasyon sayısını değiştirerek sınır geri çağırmayı, ulaşılabilir bölütleme doğruluğunu (ASA) ve boyut düzenliliğini ölç; süper piksel ortalamalarını k-means ile kümeleyip SLIC + k-means'in saflığını gör.
+    predict:
+      q: "c'yi 0.15'ten 1.5'e çıkarınca (konum ağırlığı artar) sınır geri çağırma ne olur?"
+      options:
+        - {t: "Artar", why: "Kompakt süper pikseller sınırları izlemez."}
+        - {t: "%99.7'den %74.3'e düşer", ok: true, why: "Süper pikseller ızgaraya benzer karelere dönüşür (boyut std/ortalama 0.35 → 0.10) ve sınırları kaçırır."}
+        - {t: "Değişmez", why: "c renk ve konum uzaklığının dengesini belirler."}
+    presets:
+      - {name: "Varsayılan", params: {nsp: 64, c: 0.15, it: 5, km: 0, noise: 0.04}, note: "Geri çağırma %99.7, ASA %97.5."}
+      - {name: "c küçük", params: {c: 0.03}, note: "Sınıra yapışık ama düzensiz: boyut std/ortalama 0.53."}
+      - {name: "c büyük", params: {c: 1.5}, note: "Kompakt kareler: geri çağırma %74.3, ASA %90.7."}
+      - {name: "Az süper piksel", params: {nsp: 16}, note: "ASA %94.7: küçük disk ve üçgen ucu komşularıyla birleşiyor."}
+      - {name: "Çok süper piksel", params: {nsp: 200}, note: "ASA %98.2."}
+      - {name: "SLIC + k-means", params: {km: 1}, note: "64 süper piksel ortalaması 5 kümeye: saflık %92.6."}
+    questions:
+      - q: "SLIC neden k-means'ten çok daha hızlıdır, n_sp'yi artırmak süreyi neden pek değiştirmez?"
+        a: "Her merkez yalnız 2s × 2s penceresindeki piksellerle karşılaştırılır; bir piksel yalnız birkaç (≈ 4) merkezin penceresine düşer. Bir iterasyonun maliyeti O(n_tp)'dir. n_sp artınca pencereler küçülür (s ∝ 1/√n_sp), toplam iş aynı kalır. k-means ise her pikseli her merkezle karşılaştırır: O(n_tp·k)."
+    limits: "RGB'de (özgün SLIC CIELAB kullanır); bağlantı zorlama adımı yok; 64 × 64 yapay sahne; sınır geri çağırma 1 piksel toleranslı ve gürültüde düzensiz sınırlar yüzünden şişebilir."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir SLIC adımı
+    goal: Uzaklığı hesaplayıp atamak
+    needs: $D=\sqrt{(d_c/c)^2+(d_s/s)^2}$
+    q: |-
+      $s=10$, $c=0.2$. Bir piksel $p$: renk (0.5, 0.5, 0.5), konum (12, 10). Merkez A: renk (0.6, 0.5, 0.5), konum (10, 10); merkez B: renk (0.5, 0.5, 0.5), konum (20, 10). $p$ hangisine atanır?
+    solution: |-
+      A: $d_c=0.1$, $d_s=2$: $D=\sqrt{0.25+0.04}=0.539$. B: $d_c=0$, $d_s=8$: $D=0.8$. $p$ A'ya atanır: renk farkı küçük, konum yakın. $c=0.05$ olsaydı A'nın $D$'si $\sqrt{4+0.04}=2.01$ olur ve $p$ B'ye giderdi: küçük $c$ rengi öne çıkarır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: k-means ilk güncelleme
+    goal: Atama ve güncellemeyi elle yapmak
+    needs: En yakın ortalamaya atama, ortalama
+    q: |-
+      1-B veri $\{2,4,5,9,13,14\}$, başlangıç $m_1=2$, $m_2=4$. İlk güncellemeden sonra $m_2$?
+    answer: 9
+    calc: "(4+5+9+13+14)/5"
+    tol: 1e-9
+    mistakes:
+      - {answer: 11.25, msg: "4 de m₂'ye en yakın (uzaklık 0); m₂ kümesi {4, 5, 9, 13, 14}."}
+      - {answer: 7.833, msg: "Bu bütün verinin ortalaması."}
+    hints:
+      - "Yalnız 2, m₁'e en yakın."
+    solution: |-
+      $m_1$ kümesi {2}, $m_2$ kümesi {4, 5, 9, 13, 14}: $m_2=45/5=9$. Sonraki adımda 4 ve 5 de $m_1$'e geçer (|4 − 2| < |4 − 9|): $m_1=11/3$, $m_2=12$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Izgara aralığı
+    goal: SLIC başlatmasını boyutlandırmak
+    needs: $s=\sqrt{n_{tp}/n_{sp}}$
+    q: |-
+      1920 × 1080 bir görüntüde ortalama süper piksel kenarı 24 piksel olsun istiyoruz. $n_{sp}$?
+    answer: 3600
+    calc: "1920*1080/24**2"
+    tol: 0
+    mistakes:
+      - {answer: 86400, msg: "24² değil 24'e bölünmüş."}
+      - {answer: 60, msg: "Bu √n_sp."}
+    hints:
+      - "$n_{sp}=n_{tp}/s^2$."
+    solution: |-
+      $2\,073\,600/576=3600$ süper piksel (80 × 45'lik bir ızgara).
+  - id: p4
+    type: hesap
+    level: 2
+    title: EM sorumluluğu
+    goal: Yumuşak atamayı hesaplamak
+    needs: $\gamma=\pi_1\mathcal N_1/(\pi_1\mathcal N_1+\pi_2\mathcal N_2)$
+    q: |-
+      1-B GMM: $\pi_1=0.2$, $\mu_1=0$; $\pi_2=0.8$, $\mu_2=3$; ikisinde de $\sigma=1$. $x=1$'in 1. bileşene sorumluluğu? (3 basamak)
+    answer: 0.528
+    calc: "round(0.2*math.exp(-0.5)/(0.2*math.exp(-0.5)+0.8*math.exp(-2)), 3)"
+    tol: 0.001
+    mistakes:
+      - {answer: 0.818, msg: "Ağırlıklar (π) unutulmuş: eşit ağırlıkta öyle olurdu."}
+      - {answer: 0.2, msg: "Bu yalnız öncel π₁."}
+    hints:
+      - "$0.2e^{-0.5}=0.1213$, $0.8e^{-2}=0.1083$."
+    solution: |-
+      $0.1213/(0.1213+0.1083)=0.528$. Eşit ağırlıklarda 0.818 olurdu: öncel, ortalamaya daha yakın bileşenin üstünlüğünü neredeyse siliyor.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: k-means küçük nesneleri yutuyor
+    goal: Başlatma ve küme dengesizliğini tanımak
+    needs: k-means'in yerel minimumları
+    q: |-
+      Geniş bir gökyüzü ve birkaç küçük renkli nesne içeren fotoğraflarda k = 4 ile k-means çoğu koşuda gökyüzünü birkaç tona bölüp nesneleri tek kümede bırakıyor. Ne yaparsın?
+    choices:
+      - {t: "k'yi 2'ye indir", why: "Daha az küme nesneleri ayırmaz."}
+      - {t: "k-means++ ya da birden çok başlatmadan en düşük J'yi seç; gerekirse küçük nesneleri öne çıkaran öznitelikler (renk doygunluğu, L*a*b*) kullan", ok: true, why: "Lab l2: rastgele başlatma %81, k-means++ %100."}
+      - {t: "İterasyon sayısını artır", why: "Yerel minimuma yakınsamış bir çözüm daha çok iterasyonla değişmez."}
+    hints:
+      - "Rastgele seçilen başlangıç örnekleri hangi bölgeden gelir?"
+    solution: |-
+      Başlangıç örnekleri piksel alanıyla orantılı seçildiği için çoğu gökyüzünden gelir; Lloyd algoritması bu kötü başlangıçtan çıkamaz. k-means++ uzak noktalara öncelik verdiği için nesnelerden de merkez seçer; birden çok başlatma da aynı işi görür.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: k-means'in yakınsaması
+    goal: Monotonluğu ve sonluluğu kanıtlamak
+    needs: Ortalamanın kare hatayı en küçüklediği
+    q: |-
+      (a) Sabit atamalar için $\sum_{\mathbf z\in C}\|\mathbf z-\mathbf m\|^2$'yi en küçükleyen $\mathbf m$'nin ortalama olduğunu göster. (b) Lloyd algoritmasının iki adımının da J'yi artırmadığını ve algoritmanın sonlu adımda durduğunu göster. (c) Neden küresel en küçüğün garantisi yoktur?
+    rubric:
+      - "Gradyanı sıfırlayıp m = (1/|C|)Σz buldum (ya da Σ‖z − m‖² = Σ‖z − m̄‖² + |C|‖m̄ − m‖² ayrıştırmasını kullandım)"
+      - "Atama adımının her terimi küçülttüğünü (ya da korunduğunu) gösterdim"
+      - "Olası atama sayısının sonlu (k^Q) olduğunu ve J'nin kesin azaldığı sürece tekrar edilmediğini kullandım"
+      - "Yerel en küçük için iki adımlı açgözlü yapıyı ve bir karşı örneği (kötü başlatma) verdim"
+    hints:
+      - "$\\|\\mathbf z-\\mathbf m\\|^2=\\|\\mathbf z-\\bar{\\mathbf m}\\|^2+2(\\mathbf z-\\bar{\\mathbf m})^\\top(\\bar{\\mathbf m}-\\mathbf m)+\\|\\bar{\\mathbf m}-\\mathbf m\\|^2$."
+    solution: |-
+      (a) Toplamda orta terim sıfırdır: $\sum\|\mathbf z-\mathbf m\|^2=\sum\|\mathbf z-\bar{\mathbf m}\|^2+|C|\|\bar{\mathbf m}-\mathbf m\|^2$, en küçüğü $\mathbf m=\bar{\mathbf m}$. (b) Atama her örneğin terimini en küçüğe indirir; güncelleme (a) gereği. J artmaz; J değişmezse atamalar da değişmez ve algoritma durur. Atama sayısı sonlu ($k^Q$) olduğu için kesin azalan bir dizi sonsuza dek süremez. (c) Her iki adım da yalnız diğerini sabit tutarak en iyiler; Şekil 2'deki gibi ya da lab l2'deki gökyüzü örneğindeki gibi bir başlangıç, daha düşük J'li bir çözüme hiç geçmeden yakınsayabilir.
+pitfalls:
+  - wrong: "Çizgi tespitinde Laplasyenin mutlak değerini almak en iyisidir."
+    right: "Mutlak değer çift çizgi etkisini de alır ve kalınlığı iki katına çıkarır; parlak çizgiler için yalnız pozitif kısım (−∇²f > 0) ince sonuç verir."
+  - wrong: "k-means her koşuda aynı ve en iyi bölütlemeyi bulur."
+    right: "Yalnız yerel bir en küçüğe yakınsar ve başlatmaya bağlıdır; dengesiz bölge alanlarında rastgele başlatma kötü sonuç verebilir (k-means++)."
+  - wrong: "SLIC'te renk ve konum uzaklıkları doğrudan toplanabilir."
+    right: "Ölçekleri farklıdır; d_c/c ve d_s/s ile normalize edilip birleştirilir. c, kompaktlık ile sınıra yapışma arasındaki dengeyi kurar."
+  - wrong: "Süper pikseller bölütlemenin kendisidir."
+    right: "Aşırı bölütlenmiş ilkel bölgelerdir (yüzlerce parça); anlamlı bölgeler için üstüne bir kümeleme ya da sınıflandırma (SLIC + k-means, grafik kesim, CNN) gerekir."
+whatif:
+  - q: "k-means'te Öklid yerine Mahalanobis uzaklığı kullanılsa?"
+    a: "Her kümenin kendi kovaryansıyla ölçmek eliptik kümeleri yakalar; bu, sert atamalı bir GMM'ye (sınıflandırma EM) çok yakındır. Kovaryanslar da kestirildiği için küçük kümelerde kararsızlaşabilir ve düzenleme gerekir."
+  - q: "SLIC'e renk yerine derin ağ öznitelikleri (ör. ilk konvolüsyon katmanları) verilse?"
+    a: "Süper pikseller doku ve anlamsal sınırlara daha iyi uyar ama öznitelik uzayının ölçeği değişir ve c yeniden ayarlanmalıdır. Öğrenilen süper piksel ağları (ör. SSN) bu fikri uçtan uca eğitir."
+  - q: "k bilinmiyorsa?"
+    a: "Dirsek yöntemi (J'nin k'ye göre kırılma noktası), siluet katsayısı ya da GMM için BIC/AIC kullanılır; görüntüde ayrıca ortalama kayma (mean shift) gibi k gerektirmeyen yöntemler vardır."
