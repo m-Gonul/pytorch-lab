@@ -99,3 +99,186 @@ homework:
       - "K-boyutu döngüsünde (c, u, v) üçlüsünü tek indeksten çöz."
     accept:
       - "Açık im2col'a göre bellek kullanımı K² kat az, hız aynı mertebede."
+
+labs:
+  - id: l1
+    lab: convtile
+    title: "Karolu 2-B evrişim: halo, blok stratejisi ve global okumalar"
+    goal: |
+      Çıktı karosu T ve filtre boyu K için dört stratejinin çıktı başına global okumasını, paylaşımlı bellek gereksinimini, blok boyunu ve boşta thread oranını say. Azalma oranının K²T²/(T + K − 1)² ile nasıl K² sınırına yaklaştığını gör.
+    predict:
+      q: "21 × 21 filtrede 16 × 16 çıktı karosu, doğrudan çekirdeğe göre global okumaları kaç kat azaltır?"
+      options:
+        - {t: "441 kat (K²)", why: "Bu sonsuz büyük karonun sınırı; 36 × 36'lık girdi karosunun hale payı büyük."}
+        - {t: "≈ 87 kat", ok: true, why: "441 / (36²/256) = 87.1."}
+        - {t: "≈ 16 kat", why: "Bu 5 × 5 filtre için."}
+    presets:
+      - {name: "Girdi boyutlu, 5 × 5", params: {s: 1, T: 16, K: 1}, note: "1.56 okuma / çıktı, 16 kat; thread'lerin %36'sı hesapta boş."}
+      - {name: "Çıktı boyutlu, 21 × 21", params: {s: 2, T: 16, K: 4}, note: "5.06 okuma, 87.1 kat; thread başına 6 yükleme."}
+      - {name: "Girdi boyutlu, T = 8, 21 × 21", params: {s: 1, T: 8, K: 4}, note: "784 thread'in %91.8'i yalnız yüklüyor."}
+      - {name: "Doğrudan, 21 × 21", params: {s: 0, T: 16, K: 4}, note: "441 okuma / çıktı."}
+      - {name: "Büyük karo, 21 × 21", params: {s: 2, T: 32, K: 4}, note: "2.64 okuma, 167 kat."}
+      - {name: "Hale önbellekte, 3 × 3", params: {s: 3, T: 16, K: 0}, note: "1 KB paylaşımlı bellek; çıktı başına 0.73 hale okuması."}
+    questions:
+      - q: "Girdi boyutlu blok stratejisi 21 × 21 filtrede neden T = 16 ile çalışmaz, ve çıktı boyutlu strateji bunu nasıl aşar?"
+        a: "Girdi boyutlu blokta her girdi öğesine bir thread düşer: (16 + 20)² = 1296 thread, blok sınırı 1024'ü aşar. T = 8'e inince blok sığar ama 784 thread'in yalnız 64'ü çıktı hesaplar (%91.8 boşta) ve azalma 36 kata düşer. Çıktı boyutlu blokta 256 thread vardır; 1296 öğelik girdi karosu bir döngüyle 6 turda yüklenir. Hem blok sınırı aşılmaz hem hesap evresinde boş thread kalmaz."
+      - q: "Hale öğelerini paylaşımlı belleğe almamak hangi koşulda iyi bir fikirdir?"
+        a: "Hale payı küçükken (küçük K, büyük T) ve GPU'nun L1/L2 önbelleği bu öğeleri komşu blokların yüklemelerinden tutuyorken. 3 × 3'te çıktı başına 0.73 hale okuması önbellekten gelir; paylaşımlı bellek 1 KB'ye iner ve doluluk artar. 21 × 21'de hale okuması çıktı başına 241'dir ve önbellek isabetine güvenmek risklidir."
+    limits: "Okuma sayımı önbelleksiz modelde (hale-önbellekte stratejisinde hale okumaları global sayılıyor); bank çakışması, birleşme, sınır pikselleri ve uint8 yükleme genişliği modellenmedi."
+  - id: l2
+    lab: convmethods
+    title: "Evrişim yöntemleri: doğrudan, im2col + GEMM, FFT ve ayrılabilir filtre"
+    goal: |
+      Görüntü boyu, kanal sayısı ve filtre boyu için dört yöntemin FLOP sayısını, ek belleğini ve A100 benzeri bir GPU'da kaba süre tahminini karşılaştır. FFT'nin K'dan bağımsızlığını, im2col'un bellek bedelini ve tek kanalda GEMM'in verimsizleştiği durumu gör.
+    predict:
+      q: "512 × 512, 64 kanal: filtre 3 × 3'ten 31 × 31'e büyüyünce en hızlı genel yöntem ne olur?"
+      options:
+        - {t: "im2col + GEMM her zaman önde kalır", why: "İşi K² ile büyür: 31 × 31'de 2060 GFLOP ve 60 GiB sütun matrisi."}
+        - {t: "FFT öne geçer", ok: true, why: "FFT'nin işi 47.8 GFLOP'ta sabit; 9.7 ms'ye karşı GEMM 218 ms."}
+        - {t: "Doğrudan çekirdek öne geçer", why: "Doğrudan da K² ile büyür (176 ms)."}
+    presets:
+      - {name: "Ağ katmanı, 3 × 3", params: {logH: 9, logC: 6, K: 3}, note: "GEMM 2.13 ms, doğrudan 2.88, FFT 9.69."}
+      - {name: "1 × 1 evrişim", params: {logH: 9, logC: 6, K: 1}, note: "Saf matris çarpımı: GEMM 0.32 ms."}
+      - {name: "11 × 11", params: {logH: 9, logC: 6, K: 11}, note: "FFT 9.69 ms ile önde."}
+      - {name: "31 × 31", params: {logH: 9, logC: 6, K: 31}, note: "Sütun matrisi 60 GiB: GPU'ya sığmaz."}
+      - {name: "Ex. 4: tek kanal, 21 × 21", params: {logH: 11, logC: 0, K: 21}, note: "GEMM'in iç boyutu 441: doğrudan 0.34 ms önde."}
+      - {name: "Küçük harita, çok kanal", params: {logH: 6, logC: 9, K: 3}, note: "GEMM 1.35 ms."}
+    questions:
+      - q: "Tek kanallı 2048 × 2048 görüntü ve 21 × 21 filtrede im2col + GEMM neden doğrudan çekirdekten yaklaşık 30 kat yavaş görünüyor?"
+        a: "FLOP aynı (3.7 GFLOP), ama sütun matrisi 7 GiB'dir ve yazılıp okunması 1.5 TB/s'de ~10 ms sürer. Tek kanalda bu matris girdinin 441 katıdır ve GEMM'in iç boyutu yalnız 441'dir; ek bellek trafiği hesabın önüne geçer. Örtük GEMM bu matrisi oluşturmaz; çok kanallı katmanlarda ise iç boyut C·K² büyür ve GEMM'in yeniden kullanımı bedeli karşılar."
+    limits: "Kaba tavan modeli: sabit verim katsayıları (GEMM 0.8, FFT 0.3, doğrudan 0.3–0.6), A100 benzeri tepe ve bant genişliği; Winograd, Tensor Core, örtük GEMM ve önbellek etkileri yok. Ayrılabilir yol yalnız rank-1 filtreler için geçerli ve en iyi genel yöntem seçimine katılmıyor."
+  - id: l3
+    lab: regtile
+    title: "Yazmaç karolamalı matmul: blok ve thread karosu, doluluk ve dalgalar"
+    goal: |
+      Blok karosu, k dilimi, thread karosu, tampon sayısı ve matris boyu için fp32 matmul'un dört tavanını (tepe × gecikme gizleme, DRAM, paylaşımlı bellek) ve bariyer ve dalga verimlerini hesapla. Hangi kaynağın sınırladığını ve küçük matriste büyük karonun neden kaybettiğini gör.
+    predict:
+      q: "4096 × 4096 matriste 1 × 1 thread karosundan 8 × 8'e geçmek tahmini hızı nasıl değiştirir?"
+      options:
+        - {t: "Değiştirmez: global okumalar aynı", why: "Global trafik blok karosuna bağlı, ama darboğaz paylaşımlı bellekte."}
+        - {t: "Yaklaşık dört kat artırır", ok: true, why: "1 × 1'de paylaşımlı okuma başına yarım FMA: tepenin dörtte biri (4.1 TFLOP/s). 8 × 8'de 4 FMA/okuma: 15.7 TFLOP/s."}
+        - {t: "Azaltır: yazmaç taşar", why: "8 × 8 ≈ 104 yazmaç; taşma 16 × 16'da başlar."}
+    presets:
+      - {name: "Tipik SGEMM", params: {bt: 3, BK: 0, TM: 3, TN: 3, db: 0, logn: 12}, note: "15.7 TFLOP/s; bariyer verimi %85."}
+      - {name: "Çift tampon", params: {bt: 3, BK: 0, TM: 3, TN: 3, db: 1, logn: 12}, note: "18 TFLOP/s."}
+      - {name: "Thread karosu yok", params: {bt: 1, BK: 0, TM: 0, TN: 0, db: 0, logn: 12}, note: "4.1 TFLOP/s: paylaşımlı bellek sınırı."}
+      - {name: "1-B karo (4 × 1)", params: {bt: 2, BK: 0, TM: 2, TN: 0, db: 0, logn: 12}, note: "5.5 TFLOP/s."}
+      - {name: "Taşan yazmaçlar", params: {bt: 4, BK: 0, TM: 4, TN: 4, db: 0, logn: 12}, note: "≈ 312 yazmaç: 3.8 TFLOP/s."}
+      - {name: "Küçük matris", params: {bt: 3, BK: 0, TM: 3, TN: 3, db: 0, logn: 9}, note: "16 blok, 108 SM: 1.2 TFLOP/s."}
+    questions:
+      - q: "n = 512'de 128 × 128 blok karosu neden 32 × 32'lik karodan yavaş çıkıyor?"
+        a: "512² matris 128'lik karolarla yalnız 16 blok verir; 108 SM'nin çoğu boştur (dalga verimi %7). 32'lik karolarla 256 blok vardır ve SM'ler daha iyi dolar, ama blok başına DRAM yoğunluğu ve thread başına yeniden kullanım düşer. Küçük matrislerde cuBLAS daha küçük karolar ya da k boyutunu bölen split-K çekirdekleri seçer."
+      - q: "Thread karosunu 16 × 16'ya büyütmek paylaşımlı bellek tavanını iki kat artırırken neden toplam hızı düşürüyor?"
+        a: "Thread başına ≈ 312 yazmaç gerekir; 255 sınırını aşan kısım yerel belleğe taşar (yavaş bellek erişimleri). Ayrıca 256 thread × 255 yazmaç = 65 280: SM'ye tek blok sığar, 8 warp kalır. Gecikme gizleme zayıflar ve bariyerlerde SM boş bekler."
+    limits: "Kaba tavan modeli: yazmaç sayısı TM·TN + TM + TN + 24 tahmini, gecikme gizleme warp × ILP eşiği, taşma 0.35 katsayısı, bariyer kaybı sabit katsayılı; bank çakışması, vektörlü yükleme, L2 isabeti ve Tensor Core yok. Mutlak sayılar değil, eğilimler anlamlıdır."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: 7 × 7 filtre ve 32'lik karo
+    goal: Halo'lu karonun boyutunu ve okuma azalmasını hesaplamak
+    needs: Girdi karosu $(T+K-1)^2$
+    q: |-
+      Çıktı karosu 32 × 32, filtre 7 × 7. Girdi karosu kaç öğedir, çıktı başına kaç global okuma düşer ve doğrudan çekirdeğe göre azalma kaç kattır?
+    solution: |-
+      Girdi karosu $(32+6)^2=1444$ öğe. Çıktı başına $1444/1024=1.41$ okuma. Doğrudan çekirdek 49 okur: azalma $49/1.41=34.7$ kat (sınır 49). Paylaşımlı bellek fp32 olarak $1444\cdot4=5.6$ KB, uint8 tutulursa 1.4 KB.
+  - id: p2
+    type: hesap
+    level: 1
+    title: İntegral görüntü ve int32
+    goal: Taşma sınırını türetmek
+    needs: $N^2\cdot255\le2^{31}-1$
+    q: |-
+      8 bitlik kare bir görüntünün integral görüntüsü int32'de tutuluyor. Hiçbir görüntüde taşma olmaması için kenar uzunluğu $N$ en çok kaç olabilir?
+    answer: 2901
+    calc: "int(((2**31-1)/255)**0.5)"
+    tol: 0
+    mistakes:
+      - {answer: 4104, msg: "Bu uint32 sınırı ($2^{32}-1$)."}
+      - {answer: 46340, msg: "Piksel değeri 255'e kadar çıkabilir; $\\sqrt{2^{31}}$ değeri 1'lik pikseller içindir."}
+    hints:
+      - "En kötü durum: bütün pikseller 255; son öğe $255N^2$."
+    solution: |-
+      $N\le\sqrt{(2^{31}-1)/255}=2901.98$, yani 2901. 4096 × 4096 int32'yi aşar, uint32'ye ($N\le4104$) sığar.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Dikdörtgen thread karosu
+    goal: Paylaşımlı bellek yoğunluğunu hesaplamak
+    needs: $T_MT_N/(T_M+T_N)$
+    q: |-
+      Bir SGEMM çekirdeğinde her thread $8\times4$ çıktı hesaplıyor. Paylaşımlı bellekten okunan float başına kaç FMA yapılır?
+    answer: 2.6666667
+    calc: "8*4/(8+4)"
+    mistakes:
+      - {answer: 32, msg: "Bu FMA sayısı; okuma sayısına (8 + 4) bölünmeli."}
+      - {answer: 0.5, msg: "Bu 1 × 1 thread karosu."}
+    hints:
+      - "Her k adımında thread A'dan 8, B'den 4 float okur."
+    solution: |-
+      $32/12=2.67$ FMA/okuma; $1\times1$'e göre 5.3 kat az paylaşımlı bellek trafiği. Aynı yazmaç bütçesine yakın $6\times6$ (36/12 = 3) biraz daha iyidir: kare karolar okuma başına en çok FMA'yı verir.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: 4096² görüntüde 21 × 21 Gauss
+    goal: Evrişim yöntemini koşullara göre seçmek
+    needs: im2col belleği, ayrılabilirlik, FFT
+    q: |-
+      Ex. 4'ün GPU kısmında 4096 × 4096 uint8 görüntüye 21 × 21 Gauss filtresi uygulanacak. Hangi yolu seçersin?
+    choices:
+      - {t: "im2col + cuBLAS GEMM", why: "Sütun matrisi $4096^2\\cdot441\\cdot4$ bayt ≈ 27.6 GiB; tek kanalda GEMM'in iç boyutu yalnız 441."}
+      - {t: "Ayrılabilir iki geçiş (yatay, dikey), tercihen tek çekirdekte paylaşımlı bellekteki ara sonuçla", ok: true, why: "Gauss rank-1: piksel başına 441 yerine 42 çarpma; ara görüntü global belleğe çıkmaz."}
+      - {t: "Doğrudan çekirdek, paylaşımlı bellek yok", why: "Çıktı başına 441 global okuma; önbelleğe kalır."}
+    hints:
+      - "Gauss filtresi $g\\,g^\\top$ biçiminde mi?"
+    solution: |-
+      Gauss rank-1'dir: iki 1-B geçiş $2K=42$ çarpma yapar (10.5 kat az). Filtre genel (ayrılabilir değil) olsaydı halo'lu karolu doğrudan çekirdek ya da FFT seçilirdi. Ex. 4 keyfi filtre istediği için genel çekirdek de yazılmalı, ayrılabilir yol ayrı ölçülmelidir.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Kenarda donan matmul
+    goal: Karolu çekirdekte bariyer ve sınır denetimini doğru yerleştirmek
+    needs: "`__syncthreads()`, sınır denetimi"
+    q: |-
+      Bir öğrencinin karolu matmul çekirdeği $n$ 32'nin katıyken doğru çalışıyor; $n=1000$'de kilitleniyor ya da yanlış sonuç veriyor. Kod `if (row < n && col < n) { for (ph…) { As[ty][tx] = A[…]; Bs[ty][tx] = B[…]; __syncthreads(); for (k…) acc += …; __syncthreads(); } C[row*n+col] = acc; }` biçiminde. Sorun nedir?
+    choices:
+      - {t: "Paylaşımlı bellek dizileri yeterince büyük değil", why: "Karo boyu sabit; boyut sorunu yok."}
+      - {t: "Bariyerler koşulun içinde: kenar bloklarında matrisin dışındaki thread'ler __syncthreads()'e hiç ulaşmıyor; ayrıca bu thread'ler karonun kendi öğelerini yüklemediği için diğerleri çöp okuyor", ok: true, why: "Bir bloğun bütün thread'leri aynı bariyere ulaşmalıdır."}
+      - {t: "n = 1000 için float hassasiyeti yetmiyor", why: "Hata kilitlenme ve çöp veridir, yuvarlama değil."}
+    hints:
+      - "Son blok satırındaki row = 1010 olan thread ne yapıyor?"
+    solution: |-
+      Döngü ve bariyerler bütün thread'ler için çalışmalı. Yüklemede sınır dışı öğeler 0 yazılır (`As[ty][tx] = (row < n && ph*T+tx < n) ? A[…] : 0.f`), yalnız son yazma koşullanır: `if (row < n && col < n) C[…] = acc;`.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Winograd F(2, 3)
+    goal: Minimal filtreleme formülünü doğrulamak
+    needs: Doğrusal cebir, açma
+    q: |-
+      $m_0=(d_0-d_2)g_0$, $m_1=(d_1+d_2)\frac{g_0+g_1+g_2}2$, $m_2=(d_2-d_1)\frac{g_0-g_1+g_2}2$, $m_3=(d_1-d_3)g_2$ olmak üzere $y_0=m_0+m_1+m_2$ ve $y_1=m_1-m_2-m_3$'ün 3 katsayılı filtrenin iki çıktısını verdiğini gösterin. Çarpma sayısı nedir ve neden filtre dönüşümleri sayılmaz?
+    rubric:
+      - "m₁ + m₂'yi açıp d₁'in katsayısını g₁, d₂'ninkini g₀ + g₂ buldum"
+      - "m₀ eklenince y₀ = d₀g₀ + d₁g₁ + d₂g₂ elde ettim"
+      - "m₁ − m₂'yi açıp m₃'ü çıkararak y₁ = d₁g₀ + d₂g₁ + d₃g₂ elde ettim"
+      - "Çarpmaları 4 olarak saydım (doğrudan 6); filtre terimlerinin bir kez hesaplanıp bütün görüntüde yeniden kullanıldığını belirttim"
+    hints:
+      - "$m_1-m_2$'de $d_1$'in katsayısı $\\frac{(g_0+g_1+g_2)+(g_0-g_1+g_2)}2=g_0+g_2$."
+    solution: |-
+      $m_1+m_2=d_1g_1+d_2(g_0+g_2)$, $m_0$ ile $y_0=d_0g_0+d_1g_1+d_2g_2$. $m_1-m_2=d_1(g_0+g_2)+d_2g_1$, $m_3$'ü çıkarınca $d_1g_2$ gider ve $d_3g_2$ gelir: $y_1=d_1g_0+d_2g_1+d_3g_2$. Dört çarpma (doğrudan altı); $\frac{g_0\pm g_1+g_2}2$ yalnız filtreye bağlıdır, bir kez hesaplanır. 2-B iç içe uygulama 16'ya karşı 36 çarpma (2.25 kat).
+pitfalls:
+  - wrong: "CPU saatiyle `kernel<<<…>>>()` çağrısının süresini ölçmek çekirdeğin süresini verir."
+    right: "Başlatma eşzamansızdır; ölçülen yalnız başlatmadır. CUDA olayları (cudaEventRecord / ElapsedTime) ya da ölçümden önce cudaDeviceSynchronize gerekir; ilk çağrının bağlam ve JIT maliyeti ısınmayla dışarıda bırakılır."
+  - wrong: "GPU histogramında her thread, CPU'daki gibi bitişik bir piksel parçası işlemelidir."
+    right: "Bitişik parçalarla warp'ın thread'leri birbirinden uzak adresleri okur ve erişim birleşmez. GPU'da iç içe erişim (thread i: i, i + N_t, …) kullanılır; çakışma paylaşımlı bellekte özelleştirme ve biriktirmeyle azaltılır."
+  - wrong: "4096 × 4096 uint8 görüntünün integral görüntüsü int32'ye sığar."
+    right: "$4096^2\\cdot255=4.28\\cdot10^9>2^{31}$: int32 taşar, uint32'ye sığar; 8192² için 64 bit gerekir. Kenar sınırı int32'de 2901."
+  - wrong: "GPU matmul sonucu kütüphaneyle tutmuyorsa çekirdek hatalıdır."
+    right: "Fp32 toplama sırası farklıdır; göreli hata $\\sqrt n\\,2^{-24}$ düzeyinde beklenir. PyTorch'ta TF32 açıksa hata $10^{-4}$–$10^{-3}$'e çıkar; tamsayı girdilerde toplam $2^{24}$'ü aşınca fp32 yuvarlar. Göreli hata ve doğru veri türüyle karşılaştırılmalı."
+whatif:
+  - q: "Filtre sabit belleğe sığmayacak kadar büyükse (ör. 151 × 151 ≈ 89 KB)?"
+    a: "Filtre global bellekte `const __restrict__` işaretçiyle tutulur; salt okunur veri önbelleği (`__ldg`) aynı yayın yararının çoğunu verir. Ama bu boyutta piksel başına 22 801 çarpma vardır: FFT tabanlı evrişim çok daha ucuzdur ve işi K'dan bağımsızdır."
+  - q: "Görüntü üç kanallı (RGB, iç içe uint8) olsaydı?"
+    a: "Piksel başına 3 bayt hizasız erişim üretir (uchar3 doğal hizada değildir). Ya kanallar ayrı düzlemlere (planar) ayrılıp her biri tek kanal gibi işlenir, ya da piksel uchar4'e doldurulur. Filtre kanallar için aynıysa sabit bellekteki katsayılar üç kez yeniden kullanılır; hesap 3 kat, aktarım 3 kat büyür ve CPU–GPU kesişimi değişmez."
+  - q: "Matrisler çok küçük ama çok sayıda olsaydı (ör. 10 000 tane 32 × 32)?"
+    a: "Tek bir 32 × 32 çarpım GPU'yu doldurmaz ve başlatma maliyeti işi aşar. Toplu (batched) GEMM (`torch.bmm`, cublasSgemmStridedBatched) bütün çarpımları tek çekirdekte farklı bloklara dağıtır; her blok bir matrisi paylaşımlı bellekte tümüyle tutabilir."
