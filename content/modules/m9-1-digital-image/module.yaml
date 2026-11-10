@@ -97,3 +97,142 @@ homework:
       - "`bilinear` ve `bicubic` float32'de `cv2.resize` ile en fazla $10^{-3}$ farklı."
       - "Tam sayı küçültme oranlarında `area` yöntemi `cv2.INTER_AREA` ile en fazla $10^{-3}$ farklı."
       - "Zone-plate'te antialias'lı küçültmenin yüksek frekans enerjisi naif bilineerinkinin en az 5 katı düşük."
+
+labs:
+  - id: l1
+    lab: interp
+    title: "İnterpolasyon çekirdekleri: en yakın komşu, doğrusal, kübik"
+    goal: |
+      Örneklenmiş bir 1-B sinyali (sinüs, basamak kenarı ya da frekansı artan bir çırp) üç çekirdekle yeniden kur. Gerçek sinyale olan hatayı, kübik çekirdeğin kenarlarda ürettiği aşmayı ve örnekleme adımı çok büyüdüğünde hiçbir interpolasyonun kaybı geri getiremediğini gör.
+    predict:
+      q: "Basamak kenarında OpenCV'nin kübik çekirdeği (a = −0.75) değeri 0–1 aralığının dışına taşırır mı?"
+      options:
+        - {t: "Hayır, interpolasyon örnekler arasında kalır", why: "Kübik çekirdeğin negatif kanatları vardır."}
+        - {t: "Evet, ≈ %11 aşar", ok: true, why: "Ölçülen aşma 0.111; a = −0.5 ile 0.074. Doğrusal ve en yakın komşu hiç aşmaz."}
+        - {t: "Evet, %50'den fazla", why: "Aşma küçüktür."}
+    presets:
+      - {name: "Basamak, kübik a = −0.75", params: {sig: 1, m: 2, a: -0.75, h: 1}, note: "Aşma 0.111; RMSE: en yakın 0.105, doğrusal 0.086, kübik 0.089."}
+      - {name: "Basamak, a = −0.5", params: {a: -0.5}, note: "Aşma 0.074."}
+      - {name: "Düzgün sinüs", params: {sig: 0, m: 2}, note: "Kübik 0.018, doğrusal 0.039, en yakın 0.160: düzgün sinyalde kübik açıkça iyi."}
+      - {name: "Seyrek örnekli çırp", params: {sig: 2, h: 2}, note: "En iyi yöntemle bile RMSE 0.167: kayıp örneklemede olmuş (aliasing)."}
+    questions:
+      - q: "Kenarda aşma olmasına rağmen fotoğraf büyütmede neden çoğu zaman bikübik tercih edilir?"
+        a: "Düzgün bölgelerde (görüntünün büyük kısmı) hata belirgin biçimde küçüktür ve kenarlar daha keskin görünür; hafif aşma gözle çoğu zaman keskinlik olarak algılanır. Aşmanın sorun olduğu yerlerde (maskeler, tıbbi ölçüm) doğrusal ya da en yakın komşu seçilir."
+    limits: "1-B; 2-B bilineer/bikübik ayrılabilir uygulamadır. Kenarlarda örnekler sınıra kırpılıyor."
+  - id: l2
+    lab: fwdinv
+    title: "İleri ve ters eşleme"
+    goal: |
+      Bir test görüntüsünü merkez etrafında döndürüp ölçekle. İleri eşlemede kaç çıkış pikselinin hiç değer almadığını (delik) ve kaçına birden çok girdinin yazıldığını (çakışma) say; ters eşlemeyi en yakın komşu ve bilineer interpolasyonla karşılaştır.
+    predict:
+      q: "Ölçek 1, yalnız 45° döndürme. İleri eşleme delik bırakır mı?"
+      options:
+        - {t: "Hayır: ölçek değişmediği için her çıkış pikseli bir girdi alır", why: "Döndürülmüş ızgara çıkış ızgarasına bire bir oturmaz."}
+        - {t: "Evet, yüzlerce", ok: true, why: "48 × 48'de 321 delik ve 305 çakışma."}
+        - {t: "Yalnız köşelerde", why: "Delikler görüntünün içine dağılır."}
+    presets:
+      - {name: "İleri, büyütme", params: {th: 30, s: 1.6, m: 0, W: 48}, note: "İçerideki 2304 pikselin 1404'ü delik."}
+      - {name: "Ters, en yakın komşu", params: {m: 1}, note: "Delik ve çakışma yok; kenarlar basamaklı."}
+      - {name: "Ters, bilineer", params: {m: 2}, note: "Delik yok; kenarlar yumuşak."}
+      - {name: "İleri, küçültme", params: {m: 0, s: 0.5}, note: "Delik yok ama 588 çakışma: bilginin çoğu atılıyor."}
+      - {name: "İleri, yalnız döndürme", params: {m: 0, s: 1, th: 45}, note: "321 delik, 305 çakışma."}
+    questions:
+      - q: "İleri eşlemenin deliklerini, her girdi pikselini çıkışta birkaç piksele yayarak kapatmak iyi bir çözüm müdür?"
+        a: "Delikleri kapatır ama çakışmaları artırır ve ağırlıkları normalize etmek gerekir (splatting). Ters eşleme her çıkış pikselinin tam bir kez hesaplandığı, daha basit ve doğru yoldur; ileri eşleme yalnız dönüşümün tersi bilinmediğinde (ör. bazı optik akış uygulamaları) kullanılır."
+    limits: "Merkez etrafında döndürme + eş yönlü ölçekleme; görüntü dışı 0 ile dolduruluyor."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Depolama
+    goal: Bit derinliğiyle boyutu hesaplamak
+    needs: M · N · k bit
+    q: |-
+      1920 × 1080'lik bir RGB görüntü, kanal başına 8 bit. Kaç bayt? 10 bitlik kanallarla?
+    solution: |-
+      $1920\cdot1080\cdot3=6\,220\,800$ bayt (≈ 6.2 MB). 10 bitte $\cdot10/8=7\,776\,000$ bayt (pratikte 10 bit çoğu zaman 16 bitlik sözcüklerde saklanır: 12.4 MB).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Bilineer interpolasyon
+    goal: Dört ağırlığı uygulamak
+    needs: $(1-a)(1-b)f_{00}+a(1-b)f_{01}+(1-a)bf_{10}+abf_{11}$
+    q: |-
+      $I=\begin{bmatrix}0&100\\50&200\end{bmatrix}$ (satır $y$, sütun $x$). $I(x=0.5,\ y=0.25)$?
+    answer: 68.75
+    calc: "0.75*(0.5*0+0.5*100) + 0.25*(0.5*50+0.5*200)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 56.25, msg: "x ile y karışmış: x sütun, y satır."}
+      - {answer: 50.0, msg: "Bu yalnız üst satırın ortası."}
+    hints:
+      - "Üst satırda x = 0.5: 50; alt satırda: 125."
+    solution: |-
+      Satırlarda: $50$ ve $125$; $y=0.25$: $0.75\cdot50+0.25\cdot125=68.75$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: OpenCV piksel merkezi kuralı
+    goal: Kaynak koordinatını hesaplamak
+    needs: $x_s=(x+0.5)s-0.5$
+    q: |-
+      10 piksellik bir satır 4'e küçültülüyor ($s=2.5$). Hedef $x=3$'ün kaynak koordinatı?
+    answer: 8.25
+    calc: "(3+0.5)*2.5-0.5"
+    tol: 1e-9
+    mistakes:
+      - {answer: 7.5, msg: "Bu x·s: piksel merkezi kuralı yarım piksel kaydırır."}
+      - {answer: 9.0, msg: "Kaynak koordinatı kırpılmadan önce 8.25."}
+    hints:
+      - "$(3.5)\\cdot2.5-0.5$."
+    solution: |-
+      $3.5\cdot2.5-0.5=8.25$: kaynak pikseller 8 ile 9 arasında, 0.25 ağırlıkla.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Döndürülmüş görüntüde siyah noktalar
+    goal: İleri eşlemenin sorununu tanımak
+    needs: İleri/ters eşleme
+    q: |-
+      Bir öğrencinin yazdığı döndürme fonksiyonu her girdi pikselinin yeni konumunu hesaplayıp oraya yazıyor; sonuçta görüntünün içinde dağınık siyah noktalar var. Neden, nasıl düzeltilir?
+    choices:
+      - {t: "Yuvarlama hatası; float kullanılmalı", why: "Hangi tipte olursa olsun bazı çıkış pikselleri hiç değer almaz."}
+      - {t: "İleri eşleme delik bırakır; çıkış piksellerini tarayıp A⁻¹ ile kaynağı bulan ters eşleme kullanılmalı", ok: true, why: "Ters eşlemede her çıkış pikseli tam bir kez hesaplanır."}
+      - {t: "Döndürme açısı çok büyük", why: "Küçük açılarda da olur."}
+    hints:
+      - "Döndürülmüş ızgara çıkış ızgarasına bire bir oturur mu?"
+    solution: |-
+      Döndürülmüş girdi ızgarası çıkış ızgarasını tam örtmez: bazı pikseller boş kalır, bazılarına iki değer yazılır. Ters eşlemede her çıkış pikseli için kaynak koordinatı hesaplanıp interpolasyonla okunur.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Mesafelerin sırası
+    goal: D₈ ≤ Dₑ ≤ D₄'ü göstermek
+    needs: Metrik tanımları
+    q: |-
+      Her $p,q$ için $D_8(p,q)\le D_e(p,q)\le D_4(p,q)$ olduğunu göster; eşitliklerin ne zaman geçerli olduğunu belirt.
+    rubric:
+      - "a = |Δx|, b = |Δy| ile max(a, b) ≤ √(a² + b²) yazdım"
+      - "√(a² + b²) ≤ a + b'yi kare alarak (2ab ≥ 0) gösterdim"
+      - "Sol eşitliğin a = 0 ya da b = 0'da, sağ eşitliğin de aynı durumda geçerli olduğunu belirttim"
+      - "Bu üç metriğin birim 'çemberlerinin' kare (D₈), daire (Dₑ) ve elmas (D₄) olduğunu belirttim"
+    hints:
+      - "$a=|\\Delta x|$, $b=|\\Delta y|$."
+    solution: |-
+      $\max(a,b)=\sqrt{\max(a,b)^2}\le\sqrt{a^2+b^2}$; $(a+b)^2=a^2+b^2+2ab\ge a^2+b^2$. Eşitlikler biri sıfırken (yatay ya da dikey hizada) geçerlidir. Birim kümeler: $D_8$ için kare, $D_e$ için daire, $D_4$ için 45° dönmüş kare.
+pitfalls:
+  - wrong: "Piksel sayısı uzamsal çözünürlüktür."
+    right: "Çözünürlük ayırt edilebilen en küçük ayrıntıdır; bulanık optik ya da sıkıştırma, piksel sayısı yüksek olsa da ayrıntıyı sınırlar."
+  - wrong: "Görüntüyü döndürmek için her pikseli yeni konumuna taşımak yeter."
+    right: "İleri eşleme delik ve çakışma bırakır; ters eşleme ve interpolasyon kullanılır."
+  - wrong: "img[x, y] ile (x, y) pikseline erişilir."
+    right: "NumPy/OpenCV'de dizi img[satır, sütun] = img[y, x] diye indekslenir; Gonzalez–Woods'un (x, y) = (satır, sütun) kuralıyla karıştırılmamalıdır."
+  - wrong: "Bikübik interpolasyon değerleri her zaman komşu örnekler arasında tutar."
+    right: "Keys çekirdeğinin negatif kanatları kenarlarda aşma üretir; 8 bitlik görüntülerde sonuç 0–255'e kırpılmalıdır."
+whatif:
+  - q: "Bayer deseninde yeşil yerine kırmızı iki kat örneklenseydi?"
+    a: "Parlaklık bilgisinin çoğu yeşil kanalda taşındığı için demozaiklenen görüntünün ayrıntısı (keskinliği) azalırdı; kırmızı nesnelerde biraz daha iyi renk çözünürlüğü elde edilirdi."
+  - q: "Görüntü 1 bitle nicemlenseydi?"
+    a: "İkili (siyah-beyaz) görüntü: yalnız eşik üstü ve altı ayrılır, gri tonlar kaybolur. Titreme (dithering) gibi yöntemler gri ton izlenimini uzamsal desenle geri verir."
+  - q: "Kayıtlamada dört yerine üç bağlantı noktası olsaydı?"
+    a: "Bilineer model (8 bilinmeyen) çözülemez; afin model (6 bilinmeyen) tam olarak çözülür. Daha çok nokta varsa en küçük kareler ve aykırı eşleşmelere karşı RANSAC kullanılır."
