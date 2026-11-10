@@ -94,3 +94,161 @@ homework:
       - "Piramit yeniden kurulum hatası $<10^{-5}$ (float)."
       - "Basamak kenar profilinde aşma (overshoot) unsharp masking'in en fazla yarısı."
       - "512 × 512 gri görüntüde süre < 2 s (NumPy, vektörel)."
+
+labs:
+  - id: l1
+    lab: deriv1d
+    title: "Birinci ve ikinci fark: rampa, ince çizgi, basamak"
+    goal: |
+      Rampa, ince çizgi, basamak ve tek nokta içeren bir profilin birinci ve ikinci farkını gör. Rampa boyunca hangisinin sıfır olduğunu, çift kenarı ve sıfır geçişlerini, ince ayrıntıya yanıtların oranını ölç; sonra gürültü ekleyip türevlerin gürültüyü nasıl büyüttüğünü ve önce yumuşatmanın ne yaptığını izle.
+    predict:
+      q: "Gürültüsüz profilde, iki örnek genişliğindeki ince çizgide en büyük |f″| en büyük |f′|'nün kaç katıdır?"
+      options:
+        - {t: "Yarısı", why: "İkinci fark iki komşudan da yararlanır: tersine, daha büyük."}
+        - {t: "Aynı", why: "Basamakta öyledir (4 ve 4), ince çizgide değil."}
+        - {t: "İki katı", ok: true, why: "5 ve 10: ince çizgide iki farkın işareti zıt olduğu için ikinci farkta toplanırlar."}
+    presets:
+      - {name: "El hesabı", params: {kind: 0, noise: 0, s: 0}, note: "f′(3) = −1, f″(3) = 0, f″(1) = −1, f″(9) = −12: metindeki el hesabının aynısı."}
+      - {name: "Gürültüsüz profil", params: {kind: 1, noise: 0, s: 0}, note: "Rampada |f′| = 0.6, |f″| = 0; ince çizgide 5 ve 10, basamakta 4 ve 4."}
+      - {name: "Gürültü 0.3", params: {kind: 1, noise: 0.3, s: 0}, note: "f″ gürültüyle doluyor: rampada 0 yerine 1.18; güçlü sıfır geçişi 5'ten 36'ya çıkıyor."}
+      - {name: "Gürültü 0.3, önce σ = 2", params: {kind: 1, noise: 0.3, s: 2}, note: "Sıfır geçişi 7'ye iniyor ama ince çizgi yayılıyor: |f″|/|f′| oranı 2'den 0.75'e düşüyor."}
+    questions:
+      - q: "Basamakta neden |f′| ile |f″| eşit (4 ve 4), ince çizgide neden değil?"
+        a: "Basamakta tek bir sıçrama var: birinci fark bir kez 4, ikinci fark sıçramanın iki yanında +4 ve −4 olur. İnce çizgide çıkış ve iniş bitişik: ikinci fark f(x+1) − f(x) ile f(x) − f(x−1)'in farkıdır ve zıt işaretli bu iki değer toplanarak 2 kat yanıt verir."
+    limits: "1-B, tek bir el yapımı profil; 2-B'de Laplasyen iki eksenin toplamıdır ve köşelerde ayrıca yanıt verir."
+  - id: l2
+    lab: sharpen1d
+    title: "Laplasyen mi, keskinliği azaltılmış maskeleme mi?"
+    goal: |
+      Bulanık bir basamak kenarını iki yöntemle keskinleştir: 3 noktalı Laplasyen (g = f − c·f″) ve keskinliği azaltılmış maskeleme/highboost (g = f + k(f − bulanık)). Kenar genişliğini (gürültüsüz kopyada), aşmayı (hale) ve düz bölgedeki gürültü std'sini karşılaştır.
+    predict:
+      q: "Varsayılan bulanıklıkta iki yöntem de kenarı 6'dan 4 örneğe indirirken (Laplasyen c = 1, maskeleme k = 1), hangisi gürültüyü daha çok büyütür?"
+      options:
+        - {t: "Laplasyen", ok: true, why: "×3.3 (0.0087 → 0.029); maskeleme ×1.8 (→ 0.0158). Maske bulanıklaştırmadan geçtiği için en yüksek frekansları daha az yükseltir."}
+        - {t: "Maskeleme", why: "Maskeleme, kendi bulanıklaştırması yüzünden daha az büyütür."}
+        - {t: "Eşit", why: "Kenar dikliği aynı olsa da frekans yanıtları farklıdır."}
+    presets:
+      - {name: "Klasik maskeleme k = 1", params: {m: 1, k: 1, s: 2, blur: 2, noise: 0.01}, note: "Kenar 6 → 4 örnek, aşma 0.019, gürültü 0.0087 → 0.0158."}
+      - {name: "Highboost k = 2.5", params: {m: 1, k: 2.5, s: 2}, note: "Kenar 6 → 2, ama aşma 0.079'a (hale) ve gürültü 0.027'ye çıkıyor."}
+      - {name: "Laplasyen c = 1", params: {m: 0, k: 1}, note: "Kenar 6 → 4, aşma çok küçük (0.004), ama gürültü 0.029 (×3.3)."}
+      - {name: "Laplasyen c = 3", params: {m: 0, k: 3}, note: "Kenar 6 → 2, aşma 0.045, gürültü 0.072 (×8.3)."}
+      - {name: "Geniş maske σ = 4", params: {m: 1, k: 1, s: 4}, note: "Kenar 6 → 2 ama aşma 0.084: geniş maske hale'yi de genişletir; gürültü yalnız 0.0165."}
+    questions:
+      - q: "Geniş maskeli (σ = 4) k = 1 maskeleme, k = 2.5 highboost'la aynı kenar dikliğini verirken neden gürültüyü çok daha az büyütüyor?"
+        a: "Gürültü en yüksek frekanslardadır; maskenin bu frekanslardaki kazancı ≈ k'dır, σ'dan bağımsız. Kenar ise orta frekanslarda yaşar ve geniş σ, maskenin orta frekanslardaki kazancını artırır. Bedeli daha geniş ve belirgin bir hale'dir."
+    limits: "1-B tek kenar, Gauss bulanıklık ve beyaz gürültü; kırpma (0–1) uygulanmıyor."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Rampa ve basamakta farklar
+    goal: Birinci ve ikinci farkı elle almak
+    needs: $f(x+1)-f(x)$ ve $f(x+1)+f(x-1)-2f(x)$
+    q: |-
+      $f=(0,0,2,4,6,6,6,0,0)$. Birinci ve ikinci farkları yaz; rampa içinde, rampanın uçlarında ve basamakta ne görüyorsun?
+    solution: |-
+      Birinci fark ($x=0..7$): $(0,2,2,2,0,0,-6,0)$: rampa boyunca sabit 2, basamakta −6. İkinci fark ($x=1..7$): $(2,0,0,-2,0,-6,6)$: rampa içinde 0, rampanın başında +2, sonunda −2 (çift kenar); basamakta −6 ve +6, arada sıfır geçişi.
+  - id: p2
+    type: hesap
+    level: 1
+    title: 8-komşulu Laplasyenle keskinleştirme
+    goal: Merkez katsayısı ve işaret kuralını uygulamak
+    needs: $\nabla^2f=\sum_{8\text{ komşu}}f-8f(x,y)$, $g=f-\nabla^2f$
+    q: |-
+      Parça $\begin{bmatrix}10&10&10\\10&50&10\\10&10&10\end{bmatrix}$. 8-komşulu (negatif merkezli) Laplasyenle keskinleştirilmiş merkez değeri $g$, 8 bite kırpmadan önce?
+    answer: 370
+    calc: "50-(80-8*50)"
+    tol: 0
+    mistakes:
+      - {answer: -270, msg: "Negatif merkezli çekirdekte Laplasyen çıkarılır (c = −1), eklenmez."}
+      - {answer: 210, msg: "Bu 4-komşulu sonuç; 8 komşuda Laplasyen −320."}
+      - {answer: 255, msg: "Soru kırpmadan önceki değeri istiyor."}
+    hints:
+      - "$\\nabla^2f=80-400$."
+    solution: |-
+      $\nabla^2f=8\cdot10-8\cdot50=-320$, $g=50+320=370$; 8 bitte 255'e kırpılır. 8-komşulu çekirdek tek noktaya 4-komşulunun iki katı yanıt verir.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Highboost
+    goal: Maske formülünü uygulamak
+    needs: $g=f+k(f-\bar f)$
+    q: |-
+      Bir pikselde $f=120$, bulanık değer $\bar f=100$. $k=3$ highboost çıkışı?
+    answer: 180
+    calc: "120+3*(120-100)"
+    tol: 0
+    mistakes:
+      - {answer: 60, msg: "Maske f − bulanık, bulanık − f değil."}
+      - {answer: 140, msg: "Bu k = 1 (klasik maskeleme)."}
+    hints:
+      - "Maske 20."
+    solution: |-
+      $g_{\text{mask}}=20$, $g=120+3\cdot20=180$.
+  - id: p4
+    type: hesap
+    level: 2
+    title: L1 yaklaşımının hatası
+    goal: "|g_x| + |g_y| yaklaşımının izotropiyi nasıl bozduğunu görmek"
+    needs: $M=\sqrt{g_x^2+g_y^2}$, $M_1=|g_x|+|g_y|$
+    q: |-
+      Aynı büyüklükte (1) bir gradyan önce $x$ ekseni boyunca, sonra 45°'de duruyor. 45°'deki $M_1$ değeri $x$ eksenindekinin kaç katıdır? (3 basamak)
+    answer: 1.414
+    calc: "round(2/sqrt(2), 3)"
+    tol: 0.001
+    mistakes:
+      - {answer: 1.0, msg: "Bu tam büyüklük M için doğru; L1 yaklaşımı değil."}
+      - {answer: 2.0, msg: "45°'de bileşenler 1/√2'dir, 1 değil."}
+    hints:
+      - "45°'de $g_x=g_y=1/\\sqrt2$."
+    solution: |-
+      Eksen boyunca $M_1=1$; 45°'de $M_1=2/\sqrt2=\sqrt2\approx1.414$. Çapraz kenarlar %41 daha güçlü görünür: göreli değişimler korunur ama izotropi bozulur.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Keskinleştirilmiş fotoğrafta beyaz çerçeveler
+    goal: Hale'yi tanımak
+    needs: Keskinliği azaltılmış maskeleme
+    q: |-
+      Bir fotoğrafa $\sigma=8$, $k=2$ ile keskinliği azaltılmış maskeleme uygulanıyor. Koyu binaların gökyüzüne bakan kenarlarında birkaç piksel genişliğinde parlak şeritler, gökyüzünün binaya bitişik kısmında ise koyu bir bant beliriyor. Neden?
+    choices:
+      - {t: "JPEG sıkıştırma kusuru", why: "Şeritler kenar boyunca düzgün ve σ ile ölçekleniyor; blok yapısı yok."}
+      - {t: "Aşma (hale): maske kenarın iki yanında zıt işaretlidir; büyük σ hale'yi genişletir, büyük k yükseltir", ok: true, why: "Lab l2'de σ = 4'te aşma 0.084, k = 2.5'te 0.079."}
+      - {t: "Gürültü yükseltmesi", why: "Gürültü rastgele dağılır; burada desen kenara bağlı ve sistematik."}
+    hints:
+      - "Maske $f-\\bar f$ bir kenarın iki yanında hangi işareti alır?"
+    solution: |-
+      Kenarın parlak tarafında $f>\bar f$, koyu tarafında $f<\bar f$: maske parlağı daha parlak, koyuyu daha koyu yapar. Bu bölgenin genişliği maskenin σ'sı kadardır. Çözüm daha küçük σ, daha küçük k ya da kenar korumalı bir bulanıklaştırma (ör. ikili süzgeç) kullanmaktır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Gradyan büyüklüğü ve Laplasyen dönmeyle değişmez
+    goal: İzotropiyi sürekli durumda göstermek
+    needs: Zincir kuralı, dönme matrisi
+    q: |-
+      $x=x'\cos\theta-y'\sin\theta$, $y=x'\sin\theta+y'\cos\theta$ dönmesi altında (a) $\|\nabla f\|$'nin, (b) $\nabla^2f$'nin değişmediğini göster. Bileşenler $g_x$, $g_y$ neden değişmez değil?
+    rubric:
+      - "∂f/∂x′ = g_x cosθ + g_y sinθ, ∂f/∂y′ = −g_x sinθ + g_y cosθ yazdım"
+      - "Kareler toplamında çapraz terimlerin sadeleştiğini ve cos² + sin² = 1 ile g_x² + g_y² kaldığını gösterdim"
+      - "İkinci türevler için aynı hesabı yapıp f_x′x′ + f_y′y′ = f_xx + f_yy elde ettim (karışık terimler sadeleşir)"
+      - "Bileşenlerin dönme ile karıştığını, yani tek başlarına yöne bağlı olduğunu belirttim"
+    hints:
+      - "Gradyan bir vektör gibi dönüşür: $\\nabla'f=R^\\top\\nabla f$."
+    solution: |-
+      Zincir kuralıyla $\nabla'f=R^\top\nabla f$, $R$ ortogonal: $\|\nabla'f\|=\|\nabla f\|$. Hessian $H'=R^\top HR$ ve iz benzerlik dönüşümüyle değişmez: $\operatorname{tr}H'=\operatorname{tr}H$, yani $\nabla^2f$ değişmez. Bileşenler ise $R^\top$ ile karışır. Ayrık çekirdekler bu özelliği yalnız belirli açılarda korur (4-komşulu 90°, 8-komşulu 45°).
+pitfalls:
+  - wrong: "Laplasyen görüntüsünü her zaman özgüne eklerim."
+    right: "İşaret çekirdeğe bağlı: merkez katsayısı negatifse (−4, −8) Laplasyen çıkarılır (c = −1); eklenirse görüntü bulanıklaşır."
+  - wrong: "Laplasyen sonucunu doğrudan uint8'e çeviririm."
+    right: "Negatif değerler kaybolur ya da sarar. CV_32F/CV_16S ile hesaplayıp gösterim için min–max ölçekleme ya da mutlak değer kullanılmalıdır."
+  - wrong: "|g_x| + |g_y|, büyüklükle aynı şeydir."
+    right: "Yalnız eksenler boyunca; 45°'de √2 kat fazla verir. Göreli sıralamayı korur ama izotropik değildir."
+  - wrong: "Keskinleştirme ayrıntı ekler."
+    right: "Var olan yüksek frekansları yükseltir; bulanıklıkta kaybolmuş bilgiyi geri getirmez. Gürültü de aynı oranda yükselir."
+whatif:
+  - q: "Laplasyen keskinleştirmeden önce görüntü Gauss ile yumuşatılsa?"
+    a: "Bu, Gauss'un Laplasyeni (LoG) ile keskinleştirmedir: gürültü daha az yükselir, ince ayrıntı da daha az vurgulanır. Gauss farkı (DoG) bunun bir yaklaşımıdır; keskinliği azaltılmış maskeleme de aynı aileden (M9.6)."
+  - q: "Maske bulanıklaştırması yerine medyan kullanılsa?"
+    a: "f − medyan, ince çizgi ve noktalarda büyük, kenarlarda küçüktür (medyan kenarları korur): hale azalır ve keskinleştirme ince ayrıntıya yoğunlaşır, ama darbe gürültüsü de güçlü biçimde vurgulanır."
+  - q: "Sobel'in merkez ağırlığı 2 yerine 1 olsa?"
+    a: "Prewitt işlemcisi elde edilir: dik yöndeki yumuşatma daha zayıftır, gürültüye biraz daha duyarlıdır ve yön tahmini daha az doğrudur. Scharr (3, 10, 3) tam tersine yön doğruluğunu en iyileyen ağırlıkları seçer."
