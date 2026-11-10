@@ -102,3 +102,186 @@ homework:
       - "İki thread farklı çekirdeklere sabitlenmeli (`pthread_setaffinity_np`)."
     accept:
       - "(a) ve (b)'de ihlal gözlenir, (c)'de gözlenmez."
+
+labs:
+  - id: l1
+    lab: interleave
+    title: "Kayıp güncellemeler: veri yarışı ve yarış koşulu"
+    goal: |
+      T thread paylaşılan bir sayacı n kez artırıyor. Korumasız oku–artır–yaz, "atomik oku + atomik yaz" ve bölünmez fetch_add sürümlerini rastgele bir önalımlı zamanlayıcıyla 1000 kez çalıştır; sonuç dağılımını, kayıp güncellemeleri ve önalım olasılığının etkisini ölç. 2 thread × 1 artırım için bütün iç içe geçmeler tam sayılır.
+    predict:
+      q: "Okuma ve yazma ayrı ayrı atomik yapılırsa (arada yerel artırma) kayıp güncellemeler ne olur?"
+      options:
+        - {t: "Kaybolur; artık veri yarışı yok", why: "Veri yarışı gerçekten yok, ama oku ile yaz arasında başka bir thread yazabilir."}
+        - {t: "Korumasız sürümle aynı dağılımda sürer", ok: true, why: "Yarış koşulu bölünmez olmayan oku–değiştir–yaz bütününden gelir: ortalama kayıp yine 30."}
+        - {t: "Azalır ama sıfırlanmaz", why: "Zamanlama aynı kaldıkça atomik tek tek erişimler sonucu değiştirmez."}
+    presets:
+      - {name: "Korumasız, 2 × 50", params: {mode: 0, T: 2, n: 50, q: 0.05}, note: "Doğru oranı 0.044, ortalama kayıp 30."}
+      - {name: "Atomik oku + yaz", params: {mode: 1, T: 2, n: 50, q: 0.05}, note: "Aynı: yarış koşulu sürüyor."}
+      - {name: "fetch_add", params: {mode: 2, T: 2, n: 50, q: 0.05}, note: "Her çalıştırmada 100."}
+      - {name: "Seyrek önalım", params: {mode: 0, T: 2, n: 50, q: 0.001}, note: "%96 doğru: hata nadir, test onu kaçırır."}
+      - {name: "Sık önalım", params: {mode: 0, T: 2, n: 50, q: 0.9}, note: "Hiç doğru yok, ortalama kayıp 42."}
+      - {name: "8 thread", params: {mode: 0, T: 8, n: 50, q: 0.05}, note: "400 yerine ortalama 114."}
+      - {name: "Tek artırım", params: {mode: 0, T: 2, n: 1, q: 0.05}, note: "%95.5 doğru; tam sayımda 20 sıranın 2'si doğru."}
+    questions:
+      - q: "Önalım seyrekken korumasız sayaç çalıştırmaların %96'sında doğru sonuç veriyor. Bu, kodun 'çoğunlukla doğru' olduğu anlamına gelir mi?"
+        a: "Hayır. Gerçek bir makinede önalım olasılığı yük, çekirdek sayısı ve frekans ölçeklemeyle değişir; geliştirici makinesinde hiç görülmeyen hata üretimde sık görülebilir. Üstelik C++'ta bu bir veri yarışıdır: derleyici sayacı yazmaçta tutup döngü sonunda tek seferde yazabilir ve sonuç burada ölçülenden çok daha kötü olabilir. Doğruluk test sıklığıyla değil, eşzamanlama ile güvence edilir."
+    limits: "Sıralı tutarlı bellek modeli (yazma tamponu yok); zamanlayıcı adım başına önalım; derleyici eniyilemeleri modellenmiyor."
+  - id: l2
+    lab: deadlock
+    title: "Kilitlenme, livelock ve açlık: yemek yiyen filozoflar"
+    goal: |
+      Halkadaki N thread, iki komşu kilidi birlikte tutarak "yer". Önce sol / sonra sağ, küresel kilit sırası, try_lock + sabit geri çekilme ve try_lock + rastgele geri çekilme stratejilerini karşılaştır; kilitlenme anını, toplam yemeği, thread başına dağılımı ve boşa harcanan adımları ölç. Süre sapması sıfırken thread'ler tam eşzamanlıdır.
+    predict:
+      q: "Tam eşzamanlı thread'lerde 'try_lock + sabit geri çekilme' ne yapar?"
+      options:
+        - {t: "Kilitlenmeyi önler ve normal yemek yenir", why: "Kilitlenme yok, ama hepsi aynı anda alıp aynı anda bırakıyor."}
+        - {t: "Livelock: kimse bloklu değil ama hiç yemek yenmiyor", ok: true, why: "Zamanın %99.5'i geri çekilme ve başarısız denemede; rastgele geri çekilme simetriyi kırıp 360 yemek veriyor."}
+        - {t: "Önce sol stratejisi gibi kilitlenir", why: "try_lock başarısız olunca sol kilit bırakılıyor: döngüsel bekleme oluşmuyor."}
+    presets:
+      - {name: "Önce sol, eşzamanlı", params: {strat: 0, N: 5, jit: 0, think: 10, eat: 10}, note: "10. adımda kilitlenme."}
+      - {name: "Önce sol, rastgele", params: {strat: 0, N: 5, jit: 0.5, think: 10, eat: 10}, note: "Bu tohumda kilitlenme yok ama 211 yemek: sol kilidi tutarak beklemek eşzamanlılığı düşürüyor."}
+      - {name: "Küresel sıra", params: {strat: 1, N: 5, jit: 0.5, think: 10, eat: 10}, note: "Kilitlenme yok, 362 yemek."}
+      - {name: "Sabit geri çekilme, eşzamanlı", params: {strat: 2, N: 5, jit: 0, think: 10, eat: 10}, note: "Livelock: 0 yemek."}
+      - {name: "Rastgele geri çekilme, eşzamanlı", params: {strat: 3, N: 5, jit: 0, think: 10, eat: 10}, note: "360 yemek."}
+      - {name: "İki filozof", params: {strat: 0, N: 2, jit: 0.5, think: 10, eat: 10}, note: "1067. adımda kilitlenme: olasılıksal."}
+    questions:
+      - q: "Önce sol stratejisi rastgele sürelerle bu tohumda kilitlenmedi. Neden yine de yanlıştır?"
+        a: "Kilitlenme olasılıksaldır: döngüsel beklemenin dört koşulu yapısal olarak sağlanıyor; yalnız bütün thread'lerin aynı anda sol kilidi tutması gerekiyor. Uzun çalışan bir sistemde bu er ya da geç olur (iki filozofla 1067. adımda oldu). Küresel kilit sırası ise döngüyü yapısal olarak imkânsız kılar."
+    limits: "Zaman adımlı simülasyon, 2000 adım; aynı kilit için eşzamanlı isteklerde rastgele kazanan; işletim sistemi zamanlaması ve öncelikler yok."
+  - id: l3
+    lab: prodcons
+    title: "Üretici–tüketici: sınırlı tampon, meşgul bekleme ve sonlandırma"
+    goal: |
+      P üretici ve C tüketici, B yuvalı bir tampon üzerinden 200 öğe alışverişi yapıyor. Tampon doluluğunu ve bekleyen thread'leri izle; bloklayan semafor ile meşgul beklemenin CPU maliyetini, zehirli hap ile paylaşılan bayrakla sonlandırmanın farkını ölç.
+    predict:
+      q: "Tüketiciler üreticilerden hızlıyken sonlandırma paylaşılan bir bayrakla yapılırsa ne olur?"
+      options:
+        - {t: "Bütün tüketiciler bayrağı görüp çıkar", why: "Boş tamponda semaforda uyuyan bir tüketici bayrağa hiç bakmaz."}
+        - {t: "Bazı tüketiciler semaforda sonsuza dek bloklu kalır", ok: true, why: "Bu tohumda 1 tüketici takılı kalıyor; 6 tüketiciyle 2. Zehirli hap her tüketiciyi uyandırır."}
+        - {t: "Üreticiler bloklanır", why: "Üreticiler işini bitirmiştir; sorun bekleyen tüketicilerde."}
+    presets:
+      - {name: "Zehirli hap", params: {P: 2, C: 3, B: 8, tp: 1, tc: 0.5, wait: 0, term: 0}, note: "Bütün tüketiciler çıktı; bloklu bekleme 159 thread·birim."}
+      - {name: "Bayrak", params: {P: 2, C: 3, B: 8, tp: 1, tc: 0.5, wait: 0, term: 1}, note: "1 tüketici takılı."}
+      - {name: "Meşgul bekleme + bayrak", params: {P: 2, C: 3, B: 8, tp: 1, tc: 0.5, wait: 1, term: 1}, note: "Bayrak görülüyor ama 159 thread·birim CPU boşa."}
+      - {name: "Tek yuvalı tampon", params: {P: 2, C: 3, B: 1, tp: 1, tc: 1.5, wait: 0, term: 0}, note: "Verim 1.6'ya düşüyor; üreticiler sık bekliyor."}
+      - {name: "Büyük tampon", params: {P: 2, C: 3, B: 64, tp: 1, tc: 1.5, wait: 0, term: 0}, note: "Verim 1.95 ≈ sınır 2."}
+      - {name: "Tek tüketici", params: {P: 2, C: 1, B: 8, tp: 1, tc: 1.5, wait: 0, term: 0}, note: "Darboğaz tüketici: verim ≈ 0.7."}
+    questions:
+      - q: "Tampon boyunu artırmak verimi neden ancak bir yere kadar artırıyor?"
+        a: "Verimin üst sınırı min(P/tp, C/tc)'dir: tampon yalnız iki tarafın anlık hız dalgalanmalarını emer. Rastgele süreler yüzünden kısa süreli dengesizlikler bir tarafın beklemesine yol açar; büyük tampon bunları yumuşatır (1 yuvada 1.6, 64 yuvada 1.95), ama ortalama hızı yavaş taraf belirler."
+    limits: "Zaman adımlı simülasyon (dt = 0.02); kilitlerin kendi maliyeti ve bağlam değiştirme yok; bayrak sürümünde bekleyenler uyandırılmıyor (sorunu göstermek için)."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: İç içe geçmeleri saymak
+    goal: Kayıp güncellemenin kombinatoriğini görmek
+    needs: $\binom{2k}{k}$
+    q: |-
+      İki thread'in her biri `x = x + 1`'i üç adımda yapıyor (oku, artır, yaz); başta x = 0. Kaç iç içe geçme var, kaçı x = 2 bırakır?
+    solution: |-
+      $\binom63=20$ sıra. x = 2 için bir thread'in yazması ötekinin okumasından önce olmalı: yalnız AAABBB ve BBBAAA. 18 sıra bir güncellemeyi kaybeder. İki adımlı modelde (LOAD, STORE+1) $\binom42=6$ sıranın 4'ü kaybeder.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Dört adımlı iç içe geçmeler
+    goal: Sıra sayısının büyümesini hesaplamak
+    needs: $\binom{2k}{k}$
+    q: |-
+      İki thread'in her biri 4 adımlık bir dizi yürütüyor (her thread kendi sırasını koruyor). Kaç farklı iç içe geçme vardır?
+    answer: 70
+    calc: "math.comb(8,4)"
+    tol: 0
+    mistakes:
+      - {answer: 40320, msg: "8! bütün sıralamalardır; her thread'in kendi sırası korunur."}
+      - {answer: 16, msg: "2⁴ değil: 8 konumdan 4'ü birinci thread'e seçilir."}
+    hints:
+      - "8 konumdan birinci thread'in 4 adımının yerlerini seç."
+    solution: |-
+      $\binom84=70$. Her thread 10 adımda $\binom{20}{10}=184\,756$: elle denetlemek olanaksız.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Sayan semaforun durumu
+    goal: P ve V işlemlerinin sayaca etkisini izlemek
+    needs: P → C−1 (negatifse blokla), V → C+1
+    q: |-
+      Bir sayan semafor C = 3 ile başlıyor. Beş thread art arda acquire (P) çağırıyor, sonra bir thread release (V) çağırıyor. C'nin son değeri (negatifse bekleyen sayısının eksiğidir)?
+    answer: -1
+    calc: "3-5+1"
+    tol: 0
+    mistakes:
+      - {answer: 0, msg: "Sayaç sıfırda kırpılmaz: negatif değer bekleyen thread sayısını gösterir."}
+      - {answer: 2, msg: "Bloklanan iki thread de sayacı azalttı."}
+    hints:
+      - "Üç thread geçer, iki thread bloklanır (C = −2); V birini uyandırır."
+    solution: |-
+      $3-5=-2$ (iki bekleyen), $-2+1=-1$: biri uyandı, biri hâlâ bekliyor.
+  - id: p4
+    type: hesap
+    level: 1
+    title: Sahte paylaşımı önlemek
+    goal: Önbellek satırı dolgusunu hesaplamak
+    needs: 64 baytlık satır, alignas
+    q: |-
+      8 thread'in her biri kendi 8 baytlık sayacını sık sık artırıyor. Sayaçlar bitişik bir dizideyse hepsi tek bir 64 baytlık önbellek satırını paylaşır. Her sayacı kendi satırına koymak (`alignas(64)`) için dizinin toplam boyutu kaç bayt olur?
+    answer: 512
+    calc: "8*64"
+    tol: 0
+    mistakes:
+      - {answer: 64, msg: "Bu dolgusuz dizi: sekizi de aynı satırda."}
+      - {answer: 72, msg: "Her sayaç kendi 64 baytlık satırını kaplar."}
+    hints:
+      - "Her eleman 64 bayta dolgulanır."
+    solution: |-
+      $8\cdot64=512$ bayt. Veri paylaşılmasa bile aynı satıra yazan çekirdekler satırı birbirinden geri çeker (MESI geçersizleştirmeleri); dolgu bunu önler. C++17'de `std::hardware_destructive_interference_size`.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Release derlemesinde donan program
+    goal: Veri yarışının derleyiciyle etkileşimini tanımak
+    needs: Veri yarışı, eniyileme, atomic
+    q: |-
+      Bir işçi thread `while (!done) { iş(); }` döngüsünde çalışıyor; ana thread bir süre sonra `done = true;` yazıyor (`bool done` sıradan bir küresel değişken). Hata ayıklama derlemesinde program düzgün bitiyor, `-O2` ile işçi hiç durmuyor. Neden ve çözüm?
+    choices:
+      - {t: "Önbellek tutarsızlığı; bayrağın önbellekten silinmesi için sleep eklenmeli", why: "Önbellekler eşevrelidir; sorun derleyicide."}
+      - {t: "Veri yarışı tanımsız davranış: derleyici done'ın döngüde değişmediğini varsayıp okumayı döngü dışına taşıdı; done std::atomic<bool> olmalı", ok: true, why: "SC-DRF: yarışsız programda okuma her turda yapılır ve yazma görünür."}
+      - {t: "done volatile yapılmalı", why: "volatile okumayı korur ama atomiklik ve sıralama vermez; hâlâ veri yarışıdır."}
+    hints:
+      - "Derleyici tek thread'li anlamı koruyarak neyi yapabilir?"
+    solution: |-
+      Derleyici `iş()`'in done'ı değiştirmediğini görürse okumayı döngü dışına çıkarır (`if (!done) while (true) iş();`). Bu, veri yarışı olmayan bir programda geçerli bir dönüşümdür. `std::atomic<bool> done` her turda gerçek bir okuma ve ana thread'in yazmasının görünmesini güvence eder.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Kilit sıralaması kilitlenmeyi önler
+    goal: Döngüsel beklemenin imkânsızlığını kanıtlamak
+    needs: Bekleme grafiği, toplam sıra
+    q: |-
+      Kilitlere bir toplam sıra verildiğini ve her thread'in birden çok kilidi yalnız artan sırada aldığını varsayın. Hiçbir zaman kilitlenme olamayacağını kanıtlayın.
+    rubric:
+      - "Kilitlenmeyi bekleme grafiğinde bir döngü olarak ifade ettim"
+      - "Döngüdeki her thread'in tuttuğu en büyük kilitten büyük bir kilidi beklediğini gösterdim"
+      - "Döngü boyunca kilitlerin kesin artan bir dizi oluşturup kendine döndüğü çelişkisini kurdum"
+      - "Diğer üç Coffman koşulunun sağlansa bile döngüsüz kilitlenme olamayacağını belirttim"
+    hints:
+      - "Thread $T_i$'nin beklediği kilit, tuttuğu bütün kilitlerden büyüktür."
+    solution: |-
+      Bkz. derste "Kilitlenmenin dört koşulu ve kilit sıralaması" türetimi.
+pitfalls:
+  - wrong: "Sonlandırma bayrağını volatile yapmak thread'ler arası görünürlüğü sağlar."
+    right: "C/C++'ta volatile atomiklik ve sıralama vermez; bir thread'in yazıp ötekinin okuduğu volatile değişken hâlâ veri yarışıdır. std::atomic<bool> kullanılmalı."
+  - wrong: "Okumayı ve yazmayı ayrı ayrı atomik yapmak yarışı giderir."
+    right: "Veri yarışını giderir, yarış koşulunu gidermez: oku–değiştir–yaz bütünü bölünmez olmalı (fetch_add ya da kilit). Lab l1'de iki sürüm aynı kayıpları veriyor."
+  - wrong: "Doğruluk için her eleman güncellemesini kilitle korumak iyi bir yoldur."
+    right: "Kritik bölge her elemanda girilirse thread'ler sıraya girer ve kilit maliyeti eklenir: program sıralıdan yavaşlar. Thread'e özel yerel toplam + sonda tek kilitli birleştirme kullanılır."
+  - wrong: "Koşul değişkeninde `if (koşul yok) cv.wait(lock);` yeterlidir."
+    right: "Lampson–Redell monitörlerinde uyanan thread çalışana kadar koşul yeniden bozulabilir ve sahte uyanmalar olur: bekleme `while` ile (ya da wait(lock, pred)) yapılır."
+whatif:
+  - q: "Banka monitöründe deposit notify_all yerine notify_one çağırsa?"
+    a: "Bekleyen birden çok çekme varsa yalnız biri uyanır; o da bakiyeyi yetersiz bulup yeniden uyursa, bakiyenin karşılayabileceği başka bir çekme hiç uyanmaz (kaybolan uyanma). notify_one yalnız her sinyalin tam bir bekleyeni ilerletebildiği durumlarda (ör. sayan bir kaynak) güvenlidir."
+  - q: "N üretici ve M tüketici görevi N + M'den az thread'li bir havuzda çalıştırılsa?"
+    a: "Bloklanan görevler thread'leri tutar: tampon doluyken bütün thread'ler üreticilerle dolarsa tüketici görevleri hiç çalışamaz ve tampon hiç boşalmaz: havuz düzeyinde kilitlenme. Çözüm bloklamayan görevler (iş yoksa görevi kuyruğa geri koymak), ayrı havuzlar ya da fiber/eşyordam tabanlı bekleme."
+  - q: "std::async varsayılan politikayla çağrılsa ve sonuçlar hemen get() ile alınmasa?"
+    a: "Varsayılan politika async | deferred'dır; kütüphane deferred seçerse hiçbir thread açılmaz ve fonksiyon get() çağrısında, çağıran thread'de çalışır: paralellik kaybolur. Paralellik isteniyorsa launch::async açıkça verilmelidir."
