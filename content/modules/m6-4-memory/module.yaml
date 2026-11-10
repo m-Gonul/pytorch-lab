@@ -76,3 +76,143 @@ homework:
     accept:
       - "Bellek–k grafiği kuramla uyumlu."
       - "√n seçiminde ek hesap ≈ bir ileri geçiş."
+
+labs:
+  - id: l1
+    lab: ckptsim
+    title: "Checkpointing: bellek zaman çizelgesi ve √n kuralı"
+    goal: |
+      n katmanlı bir zincirde segment uzunluğu k ile checkpointing'i benzet. İleri geçişte birikim, geri geçişte her segmentin yeniden hesaplanması ve serbest bırakılmasıyla belleğin adım adım nasıl değiştiğini gör. Tepeyi ve yeniden hesap sayısını k'ya göre tara, en iyi k'yı √n ile karşılaştır.
+    predict:
+      q: "64 katman, her biri 1 birim. En iyi k ile tepe bellek kabaca kaç birim olur?"
+      options:
+        - {t: "≈ 64", why: "Bu checkpoint'siz durum."}
+        - {t: "≈ 16", ok: true, why: "k ≈ √64 = 8 civarında n/k + k − 1 ≈ 15; ölçülen en iyi (k = 6): 15 birim."}
+        - {t: "≈ 1", why: "Geri geçişte en az bir segmentin iç çıktıları ve segment sonları bellekte durmalı."}
+    presets:
+      - {name: "El hesabı", params: {n: 16, k: 4, kind: 0, unit: 64}, note: "Tepe 7 birim (checkpoint'siz 16), yeniden hesap 12 katman."}
+      - {name: "Checkpoint yok", params: {k: 1}, note: "Tepe 16, yeniden hesap 0."}
+      - {name: "Tek dev segment", params: {k: 16}, note: "Tepe yine 16: geri geçişte bütün zincir yeniden hesaplanır ve bellekte durur; 15 katman yeniden hesaplanır."}
+      - {name: "64 katman, k = 8", params: {n: 64, k: 8}, note: "Tepe 15 (64 yerine), yeniden hesap 56 katman (≈ bir ileri geçiş)."}
+      - {name: "Farklı boyutlar", params: {kind: 1}, note: "Dönüşümlü 3 ve 1 birim: k = 4'te tepe 11 (32 yerine); en iyi k = 2."}
+    questions:
+      - q: "Yeniden hesap neden en fazla bir ileri geçiş kadardır, k ne olursa olsun?"
+        a: "Her katman geri geçişte en fazla bir kez yeniden hesaplanır (segment sonları hiç). Toplam n − n/k < n katman. Özyinelemeli checkpointing'de bu sınır aşılır: bellek O(log n)'ye iner, hesap O(n log n)'ye çıkar."
+    limits: "Katman çıktıları birim boyutlu ya da iki boyut; gradyan tamponları ve parametre belleği dahil değil. Tepe tanımı aşama b'dekiyle aynı."
+  - id: l2
+    lab: accumlab
+    title: "Gradyan biriktirme: ne zaman birebir aynı?"
+    goal: |
+      Farklı uzunluklu dizilerden oluşan bir batch'in token ortalamalı kaybı için büyük batch gradyanını, m dizilik mikro batch'lerden biriktirilen gradyanla karşılaştır. Üç ölçeklemeyi (örnek sayısı, token sayısı, eşit) ve BatchNorm'un etkisini mikro batch boyuna göre tara.
+    predict:
+      q: "Diziler 1–32 token uzunluğunda, kayıp token ortalaması. Mikro kayıpları örnek sayısıyla (n_j/N) ölçeklersek biriktirilen gradyan?"
+      options:
+        - {t: "Büyük batch'le birebir aynı", why: "Bu ancak dizi uzunlukları eşitse geçerli."}
+        - {t: "Sistematik olarak sapar; doğru ağırlık T_j/T", ok: true, why: "Kısa dizilerin bulunduğu mikro batch'ler fazla ağırlık alır (bu oyuncak problemde ≈ %2 göreli fark)."}
+        - {t: "Rastgele sapar, ortalamada aynı", why: "Ağırlıklar sabit ve yanlış: sapma sistematiktir."}
+    presets:
+      - {name: "Token sayısıyla (doğru)", params: {N: 32, m: 8, Lmax: 32, bn: 0, scale: 1}, note: "Göreli fark 5.6·10⁻¹⁶: birebir aynı."}
+      - {name: "Örnek sayısıyla", params: {scale: 0}, note: "Göreli fark 0.019: uzunluklar farklı, ağırlık yanlış."}
+      - {name: "Eşit uzunluk, örnek sayısıyla", params: {Lmax: 1, scale: 0}, note: "Uzunluklar eşitken n_j/N = T_j/T: fark 10⁻¹⁶."}
+      - {name: "Eşit ağırlık, düzensiz son parça", params: {Lmax: 1, scale: 2, m: 5}, note: "32 örnek, 5'lik parçalar: son parça 2 örnek ama 1/7 ağırlık alıyor; fark 0.11."}
+      - {name: "BatchNorm", params: {bn: 1}, note: "Doğru ölçekle bile fark 0.0048; m = 4'te 0.0079. Yalnız m = N'de sıfır."}
+    questions:
+      - q: "Dil modeli eğitiminde mikro batch'lerdeki dolgu (padding) tokenları maskelenmişse doğru ölçek ne olur?"
+        a: "Yalnız maskelenmemiş (gerçek) tokenların sayısı: ağırlık T_j^gerçek / T^gerçek. Bu sayı bütün mikro batch'ler görülmeden bilinmediği için ya önceden sayılır ya da kayıplar toplam olarak biriktirilip sonda toplam token sayısına bölünür."
+    limits: "Doğrusal model, sabit w (gradyanın kendisi karşılaştırılıyor, eğitim yok); BN afin parametresiz, yalnız token istatistikleriyle."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Adam ile bellek
+    goal: Parametre tarafını saymak
+    needs: 16 bayt/parametre
+    q: |-
+      1.3 milyar parametreli bir model fp32 Adam ile eğitiliyor. Aktivasyonlar hariç kaç GB gerekir? 80 GB'lık bir GPU'ya sığar mı?
+    solution: |-
+      $1.3\cdot10^9\cdot16=20.8$ GB. Sığar, ama aktivasyonlar için 59 GB kalır. 7 milyar parametrede $112$ GB olur ve tek GPU'ya sığmaz: ZeRO/FSDP ile paylaştırmak gerekir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: En iyi segment uzunluğu
+    goal: √n kuralını uygulamak
+    needs: $M(k)\approx n/k+k-1$
+    q: |-
+      100 katmanlı zincir, her çıktı 1 birim. $k=10$ ile tepe kaç birim?
+    answer: 19
+    calc: "100/10 + 10 - 1"
+    tol: 0
+    mistakes:
+      - {answer: 20, msg: "Son segmentin sonu zaten segment sonları arasında sayıldı: k − 1 iç çıktı."}
+      - {answer: 10, msg: "Yeniden hesaplanan iç çıktılar da bellekte."}
+    hints:
+      - "10 segment sonu + son segmentin 9 iç çıktısı."
+    solution: |-
+      $10+9=19$ (100 yerine). Deneyde n = 100, k = 10 ile ölçülen de 19.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Biriktirmede ölçek
+    goal: Düzensiz son parçayı doğru ağırlıklamak
+    needs: $n_j/N$
+    q: |-
+      70 örneklik batch, 32'lik mikro batch'ler: 32, 32, 6. Üçüncü mikro kaybın çarpanı?
+    answer: 0.08571428571428572
+    calc: "6/70"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.3333333333333333, msg: "1/J yalnız eşit parçalarda doğru."}
+      - {answer: 0.1875, msg: "Payda toplam batch: 6/70."}
+    hints:
+      - "$n_3/N$."
+    solution: |-
+      $6/70\approx0.0857$. İlk iki parça $32/70$ alır; toplam 1.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Checkpoint'ten sonra doğruluk düştü
+    goal: Yeniden hesabın yan etkisini tanımak
+    needs: BN, checkpoint
+    q: |-
+      Bir ResNet'e (BN'li) bellek için checkpoint eklendi. Eğitim kaybı aynı kaldı ama değerlendirme doğruluğu belirgin düştü. Olası neden?
+    choices:
+      - {t: "Checkpoint gradyanları yanlış hesaplıyor", why: "Gradyanlar aynı; eğitim kaybı değişmedi."}
+      - {t: "Yeniden hesapta BN koşu istatistikleri ikinci kez güncelleniyor; değerlendirmede kullanılan istatistikler kayıyor", ok: true, why: "Ölçtük: num_batches_tracked ileri sonrası 1, geri sonrası 2."}
+      - {t: "RNG durumu korunmuyor", why: "preserve_rng_state varsayılan olarak açık."}
+    hints:
+      - "Değerlendirmede BN neyi kullanır?"
+    solution: |-
+      Eğitimde BN batch istatistiklerini kullanır (kayıp etkilenmez) ama koşu ortalamalarını günceller; yeniden hesap bu güncellemeyi tekrarlar. Momentum etkin olarak değişir ve istatistikler kayar. Çare: BN katmanlarını checkpoint dışında bırakmak ya da yeniden hesapta güncellemeyi kapatmak (momentum geçici olarak 0).
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Biriktirmenin birebir aynılığı
+    goal: Ölçek kuralını kanıtlamak
+    needs: Türevin doğrusallığı
+    q: |-
+      Kayıp $\mathcal L=\frac1T\sum_{t=1}^T\ell_t$ (token ortalaması), mikro batch $j$'de $T_j$ token ve $\mathcal L_j=\frac1{T_j}\sum_{t\in j}\ell_t$. $\sum_j\frac{T_j}T\nabla\mathcal L_j=\nabla\mathcal L$ olduğunu ve modelde BN varsa neden bozulduğunu göster.
+    rubric:
+      - "Toplamı mikro batch'lere ayırıp T_j/T ağırlıklarını çıkardım"
+      - "Türevin doğrusallığını kullandım"
+      - "ℓ_t'nin yalnız kendi tokenına bağlı olmasının (örnekler arası etkileşim yok) gerekli olduğunu belirttim"
+      - "BN'de ℓ_t'nin batch istatistiklerine, yani mikro batch'in diğer elemanlarına bağlı olduğunu ve ayrışmanın bozulduğunu gösterdim"
+    hints:
+      - "$\\sum_{t}\\ell_t=\\sum_j\\sum_{t\\in j}\\ell_t$."
+    solution: |-
+      $\mathcal L=\frac1T\sum_j\sum_{t\in j}\ell_t=\sum_j\frac{T_j}T\mathcal L_j$; gradyan doğrusal olduğu için eşitlik gradyanlara geçer. Bu, her $\ell_t$'nin yalnız kendi girdisine bağlı olduğu varsayımına dayanır. BN'de $\ell_t$ batch'in ortalamasına ve varyansına bağlıdır; mikro batch'te hesaplanan $\ell_t$ büyük batch'tekinden farklı bir fonksiyondur ve eşitlik bozulur.
+pitfalls:
+  - wrong: "Checkpointing gradyanları yaklaşık hesaplar."
+    right: "Yeniden hesap aynı işlemleri tekrarlar; gradyanlar aynıdır (RNG korunur). Değişen yalnız yan etkilerdir (BN koşu istatistikleri)."
+  - wrong: "Karışık hassasiyet parametre belleğini yarıya indirir."
+    right: "bf16 ağırlık ve gradyana fp32 ana kopya ile iki fp32 moment eklenir; Adam'da toplam yine 16 bayt/parametre. Kazanç aktivasyonlarda ve hızdadır."
+  - wrong: "Gradyan biriktirmede her mikro kaybı 1/J ile ölçeklemek her zaman doğrudur."
+    right: "Yalnız mikro batch'ler eşit büyüklükteyse (token kaybında eşit token sayısındaysa). Genel kural n_j/N ya da T_j/T."
+  - wrong: "Daha çok checkpoint her zaman daha az bellek demektir."
+    right: "Tek dev segment (k = n) tepe belleği düşürmez: geri geçişte bütün zincir yeniden hesaplanır ve bellekte durur. En iyisi k ≈ √n civarıdır."
+whatif:
+  - q: "Mikro batch boyu 1'e inse?"
+    a: "Aktivasyon belleği en aza iner ama GPU'nun paralelliği kullanılamaz; adım başına süre neredeyse J kat artar. BN'li modellerde batch istatistiği tek örnekten hesaplanamaz."
+  - q: "Checkpoint'i yalnız dikkat bloklarına uygulasak?"
+    a: "Dikkatin s² terimi aktivasyon belleğinin çoğu olduğu için bellek büyük ölçüde düşer, yeniden hesap ise dikkatin softmax ve dropout kısmıyla sınırlı kalır (seçici yeniden hesaplama)."
+  - q: "ZeRO aşama 3 ile 8 GPU'da 16 bayt/parametre ne olur?"
+    a: "Ağırlık, gradyan ve optimizasyon durumu 8'e bölünür: ≈ 2 bayt/parametre/GPU. Karşılığında her katmanın ağırlıkları kullanılmadan önce diğer GPU'lardan toplanır (all-gather), iletişim artar."
