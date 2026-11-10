@@ -178,7 +178,7 @@ groups:
         pages: [m10-3-cpu-parallel, m10-7-gpu-conv]
         status: tam
         gap: "CUDA kısımları tarayıcıda çalışmaz; NumPy modeli + Colab notebook'u."
-        done: "—"
+        done: "M10.3 konu anlatımı Ex. 1 ve Ex. 2'nin bütün CPU maddelerini işliyor: ölçüm kuralları; histogram (atomik, mutex, thread'e özel; satır transferi ve serileşme), integral dizi (iki geçişli blok taraması, topla-sonra-tara, taşma, problem boyu ve bant genişliği), integral görüntü (satır ve sütun şeridi geçişleri, taşma), 2-B evrişim (veri türü kuralları, bantlar ve hale, ayrılabilir filtre), matris çarpımı (döngü sırası, devrik B, karolama türetimi, 2'nin kuvveti çakışmaları, satır blokları, göreli hata ile doğrulama), PyTorch karşılıkları; histlab, scanlab ve matmulcache deneyleri. CUDA kısımları (Ex. 3–4) M10.7'de."
   - title: "YAP 446 Pekiştirmeli Öğrenme"
     rows:
       - src: "lect_1, lect_2 — RL'ye giriş, rastgele süreçler"

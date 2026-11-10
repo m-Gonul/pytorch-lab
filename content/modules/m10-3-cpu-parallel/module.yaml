@@ -99,3 +99,188 @@ homework:
     accept:
       - "Değişken pencereli filtre doğrudan toplamla aynı (int64)."
       - "fp32 integral görüntüde 4096² sonrası hata ölçülür ve açıklanır."
+
+labs:
+  - id: l1
+    lab: histlab
+    title: "Çok thread'li histogram: atomik, mutex ve thread'e özel kopyalar"
+    goal: |
+      Bir maliyet modeliyle (çevrim) üç histogram stratejisini karşılaştır: paylaşılan histogram + atomik artırma, paylaşılan histogram + küresel mutex, thread'e özel histogram + birleştirme. Önbellek satırı transfer maliyetinin, görüntü histogramının biçiminin, thread sayısının ve piksel sayısının hızlanmaya etkisini gör.
+    predict:
+      q: "8 thread'le paylaşılan bir histogramı atomik artırmayla doldurmak tek thread'e göre kaç kat hızlıdır?"
+      options:
+        - {t: "≈ 8 kat", why: "Her artırma paylaşılan bir önbellek satırına yazıyor; satır çekirdekler arasında gidip geliyor."}
+        - {t: "≈ 4 kat", why: "Ek yük bundan çok daha büyük."}
+        - {t: "Daha yavaş (≈ 0.1 kat)", ok: true, why: "Piksellerin %92'si satır transferi gerektiriyor ve kilitli artırma sıradan artırmadan pahalı: hızlanma 0.12. Özel histogramlar 7.1."}
+    presets:
+      - {name: "Atomik, doğal görüntü", params: {strat: 0, p: 8, logN: 16, dist: 1, ct: 60}, note: "Hızlanma 0.12."}
+      - {name: "Atomik, dar tepeli", params: {strat: 0, p: 8, logN: 16, dist: 2, ct: 60}, note: "0.027: tek satırda serileşme."}
+      - {name: "Atomik, transfer bedava", params: {strat: 0, p: 8, logN: 16, dist: 1, ct: 0}, note: "0.44: kilitli artırmanın kendisi bile pahalı."}
+      - {name: "Küresel mutex", params: {strat: 1, p: 8, logN: 16, dist: 1, ct: 60, cm: 40}, note: "0.049."}
+      - {name: "Özel histogram", params: {strat: 2, p: 8, logN: 16, dist: 1, ct: 60}, note: "7.1."}
+      - {name: "Özel, küçük görüntü, 32 thread", params: {strat: 2, p: 32, logN: 10, dist: 1, ct: 60}, note: "0.25: 8192'lik birleştirme işin kendisini aşıyor."}
+      - {name: "Özel, büyük görüntü", params: {strat: 2, p: 8, logN: 20, dist: 1, ct: 60}, note: "7.9."}
+    questions:
+      - q: "Transfer maliyeti sıfırken bile atomik sürüm neden tek thread'den yavaş (0.44)?"
+        a: "Modelde kilitli bir artırma (lock xadd) sıradan bir artırmadan yaklaşık on kat pahalı ve aynı satırı tutan çekirdekler yine sıraya giriyor: satır bir anda tek çekirdekte olabilir. Atomik işlemler doğruluk sağlar ama paylaşılan, sık güncellenen bir veri yapısını ölçeklenebilir yapmaz; ölçeklenebilirliği paylaşımı ortadan kaldırmak (özel kopyalar) sağlar."
+    limits: "Kaba maliyet modeli (ölçüm değil): MESI satır transferi sabit maliyet, satır başına serileşme, thread'ler eşit hızda ilerliyor; 256 kutu × 4 bayt = 16 satır."
+  - id: l2
+    lab: scanlab
+    title: "İntegral dizi: blok taraması, problem boyu ve bant genişliği"
+    goal: |
+      İki geçişli paralel önek toplamının (tara + ofset ekle ya da topla + tara) süresini thread yaratma maliyeti ve bellek bant genişliği tavanıyla modelle. Hızlanmanın dizi boyuna göre değişimini, başa baş noktasını ve önbelleğe sığmayan dizilerde iki algoritmanın farkını gör.
+    predict:
+      q: "4096 elemanlık bir dizinin önek toplamı 8 thread'le kaç kat hızlanır (thread yaratma 20 000 çevrim)?"
+      options:
+        - {t: "≈ 4 kat (iş 2N, p = 8)", why: "Bu, thread yaratma bedava olsaydı."}
+        - {t: "≈ 40 kat yavaşlar", ok: true, why: "Sıralı tarama 4096 çevrim; 8 thread yaratmak 160 000. Paralel sürüm ancak 2^18 elemandan sonra kazandırıyor."}
+        - {t: "≈ 1 (fark yok)", why: "Ek yük işin kendisinden çok büyük."}
+    presets:
+      - {name: "4096 eleman", params: {alg: 0, p: 8, logN: 12, cs: 20000, m: 4}, note: "Hızlanma 0.025."}
+      - {name: "Ucuz thread (havuz)", params: {alg: 0, p: 8, logN: 12, cs: 100, m: 4}, note: "0.70; başa baş 2^13."}
+      - {name: "1 M eleman", params: {alg: 0, p: 8, logN: 20, cs: 20000, m: 4}, note: "2.46."}
+      - {name: "16 M, tara + ofset", params: {alg: 0, p: 8, logN: 24, cs: 20000, m: 4}, note: "2.97: bant genişliği sınırlı (4N trafik)."}
+      - {name: "16 M, topla + tara", params: {alg: 1, p: 8, logN: 24, cs: 20000, m: 4}, note: "3.95 (3N trafik)."}
+      - {name: "16 M, yüksek bant genişliği", params: {alg: 0, p: 8, logN: 24, cs: 20000, m: 16}, note: "5.9."}
+    questions:
+      - q: "Önbelleğe sığmayan dizide 32 thread neden 8 thread'den daha iyi değil?"
+        a: "Süreyi bellek trafiği belirliyor ve bant genişliği birkaç çekirdekle doyuyor (modelde 4 çekirdek eşdeğeri). Daha çok thread hesabı paylaştırır ama aynı belleği daha hızlı okuyamaz; üstelik thread yaratma maliyeti artar. Bant genişliği sınırlı çekirdeklerde kazanç, trafiği azaltmaktan (topla + tara) gelir."
+    limits: "Maliyet modeli (ölçüm değil): son düzey önbellek 8 MB, eleman başına 1 çevrim hesap ve 1 çevrim aktarım (tek çekirdek), bariyer 2000 çevrim, thread'ler sıralı yaratılıyor."
+  - id: l3
+    lab: matmulcache
+    title: "Matris çarpımında döngü sırası ve karolama: önbellek simülasyonu"
+    goal: |
+      C = A·B'nin bellek erişim izini 8 yollu, LRU bir önbellekte simüle et ve ijk, ikj, jki, devrik B ve karolu ikj sıralarının ıska sayılarını karşılaştır. Önbellek boyunun, matris boyunun (2'nin kuvvetleri dahil) ve karo boyunun etkisini gör.
+    predict:
+      q: "n = 64 ve 16 KB önbellekte ijk sırası ikj'ye göre kaç kat fazla ıska verir?"
+      options:
+        - {t: "Aynı: aynı aritmetik", why: "İş aynı, erişim deseni farklı."}
+        - {t: "≈ 8 kat", ok: true, why: "0.152'ye karşı 0.018 ıska/FMA: ijk'nin iç döngüsü B'nin sütununda yürüyor."}
+        - {t: "≈ 100 kat", why: "ikj de ilk yükleme ve kapasite ıskaları veriyor."}
+    presets:
+      - {name: "ijk", params: {order: 0, n: 64, kb: 16, pen: 100}, note: "0.152 ıska/FMA."}
+      - {name: "ikj", params: {order: 1, n: 64, kb: 16, pen: 100}, note: "0.018."}
+      - {name: "jki", params: {order: 2, n: 64, kb: 16, pen: 100}, note: "0.62: iki matris sütun boyunca."}
+      - {name: "Devrik B", params: {order: 3, n: 64, kb: 16, pen: 100}, note: "0.018."}
+      - {name: "Karolu, b = 16", params: {order: 4, n: 64, b: 16, kb: 16, pen: 100}, note: "0.006."}
+      - {name: "ijk, n = 68", params: {order: 0, n: 68, kb: 16, pen: 100}, note: "0.065: 2'nin kuvveti olmayınca çakışma ıskaları azalıyor."}
+      - {name: "Hepsi sığıyor", params: {order: 0, n: 64, kb: 64, pen: 100}, note: "0.003: sıra fark etmiyor."}
+      - {name: "Küçük önbellek", params: {order: 0, n: 64, kb: 4, pen: 100}, note: "1.03: her erişim ıska."}
+    questions:
+      - q: "n = 64'te ijk neden n = 68'den 2.4 kat fazla ıska veriyor?"
+        a: "Satır uzunluğu 64 × 4 = 256 bayt; B'nin bir sütunundaki ardışık elemanlar 256 bayt aralıklı ve önbellek seti indeksi adresin orta bitlerinden geldiği için hepsi aynı birkaç sete düşüyor. 8 yol bu sütunu tutamıyor ve önbellek boşken bile satırlar birbirini atıyor (çakışma ıskaları). 68'de adım 272 bayt; erişimler setlere yayılıyor. Satır dolgusu (leading dimension'ı 2'nin kuvvetinden kaydırmak) bu yüzden yaygın bir eniyilemedir."
+    limits: "Tek düzeyli önbellek, 64 baytlık satır, 8 yol, LRU; yazmaçlar dışında yerellik yok; ön getirme (prefetch) ve vektör komutları modellenmiyor; süre = FMA + ıska × ceza."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Blok taraması el hesabı
+    goal: Üç adımı izlemek
+    needs: Yerel tarama, ofset, ekleme
+    q: |-
+      $a=[2,1,3,4,1,1,2,5]$, 4 thread (blok başına 2). Önek toplamını üç adımla hesaplayın.
+    solution: |-
+      1. Yerel taramalar: $(2,3),(3,7),(1,2),(2,7)$. 2. Blok toplamları $(3,7,2,7)$, ofsetler $(0,3,10,12)$. 3. Ofset ekle: $(2,3),(6,10),(11,12),(14,19)$. Sonuç $[2,3,6,10,11,12,14,19]$ = sıralı `cumsum`.
+  - id: p2
+    type: hesap
+    level: 1
+    title: İntegral görüntü taşması
+    goal: Gerekli tamsayı genişliğini bulmak
+    needs: $255HW$
+    q: |-
+      4096 × 4096'lık 8 bitlik bir görüntünün integral görüntüsündeki en büyük değer?
+    answer: 4278190080
+    calc: "255*4096**2"
+    tol: 0
+    mistakes:
+      - {answer: 2147483647, msg: "Bu int32'nin en büyük değeri: değer onu aşıyor."}
+      - {answer: 16777216, msg: "Bu piksel sayısı; her piksel 255'e kadar."}
+    hints:
+      - "Bütün pikseller 255 olabilir."
+    solution: |-
+      $255\cdot16\,777\,216=4.28\cdot10^9>2^{31}-1$: int32 taşar, uint32'ye ($4.29\cdot10^9$) ancak sığar. Daha büyük görüntüde int64.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Evrişimin maliyeti
+    goal: k² büyümesini hesaplamak
+    needs: $HWk^2$
+    q: |-
+      1024 × 1024'lük bir görüntü 11 × 11'lik bir filtreyle evriştiriliyor (ayrılabilir değil). Çarp-topla sayısı?
+    answer: 126877696
+    calc: "1024*1024*121"
+    tol: 0
+    mistakes:
+      - {answer: 23068672, msg: "Bu ayrılabilir sürüm (2k = 22)."}
+      - {answer: 11534336, msg: "k değil k²: her çıktı pikseli 121 komşu okur."}
+    hints:
+      - "$1024^2\\cdot11^2$."
+    solution: |-
+      $1\,048\,576\cdot121=126\,877\,696$; ayrılabilir olsaydı 22 ile çarpılır, 5.5 kat az.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Matmul'un aritmetik yoğunluğu
+    goal: FLOP/bayt oranını hesaplamak
+    needs: $2n^3$ FLOP, $3n^2$ fp32 eleman
+    q: |-
+      $n=1024$ fp32 matris çarpımında her eleman bellekten yalnız bir kez okunur/yazılırsa aritmetik yoğunluk kaç FLOP/bayttır?
+    answer: 170.666667
+    calc: "2*1024**3/(3*4*1024**2)"
+    tol: 0.001
+    mistakes:
+      - {answer: 682.666667, msg: "Bayt değil eleman sayıldı (4 ile çarpılmalı)."}
+      - {answer: 85.333333, msg: "2n³ FLOP (çarp + topla), n³ değil."}
+    hints:
+      - "$2n^3/(12n^2)=n/6$."
+    solution: |-
+      $n/6=170.7$ FLOP/bayt: bu yoğunlukta hesap sınırlıdır. Ama saf ijk her çarpımda B'yi bellekten okursa yoğunluk birkaç FLOP/bayta düşer; karolama yeniden kullanımı geri getirir.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Ölçüm sonuçlarını yorumlamak
+    goal: Paylaşılan durumun maliyetini tanımak
+    needs: Atomik, satır transferi, özel kopya
+    q: |-
+      Bir öğrencinin ölçümleri (1 M piksel): tek thread 1.1 ms; 8 thread + atomik kutular 6.4 ms; 8 thread + mutex 41 ms. "Thread'ler bu problemde işe yaramıyor" diye sonuca varıyor. Doğru mu?
+    choices:
+      - {t: "Evet, histogram paralelleşmez", why: "Pikseller bağımsız; sorun paylaşılan sonuç dizisinde."}
+      - {t: "Hayır: yavaşlığın nedeni her pikselde paylaşılan kutulara yazmak (satır transferi, kilit); thread'e özel histogram + birleştirme ile ~p kat hızlanma beklenir", ok: true, why: "Paylaşımı ortadan kaldırmak ölçeklenebilirliğin anahtarı."}
+      - {t: "Hayır, ama yalnız daha çok thread gerekir", why: "Daha çok thread çekişmeyi artırır."}
+    hints:
+      - "Thread'ler neyi paylaşıyor?"
+    solution: |-
+      Histogram "utanç verici derecede paralel" bir indirgemedir; paylaşılan sonuca her pikselde yazmak onu seri yapar. Özel kopyalar + 256p toplamalık birleştirme doğru tasarımdır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Blok taramasının doğruluğu ve maliyeti
+    goal: Birleşmeliliğin rolünü göstermek
+    needs: Birleşmeli işlem, iş ve yol
+    q: |-
+      Birleşmeli bir $\oplus$ işlemi için iki geçişli blok taramasının (yerel tarama, blok toplamlarının dışlayıcı taraması, ofset ekleme) sıralı taramayla aynı sonucu verdiğini gösterin; işini ve yolunu $N$ ve $p$ cinsinden bulun.
+    rubric:
+      - "Blok b'deki indeks i için $S_i$'yi önceki bloklar ve blok içi kısım olarak ayırdım"
+      - "Ayrımın birleşmelilik gerektirdiğini (yeniden gruplama) belirttim"
+      - "İşi ≈ 2N (N yerel + p + N ekleme) olarak saydım"
+      - "Yolu ≈ 2N/p + p olarak buldum ve p ≪ √N iken hızlanmanın ≈ p/2 olduğunu çıkardım"
+    hints:
+      - "$S_i=(a_0\\oplus\\dots\\oplus a_{s-1})\\oplus(a_s\\oplus\\dots\\oplus a_i)$, $s$ bloğun başlangıcı."
+    solution: |-
+      Bkz. derste "Doğruluk, iş ve yol" türetimi. Değişme özelliği gerekmez, yalnız birleşmelilik: blokların sırası korunur.
+pitfalls:
+  - wrong: "Hızlanmayı -O0 ile derlenmiş programlarla ölçmek yeterlidir; oran aynı kalır."
+    right: "Eniyilenmemiş sıralı kod yapay biçimde yavaştır ve oranlar anlamsızlaşır; ikisi de -O2/-O3 ile derlenmeli, ısınma ve tekrarla ölçülmelidir."
+  - wrong: "Atomik artırma mutex'ten ucuz olduğu için paylaşılan histogramı ölçeklenebilir yapar."
+    right: "Atomik doğruluğu sağlar, ölçeklenebilirliği değil: her artırma paylaşılan bir önbellek satırını çekirdekler arasında taşır. Ölçeklenebilirlik thread'e özel kopyalarla gelir (lab l1: 0.12'ye karşı 7.1)."
+  - wrong: "Her problem boyunda thread eklemek kazandırır."
+    right: "Thread yaratma onlarca mikrosaniye sürer; 4096 elemanlık bir önek toplamı bundan kısadır (lab l2: 40 kat yavaşlama). Başa baş boyu ölçülmeli, küçük problemler sıralı ya da havuzla çalıştırılmalı."
+  - wrong: "Evrişimde ara sonucu uint8'e yuvarlamak ya da çıktıyı kırpmadan uint8'e çevirmek zararsızdır."
+    right: "Kırpılmayan değerler uint8'de sarmalanır (300 → 44) ve parlak bölgelerde koyu lekeler belirir; ayrılabilir filtrede ara görüntü fp32 tutulmalı, yalnız son çıktı yuvarlanıp [0, 255]'e kırpılmalı."
+whatif:
+  - q: "Histogram 256 değil 65 536 kutulu (16 bitlik görüntü) olsaydı?"
+    a: "Thread'e özel histogramların birleştirmesi 65 536·p toplama olur ve küçük görüntülerde işin kendisini aşar; her kopya 256 KB ile L2'yi zorlar. Ama paylaşılan atomik sürümde çekişme azalır (kutular 4096 satıra yayılır). Orta yol: kutuları thread gruplarına bölmek ya da önce sıralayıp (radix) sayım yapmak."
+  - q: "Evrişim filtresi 21 × 21 ama ayrılabilir değilse?"
+    a: "Maliyet 441 MAC/piksel kalır. Seçenekler: SVD ile düşük ranklı yaklaşım (birkaç ayrılabilir terimin toplamı, ek x1), FFT tabanlı evrişim (k'dan bağımsız O(HW log HW); M9.10) ya da im2col + matmul (evrişimi iyi eniyilenmiş GEMM'e çevirmek; derin öğrenme kütüphanelerinin yolu)."
+  - q: "Matris boyutu 2'nin kuvveti (1024) ve sonuçlar beklenenden yavaşsa?"
+    a: "Sütun erişimleri aynı önbellek setlerine yığılır (lab l3: n = 64'te 2.4 kat fazla ıska); TLB ve bellek bankası çakışmaları da artar. Satır uzunluğunu (leading dimension) biraz dolgulamak (1024 yerine 1040) çakışmaları dağıtır; BLAS kütüphaneleri bunu iç kopyalarında yapar."
