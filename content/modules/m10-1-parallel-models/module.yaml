@@ -120,3 +120,165 @@ labs:
       - {name: "f = %1", params: {f: 0.01}, note: "Tavan 100: büyük makinelerde %1 seri kod bile çok pahalı."}
       - {name: "İletişim ek yükü", params: {f: 0.02, ov: 0.004}, note: "En iyi N belirdi; sonrası yavaşlama."}
     limits: "Kusursuz yük dengesi; ek yük modeli log₂N (ağaç indirgeme)."
+  - id: l2
+    lab: workspan
+    title: "İş–yol modeli: açgözlü zamanlama ve Brent sınırları"
+    goal: |
+      Merge sort, ağaç indirgeme, rastgele katmanlı DAG ve seri baş/son + bağımsız gövde grafiklerinde iş W'yi, yol S∞'u ve paralellik W/S∞'u hesapla. p işlemcide açgözlü liste zamanlamanın süresini max(W/p, S∞) ≤ T_p ≤ W/p + S∞ sınırlarıyla ve Gantt şemasıyla karşılaştır; hazır kuyruğu sırasının (FIFO, kritik yol önceliği) etkisini gör.
+    predict:
+      q: "128 öğelik merge sort (birleştirme seri) 64 işlemcide en çok kaç kat hızlanır?"
+      options:
+        - {t: "≈ 64", why: "Paralellik W/S∞ yalnız 4: son birleştirmeler sırayla yapılmalı."}
+        - {t: "≈ 4", ok: true, why: "W = 1024, S∞ = 255: T_64 = 256, hızlanma 4.0."}
+        - {t: "≈ 7 (log₂ 128)", why: "Ağacın derinliği 7, ama yol birleştirme maliyetleriyle ağırlıklı: 128 + 64 + … ≈ 255."}
+    presets:
+      - {name: "Merge sort, p = 8", params: {kind: 0, n: 128, p: 8}, note: "W 1024, S∞ 255; T_8 = 304, hızlanma 3.37."}
+      - {name: "Merge sort, p = 64", params: {kind: 0, n: 128, p: 64}, note: "T = 256 ≈ S∞: işlemcilerin çoğu boşta."}
+      - {name: "Ağaç indirgeme, p = 8", params: {kind: 1, n: 128, p: 8}, note: "W 127, S∞ 7; verim %88."}
+      - {name: "Ağaç indirgeme, p = 64", params: {kind: 1, n: 128, p: 64}, note: "T = S∞ = 7, hızlanma 18."}
+      - {name: "Rastgele DAG, FIFO", params: {kind: 2, n: 128, p: 8, cp: 0}, note: "T = 94 (alt sınır 85.75)."}
+      - {name: "Rastgele DAG, kritik yol", params: {kind: 2, n: 128, p: 8, cp: 1}, note: "T = 86: neredeyse en iyi."}
+      - {name: "Seri baş/son + gövde", params: {kind: 3, n: 128, p: 8, cp: 0}, note: "Hızlanma 6.1; p = 64'te 15.7 (seri uçlar)."}
+    questions:
+      - q: "Kritik yol önceliği merge sort'ta hiçbir şey değiştirmiyor, rastgele DAG'da süreyi 94'ten 86'ya indiriyor. Neden?"
+        a: "Merge sort'un grafiği simetriktir: aynı anda hazır olan görevlerin kalan yolları eşittir ve sıranın önemi yoktur. Düzensiz bir DAG'da ise bazı hazır görevlerin ardından uzun zincirler gelir; onları önce başlatmak zincirin erken ilerlemesini sağlar ve sonda işlemcilerin tek bir zinciri beklemesini önler. Bu, liste zamanlamada yaygın HLFET (en yüksek düzey önce) sezgiselidir."
+    limits: "Görev maliyetleri tamsayı ve önceden bilinir; iletişim ve zamanlama ek yükü yok; Gantt şeması en çok 16 işlemci gösterir."
+  - id: l3
+    lab: mandelbal
+    title: "Yük dengeleme: Mandelbrot satırlarını thread'lere dağıtmak"
+    goal: |
+      96 × 128'lik Mandelbrot ızgarasında satır maliyetlerini (kaçış iterasyonları) gerçekten hesapla ve satırları p thread'e blok, döngüsel, döngüsel blok ya da dinamik (parça başına ek yüklü) dağıt. Thread yüklerini, dengesizliği ve 1–32 thread için hızlanma eğrilerini karşılaştır.
+    predict:
+      q: "8 thread'de ardışık blok dağıtım ne kadar hızlanma verir?"
+      options:
+        - {t: "≈ 8", why: "Satır maliyetleri çok farklı: en pahalı satır ortalamanın 2.4 katı."}
+        - {t: "≈ 3.7", ok: true, why: "Kümenin içi ortadaki satırlarda; ortadaki thread'ler 2.15 kat fazla yük taşıyor. Döngüsel dağıtım 7.7."}
+        - {t: "≈ 1", why: "Thread'ler yine paralel çalışıyor; yalnız biri geç bitiyor."}
+    presets:
+      - {name: "Blok", params: {mode: 0, p: 8, maxit: 200}, note: "Hızlanma 3.71, dengesizlik 2.15."}
+      - {name: "Döngüsel", params: {mode: 1, p: 8, maxit: 200}, note: "7.66."}
+      - {name: "Döngüsel blok, c = 4", params: {mode: 2, p: 8, c: 4, maxit: 200}, note: "7.56."}
+      - {name: "Dinamik, c = 4", params: {mode: 3, p: 8, c: 4, o: 0.1, maxit: 200}, note: "7.38 (ek yükle)."}
+      - {name: "Dinamik, pahalı alış", params: {mode: 3, p: 8, c: 1, o: 2, maxit: 200}, note: "2.63: ek yük işi yiyor."}
+      - {name: "Dinamik, kaba parça", params: {mode: 3, p: 8, c: 24, o: 0.1, maxit: 200}, note: "2.25: yalnız 4 parça."}
+      - {name: "32 thread, döngüsel", params: {mode: 1, p: 32, maxit: 200}, note: "28.7."}
+      - {name: "32 thread, dinamik c = 4", params: {mode: 3, p: 32, c: 4, o: 0.1, maxit: 200}, note: "10: 24 parça < 32 thread."}
+    questions:
+      - q: "Döngüsel dağıtım burada dinamikten iyi; dinamik dağıtım ne zaman üstün olur?"
+        a: "Döngüsel dağıtım maliyetin satır indeksiyle yavaş değiştiği ve her thread'in her bölgeden örnek aldığı durumlarda iyidir; ek yükü yoktur. Maliyetler öngörülemez ya da desenli olduğunda (ör. her p'inci satır pahalıysa döngüsel dağıtım bütün pahalı satırları tek thread'e verir), thread'lerin hızları farklı olduğunda (başka işlerle paylaşılan çekirdekler) ya da görevler çalışma sırasında üretildiğinde dinamik dağıtım dengeyi korur."
+    limits: "Maliyet = iterasyon sayısı (önbellek ve bellek etkileri yok); dinamik dağıtımda alış ek yükü sabit, çekişme modellenmiyor."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Amdahl ve Gustafson
+    goal: İki yasayı aynı sayılarla uygulamak
+    needs: $1/((1-\alpha)+\alpha/N)$, $(1-\alpha)+N\alpha$
+    q: |-
+      Bir programın %95'i paralelleştirilebiliyor ($\alpha=0.95$). 16 çekirdekte Amdahl hızlanması, tavanı ve Gustafson ölçeklenmiş hızlanması?
+    solution: |-
+      Amdahl: $1/(0.05+0.95/16)=1/0.109375=9.14$; verim %57. Tavan $1/0.05=20$. Gustafson: $0.05+16\cdot0.95=15.25$. Fark sorunun farkıdır: Amdahl aynı işi 16 çekirdekle, Gustafson 16 kat büyük paralel işi aynı sürede yapmayı sorar.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Karp–Flatt
+    goal: Ölçülen hızlanmadan seri kesri bulmak
+    needs: $e=(1/S-1/p)/(1-1/p)$
+    q: |-
+      8 çekirdekte ölçülen hızlanma 6. Deneysel seri kesir $e$?
+    answer: 0.047619
+    calc: "(1/6-1/8)/(1-1/8)"
+    tol: 0.0001
+    mistakes:
+      - {answer: 0.041667, msg: "Payda (1 − 1/p) unutuldu."}
+      - {answer: 0.75, msg: "Bu verim (S/p)."}
+    hints:
+      - "$1/6-1/8=0.04167$; $1-1/8=0.875$."
+    solution: |-
+      $e=0.04167/0.875=0.0476$: programın yaklaşık %4.8'i seri davranıyor. p artınca e de artıyorsa sınırlayan seri kod değil ek yüktür.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Açgözlü zamanlama sınırı
+    goal: Brent üst sınırını uygulamak
+    needs: $T_p\le W/p+S_\infty$
+    q: |-
+      Bir görev grafiğinde iş $W=1000$, yol $S_\infty=50$. 16 işlemcide açgözlü bir zamanlamanın süresi en çok kaç birimdir?
+    answer: 112.5
+    calc: "1000/16+50"
+    tol: 1e-9
+    mistakes:
+      - {answer: 62.5, msg: "Bu alt sınır (W/p); yol da eklenmeli."}
+      - {answer: 50, msg: "Bu yalnız yol (sonsuz işlemcide süre)."}
+    hints:
+      - "Tam adımlar en çok W/p, eksik adımlar en çok S∞."
+    solution: |-
+      $62.5+50=112.5$; alt sınır $\max(62.5,50)=62.5$. Paralellik $W/S_\infty=20$: 16 işlemci bunun altında, iyi bir hızlanma beklenir.
+  - id: p4
+    type: hesap
+    level: 1
+    title: Boru hattının süresi
+    goal: En yavaş aşamanın etkisini hesaplamak
+    needs: $\sum d+(n-1)d_{\max}$
+    q: |-
+      Aşama süreleri (4, 2, 6, 3) olan bir boru hattı 50 öğe işliyor. Toplam süre?
+    answer: 309
+    calc: "sum([4,2,6,3])+49*6"
+    tol: 0
+    mistakes:
+      - {answer: 750, msg: "Bu sıralı süre (15 · 50): aşamalar eşzamanlı çalışır."}
+      - {answer: 300, msg: "İlk öğenin boru hattını doldurma süresi (15) eksik: 15 + 49 · 6."}
+    hints:
+      - "İlk öğe 15'te çıkar, sonrakiler her 6 birimde bir."
+    solution: |-
+      $15+49\cdot6=309$. Aşama 3 iki kopyaya çoğaltılırsa darboğaz 4 olur: $15+49\cdot4=211$.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Karp–Flatt eğilimini okumak
+    goal: Ölçeklenmeyi sınırlayan etkeni bulmak
+    needs: Karp–Flatt, ek yük
+    q: |-
+      Bir programın ölçülen hızlanmalarından hesaplanan seri kesir p = 2, 4, 8, 16 için sırasıyla 0.020, 0.021, 0.034, 0.061. En olası yorum?
+    choices:
+      - {t: "Programın %2'si seri; daha çok çekirdekle hızlanma 50'ye ulaşır", why: "e sabit kalsaydı öyle olurdu; ama p ile artıyor."}
+      - {t: "p ≥ 8'de işlemci sayısıyla büyüyen bir ek yük (eşgüdüm, iletişim, yük dengesizliği ya da bellek bant genişliği) devreye giriyor; Amdahl tavanı iyimser", ok: true, why: "Gerçek seri kesir sabittir; artan e ek yükün imzasıdır."}
+      - {t: "Ölçüm hatası; ortalaması alınmalı", why: "Düzenli artış rastgele hata değildir."}
+    hints:
+      - "Gerçek seri kod p'ye bağlı mı?"
+    solution: |-
+      İlk iki değer yaklaşık sabit: yaklaşık %2 seri kod var. p = 8'den sonra e'nin artması, p ile büyüyen bir maliyete işaret eder; örneğin bellek bant genişliğine doyan bir döngü ya da her thread'in bir kilidi beklemesi. Çözüm seri kodu değil ek yükü hedeflemektir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Açgözlü zamanlamanın üst sınırı
+    goal: Graham/Brent sınırını kanıtlamak
+    needs: Tam ve eksik adımlar
+    q: |-
+      Birim süreli görevlerden oluşan bir DAG'da (iş $W$, yol $S_\infty$) hiçbir işlemcinin hazır görev varken boş durmadığı her zamanlamanın $T_p\le W/p+S_\infty$ sağladığını kanıtlayın.
+    rubric:
+      - "Zaman adımlarını tam (p işlemci dolu) ve eksik adımlar olarak ayırdım"
+      - "Tam adım sayısının en çok W/p olduğunu gösterdim"
+      - "Eksik adımda bütün hazır görevlerin çalıştığını ve kalan grafiğin en uzun yolunun bir kısaldığını gösterdim"
+      - "Eksik adım sayısının en çok S∞ olduğu sonucuna varıp iki sınırı topladım"
+    hints:
+      - "Kalan grafikte en uzun yolun ilk görevi hazır mıdır?"
+    solution: |-
+      Bkz. derste "Açgözlü zamanlamanın sınırları" türetimi. Kalan grafiğin en uzun yolunun ilk görevinin bütün öncülleri bitmiştir, yani hazırdır; eksik adımda bütün hazır görevler çalıştığı için o görev de çalışır ve yol bir kısalır.
+pitfalls:
+  - wrong: "Hızlanmayı paralel programın tek thread'le çalıştırılmasına göre hesaplamak yeterlidir."
+    right: "Altın kural: karşılaştırma bilinen en hızlı sıralı programla yapılır. Paralel algoritma tek thread'de genellikle sıralı algoritmadan yavaştır (ek iş, eşgüdüm), bu yüzden kendine göre hızlanma şişkin çıkar."
+  - wrong: "Süper doğrusal hızlanmalar Amdahl yasasının yanlış olduğunu gösterir."
+    right: "Süper doğrusal hızlanma genellikle önbellek etkisidir: bölünen veri önbelleğe sığar ve parça başına iş daha hızlı yapılır. Bu, Amdahl'ın paralel kısım tam N kat hızlanır varsayımını bozar; yasa sabit problem boyu için geçerli kalır."
+  - wrong: "Daha çok thread her zaman daha hızlıdır."
+    right: "İşlemci sayısı paralelliği (W/S∞) aşınca işlemciler boşta kalır; iletişim ve eşgüdüm ek yükü işlemci sayısıyla büyür ve bir noktadan sonra programı yavaşlatır (lab l1'de ek yükle en iyi N)."
+  - wrong: "Boru hattına aşama eklemek onu hızlandırır."
+    right: "Boru hattının hızını en yavaş aşama belirler: T = Σd + (n − 1)d_max. Dengesiz bir aşamayı bölmeden aşama eklemek yalnız gecikmeyi (Σd) artırır."
+whatif:
+  - q: "Mandelbrot'ta dinamik dağıtım satır yerine tek tek piksellerle (c = 1 piksel) yapılsa?"
+    a: "Denge neredeyse kusursuz olur, ama 12 288 alış işlemi yapılır: her alış paylaşılan atomik sayaca bir erişimdir ve thread sayısı arttıkça sayaç bir çekişme noktası olur. Parça boyu, alış ek yükünün işe oranını küçük tutacak ve parça sayısı thread sayısının birkaç katı olacak biçimde seçilir."
+  - q: "GPU ayrık bir PCIe kartı değil de CPU ile aynı belleği paylaşsaydı (APU, tümleşik bellekli sistemler)?"
+    a: "Aktarım maliyeti ve onunla gelen veri boyutu eşiği kalkar: küçük işler de GPU'ya verilebilir ve CPU ile GPU aynı veri yapıları üzerinde dönüşümlü çalışabilir. Bedeli, paylaşılan bellek bant genişliğidir: ayrık GPU'nun kendine ait yüksek bant genişlikli belleği yerine iki işlemci aynı belleği bölüşür."
+  - q: "Merge sort'ta birleştirme adımı da paralelleştirilse (paralel merge)?"
+    a: "İki sıralı diziyi ikili aramayla bölerek birleştirmek O(log² n) yol verir; merge sort'un yolu O(log³ n)'e, paralellik ise n log n / log³ n = n / log² n'ye çıkar. Lab l2'deki 4'lük paralellik, n = 128 için onlarca kat büyür; iş aynı mertebede kalır."

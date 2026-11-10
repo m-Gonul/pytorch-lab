@@ -153,8 +153,8 @@ groups:
         topics: "Moore yasası, çok çekirdek, GPGPU, Flynn sınıflaması, paylaşımlı/dağıtık bellek, Amdahl, Gustafson–Barsis; PCAM; görev/veri/böl-yönet/boru hattı/olay tabanlı ayrıştırma; SPMD, MPMD, usta–işçi"
         pages: [m10-1-parallel-models]
         status: genis
-        gap: "Somut çipler (Kepler, TILE-Gx) bizde örnek olarak yok."
-        done: "Amdahl/Gustafson deneyi (seri kesir, iletişim ek yükü, verim)."
+        gap: "—"
+        done: "Amdahl/Gustafson deneyi (seri kesir, iletişim ek yükü, verim). M10.1 konu anlatımı lect_01'in (1–71) ve lect_02'nin (1–57) bütün slaytlarını işliyor: Moore yasası ve frekans duvarı (güç türetimi P ∝ f³), çok çekirdek ve GPGPU, watt başına işlem, Flynn sınıflaması, paylaşımlı/dağıtık bellek, NUMA, SMP ve efendi–işçi, modern işlemciler, GPU–CPU farkı ve PCIe eşiği, Cell BE, Kepler, APU/HSA, TILE-Gx8072 ve Xeon Phi (önceki boşluk kapandı), başarım ölçüleri ve altın kurallar, Amdahl, karıncalar ve filler, Gustafson–Barsis, gecikme ve verim; PCAM'in dört adımı ve örnekleri, altı ayrıştırma deseni, program yapısı desenleri (SPMD, MPMD, efendi–işçi, map-reduce, fork/join, döngü paralelliği) ve desen–yapı tablosu; modül hedefleri için Karp–Flatt, iş–yol modeli ve açgözlü zamanlama sınırının kanıtı, boru hattı süresi, yük dengeleme eklendi; workspan ve mandelbal deneyleri. Slayt notları: Cell'in tarihi, SPE sayısı ve çift duyarlık başarımı, Kepler'de 255 yazmaç thread başınadır, Amdahl 'temelden kusurlu' değildir, önek toplamı kodu ve map/scan/reduce tanımları."
       - src: "lect_03 — Thread'ler ve eşzamanlama"
         topics: "fork, thread, C++11 thread, veri yarışı, mutex, sıralı tutarlılık/doğrusallaştırılabilirlik, semaforlar (ikili, sayan), kritik bölge, call_once, livelock/açlık, üretici–tüketici ve sonlandırma, CAS ve LL/SC, monitörler, fiber'ler, hata ayıklama"
         pages: [m10-2-threads-sync, m10-3-cpu-parallel]
