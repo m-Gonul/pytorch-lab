@@ -1,5 +1,76 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 9
+
+Faz 9'un (klasik görüntü ve video işleme) 18 modülünün hepsine tam konu anlatımı yazıldı. Kaynak, BİL 467/561 Image Processing ders arşivindeki 30 slayt destesidir; her deste sayfa sayfa işlendi ve görsel slaytlar sayfa görüntüsüne çevrilerek kontrol edildi. Slayt metni kopyalanmadı. Konular yeniden anlatıldı, türetimler eklendi ve slaytlardaki hatalar "Kaynak düzeltmesi" kutularında gerekçeleriyle düzeltildi. Destekleyici kaynaklar Gonzalez–Woods'tur; özgün makaleler de kullanıldı: Canny, Harris, Lowe, Dalal–Triggs, Viola–Jones, Lucas–Kanade, Bolme (MOSSE), Barnich (ViBe), Wang (SSIM) ve Tomasi (ikili süzgeç). OpenCV, scikit-image ve colorsys ile birebir karşılaştırmalar yapıldı.
+
+| modül | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|
+| M9.1 dijital görüntü | 3 | interp, fwdinv | elektromanyetik spektrum ve dalga boyu, örnekleme ve nicemleme, enterpolasyon çekirdekleri, ileri/ters eşleme ve delikler |
+| M9.2 yoğunluk ve histogram | 2 | histeq, histmatch | histogram eşitlemenin CDF türetimi, eşleştirme ve monotonluk |
+| M9.3 uzamsal süzgeçleme | 2 | smoothcmp, padmodes | korelasyon/evrişim, ayrılabilirlik ve maliyeti, kutu ile Gauss, dolgu kipleri |
+| M9.4 keskinleştirme | 2 | deriv1d, sharpen1d | birinci/ikinci türev davranışı, Laplace ve keskinleştirme maskesi, yüksek artırma |
+| M9.5 restorasyon | 2 | noisepdf, denoise2d | altı gürültü yoğunluğu ve momentleri, ortalama ve sıra istatistiği süzgeçleri, uyarlamalı medyan |
+| M9.6 kenarlar | 3 | edgeop, cannylab | gradyan operatörleri, LoG ve sıfır geçişleri, Canny'nin dört adımı |
+| M9.7 köşeler | 2 | harrisgeo, harrismap | yapı tensörü, özdeğer geometrisi, Harris yanıtı |
+| M9.8 morfoloji | 3 | morphbin, morphgray | genişleme/aşınma/açma/kapama, dualite, gri seviye morfoloji |
+| M9.9 renk | 2 | colorconv, colorproc | RGB/HSI/HSV/Lab dönüşümleri, renk histogram eşitleme, Di Zenzo gradyanı |
+| M9.10 frekans uzayı | 3 | circconv, freqfilt, deconv | DFT ve dairesel evrişim, ideal/Butterworth/Gauss süzgeçler, Wiener süzgeci |
+| M9.11 bölütleme | 3 | pointline, segcluster, slic | nokta/çizgi tespiti, k-means ve GMM, SLIC uzaklığı |
+| M9.12 kenar koruyan süzgeçler | 3 | bilateral1d, clahelab, nlmlab | CLAHE kırpma ve dağıtma, ikili süzgeç, yerel olmayan ortalamalar |
+| M9.13 kalite ölçütleri | 2 | eqmse, ssimparts | MSE/PSNR'nin kandırılması, SSIM'in l/c/s parçaları ve C3 = C2/2 |
+| M9.14 öznitelikler | 3 | dogscale, hoglab | ölçek uzayı, DoG ≈ (k − 1)σ²∇²G, SURF kutu süzgeçleri, SIFT ve HOG betimleyicileri |
+| M9.15 eşleştirme | 2 | ncclab, ransaclab, mossetrack | korelasyon katsayısı, homografi ve DLT, RANSAC iterasyon formülü, MOSSE |
+| M9.16 Viola–Jones | 2 | haarfeat, adaboostlab | integral görüntü, 162 336 özniteliğin sayımı, VJ AdaBoost'unun özgün AdaBoost'a denkliği, kaskad aritmetiği |
+| M9.17 video ve hareket | 3 | lkflow, blockfruc, stablab | optik akış denklemi ve normal akış, LK ve yapı tensörü, piramit, ileri–geri denetimi, yumuşatmanın frekans yanıtı |
+| M9.18 arka plan çıkarma | 2 | bgsub, vibeghost | üstel ortalamanın belleği, Stauffer–Grimson, ViBe örnek ömrü, doğrusal özyinelemenin paralel taraması |
+
+- **Faz 9'da 41 deney (40'ı yeni; M9.12'deki bilateral1d korundu) ve 44 şekil.** Şekillerdeki bütün sayılar betikle hesaplandı.
+- **Birebir doğrulanan deneyler:**
+  - clahelab, `cv2.createCLAHE` ile 2 × 2'de birebir aynı; 8 × 8'de 57 pikselde 1 gri seviye fark var (yuvarlama kuralı).
+  - colorconv'un Lab dönüşümü scikit-image, HSV dönüşümü colorsys ile aynı.
+  - eqmse'nin SSIM'i scikit-image ile 5 basamak aynı.
+  - hoglab, `skimage.feature.hog` ile 10⁻⁷ içinde aynı.
+  - ncclab, `cv2.matchTemplate(TM_CCOEFF_NORMED)` ile 10⁻⁵ içinde aynı.
+  - M9.16'daki öznitelik sayısı `haar_like_feature_coord` ile aynı (162 336).
+- **Kaynak düzeltmeleri** (slayt görüntüleriyle doğrulandı; her biri ilgili modülde kutu içinde):
+  - M9.1: görünür bant µm, ultrason dalga boyu, afin dönüşümün koruduğu nicelikler.
+  - M9.2: 8 bitte L = 256, monotonluğun anlamı.
+  - M9.3: ayrılabilirlik tanımı, 11 × 11 çekirdeğin kazancı.
+  - M9.5: Erlang'ın tanım aralığı, tuz-biber momentleri ve yer değiştirmiş etiketler.
+  - M9.6: g_y, LoG paydası σ⁴, sıfır çemberi √2σ, Canny açı ve zayıf eşik aralıkları.
+  - M9.7: R'nin tanımı, elips eksenleri √λ.
+  - M9.8: genişleme ve kapama küme formülleri.
+  - M9.9: hayali CIE ana renkleri, b* ekseni, yayın yılı.
+  - M9.11: k-means amacı kareler toplamıdır.
+  - M9.13: S ≤ 1.
+  - M9.14: Gauss'un tekliği kuramsaldır; iki bölmeye enterpolasyon; Frobenius normu; HOG maskesi ve L2-Hys.
+  - M9.16: dört dikdörtgenli öznitelik çaprazdır; VJ başlangıç ağırlıkları; aydınlatma dayanıklılığının kaynağı.
+  - M9.17: LK türetimindeki yazım ve işaret hataları, ileri–geri denetiminin karşılık noktası, kayan deklanşörde satırlar, homografinin 8 serbestliği.
+  - M9.18: ViBe'de komşu güncellemesi bağımsız bir çekiliştir.
+- **Ölçümle düzeltilen ya da anlatıma giren sonuçlar:**
+  - Taslak notlarda ölçümle çürütülüp yeniden yazılan iddialar:
+    - harmonik ortalamanın Gauss gürültüsünde iyi olduğu;
+    - Gauss çekirdeğinin dairesel sarmada daha az etkilendiği;
+    - koşulsuz "NLM dokuyu korur" (bu sahnede ikili süzgecin yöntem gürültüsü 0.009, NLM'ninki 0.025);
+    - HOG normalizasyonunun kosinüs benzerliğini artırdığı (yerine şablon skor oranı ölçüldü);
+    - eşit MSE görüntülerinde SSIM sıralamasının Wang ve ark. ile aynı olduğu;
+    - RANSAC'ta nominal ε ile hesaplanan başarı olasılığı (gerçekleşen içerdeğer oranı kullanıldı);
+    - MOSSE'nin tek örnekle başlatılması.
+  - M9.12: CLAHE'de OpenCV ile bir gri seviyelik fark, yarıyı çifte yuvarlama ile giderildi.
+  - M9.14: mini SIFT en küçük lekeyi kaçırıyordu, 2 kat büyütme seçeneği eklendi; en büyük leke z = 1.5'te kaçıyordu, 4 oktav kullanıldı.
+  - M9.16: kaskadın ilk sürümü tek AdaBoost'un önekleriydi. 0/1 kütük çıktıları yüzünden ilk aşamalar hiçbir şey reddetmiyordu; zor negatif madenciliğiyle ayrı eğitilen aşamalara geçildi. Zor negatifler eklenmeden görev çok kolaydı (test FPR 0).
+  - M9.17: FRUC deneyinin varsayılan hızı arama aralığını aşıyordu.
+  - M9.18: deney videosundaki duran nesne yanlış işaretli bir min/max yüzünden durmuyordu.
+- **Pratik kartlarında düzeltilen hesap hataları** (yayından önce, test yakaladı): M9.4 p4, M9.7 p3, M9.9 p2/p3/p6, M9.10 p2, M9.11 p4, M9.12 p4, M9.13 p4, M9.15 p4, M9.17 p4 (yuvarlanmış cevap).
+- **Şekil sorunları** (ekran görüntüsünde fark edildi):
+  - SVG metninde ham "<" karakteri;
+  - tanımsız bir dolgu sınıfının siyah çizilmesi;
+  - renk adlarıyla paletin uyuşmadığı başlıklar (M9.16 histogramı, M9.17 LK);
+  - çakışan alt yazılar;
+  - görüntü üstü işaretlerde ters y ekseni.
+- **Kalan:** Faz 10 (BİL 455) ve Faz 11 (YAP 446 ve DQN/AlphaGo) konu anlatımları; kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 8
 
 Faz 8'in iki proje modülüne tam konu anlatımı yazıldı. İkisi de önceki fazların araçlarını tek bir çalışan sistemde birleştiriyor; anlatım projenin her adımını (bütçe, biçim, eğitim, değerlendirme, profil) gerekçeleriyle veriyor.
