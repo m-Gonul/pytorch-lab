@@ -101,3 +101,140 @@ homework:
     accept:
       - "a ve b üsleri raporlanmış, yaklaşık eşit."
       - "Parametrik form uydurması ve kalıntılar."
+
+labs:
+  - id: l1
+    lab: budget
+    title: "Hesap bütçesi ve eş-FLOP eğrisi"
+    goal: |
+      Parametre sayısı ve token/parametre oranından eğitim FLOP'unu (6ND) ve süreyi hesapla. Chinchilla'nın uydurulmuş kayıp yasasıyla aynı hesap bütçesinde kaybı model boyuna göre çiz; en iyi bölüşümü "20 token/parametre" kuralıyla karşılaştır.
+    predict:
+      q: "Sabit hesap bütçesinde 10 kat fazla token (D/N = 200) ile daha küçük bir model eğitmek kaybı nasıl etkiler?"
+      options:
+        - {t: "Daha düşük kayıp: daha çok veri her zaman iyidir", why: "Aynı C'de daha çok token daha küçük model demektir."}
+        - {t: "Daha yüksek kayıp (eş-FLOP eğrisinin dibinden uzaklaşılır)", ok: true, why: "N = 10⁷, D/N = 200: kayıp 4.41, aynı C'nin en iyisi 4.25."}
+        - {t: "Aynı", why: "Eğri dipte düz ama 10 katlık sapma hissedilir."}
+    presets:
+      - {name: "El hesabı", params: {logN: 7, ratio: 20, peak: 100, mfu: 0.4}, note: "C = 1.2·10¹⁶ FLOP, 300 s. En iyi N* ≈ 1.1·10⁷ (kurala çok yakın)."}
+      - {name: "Çok token", params: {ratio: 200}, note: "Kayıp 4.41, eş-FLOP en iyisi 4.25; ama çıkarımda daha ucuz bir model."}
+      - {name: "Az token", params: {ratio: 2}, note: "Kayıp 7.09, en iyisi 6.87: büyük model az eğitilmiş."}
+      - {name: "Chinchilla ölçeği", params: {logN: 10.85, ratio: 20, peak: 312, mfu: 0.4}, note: "C ≈ 6·10²³; yaklaşım 3 katsayılarıyla N* ≈ 3.2·10¹⁰ (makale yaklaşım 3 için 40 milyar bildirir)."}
+    questions:
+      - q: "LLaMA gibi modeller neden Chinchilla-optimal oranın çok üstünde token ile eğitilir?"
+        a: "Chinchilla eğitim hesabını en aza indirir; çıkarım maliyeti model boyuyla orantılıdır. Model çok kez çalıştırılacaksa daha küçük bir modeli daha uzun eğitmek toplam maliyeti düşürür."
+    limits: "Uydurulmuş yasa ve sabitler büyük dil modelleri için; küçük görevlere doğrudan taşınmaz. 6ND dikkat terimini ihmal eder."
+  - id: l2
+    lab: mfu
+    title: "MFU: modelin donanımı ne kadar kullandığı"
+    goal: |
+      GPT benzeri bir yapılandırmadan parametre sayısını, token başına eğitim FLOP'unu ve ölçülen adım süresinden ulaşılan hızı ve MFU'yu hesapla. Bağlam uzadıkça dikkatin FLOP payının nasıl büyüdüğünü gör.
+    predict:
+      q: "Bu modüldeki mini-GPT (2 katman, d = 128, bağlam 9) için MFU büyük modellerdekine göre nasıldır?"
+      options:
+        - {t: "Benzer (%40–60)", why: "Küçük matrislerde süre ek yük bağımlıdır."}
+        - {t: "Çok düşük", ok: true, why: "Adım başına FLOP küçük, sabit maliyetler (Python, çekirdek başlatma) baskın."}
+        - {t: "%100'e yakın", why: "Ancak saf matmul işinde ve büyük boyutlarda yaklaşılır."}
+    presets:
+      - {name: "Mini-GPT", params: {L: 2, d: 128, T: 9, V: 13, B: 128, ms: 15, peak: 1}, note: "N ≈ 4·10⁵; 1 TFLOP/s'lik bir CPU tepesine göre MFU 0.18."}
+      - {name: "GPT-2 small", params: {L: 12, d: 768, T: 1024, V: 50257, B: 8, ms: 150, peak: 312}, note: "N ≈ 1.24·10⁸ (gerçek 124 439 808); MFU 0.14."}
+      - {name: "7B, uzun bağlam", params: {L: 32, d: 4096, T: 4096, V: 32000, B: 1, ms: 400, peak: 989}, note: "N ≈ 6.6·10⁹; 400 ms'de MFU 0.44. Dikkat, ileri FLOP'un ≈ %7.5'i."}
+    questions:
+      - q: "MFU ile donanım kullanımı (HFU) neden farklı olabilir?"
+        a: "MFU yalnız modelin gerektirdiği FLOP'ları sayar. Aktivasyon checkpointing'deki yeniden hesap (M6.4) donanımın yaptığı ama modelin gerektirmediği FLOP'lardır; HFU onları da sayar ve daha yüksektir."
+    limits: "Yaklaşık FLOP sayımı (LayerNorm, softmax ve eleman bazlı işlemler yok); nedensel maske indirimi yok."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Koşu bütçesi
+    goal: 6ND ve süre hesabı
+    needs: C ≈ 6ND
+    q: |-
+      $N=5\cdot10^7$, Chinchilla-optimal token, 50 TFLOP/s tepe, %30 MFU. Süre?
+    solution: |-
+      $D=20N=10^9$; $C=6\cdot5\cdot10^7\cdot10^9=3\cdot10^{17}$ FLOP; etkin hız $1.5\cdot10^{13}$ FLOP/s; süre $2\cdot10^4$ s ≈ 5.6 saat.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kosinüs programı
+    goal: Formülü uygulamak
+    needs: $\eta=\eta_{\min}+\frac12(\eta_{\max}-\eta_{\min})(1+\cos\pi p)$
+    q: |-
+      Isınma 200, toplam 2200, $\eta_{\max}=3\cdot10^{-3}$, $\eta_{\min}=3\cdot10^{-4}$. Adım 1700'de $\eta$?
+    answer: 0.000695
+    calc: "3e-4 + 0.5*(3e-3-3e-4)*(1+cos(pi*0.75))"
+    tol: 1e-6
+    mistakes:
+      - {answer: 0.000525, msg: "p = (1700 − 200)/2000 = 0.75; cos(3π/4) ≈ −0.707."}
+      - {answer: 0.00165, msg: "Bu p = 0.5'teki değer."}
+    hints:
+      - "$p=0.75$, $1+\\cos(0.75\\pi)\\approx0.2929$."
+    solution: |-
+      $3\cdot10^{-4}+0.5\cdot2.7\cdot10^{-3}\cdot0.2929\approx6.95\cdot10^{-4}$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Ters cevap
+    goal: Biçimi uygulamak
+    needs: Üç basamak, ters
+    q: |-
+      `09+93=` satırının ters çevrilmiş 3 basamaklı cevabı (sayı olarak, baştaki sıfırlar atılarak)?
+    answer: 201
+    calc: "201"
+    tol: 0
+    mistakes:
+      - {answer: 102, msg: "Bu toplamın kendisi; cevap ters yazılır: 102 → \"201\"."}
+      - {answer: 21, msg: "Üç basamak: 102 → \"201\"."}
+    hints:
+      - "9 + 93 = 102."
+    solution: |-
+      $102$ → `"102"` → ters `"201"`.
+  - id: p4
+    type: yorumla
+    level: 2
+    title: Kayıp tabanın altında, doğruluk %60
+    goal: Hatayı yerelleştirmek
+    needs: Tam eşleşme, elde
+    q: |-
+      Eğitim kaybı 0.4 nat/konum (taban 1.77) ama tam eşleşme doğruluğu %60'ta takıldı. İlk bakılacak şey?
+    choices:
+      - {t: "Öğrenme oranını artırmak", why: "Önce hatanın nerede olduğunu bulmak gerekir."}
+      - {t: "Doğruluğu elde olan ve olmayan örneklere ve basamak konumuna göre ayırmak", ok: true, why: "Genellikle eldeli durumlar (özellikle onlar basamağı) geride kalır; hedefli veri ya da daha uzun eğitim gerekir."}
+      - {t: "Modeli büyütmek", why: "Belki gerekir ama önce hata türü anlaşılmalı."}
+    hints:
+      - "Hangi örneklerde yanlış?"
+    solution: |-
+      Ortalama kayıp iyi olsa da tam eşleşme bütün basamakları ister. Hataları elde durumuna ve konuma göre ayırmak, modelin hangi alt görevi öğrenmediğini gösterir.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Eğitim FLOP'u 6N
+    goal: İleri 2N, geri 4N'yi göstermek
+    needs: Doğrusal katman, VJP
+    q: |-
+      Doğrusal bir katman $y=Wx$ ($W\in\mathbb R^{m\times n}$) için bir token'ın ileri geçişinin $2mn$, geri geçişinin $4mn$ FLOP olduğunu göster; bütün katmanlar toplanınca token başına $\approx6N$ çıktığını açıkla.
+    rubric:
+      - "İleri: mn çarpma + mn toplama = 2mn"
+      - "Geri: girdi gradyanı Wᵀȳ için 2mn"
+      - "Geri: ağırlık gradyanı ȳxᵀ için 2mn"
+      - "Ağırlıkların toplamı N olduğu için 2N + 4N = 6N; dikkat skorları gibi ağırlıksız işlemlerin ihmal edildiğini belirttim"
+    hints:
+      - "Geri geçişte iki VJP vardır."
+    solution: |-
+      İleri $2mn$; geri $\bar x=W^\top\bar y$ ($2mn$) ve $\bar W=\bar yx^\top$ ($2mn$). Katmanlar üzerinden $\sum mn=N$, token başına $6N$. İlk katmanın girdi gradyanı gerekmez ve dikkatin $QK^\top$ terimi ağırlıksızdır; bunlar küçük düzeltmelerdir.
+pitfalls:
+  - wrong: "Daha çok veri her zaman daha iyidir."
+    right: "Sabit hesapta daha çok token daha küçük model demektir; eş-FLOP eğrisinin dibinden uzaklaşınca kayıp artar."
+  - wrong: "Kayıp tüm diziye uygulanmalıdır."
+    right: "Rastgele soru kısmını tahmin etmek öğrenilemez; kayıp yalnız cevap konumlarına uygulanır, yoksa kayıp değeri yanıltıcı olur."
+  - wrong: "Profil çıkarmadan önce torch.compile ekle."
+    right: "Önce darboğaz bulunur: ek yük mü, bellek mi, hesap mı? Çözüm buna göre seçilir (birleştirme, batch, compile, düşük hassasiyet)."
+  - wrong: "Kayıp düşüyorsa doğruluk da yeterlidir."
+    right: "Tam eşleşme bütün basamakları ister; ortalama kayıp bazı durumların (eldeli) öğrenilmediğini gizleyebilir."
+whatif:
+  - q: "Cevap ters değil normal sırada yazılsaydı?"
+    a: "Model önce yüzler basamağını, yani bütün eldelerin sonucunu tahmin etmek zorundadır; öğrenme yavaşlar ve daha çok örnek gerektirir (Lee ve ark. 2023)."
+  - q: "Isınma olmadan büyük öğrenme oranıyla başlansaydı?"
+    a: "İlk adımlarda Adam'ın ikinci moment kestirimi güvenilmez ve gradyanlar büyüktür; kayıp sıçrayabilir ya da NaN olabilir. Kırpma kısmen korur."
+  - q: "Üç basamaklı toplamaya geçilse?"
+    a: "Satır 13 karakter, cevap 4 basamak; aynı biçim ve maske çalışır. Elde zincirleri uzadığı için daha çok veri ve adım gerekir; uzunluk genelleştirmesi (eğitimde görülmeyen uzunluklar) transformer'lar için ayrıca zordur."
