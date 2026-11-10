@@ -94,3 +94,141 @@ homework:
     accept:
       - "Örtüşmeli sürüm örtüşmesizden hızlı."
       - "Kova boyutu–süre grafiği."
+
+labs:
+  - id: l1
+    lab: ringar
+    title: "Ring all-reduce adım adım"
+    goal: |
+      N işçinin parça durumlarını reduce-scatter ve all-gather adımları boyunca izle: hangi işçinin hangi parçada kaç katkı topladığını gör. İşçi başına gönderilen veriyi ve α–β modeliyle süreyi merkezi sunucu yaklaşımıyla karşılaştır; gecikmenin baskın olduğu durumu bul.
+    predict:
+      q: "N = 4, reduce-scatter'ın sonunda (3. adım) her işçi ne tutar?"
+      options:
+        - {t: "Bütün vektörün toplamı", why: "Bu all-gather'dan sonra."}
+        - {t: "Bir parçanın tam toplamı (diğer parçalar kısmi)", ok: true, why: "İşçi i, parça (i + 1) mod N'nin dört katkısını toplamış olur."}
+        - {t: "Yalnız kendi gradyanı", why: "Bu başlangıç."}
+    presets:
+      - {name: "Reduce-scatter sonu", params: {N: 4, step: 3, MB: 100, alpha: 10, bw: 25}, note: "Her satırda tek bir tam parça. Toplam 6 adım, işçi başına 150 MB; ring 6.06 ms, merkezi 24.0 ms."}
+      - {name: "All-gather sonu", params: {step: 6}, note: "Bütün hücreler tam toplam."}
+      - {name: "8 işçi", params: {N: 8, step: 14}, note: "14 adım, işçi başına 175 MB (2 · 100'e yaklaşıyor); ring 7.1 ms, merkezi 56.0 ms."}
+      - {name: "Gecikme baskın", params: {N: 16, step: 30, MB: 1, alpha: 100}, note: "1 MB, α = 100 µs: ring 3.08 ms, merkezi 1.40 ms; 30 adımlık gecikme bant tasarrufunu aşıyor."}
+    questions:
+      - q: "Ring all-reduce'da işçi sayısı iki katına çıkınca süre neden neredeyse değişmez?"
+        a: "İşçi başına gönderilen veri 2(N − 1)/N · M, N büyüdükçe 2M'ye yaklaşır; her bağlantı eşit yük taşır ve hepsi paralel çalışır. Artan yalnız 2(N − 1)α gecikme terimidir."
+    limits: "α–β modeli; topoloji, çakışma, NVLink/InfiniBand ayrımı ve ağaç algoritmaları modellenmedi."
+  - id: l2
+    lab: zeromem
+    title: "GPU başına bellek: DDP ve ZeRO aşamaları"
+    goal: |
+      Parametre sayısı, GPU sayısı ve hassasiyete göre DDP, ZeRO-1, ZeRO-2 ve ZeRO-3/FSDP'de GPU başına model durumu belleğini hesapla; aktivasyonları ekleyip GPU belleğine sığıp sığmadığını ve stratejilerin iletişim bedelini gör.
+    predict:
+      q: "1 milyar parametre, fp32 Adam, 8 GPU, ZeRO-1. GPU başına model durumu?"
+      options:
+        - {t: "16 GB", why: "Bu DDP."}
+        - {t: "9 GB", ok: true, why: "Ağırlık 4 + gradyan 4 + durum 8/8 = 9 bayt/parametre."}
+        - {t: "2 GB", why: "Bu ZeRO-3."}
+    presets:
+      - {name: "El hesabı (ZeRO-3)", params: {P: 1, N: 8, prec: 0, mode: 3, act: 0, cap: 80}, note: "DDP 16, ZeRO-1 9, ZeRO-2 5.5, ZeRO-3 2 GB."}
+      - {name: "El hesabı (ZeRO-1)", params: {mode: 1, act: 0}, note: "9 GB."}
+      - {name: "70 milyar, 64 GPU", params: {P: 70, N: 64, prec: 1, mode: 3, act: 4}, note: "Karışık hassasiyet: DDP 1120 GB (imkânsız), ZeRO-1 297, ZeRO-2 159, ZeRO-3 21.5 GB (+ 4 GB aktivasyon) sığıyor."}
+      - {name: "70 milyar, ZeRO-2", params: {P: 70, N: 64, prec: 1, mode: 2, act: 4}, note: "163 GB: 80 GB'a sığmıyor; ağırlıkların da bölünmesi gerekiyor."}
+    questions:
+      - q: "GPU sayısı çok büyüdüğünde ZeRO-3'ün GPU başına belleği neden yine de sıfıra inmez?"
+        a: "Bölünmüş durum 16Ψ/N ile küçülür ama aktivasyonlar, geçici olarak toplanan katman parametreleri (bir FSDP biriminin tam ağırlıkları) ve iletişim tamponları bölünmez. Bu sabit kısım bir taban oluşturur."
+    limits: "Aktivasyonlar sabit kabul edildi; geçici tamponlar, parçalanma ve ZeRO-3'te toplanan birimin belleği dahil değil."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: All-reduce ortalaması
+    goal: Veri paralelliğinin eşdeğerliğini sayıyla görmek
+    needs: Ortalama
+    q: |-
+      Üç işçi, eşit parçalar; yerel gradyanlar $2$, $-1$, $5$. All-reduce (ortalama) sonrası herkesin gradyanı nedir? Bu neye eşittir?
+    solution: |-
+      $(2-1+5)/3=2$. Parçalar eşit olduğu için bu, üç parçanın birleşiminden oluşan büyük batch'in gradyanıdır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Ring trafiği
+    goal: 2(N − 1)/N kuralını uygulamak
+    needs: Ring all-reduce
+    q: |-
+      8 işçi, 400 MB gradyan. Ring all-reduce'da işçi başına gönderilen veri (MB)?
+    answer: 700
+    calc: "2*7/8*400"
+    tol: 1e-9
+    mistakes:
+      - {answer: 800, msg: "Bu N → ∞ sınırı (2M)."}
+      - {answer: 350, msg: "Reduce-scatter ve all-gather'ın ikisi de sayılır: 2(N − 1)/N."}
+    hints:
+      - "$2\\cdot7/8\\cdot400$."
+    solution: |-
+      $2\cdot7/8\cdot400=700$ MB, 14 adımda.
+  - id: p3
+    type: hesap
+    level: 1
+    title: ZeRO-2 belleği
+    goal: Aşama formülünü uygulamak
+    needs: Bayt/parametre dökümü
+    q: |-
+      2 milyar parametre, fp32 Adam (4 + 4 + 8), 16 GPU, ZeRO-2. GPU başına model durumu (GB, 10⁹ bayt)?
+    answer: 9.5
+    calc: "2*(4 + 4/16 + 8/16)"
+    tol: 1e-9
+    mistakes:
+      - {answer: 17.0, msg: "Bu ZeRO-1: 2 · (4 + 4 + 8/16); ZeRO-2'de gradyan da bölünür."}
+      - {answer: 2.0, msg: "Bu ZeRO-3: ağırlıklar ZeRO-2'de bölünmez."}
+    hints:
+      - "Ağırlık 4, gradyan 4/16, durum 8/16 bayt/parametre."
+    solution: |-
+      $2\cdot(4+0.25+0.5)=2\cdot4.75=9.5$ GB. Kalan en büyük kalem bölünmeyen ağırlıklardır (8 GB).
+  - id: p4
+    type: yorumla
+    level: 2
+    title: DDP'de kopyalar ayrıştı
+    goal: Ayrışmanın nedenini bulmak
+    needs: DDP kurulumu
+    q: |-
+      Elle yazılmış bir veri paralel eğitimde (DDP yok, gradyanlar all-reduce ile ortalanıyor) birkaç yüz adım sonra işçilerin parametreleri farklılaşıyor. Olası neden?
+    choices:
+      - {t: "All-reduce yanlış toplar", why: "Kolektifler deterministiktir."}
+      - {t: "Başlangıç parametreleri farklı (tohum ya da broadcast yok) ya da işçilerden birinde ek bir rastgele işlem (dropout tohumu farklıyken) parametreleri etkiliyor", ok: true, why: "Aynı gradyan farklı parametrelere uygulanınca kopyalar ayrı kalır; DDP başlangıçta rank 0'ı yayınlar."}
+      - {t: "Öğrenme oranı çok küçük", why: "Ayrışmayla ilgisi yok."}
+    hints:
+      - "Aynı güncelleme farklı başlangıçlara uygulanırsa ne olur?"
+    solution: |-
+      Veri paralelliğinin varsayımı kopyaların özdeş başlaması ve özdeş güncellenmesidir. Ya başlangıçta dist.broadcast ile eşitlenmeli ya da aynı tohum kullanılmalıdır; ayrıca optimizasyon durumu ve BN istatistikleri de eşit tutulmalıdır.
+  - id: p5
+    type: kanıt
+    level: 3
+    title: Ring all-reduce'un alt sınırı
+    goal: 2(N − 1)/N · M'nin optimal olduğunu göstermek
+    needs: İletişim argümanı
+    q: |-
+      Her işçinin $M$ boyutlu bir vektörü var ve sonunda hepsi toplamı tutmalı. Her işçinin en az $\frac{N-1}NM$ veri göndermesi ve en az $\frac{N-1}NM$ veri alması gerektiğini, dolayısıyla ring'in toplam $\frac{2(N-1)}NM$'sinin sabit çarpana kadar optimal olduğunu tartış.
+    rubric:
+      - "Her işçinin toplamın her parçası için diğer N − 1 işçinin katkısını alması gerektiğini belirttim"
+      - "Toplam alınan verinin en az (N − 1)/N · M olduğunu (parçalar dengeliyse) savundum"
+      - "Simetriyle gönderilen için de aynı sınırı yazdım"
+      - "Ring'in hem reduce-scatter hem all-gather'da bu sınıra ulaştığını ve toplamın 2 katı olduğunu belirttim"
+    hints:
+      - "Her parçanın toplamı en az bir yerde hesaplanmalı ve sonra herkese ulaşmalı."
+    solution: |-
+      Toplamın bir parçası bir işçide hesaplanacaksa diğer N − 1 işçinin o parçadaki katkıları oraya gitmelidir; yük dengeliyse her işçi (N − 1)/N · M alır (reduce-scatter sınırı). Sonra her işçi, kendisinde olmayan (N − 1)/N · M'lik tam toplamları almalıdır (all-gather sınırı). Ring her iki aşamada da bu sınıra ulaşır.
+pitfalls:
+  - wrong: "Veri paralelliği belleği N'ye böler."
+    right: "Hesabı böler, belleği kopyalar; belleği bölmek için ZeRO/FSDP gerekir."
+  - wrong: "All-reduce'un maliyeti işçi sayısıyla doğrusal artar."
+    right: "Ring algoritmasında işçi başına bant maliyeti 2(N − 1)/N · M, N'den neredeyse bağımsızdır; artan gecikme terimidir."
+  - wrong: "ZeRO-1 ve ZeRO-2 ek iletişim getirir."
+    right: "Reduce-scatter + all-gather, all-reduce ile aynı hacimdir (2Ψ); ek iletişim yalnız ZeRO-3'tedir (3Ψ)."
+  - wrong: "Gradyan biriktirmede her mikro batch'te all-reduce gerekir."
+    right: "Yalnız son mikro batch'te gerekir; arada model.no_sync() ile atlanır."
+whatif:
+  - q: "İşçiler farklı hızdaysa (yavaş bir GPU)?"
+    a: "Kolektifler eşzamanlıdır; her adım en yavaş işçiyi bekler. Veri paralel eğitimin hızı en yavaş işçiyle sınırlıdır; heterojen kümelerde iş yükünü dengelemek ya da eşzamansız yöntemler gerekir."
+  - q: "Kovalama yapılmasaydı?"
+    a: "Her parametre ayrı bir all-reduce olurdu; küçük mesajlarda gecikme terimi baskınlaşır ve iletişim geri geçişle iyi örtüşemez. 25 MB'lık kovalar bu iki etkiyi dengeler."
+  - q: "ZeRO-3'te bir katmanın parametreleri ileri geçişten sonra serbest bırakılmasaydı?"
+    a: "Bellek kazancı kaybolur (toplanan parametreler birikir); geri geçişte yeniden toplamak gerekmezdi ama tepe bellek DDP'ye yaklaşırdı. FSDP'nin reshard_after_forward seçeneği bu ödünleşimi ayarlar."
