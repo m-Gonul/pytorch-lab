@@ -107,3 +107,181 @@ homework:
       - "Kopya → hesap → geri kopya sürelerini ayrı ölç (cudaEvent)."
     accept:
       - "Tek renkli görüntüde (a) çok yavaşlar, (c) sağlam kalır."
+
+labs:
+  - id: l1
+    lab: redtree
+    title: "İndirgeme ağacı: basit ve yakınsak eşleme"
+    goal: |
+      Bir bloğun T thread'iyle 2T öğeyi indirgerken her yinelemede kaç thread'in ve warp'ın iş yaptığını, kaç warp'ın ayrıştığını, SIMT verimini ve global bellek sektör sayısını iki eşleme için say.
+    predict:
+      q: "256 öğelik (128 thread) blokta basit eşleme kaç yinelemede ayrışan warp içerir?"
+      options:
+        - {t: "10", why: "256 öğede yalnız 8 yineleme var; 10, 2048 öğelik blok içindir."}
+        - {t: "7", ok: true, why: "İlk yineleme (adım 1) hariç hepsi; yakınsak eşlemede 5."}
+        - {t: "5", why: "Bu yakınsak eşlemenin sayısı."}
+    presets:
+      - {name: "Basit, 128 thread", params: {map: 0, logT: 7}, note: "27 warp-yinelemesi, 7 ayrışan yineleme, 381 sektör."}
+      - {name: "Yakınsak, 128 thread", params: {map: 1, logT: 7}, note: "12 warp-yinelemesi, 5 ayrışan, 102 sektör."}
+      - {name: "Yakınsak, 1024 thread", params: {map: 1, logT: 10}, note: "68 / 223 warp-yinelemesi; ayrışan 5 (basitte 10)."}
+      - {name: "Tek warp", params: {map: 0, logT: 5}, note: "32 thread'de eşlemeler aynı warp sayısını verir; yalnız bellek erişimi farklı (93 / 30 sektör)."}
+    questions:
+      - q: "Yakınsak eşlemede son 5 yineleme neden hâlâ ayrışıyor ve bunu ne giderir?"
+        a: "Adım 32'nin altına inince etkin thread sayısı 16, 8, 4, 2, 1 olur: tek warp içinde bir kısmı çalışır, kalanı maskelidir. Son 5 adımı warp shuffle (__shfl_down_sync) ile yazmak paylaşımlı belleği ve __syncthreads'i ortadan kaldırır; ayrıca blok başına çok daha fazla öğeyi önceden yazmaçta toplamak (kabalaştırma) bu evrenin toplam süredeki payını küçültür."
+    limits: "Tek blok; global bellekte yerinde indirgeme; 4 baytlık öğeler, 32 baytlık sektörler; paylaşımlı bellek ve önbellek modellenmiyor."
+  - id: l2
+    lab: fpsum
+    title: "Kayan nokta toplamı: sıralı, ikili ve Kahan"
+    goal: |
+      N tane fp32 sayıyı sıralı, ikili (indirgeme ağacı), Kahan ve "blok içinde sıralı + bloklar arasında ağaç" yöntemleriyle topla ve float64 başvurusuna göre göreli hatayı ölç; N'nin ve veri dağılımının etkisini gör.
+    predict:
+      q: "10⁶ düzgün pozitif fp32 sayıyı sırayla toplamanın göreli hatası yaklaşık nedir (ε ≈ 6·10⁻⁸)?"
+      options:
+        - {t: "≈ ε", why: "Bu Kahan toplamının düzeyi."}
+        - {t: "≈ 2.5·10⁻⁵", ok: true, why: "Kısmi toplam büyüdükçe eklenen küçük öğelerin bitleri kayboluyor; ikili toplam 4.4·10⁻⁸."}
+        - {t: "≈ 6·10⁻² ((N − 1)ε)", why: "Bu kötü durum sınırı; hatalar kısmen birbirini götürüyor."}
+    presets:
+      - {name: "Düzgün, 10⁵", params: {logN: 5, dist: 0}, note: "Sıralı 1.8·10⁻⁶, ikili 5.1·10⁻⁸, Kahan 2.8·10⁻⁸."}
+      - {name: "Düzgün, 10⁶", params: {logN: 6, dist: 0}, note: "Sıralı 2.5·10⁻⁵."}
+      - {name: "Karışık işaretli", params: {logN: 5, dist: 1}, note: "Hatalar birbirini götürüyor: sıralı 5·10⁻⁹."}
+      - {name: "Geniş aralık", params: {logN: 5, dist: 2}, note: "Sıralı 5.5·10⁻⁵: büyük kısmi toplama küçük sayılar ekleniyor."}
+      - {name: "Küçük N", params: {logN: 2, dist: 0}, note: "Yöntemler arasında fark küçük."}
+    questions:
+      - q: "GPU'nun paralel toplamı CPU'daki sıralı döngüden farklı çıkınca hangisi daha doğrudur?"
+        a: "Genellikle GPU'nunki: indirgeme ağacı ikili toplamdır ve her öğe yalnız log₂N toplamadan geçer; sıralı döngüde ilk öğeler N kez yuvarlanır. İkisi de gerçek toplamın yaklaşığıdır; karşılaştırma birebir değil, göreli bir toleransla yapılmalı. Kesin tekrarlanabilirlik gerekiyorsa toplama sırası sabitlenmeli (atomik birleştirme sırası deterministik değildir) ya da Kahan/çift duyarlık kullanılmalıdır."
+    limits: "fp32 Math.fround ile her adımda yuvarlanıyor; başvuru float64 Neumaier toplamı; blok sürümünde blok boyu 256."
+  - id: l3
+    lab: coarsen
+    title: "Thread kabalaştırma: blok sayısı, dalgalar ve sabit maliyetler"
+    goal: |
+      Hiyerarşik bir toplam indirgemesinde kabalaştırma çarpanı C'nin (her thread'in ağaca girmeden önce 2C öğe toplaması) blok sayısını, eşzamanlı kapasiteye göre dalga sayısını ve toplam süreyi nasıl etkilediğini bir maliyet modeliyle incele.
+    predict:
+      q: "2²⁴ öğe ve 256 thread'lik bloklarla (108 SM) en iyi kabalaştırma çarpanı yaklaşık nedir?"
+      options:
+        - {t: "C = 1 (en çok paralellik)", why: "32 768 blok başlatılıyor; her blok sabit maliyetleri ve bir atomik işlemi ödüyor."}
+        - {t: "C ≈ 32", ok: true, why: "1024 blok, eşzamanlı kapasite 864: donanım dolu, sabit maliyetler az blokta."}
+        - {t: "C = 1024", why: "Yalnız 32 blok kalıyor: SM'lerin çoğu boş."}
+    presets:
+      - {name: "C = 1", params: {logN: 24, T: 1, logC: 0, sm: 108}, note: "32 768 blok, 38 dalga; süre 3.95·10⁵."}
+      - {name: "C = 32", params: {logN: 24, T: 1, logC: 5, sm: 108}, note: "En iyi: 7.7·10⁴."}
+      - {name: "C = 1024", params: {logN: 24, T: 1, logC: 10, sm: 108}, note: "32 blok: 1.8·10⁶."}
+      - {name: "Küçük girdi", params: {logN: 16, T: 1, logC: 0, sm: 108}, note: "En iyi C = 1: blok zaten az."}
+      - {name: "Küçük GPU", params: {logN: 24, T: 1, logC: 0, sm: 8}, note: "Kapasite 64 blok: en iyi C = 512."}
+    questions:
+      - q: "En iyi kabalaştırma çarpanı neden girdi boyuyla ve GPU'nun SM sayısıyla değişir?"
+        a: "En iyi nokta, blok sayısı eşzamanlı kapasiteyi (SM × SM başına blok) dolduracak kadar olup fazlasının olmadığı yerdir: daha az blok donanımı boş bırakır, daha çok blok her biri için ağaç adımlarının, başlatmanın ve atomiğin sabit maliyetini ekler. Kapasite SM sayısıyla, blok sayısı N / (2TC) ile ölçeklendiği için en iyi C ≈ N / (2T × kapasite)."
+    limits: "Kaba maliyet modeli: bant genişliği 1000 bayt/çevrim ve doluluğa orantılı, ağaç adımı 30, blok sabit maliyeti 500, atomik 10 çevrim (sıralı); önbellek ve gerçek zamanlama yok."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Toplam ağacı
+    goal: Ağacın adımlarını izlemek
+    needs: Birleşmelilik
+    q: |-
+      $[2,5,1,3,4,4,0,6]$'nın toplamını indirgeme ağacıyla (komşu çiftler) hesaplayın; her adımdaki işlem sayısını yazın.
+    solution: |-
+      1. adım (4 işlem): $7,4,8,6$. 2. adım (2 işlem): $11,14$. 3. adım (1 işlem): $25$. Toplam $4+2+1=7=N-1$ işlem, $\log_28=3$ adım.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Ortalama paralellik
+    goal: İş / adım oranını hesaplamak
+    needs: $(N-1)/\log_2N$
+    q: |-
+      4096 öğelik bir indirgeme ağacının ortalama paralelliği?
+    answer: 341.25
+    calc: "4095/12"
+    tol: 1e-9
+    mistakes:
+      - {answer: 2048, msg: "Bu en yüksek paralellik (ilk adım)."}
+      - {answer: 4095, msg: "Bu toplam iş; adım sayısına bölünmeli."}
+    hints:
+      - "İş $N-1=4095$, adım $\\log_24096=12$."
+    solution: |-
+      $4095/12=341.25$: ilk adımda 2048 birim gerekirken ortalamada 341 yeter.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Kabalaştırmayla blok sayısı
+    goal: Blok sayısını hesaplamak
+    needs: $N/(2TC)$
+    q: |-
+      $2^{24}$ öğe, 512 thread'lik bloklar, kabalaştırma çarpanı 4 (her thread 8 öğe). Kaç blok başlatılır?
+    answer: 4096
+    calc: "2**24//(2*512*4)"
+    tol: 0
+    mistakes:
+      - {answer: 16384, msg: "Kabalaştırma unutuldu (C = 1)."}
+      - {answer: 8192, msg: "Her thread 2C = 8 öğe işler."}
+    hints:
+      - "Blok başına $2\\cdot512\\cdot4=4096$ öğe."
+    solution: |-
+      $2^{24}/4096=4096$ blok. 108 SM × 4 blok (2048/512) = 432 kapasiteyle yaklaşık 10 dalga.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Hata sınırlarının oranı
+    goal: Sıralı ve ikili toplamı karşılaştırmak
+    needs: $(N-1)\epsilon$, $\lceil\log_2N\rceil\epsilon$
+    q: |-
+      $N=2^{20}$ öğede sıralı toplamın hata sınırı ikili toplamınkinin kaç katıdır?
+    answer: 52428.75
+    calc: "(2**20-1)/20"
+    tol: 1e-6
+    mistakes:
+      - {answer: 1048575, msg: "Bu yalnız sıralı sınırın katsayısı (N − 1)."}
+      - {answer: 20, msg: "Bu ikili sınırın katsayısı (log₂N)."}
+    hints:
+      - "$(N-1)/\\log_2N$."
+    solution: |-
+      $1\,048\,575/20\approx52\,429$. Gerçek hatalar sınırlardan küçüktür; deneyde 10⁶ öğede oran yaklaşık 570.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: GPU ile CPU toplamı farklı
+    goal: Kayan nokta birleşmesizliğini yorumlamak
+    needs: Birleşmelilik, ikili toplam, atomik sıra
+    q: |-
+      CPU'da sıralı döngüyle hesaplanan 10⁷ öğelik fp32 toplam 4999823.5, GPU indirgemesi 5000012.0 veriyor; GPU sonucu her çalıştırmada son basamakta biraz değişiyor. Doğru yorum?
+    choices:
+      - {t: "GPU çekirdeğinde yarış koşulu var", why: "Bir yarış genellikle çok daha büyük hatalara (kayıp toplamlar) yol açar; burada fark yuvarlama düzeyinde."}
+      - {t: "İkisi farklı sırayla topluyor; ağaç daha doğru olabilir; çalıştırmalar arası fark atomik birleştirmenin sırasının deterministik olmamasından", ok: true, why: "Kayan nokta birleşmeli değil; blok sonuçlarının atomicAdd sırası her çalıştırmada değişebilir."}
+      - {t: "GPU fp32'yi yanlış hesaplıyor", why: "IEEE 754 her işlemde doğru yuvarlar; fark işlem sırasından."}
+    hints:
+      - "10⁷ öğede sıralı toplamın beklenen hatası ne düzeyde?"
+    solution: |-
+      Bir float64 başvurusuyla karşılaştırınca GPU'nun ağacı büyük olasılıkla daha yakın çıkar. Tekrarlanabilirlik için blok toplamları bir diziye yazılıp ikinci bir çekirdekle sabit sırada indirgenebilir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Ağacın işi ve adımları
+    goal: N − 1 ve ⌈log₂N⌉ sonuçlarını kanıtlamak
+    needs: Tümevarım
+    q: |-
+      İkili işlemlerle kurulan herhangi bir indirgeme ağacının tam $N-1$ işlem yaptığını, ve her adımda öğe sayısını yarıya indiren ağacın $\lceil\log_2N\rceil$ adımda bittiğini gösterin. Daha az adım mümkün müdür?
+    rubric:
+      - "Her ikili işlemin değer sayısını bir azalttığını, N'den 1'e inmek için N − 1 işlem gerektiğini gösterdim"
+      - "Her adımda kalan değer sayısının ⌈n/2⌉ olduğunu ve ⌈log₂N⌉ adımda 1'e indiğini gösterdim"
+      - "Bir adımda değer sayısının en fazla yarıya inebileceğini (her değer en çok bir işleme girer) belirterek alt sınırı kurdum"
+      - "Sonuç: ⌈log₂N⌉ adım en iyidir"
+    hints:
+      - "Bir adımda bir değer kaç işleme girebilir?"
+    solution: |-
+      Bir adımda her değer en çok bir ikili işleme girer: n değer en az ⌈n/2⌉ değere iner. Dolayısıyla k adımdan sonra en az ⌈N/2^k⌉ değer kalır ve 1'e inmek için k ≥ ⌈log₂N⌉ gerekir.
+pitfalls:
+  - wrong: "Yakınsak eşleme her işleç için basit eşlemenin yerine geçer."
+    right: "Yakınsak eşleme bitişik olmayan öğeleri birleştirir (x₀ ⊕ x₈ …): işleç değişmeli değilse (matris çarpımı, sıraya duyarlı argmax) sonuç yanlış olur. Bu durumda basit eşleme ya da sırayı koruyan bir yeniden düzenleme gerekir."
+  - wrong: "İndirgeme döngüsündeki __syncthreads() yalnız ilk yinelemede gereklidir."
+    right: "Her yinelemede bir thread'in okuduğu kısmi toplamı başka bir thread önceki yinelemede yazmıştır; her yinelemenin sonunda bariyer gerekir. (Warp içi son adımlar shuffle ile yazılırsa bariyer kalkar, ama warp'ın kilitli adımda yürüdüğü varsayılamaz.)"
+  - wrong: "Her thread kendi öğesini doğrudan global sonuca atomicAdd ile eklemek basit ve hızlıdır."
+    right: "N atomik işlem tek bir adreste sıraya girer; süre N ile doğrusal büyür. Önce blok içinde (paylaşımlı bellek ya da shuffle) indirgemek, blok başına tek atomik yapmak gerekir."
+  - wrong: "GPU'nun float toplamı CPU'nunkiyle birebir aynı olmalıdır; farklıysa hata vardır."
+    right: "Kayan nokta toplaması birleşmeli değildir: farklı sıra farklı yuvarlama verir. Karşılaştırma göreli toleransla yapılır; ağaç toplamı genellikle sıralı döngüden daha doğrudur."
+whatif:
+  - q: "N 2'nin kuvveti değilse (ör. 1000 öğe)?"
+    a: "Blok 512 thread'le 1024 öğe beklerken son 24 konum boştur. Bu konumlar işlecin birim elemanıyla doldurulur (toplamda 0, max'ta −∞) ya da yüklemede sınır denetimiyle (i < N ? x[i] : I) okunur; birim eleman olmadan bu basit çözüm yoktur."
+  - q: "Toplam yerine argmax (en büyük değerin indeksi) indirgensin?"
+    a: "İşlenen değer–indeks çiftidir; işleç (v₁, i₁) ⊕ (v₂, i₂) = büyük değerli çift (eşitlikte küçük indeks). Bu işleç birleşmeli ve eşitlik kuralıyla değişmelidir; böylece yakınsak eşleme ve shuffle kullanılabilir. Eşitlik kuralı olmadan sonuç indirgeme sırasına bağlı olur."
+  - q: "Eski bir GPU'da double için atomicAdd yoksa?"
+    a: "Hesap yeteneği 6.0 öncesinde double atomicAdd yoktu: atomicCAS ile bir döngü kurulur (oku, topla, CAS ile yazmayı dene, başarısızsa yeniden). Çekişme altında CAS döngüleri yavaştır; bu da blok içi indirgemeyi önce yapmanın bir nedeni."
