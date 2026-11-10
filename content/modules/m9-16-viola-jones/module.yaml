@@ -96,3 +96,166 @@ homework:
       - "En az 10 aşamalı kaskad; aşama başına öznitelik sayısı, d_i ve f_i tablosu."
       - "640 × 480 görüntüde CPU'da 10 fps üstü (vektörel tarama)."
       - "ROC (tespit oranı – yanlış pozitif sayısı) ve OpenCV'nin hazır `haarcascade_frontalface_default.xml`'i ile karşılaştırma."
+
+labs:
+  - id: l1
+    lab: haarfeat
+    title: "Tek bir Haar özniteliği: dağılım, karar kütüğü ve normalizasyon"
+    goal: |
+      24 × 24 yapay yüz ve yüz olmayan yamalarda bir Haar özniteliği seç (tür, konum, boyut). İki sınıftaki değer dağılımını, en iyi karar kütüğünün hatasını ve integral görüntüdeki erişim sayısını gör. Pencere varyans normalizasyonunu aç/kapat ve aydınlatma değişkenliğini artır.
+    predict:
+      q: "Burun köprüsünü ölçen üç dikdörtgenli öznitelik normalize pencerelerde %9.25 hata veriyor. Normalizasyon kapatılınca ne olur?"
+      options:
+        - {t: "Hemen hemen değişmez; fark öznitelikleri parlaklığı zaten siler", why: "Bu yalnız sıfır toplamlı (iki ve dört dikdörtgenli) özniteliklerde ofset için doğrudur."}
+        - {t: "Hata belirgin artar (≈ %29)", ok: true, why: "Orta − iki dış öznitelikte ağırlıkların alan toplamı −wh: ham değer pencere ortalamasını da taşır, parlaklık değişimi sınıf bilgisini bastırır."}
+        - {t: "Hata azalır", why: "Normalizasyon bilgi kaybettirmez; kontrast ve parlaklık değişkenliğini siler."}
+    presets:
+      - {name: "Göz bandı − yanak", params: {t: 1, x: 3, y: 7, w: 18, h: 4, norm: 1, light: 0.4}, note: "Hata %13.3; 6 erişim, doğrudan 144 piksel."}
+      - {name: "Aynısı, normalizasyonsuz", params: {t: 1, x: 3, y: 7, w: 18, h: 4, norm: 0, light: 0.4}, note: "%16.3: kontrast ve kazanç özniteliği ölçekliyor."}
+      - {name: "Burun köprüsü", params: {t: 2, x: 3, y: 6, w: 6, h: 7, norm: 1, light: 0.4}, note: "%9.25: en ayırıcı tek öznitelik."}
+      - {name: "Burun köprüsü, normalizasyonsuz", params: {t: 2, x: 3, y: 6, w: 6, h: 7, norm: 0, light: 0.4}, note: "%29: sıfır toplamlı olmayan öznitelik parlaklığı taşıyor."}
+      - {name: "Sol − sağ", params: {t: 0, x: 2, y: 2, w: 10, h: 10, norm: 1, light: 0.4}, note: "%37.5: yüz yatayda simetrik."}
+      - {name: "Çapraz", params: {t: 4, x: 6, y: 6, w: 6, h: 6, norm: 1, light: 0.4}, note: "%43: yüzde köşegen yapı yok."}
+      - {name: "Alın şeridi", params: {t: 1, x: 3, y: 0, w: 18, h: 2, norm: 1, light: 0.4}, note: "%40.8: yanlış yerdeki doğru tür işe yaramıyor."}
+    questions:
+      - q: "Aydınlatma değişkenliği sıfırken bile normalizasyon göz bandı özniteliğinin hatasını %16'dan %13'e indiriyor. Neden?"
+        a: "Yapay yüzlerin kontrastı (göz bandının koyuluğu) da örnekten örneğe değişiyor. Normalizasyon pencereyi std'sine böldüğü için yalnız aydınlatma kazancını değil, yüzün kendi kontrast değişkenliğini de siliyor ve iki sınıfın dağılımları daha az örtüşüyor."
+    limits: "Yapay 24 × 24 yamalar (200 + 200); tek ölçek; kütük eşit ağırlıklarla eğitilip aynı kümede ölçülüyor (eğitim hatası)."
+  - id: l2
+    lab: adaboostlab
+    title: "AdaBoost ile öznitelik seçimi ve zor negatiflerle eğitilen kaskad"
+    goal: |
+      Rastgele bir Haar öznitelik havuzu üzerinde Viola–Jones biçiminde AdaBoost eğit (300 yüz + 300 yüz olmayan) ve eğitim ile test hatasının tur sayısıyla düşüşünü izle. Sonra bir kaskad kur. Her aşama ayrı bir AdaBoost'tur ve negatifleri, 3 000 pencerelik havuzdan şimdiye kadarki kaskadı geçenlerdir. Aşamaya, yüzlerin en az d oranı geçerken negatiflerin en çok f'si geçene kadar öznitelik eklenir. 2 000 test negatifinde yanlış pozitif oranını ve pencere başına ortalama öznitelik sayısını ölç.
+    predict:
+      q: "Varsayılan kaskadda bir yüz bütün aşamalardan geçip yaklaşık 34 öznitelik hesaplatıyor. Bir negatif pencere ortalama kaç öznitelik hesaplatır?"
+      options:
+        - {t: "≈ 34", why: "Negatiflerin çoğu ilk aşamada reddediliyor."}
+        - {t: "≈ 9", ok: true, why: "8.9: ilk aşamanın 6 özniteliği her pencerede hesaplanır, sonrakilere negatiflerin yalnız bir kısmı ulaşır."}
+        - {t: "≈ 1", why: "İlk aşama tek öznitelikle yüzlerin %99'unu geçirip negatiflerin %60'ını eleyemiyor; 6 öznitelik gerekiyor."}
+    presets:
+      - {name: "Varsayılan", params: {T: 16, P: 300, d: 0.99, f: 0.4, hard: 0.5, light: 0.4}, note: "Aşamalar 6, 5, 9, 9, 6; test D 0.92, F 0.01; negatif başına 8.9 öznitelik."}
+      - {name: "Tek kütük", params: {T: 1, P: 300, d: 0.99, f: 0.4, hard: 0.5, light: 0.4}, note: "Tek AdaBoost: eğitim %10.3, test %16.6."}
+      - {name: "Dört tur", params: {T: 4, P: 300, d: 0.99, f: 0.4, hard: 0.5, light: 0.4}, note: "%8.5 / %14.5."}
+      - {name: "Kolay negatifler", params: {T: 16, P: 300, d: 0.99, f: 0.4, hard: 0, light: 0.4}, note: "3 aşama (2, 5, 4); negatif başına 3.4 öznitelik, F 0.006."}
+      - {name: "Küçük havuz", params: {T: 16, P: 50, d: 0.99, f: 0.4, hard: 0.5, light: 0.4}, note: "Aşamalar 6–12 öznitelik; test D 0.89."}
+      - {name: "Gevşek d", params: {T: 16, P: 300, d: 0.9, f: 0.4, hard: 0.5, light: 0.4}, note: "1, 3, 3 öznitelik, F 0.003: ucuz, ama yüzlerin %29'u kaçıyor."}
+      - {name: "Sıkı d", params: {T: 16, P: 300, d: 0.999, f: 0.4, hard: 0.5, light: 0.4}, note: "Eğitimde D = 1, testte 0.957; 64 öznitelik, negatif başına 13."}
+      - {name: "Gevşek f", params: {T: 16, P: 300, d: 0.99, f: 0.8, hard: 0.5, light: 0.4}, note: "6 kısa aşama (3–7 öznitelik), F 0.046."}
+    questions:
+      - q: "Eğitimde kaskadın tespit oranı d⁵'in üstünde (0.967) ama testte 0.92. Neden ve gerçek kaskad eğitimi bunu nasıl ele alır?"
+        a: "Eşikler eğitim yüzlerinin skor dağılımının alt kuyruğundan seçiliyor; 300 örnekle bu kuyruk iyi kestirilemez ve test yüzleri biraz daha düşük skor alabilir. Her aşamadaki küçük kayıp aşama sayısıyla çarpılarak birikir. Viola–Jones eşikleri ayrı bir doğrulama kümesinde ayarlar ve binlerce yüz kullanır."
+    limits: "Yapay 24 × 24 yamalar; tek ölçek; havuz ≤ 600 rastgele öznitelik (gerçekte 162 336); aşama başına en çok 12 öznitelik, en çok 6 aşama."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Integral görüntüden dikdörtgen toplamı
+    goal: Dört erişim kuralını uygulamak
+    needs: $ii(D)-ii(B)-ii(C)+ii(A)$
+    q: |-
+      Bir dikdörtgenin köşelerinde $ii(A)=100$ (sol üst), $ii(B)=300$ (sağ üst), $ii(C)=350$ (sol alt), $ii(D)=900$ (sağ alt). Dikdörtgenin toplamı? Sağına bitişik, aynı boyutlu ikinci dikdörtgenin sağ köşelerinde $ii=520$ (üst) ve $ii=1500$ (alt) ise iki dikdörtgenli öznitelik (sağ − sol)?
+    solution: |-
+      Sol: $900-300-350+100=350$. Sağ: $1500-520-900+300=380$. Öznitelik $380-350=30$. Ortak köşeler ($B$, $D$) iki kez kullanıldı: toplam 6 farklı erişim.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Üç dikdörtgenli öznitelik sayısı
+    goal: Sayım formülünü uygulamak
+    needs: $\sum_a(25-a\,s_x)\sum_b(25-b\,s_y)$
+    q: |-
+      24 × 24 pencerede yatay üç dikdörtgenli (temel boyut 3 × 1) öznitelik sayısı?
+    answer: 27600
+    calc: "sum((25-3*a)*(25-b) for a in range(1,9) for b in range(1,25))"
+    tol: 0
+    mistakes:
+      - {answer: 43200, msg: "Bu iki dikdörtgenli tür (genişlik 2'nin katları)."}
+      - {answer: 162336, msg: "Bu beş türün toplamı."}
+    hints:
+      - "Genişlik 3, 6, …, 24: $\\sum_{a=1}^8(25-3a)=92$; yükseklik 1…24: 300."
+    solution: |-
+      $92\cdot300=27\,600$.
+  - id: p3
+    type: hesap
+    level: 2
+    title: AdaBoost ağırlık güncellemesi
+    goal: β ile güncelleyip normalize etmek
+    needs: $\beta=\epsilon/(1-\epsilon)$, normalizasyon
+    q: |-
+      Bir turda seçilen kütüğün ağırlıklı hatası $\epsilon=0.25$. Yanlış sınıflanan bir örneğin ağırlığı 0.01. Güncelleme ve normalizasyondan sonra ağırlığı?
+    answer: 0.02
+    calc: "0.01/(0.25+0.75*(0.25/0.75))"
+    tol: 1e-9
+    mistakes:
+      - {answer: 0.01, msg: "Normalizasyon unutuldu: toplam ağırlık 1'den 0.5'e indi."}
+      - {answer: 0.004, msg: "Yanlışlar değil doğrular β ile çarpılır."}
+    hints:
+      - "$\\beta=1/3$; yeni toplam $0.25+0.75\\cdot\\frac13$."
+    solution: |-
+      Doğruların toplamı $0.75\cdot\frac13=0.25$, yanlışlarınki $0.25$: toplam 0.5. $0.01/0.5=0.02$. Seçilen kütük yeni dağılımda tam %50 hatalı.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Kaskad derinliği
+    goal: Aşama oranlarından aşama sayısını bulmak
+    needs: $F=\prod f_i$
+    q: |-
+      Her aşamanın yanlış pozitif oranı 0.4 ise toplam yanlış pozitif oranının $10^{-6}$'nın altına inmesi için en az kaç aşama gerekir?
+    answer: 16
+    calc: "math.ceil(math.log(1e-6)/math.log(0.4))"
+    tol: 0
+    mistakes:
+      - {answer: 15, msg: "15.08 aşağı yuvarlandı: 0.4¹⁵ = 1.07 × 10⁻⁶ hedefin üstünde."}
+      - {answer: 6, msg: "log tabanı karıştı: 0.4ⁿ ≤ 10⁻⁶ → n ≥ ln 10⁻⁶ / ln 0.4."}
+    hints:
+      - "$n\\ge\\ln10^{-6}/\\ln0.4=15.08$."
+    solution: |-
+      16 aşama. Her aşamada $d=0.995$ ise $D=0.995^{16}=0.923$.
+  - id: p5
+    type: yorumla
+    level: 2
+    title: Dokulu arka planda yanlış pozitifler
+    goal: detectMultiScale parametrelerini yorumlamak
+    needs: scaleFactor, minNeighbors, minSize
+    q: |-
+      Bir güvenlik kamerasında `detectMultiScale(gray, 1.05, 2)` tuğla duvarda ve yapraklarda çok sayıda küçük kutu buluyor; gerçek yüzler 80–150 piksel ve hepsi bulunuyor. En uygun ayar?
+    choices:
+      - {t: "scaleFactor'ı 1.01'e indirmek", why: "Daha çok ölçek, daha çok pencere: yanlış pozitif artar."}
+      - {t: "minNeighbors'ı 5–6'ya çıkarmak ve minSize'ı (60, 60) yapmak", ok: true, why: "Yalnız birçok örtüşen ham tespitle desteklenenler kalır; küçük ölçeklerdeki doku tetiklemeleri hiç aranmaz."}
+      - {t: "Görüntüyü bulanıklaştırmak", why: "Haar öznitelikleri zaten bölge toplamları; bulanıklık yüzleri de zayıflatır."}
+    hints:
+      - "Yanlış pozitifler hangi boyutta? Gerçek yüzler hangi boyutta?"
+    solution: |-
+      Yanlış pozitifler genellikle tek ya da birkaç ham tespittir ve küçük ölçeklerde yoğunlaşır; gerçek yüz çevresinde komşu konum ve ölçeklerde çok sayıda ham tespit oluşur. minNeighbors'ı artırmak ve yüz boyutunu sınırlamak ikisini ayırır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Viola–Jones AdaBoost'u özgün AdaBoost'tur
+    goal: İki biçimin aynı karar ve ağırlıkları verdiğini göstermek
+    needs: $h\in\{0,1\}$ ↔ $h'=2h-1$, normalizasyon
+    q: |-
+      Viola–Jones güncellemesinin ($w\leftarrow w\beta^{1-e}$, $\beta=\epsilon/(1-\epsilon)$, karar $\sum\alpha h\ge\frac12\sum\alpha$, $\alpha=\ln1/\beta$), $\pm1$ çıktılı ayrık AdaBoost ($a=\frac12\ln\frac{1-\epsilon}\epsilon$, ağırlık $e^{\mp a}$) ile normalizasyondan sonra aynı ağırlıkları ve aynı kararı verdiğini göster. Güncellemeden sonra seçilen kütüğün ağırlıklı hatası nedir?
+    rubric:
+      - "Karar eşitsizliğini $h'=2h-1$ ile $\\sum\\alpha h'\\ge0$ biçimine getirdim"
+      - "$\\alpha=2a$ olduğunu ve pozitif çarpanın işareti değiştirmediğini gösterdim"
+      - "İki kuralda yanlış/doğru ağırlık oranının $(1-\\epsilon)/\\epsilon$ olduğunu ve normalizasyonun ortak çarpanı sildiğini gösterdim"
+      - "Güncellemeden sonra seçilen kütüğün hatasının 1/2 olduğunu hesapladım"
+    hints:
+      - "Doğruların yeni toplamı $(1-\\epsilon)\\beta$."
+    solution: |-
+      Bkz. derste "Viola–Jones biçimi özgün AdaBoost ile neden aynıdır?" türetimi.
+pitfalls:
+  - wrong: "AdaBoost bütün örneklere eşit başlangıç ağırlığıyla başlar."
+    right: "Viola–Jones sınıfları dengeler: pozitiflere 1/2l, negatiflere 1/2m. Negatifler çok daha fazlayken eşit örnek ağırlığı ilk kütükleri negatiflere yöneltir."
+  - wrong: "Haar öznitelikleri fark aldığı için aydınlatmaya kendiliğinden dayanıklıdır."
+    right: "Fark yalnız sabit ofseti (iki/dört dikdörtgende) siler; kazancı silmez, üç dikdörtgenli öznitelikler ofseti de taşır. Dayanıklılık pencere varyans normalizasyonundan gelir (lab l1: %9.25'e karşı %29)."
+  - wrong: "Kaskadın her aşaması kendi hatasını en küçükleyen 0.5 · Σα eşiğini kullanır."
+    right: "Aşama eşiği yüzlerin %99–99.5'ini geçirecek kadar düşürülür; amaç yüz kaçırmadan negatif elemektir, yanlış pozitifleri sonraki aşamalar temizler."
+  - wrong: "Integral görüntü ve kare integral görüntü için int32 yeter."
+    right: "640 × 480 × 255 = 7.8 × 10⁷ sığar, ama kareler toplamı 2.0 × 10¹⁰ ile 2³¹'i aşar; OpenCV integral2 bu yüzden float64 döndürür."
+whatif:
+  - q: "Kaskad yerine 200 öznitelikli tek parça sınıflandırıcı kullanılsa?"
+    a: "Doğruluk benzer olabilir (makalede %95 tespit, 14 084'te 1 yanlış pozitif), ama her pencerede 200 öznitelik hesaplanır; kaskadın ortalaması yaklaşık 10'dur. 640 × 480'de 1.3 milyon pencereyle bu kare başına yaklaşık 20 kat daha çok iş demektir ve gerçek zaman kaybolur."
+  - q: "Sonraki aşamaların negatifleri, önceki aşamaların yanlış pozitiflerinden değil, rastgele pencerelerden seçilse?"
+    a: "Rastgele negatiflerin çoğu ilk aşamalarda zaten elenen kolay örneklerdir; sonraki aşamalar onları yeniden ayırmayı öğrenir ve kaskadın gerçekten geçirdiği zor örneklere karşı zayıf kalır. Toplam F beklenenden çok daha yavaş düşer; zor negatif madenciliği yöntemin özüdür."
+  - q: "Yüzler 45° dönmüş olsaydı?"
+    a: "Eksene paralel dikdörtgenler göz bandı ve burun köprüsü karşıtlığını artık yakalamaz; önden kaskad yüzleri kaçırır. Çözümler: görüntüyü birkaç açıyla döndürüp taramak (maliyet çarpılır), 45° döndürülmüş öznitelikler (Lienhart–Maydt) ya da poza göre ayrı kaskadlar ve bir poz kestiricisi (Jones–Viola 2003)."

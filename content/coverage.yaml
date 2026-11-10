@@ -140,7 +140,7 @@ groups:
         pages: [m9-18-background, m9-16-viola-jones]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M9.16 konu anlatımı lect_ViolaJones'un bütün slaytlarını (1–15) işliyor: üç ana fikir, Haar öznitelik aileleri ve yüz karşıtlıkları, integral görüntü (4 erişim türetimi, slayt örneğinin doğrulaması 14), öznitelik sayısının türetimi (162 336, skimage ile aynı), AdaBoost (VJ biçimi, özgün AdaBoost ile denkliği ve eğitim hatası sınırı), kaskad (D, F, beklenen maliyet, aşama eşiği, zor negatif madenciliği), algoritma adımları, çok ölçekli tarama ve detectMultiScale parametreleri, artılar ve eksiler; pencere varyans normalizasyonunun türetimi eklendi; haarfeat ve adaboostlab deneyleri. ViBe (M9.18) sırada."
       - src: "Alıştırmalar ex1 – ex9"
         topics: "HE, kutu süzgeç, medyan, uyarlamalı ortalama, integral görüntü, SLIC + k-means ve panorama, CLAHE, bilateral, NLM"
         pages: [m9-2-intensity-histogram, m9-3-spatial-filtering, m9-5-restoration, m9-11-segmentation, m9-15-matching, m9-12-edge-preserving]
