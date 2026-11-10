@@ -134,7 +134,7 @@ groups:
         pages: [m9-17-motion]
         status: genis
         gap: "Sabitlemenin zorlukları (düşük doku, paralaks, rolling shutter, kırpma) ve yöntem aileleri yalnız kısmen vardı."
-        done: "M9.17'ye sabitleme zorlukları ve yöntem aileleri ayrıntı kutusu eklendi."
+        done: "M9.17 konu anlatımı dört kaynağın bütün slaytlarını işliyor (lect_21 1–25, lect_22 1–30, lect_23 1–81, lect_LucasKanade 1–12): video temelleri ve görevler, tek/çok kare, hareket tespiti ve kestirimi, zamansal gürültü giderme (σ/√N türetimi, hareket duyarlı ve telafili ortalama), optik akışın tanımı ve kötü konumlanmışlığı, hareket modelleri, gerçek/kestirilen hareket, küresel hareket, blok eşleme ve TSS, optik akış denklemi ve açıklık (normal akış), LK en küçük kareleri ve yapı tensörü, yineleme, piramit, Horn–Schunck; FRUC yöntemleri, blok telafisi (delik/örtüşme, codec vektörleri), ileri–geri tutarlılık, RIFE; stabilizasyonun bütün zorlukları, yöntem aileleri ve yumuşatmanın alçak geçiren türetimi (Gauss, L2, L1); lkflow, blockfruc ve stablab deneyleri. Slayt notları: LK slayt 5/7 yazım ve işaret hataları, ileri–geri denetiminde karşılık noktası, kayan deklanşör satırları, homografi 8 serbestlik."
       - src: "lect_ViBE, lect_ViolaJones"
         topics: "ViBe modeli, güncelleme, komşuya yayılım; Haar öznitelikleri, integral görüntü, AdaBoost, kaskad"
         pages: [m9-18-background, m9-16-viola-jones]

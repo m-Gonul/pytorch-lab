@@ -105,3 +105,193 @@ homework:
       - "ConvGRU güncelleme, dışbükey üst örnekleme (convex upsampling)."
     accept:
       - "Sintel clean EPE: RAFT-S < piramitli LK; iterasyon sayısına karşı EPE grafiği."
+
+labs:
+  - id: l1
+    lab: lkflow
+    title: "Lucas–Kanade: açıklık, yineleme, piramit ve parlaklık sabitliği"
+    goal: |
+      Üç bölgeli bir sahnede (dokulu, yalnız x'te değişen çizgiler, düz) Lucas–Kanade akışını 8 piksel aralıklı ızgarada kestir ve gerçek akışla karşılaştır. En küçük özdeğer eşiğinin hangi noktaları reddettiğini, yineleme ve piramit seviyelerinin büyük hareketteki etkisini, parlaklık değişimi ve gürültünün sonuçlarını ölç.
+    predict:
+      q: "Öteleme 6 piksel; tek seviyeli LK dokulu bölgede ne kadar hata verir (1.5 pikselde 0.36)?"
+      options:
+        - {t: "≈ 0.4 piksel; yer değiştirme LK'yi etkilemez", why: "Taylor açılımı küçük hareket varsayar."}
+        - {t: "≈ 4.5 piksel; doğrusallaştırma geçersiz", ok: true, why: "4.47: lekeler birkaç piksel boyunda, 6 piksellik kaymada birinci mertebe yaklaşım çöker. 3 seviyeli piramitle 0.21."}
+        - {t: "Bütün noktalar reddedilir", why: "Ret, AᵀA'ya (birinci karenin gradyanlarına) bağlıdır, hareketin büyüklüğüne değil."}
+    presets:
+      - {name: "Varsayılan", params: {type: 0, mag: 1.5, win: 7, levels: 1, iters: 1, tau: 0.0001, gain: 1, noise: 0.01}, note: "Doku EPE 0.36; çizgili ve düz bölge reddedildi."}
+      - {name: "Yinelemeli", params: {type: 0, mag: 1.5, win: 7, levels: 1, iters: 5, tau: 0.0001, gain: 1, noise: 0.01}, note: "EPE 0.12: geri bükme + yeniden çözüm."}
+      - {name: "Büyük hareket, tek seviye", params: {type: 0, mag: 6, win: 7, levels: 1, iters: 1, tau: 0.0001, gain: 1, noise: 0.01}, note: "EPE 4.47."}
+      - {name: "Büyük hareket, piramit", params: {type: 0, mag: 6, win: 7, levels: 3, iters: 5, tau: 0.0001, gain: 1, noise: 0.01}, note: "EPE 0.11."}
+      - {name: "Eşiksiz: açıklık", params: {type: 0, mag: 1.5, win: 7, levels: 1, iters: 1, tau: 0.000001, gain: 1, noise: 0.01}, note: "Çizgili bölge EPE 1.02, ama x bileşeni hatası 0.054; düz bölge 1.53."}
+      - {name: "Parlaklık değişimi", params: {type: 0, mag: 1.5, win: 7, levels: 1, iters: 1, tau: 0.0001, gain: 0.8, noise: 0.01}, note: "EPE 2.45: parlaklık sabitliği bozuldu."}
+      - {name: "Güçlü gürültü", params: {type: 0, mag: 1.5, win: 7, levels: 1, iters: 1, tau: 0.0001, gain: 1, noise: 0.05}, note: "Düz bölge de kabul ediliyor (sahte gradyan), doku EPE 1.07."}
+      - {name: "Küçük pencere", params: {type: 0, mag: 1.5, win: 3, levels: 1, iters: 1, tau: 0.0001, gain: 1, noise: 0.01}, note: "Dokulu noktaların yalnız %42'si kabul."}
+      - {name: "Dönme", params: {type: 1, mag: 3, win: 7, levels: 3, iters: 5, tau: 0.0001, gain: 1, noise: 0.01}, note: "Akış her yerde farklı; EPE 0.24 (piramitsiz 1.04)."}
+    questions:
+      - q: "Gürültü artınca düz bölgedeki noktalar neden eşiği geçiyor ve bu neden tehlikeli?"
+        a: "Gürültünün türevi rastgele yönlü gradyanlar üretir; AᵀA'nın iki özdeğeri de gürültü varyansıyla orantılı büyür ve λmin eşiği aşar. Ama bu gradyanlar kareden kareye bağımsızdır: I_t de gürültüdür ve çözülen akış rastgeledir. Eşik gürültü düzeyine göre ölçeklenmelidir; ileri–geri denetimi bu noktaları yakalar."
+    limits: "96 × 96 yapay sahne, ikinci kare analitik olarak kaydırılmış; seyrek ızgara (8 piksel), bilineer geri bükme, 2 × 2 ortalamalı piramit (Gauss ön süzgeci yok)."
+  - id: l2
+    lab: blockfruc
+    title: "Blok eşleme ile kare hızı artırma: tekrar, ortalama ve hareket telafisi"
+    goal: |
+      Dokulu bir arka plan üzerinde hareket eden bir nesnenin iki karesinden t = 0.5'teki ara kareyi üret ve gerçeğiyle karşılaştır (PSNR). Blok hareket telafili FRUC'ta blok boyutu, arama aralığı, benzerlik ölçütü ve arama stratejisinin vektör doğruluğu, delik/örtüşme oranı ve hesap maliyeti üzerindeki etkisini ölç.
+    predict:
+      q: "Kare 1, kare 0'dan 0.15 daha parlak. SAD ile blok eşleme 64 bloğun kaçında doğru vektörü bulur (parlaklık farkı yokken 51)?"
+      options:
+        - {t: "Yine ≈ 51", why: "Sabit ofset SAD'ye her adayda farklı etki eder: arka planda daha parlak bir yer daha iyi eşleşir."}
+        - {t: "≈ 1", ok: true, why: "1/64: ofset, doğru eşleşmenin maliyetini 0.15 · 64 = 9.6'ya çıkarıyor; daha parlak yanlış adaylar kazanıyor. Ortalaması çıkarılmış SAD ile 46/64."}
+        - {t: "≈ 32", why: "Yarı yarıya değil: ofset bütün bloklara aynı etkiyi yapıyor."}
+    presets:
+      - {name: "Kare tekrarı", params: {meth: 0, dx: 6, dy: 4, light: 0, noise: 0.01}, note: "PSNR 20.2 dB."}
+      - {name: "Kare ortalaması", params: {meth: 1, dx: 6, dy: 4, light: 0, noise: 0.01}, note: "23.0 dB, hayalet."}
+      - {name: "BMC 8 × 8, tam arama", params: {meth: 2, dx: 6, dy: 4, B: 1, R: 7, m: 0, tss: 0, light: 0, noise: 0.01}, note: "29.9 dB; 51/64 doğru, %5.8 delik."}
+      - {name: "Üç adımlı arama", params: {meth: 2, dx: 6, dy: 4, B: 1, R: 7, m: 0, tss: 1, light: 0, noise: 0.01}, note: "25 aday (225 yerine), 27.8 dB."}
+      - {name: "4 × 4 blok", params: {meth: 2, dx: 6, dy: 4, B: 0, R: 7, m: 0, tss: 0, light: 0, noise: 0.01}, note: "27.6 dB; %12 delik: küçük bloklar belirsiz."}
+      - {name: "Dar arama", params: {meth: 2, dx: 6, dy: 4, B: 1, R: 3, m: 0, tss: 0, light: 0, noise: 0.01}, note: "Hız aralığın dışında: 25.8 dB."}
+      - {name: "Parlaklık farkı, SAD", params: {meth: 2, dx: 6, dy: 4, B: 1, R: 7, m: 0, tss: 0, light: 0.15, noise: 0.01}, note: "1/64 doğru, %31 delik."}
+      - {name: "Parlaklık farkı, ortalaması çıkarılmış", params: {meth: 2, dx: 6, dy: 4, B: 1, R: 7, m: 2, tss: 0, light: 0.15, noise: 0.01}, note: "46/64 doğru, 28.9 dB."}
+      - {name: "Hareketsiz", params: {meth: 2, dx: 0, dy: 0, B: 1, R: 7, m: 0, tss: 0, light: 0, noise: 0.01}, note: "42.7 dB; yine de 4 blokta yanlış vektör (dokusuz arka plan)."}
+    questions:
+      - q: "Hareketsiz sahnede bile neden birkaç blok sıfırdan farklı vektör alıyor ve bu FRUC'ta neye yol açıyor?"
+        a: "Dokusu zayıf arka plan bloklarında birçok aday gürültü düzeyinde aynı maliyeti verir; en küçüğü gürültüyle belirlenir. Sıkıştırmada bu zararsızdır (artık küçük), ama FRUC'ta blok yanlış yere taşınır ve delik/örtüşme yaratır. Pratik çözümler: eşit maliyette sıfır vektörü tercih etmek, komşu vektörlerle düzgünlük cezası ve güven denetimi."
+    limits: "64 × 64 yapay sahne, tek dokulu nesne, tamsayı vektörler; ileri izdüşümlü BMC (delikler kare ortalamasıyla dolduruluyor, örtüşen bloklarda ağırlıksız ortalama)."
+  - id: l3
+    lab: stablab
+    title: "Stabilizasyon: yörünge yumuşatma, kırpma ve gecikme"
+    goal: |
+      300 karelik bir kamera yörüngesini (durgun → kaydırma → durgun, yürüme sallanması ve el titremesi) Gauss süzgeci (çevrimdışı ya da çevrimiçi), Kalman süzgeci ya da L2 eniyilemeyle yumuşat. Kalan titremeyi, gereken kırpmayı, kaydırmadaki gecikmeyi ve kasıtlı yoldan sapmayı ölç.
+    predict:
+      q: "σ = 10 Gauss süzgeci çevrimdışı 19 piksel kırpma istiyor. Yalnız geçmiş kareleri kullanan çevrimiçi sürüm ne ister?"
+      options:
+        - {t: "Aynı, ≈ 19 piksel", why: "Tek taraflı süzgeç kaydırmayı geriden izler: kasıtlı hareket de düzeltme gibi görünür."}
+        - {t: "≈ 50 piksel, gecikme ≈ 8 kare", ok: true, why: "49.8 piksel ve 7.8 kare: çevrimiçi yumuşatmanın bedeli."}
+        - {t: "Daha az; çevrimiçi daha az yumuşatır", why: "Daha az yumuşatır (titreme 0.39) ama gecikme kırpmayı büyütür."}
+    presets:
+      - {name: "Gauss σ = 10", params: {meth: 0, sigma: 10, causal: 0, jit: 4, bounce: 10}, note: "Titreme 0.08, kırpma 19 piksel."}
+      - {name: "Gauss σ = 3", params: {meth: 0, sigma: 3, causal: 0, jit: 4, bounce: 10}, note: "Titreme 0.28, kırpma 11; yürüme kalıyor."}
+      - {name: "Gauss σ = 30", params: {meth: 0, sigma: 30, causal: 0, jit: 4, bounce: 10}, note: "Titreme 0.03, kırpma 51; kaydırma yuvarlanıyor."}
+      - {name: "Çevrimiçi Gauss", params: {meth: 0, sigma: 10, causal: 1, jit: 4, bounce: 10}, note: "Gecikme 7.8 kare, kırpma 50."}
+      - {name: "Kalman q = 0.01", params: {meth: 1, q: 0.01, jit: 4, bounce: 10}, note: "Titreme 1.22, kırpma 18."}
+      - {name: "Kalman q = 10⁻⁴", params: {meth: 1, q: 0.0001, jit: 4, bounce: 10}, note: "Daha düz ama 6.2 kare gecikme, kırpma 52."}
+      - {name: "L2 λ = 1000", params: {meth: 2, lam: 1000, jit: 4, bounce: 10}, note: "Titreme 0.14, kırpma 15."}
+      - {name: "L2 λ = 10⁵", params: {meth: 2, lam: 100000, jit: 4, bounce: 10}, note: "Titreme 0.04, kırpma 31: Gauss σ = 30'dan daha az kırpma, kasıtlı yola daha yakın (6.6'ya karşı 15.5)."}
+    questions:
+      - q: "L2 eniyileme λ = 10⁵ ile Gauss σ = 30'a benzer titreme verirken neden kasıtlı yola çok daha yakın kalıyor?"
+        a: "Gauss süzgeci kaydırmanın başındaki ve sonundaki köşeleri de σ genişliğinde yuvarlar. L2'nin ikinci fark cezası ise sabit hızlı (doğrusal) parçaları hiç cezalandırmaz: kaydırma doğrusu cezasız geçer, yalnız köşelerde bir ödünleşim kurulur. L1 sürümü (Grundmann 2011) bunu daha da ileri götürüp yolu durgun, sabit hızlı parçalara ayırır."
+    limits: "1-B (yatay) yörünge; kamera hareketi kestirimi ve oluşturma yok, kırpma = en büyük |p − c|; Kalman ölçüm gürültüsü sabit (σ = 4)."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Lucas–Kanade el hesabı
+    goal: 2 × 2 normal denklemleri çözmek
+    needs: $(\mathbf A^T\mathbf A)\mathbf m=-\mathbf A^T\mathbf b$
+    q: |-
+      Pencerede $\sum I_x^2=4$, $\sum I_xI_y=2$, $\sum I_y^2=2$, $\sum I_xI_t=-6$, $\sum I_yI_t=-4$. $(u,v)$?
+    solution: |-
+      $\begin{bmatrix}4&2\\2&2\end{bmatrix}\begin{bmatrix}u\\v\end{bmatrix}=\begin{bmatrix}6\\4\end{bmatrix}$; determinant $8-4=4$. $u=(2\cdot6-2\cdot4)/4=1$, $v=(4\cdot4-2\cdot6)/4=1$. Özdeğerler $3\pm\sqrt5$ (5.24 ve 0.76): ikisi de sıfırdan uzak, çözüm kararlı.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Üç adımlı aramanın maliyeti
+    goal: Hiyerarşik aramada aday saymak
+    needs: Adımlar 8, 4, 2, 1
+    q: |-
+      Arama aralığı ±15. Adımlar 8 → 4 → 2 → 1 olan logaritmik aramada (her adımda 8 komşu, başlangıçta merkez) kaç aday değerlendirilir?
+    answer: 33
+    calc: "1+8*4"
+    tol: 0
+    mistakes:
+      - {answer: 961, msg: "Bu tam arama: (2 · 15 + 1)²."}
+      - {answer: 25, msg: "Bu ±7 için üç adım (4, 2, 1)."}
+    hints:
+      - "Dört adım, her birinde 8 yeni aday."
+    solution: |-
+      $1+4\cdot8=33$; tam aramanın %3.4'ü.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Zamansal ortalama
+    goal: σ/√N kuralını uygulamak
+    needs: $\operatorname{Var}(\bar g)=\sigma^2/N$
+    q: |-
+      Hareketsiz bir sahnede gürültü std'si 12. Std'yi 3'e indirmek için kaç kare ortalanmalı?
+    answer: 16
+    calc: "(12/3)**2"
+    tol: 0
+    mistakes:
+      - {answer: 4, msg: "σ/N değil, σ/√N."}
+      - {answer: 8, msg: "√N = 4 → N = 16."}
+    hints:
+      - "$12/\\sqrt N=3$."
+    solution: |-
+      $\sqrt N=4$, $N=16$. 30 fps'te bu yarım saniyelik bir pencere: o sürede hareket eden her şey hayalet bırakır.
+  - id: p4
+    type: hesap
+    level: 2
+    title: Yörünge yumuşatmanın kazancı
+    goal: Gauss süzgecinin frekans yanıtını uygulamak
+    needs: $H=\exp(-2\pi^2\sigma^2/P^2)$
+    q: |-
+      σ = 10 karelik Gauss yumuşatması, periyodu 40 kare olan yürüme sallanmasının genliğini hangi katsayıyla çarpar?
+    answer: 0.291213
+    calc: "math.exp(-2*math.pi**2*100/1600)"
+    tol: 0.001
+    mistakes:
+      - {answer: 0.8825, msg: "2π² çarpanı unutuldu: exp(−2σ²/P²)."}
+      - {answer: 0.0072, msg: "σ ve P'nin kareleri alınmadı."}
+    hints:
+      - "$2\\pi^2\\cdot100/1600=1.234$."
+    solution: |-
+      $e^{-1.234}=0.291$: 10 piksellik sallanma 2.9 piksele iner (lab l3'te kasıtlı yoldan RMS sapma 3.8).
+  - id: p5
+    type: yorumla
+    level: 2
+    title: FRUC'ta nesne kenarında bozulma
+    goal: Blok telafili FRUC'un hata kaynağını bulmak
+    needs: Delik, örtüşme, örtme
+    q: |-
+      Blok telafili FRUC ile üretilen ara karelerde hareket eden bir arabanın gövdesi temiz, ama arka kenarında bloklu bir "kuyruk" ve önünde arka planın tekrarı görülüyor. En olası neden?
+    choices:
+      - {t: "Arama aralığı küçük", why: "Gövde temiz: vektörler doğru bulunmuş."}
+      - {t: "Kenardaki bloklar hem araba hem arka plan içeriyor ve tek vektörle taşınıyor; araba arkasında açığa çıkan arka planın bir karede karşılığı yok (örtme)", ok: true, why: "Blok hareket varsayımı sınırlarda geçersiz; delik/örtüşme ve örtme birlikte bozulma üretir."}
+      - {t: "SSD yerine SAD kullanılmış", why: "Ölçüt değişimi sınır sorununu çözmez."}
+    hints:
+      - "Kayar yapboz benzetmesi nerede bozulur?"
+    solution: |-
+      Çözümler: blokları sınırlarda bölmek (değişken blok boyutu), örtüşen blok telafisi (OBMC), ileri–geri denetimiyle örtülen bölgeleri bulup yalnız bir kareden doldurmak, ya da yoğun akış ve öğrenilmiş birleştirme haritası (RIFE'deki M).
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Normal akış ve LK'nin tekilliği
+    goal: Açıklık probleminin cebirsel biçimini göstermek
+    needs: Rang, en küçük normlu çözüm
+    q: |-
+      (a) Tek pikselde $\nabla I\cdot\mathbf u=-I_t$ denkleminin en küçük normlu çözümünün $\mathbf u_\perp=-I_t\nabla I/\|\nabla I\|^2$ olduğunu gösterin. (b) Lucas–Kanade'de $\mathbf A^T\mathbf A$'nın ancak penceredeki bütün gradyanlar paralel (ya da sıfır) olduğunda tekil olduğunu gösterin.
+    rubric:
+      - "Çözüm kümesini $\\mathbf u_\\perp+s\\,\\mathbf t$ ($\\mathbf t\\perp\\nabla I$) olarak yazdım"
+      - "Normun $s=0$'da en küçük olduğunu Pisagor ile gösterdim"
+      - "$\\mathbf A^T\\mathbf A$'nın rangının $\\mathbf A$'nın rangına eşit olduğunu kullandım"
+      - "Rang 1 ⇔ bütün satırlar ($\\nabla I_i$) aynı doğrultuda sonucuna vardım"
+    hints:
+      - "$\\mathbf x^T\\mathbf A^T\\mathbf A\\mathbf x=\\|\\mathbf A\\mathbf x\\|^2$."
+    solution: |-
+      (a) $\mathbf u_\perp$ denklemi sağlar ve gradyana paraleldir; her çözüm $\mathbf u_\perp+s\mathbf t$ biçimindedir ve $\|\mathbf u\|^2=\|\mathbf u_\perp\|^2+s^2$. (b) $\mathbf A^T\mathbf A\mathbf x=0\Rightarrow\|\mathbf A\mathbf x\|^2=0\Rightarrow\mathbf A\mathbf x=0$: sıfırdan farklı bir $\mathbf x$ bütün gradyanlara diktir, yani gradyanlar $\mathbf x^\perp$ doğrultusundadır.
+pitfalls:
+  - wrong: "Lucas–Kanade her büyüklükteki hareketi bulur; yeter ki pencere büyük olsun."
+    right: "Taylor açılımı birkaç piksellik kaymada geçersizleşir; pencere bunu düzeltmez. Piramit ve yineleme gerekir (lab l1: 6 pikselde tek seviye 4.47, piramitle 0.11 piksel)."
+  - wrong: "İleri–geri denetiminde ileri ve geri akış aynı pikselde karşılaştırılır."
+    right: "Geri akış, ileri akışın gösterdiği karşılık noktasında okunur: ‖f(x) + b(x + f(x))‖. Aynı pikselde karşılaştırmak hareketli nesnelerin kenarındaki doğru vektörleri de reddeder."
+  - wrong: "Homografinin serbestlik derecesi 6'dır."
+    right: "6 afinin serbestlik derecesidir; homografi 3 × 3 matrisi ölçeğe kadar tanımlı olduğu için 8'dir. Benzerlik 4."
+  - wrong: "Kalman süzgeciyle yumuşatma çevrimdışı Gauss gibi gecikmesizdir."
+    right: "Kalman yalnız geçmişi görür (çevrimiçi): q küçüldükçe yol düzleşir ama kaydırmayı geriden izler (lab l3: q = 10⁻⁴'te 6.2 kare gecikme, 52 piksel kırpma)."
+whatif:
+  - q: "İki kare arasında aydınlatma %20 değişse (bulut geçmesi, otomatik pozlama)?"
+    a: "Parlaklık sabitliği bozulur: LK'de I_t'ye hareketten bağımsız bir terim eklenir (lab l1: EPE 0.36 → 2.45), SAD'li blok eşleme yanlış adaylara kayar (lab l2: 51 → 1 doğru blok). Çözümler: gradyan sabitliği, ortalaması çıkarılmış/normalize ölçütler (NCC, ZSAD), yerel kazanç-ofset modeli ya da census dönüşümü gibi sıralı ölçütler."
+  - q: "Kayan deklanşörlü bir telefon videosu tek bir küresel homografiyle stabilize edilse?"
+    a: "Titreme ortalamada giderilir ama her satır farklı anda pozlandığı için kare içi bükülme (jello etkisi) kalır, hatta kare ötelemesi düzeltilince daha belirgin görünür. Satır başına (ya da şerit başına) dönüşüm, mesh tabanlı yerel modeller ya da jiroskop verisiyle satır zamanlarına göre düzeltme gerekir."
+  - q: "FRUC'ta hareket kestirimi yerine doğrudan codec'in blok vektörleri kullanılsa?"
+    a: "Hesap neredeyse sıfıra iner, ama kodlayıcı vektörleri artığı küçültmek için seçer, gerçek hareket için değil: tekrar eden dokularda ve dokusuz bölgelerde rastgele vektörler, büyük bloklar ve intra kodlanmış bloklarda vektör yokluğu. Vektörler bir başlangıç noktası olarak, güven denetimi ve yedekle (kare ortalaması ya da yeniden arama) birlikte kullanılmalı."
