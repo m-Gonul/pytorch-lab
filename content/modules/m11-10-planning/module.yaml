@@ -99,3 +99,161 @@ homework:
       - "Örnek sayısına göre ödül eğrisi: MB, MB-MF ve saf MF."
     accept:
       - "MB, MF'ye göre 1–2 büyüklük mertebesi az örnekle makul performansa ulaşır (makale Şekil 6 nitel)."
+labs:
+  - id: l1
+    lab: dynamaze
+    title: "Dyna labirenti: planlama adımı sayısı ve değişen ortamda Dyna-Q+"
+    goal: |
+      Sutton–Barto labirentinde bölüm başına adım sayısını planlama adımı sayısına (n) bağlı izle: n = 0, seçili n ve n = 50 aynı grafikte. Kısayol deneyinde 3000. adımda açılan geçidi düz Dyna-Q ile Dyna-Q+ (κ√τ bonusu) arasındaki birikimli ödül farkından izle; κ = 0'da keşif itmesinin ne kadarını yitirdiğini ölç.
+    predict:
+      q: "İkinci bölümde ortalama adım sayısı n = 0'dan n = 50'ye geçince kabaca nasıl değişir?"
+      options:
+        - {t: "İki katına kadar kısalır", why: "Ölçülen değişim çok daha büyük: 30 çalıştırma ortalamasında 752'den 98'e."}
+        - {t: "Birkaç katla yirmi kata kadar kısalır (30 çalıştırmada 752'den 98'e)", ok: true, why: "Planlama her gerçek adımı n + 1 güncellemeye çoğaltıyor; tohumdan tohuma 37–212 arasında değişen ağır kuyruklu bir dağılım var."}
+        - {t: "Uzunluğu değiştirmez, yalnız öğrenme sonrası bölüm uzunluğunu iyileştirir", why: "En büyük kazanç ilk bölümlerde: ikinci bölüm 752'den 98'e iniyor."}
+    presets:
+      - {name: "Varsayılan (n = 10)", params: {}, note: "İkinci bölüm ortalaması: n = 0 için 530, n = 10 için 127, n = 50 için 38 adım. Kısayol deneyinde Dyna-Q+ oranı 1.40 (ikinci yarı 165'e karşı 231)."}
+      - {name: "Ağır planlama (n = 50)", params: {n: 50}, note: "İkinci bölüm 42 adım; kısayolda oran 1.34 (168'e karşı 225)."}
+      - {name: "Dyna'sız (n = 0)", params: {n: 0}, note: "İkinci bölüm 530 adım. Kısayol deneyinde iki ajan da çok yavaş: ikinci yarı 52 ve 93 ödül."}
+      - {name: "Bonus kapalı (κ = 0)", params: {kappa: 0}, note: "Dyna-Q+ kısayolu bulamıyor: ikinci yarı ödülü 145, Dyna-Q 165 (oran 0.879)."}
+      - {name: "Keşifsiz (ε = 0)", params: {eps: 0}, note: "İlk yarıda Dyna-Q 85, Dyna-Q+ 130 ödül: bonus olmasa da denenmemiş eylemlerin modele eklenmesi başlı başına keşif sağlıyor."}
+    questions:
+      - q: "Kısayol açıldıktan sonra düz Dyna-Q kısayolu neden bulamaz?"
+        a: "Eski yol hâlâ hedefe götürüyor; model 'çalışıyor' görünür ve Q değerlerinde tutarsızlık doğmaz. ε-açgözlü keşif kısayola giden uzun eylem dizisini neredeyse hiç denemez; planlama ise yalnız gerçekte görülmüş (s, a) çiftlerinden örnekleme yapar. Dyna-Q+ uzun süredir denenmemiş çiftlere κ√τ bonusu eklediği için planlama onları yeniden denemeye değer bulur, model güncellenir ve kısayol devreye girer."
+      - q: "n = 50'de bile ikinci bölüm bazı tohumlarda 200 adımı aşıyor. Neden?"
+        a: "Bölüm 1'de hedefe götüren geçişler tesadüfen geç öğrenülürse Q'da yol bilgisi eksik kalır: planlama, modelde olan bilgiyi çoğaltır, olmayanı üretemez. Bu yüzden dağılım ağır kuyrukludur; ölçümümüzde n = 50'nin ikinci bölümü 8 tohumda 37 ile 212 arasında değişti."
+    limits: "Deterministik labirent (duvara çarpınca yerinde kalma); tablo model yalnız gerçekte görülmüş (s, a) çiftlerinden simüle adım üretir; statik deney 10 çalıştırmanın ortalaması, kısayol deneyi tek koşu (tohum arayüzden değiştirilebilir); bölüm en çok 2000 adım; iki deneyde de α, ε, n ve κ ortak."
+  - id: l2
+    lab: mctsttt
+    title: "MCTS ve UCT: keşif katsayısı ve politika önseli"
+    goal: |
+      Üç tic-tac-toe konumunda UCT ağacını kur: kök hamlelerinin ziyaretleri ve ortalama değerleri, minimax ile doğru (oyun değerini koruyan) hamlelerin ziyaret payının simülasyon sayısıyla gelişimi. UCT ile PUCT (merkez/köşe/kenar ağırlıklı sabit politika önseli) seçim kurallarını karşılaştır; c'nin uç değerlerindeki kilitlenme ve dağınıklık davranışını ölç.
+    predict:
+      q: "Engelleme konumunda 200 simülasyon sonunda ziyaretlerin ne kadarı doğru hamleye gider?"
+      options:
+        - {t: "Yaklaşık yarısı", why: "Ölçülen pay daha yüksek: UCT ile 0.87, PUCT ile 0.95."}
+        - {t: "Büyük çoğunluğu (UCT ile 0.87, PUCT ile 0.95)", ok: true, why: "174/200 ziyaret kazandıran tek hamleye gidiyor; diğer dört hamle kaybettiriyor ve ağaç onları erken bırakıyor."}
+        - {t: "Rastgele oyunlar yüzünden ziyaretler dağılır, belirgin bir hamle çıkmaz", why: "Rastgele oyunlar gürültülüdür ama 200 simülasyonda fark büyük: hamlelerin ortalama değerleri 0.87'ye karşı −0.2 ile −0.55."}
+    presets:
+      - {name: "Varsayılan (engelleme konumu)", params: {}, note: "Kare 6: 174/200 ziyaret, ort. değer 0.87; pay UCT 0.87, PUCT 0.95."}
+      - {name: "Az simülasyon", params: {sims: 50}, note: "Pay UCT 0.60, PUCT 0.86: küçük bütçede önselin katkısı büyük."}
+      - {name: "Büyük keşif katsayısı", params: {c: 3}, note: "UCT payı 0.65'e iniyor (12 tohumda 0.63–0.66 bandı); PUCT'ta önsel dağılmayı frenliyor (≈ 0.91)."}
+      - {name: "Kazanma konumu", params: {pos: 2}, note: "Kazandıran hamle üst orta (1-4-7 sütunu); pay UCT 0.875, PUCT 0.92."}
+      - {name: "Boş tahta", params: {pos: 0}, note: "Minimax değeri beraberlik ve bütün ilk hamleler bunu koruyor; ziyaretler yine merkezde yoğun (48/200)."}
+    questions:
+      - q: "Kökteki hamle neden en yüksek skorlu değil, en çok ziyaret edilen hamle seçilir?"
+        a: "Skorda keşif bonusu vardır: az ziyaretli bir kol bonusla en yüksek skoru alabilir ama bu, iyi olduğunun kanıtı değildir. Ziyaret sayısı ağacın o kola yatırdığı değerlendirme denemelerinin sayısıdır ve sonsuz simülasyonda ziyaretler en iyi hamleye yakınsar (UCT tutarlılığı). AlphaGo da dahil uygulamalarda kök seçimi ziyaret sayısıyladır."
+      - q: "Yaprak başına rastgele oyun sayısını (roll) artırmak neyi değiştirir?"
+        a: "Yaprak değer kestiriminin gürültüsü 1/√roll ölçeğinde azalır; aynı simülasyon bütçesinde daha az ama daha güvenilir yaprak değeri hesaplanmış olur. Gürültü azalınca agresif seçim kuralları daha az kilitlenir: ölçümümüzde roll = 20 ile c = 0 payı 0.98'di; roll = 1'de ise 12 tohumdan 2'sinde pay 0.005'e düştü."
+    limits: "Tic-tac-toe (3 × 3); varsayılan politika düz rastgele oyun; yaprak değeri roll oyunun ortalaması; PUCT önseli sabit bir merkez/köşe/kenar ağırlığı (öğrenilmiyor); aynı c katsayısı UCT ve PUCT'ta kullanılıyor; kök analizi tek koşu (tohum arayüzden değiştirilebilir)."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: UCT seçim skoru
+    goal: Skoru elle hesaplamak
+    needs: $\bar Q+c\sqrt{2\ln N/n}$
+    q: |-
+      Bir karar düğümünde iki hamle var. Birincide $\bar Q=0.3$, $N=40$ (düğüm ziyareti), $n=5$ (kol ziyareti), $c=\sqrt2$; ikincide $\bar Q=0.4$, aynı $N$, $n=35$. Hangisi seçilir ve skoru nedir?
+    solution: |-
+      Birinci kol: $0.3+\sqrt2\sqrt{\ln 40/5}=0.3+1.414\cdot0.859=1.515$. İkinci kol: $0.4+\sqrt2\sqrt{\ln40/35}=0.4+0.325=0.725$. Az ziyaretli kol seçilir: keşif bonusu belirsizliği ödüllendirir. (Skordaki 2 çarpanı UCB1'den gelir; $c$ bunu içine aldığı için uygulamada genelde $c\sqrt{\ln N/n}$ yazılır.)
+  - id: p2
+    type: hesap
+    level: 1
+    title: Ödül modelinin artımlı ortalaması
+    goal: Model güncellemesini hesaplamak
+    needs: $\hat R\leftarrow(r+(n-1)\hat R)/n$
+    q: |-
+      Bir $(s,a)$ çifti daha önce 4 kez denendi ve $\hat R(s,a)=0.6$. Beşinci denemede ödül $r=1.0$ geldi. Güncellenmiş $\hat R(s,a)$ nedir?
+    answer: 0.68
+    calc: "(1.0 + 4*0.6)/5"
+    mistakes:
+      - {answer: 0.32, msg: "n − 1 yerine 1: (1.0 + 0.6)/5. Eski tahmin tam ağırlıkta değil, gördüğü deneme sayısı kadardır."}
+      - {answer: 0.8, msg: "İki değerin basit ortalaması: 5 örneğin ortalaması değil."}
+      - {answer: 1.0, msg: "Son gözlemle değiştirmek: model son örneği değil beklenen ödülü tahmin eder."}
+    hints:
+      - "Beş örneğin ortalaması: (4 eski örnek özet + 1 yeni)/5."
+    solution: |-
+      $\hat R=(r+(n-1)\hat R_{\text{eski}})/n=(1.0+4\cdot0.6)/5=0.68$. Bu, M11.4'teki artımlı ortalamanın aynısı: $n-1$ eski gözlemin toplamı $4\cdot0.6=2.4$, yenisıyla birlikte $3.4$, beşe bölünce 0.68.
+  - id: p3
+    type: yorumla
+    level: 2
+    title: Ağır kuyruklu öğrenme eğrisi
+    goal: Ölçüm dağılımını yorumlamak
+    needs: planlama, keşif, örneklem varyansı
+    q: |-
+      Bir öğrenci Dyna-Q labirentini n = 50 ile 30 farklı tohumla koşuyor. İkinci bölümün ortalaması 98 adım; ama tek tek tohumlarda 37 ile 212 arasında değişiyor. Öğrenci "planlama bazı tohumlarda işe yaramıyor" diyor. En doğru yorum hangisi?
+    choices:
+      - {t: "Planlama bozuk: n = 50 her tohumda ikinci bölümü 40 adımın altına indirmeli", why: "Böyle bir garanti yok: planlama modeldeki bilgiyi çoğaltır, keşif eksikliğini telafi etmez."}
+      - {t: "Dağılım ağır kuyruklu: bölüm 1'de hedef yolunun geç keşfedildiği talihsiz koşular ikinci bölümü uzatıyor; ortalama hâlâ n = 0'daki 752'den çok düşük", ok: true, why: "Planlamanın getirisi ortalamada net (752'den 98'e); kuyruk, keşfin özyinelemeli bağımlılığından geliyor."}
+      - {t: "Tohum sayısı yetersiz: 30 tohumla ortalama güvenilmez", why: "Ortalama 98'in güven aralığı geniş olabilir ama gözlenen tablo tutarlı: n = 0 için ortalama 752."}
+    hints:
+      - "Bölüm 1'de ne öğrenilirse planlama onu çoğaltır."
+    solution: |-
+      Planlama, modelde olmayan bilgiyi üretemez. Bölüm 1'de rastgele yürüyüş hedefe giden geçişleri geç tandaysa Q'da yol eksik kalır ve ikinci bölüm uzar. Ortalama yine de n = 0'a göre çok iyi (98'e karşı 752); kuyruğu kesmenin yolu keşfi iyileştirmektir (ör. iyimser başlangıç, ε takvimi), planlamayı artırmak değil.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Depo robotu için yöntem seçimi
+    goal: Modelli ve modelsiz yöntemleri duruma göre seçmek
+    needs: Dyna, DQN, MCTS
+    q: |-
+      Bir depoda yol bulma robotu: ızgara harita, 4 hareket eylemi, pil ve süre pahalı (günde birkaç yüz gerçek adım), ortam yavaş değişiyor (raf yerleri arada değişiyor). Hangi yaklaşım en uygun başlangıç?
+    choices:
+      - {t: "Sayım/doğrusal model öğrenen ve Dyna planlaması yapan ajan; ortam değişimine karşı Dyna-Q+ bonusu", ok: true, why: "Az gerçek denemeyle simüle deneyim üretir; değişen ortamda bonuslu keşif modelin bayatlamasını fark eder."}
+      - {t: "DQN: görsel girdiden Q ağı, milyonlarca adımlık tekrar tamponu", why: "Örnek verimliliği düşük; pahalı gerçek deneyimle ölçeklenmez (görsel girdi de yok)."}
+      - {t: "Doğrudan MCTS", why: "MCTS bir geçiş modeli ister; model öğrenilmeden ağaç kurulamaz. Model öğrenilirse MPC/MCTS düşünülebilir."}
+    hints:
+      - "Günde birkaç yüz gerçek adımla kaç milyon güncelleme yapılabilir?"
+    solution: |-
+      Küçük eylem uzayı + pahalı deneyim + değişen ortam: modelli RL'nin tipik senaryosu. Sayım modeli (ya da doğrusal model) + Dyna planlaması her gerçek adımı onlarca simüle adıma çevirir; Dyna-Q+'nın κ√τ bonusu uzun süredir denenmeyen geçişleri yeniden gündeme getirir. Model hatası riski deterministik ızgarada düşüktür.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Keyfî örneklemeli Dyna
+    goal: Planlama örnekleme hatasını bulmak
+    needs: görülmüş (s, a) çiftleri
+    q: |-
+      Bir öğrencinin Dyna-Q kodu planlama adımında (ŝ, â) çiftini bütün durum–eylem tablosundan rastgele seçiyor; modelde olmayan çiftler için de `(r = 0, s' = ŝ)` varsayıyor. Kod yavaş öğreniyor ve bazı (s, a)'ların Q değeri nedeni anlaşılmayan biçimde düşüyor. Hata nerede?
+    choices:
+      - {t: "Öğrenme oranı çok küçük", why: "Semptom orandan bağımsız: Q düşüşü planlama hedeflerinden geliyor."}
+      - {t: "Hiç denenmemiş (ŝ, â) çiftleri için kendi-kendine-geçiş varsayımı, bu eylemlerin Q'sunu ŝ durumunun değerine doğru çekiyor; görülmemiş çiftlerin de Q'su gerçekte varmış gibi güncelleniyor", ok: true, why: "Planlama yalnız görülmüş çiftlerden örnekleme yapmalı (Sutton ve Barto, Algoritma 8.1)."}
+      - {t: "Model güncellemesi yanlış sırada yapılıyor", why: "Sıralama sorunu değil; sorun modelde olmayan çiftlerin uydurma değerlerle kullanılması."}
+    hints:
+      - "Hiç denenmemiş bir (ŝ, â) için (r = 0, s' = ŝ) hedefi Q(ŝ, â)'yı hangi değere çeker?"
+    solution: |-
+      Uydurma hedef $0+\gamma\max_{a'}Q(\hat s,a')$: hiç denenmemiş eylemin değeri kendi durumunun değerine yapıştırılır. Bu, hem görünmüş komşuların öğrenimini gürültüler hem de gerçekten iyi eylemleri bastırabilir. Doğrusu: `keys` listesinde yalnız gerçekte denenen çiftleri tutmak ve planlamayı oradan örneklemek. Fonksiyon yaklaşımı modelinde görülmemiş girdiye genelleme meşrudur; tabloda değildir.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Tablo model ile tekrar tamponunun ilişkisi
+    goal: İki mekanizmanın taşıdığı bilgiyi karşılaştırmak
+    needs: deterministik/stokastik MDP, sayım modeli
+    q: |-
+      (a) Deterministik bir MDP'de, her (s, a)'nin son gözlemini saklayan bir tekrar tamponuyla, model(s, a) = (r, s') saklayan tablo Dyna-Q'nun simüle ettikleri örneklerin dağılımı bakımından eş olduğunu gösterin. (b) Stokastik MDP'de sayım modelinin tek gözlem tekrarından neyi fazladan taşıdığını açıklayın.
+    rubric:
+      - "Deterministik durumda her (s, a) için tek bir (r, s') olası olduğunu ve modelin son gözlemi saklamanın tam bilgi olduğunu yazdım"
+      - "Her iki mekanizmanın da aynı (s, a) kümesinden örnekleme yapıp aynı (r, s') değerlerini ürettiğini, dolayısıyla Q güncellemelerinin dağılışının aynı olduğunu gösterdim"
+      - "Stokastik durumda tamponun tek bir realized örneği (bir olasılık yolu) tekrarladığını, sayım modelinin ise gözlemlerin görece sıklıklarıyla P̂(s'|s, a) ürettiğini belirttim"
+      - "Sayım modelinden örnekleme yapmanın tampondan farkını yazdım: model P̂'tan örnekleme yaparak görülmemiş birleşik yollar da üretebilir (model genelleştikçe öbek-dışı geçişler)"
+      - "Sinir ağı Q ile tamponun da genelleme yaptığını (parametre değişimi benzer durumlara taşar) not ettim"
+    hints:
+      - "Deterministik ortamda 'son gözlem' ile 'tek doğru gözlem' aynı şey midir?"
+    solution: |-
+      (a) Deterministik MDP'de (s, a)'nın çıktısı tektir; son gözlem = tek gözlem. Tampon da model de aynı (r, s') değerini verir; ikisi de aynı görülmüş (s, a) kümesinden örneklendiği için Q güncellemelerinin dağılımı aynıdır. (b) Stokastik ortamda tampon realized bir yolu tekrar eder; sayım modeli P̂(s'|s, a) = n(s,a,s')/n(s,a) ile beklenen geçişi temsil eder: örnekleme, gözlemlenen s' değerleri arasında sıklıklarına göre seçim yapar ve (planlama turları biriktikçe) gerçekleşmiş olandan farklı birleşik yollar üretebilir. Bilgi farkı budur; tablo Q'da ikisi arasındaki en büyük pratik fark dağılımdadır.
+pitfalls:
+  - wrong: "Modelli RL modelsizden her zaman daha örnek-verimlidir; model öğrenmek her durumda kazançtır."
+    right: "Küçük ve orta ölçekte genelde öyledir; ama model hatası çok adımlı planda birikir ve yanlış model, yanlış politikayı hızla planlar. Bu yüzden uygulamalar modelli hızı modellsiz ince ayarla birleştirir (Nagabandi ve ark. 2018). Deterministik labirent gibi kolay model problemlerinde modelli yöntem açık ara kazanır."
+  - wrong: "MCTS'te bir düğümün değeri, keşif bonusunu da içeren skoru en yüksek eylemin skorudur."
+    right: "Bonus yalnız hangi çocuğun derinleştirileceğini seçmek içindir; düğümün değeri geri yayılımla çocuk ortalamalarından gelir. Karar düğümünde V(s) = max_a Q̄(s, a) tanımlanır. Bonusu değere katmak, kötü eylemi 'keşif gereği' şişirir ve üst düğümlerin ortalamalarını bozar."
+  - wrong: "Dyna planlaması durum–eylem uzayından keyfî örnekler çekebilir."
+    right: "Tablo model yalnız gerçekte görülmüş (s, a) çiftleri için tanımlıdır; görülmemiş çift için uydurulan değer (ör. kendi-kendine geçiş, ödül 0) Q'yu amaçtan uzaklaştırır. Görülmemiş çiftler yalnız fonksiyon yaklaşımı modelinin genelleme yapabildiği durumda kullanılabilir."
+  - wrong: "Tekrar tamponu modelden üstündür çünkü gerçek örneklerle çalışır; model simüle örnekle eğlence olur."
+    right: "İkisi farklı amaçlara hizmet eder: tampon yalnız yaşanmış örnekleri tekrar eder; model görülmemiş (s, a)'lar için de öngörü üretir ve stokastik ortamda tek bir yol yerine beklenen geçişi taşır. Deterministik tablo durumunda ikisi aynı bilgiyi taşır (pratik kartında kanıtlı)."
+whatif:
+  - q: "Kısayol açılsa ama Dyna-Q+ bonusu κ = 0 olsa ne olur?"
+    a: "Dyna-Q+ denenmemiş eylemleri modele eklemeye devam eder ama keşif itmesi kalmaz. Ölçülen sonuç: değişimden sonraki 3000 adımda Dyna-Q+ 145 ödül topladı, Dyna-Q 165 — oran 0.879. Kısayolu bulan şey κ√τ bonusunun kendisidir; model genişletme tek başına yetmez."
+  - q: "MCTS'te c = 0 olsaydı?"
+    a: "Seçim yalnız ortalamalara bakar. Değer farklarının büyük olduğu ölçtüğümüz konumda doğru hamle yine bulunur (pay 0.98); ama yaprak kestirimi gürültülüyse (yaprak başına tek rastgele oyun) kötü ilk izlenim kalıcı olur: 12 tohumdan 2'sinde pay 0.005'e düştü. Bonus, kilitlenmeyi kıran sigortadır; c = 3'te ise ziyaretler dağılır (pay 0.63–0.66)."
+  - q: "Varsayılan politika (düz rastgele oyun) yerine daha iyi bir politika kullanılsaydı?"
+    a: "Yaprak değerleri daha az gürültülü ve gerçek değere daha yakın olurdu; aynı simülasyon bütçesiyle daha güvenilir ağaç. AlphaGo tam bunu yapar: yaprakta değer ağı (ya da değer ağı + kısa rastgele oyun karışımı). Sınır: varsayılan politika çok açgözlü olursa ağaç tek dala kilitlenebilir; keşif yine c ve politika önseliyle dengelenir."

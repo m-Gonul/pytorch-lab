@@ -216,7 +216,7 @@ groups:
         pages: [m11-10-planning, m11-12-trust-region]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M11.10 konu anlatımı lect_12'nin bütün slaytlarını (1–19) işliyor: modelsizden modelliye geçiş ve dört adımlı döngü, tablo model (sayım kestiriminin en çok olabilirlik olmasının türetimi, artımlı ödül ortalaması) ve değer yinelemesiyle kesinlik eşdeğerli planlama, doğrusal/Gauss süreci/sinir ağı modelleri ve artık tahmini, kısmi planlama ve Dyna-Q, tekrar tamponuyla karşılaştırma, Dyna-Q+ (κ√τ bonusu) ve öncelikli tarama, şimdiki durumdan planlama ve MPC (rastgele atış), ağaç araması ve üç budama (yaprak, şans, karar düğümleri), UCT'nin haydut azaltımı, MCTS'in dört adımı, AlphaGo iskeleti ve PUCT; dynamaze ve mctsttt deneyleri, 2 şekil (BFS yolu ve gerçek UCT koşusundan kök düğümleri). Kaynak düzeltmeleri: planlama çiftleri keyfî değil gerçekte görülmüş olmalı; 'tampon genelleme yapmaz' tablo Q için doğrudur ama sinir ağı Q'da değil; V*(s) = Q(s, a*) (a* bonusla seçilmiş) tanımı; AlphaGo bonusunda √N(s) çarpanı eksik (makale denklemi 2; el hesabı makale formülüyle hesaplandı). Ölçümle düzeltilen taslak: 'X engellemeli' tic-tac-toe konumu aslında tek hamlede kazandıran çift tehdit konumu (ilk el analizi beraberlik sanıyordu); 'kötü politika önseli keşfi yavaşlatır' iddiası ölçümde tutmadı (kenar hamlelik kazanan konumda PUCT yine öndeydi: kesin yaprak değerleri yanlış önseli düzeltiyor). lect_13 (güven bölgesi) M11.12'de."
   - title: "Makaleler"
     note: "Her makale ilgili modülde anlatılıyor ve bir makale ödevi olarak uygulatılıyor (Ödevler sayfası)."
     rows:
