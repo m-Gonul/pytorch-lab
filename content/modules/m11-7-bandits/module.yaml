@@ -37,7 +37,7 @@ hand:
       fields:
         - {id: hoe, label: "$n=100$, $c=0.1$: $2e^{-2nc^2}$", answer: 0.2706705664732254, tol: 1.0e-6}
         - {id: ucb, label: "UCB1: ortalama 0.6, $n=100$, $n_a=10$", answer: 1.5597051061, tol: 1.0e-6}
-    - title: "Beta–Bernoulli: önsel Beta(1,1), 3 yazı 1 tura"
+    - title: "Beta–Bernoulli: önsel Beta(1,1), 3 tura 1 yazı (tura = ödül 1)"
       fields:
         - {id: ba, label: "Sonsal α", answer: 4}
         - {id: bm, label: "Sonsal ortalama", answer: 0.6666666666666666, tol: 1.0e-9}
@@ -117,3 +117,156 @@ labs:
       - {name: "ε = 0", params: {eps: 0}, note: "Saf açgözlü: ilk şanslı kola takılabilir (tohumları dene)."}
       - {name: "UCB c küçük", params: {c: 0.3, B: {c: 2}}, note: "Az keşif hızlıdır ama yanlış kola kilitlenme riski taşır."}
     limits: "Bernoulli ödüller, 30 tekrar ortalaması; kollar sabit (durağan)."
+  - id: l2
+    lab: ucbbound
+    title: "UCB1'in içi: güven terimleri, çekilme sayıları ve alt sınır"
+    goal: |
+      Bernoulli kollarda UCB1'i n adım oynat; o andaki görgül ortalamaları, güven terimlerini ve gerçek ortalamaları yan yana gör. Çekilme sayılarını Auer ve ark.'nın 8 ln n/Δ² üst sınırıyla, birikimli pişmanlığı Lai–Robbins alt sınırının öncü terimiyle karşılaştır; güven çarpanı c'nin etkisini dene.
+    predict:
+      q: "UCB1 (c = 1), 4 kol, n = 1000: en kötü kol (μ = 0.4) yaklaşık kaç kez çekilir?"
+      options:
+        - {t: "≈ 600: Auer sınırı 8 ln n / Δ²", why: "Sınır kötümser; gerçek sayı çok daha az."}
+        - {t: "≈ 100", ok: true, why: "Bu tohumda 99; güven terimi √(2 ln n / n_a) bu kolu ara sıra yeniden denetiyor."}
+        - {t: "0: kötü kol hiç denenmez", why: "UCB her kolu sonsuz kez (ama logaritmik sıklıkla) dener."}
+    presets:
+      - {name: "UCB1, n = 1000", params: {K: 4, n: 1000, c: 1}, note: "Çekilmeler 582 / 204 / 115 / 99; pişmanlık 73."}
+      - {name: "Uzun ufuk", params: {K: 4, n: 5000, c: 1}, note: "Pişmanlık 167; Lai–Robbins öncü terimi 71."}
+      - {name: "Altı kol", params: {K: 6, n: 5000, c: 1}, note: "Pişmanlık 175."}
+      - {name: "Az keşif (c = 0.3)", params: {K: 4, n: 1000, c: 0.3}, note: "Bu tohumda şanslı: pişmanlık 5.8."}
+      - {name: "Açgözlü (c = 0)", params: {K: 4, n: 1000, c: 0}, note: "Tohuma göre ya çok iyi ya da en iyi kolu hiç bulamıyor."}
+    questions:
+      - q: "c = 0.3 bu tohumda UCB1'den çok daha az pişmanlık yapıyor. Neden yine de UCB1'in c = 1'i tercih edilir?"
+        a: "Pişmanlık rastgeledir ve tek bir çalıştırma beklenen pişmanlık hakkında az şey söyler. Küçük c az keşif demektir: çoğu çalıştırmada hızla doğru kolu bulur ama bazı çalıştırmalarda en iyi kol erken şanssız kalır ve uzun süre (belki hiç) denenmez; o çalıştırmalar doğrusal pişmanlık yapar. c = 1'in (δ = 1/n⁴) Hoeffding tabanlı güvencesi her ortamda logaritmik beklenen pişmanlık verir; daha küçük c'ler bu güvenceyi kaybeder."
+    limits: "Ortalamalar sabit (0.7, 0.6, …); Bernoulli ödüller; tek çalıştırma (tohumla değişir). Lai–Robbins çizgisi yalnız öncü terim, sabitler yok."
+  - id: l3
+    lab: betapost
+    title: "Beta sonsalları ve Thompson'ın bir sonraki seçimi"
+    goal: |
+      İki madeni paranın gözlenen tura ve yazı sayılarından Beta sonsallarını çiz. Thompson örneklemesinin bir sonraki atışta her parayı hangi olasılıkla seçtiğini (k = 1'de sonsal olasılık P(θ₁ > θ₂)) ve örnek sayısı k ile önselin bunu nasıl değiştirdiğini gör.
+    predict:
+      q: "C1: 3 tura 2 yazı (ortalama 0.57), C2: 12 tura 10 yazı (ortalama 0.54). Thompson (k = 1) bir sonraki atışta C1'i hangi olasılıkla seçer?"
+      options:
+        - {t: "1: ortalaması daha yüksek", why: "Bu açgözlü seçim; Thompson belirsizliği kullanır."}
+        - {t: "≈ 0.56", ok: true, why: "C1'in sonsalı geniş; daha iyi olma olasılığı yalnız 0.56."}
+        - {t: "≈ 0.19 (5 / 27 gözlem payı)", why: "Seçim gözlem sayısıyla değil sonsal olasılıkla."}
+    presets:
+      - {name: "Az gözlenen kol", params: {h1: 3, t1: 2, h2: 12, t2: 10, k: 1, a0: 1}, note: "P(C1) ≈ 0.56."}
+      - {name: "k = 10", params: {h1: 3, t1: 2, h2: 12, t2: 10, k: 10, a0: 1}, note: "0.68: açgözlüye yaklaşıyor."}
+      - {name: "Çok veri", params: {h1: 30, t1: 20, h2: 12, t2: 10, k: 1, a0: 1}, note: "C1 sonsalı daralıyor: 0.67."}
+      - {name: "Güçlü önsel", params: {h1: 3, t1: 2, h2: 12, t2: 10, k: 1, a0: 5}, note: "Önsel iki parayı 0.5'e çekiyor: ≈ 0.51."}
+      - {name: "Hiç denenmemiş C1", params: {h1: 0, t1: 0, h2: 12, t2: 10, k: 1, a0: 1}, note: "Düzgün önsel: C1 yine 0.46 olasılıkla denenir."}
+    questions:
+      - q: "Hiç denenmemiş C1, ortalaması 0.54 olan C2'ye karşı neden 0.46 olasılıkla seçiliyor, ve bu iyi bir şey mi?"
+        a: "C1'in sonsalı önselin kendisidir (Beta(1, 1), düzgün): θ₁'in C2'nin örneğinden büyük çıkma olasılığı yaklaşık P(U > 0.54) ≈ 0.46. Bilgi eksikliği keşfe dönüşür; az bilinen kol, iyi olma olasılığıyla orantılı denenir. Bu iyidir, çünkü C1 gerçekten daha iyi olabilir; kötüyse birkaç denemede sonsalı daralır ve seçilme olasılığı hızla düşer."
+    limits: "İki kol; olasılıklar 20 000 tekrarlı tohumlu Monte Carlo ile (±0.01). Önsel iki kol için aynı Beta(α₀, α₀)."
+
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Pişmanlığı hesaplamak
+    goal: Pişmanlık tanımını uygulamak
+    needs: $\sum_a\Delta_aN_a$
+    q: |-
+      Üç kolun ortalamaları 0.6, 0.5, 0.2. 100 adımda kollar sırasıyla 70, 20, 10 kez çekildi. Beklenen birikimli pişmanlık nedir?
+    solution: |-
+      $\Delta=(0,0.1,0.4)$; pişmanlık $20\cdot0.1+10\cdot0.4=6$. En kötü kolun az çekilmesi bile pişmanlığın yarısından fazlasını oluşturur: büyük boşluklu kollardan hızlı vazgeçmek önemlidir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: UCB1 indisi
+    goal: UCB1 güven terimini hesaplamak
+    needs: $\tilde R+\sqrt{2\ln n/n_a}$
+    q: |-
+      $n=1000$ adımda bir kol 50 kez çekilmiş ve ortalaması 0.55. UCB1 indisi nedir?
+    answer: 1.0756522
+    calc: "0.55 + sqrt(2*log(1000)/50)"
+    mistakes:
+      - {answer: 0.8964102, msg: "ln n yerine log₁₀ n kullanılmış."}
+      - {answer: 0.9216922, msg: "Karekök içinde 2 unutulmuş: √(ln n / n_a)."}
+    hints:
+      - "$\\ln1000\\approx6.91$."
+    solution: |-
+      $\sqrt{2\cdot6.908/50}=0.5257$; indis $1.0757$. Ortalaması 0.6 olup 500 kez çekilmiş bir kolun indisi $0.6+0.166=0.766$: az denenen kol, düşük ortalamasına rağmen seçilir.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Beta sonsal ortalaması
+    goal: Eşlenik güncellemeyi uygulamak
+    needs: $\alpha/(\alpha+\beta)$
+    q: |-
+      Önsel $\text{Beta}(2,2)$. 8 atışta 6 tura, 2 yazı gözlendi. Sonsal ortalama nedir?
+    answer: 0.6666667
+    calc: "(2+6)/(2+6+2+2)"
+    mistakes:
+      - {answer: 0.75, msg: "Bu görgül oran 6/8; önsel iki tura ve iki yazı daha ekliyor."}
+      - {answer: 0.7, msg: "Önsel Beta(1, 1) gibi hesaplanmış: (1 + 6)/(1 + 6 + 1 + 2)."}
+    hints:
+      - "Sonsal $\\text{Beta}(2+6,\\,2+2)$."
+    solution: |-
+      $\text{Beta}(8,4)$, ortalama $8/12=0.667$. Önsel, 2 tura ve 2 yazılık sanal gözlem gibi davranır ve kestirimi 0.5'e doğru çeker.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Kampanya süresince reklam seçimi
+    goal: Haydut algoritmasını koşullara göre seçmek
+    needs: Pişmanlık türleri
+    q: |-
+      Bir site 20 reklamdan birini gösterecek; tıklanma oranları %1–%3 arasında ve kampanya bir milyon gösterim sürecek. Gelir en çoklansın. Hangisi?
+    choices:
+      - {t: "Sabit ε = 0.1 ile ε-açgözlü", why: "Gösterimlerin %10'u sonsuza dek rastgele: doğrusal pişmanlık, bir milyon gösterimde büyük kayıp."}
+      - {t: "Beta–Bernoulli Thompson örneklemesi", ok: true, why: "Logaritmik pişmanlık, ayar gerektirmez, küçük CTR farklarında pratikte UCB1'den iyi."}
+      - {t: "Önce her reklamı 10 000 kez göster, sonra en iyisini seç", why: "200 000 gösterim keşfe harcanıyor; %1–%3 farkları için bile fazla, kötü reklamlardan erken vazgeçilmiyor."}
+    hints:
+      - "Kampanyanın sonunda kaç gösterim keşfe harcanmış olur?"
+    solution: |-
+      Thompson, kötü reklamları belirsizlikleri azaldıkça otomatik olarak bırakır. Reklamların bağlama (kullanıcıya) göre farklı performansı varsa bağlamlı haydut (M11.8) gerekir.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Hiç seçilmeyen kol
+    goal: UCB'de başlatmayı doğru yapmak
+    needs: UCB1 başlangıcı
+    q: |-
+      Bir öğrencinin UCB kodunda `n_a = [1e-9]*K`, `mean = [0]*K` ve indis `mean[a] + sqrt(2*log(n+1)/n_a[a])`. Kod çalışıyor ama ilk adımlarda garip davranıyor ve ara sıra NaN üretiyor. Ne yanlış?
+    choices:
+      - {t: "log(n+1) yerine log(n) olmalı", why: "Küçük bir fark; asıl sorun bölme."}
+      - {t: "Her kol önce bir kez oynanmalı (n_a ≥ 1); 1e-9'a bölmek devasa güven terimleri ve sayısal taşmalar üretiyor, ortalama güncellemesi de n_a = 1e-9'la bozuluyor", ok: true, why: "UCB1'in tanımı her kolun en az bir kez denenmesini varsayar."}
+      - {t: "Ortalama 0 yerine 0.5 başlatılmalı", why: "Başlangıç değeri, ilk çekilişten sonra önemini yitirmeli; sorun bölmede."}
+    hints:
+      - "İlk K adımda hangi kollar oynanmalı?"
+    solution: |-
+      İlk $K$ adımda her kolu bir kez oyna, sonra indisi kullan. Alternatif olarak hiç oynanmamış kolun indisi $+\infty$ alınır (iyimserlik).
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Hoeffding'den UCB1'in güven terimine
+    goal: Güven teriminin türetimini yapmak
+    needs: Hoeffding, $\delta=n^{-4}$
+    q: |-
+      $[0,1]$'de bağımsız $n_a$ ödülün ortalaması için Hoeffding $P(R\ge\tilde R+c)\le e^{-2n_ac^2}$ verir. (a) $P(R\le\tilde R+c)\ge1-\delta$ için gereken $c$'yi bulun. (b) $\delta=n^{-4}$ ile UCB1'in $\sqrt{2\ln n/n_a}$ terimini elde edin. (c) Bu seçimin neden $n$ ile azalan bir hata olasılığı istediğini açıklayın.
+    rubric:
+      - "(a) e^{−2n_a c²} = δ'dan c = √(ln(1/δ)/(2n_a)) buldum"
+      - "(b) ln(1/δ) = 4 ln n koyup √(4 ln n/(2n_a)) = √(2 ln n/n_a) elde ettim"
+      - "(c) Toplam pişmanlıkta her adımın hata olasılığı toplandığını; Σ_n n · n^{−4} (kollar ve sayılar üzerinden birleşim sınırı) sonlu kaldığı için sınırın ihlallerinin pişmanlığa sabit katkı yaptığını belirttim"
+      - "Sabit δ'nın ise n ile doğrusal sayıda ihlale ve doğrusal pişmanlığa yol açabileceğini belirttim"
+    hints:
+      - "Her adımda yanlış bir sınır en çok bir hata yapar; hata olasılıklarının toplamı sonlu olmalı."
+    solution: |-
+      (a) $c=\sqrt{\ln(1/\delta)/(2n_a)}$. (b) $\sqrt{4\ln n/(2n_a)}=\sqrt{2\ln n/n_a}$. (c) Sınır ihlali bir adımda yanlış kolu seçtirebilir. Birleşim sınırıyla $t$ adımında ihlal olasılığı $O(t\cdot t^{-4})$'tür ve $\sum_tt^{-3}<\infty$: ihlallerin pişmanlığa katkısı sabittir; geriye $8\ln n/\Delta^2$ terimi kalır.
+pitfalls:
+  - wrong: "Sabit küçük bir ε ile ε-açgözlü uzun vadede neredeyse en iyidir."
+    right: "Sabit ε sonsuza dek ε oranında rastgele kol çeker: pişmanlık doğrusaldır (ε = 0.1'de 1000 adımda ≈ 20 ekler; Şekil 1). Logaritmik pişmanlık için ε azaltılmalı."
+  - wrong: "UCB1'in pişmanlığı logaritmik olduğu için her ufukta sabit ε'dan azdır."
+    right: "Büyüme hızı logaritmiktir ama sabiti büyüktür: 5 kollu örnekte T = 5000'de UCB1'in toplam pişmanlığı (178) sabit ε'unkinden (135) fazla; eğimi ise azalıyor. Asimptotik sınıflar sonlu ufku tek başına belirlemez."
+  - wrong: "Thompson örneklemesinde k büyük seçilirse kestirimler daha doğru olur ve sonuç iyileşir."
+    right: "k büyüdükçe örneklerin ortalaması sonsal ortalamaya yaklaşır ve seçim açgözlüye döner: keşif azalır. Standart Thompson k = 1'dir; seçilme olasılığı en iyi olma olasılığına eşittir."
+  - wrong: "Haydut problemlerinin hiçbir biçiminin hesaplanabilir en iyi çözümü yoktur."
+    right: "İndirimli Bayesçi biçimde Gittins indisi en iyidir (Gittins 1979). Sonlu ufuklu ya da sıklıkçı biçimlerde ise basit bir en iyi çözüm yoktur ve UCB, Thompson gibi yöntemler logaritmik pişmanlık sınırına ulaşır."
+whatif:
+  - q: "Kolların ortalamaları zamanla değişseydi (durağan olmayan haydut)?"
+    a: "Örnek ortalaması eski gözlemleri sonsuza dek eşit ağırlıkta tutar ve değişimi izleyemez; sabit adımlı (üstel) ortalama ya da kayan pencere kullanılır. UCB'nin kayan pencereli (SW-UCB) ve indirimli (D-UCB) sürümleri, Thompson'da sonsal sayımlarının zamanla söndürülmesi aynı fikirdir."
+  - q: "Ödüller [0, 1] dışında ve ağır kuyruklu olsaydı?"
+    a: "Hoeffding sınırlı ödüller ister; ağır kuyruklu ödüllerde görgül ortalama aykırı değerlere duyarlıdır ve UCB1'in güvencesi geçersizdir. Medyan-of-means ya da kırpılmış ortalama gibi sağlam kestiricilerle UCB çeşitleri (robust UCB) ya da uygun önselli Bayesçi yöntemler kullanılır."
+  - q: "Kol sayısı ödül gözleminden çok daha büyük olsaydı (ör. 10⁶ ürün)?"
+    a: "Her kolu bir kez denemek bile imkânsız olur. Kollar arasında yapı kullanılmalıdır: kolların öznitelikleriyle ödülü genelleyen doğrusal ya da sinir ağı modelleri (bağlamlı ve doğrusal haydutlar, M11.8). Pişmanlık kol sayısına değil öznitelik boyutuna bağlı hâle gelir."
