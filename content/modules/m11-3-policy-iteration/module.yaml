@@ -103,3 +103,161 @@ homework:
     accept:
       - "LP, VI ve PI aynı V*'ı verir (1e-8)."
       - "γ → 1 iken iterasyon sayısının 1/(1−γ) ile büyüdüğü bir aile gösterilmiş."
+
+labs:
+  - id: l1
+    lab: pimpi
+    title: "VI, PI ve değiştirilmiş PI: hata ve hesap işi"
+    goal: |
+      Aynı tohumlu MDP'de değer yinelemesini, politika yinelemesini ve K taramalı değiştirilmiş politika yinelemesini çalıştır. ‖V − V*‖ hatasını geçişlerin seyrekliğini hesaba katan çarpma–toplama sayısına göre çiz. Hangi yöntemin hangi yapıda ve γ'da en az işle bittiğini ve PI'de değerlerin monoton arttığını gör.
+    predict:
+      q: "Seyrek bir halka MDP'sinde (40 durum, γ = 0.95) 10⁻⁶ hataya en az toplam işle hangisi ulaşır?"
+      options:
+        - {t: "Politika yinelemesi: en az yineleme", why: "8 yineleme ama her biri 40³/3 işlemlik doğrusal sistem: 0.17 M işlem."}
+        - {t: "Değiştirilmiş PI (K = 20)", ok: true, why: "19 yineleme, 0.035 M işlem; doğrusal sistem yok, seyrek taramalar ucuz."}
+        - {t: "Değer yinelemesi: en ucuz yineleme", why: "327 yineleme, 0.079 M işlem."}
+    presets:
+      - {name: "Halka, K = 5", params: {kind: 2, S: 30, A: 3, g: 0.95, K: 5}, note: "MPI 0.032, PI 0.046, VI 0.059 M işlem."}
+      - {name: "Halka, 40 durum, K = 20", params: {kind: 2, S: 40, A: 3, g: 0.95, K: 20}, note: "MPI 0.035, VI 0.079, PI 0.173 M."}
+      - {name: "K = 1 (VI ile aynı)", params: {kind: 2, S: 30, A: 3, g: 0.95, K: 1}, note: "MPI 328 yineleme: VI ile aynı sayı."}
+      - {name: "K = 60 (PI'ye yakın)", params: {kind: 2, S: 30, A: 3, g: 0.95, K: 60}, note: "6 yineleme."}
+      - {name: "Yoğun MDP", params: {kind: 0, S: 30, A: 3, g: 0.95, K: 5}, note: "Yoğun geçişlerde PI 3 yinelemede ve en az işle bitiyor."}
+      - {name: "γ = 0.99", params: {kind: 2, S: 30, A: 3, g: 0.99, K: 20}, note: "VI 1830 yineleme; PI 11."}
+    questions:
+      - q: "MPI'de K'yı büyütmek neden toplam işi önce azaltıp sonra artırabilir?"
+        a: "Küçük K'da her iyileştirme kaba bir değer tahminine dayanır ve çok sayıda dış yineleme gerekir; her dış yinelemenin |A|·nnz'lik iyileştirme taraması bir sabit maliyettir. K büyüdükçe dış yineleme sayısı düşer, ama her politikayı neredeyse tam değerlendirmek, politika zaten değişecekken boşa iş harcar. Optimum, iyileştirme maliyeti ile değerlendirme maliyetinin dengelendiği orta bir K'dadır."
+    limits: "Rastgele MDP'ler S ≤ 40; iş modeli: yedekleme taraması Σ nnz(P_a), politika taraması nnz(P_π), PI'nin doğrusal sistemi |S|³/3 (yoğun LU; seyrek çözücüler yok). PI π₀ = hep eylem 0'dan başlıyor."
+  - id: l2
+    lab: gridpe
+    title: "4 × 4 ızgara dünyası: yinelemeli politika değerlendirme ve tek iyileştirme adımı"
+    goal: |
+      Sutton ve Barto'nun 4 × 4 ızgara dünyasında rastgele politikanın değerlerini tarama tarama hesapla; eşzamanlı ve yerinde güncellemenin yakınsama hızını karşılaştır. Her aşamada V_k'ye göre açgözlü politikanın ne zaman en iyi politikaya ulaştığını gör.
+    predict:
+      q: "Rastgele politikanın kaç taramalık değerlendirmesine göre açgözlü politika en iyi politika olur (eşzamanlı güncelleme)?"
+      options:
+        - {t: "Değerler yakınsadıktan sonra (≈ 170 tarama)", why: "Değerlerin yakınsaması gerekmiyor; yalnız eylemlerin sırası önemli."}
+        - {t: "3 tarama", ok: true, why: "k = 3'te değerler hâlâ 0, −2.4, −2.9, −3 düzeyinde ama sıralama doğru."}
+        - {t: "1 tarama", why: "k = 1'de bütün iç hücreler −1: eylemlerin çoğu eşit."}
+    presets:
+      - {name: "k = 3", params: {k: 3, mode: 0, g: 1, rw: -1}, note: "Açgözlü politika en iyi."}
+      - {name: "k = 2", params: {k: 2, mode: 0, g: 1, rw: -1}, note: "Henüz en iyi değil."}
+      - {name: "Yakınsamış", params: {k: 300, mode: 0, g: 1, rw: -1}, note: "0, −14, −20, −22 / …"}
+      - {name: "Yerinde, k = 3", params: {k: 3, mode: 1, g: 1, rw: -1}, note: "Değerler tarama sırasına göre asimetrik; politika henüz en iyi değil."}
+      - {name: "Yerinde, k = 4", params: {k: 4, mode: 1, g: 1, rw: -1}, note: "En iyi; yakınsama 114 taramada (eşzamanlı 173)."}
+      - {name: "γ = 0.9", params: {k: 300, mode: 0, g: 0.9, rw: -1}, note: "Değerler −5.3 … −7.7; 60 taramada yakınsıyor."}
+    questions:
+      - q: "Yerinde güncelleme neden daha hızlı yakınsar, ama k = 3'te neden en iyi olmayan bir politika verir?"
+        a: "Yerinde güncellemede bir hücrenin yeni değeri aynı taramada sonraki hücrelere hemen yayılır: bilgi bir taramada birden çok adım ilerler (Gauss–Seidel), bu yüzden 114 taramada yakınsar (eşzamanlı 173). Ama yayılma tarama sırasına bağlıdır: sol üstten başlayan taramada sol üst köşeye yakın hücrelerin değerleri hızla güncellenirken sağ alt köşeye yakın olanlar geride kalır. Simetri bozulur ve bazı hücrelerde açgözlü eylem yanlış köşeye yönelir. Bir tarama daha yapılınca bu düzelir."
+    limits: "Rastgele politikanın değerlendirmesi; ızgara 4 × 4, son durumlar sabit köşeler. Açgözlü politikanın en iyiliği V*'a (değer yinelemesi) göre denetleniyor. Isı haritasında sayılar notta yazılı."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: İki durumda politika yinelemesi, γ = 0.9
+    goal: Değerlendirme ve iyileştirme adımlarını elle yapmak
+    needs: Doğrusal denklem, açgözlü seçim
+    q: |-
+      $s_0$: kal → ödül 0, $s_0$; git → ödül 1, $s_1$. $s_1$: kal → ödül 2, $s_1$; git → ödül 0, $s_0$. $\gamma=0.9$, $\pi_0=(\text{kal},\text{kal})$. Politika yinelemesini yapın.
+    solution: |-
+      $V(s_0)=0$, $V(s_1)=2/(1-0.9)=20$. $s_0$'da $Q(\text{git})=1+0.9\cdot20=19>0$; $s_1$'de $Q(\text{git})=0+0.9\cdot0=0<20$. $\pi_1=(\text{git},\text{kal})$, $V(s_0)=19$, $V(s_1)=20$. İkinci iyileştirmede $s_0$: kal $0.9\cdot19=17.1<19$; $s_1$: git $0.9\cdot19=17.1<20$: politika değişmez, dur.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Değiştirilmiş PI'nin yineleme maliyeti
+    goal: Maliyet formülünü uygulamak
+    needs: $K|\mathcal S|^2+|\mathcal A||\mathcal S|^2$
+    q: |-
+      Yoğun geçişli bir MDP'de $|\mathcal S|=1000$, $|\mathcal A|=4$. $K=10$ ile bir MPI yinelemesi kaç çarpma–toplama ister?
+    answer: 14000000
+    calc: "10*1000**2 + 4*1000**2"
+    tol: 0
+    mistakes:
+      - {answer: 4000000, msg: "Bu yalnız iyileştirme taraması (bir VI yinelemesi)."}
+      - {answer: 337333333.3, msg: "Bu bir PI yinelemesi: |S|³/3 + |A||S|²."}
+    hints:
+      - "Her değerlendirme taraması bir $|\\mathcal S|\\times|\\mathcal S|$ matris–vektör çarpımı."
+    solution: |-
+      $10\cdot10^6+4\cdot10^6=1.4\cdot10^7$. PI'nin doğrusal sistemi tek başına $\approx3.3\cdot10^8$; MPI aynı işle yaklaşık 24 yineleme yapar.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Politika sayısı
+    goal: Sonlu yakınsamanın kaba sınırını hesaplamak
+    needs: $|\mathcal A|^{|\mathcal S|}$
+    q: |-
+      10 durumlu, 3 eylemli bir MDP'de kaç farklı belirlenimci politika vardır?
+    answer: 59049
+    calc: "3**10"
+    tol: 0
+    mistakes:
+      - {answer: 30, msg: "Bu durum–eylem çifti sayısı."}
+      - {answer: 1000, msg: "|S|^|A|: üs ve taban yer değiştirmiş; her durum 3 eylemden birini bağımsız seçer."}
+    hints:
+      - "Her durum için eylem seçimi bağımsızdır."
+    solution: |-
+      $3^{10}=59\,049$. PI bu kadar yinelemeye hiç yaklaşmaz; pratikte birkaç yinelemede biter.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Yüz bin durumlu seyrek MDP
+    goal: Yöntemi problem boyutuna göre seçmek
+    needs: Yineleme başına maliyetler
+    q: |-
+      $|\mathcal S|=10^5$ durumlu, her durumdan her eylemle en çok 5 ardılın olduğu bir MDP'de, $\gamma=0.99$. Hangisini seçersin?
+    choices:
+      - {t: "Politika yinelemesi (doğrusal sistemi yoğun LU ile çöz)", why: "Bir yineleme ≈ 3·10¹⁴ işlem ve 80 GB'lık yoğun matris."}
+      - {t: "Orta K ile değiştirilmiş politika yinelemesi (seyrek taramalar)", ok: true, why: "Tarama başına ≈ 5·10⁵ işlem; γ = 0.99'da VI'dan çok daha az dış yineleme."}
+      - {t: "Değer yinelemesi, γ'yı 0.9'a düşürerek", why: "γ'yı değiştirmek problemi değiştirir: 0.9'un en iyi politikası 0.99'unkinden farklı olabilir."}
+    hints:
+      - "Yoğun $|\\mathcal S|\\times|\\mathcal S|$ bir matris kaç bayttır?"
+    solution: |-
+      Seyrek taramalar ucuzdur ($|\mathcal A|\cdot5\cdot10^5$). VI $\gamma=0.99$'da binlerce yineleme ister; MPI her politikayı $K$ ucuz taramayla değerlendirip çok daha az dış yinelemede biter. Doğrusal sistem gerekirse yoğun LU değil, yinelemeli seyrek çözücü (GMRES) kullanılır — bu da yine bir tür kısmi değerlendirmedir.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Bitmeyen politika yinelemesi
+    goal: İyileştirmede eşitlikleri doğru ele almak
+    needs: Durma koşulu
+    q: |-
+      Bir öğrencinin PI kodu iyileştirmede `pi_new[s] = random.choice([a for a in A if Q[s][a] == max(Q[s])])` kullanıyor ve `pi_new == pi` olunca duruyor. Bazı MDP'lerde kod hiç durmuyor. Neden?
+    choices:
+      - {t: "Değerlendirme yeterince hassas değil", why: "Doğrusal sistem tam çözülüyor; sorun seçimde."}
+      - {t: "Eşit değerli eylemler arasında her seferinde rastgele seçim yapıldığı için politika eşdeğer politikalar arasında gidip geliyor; mevcut eylem yalnız kesin olarak daha iyi bir eylem varsa değiştirilmeli", ok: true, why: "Eşdeğer politikaların değerleri aynıdır; Lemma 1'in kesin artışı yoktur, algoritma döngüye girer."}
+      - {t: "γ = 1 kullanılmış", why: "Kod γ < 1'de de durmayabilir."}
+    hints:
+      - "İki eylem aynı Q değerine sahipse politika neye göre değişiyor?"
+    solution: |-
+      `if max(Q[s]) > Q[s][pi[s]] + tol: pi_new[s] = argmax` biçiminde, yani mevcut eylem eşitlikte korunarak. Kayan nokta için küçük bir tol eklenir; ya da durma koşulu politika yerine değerlerin değişmemesine bağlanır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Politika iyileştirme teoremi
+    goal: Monoton iyileşmeyi kanıtlamak
+    needs: $H_\pi$'nin monotonluğu ve büzülmesi
+    q: |-
+      $\pi'$, $V^\pi$'ye göre açgözlü politika olsun. $V^{\pi'}\ge V^\pi$ olduğunu (her durumda) ve eşitliğin yalnız $\pi$ en iyiyse sağlandığını gösterin.
+    rubric:
+      - "H_{π'} V^π = max_a [R_a + γT^a V^π] ≥ R_π + γT^π V^π = V^π yazdım"
+      - "T^{π'} negatif olmadığı için H_{π'}'nin monoton olduğunu belirttim"
+      - "H_{π'}'yi tekrar uygulayıp H_{π'}^k V^π dizisinin artan ve V^{π'}'ye yakınsadığını gösterdim"
+      - "Eşitlikte V^π'nin Bellman en iyilik denklemini sağladığını, dolayısıyla V^π = V* olduğunu belirttim"
+    hints:
+      - "$V\\ge U\\Rightarrow T^{\\pi'}V\\ge T^{\\pi'}U$."
+    solution: |-
+      $V^\pi\le H_{\pi'}V^\pi\le H_{\pi'}^2V^\pi\le\dots\to V^{\pi'}$ (monotonluk ve büzülme). $V^{\pi'}=V^\pi$ ise zincirdeki her eşitsizlik eşitliktir: $\max_a[R_a+\gamma T^aV^\pi]=V^\pi$, yani $V^\pi$ Bellman en iyilik denkleminin tek çözümü $V^*$'dır.
+pitfalls:
+  - wrong: "Politika yinelemesi her zaman değer yinelemesinden hızlıdır, çünkü çok daha az yineleme yapar."
+    right: "Bir PI yinelemesi |S|³ işlemlik bir doğrusal sistem ister; büyük ve seyrek MDP'lerde VI ya da orta K'lı MPI toplamda daha az iş yapar (lab l1)."
+  - wrong: "Politika iyileştirmesinde bazı durumların değeri düşebilir, ama ortalama artar."
+    right: "Politika iyileştirme teoremi her durumda V^{π'}(s) ≥ V^π(s) verir; hiçbir durumun değeri düşmez."
+  - wrong: "Politikanın en iyi olması için değerlerin tam yakınsaması gerekir."
+    right: "Politika yalnız eylemlerin sırasına bağlıdır: 4 × 4 ızgarada rastgele politikanın 3 taramalık değerleri bile en iyi açgözlü politikayı verir (lab l2)."
+  - wrong: "MPI'de durma koşulu olarak ‖V_n − V_{n−1}‖ ≤ ε kullanıp değer yinelemesinin sınırlarını uygulamak yeterlidir."
+    right: "MPI'de ardışık farklar K taramanın toplam değişimidir; sınırlar Bellman artığı ‖H*V − V‖ ile kurulur: ‖V* − V‖ ≤ ε/(1 − γ), açgözlü politika için 2ε/(1 − γ)."
+whatif:
+  - q: "Politika değerlendirme yaklaşık olsaydı (ör. bir sinir ağıyla)?"
+    a: "Monoton iyileşme güvencesi kaybolur: değer hatası açgözlü adımda yanlış eylemlere yol açabilir. Yaklaşık politika yinelemesinin (API) kaybı, değerlendirme hatası δ ile sınırlıdır: limsup ‖V* − V^{π_n}‖ ≤ 2γδ/(1 − γ)². Derin RL'deki salınımlar ve 'politika çöküşü' bu yüzden görülür; güven bölgesi yöntemleri (M11.12) iyileştirme adımını küçük tutarak bunu sınırlar."
+  - q: "γ 1'e yaklaştıkça yöntemler nasıl etkilenir?"
+    a: "VI'ın yineleme sayısı 1/(1 − γ) ile büyür (γ = 0.999'da binlerce). PI'nin yineleme sayısı çok yavaş büyür, ama I − γT^π kötü koşullu hâle gelir ve yinelemeli değerlendirme yavaşlar. MPI'de iyi K de büyür. γ = 1'de yalnız uygun politikalar ya da ortalama ödül ölçütüyle çalışılır."
+  - q: "Politika rastgele (stokastik) olsaydı?"
+    a: "Değerlendirme aynı kalır: T^π(s, s') = Σ_a π(a|s) P(s'|s, a), R_π(s) = Σ_a π(a|s) R(s, a). İyileştirme ise yine belirlenimci açgözlü politikayı verir; sonlu MDP'lerde her zaman belirlenimci bir en iyi politika vardır. Stokastik politikalar keşif (M11.5) ve politika gradyanı (M11.9) için gerekir."
