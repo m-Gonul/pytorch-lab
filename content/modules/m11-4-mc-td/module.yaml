@@ -89,3 +89,159 @@ homework:
     accept:
       - "Şekil 3: hata λ arttıkça artar (λ = 0 en iyi, ≈ 0.19), λ = 1 ≈ 0.25."
       - "Şekil 4/5'in nitel biçimi: ara λ (≈ 0.3) tek sunumda en iyi."
+
+labs:
+  - id: l1
+    lab: mctd
+    title: "Beş durumlu rastgele yürüyüş: Monte Carlo ve TD(0)"
+    goal: |
+      Rastgele politikanın değerini her ziyaret Monte Carlo ve TD(0) ile kestir. Çok sayıda bağımsız çalıştırmanın ortalama RMS hatasını bölüm sayısına göre çiz. Sabit öğrenme oranının gürültü tabanını, α = 1/n(s)'nin davranışını ve iki yöntemin hız farkını gör.
+    predict:
+      q: "Sabit α (MC 0.02, TD 0.1) ile 100 bölüm sonunda hangisinin ortalama hatası daha düşüktür?"
+      options:
+        - {t: "MC: yansız olduğu için", why: "Yansızlık tek başına yetmez; varyansı yüksek (0.080'e karşı 0.054)."}
+        - {t: "TD", ok: true, why: "100 çalıştırma ortalamasında TD 0.054, MC 0.080."}
+        - {t: "İkisi aynı: aynı veriyi kullanıyorlar", why: "Aynı veriden farklı hedefler kuruyorlar."}
+    presets:
+      - {name: "Varsayılan", params: {sched: 0, am: 0.02, at: 0.1, E: 100, R: 100}, note: "MC 0.080, TD 0.054."}
+      - {name: "Örnek ortalaması (1/n)", params: {sched: 1, E: 100, R: 100}, note: "MC 0.062, TD 0.046."}
+      - {name: "Küçük TD adımı", params: {sched: 0, am: 0.02, at: 0.05, E: 100, R: 100}, note: "TD 0.036."}
+      - {name: "Büyük TD adımı", params: {sched: 0, am: 0.02, at: 0.15, E: 100, R: 100}, note: "TD hızlı iner, 0.068'de durur."}
+      - {name: "Uzun, sabit α", params: {sched: 0, am: 0.04, at: 0.05, E: 300, R: 100}, note: "MC 0.104'te takılı: sabit α'nın gürültü tabanı."}
+      - {name: "Tek çalıştırma", params: {sched: 0, am: 0.02, at: 0.1, E: 100, R: 1}, note: "Tek eğri gürültülü; ortalama almadan sonuç çıkarılamaz."}
+    questions:
+      - q: "Sabit α ile hata neden sıfıra inmiyor, ve hangi koşulda bu bir avantaj olur?"
+        a: "Sabit α Robbins–Monro'nun Σα² < ∞ koşulunu bozar: her güncelleme yeni gürültü ekler ve tahmin gerçek değer etrafında α ile büyüyen bir dağılımla dolaşır. Ortam zamanla değişiyorsa (durağan değilse) bu bir avantajdır: eski deneyim (1 − α)^k ağırlıkla unutulur ve tahmin değişen değeri izler; 1/n ise eski gözlemleri sonsuza dek eşit ağırlıkta tutar."
+    limits: "Rastgele politika, γ = 1, başlangıç V = 0.5. MC her ziyaret; ödül yalnız sağ çıkışta olduğu için getiri bölümün son ödülüdür. RMS, beş durumun eşit ağırlıklı ortalaması."
+  - id: l2
+    lab: batchmctd
+    title: "Toplu MC ve toplu TD: aynı veriden iki farklı cevap"
+    goal: |
+      Sınırlı bir deneyim kümesi üzerinde yakınsayana dek tekrarlanan (toplu) MC ve TD güncellemelerinin sabit noktalarını hesapla. Sutton'ın A–B örneğinde V(A)'nın iki yöntemde neden farklı çıktığını ve rastgele yürüyüşte veri miktarı arttıkça hangisinin daha az hata yaptığını gör.
+    predict:
+      q: "A–B örneğinde (A, 0, B, 0 bir bölüm; B'den 6 bölüm 1, 1 bölüm 0) toplu TD V(A) için ne verir?"
+      options:
+        - {t: "0: A'dan görülen tek getiri 0", why: "Bu toplu MC'nin cevabı."}
+        - {t: "0.75", ok: true, why: "A'dan her zaman 0 ödülle B'ye geçiliyor (kestirilen model); V(A) = 0 + V(B) = 0.75."}
+        - {t: "0.5", why: "A'nın getirisi ile B'nin değeri ortalanmaz."}
+    presets:
+      - {name: "A–B örneği", params: {data: 0, k: 6}, note: "MC 0, TD 0.75."}
+      - {name: "A–B, k = 3", params: {data: 0, k: 3}, note: "MC 0, TD 0.375."}
+      - {name: "A–B, k = 0", params: {data: 0, k: 0}, note: "V(B) = 0: iki yöntem aynı."}
+      - {name: "Rastgele yürüyüş, 20 bölüm", params: {data: 1, E: 20, R: 100}, note: "MC 0.133, TD 0.086."}
+      - {name: "Rastgele yürüyüş, 100 bölüm", params: {data: 1, E: 100, R: 100}, note: "MC 0.062, TD 0.041."}
+      - {name: "Tek veri kümesi", params: {data: 1, E: 20, R: 1}, note: "Gürültülü eğriler."}
+    questions:
+      - q: "Süreç Markov değilse (ör. A'dan sonra gelen B'nin sonucu A'dan gelinip gelinmediğine bağlıysa) hangi cevap daha güvenilirdir?"
+        a: "Toplu TD'nin kesinlik eşdeğeri, B'nin değerinin nereden gelindiğinden bağımsız olduğunu varsayar. A'dan gelindiğinde B gerçekten hep 0 veriyorsa (gizli bir durum), Markov varsayımı yanlıştır ve MC'nin V(A) = 0 cevabı daha doğrudur: MC durumlar arasında hiçbir yapı varsaymaz, yalnız gözlenen getirileri ortalar. TD'nin üstünlüğü Markov özelliğinin doğru olmasına bağlıdır."
+    limits: "γ = 1; toplu sabit noktalar kapalı biçimde hesaplanıyor (MC: getirilerin ortalaması, TD: sayım oranlı modelin doğrusal sistemi). Rastgele yürüyüşte hiç ziyaret edilmemiş durum 0.5 sayılıyor."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir bölümden MC ve TD güncellemeleri
+    goal: İki güncellemeyi aynı veriyle uygulamak
+    needs: $G_t$, $\delta$
+    q: |-
+      Rastgele yürüyüşte bütün değerler 0.5 iken bir bölüm gözleniyor: C → D → E → (sağdan çık, ödül 1). $\alpha=0.1$, $\gamma=1$. Her ziyaret MC ve TD(0) güncellemelerinden sonra $V(C)$, $V(D)$, $V(E)$ nedir?
+    solution: |-
+      MC: her durumun getirisi 1; $V\leftarrow0.5+0.1(1-0.5)=0.55$ üçü için. TD (sırayla): C: $\delta=0+V(D)-V(C)=0$, değişmez (0.5); D: $\delta=0+V(E)-V(D)=0$, 0.5; E: $\delta=1+0-0.5=0.5$, $V(E)=0.55$. TD bu bölümde yalnız son durumu değiştirdi; bilgi önceki durumlara sonraki bölümlerde yayılır.
+  - id: p2
+    type: hesap
+    level: 1
+    title: TD hatası ve güncelleme
+    goal: TD(0) güncellemesini hesaplamak
+    needs: $V(s)\leftarrow V(s)+\alpha\delta$
+    q: |-
+      $V(s)=2$, $r=-1$, $V(s^+)=4$, $\gamma=0.9$, $\alpha=0.25$. Güncellenmiş $V(s)$ nedir?
+    answer: 2.15
+    calc: "2 + 0.25*(-1 + 0.9*4 - 2)"
+    mistakes:
+      - {answer: 2.25, msg: "γ unutulmuş: −1 + 4 − 2 = 1."}
+      - {answer: 2.6, msg: "δ = 0.6'nın tamamı eklenmiş; α ile çarpılmalı."}
+    hints:
+      - "Önce $\\delta=r+\\gamma V(s^+)-V(s)$."
+    solution: |-
+      $\delta=-1+3.6-2=0.6$; $V(s)=2+0.25\cdot0.6=2.15$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: λ-getirisinde ağırlık
+    goal: Geometrik ağırlıkları hesaplamak
+    needs: $(1-\lambda)\lambda^{n-1}$
+    q: |-
+      $\lambda=0.8$ ile λ-getirisinde 3 adımlık getirinin ($G^{(3)}$) ağırlığı nedir?
+    answer: 0.128
+    calc: "(1-0.8)*0.8**2"
+    mistakes:
+      - {answer: 0.512, msg: "λ³; (1 − λ) çarpanı ve üs n − 1 olmalı."}
+      - {answer: 0.64, msg: "λ² tek başına; (1 − λ) ile çarpılmalı."}
+    hints:
+      - "$n=1$'in ağırlığı $1-\\lambda$'dır."
+    solution: |-
+      $(1-0.8)\cdot0.8^2=0.2\cdot0.64=0.128$. İlk üç getirinin toplam ağırlığı $1-0.8^3=0.488$.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Bitmeyen bir görevde değerlendirme
+    goal: MC ve TD'nin uygulanabilirliğini ayırt etmek
+    needs: Epizodik ve sürekli görevler
+    q: |-
+      Bir veri merkezinin soğutma politikasının değerini kestirmek istiyorsunuz. Sistem hiç durmuyor (bölüm yok), ödül her dakika ölçülüyor, $\gamma=0.99$. Hangisi?
+    choices:
+      - {t: "Monte Carlo: yansız", why: "Getiri bölüm sonunda hesaplanır; bölüm yoksa hiç güncelleme yapılamaz."}
+      - {t: "TD(0) ya da küçük λ'lı TD(λ): her adımda öğrenir", ok: true, why: "Bootstrapping, bitmeyen akışta da çalışır."}
+      - {t: "Toplu MC, akışı keyfi uzunlukta parçalara bölerek", why: "Kesilen getiri, kalan sonsuz kuyruğu yok sayar: yanlı ve keyfi."}
+    hints:
+      - "MC hedefi $G_t$ ne zaman hesaplanabilir?"
+    solution: |-
+      TD her geçişte öğrenir. Akışı parçalara bölmek gerekiyorsa getiri parçanın sonunda $\gamma^nV(s_{t+n})$ ile tamamlanır — bu zaten n adımlı TD'dir.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Yanlış indirimlenen MC getirisi
+    goal: Getirinin ziyaret anından indirimlenmesi
+    needs: $G_t=\sum_{k\ge t}\gamma^{k-t}r_k$
+    q: |-
+      Bir öğrenci her ziyaret MC'de, bölümün ödüllerinden `G = sum(gamma**k * r[k] for k in range(T))` getirisini hesaplıyor ve bölümde ziyaret edilen her durumu bu $G$'ye doğru güncelliyor. $\gamma<1$ iken bölümün sonlarına doğru ziyaret edilen durumların değerleri sistematik olarak yanlış çıkıyor. Neden?
+    choices:
+      - {t: "Öğrenme oranı fazla büyük", why: "Hata sistematik ve yönlü; oran değil hedef yanlış."}
+      - {t: "Getiri bölümün başından indirimleniyor ve önceki ödülleri de içeriyor; t anındaki durum için G_t = Σ_{k≥t} γ^{k−t} r_k olmalı", ok: true, why: "Sonradan ziyaret edilen durumun hedefi hem geçmiş ödülleri hem de fazladan γ^t indirimi taşıyor."}
+      - {t: "İlk ziyaret yerine her ziyaret kullanılmış", why: "Her ziyaret MC de tutarlıdır; sorun getirinin tanımında."}
+    hints:
+      - "$t=5$'te ziyaret edilen bir durum $r_0$'dan etkilenmeli mi?"
+    solution: |-
+      Getiriler geriye doğru tek geçişte hesaplanır: `G = 0; for t in reversed(range(T)): G = r[t] + gamma * G; ret[t] = G`. Kaynaktaki formül de indirimi mutlak zamandan başlatıyor; bu yalnız bölümün ilk durumu için doğrudur.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: λ-getirisi ve TD hataları
+    goal: İleri ve geri bakışın eşdeğerliğinin anahtar özdeşliğini kanıtlamak
+    needs: Teleskopik toplam, geometrik seri
+    q: |-
+      $V$ bölüm boyunca sabitken $\delta_k=r_k+\gamma V(s_{k+1})-V(s_k)$ olsun. $G_t^{(n)}-V(s_t)=\sum_{k=t}^{t+n-1}\gamma^{k-t}\delta_k$ ve $G_t^\lambda-V(s_t)=\sum_{k\ge t}(\gamma\lambda)^{k-t}\delta_k$ olduğunu gösterin.
+    rubric:
+      - "Σ γ^{k−t} δ_k toplamında γ^{k−t+1}V(s_{k+1}) ile γ^{k+1−t}V(s_{k+1}) terimlerinin sadeleştiğini (teleskopik) gösterdim"
+      - "Geriye Σ γ^{k−t} r_k + γ^n V(s_{t+n}) − V(s_t) = G^{(n)} − V(s_t) kaldığını yazdım"
+      - "λ-getirisinde δ_k'nin katsayısını Σ_{n>k−t} (1 − λ)λ^{n−1} γ^{k−t} olarak buldum"
+      - "Bu geometrik toplamın λ^{k−t} olduğunu, katsayının (γλ)^{k−t} çıktığını gösterdim"
+    hints:
+      - "$\\sum_{n=m+1}^\\infty(1-\\lambda)\\lambda^{n-1}=\\lambda^m$."
+    solution: |-
+      Teleskopik toplam: $\sum_{k=t}^{t+n-1}\gamma^{k-t}[r_k+\gamma V(s_{k+1})-V(s_k)]=\sum\gamma^{k-t}r_k+\gamma^nV(s_{t+n})-V(s_t)$. λ ile ağırlıklandırınca $\delta_k$, $n>k-t$ olan bütün $G^{(n)}$'lerde $\gamma^{k-t}$ katsayısıyla yer alır: $\gamma^{k-t}\lambda^{k-t}$. Değerler bölüm içinde değişirse eşdeğerlik yaklaşıktır (çevrimiçi TD(λ)); "true online TD(λ)" bunu tam yapar.
+pitfalls:
+  - wrong: "TD yanlı olduğu için yanlış değere yakınsar."
+    right: "TD'nin yanlılığı hedefin henüz yanlış olan tahmini kullanmasından gelir ve öğrenme ilerledikçe kaybolur; Robbins–Monro koşulları ve yeterli ziyaretle tablo TD(0) doğru V^π'ye yakınsar."
+  - wrong: "Sabit öğrenme oranıyla da tahmin sonunda gerçek değere eşit olur."
+    right: "Sabit α Σα² < ∞ koşulunu bozar: tahmin gerçek değer etrafında α ile orantılı bir gürültüyle dolaşmaya devam eder (lab l1). Yakınsama için α_n = 1/n gibi azalan oranlar gerekir; değişen ortamlarda ise sabit α bilinçli bir seçimdir."
+  - wrong: "Aynı veriyle toplu MC ve toplu TD aynı tahmini verir."
+    right: "Toplu MC eğitim getirilerine kare hatayı en küçükler; toplu TD veriden kestirilen Markov modelinin değerini (kesinlik eşdeğeri) bulur. A–B örneğinde V(A) = 0'a karşı 0.75."
+  - wrong: "Monte Carlo yansız olduğu için her zaman en iyi kestiricidir."
+    right: "Yansızlık hata ölçüsünün yalnız bir parçasıdır; MC'nin yüksek varyansı aynı veriyle daha büyük ortalama hata verir (C'de hedef varyansı 1/4'e karşı TD'de 1/36)."
+whatif:
+  - q: "Ödüller rastgele olsaydı (aynı geçişte farklı ödüller)?"
+    a: "İki yöntem de değişmeden çalışır: MC getirileri, TD tek adımlık hedefleri ortalar; ödül gürültüsü her iki hedefin varyansını artırır. TD'de yalnız bir ödülün gürültüsü, MC'de bölüm boyunca bütün ödüllerin gürültüsü (γ^{2k} ağırlıklı) toplanır."
+  - q: "Durum sayısı çok büyük olsaydı (her durum en çok bir kez görülseydi)?"
+    a: "Tablo tahminleri hiç ortalama alamaz. Değer fonksiyonu parametrik bir fonksiyonla yaklaşılır: V(s) ≈ v(s; w), güncelleme w ← w + α δ ∇_w v(s; w) (yarı-gradyan TD). Benzer durumlar arasında genelleme yapılır; bedeli TD'nin yakınsama güvencelerinin zayıflamasıdır (M11.6)."
+  - q: "λ bölüm içinde değişseydi (ör. durumun ne kadar tanıdık olduğuna göre)?"
+    a: "Durum bağımlı λ(s) ile iz e(s) ← γλ(s_t) e(s) + 1 olarak güncellenir. Tahmini güvenilir durumlarda küçük λ (bootstrapping), belirsiz durumlarda büyük λ (gerçek getiriye güven) seçilebilir; Sutton ve Barto'nun 12. bölümündeki genel λ-getirisi bu fikrin biçimselleştirilmesidir."
