@@ -101,3 +101,159 @@ homework:
       - "Her yöntem için 10 tohum, normalize pişmanlık."
     accept:
       - "δ büyüdükçe doğrusal yöntemler bozulur, NeuralLinear en sağlam yöntemlerdendir (makale Tablo 2–3 nitel)."
+
+labs:
+  - id: l1
+    lab: linucb
+    title: "Doğrusal bağlamlı haydut: LinUCB, doğrusal Thompson, açgözlü ve bağlamsız UCB1"
+    goal: |
+      Her adımda gelen d boyutlu bağlama göre ödülü doğrusal olan K kolda dört yöntemi aynı veriyle çalıştır. Birikimli pişmanlığı karşılaştır; bağlamı yok saymanın bedelini, gürültünün ve boyutun etkisini ve bağlam çeşitliliği yüksekken açgözlünün neden iyi çalıştığını gör.
+    predict:
+      q: "5 kol, d = 5, 1500 adım: bağlamı yok sayan UCB1'in pişmanlığı LinUCB'ninkinin kabaca kaç katıdır?"
+      options:
+        - {t: "≈ 1 kat: UCB1 de logaritmik pişmanlık yapar", why: "Bağlamsız UCB1 her kolun ortalamasını öğrenir; ama en iyi kol bağlama göre değişir."}
+        - {t: "≈ 50 kat", ok: true, why: "1870'e karşı 38: bağlamsız yöntem doğrusal pişmanlık yapıyor."}
+        - {t: "≈ 2 kat", why: "Fark çok daha büyük; yalnız sabit değil, büyüme hızı da farklı."}
+    presets:
+      - {name: "Varsayılan", params: {d: 5, K: 5, sigma: 0.5, c: 1, T: 1500, R: 10}, note: "LinUCB 38, Thompson 46, açgözlü 48, UCB1 1870."}
+      - {name: "Uzun ufuk", params: {d: 5, K: 5, sigma: 0.5, c: 1, T: 3000, R: 10}, note: "UCB1 3560: doğrusal büyüme."}
+      - {name: "Gürültülü", params: {d: 5, K: 5, sigma: 1.5, c: 1, T: 1500, R: 5}, note: "Pişmanlıklar üç katına çıkıyor."}
+      - {name: "Yüksek boyut", params: {d: 15, K: 5, sigma: 0.5, c: 1, T: 1500, R: 5}, note: "Öğrenilecek parametre arttı: ≈ 100."}
+      - {name: "c = 0", params: {d: 5, K: 5, sigma: 0.5, c: 0, T: 1500, R: 5}, note: "LinUCB açgözlüye eşit."}
+    questions:
+      - q: "Bağlamlar her yönde rastgele geldiğinde bağlamlı açgözlü neden LinUCB'ye bu kadar yakın?"
+        a: "Açgözlü seçim hangi kolu seçerse seçsin, gelen bağlamlar N(0, I)'den her yönde çeşitlidir: bir kol farklı bağlamlarda seçildikçe ağırlık vektörünün her yönü hakkında bilgi birikir. Keşfin asıl işi olan 'belirsiz yönleri denemek' bağlam çeşitliliğiyle kendiliğinden olur. Bağlamlar dar bir altuzayda kalsaydı (ör. hep aynı kullanıcı türü) açgözlü bazı kolların bazı yönlerini hiç öğrenemezdi ve LinUCB'nin bonusu belirleyici olurdu."
+    limits: "Ayrık doğrusal modeller (her kol kendi θ_a'sı), Gauss bağlam ve gürültü, λ = 1. Doğrusal Thompson her adımda tek bir standart normal vektörle örnekleniyor. R ≤ 30 çalıştırma; büyük d ve T'de hesap birkaç saniye sürebilir."
+  - id: l2
+    lab: ope
+    title: "Kayıtlı veriden değerlendirme: DM, IPS, SNIPS ve DR"
+    goal: |
+      Eski bir politikanın kayıtlarından (bağlam, eylem, ödül, eğilim) yeni bir politikanın ortalama ödülünü dört kestiriciyle tahmin et. Tekrarlar boyunca yanlılığı, standart sapmayı ve RMSE'yi gerçek değerle karşılaştır; kayıt politikasının keşif oranının ve ödül modelinin yanlış belirlenmesinin etkisini gör.
+    predict:
+      q: "Ödül modeli yanlış belirlenmişken (β = 0.3) hangisinin RMSE'si en küçük olur?"
+      options:
+        - {t: "DM: en düşük varyans", why: "Model yanlış: yanlılığı 0.07, RMSE 0.08."}
+        - {t: "IPS: yansız", why: "Yansız ama varyanslı: RMSE 0.08."}
+        - {t: "DR", ok: true, why: "Yanlılık ≈ 0, varyans IPS'ten düşük: RMSE 0.047."}
+    presets:
+      - {name: "Varsayılan", params: {n: 1000, eps: 0.2, beta: 0.3, R: 50}, note: "RMSE: DM 0.08, IPS 0.08, SNIPS 0.063, DR 0.047."}
+      - {name: "Doğru model", params: {n: 1000, eps: 0.2, beta: 0, R: 50}, note: "DM en iyi (0.031)."}
+      - {name: "Az keşif", params: {n: 1000, eps: 0.04, beta: 0.3, R: 50}, note: "IPS 0.18: küçük eğilimler varyansı patlatıyor."}
+      - {name: "Çok veri", params: {n: 5000, eps: 0.2, beta: 0.3, R: 50}, note: "DM'nin yanlılığı (0.08) veriyle azalmıyor; IPS 0.039, DR 0.026."}
+      - {name: "Çok yanlış model", params: {n: 1000, eps: 0.2, beta: 1, R: 50}, note: "DM yanlılığı 0.25."}
+      - {name: "Düzgün kayıt", params: {n: 1000, eps: 1, beta: 0.3, R: 50}, note: "Rastgele kayıt politikası: her eylem 1/K eğilimli."}
+    questions:
+      - q: "Veri beş katına çıkınca IPS'in hatası azalıyor da DM'ninki neden azalmıyor?"
+        a: "DM'nin hatası çoğunlukla yanlılıktır: doğrusal model x₁² terimini hiçbir veri miktarıyla öğrenemez, tahmin yanlış bir değere yakınsar. IPS yansızdır; hatası tamamen varyanstır ve 1/√n ile küçülür. DR yansızlığını eğilimlerden alır ve modelin açıkladığı kısmı çıkardığı için IPS'ten de daha az varyanslıdır."
+    limits: "d = 4, K = 4; kayıt politikası gürültülü bir modele göre ε-açgözlü, eğilimler biliniyor; değerlendirilen politika gerçek doğrusal kısma göre açgözlü. DM her kol için sırt regresyonu (λ = 1). Gerçek değer 20 000 bağlamla Monte Carlo."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Tek boyutlu Bayesçi güncelleme
+    goal: Sonsal ve öngörü dağılımını elle hesaplamak
+    needs: $\Sigma=(\sigma^{-2}x^2+\lambda^{-2})^{-1}$
+    q: |-
+      Önsel $w\sim\mathcal N(0,1)$, $\sigma^2=1$. İki gözlem: $(x,r)=(1,2)$ ve $(2,3)$. Sonsal ortalama ve varyans nedir? $x=1$'de öngörü dağılımı nedir?
+    solution: |-
+      $\Sigma=(1+4+1)^{-1}=1/6$, $\mu=\Sigma(1\cdot2+2\cdot3)=8/6=1.333$. $x=1$'de öngörü $\mathcal N(1.333,\ 1/6+1)=\mathcal N(1.333,1.167)$. Ağırlık belirsizliği (0.167) gürültünün (1) yanında küçük.
+  - id: p2
+    type: hesap
+    level: 1
+    title: LinUCB güven çarpanı
+    goal: c'yi δ'dan hesaplamak
+    needs: $c=1+\sqrt{\ln(2/\delta)/2}$
+    q: |-
+      $\delta=0.01$ için LinUCB'nin $c$ çarpanı nedir?
+    answer: 2.6276236
+    calc: "1 + sqrt(log(2/0.01)/2)"
+    mistakes:
+      - {answer: 2.3581015, msg: "Bu δ = 0.05 için."}
+      - {answer: 3.3018, msg: "1/2 çarpanı unutulmuş: 1 + √ln(2/δ)."}
+    hints:
+      - "$\\ln200\\approx5.30$."
+    solution: |-
+      $\sqrt{5.298/2}=1.628$; $c=2.628$. Daha küçük δ (daha yüksek güven) daha geniş sınır ve daha çok keşif demek.
+  - id: p3
+    type: hesap
+    level: 1
+    title: IPS ağırlığı
+    goal: IPS kestiricisini tek bir kayıtta hesaplamak
+    needs: $\mathbb 1[a=\pi(x)]r/p$
+    q: |-
+      Kayıt politikası bir eylemi 0.05 olasılıkla seçmiş ve ödül 1 gelmiş; yeni politika da aynı eylemi seçiyor. Bu kaydın IPS toplamına katkısı nedir?
+    answer: 20
+    calc: "1/0.05"
+    tol: 0
+    mistakes:
+      - {answer: 1, msg: "Ağırlık 1/p; ödül olduğu gibi eklenmez."}
+      - {answer: 0.05, msg: "p ile çarpılmaz, p'ye bölünür."}
+    hints:
+      - "Nadiren seçilen eylemler daha az gözlendiği için ağırlıkları büyüktür."
+    solution: |-
+      $1/0.05=20$. Böyle tek bir kayıt, ortalamayı tek başına sarsabilir: IPS'in varyansı küçük eğilimlerde patlar. SNIPS ağırlıkların toplamına bölerek bunu yumuşatır.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Sürekli yeni haberler
+    goal: Öznitelik modelini uygulamaya göre seçmek
+    needs: Ayrık ve ortak modeller
+    q: |-
+      Bir haber sitesinde her saat yüzlerce yeni haber ekleniyor ve her biri birkaç saat yaşıyor. Hangi model?
+    choices:
+      - {t: "Ayrık doğrusal model (her haber için ayrı θ_a)", why: "Yeni bir haber sıfırdan öğrenilir; ömrü kısa olduğu için yeterli veri birikmeden yok olur."}
+      - {t: "Ortak model: haber öznitelikleri (konu, kaynak, anahtar kelimeler) ile kullanıcı özniteliklerinin birleşimi üzerinde tek bir w", ok: true, why: "Yeni bir haber, benzer haberlerden öğrenilenleri ilk gösterimden kullanır."}
+      - {t: "Bağlamsız Thompson örneklemesi", why: "Kullanıcılar arasındaki farkı yok sayar; kişiselleştirme kaybolur."}
+    hints:
+      - "Hiç gösterilmemiş bir haber için ayrık model ne bilir?"
+    solution: |-
+      Li ve ark. (2010) hibrit bir model kullanır: ortak bir w ve her haber için küçük bir ayrık düzeltme. Ortak kısım soğuk başlangıcı çözer, ayrık kısım habere özgü sapmaları yakalar.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Eğilimsiz kayıtlar
+    goal: Politika dışı değerlendirmenin koşullarını tanımak
+    needs: Destek koşulu, eğilim
+    q: |-
+      Bir ekip, açgözlü bir öneri sisteminin kayıtlarında (her kullanıcıya modelin en iyi bulduğu ürün, eğilimler kaydedilmemiş) yeni bir politikayı IPS ile değerlendirmek istiyor. Sonuçlar anlamsız çıkıyor. Neden?
+    choices:
+      - {t: "Veri az", why: "Veri bol olsa da sorun aynı."}
+      - {t: "Açgözlü kayıt politikası her bağlamda tek eylemi seçmiş: yeni politikanın farklı eylemleri için eğilim 0 (destek koşulu bozuk) ve eğilimler de kaydedilmemiş; IPS ne hesaplanabilir ne yansızdır", ok: true, why: "Görülmemiş eylemlerin ödülü hakkında veri hiç yok."}
+      - {t: "IPS yerine DR kullanılmalı", why: "DR de eğilimlere ihtiyaç duyar; eğilim 0 ise yalnız modele (DM) kalır."}
+    hints:
+      - "Yeni politikanın seçtiği eylem kayıtta hangi olasılıkla seçilmişti?"
+    solution: |-
+      Değerlendirilebilir kayıtlar için kayıt politikası keşfetmeli (ε-açgözlü, Thompson) ve her kararın eğilimini kaydetmelidir. Aksi hâlde yalnız model tabanlı tahmin (DM) kalır ve onun yanlılığı denetlenemez.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Sherman–Morrison formülü
+    goal: Rank-1 ters güncellemeyi doğrulamak
+    needs: Matris çarpımı
+    q: |-
+      $A$ tersinir ve $1+\mathbf v^\top A^{-1}\mathbf u\ne0$ olsun. $(A+\mathbf u\mathbf v^\top)^{-1}=A^{-1}-\dfrac{A^{-1}\mathbf u\mathbf v^\top A^{-1}}{1+\mathbf v^\top A^{-1}\mathbf u}$ olduğunu gösterin ve güncellemenin maliyetini verin.
+    rubric:
+      - "(A + uvᵀ) ile sağ tarafı çarpıp A·A⁻¹ = I terimini ayırdım"
+      - "Kalan terimlerde vᵀA⁻¹u'nun bir sayı (s) olduğunu kullanıp u(1 + s)vᵀA⁻¹/(1 + s) biçimine getirdim"
+      - "uvᵀA⁻¹ − uvᵀA⁻¹ = 0 ile çarpımın I olduğunu gösterdim"
+      - "A⁻¹u ve dış çarpımın O(d²), baştan tersin O(d³) olduğunu belirttim"
+    hints:
+      - "$s=\\mathbf v^\\top A^{-1}\\mathbf u$ bir skalerdir."
+    solution: |-
+      $(A+\mathbf u\mathbf v^\top)\bigl(A^{-1}-\frac{A^{-1}\mathbf u\mathbf v^\top A^{-1}}{1+s}\bigr)=I+\mathbf u\mathbf v^\top A^{-1}-\frac{\mathbf u\mathbf v^\top A^{-1}+\mathbf u\,s\,\mathbf v^\top A^{-1}}{1+s}=I+\mathbf u\mathbf v^\top A^{-1}-\mathbf u\mathbf v^\top A^{-1}=I$. Maliyet $O(d^2)$.
+pitfalls:
+  - wrong: "Bağlamlı haydut, durumları olduğu için tam bir RL problemidir; değer fonksiyonu ve bootstrapping gerekir."
+    right: "Eylemler bir sonraki bağlamı etkilemez; geçiş yoktur. Her adım tek adımlık bir karardır ve ödülün regresyonu yeter."
+  - wrong: "Bayesçi doğrusal regresyonda gelecek ödülün varyansı xᵀΣx'tir."
+    right: "xᵀΣx, ortalama ödülün (wᵀx) varyansıdır. Gelecek ödül gürültüyü de taşır: xᵀΣx + σ². Keşif bonusu ortalamanın belirsizliğini kullanır, çünkü azaltılabilecek olan odur."
+  - wrong: "Doğrusal Thompson'da her eylem için sonsaldan ayrı ayrı örnek çekmek yeterlidir."
+    right: "Ortak modelde eylemlerin ödülleri aynı w'ye bağlıdır; tek bir w̃ ~ N(μ, Σ) çekip bütün eylemleri onunla değerlendirmek gerekir. Bağımsız örnekler korelasyonu yok sayar."
+  - wrong: "IPS yansız olduğu için her zaman en iyi kestiricidir."
+    right: "Küçük eğilimlerde varyansı patlar (lab l2: ε_log = 0.04'te RMSE 0.18). Model doğruysa DM, model yanlış ama eğilimler doğruysa DR genellikle daha iyidir."
+whatif:
+  - q: "Ödül gecikmeli gelseydi (ör. satın alma birkaç gün sonra)?"
+    a: "Model güncellemesi geciken ödülleri bekler; bu arada aynı bağlamlara aynı belirsizlikle karar verilir. Thompson örneklemesi, LinUCB'den daha sağlamdır: rastgeleliği, aynı belirsizlik altında farklı eylemlerin denenmesini sağlar; LinUCB gecikme boyunca hep aynı kolu seçer."
+  - q: "Bağlam dağılımı zamanla kaysaydı (yeni kullanıcı kitlesi)?"
+    a: "Eski veriyle öğrenilen model yeni bağlam bölgelerinde belirsizdir; LinUCB'nin bonusu orada büyük kalır ve keşfi oraya yöneltir — bu bir avantajdır. Ama ödül ilişkisi de değişiyorsa eski gözlemler zararlıdır: indirimli (unutan) regresyon ya da kayan pencere kullanılır."
+  - q: "Eylemler bir dizi olsaydı (ör. ana sayfada 10 haberin sıralaması)?"
+    a: "Eylem uzayı kombinatoryal olur (sıralamaların sayısı); her sıralama ayrı kol olamaz. Kaskat (cascading) ve kombinatoryal haydutlar, sıradaki her pozisyonun tıklanma modelini ve konum yanlılığını ayrı modelleyip ayrışabilir bir politika kurar. Değerlendirmede de pozisyon başına eğilimler gerekir."
