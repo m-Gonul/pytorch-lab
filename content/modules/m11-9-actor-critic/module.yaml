@@ -102,3 +102,177 @@ homework:
     accept:
       - "İşçi sayısıyla duvar saati hızlanması ≈ doğrusal (makale Şekil 3 nitel)."
       - "Entropi bonusu olmadan erken deterministikleşme ve daha kötü son performans."
+
+labs:
+  - id: l1
+    lab: reinforce
+    title: "Kısa koridorda REINFORCE: rastgele en iyi politika ve taban çizgisi"
+    goal: |
+      Eylemleri ters ikinci durumlu kısa koridorda politika tek bir sayıdır, P(sağ) = σ(θ). REINFORCE'un kesin J(p)'nin iç maksimumuna yakınsamasını izle; taban çizgisinin gradyan kestiriminin gürültüsünü ne kadar azalttığını ölç.
+    predict:
+      q: "Taban çizgisi (getirilerin hareketli ortalaması) eklenince 1000 bölüm sonundaki P(sağ) nasıl değişir?"
+      options:
+        - {t: "Belirgin biçimde değişir: taban çizgisi gradyanı kaydırır", why: "Taban çizgisi beklentiyi değiştirmez: 0.569'a karşı 0.567."}
+        - {t: "Neredeyse aynı kalır, ama gradyanın ortalama karesi ≈ 2.5 kat azalır", ok: true, why: "304'e karşı 764: yansız, daha az gürültülü."}
+        - {t: "Optimum p = 0.5'e kayar", why: "Optimum problemin özelliğidir (p* = 2 − √2), kestiricinin değil."}
+    presets:
+      - {name: "Taban çizgili", params: {alpha: 0.002, base: 1, episodes: 1000, theta0: -1.5, runs: 20}, note: "P(sağ) 0.569, J = −11.67; ortalama kare 304."}
+      - {name: "Taban çizgisiz", params: {alpha: 0.002, base: 0, episodes: 1000, theta0: -1.5, runs: 20}, note: "P(sağ) 0.567; ortalama kare 764."}
+      - {name: "Büyük adım, taban çizgisiz", params: {alpha: 0.01, base: 0}, note: "Ortalama kare 1241; çalıştırmalar arasında daha çok saçılma."}
+      - {name: "Sağdan başla", params: {theta0: 2}, note: "σ(2) = 0.88'den 0.58'e iniyor."}
+    questions:
+      - q: "Q tabanlı ε-açgözlü bir yöntem bu koridorda neden en iyi politikaya ulaşamaz?"
+        a: "Öznitelikler durumları ayırt etmediği için açgözlü politika her durumda aynı eylemi seçer: ε-açgözlü ile P(sağ) ya 1 − ε/2 ya da ε/2 olur. ε = 0.1'de J = −44.2 ya da −82.1; en iyi rastgele politika ise −11.66 verir. Politika gradyanı p'yi sürekli bir parametre olarak eniyiler ve iç noktaya ulaşır."
+    limits: "Politika tek parametreli (bütün durumlarda aynı P(sağ)); γ = 1; taban çizgisi getirilerin hareketli ortalaması; bölüm en çok 200 adım."
+  - id: l2
+    lab: pgvar
+    title: "Gradyan kestiricisinin varyansı ve taban çizgisi"
+    goal: |
+      Tek durumlu, softmax politikalı bir haydutta tek örnekli kestirici ĝ = (r − b)∇log π(a)'nın beklentisini ve toplam varyansını kapalı biçimde hesapla, Monte Carlo ile doğrula. Taban çizgisinin beklentiyi değiştirmediğini, varyansın b'ye göre ikinci dereceden olduğunu ve en iyi b*'ın nerede olduğunu gör.
+    predict:
+      q: "Ödüller 5–6 arasındayken b = 0 yerine b ≈ 5.5 seçmek varyansı kaç kat değiştirir?"
+      options:
+        - {t: "Değiştirmez: taban çizgisi beklentiyi değiştirmez", why: "Beklentiyi değiştirmez, varyansı değiştirir."}
+        - {t: "≈ 29 kat azaltır", ok: true, why: "23.5'ten 0.82'ye."}
+        - {t: "≈ 2 kat azaltır", why: "Ödüller sıfırdan uzakta toplandığı için etki çok daha büyük."}
+    presets:
+      - {name: "Taban çizgisiz", params: {K: 4, m: 5, D: 1, sigma: 1, b: 0}, note: "Varyans 23.5."}
+      - {name: "En iyi taban çizgisi", params: {K: 4, m: 5, D: 1, sigma: 1, b: 5.5}, note: "Varyans 0.82."}
+      - {name: "Ödüller sıfır çevresinde", params: {K: 4, m: 0, D: 1, sigma: 1, b: 0}, note: "b = 0 zaten iyi: 1.01."}
+      - {name: "Eşit eylemler", params: {K: 4, m: 5, D: 0, sigma: 1, b: 0}, note: "Gerçek gradyan 0; kestirici yalnız gürültü."}
+      - {name: "Gürültüsüz ödüller", params: {K: 4, m: 5, D: 1, sigma: 0, b: 0}, note: "Gürültü yokken bile b = 0'da varyans 22.8: kaynağı eylem örneklemesi."}
+    questions:
+      - q: "Ödül gürültüsü sıfırken (σ = 0) bile taban çizgisiz kestiricinin varyansı neden bu kadar büyük?"
+        a: "Varyansın kaynağı yalnız ödül gürültüsü değil, eylemin rastgele seçilmesidir. Her örnek, seçilen eylemin olasılığını getirisiyle (≈ 5) orantılı iter; hangi eylemin çekildiğine göre gradyan vektörü tamamen farklı yönlere bakar. Ortalama alınınca bu büyük katkılar birbirini götürür ve geriye küçük bir fark (0.19) kalır. b ≈ 5.5 çıkarılınca her örnek yalnız ortalamadan farkını taşır."
+    limits: "Tek durum, düzgün başlangıç politikası (θ = 0); ödüller Gauss; Monte Carlo 4000 örnek. Varyans gradyan vektörünün kovaryansının izi."
+  - id: l3
+    lab: dpglqr
+    title: "Deterministik politika gradyanı: LQR'de Riccati kazancına yakınsama"
+    goal: |
+      s' = s + a, ödül −(s² + ρa²) olan tek boyutlu bir sistemde deterministik politika a = −ks'yi DPG ile eğit. Eleştirmen olarak kesin Q'nun eyleme göre türevini kullan; kazancın Riccati çözümüne yakınsamasını, adım boyunun ve eleştirmen hatasının etkisini gör.
+    predict:
+      q: "k₀ = 0.1, α = 0.2 ile ilk DPG adımı ne yapar?"
+      options:
+        - {t: "Riccati kazancına doğru küçük bir adım atar", why: "Başlangıçta gradyan 21.5: adım 4.3."}
+        - {t: "Kazancı kararlılık bölgesinin dışına atar", ok: true, why: "k = 4.41 > 1 + 1/√γ = 2.05: kapalı çevrim kararsız, J = −∞."}
+        - {t: "Hiçbir şey: gradyan sıfır", why: "Gradyan çok dik."}
+    presets:
+      - {name: "Varsayılan", params: {rho: 1, g: 0.9, k0: 0.1, alpha: 0.05, eta: 0, N: 150}, note: "k → 0.5884 = Riccati."}
+      - {name: "Büyük adım", params: {rho: 1, g: 0.9, k0: 0.1, alpha: 0.2, eta: 0, N: 150}, note: "İlk adımda kararsız."}
+      - {name: "Gürültülü eleştirmen", params: {rho: 1, g: 0.9, k0: 0.1, alpha: 0.05, eta: 2, N: 150}, note: "k*'ın çevresinde dalgalanma."}
+      - {name: "Pahalı eylem", params: {rho: 4, g: 0.9, k0: 0.1, alpha: 0.05, eta: 0, N: 150}, note: "k* = 0.351."}
+      - {name: "Büyük kazançtan başla", params: {rho: 1, g: 0.9, k0: 1.5, alpha: 0.05, eta: 0, N: 150}, note: "Yukarıdan da k*'a iniyor."}
+    questions:
+      - q: "DPG'nin durağan noktası neden tam olarak Riccati kazancıdır?"
+        a: "Gradyanın sıfır olması, her durumda ∂_a Q(s, a)|_(a = −ks) = 0 demektir: politikanın eylemi, kendi değer fonksiyonuna göre açgözlü eylemdir. Bu, politika iyileştirmenin sabit noktası, yani Bellman en iyilik koşuludur. Doğrusal–karesel problemde bu koşul k = γP/(ρ + γP) ve P = 1 + ρk² + γP(1 − k)² denklemlerini, yani ayrık Riccati denklemini verir."
+    limits: "Belirlenimci tek boyutlu sistem, s₀ ~ N(0, 1); eleştirmen kesin (öğrenilmiyor), yalnız isteğe bağlı gürültü ekleniyor; gradyan indirimli ziyaret ağırlığıyla kapalı biçimde (sonlu farkla doğrulandı)."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir REINFORCE adımı
+    goal: Güncellemeyi elle uygulamak
+    needs: $\gamma^nG_n\nabla\log\pi$
+    q: |-
+      İki eylemli softmax politika, tek-sıcak öznitelikler, $\theta=(0,0)$. Bir bölümde $n=1$ adımında eylem 1 seçilmiş ve o andan itibaren getiri $G_1=4$, $\gamma=0.9$, $\alpha=0.1$. Güncellenmiş $\theta$ ve $\pi(1)$ nedir?
+    solution: |-
+      $\nabla\log\pi(1)=e_1-\pi=(-0.5,0.5)$. Güncelleme $0.1\cdot0.9\cdot4\cdot(-0.5,0.5)=(-0.18,0.18)$. $\pi(1)=\sigma(0.36)=0.589$. Getiri pozitif olduğu için seçilen eylem güçlendi.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Kısa koridorun en iyi politikası
+    goal: J(p)'nin maksimumunu bulmak
+    needs: $J(p)=(2p-4)/(p(1-p))$
+    q: |-
+      Kısa koridorda $J(p)=\dfrac{2p-4}{p(1-p)}$. En iyi $p^*$ nedir?
+    answer: 0.5857864
+    calc: "2 - sqrt(2)"
+    mistakes:
+      - {answer: 0.5, msg: "J(0.5) = −12; türev orada sıfır değil."}
+      - {answer: 3.4142136, msg: "2 + √2: ikinci derece denklemin (0, 1) dışındaki kökü."}
+    hints:
+      - "$J'(p)=0$, $p^2-4p+2=0$ verir."
+    solution: |-
+      Pay türevi: $2p(1-p)-(2p-4)(1-2p)=-2p^2+8p-4$; sıfırı $p^2-4p+2=0$, $p=2\pm\sqrt2$; (0, 1) içindeki $2-\sqrt2=0.586$. $J(p^*)=-11.66$.
+  - id: p3
+    type: hesap
+    level: 1
+    title: TD hatasıyla avantaj
+    goal: Aktör–eleştirmen güncellemesini hesaplamak
+    needs: $\delta=r+\gamma V(s')-V(s)$
+    q: |-
+      $r=-1$, $\gamma=0.95$, $V_w(s)=10$, $V_w(s')=12$. Aktörün güncellemesinde kullanılan $\delta$ nedir?
+    answer: 0.4
+    calc: "-1 + 0.95*12 - 10"
+    mistakes:
+      - {answer: 1, msg: "γ unutulmuş: −1 + 12 − 10."}
+      - {answer: 11.4, msg: "V(s) çıkarılmamış: bu TD hedefi, avantaj değil."}
+    hints:
+      - "δ pozitifse eylem beklenenden iyi."
+    solution: |-
+      $\delta=-1+11.4-10=0.4>0$: eylem ortalamadan biraz iyi, olasılığı artırılır. Eleştirmen de $V(s)$'yi 10.4'e doğru günceller.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Robot kolunun torku
+    goal: Sürekli eylemde yöntem seçmek
+    needs: DQN, Gauss politikası, DPG
+    q: |-
+      7 eklemli bir robot kolunun her eklemi için sürekli tork seçilecek. Hangisi?
+    choices:
+      - {t: "DQN, her eklemin torkunu 10 düzeye bölerek", why: "10⁷ birleşik eylem; max_a her adımda bu kadar seçenek ister."}
+      - {t: "Aktör–eleştirmen: Gauss politikalı (PPO, SAC) ya da deterministik politikalı (DDPG, TD3)", ok: true, why: "Sürekli eylemi doğrudan üretir; max_a gerekmez."}
+      - {t: "Tablo Q-öğrenme", why: "Durumlar da sürekli; tablo imkânsız."}
+    hints:
+      - "Eylem uzayının ızgarası kaç hücre olur?"
+    solution: |-
+      Politika ağı 7 boyutlu bir eylem (ya da Gauss ortalaması) üretir. DPG'de güncelleme $\nabla_\theta\mu\nabla_aQ$ ile, rastgele politikada log-olabilirlik gradyanıyla yapılır; ikisi de eylem uzayını aramaz.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Max'lı eleştirmen
+    goal: Aktör–eleştirmende eleştirmen hedefini doğru kurmak
+    needs: Q^π ve Q*
+    q: |-
+      Bir öğrencinin aktör–eleştirmeni, eleştirmeni `target = r + gamma * Q(s2).max()` ile eğitiyor ve avantajı `Q(s, a) - (pi(s) * Q(s)).sum()` olarak hesaplıyor. Aktör beklenmedik biçimde kararsız. Neden?
+    choices:
+      - {t: "Öğrenme oranı çok küçük", why: "Sorun hedefin kendisinde."}
+      - {t: "max hedefi Q^π yerine Q*'ı öğretir: eleştirmen mevcut politikanın değil en iyi politikanın değerini kestiriyor; politika gradyanı teoremi Q^π ister ve avantaj yanlı çıkar", ok: true, why: "Politika üstü eleştirmen r + γ Σ π(a'|s')Q(s', a') ya da örneklenen a' ile eğitilmeli."}
+      - {t: "Avantajda V(s) yerine Q(s, a) kullanılmalı", why: "Avantaj zaten Q − V; sorun Q'nun neyi kestirdiğinde."}
+    hints:
+      - "Eleştirmen hangi politikanın değerini öğreniyor?"
+    solution: |-
+      `target = r + gamma * (pi(s2) * Q(s2)).sum()` (beklenen SARSA) ya da örneklenen `a2` ile `r + gamma * Q(s2, a2)`. Standart A2C ise V eleştirmeni ve n adımlı avantaj kullanır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Taban çizgisi yanlılık getirmez
+    goal: Taban çizgisinin gradyanı değiştirmediğini kanıtlamak
+    needs: $\sum_a\pi(a\mid s)=1$
+    q: |-
+      Eylemden bağımsız herhangi bir $b(s)$ için $E_{a\sim\pi}\bigl[b(s)\nabla\log\pi(a\mid s)\bigr]=0$ olduğunu gösterin. Sonra en küçük varyanslı sabit taban çizgisinin $b^*=E[r\|\nabla\log\pi\|^2]/E[\|\nabla\log\pi\|^2]$ olduğunu gösterin (tek durumlu haydut).
+    rubric:
+      - "E[b∇log π] = b Σ_a π ∇log π = b Σ_a ∇π = b ∇Σ_a π = b∇1 = 0 yazdım"
+      - "Varyansı E[(r − b)²‖∇log π‖²] − ‖E[ĝ]‖² olarak yazdım; ikinci terimin b'den bağımsız olduğunu belirttim"
+      - "b'ye göre türevi −2E[(r − b)‖∇log π‖²] = 0'dan b*'ı buldum"
+      - "b*'ın ‖∇log π‖² ağırlıklı ortalama ödül olduğunu ve genelde ortalama ödüle yakın olduğunu belirttim"
+    hints:
+      - "$\\pi\\nabla\\log\\pi=\\nabla\\pi$."
+    solution: |-
+      $\sum_a\pi\nabla\log\pi=\sum_a\nabla\pi=\nabla1=0$. Varyans $E[(r-b)^2\|g\|^2]-\|E\hat g\|^2$; türev $-2E[(r-b)\|g\|^2]=0$ ⇒ $b^*=E[r\|g\|^2]/E[\|g\|^2]$. Lab l2'de $b^*=5.5$, ortalama ödülün kendisi.
+pitfalls:
+  - wrong: "Politika gradyanı teoremi, durum dağılımının parametrelere göre türevini hesaplamayı gerektirir."
+    right: "Teoremin asıl içeriği tam tersidir: ∇J = Σ_s μ(s) Σ_a Q(s, a)∇π(a|s) ifadesinde ∇μ yoktur. Durum dağılımının etkisi Q'ların içinde zaten vardır; gradyan yalnız örnekleyerek kestirilebilir."
+  - wrong: "Taban çizgisi gradyanı değiştirdiği için dikkatle seçilmelidir; yanlış seçilirse yanlış politikaya yakınsanır."
+    right: "Eylemden bağımsız her taban çizgisi beklentiyi değiştirmez (Σ_a b∇π = 0); yalnız varyansı etkiler. Kötü bir taban çizgisi öğrenmeyi yavaşlatır, yönünü bozmaz."
+  - wrong: "Aktör–eleştirmenin eleştirmeni Q-öğrenme hedefiyle (r + γ max Q) eğitilebilir."
+    right: "Eleştirmen mevcut politikanın değerini (Q^π ya da V^π) kestirmelidir; max hedefi Q*'ı kestirir ve avantajı yanlı yapar. Politika üstü hedef r + γ Σ π(a'|s')Q(s', a') ya da V eleştirmeniyle r + γV(s')'dir."
+  - wrong: "Rastgele politikalar yalnız keşif içindir; en iyi politika her zaman belirlenimcidir."
+    right: "Tam gözlenebilir MDP'lerde belirlenimci bir en iyi politika vardır; ama durumlar ayırt edilemiyorsa (kısa koridor) ya da rakip varsa en iyi politika rastgele olabilir (p* = 2 − √2)."
+whatif:
+  - q: "Getiriler büyük ölçekliyse (ör. bölüm başına binlerce puan)?"
+    a: "REINFORCE gradyanı getiriyle orantılı olduğundan adımlar çok büyük ve gürültülü olur. Getiriler (ya da avantajlar) yığın içinde normalize edilir (ortalaması çıkarılıp std'ye bölünür) ve gradyan kırpılır; öğrenme oranı ölçekten bağımsız hâle gelir. Normalleştirme bir taban çizgisi gibi davranır ve yanlılık getirmez (ölçekleme ise yalnız etkin adım boyunu değiştirir)."
+  - q: "Politika çok hızlı belirlenimci hâle gelirse?"
+    a: "Olasılıklar 0 ya da 1'e yaklaşınca ∇log π küçülür ve keşif biter: politika erken bir yerel optimuma kilitlenebilir. A2C/A3C bu yüzden amaca β·entropi ekler; PPO ve SAC'de de entropi terimi vardır. SAC entropiyi amacın bir parçası yapar (en büyük entropili RL)."
+  - q: "Veri eski bir politikadan gelseydi (politika dışı politika gradyanı)?"
+    a: "Gradyan, örnekleri π_θ/π_eski önem oranıyla ağırlıklandırarak kestirilir. Oranlar çarpılarak büyüdüğü için varyans patlar; pratikte adım başına oranlar kullanılır ve kırpılır. PPO'nun kırpılmış amacı (M11.12) tam olarak bu oranı [1 − ε, 1 + ε] aralığında tutar."

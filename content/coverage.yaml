@@ -204,7 +204,7 @@ groups:
         pages: [m11-9-actor-critic, m11-11-alphazero, m5-5-rl]
         status: genis
         gap: "—"
-        done: "—"
+        done: "M11.9 konu anlatımı lect_8'in politika gradyanı kısmını (1–10) ve lect_9'un bütün slaytlarını (1–15) işliyor: değer/politika tabanlı ve aktör–eleştirmen ayrımı, rastgele politika (softmax, Gauss, log-olabilirlik gradyanları), taklit ve RL amacı, REINFORCE, politika gradyanı teoremi ve kanıtı, log-türev hilesi, kısa koridor, taban çizgisinin yansızlığı ve varyans etkisi, avantaj, taban çizgili REINFORCE, aktör–eleştirmen, A2C (standart biçim), DPG teoremi ve LQR, DDPG, CartPole; reinforce, pgvar ve dpglqr deneyleri. Kaynak düzeltmeleri: amacın koşullu yazılması; teoremin sol tarafı ∇J ve sezgisel açıklamanın eksikliği; eleştirmen güncellemesinde γⁿ; A2C ve DPG'de max hedefi; DPG'de keşif."
       - src: "lect_10, lect_11 — Haydutlar"
         topics: "keşif–sömürü, pişmanlık, ε-greedy, UCB (belirsizlik karşısında iyimserlik), Hoeffding, Thompson örneklemesi, Beta–Bernoulli, endüstri kullanımı"
         pages: [m11-7-bandits, m11-8-contextual-bandits]
