@@ -95,3 +95,164 @@ homework:
     accept:
       - "SNAP grafiğinde ilk 20 düğüm ve NetworkX `pagerank` ile 1e-6 içinde uyum."
       - "d'ye karşı iterasyon grafiği ve teorik $\\log\\varepsilon/\\log d$ eğrisi."
+
+labs:
+  - id: l1
+    lab: markovlab
+    title: "Markov zinciri: p_t = Tᵗp₀, durağan dağılım ve soğurulma"
+    goal: |
+      Dört zincirde (ders örneği e-ticaret oturumu, terk durumu eklenmiş e-ticaret, iki durumlu hava, üç durumlu döngü) durum dağılımının zamanla değişimini matris kuvvetiyle hesapla ve simüle edilmiş yolların oranlarıyla karşılaştır. Durağan dağılımı, karışma hızını, periyodikliğin etkisini ve soğurucu durumların olasılıklarını gör.
+    predict:
+      q: "Ders örneğindeki e-ticaret zincirinde (terk durumu yok) ana sayfadan başlayan bir oturumun sonunda satın almayla bitme olasılığı nedir?"
+      options:
+        - {t: "Yaklaşık 0.25 (ürün sayfasından satın alma olasılığı)", why: "Bu tek adımlık bir geçiş; soru sonunda ne olacağını soruyor."}
+        - {t: "1", ok: true, why: "Satın alma tek soğurucu durum ve her durumdan ona bir yol var: her oturum er geç satın almayla biter."}
+        - {t: "Yaklaşık 0.57", why: "Bu, her adımda %10 terk olasılığı eklenmiş zincirin cevabı."}
+    presets:
+      - {name: "Ders örneği", params: {ch: 0, t: 20}, note: "P(satın alma) = 1, beklenen 6.08 adım."}
+      - {name: "Terk, q = 0.1", params: {ch: 1, q: 0.1, t: 20}, note: "0.573 satın alma, 0.427 terk; 4.27 adım."}
+      - {name: "Terk, q = 0.3", params: {ch: 1, q: 0.3, t: 20}, note: "0.215 satın alma; 2.62 adım."}
+      - {name: "Hava 0.9 / 0.5", params: {ch: 2, a: 0.9, b: 0.5, t: 20}, note: "π = (0.833, 0.167), λ₂ = 0.4, 4 adımda karışır."}
+      - {name: "Yapışkan hava", params: {ch: 2, a: 0.98, b: 0.95, t: 60}, note: "λ₂ = 0.93: 47 adımda karışır."}
+      - {name: "Periyodik döngü", params: {ch: 3, eps: 0, t: 20}, note: "p_t hiç yakınsamıyor (uzaklık 0.667)."}
+      - {name: "Tembel döngü", params: {ch: 3, eps: 0.2, t: 20}, note: "13 adımda karışıyor."}
+      - {name: "10⁴ yol", params: {ch: 2, a: 0.9, b: 0.5, logN: 4}, note: "Simülasyon kesin eğriye 0.01 içinde oturuyor."}
+    questions:
+      - q: "Yapışkan havada (a = 0.98, b = 0.95) durağan dağılım değişmeden karışma neden 4 adımdan 47 adıma çıkar?"
+        a: "Durağan dağılım yalnız (1 − a) / (1 − b) oranına bağlıdır; karışma hızını ikinci özdeğer λ₂ = a + b − 1 belirler. 0.9/0.5'te λ₂ = 0.4, 0.98/0.95'te 0.93'tür; uzaklık λ₂ᵗ ile küçüldüğü için 0.01'e inmek ln 0.01 / ln λ₂ mertebesinde adım ister. Yapışkan zincir başladığı durumu uzun süre hatırlar; MCMC'de yavaş karışan bir zincir aynı nedenle çok örnek ister."
+      - q: "Üç durumlu döngüde ε = 0 iken durağan dağılım düzgün ve tekken neden p_t ona yakınsamıyor?"
+        a: "Zincir periyodiktir: A'dan başlayınca kesinlikle B'ye, sonra C'ye, sonra A'ya gider; p_t tek-sıcak vektörler arasında döner. Teklik indirgenemezlikten gelir, yakınsama ayrıca periyodik olmamayı ister. Özdeğerler küp kökleridir (1, e^{±2πi/3}) ve hepsinin modülü 1'dir. ε > 0 yerinde kalma ekler, ikinci özdeğerin modülü 1'in altına iner."
+    limits: "Başlangıç her zaman ilk durum (tek-sıcak p₀). Zincirler sabit; yalnız q, a, b ve ε değişiyor. Simülasyon tohumlu üreteçle, N en çok 10⁴. Soğurucu zincirlerde durağan dağılım yerine soğurulma olasılıkları gösteriliyor."
+  - id: l2
+    lab: ar1lab
+    title: "AR(1) ve rastgele yürüyüş: topluluk, durağanlık ve ergodiklik"
+    goal: |
+      x_t = a·x_{t−1} + w_t sürecinden çok sayıda gerçekleşme üret. Sabit t'deki topluluk ortalamasını ve varyansını kuramsal değerlerle karşılaştır; başlangıcın durağanlığa etkisini, |a| = 1'de varyansın sınırsız büyümesini ve tek yolun zaman ortalamasının topluluk ortalamasına yakınsayıp yakınsamadığını gör.
+    predict:
+      q: "a = 1 (rastgele yürüyüş) ve 100 adımda, tek bir yolun zaman ortalamalarının yollar arasındaki standart sapması yaklaşık kaçtır?"
+      options:
+        - {t: "≈ 0.1 (1/√T)", why: "Bu bağımsız örneklerin ortalaması için geçerli; rastgele yürüyüşün örnekleri güçlü biçimde ilişkili."}
+        - {t: "≈ 5.8 (√(T/3))", ok: true, why: "Simülasyonda 5.69. Zaman ortalaması yakınsamaz, T ile büyür: süreç ergodik değil."}
+        - {t: "0", why: "Topluluk ortalaması 0, ama tek yolların ortalamaları çok dağınık."}
+    presets:
+      - {name: "Kararlı, x₀ = 0", params: {a: 0.8, st: 0, T: 100}, note: "Varyans 2.78'e yaklaşıyor; zaman ortalaması std'si 0.48."}
+      - {name: "Durağan başlangıç", params: {a: 0.8, st: 2, T: 100}, note: "Varyans en baştan 2.78."}
+      - {name: "Uzak başlangıç", params: {a: 0.8, st: 1, T: 100}, note: "Ortalama 5·0.8ᵗ ile sönüyor."}
+      - {name: "Rastgele yürüyüş", params: {a: 1, st: 0, T: 100}, note: "Varyans t; zaman ortalaması std'si 5.7."}
+      - {name: "Birim köke yakın", params: {a: 0.99, st: 0, T: 400}, note: "Durağan varyans 50; 150 adımlık geçici evre."}
+      - {name: "Negatif a", params: {a: -0.8, st: 0, T: 100}, note: "Testere dişi; zaman ortalaması std'si 0.055."}
+    questions:
+      - q: "a = 0.8 ve a = −0.8 aynı durağan varyansa (2.78) sahipken tek yolun zaman ortalaması neden −0.8'de yaklaşık dokuz kat daha kesin?"
+        a: "Zaman ortalamasının varyansı yaklaşık (v/T)·Σ_τ ρ(τ) = (v/T)(1 + a)/(1 − a) olur. a = 0.8'de komşu örnekler aynı yönde ilişkilidir ve etkin örnek sayısı T/9'a düşer; a = −0.8'de ters yönde ilişkilidir ve ardışık sapmalar birbirini götürür, etkin örnek sayısı 9T olur. Oran (1.8/0.2)/(0.2/1.8) = 81 varyansta, 9 standart sapmada. MCMC'de ve RL'de getiri kestiriminde aynı etkin örnek sayısı hesabı kullanılır."
+    limits: "σ² = 1 sabit; gürültü Gauss. Varyans eğrisi en çok 3162 gerçekleşmeden kestiriliyor, kuramsal eğriyle farkı örnekleme hatasıdır. Durağan başlangıç yalnız |a| < 1'de tanımlı."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: İki zarın toplamı
+    goal: Olasılık kütle fonksiyonunu kurmak
+    needs: Eşit olasılıklı 36 sonuç
+    q: |-
+      İki adil zarın toplamı için $P(\mathbf x\ge10)$ ve $E[\mathbf x]$'i bulun.
+    solution: |-
+      $P(\mathbf x=k)=(6-|k-7|)/36$. $P(10)+P(11)+P(12)=(3+2+1)/36=1/6$. Dağılım 7 etrafında simetrik: $E[\mathbf x]=7$ (ya da tek zarın beklentisi 3.5'in iki katı).
+  - id: p2
+    type: hesap
+    level: 1
+    title: İki durumlu zincirin durağan dağılımı
+    goal: Kapalı çözümü uygulamak
+    needs: $\pi_0=(1-b)/(2-a-b)$
+    q: |-
+      $S_0$'da kalma olasılığı $a=0.7$, $S_1$'de kalma olasılığı $b=0.6$. Durağan dağılımda $\pi_0$ nedir?
+    answer: 0.5714286
+    calc: "(1-0.6)/(2-0.7-0.6)"
+    mistakes:
+      - {answer: 0.4285714, msg: "Bu π₁: pay, öteki durumdan buraya geçiş olasılığıdır (1 − b)."}
+      - {answer: 0.5384615, msg: "a / (a + b) kalma olasılıklarının oranı; dengeyi çıkış akışları kurar."}
+    hints:
+      - "Dengede $S_0$'dan çıkan akış $(1-a)\\pi_0$, giren akış $(1-b)\\pi_1$."
+    solution: |-
+      $(1-a)\pi_0=(1-b)\pi_1$ → $0.3\pi_0=0.4(1-\pi_0)$ → $\pi_0=0.4/0.7=0.571$. İkinci özdeğer $a+b-1=0.3$: zincir hızlı karışır.
+  - id: p3
+    type: yorumla
+    level: 1
+    title: Sıfırdan başlayan AR(1)
+    goal: Homojenlik ile durağanlığı ayırmak
+    needs: AR(1) varyansı
+    q: |-
+      $x_t=0.9x_{t-1}+w_t$ süreci $x_0=0$'dan başlatılıyor ve 1000 gerçekleşmenin topluluk varyansı ölçülüyor. $t=1$'de varyans 1, $t=10$'da 4.62, $t=100$'de 5.26 çıkıyor. Süreç durağan mı?
+    choices:
+      - {t: "Evet: katsayı zamanla değişmiyor", why: "Katsayının sabitliği homojenliktir; durağanlık dağılımın sabitliğini ister."}
+      - {t: "Başlangıçta değil: varyans σ²(1 − a²ᵗ)/(1 − a²) ile 5.26'ya yaklaşıyor; geçici evreden sonra pratikte durağan, x₀ durağan dağılımdan çekilseydi baştan durağan olurdu", ok: true, why: "Kural sabit ama başlangıç dağılımı durağan dağılım değil."}
+      - {t: "Hayır, hiçbir zaman: varyans hep artıyor", why: "|a| < 1'de varyans sınırlı bir değere yakınsar; sınırsız büyüme a = 1'de olur."}
+    hints:
+      - "$1/(1-0.81)$ kaçtır?"
+    solution: |-
+      Durağan varyans $1/0.19=5.26$. $t=10$'da $(1-0.9^{20})/0.19=4.62$. Markov zincirlerinde de aynı ayrım geçerli: homojen bir zincir ancak $\mathbf p_0=\boldsymbol\pi$ ise durağan bir süreçtir.
+  - id: p4
+    type: hesap
+    level: 2
+    title: İki geçici durumlu soğurucu zincir
+    goal: Temel matrisle beklenen adım sayısını bulmak
+    needs: $N=(I-Q)^{-1}$
+    q: |-
+      $A$ durumundan her adımda 0.5 olasılıkla $A$'da kalınır, 0.5 olasılıkla $B$'ye geçilir. $B$'den 0.5 olasılıkla $B$'de kalınır, 0.5 olasılıkla soğurucu $Z$'ye geçilir. $A$'dan başlayan zincir $Z$'ye ortalama kaç adımda ulaşır?
+    answer: 4
+    calc: "1/(1-0.5) + 1/(1-0.5)"
+    tol: 0
+    mistakes:
+      - {answer: 2, msg: "Bu yalnız A'da geçen beklenen süre; B'deki 2 adım da eklenmeli."}
+      - {answer: 3, msg: "B'de kalma süresi de geometriktir: beklenen 1/(1 − 0.5) = 2 adım."}
+    hints:
+      - "Her durumda geçirilen süre geometrik dağılımlıdır."
+    solution: |-
+      $I-Q=\begin{bmatrix}0.5&0\\-0.5&0.5\end{bmatrix}$, $N=\begin{bmatrix}2&0\\2&2\end{bmatrix}$. $A$ sütununun toplamı $2+2=4$: $A$'ya 2, $B$'ye 2 beklenen ziyaret.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Toplamı 1 olmayan dağılım
+    goal: Satır ve sütun-stokastik gösterimi ayırmak
+    needs: $\mathbf p_{t+1}=T\mathbf p_t$
+    q: |-
+      Bir öğrenci geçiş matrisini bir kitaptan alıyor: `P = np.array([[0.9, 0.1], [0.5, 0.5]])` (satır $i$: $S_i$'den çıkış olasılıkları). Sonra `p = P @ p` ile $\mathbf p_0=[1,0]$'dan başlayarak dağılımı ilerletiyor; birkaç adım sonra `p.sum()` 1'den farklı çıkıyor. Hata nedir?
+    choices:
+      - {t: "Kayan nokta hatası birikiyor", why: "Fark yuvarlama değil, yapısal: ilk adımda p = [0.9, 0.5], toplam 1.4."}
+      - {t: "P satır-stokastik; P @ p sütunlar üzerinden toplar. Doğrusu p = P.T @ p (ya da p satır vektörü olarak p @ P)", ok: true, why: "Sütun-stokastik T = Pᵀ ile T @ p olasılık kütlesini korur."}
+      - {t: "Başlangıç dağılımı normalize edilmemiş", why: "[1, 0] zaten bir dağılım."}
+    hints:
+      - "$\\mathbf 1^\\top P\\mathbf p$ neden $\\mathbf 1^\\top\\mathbf p$'ye eşit olmak zorunda değil?"
+    solution: |-
+      Kütlenin korunması $\mathbf 1^\top T=\mathbf 1^\top$, yani sütun toplamlarının 1 olmasını ister. Satır-stokastik $P$'de satır toplamları 1'dir: $P\mathbf 1=\mathbf 1$. Doğru güncelleme $\mathbf p_{t+1}=P^\top\mathbf p_t$; ilk adımda $[0.9,0.1]$.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Durağan başlangıçlı zincir durağan bir süreçtir
+    goal: Homojenlik ve durağanlığın ilişkisini kanıtlamak
+    needs: Markov özelliği, $T\boldsymbol\pi=\boldsymbol\pi$
+    q: |-
+      Zamanla homojen bir Markov zinciri $\mathbf p_0=\boldsymbol\pi$ ile başlatılırsa her $n$, $t_1<\dots<t_n$ ve $\tau$ için $P(s_{t_1}=i_1,\dots,s_{t_n}=i_n)=P(s_{t_1+\tau}=i_1,\dots,s_{t_n+\tau}=i_n)$ olduğunu, yani sürecin katı anlamda durağan olduğunu gösterin. $\mathbf p_0\ne\boldsymbol\pi$ ise ne değişir?
+    rubric:
+      - "Ortak olasılığı Markov özelliğiyle P(s_{t_1} = i_1)·Π (T^{t_{k+1} − t_k})_{i_{k+1} i_k} biçiminde yazdım"
+      - "Çarpanların yalnız zaman farklarına bağlı olduğunu (homojenlik) belirttim"
+      - "P(s_t = i) = (Tᵗπ)_i = π_i olduğundan ilk çarpanın da t'ye bağlı olmadığını gösterdim"
+      - "p₀ ≠ π'de ilk çarpanın (Tᵗp₀)_i olduğunu ve t ile değiştiğini, sürecin durağan olmadığını belirttim"
+    hints:
+      - "$P(s_{t_1}=i_1)$ dışındaki her çarpan bir matris kuvvetinin öğesidir."
+    solution: |-
+      $P(s_{t_1}=i_1,\dots,s_{t_n}=i_n)=(T^{t_1}\mathbf p_0)_{i_1}\prod_k(T^{t_{k+1}-t_k})_{i_{k+1}i_k}$. Çarpım yalnız farklara bağlıdır; $\mathbf p_0=\boldsymbol\pi$ ise $T^{t_1}\boldsymbol\pi=\boldsymbol\pi$ ve ilk çarpan da $t_1$'den bağımsızdır, dolayısıyla $\tau$ kaydırması hiçbir şeyi değiştirmez. $\mathbf p_0\ne\boldsymbol\pi$ ise $(T^{t_1}\mathbf p_0)_{i_1}$ zamanla değişir: kural homojen, süreç durağan değil (ama indirgenemez, periyodik olmayan zincirde asimptotik olarak durağanlaşır).
+pitfalls:
+  - wrong: "Ortam Markov değilse (ör. tek bir oyun karesi topun yönünü göstermiyorsa) Markov zinciri ve MDP araçları kullanılamaz."
+    right: "Markov özelliği durum tanımına bağlıdır. Son k gözlemi (DQN'deki dört kare) ya da yeterli bir özeti durum yaparak k. dereceden süreç birinci dereceye indirgenir; bedeli |S|^k durum."
+  - wrong: "Zamanla homojen bir Markov zinciri durağan bir süreçtir."
+    right: "Homojenlik geçiş kuralının sabitliğidir. Süreç ancak p₀ = π ise durağandır; aksi hâlde p_t değişir ve (indirgenemez, periyodik olmayan zincirde) π'ye yakınsar."
+  - wrong: "Her zincirin tek bir durağan dağılımı vardır ve p_t her zaman ona yakınsar."
+    right: "Teklik indirgenemezlik, yakınsama ayrıca periyodik olmama ister. İki kapalı sınıflı zincirde sonsuz çok durağan dağılım vardır; periyodik zincirde p_t döner (lab l1: döngü, ε = 0)."
+  - wrong: "p_{t+1} = P p_t formülü bütün kitaplarda aynı anlama gelir."
+    right: "Bu derste T sütun-stokastiktir (sütun = kaynak). Sutton–Barto ve çoğu kaynakta P satır-stokastiktir ve güncelleme p_{t+1}ᵀ = p_tᵀP'dir. Karıştırılırsa olasılık kütlesi korunmaz."
+whatif:
+  - q: "Geçiş olasılıkları zamanla değişseydi (ör. kullanıcı davranışı gün içinde değişiyor)?"
+    a: "Zincir homojen olmaz: p_t = T_t T_{t−1} ⋯ T_1 p₀. Durağan dağılım kavramı anlamını yitirir. Değişim periyodikse zamanı (ör. saat dilimi) duruma ekleyerek homojen bir zincire dönülür; yavaşsa kayan pencerede yeniden kestirilir."
+  - q: "Durum uzayı sürekli olsaydı?"
+    a: "Geçiş matrisi yerine bir geçiş çekirdeği p(s'|s) kullanılır ve güncelleme bir integral olur: p_{t+1}(s') = ∫ p(s'|s) p_t(s) ds. AR(1) böyle bir süreçtir: çekirdek N(a·s, σ²), durağan dağılım N(0, σ²/(1 − a²)). Sürekli durumlu RL'de değer fonksiyonları bu yüzden fonksiyon yaklaşımıyla temsil edilir (M11.6)."
+  - q: "Gözlenen dizi kısa olsaydı ve bazı geçişler hiç görülmeseydi?"
+    a: "En çok olabilirlik kestirimi görülmemiş geçişlere 0 olasılık verir ve hiç ziyaret edilmemiş bir durumun satırı tanımsız kalır. Sayımlara sanal bir α eklemek (Dirichlet önseli, Laplace düzeltmesi) bunu önler: p̂_ij = (n_ij + α)/(n_i + α|S|). Modele dayalı RL'de bu belirsizlik keşif için de kullanılır (iyimser modeller)."
