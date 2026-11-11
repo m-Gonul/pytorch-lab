@@ -1,5 +1,38 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 10
+
+Faz 10'un (paralel programlama ve GPU) 7 modülünün hepsine tam konu anlatımı yazıldı. Kaynak, BİL 455/533 Parallel Processing dersinin dokuz slayt destesi (lect_01–lect_09) ve dört alıştırma föyüdür (Ex. 1–4). Her deste sayfa sayfa işlendi. Slayt metni kopyalanmadı. Konular yeniden anlatıldı, türetimler eklendi ve slaytlardaki hatalar "Kaynak düzeltmesi" kutularında gerekçeleriyle düzeltildi. C++ thread ve CUDA kodları tarayıcıda çalışmadığı için deneyler, ölçüm ya da simülasyonla kurulmuş maliyet modelleridir. Her deneyin sınırları kendi kutusunda yazılıdır.
+
+| modül | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|
+| M10.1 paralel modeller | 2 | amdahl, workspan, mandelbal | Amdahl ve Gustafson, iş–açıklık, Graham/Brent sınırları, yük dengeleme ve parça tavanı |
+| M10.2 thread'ler ve eşzamanlama | 2 | interleave, deadlock, prodcons | kayıp güncelleme sayımı, kilitlenmenin dört koşulu, bellek modeli ve acquire–release, monitörler |
+| M10.3 CPU'da paralel çekirdekler | 2 | histlab, scanlab, matmulcache | blok taraması, integral görüntü geçişleri, evrişim bantları ve hale, matmul döngü sırası ve karolama |
+| M10.4 CUDA ve bellek | 2 | occupancy, bankconf, divergence | birleştirme ve sektörler, CGMA tavanı, bank eşlemesi ve dolgu, doluluk, Little yasası |
+| M10.5 paralel indirgeme | 2 | redtree, fpsum, coarsen | iş ve adım, denetim ve bellek ayrışması, kabalaştırma koşulu, sıralı/ikili/Kahan toplam hatası |
+| M10.6 paralel tarama | 2 | scanalgo, linrec | Kogge–Stone işi ve WAR tehlikesi, Brent–Kung, hiyerarşik ve domino tarama, afin bileşim taraması |
+| M10.7 GPU'da evrişim ve matmul | 4 | convtile, convmethods, regtile | halo'lu karonun azalma oranı, Winograd F(2, 3), yazmaç karolaması, CPU–GPU hesap/aktarım oranı |
+
+- **Faz 10'da 20 deney (19'u yeni; M10.1'deki amdahl korundu) ve 16 şekil.** Şekillerdeki bütün sayılar betikle hesaplandı.
+- **Kaynak düzeltmeleri** (her biri ilgili modülde kutu içinde):
+  - M10.1: Cell'in duyuru yılı ve PS3'te kapalı SPE; 102.4 GFLOPS PowerXCell 8i'nindir; Kepler'de 255 yazmaç thread başına sınırdır; Amdahl yasası güçlü ölçekleme içindir; önek toplamı kodunda `+=` yerine `=`; map/scan/reduce tanımları.
+  - M10.2: fork'un dönüş değeri ve yazınca kopyalama; join nesneyi yok etmez; anlatılan şey NUMA değil önbellek hiyerarşisidir; donanım SC değildir; volatile thread'ler arası bayrak değildir; std::atomic'in kapsamı; acquire–release'in anlamı; make_weak ve standart fiber yoktur; thread güvenli ile yeniden girilebilir farklıdır.
+  - M10.4: Fermi'nin hesap yeteneği 2.x, 4.x yoktur; thread blok kümeleri Hopper/CUDA 12'dir; A100'de en çok 7 MIG; __syncthreads thread'leri eşzamanlar; ana makine yerel belleğe erişemez; cubin uyumluluğu; shuffle 3.0'da geldi; 8 baytlık bank kipi Kepler'e özgüdür.
+  - M10.5: 256 öğede ayrışan yinelemeler yediden beşe iner; yakınsak eşleme değişmelilik ister; warp işlemlerinin tarihleri.
+  - M10.6: "bölümlü tarama" bayraklı taramanın adıdır, anlatılan yöntem hiyerarşik taramadır.
+  - M10.7: Ex. 3'te GPU maddesine kopyalanmış "standart C++ thread'leri" ifadesi ve 8 bitlik integral dizi çıktısı; Ex. 4'te tamsayı girdinin fp32'de 2^24 sınırı.
+- **Ölçümle düzeltilen ya da anlatıma giren sonuçlar:**
+  - M10.1: kritik yol önceliği simetrik grafiklerde etkisizdi, düzensiz grafiklere bağlandı; desen–yapı tablosu slayt görüntüsüne göre düzeltildi.
+  - M10.2: kilitlenme simülasyonu thread'leri sırayla işlediği için livelock göstermiyordu; istekler eşzamanlı çözülecek biçimde yeniden yazıldı.
+  - M10.3: atomik histogram modeli satır transferlerinin serileşmesini içermiyordu; matmul önbellek simülasyonunda n = 64'ün n = 68'den 2.4 kat fazla ıska vermesi 2'nin kuvveti çakışmalarıyla açıklandı ve dayanaksız bir öneri kaldırıldı.
+  - M10.4: boş else yolu ayrışmayı sıfır gösteriyordu; "döngü boyunu 32'nin katı yap" önerisi yanlıştı.
+  - M10.5: kabalaştırma modeli bant genişliğini bütün SM'ler doluymuş gibi hesaplıyordu.
+  - M10.7: evrişim yöntemi karşılaştırmasında ayrılabilir yol her zaman en hızlı seçiliyordu, ayrı raporlanıyor; matmul modelinde çift tampon ve k diliminin etkisi yoktu, bariyer kaybı eklendi.
+- **Dağıtım sorunu:** M7.4'ten M10.5'e kadar yapılan değişiklikler, M8.1'in bir pratik kartındaki yuvarlanmış cevap (0.000695) CI modül testini geçemediği için yayına çıkmamıştı. Cevap 0.00069541 olarak düzeltildi; o tarihten bu yana her gönderimden sonra CI'nin ve Pages dağıtımının sonucu denetleniyor.
+- **Test ortamı notu:** C++ aşamaları için sunucuya GCC 16 ve ninja kuruldu. Triton yerel olarak kurulu olmadığı için Triton aşamaları yalnız CI'de sınanıyor.
+- **Kalan:** Faz 11 (YAP 446 pekiştirmeli öğrenme, DQN ve AlphaGo makaleleri) konu anlatımları; kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 9
 
 Faz 9'un (klasik görüntü ve video işleme) 18 modülünün hepsine tam konu anlatımı yazıldı. Kaynak, BİL 467/561 Image Processing ders arşivindeki 30 slayt destesidir; her deste sayfa sayfa işlendi ve görsel slaytlar sayfa görüntüsüne çevrilerek kontrol edildi. Slayt metni kopyalanmadı. Konular yeniden anlatıldı, türetimler eklendi ve slaytlardaki hatalar "Kaynak düzeltmesi" kutularında gerekçeleriyle düzeltildi. Destekleyici kaynaklar Gonzalez–Woods'tur; özgün makaleler de kullanıldı: Canny, Harris, Lowe, Dalal–Triggs, Viola–Jones, Lucas–Kanade, Bolme (MOSSE), Barnich (ViBe), Wang (SSIM) ve Tomasi (ikili süzgeç). OpenCV, scikit-image ve colorsys ile birebir karşılaştırmalar yapıldı.
