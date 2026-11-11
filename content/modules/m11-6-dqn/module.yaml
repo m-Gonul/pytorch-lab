@@ -105,3 +105,160 @@ homework:
       - "NumPy ile polinom uydurma; eylem sayısı 2, 10 ve 100."
     accept:
       - "Eylem sayısı arttıkça tek kestirimcinin yanlılığı artar, çift kestirimci yanlılığı küçük tutar (makale Şekil 2)."
+
+labs:
+  - id: l1
+    lab: baird
+    title: "Baird'in karşı örneği: ölümcül üçlü"
+    goal: |
+      Yedi durumlu, sekiz ağırlıklı doğrusal değer fonksiyonunda bütün ödüller 0 ve doğru çözüm temsil edilebilir (w = 0). Politika dışı yarı-gradyan TD(0)'ın ağırlıklarının ıraksamasını izle; aynı yöntemi politika üstü örneklemeyle ve politika dışı gradyan-TD (TDC) ile karşılaştır.
+    predict:
+      q: "Ödüller hep 0, doğru değer her yerde 0 ve bu değer temsil edilebilir. Politika dışı yarı-gradyan TD(0) (γ = 0.99) 1000 adımda ağırlıklara ne yapar?"
+      options:
+        - {t: "Sıfıra götürür: doğru çözüm temsil edilebilir", why: "Temsil edilebilirlik yakınsamayı güvence etmez."}
+        - {t: "Iraksatır", ok: true, why: "‖w‖ 10'dan 336'ya; 5000 adımda 10⁶'yı geçiyor."}
+        - {t: "Başladığı yerde bırakır", why: "Güncellemeler sıfır değil: TD hataları γv(s') − v(s)."}
+    presets:
+      - {name: "Politika dışı TD, γ = 0.99", params: {alg: 0, g: 0.99, alpha: 0.01, N: 1000}, note: "‖w‖ = 336."}
+      - {name: "Uzun koşu", params: {alg: 0, g: 0.99, alpha: 0.01, N: 5000}, note: "‖w‖ ≈ 2·10⁶."}
+      - {name: "Küçük adım", params: {alg: 0, g: 0.99, alpha: 0.005, N: 1000}, note: "Daha yavaş ama yine ıraksıyor (85)."}
+      - {name: "γ = 0.8", params: {alg: 0, g: 0.8, alpha: 0.01, N: 1000}, note: "Bu adım sayısında ıraksama görünmüyor."}
+      - {name: "Politika üstü TD", params: {alg: 1, g: 0.99, alpha: 0.01, N: 1000}, note: "Kararlı: yalnız durum 6 eğitiliyor."}
+      - {name: "TDC", params: {alg: 2, g: 0.99, alpha: 0.01, N: 5000}, note: "Iraksamıyor; değer hatası ≈ 1.6'da dalgalanıyor."}
+    questions:
+      - q: "Küçük bir öğrenme oranı neden ıraksamayı önlemiyor, yalnız geciktiriyor?"
+        a: "Beklenen yarı-gradyan TD güncellemesi w ← w + α(b − Aw) biçimindedir. Politika dışı dağılımda A matrisinin negatif reel kısımlı özdeğerleri vardır: I − αA'nın bir özdeğeri 1'den büyüktür ve her α > 0 için o yönde üstel büyüme olur. α yalnız büyüme hızını belirler. Politika üstü dağılımda A pozitif tanımlıdır ve yeterince küçük α ile güncelleme bir büzülmedir."
+    limits: "Sutton & Barto Örnek 11.1'in örneklemeli sürümü; önem örneklemesi ρ ∈ {0, 7}; TDC'de β = 5α. Ağırlıklar 10¹² aşınca simülasyon durduruluyor."
+  - id: l2
+    lab: replaylab
+    title: "Deneyim tekrarı: ilişkili örneklerden öğrenmek"
+    goal: |
+      Durum [0, 1] aralığında yavaşça ileri geri kayarken bir fonksiyonu gürültülü örneklerden öğren. Yalnız son örnekle güncellenen çevrimiçi SGD'yi, son N örneği tutan bir tampondan düzgün mini yığınlar çeken deneyim tekrarıyla karşılaştır; hata bütün aralıkta ölçülüyor.
+    predict:
+      q: "Küresel (Fourier) özniteliklerle ve aynı sayıda güncellemeyle, son 2000 adımda bütün aralıktaki hatayı hangisi daha düşük tutar?"
+      options:
+        - {t: "Çevrimiçi SGD: her zaman en taze örneği kullanıyor", why: "En taze örnek yalnız o anki bölgeyi temsil ediyor (0.29)."}
+        - {t: "Deneyim tekrarı", ok: true, why: "0.013: mini yığın yakın geçmişin bütün bölgelerini içeriyor."}
+        - {t: "Aynı: aynı veriyi görüyorlar", why: "Aynı veri, farklı sıra ve tekrar sayısı."}
+    presets:
+      - {name: "Küresel öznitelik", params: {feat: 1, P: 2000, lr: 0.1, N: 2000, B: 16, T: 6000}, note: "Çevrimiçi 0.29, tekrar 0.013."}
+      - {name: "Yerel öznitelik", params: {feat: 0, P: 2000, lr: 0.1, N: 2000, B: 16, T: 6000}, note: "Çevrimiçi 0.48 (yavaş), tekrar 0.013."}
+      - {name: "Hızlı kayma", params: {feat: 1, P: 200, lr: 0.1, N: 2000, B: 16, T: 6000}, note: "Çevrimiçi de iyi: 0.037."}
+      - {name: "Küçük adım", params: {feat: 1, P: 2000, lr: 0.02, N: 2000, B: 16, T: 6000}, note: "Çevrimiçi 0.017: küçük adımlar ilişkiyi ortalıyor."}
+      - {name: "Tek örnekli tekrar", params: {feat: 1, P: 2000, lr: 0.1, N: 2000, B: 1, T: 6000}, note: "B = 1 bile 0.034: kazancın çoğu karıştırmadan."}
+      - {name: "Küçük tampon", params: {feat: 1, P: 2000, lr: 0.1, N: 100, B: 16, T: 6000}, note: "Bu basit problemde 100'lük tampon da yetiyor (0.022)."}
+    questions:
+      - q: "Tek örnekli tekrar (B = 1) çevrimiçi SGD ile aynı sayıda gradyan hesaplar. Yine de hata neden sekiz kat düşük?"
+        a: "Fark örneklerin sırasındadır. Çevrimiçi SGD ardışık, neredeyse aynı x'lerle güncellenir: gradyanlar aynı yöne iter ve küresel özniteliklerde o an bulunulan bölgeye aşırı uyulur, uzak bölgeler bozulur. Tampondan düzgün çekilen örnekler yakın geçmişin bütün dağılımından gelir; ardışık güncellemeler birbirinden bağımsıza yakındır ve SGD'nin varsaydığı i.i.d. koşula yaklaşılır. Mini yığın (B > 1) bunun üstüne varyansı azaltır ve her örneği birçok kez kullanır."
+    limits: "Gözetimli bir benzer: hedef sabit bir fonksiyon (bootstrapping yok), doğrusal model, 20 öznitelik; kayma sinüs biçiminde. DQN'deki hareketli hedef ve hedef ağın etkisi bu deneyde yok."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Bir doğrusal Q-öğrenme adımı
+    goal: Yarı-gradyan güncellemesini elle uygulamak
+    needs: $\nabla_wQ_w(s,a)=x$
+    q: |-
+      $Q_w(s,a)=w^\top x$, $x=(1,0,2)$, $w=(0.5,1,0.25)$. Geçiş: $r=1$, $\gamma=0.9$, $\max_{a^+}Q_{\bar w}(s^+,a^+)=2$, $\alpha=0.1$. Güncellenmiş $w$ nedir?
+    solution: |-
+      $Q_w(s,a)=0.5+0+0.5=1$. Hedef $1+0.9\cdot2=2.8$, $\delta=1.8$. $w\leftarrow w+0.1\cdot1.8\cdot x=(0.68,1,0.61)$. Yalnız $x$'in sıfır olmayan bileşenleri değişir; hedefin $w$'ye bağımlılığı türevlenmez (yarı-gradyan).
+  - id: p2
+    type: hesap
+    level: 1
+    title: Nature DQN'nin evrişim çıktısı
+    goal: Evrişim boyutlarını hesaplamak
+    needs: $\lfloor(H-k)/s\rfloor+1$
+    q: |-
+      2013 DQN ağında girdi 84 × 84 × 4, ardından 16 tane 8 × 8 filtre (adım 4) ve 32 tane 4 × 4 filtre (adım 2). İkinci evrişimden sonra düzleştirilmiş vektörün boyu nedir?
+    answer: 2592
+    calc: "((((84-8)//4+1)-4)//2+1)**2*32"
+    tol: 0
+    mistakes:
+      - {answer: 3136, msg: "Bu 2015 ağı (üç evrişim, 64 kanal: 7·7·64)."}
+      - {answer: 6400, msg: "Bu birinci evrişimden sonra (20 · 20 · 16); ikinci katmanı unutmayın."}
+    hints:
+      - "Birinci katmandan sonra kenar $(84-8)/4+1=20$."
+    solution: |-
+      $20\to(20-4)/2+1=9$; $9\cdot9\cdot32=2592$. Tam bağlı katman $2592\cdot256+256\approx6.6\cdot10^5$ parametreyle ağın en büyük parçası.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Tampon belleği
+    goal: Deneyim tekrarının bellek bedelini hesaplamak
+    needs: Kare boyutu, kare yığını
+    q: |-
+      Tamponda 10⁶ geçiş tutuluyor ve her geçiş için hem $\phi_t$ hem $\phi_{t+1}$ (her biri 84 × 84 × 4, uint8) ayrı ayrı saklanıyor. Kaç GB (10⁹ bayt) gerekir?
+    answer: 56.448
+    calc: "1e6*2*84*84*4/1e9"
+    mistakes:
+      - {answer: 28.224, msg: "Bu yalnız φ_t; φ_{t+1} de saklanıyor."}
+      - {answer: 225.792, msg: "uint8: piksel başına 1 bayt, float32 değil."}
+    hints:
+      - "Bir yığın $84\\cdot84\\cdot4=28\\,224$ bayt."
+    solution: |-
+      $10^6\cdot2\cdot28\,224=5.6\cdot10^{10}$ bayt ≈ 56 GB. Uygulamalar yalnız tek tek kareleri (84·84 bayt) saklayıp yığınları indekslerle yeniden kurar: ≈ 7 GB.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Tampondan hangi hedef?
+    goal: Deneyim tekrarının politika dışı öğrenme gerektirdiğini görmek
+    needs: SARSA ve Q-öğrenme hedefleri
+    q: |-
+      Bir ajan deneyim tekrarıyla eğitiliyor; tamponda 500 000 adım önceki politikayla toplanmış geçişler de var. Hangi hedef doğrudur?
+    choices:
+      - {t: "SARSA: r + γQ(s⁺, a⁺), a⁺ tampondaki sonraki eylem", why: "a⁺ eski politikayla seçilmiş; hedef eski politikanın değerini kestirir."}
+      - {t: "Q-öğrenme: r + γ max_{a⁺} Q_{w̄}(s⁺, a⁺)", ok: true, why: "Hedef davranış politikasından bağımsız: politika dışı."}
+      - {t: "Monte Carlo getirisi", why: "Getiri de eski politikanın sonraki eylemlerine bağlı."}
+    hints:
+      - "Hangi hedef, verinin hangi politikayla toplandığından bağımsızdır?"
+    solution: |-
+      Tampondaki veri bir politika karışımından gelir. Q-öğrenmenin $\max$ hedefi yalnız $(s,a,r,s^+)$'ya bağlıdır. Çok adımlı hedefler (Rainbow'daki n adımlı getiri) yaklaşık olarak kullanılır; düzeltme için önem örneklemesi ya da Retrace gerekir.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Hedeften akan gradyan
+    goal: Yarı-gradyan güncellemeyi PyTorch'ta doğru kurmak
+    needs: "`detach`, `torch.no_grad`"
+    q: |-
+      Bir öğrencinin DQN kodu `target = r + gamma * q_net(s_next).max(1).values` ve `loss = F.mse_loss(q_net(s).gather(1, a), target)` kullanıyor; hedef ağ yok. Eğitim kararsız ve kayıp beklenmedik biçimde dalgalanıyor. Ne yanlış?
+    choices:
+      - {t: "MSE yerine Huber kullanılmalı", why: "Huber yardımcı olur ama asıl hata başka."}
+      - {t: "Hedef aynı ağla ve gradyanla hesaplanıyor: geri yayılım hedefi de kestirime doğru itiyor (tam gradyan, yarı-gradyan değil) ve hedef her adımda kayıyor. Hedef ayrı bir ağla ve torch.no_grad() / detach() ile hesaplanmalı", ok: true, why: "Hedefin türevi alınmamalı; DQN hedef ağı C adım dondurur."}
+      - {t: "max yerine argmax kullanılmalı", why: "Hedef değeri ister, indeksi değil."}
+    hints:
+      - "`target.requires_grad` nedir?"
+    solution: |-
+      `with torch.no_grad(): target = r + gamma * (1 - done) * target_net(s_next).max(1).values` ve her C adımda `target_net.load_state_dict(q_net.state_dict())`. Son durumlarda bootstrapping de kapatılmalı (`1 - done`).
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Politika dışı doğrusal TD'nin ıraksaması
+    goal: Iraksamanın en küçük örneğini çözümlemek
+    needs: Doğrusal yineleme
+    q: |-
+      Tek ağırlıklı doğrusal bir değer fonksiyonu düşünün: $v(s_1)=w$, $v(s_2)=2w$. Yalnız $s_1\to s_2$ geçişi (ödül 0) güncelleniyor (politika dışı dağılım: $s_2$'den çıkan geçiş hiç örneklenmiyor). Yarı-gradyan TD güncellemesinin $w$'yi her $\alpha>0$ için $\gamma>1/2$ iken ıraksattığını gösterin.
+    rubric:
+      - "δ = 0 + γ·2w − w = (2γ − 1)w yazdım"
+      - "∇v(s₁) = 1 ile w ← w + α(2γ − 1)w = (1 + α(2γ − 1))w buldum"
+      - "γ > 1/2 iken çarpanın 1'den büyük olduğunu ve w ≠ 0 ise |w|'nin üstel büyüdüğünü gösterdim"
+      - "s₂'den çıkan geçiş de örneklenseydi (politika üstü) ek terimin büyümeyi dengeleyeceğini belirttim"
+    hints:
+      - "Gerçek değer 0 ve $w=0$ temsil edilebilir."
+    solution: |-
+      $w_{k+1}=(1+\alpha(2\gamma-1))w_k$; $\gamma>1/2$ ise $w\to\pm\infty$. Bu Sutton & Barto'nun "w → 2w" örneğidir (Örnek 11.1'in ilk biçimi). $s_2$ de ziyaret edilseydi onun güncellemesi $\alpha(\gamma v(s')-2w)\cdot2$ ile w'yi küçültürdü; politika üstü dağılımda toplam etki büzülmedir.
+pitfalls:
+  - wrong: "Doğrusal fonksiyon yaklaşımıyla Q-öğrenme her zaman yakınsar; ıraksama yalnız sinir ağlarında olur."
+    right: "Baird'in karşı örneğinde doğrusal politika dışı TD bile ıraksar. Ölümcül üçlü (yaklaşım + bootstrapping + politika dışı) doğrusal modellerde de geçerlidir."
+  - wrong: "Q-öğrenmenin güncellemesi kare TD hatasının gradyan inişidir."
+    right: "Hedefin türevi alınmaz: yöntem yarı-gradyandır ve hiçbir fonksiyonun inişi değildir. Bu yüzden gradyan inişinin yakınsama güvenceleri geçerli değildir."
+  - wrong: "2013 DQN makalesi deneyim tekrarı ve hedef ağ kullandı."
+    right: "2013 makalesinde ayrı bir hedef ağ yoktur; hedef aynı parametrelerle hesaplanır. Hedef ağ (C = 10 000) 2015 Nature sürümünde gelir."
+  - wrong: "Deneyim tekrarı yalnız veri verimliliği içindir."
+    right: "Asıl kazançlardan biri ardışık örneklerin ilişkisini kırmaktır; tek örnekli tekrar bile çevrimiçi SGD'den çok daha düşük hata verir (lab l2). Ayrıca politika ile veri dağılımı arasındaki geri besleme döngüsünü yumuşatır."
+whatif:
+  - q: "Ödül kırpılmasaydı?"
+    a: "Oyundan oyuna puan ölçekleri (Pong'da ±1, Seaquest'te yüzler) gradyan büyüklüklerini çok farklı yapar; tek bir öğrenme oranı her oyunda çalışmaz. Kırpma bunu çözer ama ajan büyük ve küçük ödülü ayıramaz. Sonraki çalışmalar (Pop-Art, 2016) hedefleri uyarlamalı olarak normalize ederek kırpmadan aynı kararlılığı sağlar."
+  - q: "Hedef ağ her adımda güncellenseydi (C = 1)?"
+    a: "Hedef ağ olmayan duruma döner: her gradyan adımı hedefi de kaydırır ve geri besleme döngüsü kararsızlık yaratabilir. Çok büyük C ise yeni bilginin hedefe geç yansıması demektir: öğrenme yavaşlar. Pratik değerler 10³–10⁴ adım ya da yumuşak güncellemede τ ≈ 0.005."
+  - q: "Eylem uzayı sürekli olsaydı (ör. robot eklem torkları)?"
+    a: "max_a Q(s, a) her adımda bir eniyileme problemi olur ve DQN doğrudan uygulanamaz. Çözümler: eylem uzayını ızgaraya bölmek (boyutla üstel büyür), ya da max'ı öğrenilmiş bir aktörle yaklaşmak (DDPG, TD3, SAC: aktör–eleştirmen, M11.9)."
