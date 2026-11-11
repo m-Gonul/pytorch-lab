@@ -118,6 +118,50 @@ labs:
       - q: "Kalan hata sınırı γ^k R_max/(1−γ) neden gerçek farktan çok büyük?"
         a: "En kötü durum sınırıdır; gerçek yakınsama hızı geçiş yapısına (ör. sönümlenen yolların sayısına) bağlıdır. Yine de eğim (ln γ) birebir tutar."
     limits: "5 × 5 ızgara, iki duvar; kayma yalnız sağa/sola dik yönde."
+  - id: l2
+    lab: retaildp
+    title: "Perakende stok: sonlu ufukta geriye doğru dinamik programlama"
+    goal: |
+      Notlardaki stok ve fiyat MDP'sinde her gün ve durum için V_t(s) ve en iyi eylemi geriye doğru hesapla. Ufuk, indirim, satış olasılıkları, stoksuz kalma ve tasfiye cezaları değişince politikanın güne göre nasıl değiştiğini ve uzun ufukta durağan politikaya nasıl oturduğunu gör.
+    predict:
+      q: "h = 5 (notlardaki ayar): az stokta (S1) en iyi eylem günlere göre nasıl değişir?"
+      options:
+        - {t: "Her gün indirim", why: "İndirim yalnız son eylem gününde (t = 4) kazanıyor."}
+        - {t: "t ≤ 3'te yüksek fiyat, t = 4'te indirim", ok: true, why: "Sezon başında stoksuz kalma (−5) tasfiye cezasından ağır basar; sona yaklaşınca −4'lük tasfiye cezası acil olur."}
+        - {t: "Her gün yüksek fiyat", why: "t = 4'te indirim −1.8, yüksek fiyat −3.8 veriyor."}
+    presets:
+      - {name: "Notlardaki ayar", params: {h: 5, g: 1, pH: 0.3, pD: 0.8, cout: 5, L: 4}, note: "V₁ = (−11.51, −8.546, −6.459, −7.334): notlardaki tablo."}
+      - {name: "Uzun sezon", params: {h: 20, g: 1}, note: "İlk 17 gün politika sabit: sonsuz ufuklu durağan politika."}
+      - {name: "İndirimli, γ = 0.9", params: {h: 20, g: 0.9}, note: "Değerler −1/(1 − γ) mertebesinde sınırlı."}
+      - {name: "Stoksuz kalmak bedava", params: {h: 5, cout: 0}, note: "S2 ve S3 hep indirim."}
+      - {name: "Tasfiye cezası yok", params: {h: 10, L: 0}, note: "Son eylem gününde iki eylem eşit (grafikte 0.5): sonrası yok."}
+      - {name: "Yüksek fiyat da satıyor", params: {h: 10, pH: 0.5}, note: "S3 de ilk günlerde yüksek fiyata geçiyor."}
+    questions:
+      - q: "Ufuk 20 güne çıkınca ilk 17 günün politikası neden hiç değişmiyor?"
+        a: "Kalan gün sayısı arttıkça V_t, sonsuz ufuklu Bellman denkleminin çözümüne yaklaşır; politika yalnız Q değerlerinin sırasına bağlı olduğu için değerler yakınsamadan çok önce sabitlenir. Sezon sonunun etkisi geriye doğru birkaç gün içinde söner (γ = 1'de bile, çünkü stok S0'a düştükçe sistem kendini yeniler). Bu sabit politika — S1 ve S2'de yüksek fiyat, S3'te indirim — aynı MDP'nin γ = 0.9'daki sonsuz ufuklu en iyi politikasıyla aynıdır."
+    limits: "Notlardaki dört durumlu model: satış stoku tam bir düzey azaltır, S0'dan eylemden bağımsız S1'e dönülür; günlük ödüller yalnız duruma bağlı (S1, S2 −1; S3 −2). Tasfiye cezası stok düzeyiyle doğrusal (−L·k)."
+  - id: l3
+    lab: vibounds
+    title: "Değer yinelemesinin durma kuralı: hata, sınırlar ve politika kaybı"
+    goal: |
+      Tohumlu rastgele bir MDP'de değer yinelemesini V₀ = 0'dan çalıştır. Her yinelemede son değişimi ε_n, gerçek hatayı ‖V* − V_n‖, sıkı sınırı γε/(1 − γ) ve açgözlü politikanın gerçek kaybını ‖V* − V^{π_n}‖ log ölçekte izle. Durma eşiğinin, γ'nın ve MDP yapısının etkisini gör.
+    predict:
+      q: "γ = 0.99'da ε = 10⁻³ eşiğinde durulunca değerlerin gerçek hatası en çok kaç olabilir?"
+      options:
+        - {t: "10⁻³", why: "Son değişim küçük, ama kalan adımların toplamı γε/(1 − γ)."}
+        - {t: "≈ 0.1", ok: true, why: "γε/(1 − γ) = 0.99 · 10⁻³ / 0.01 = 0.099; deneyde gerçek hata 0.0985."}
+        - {t: "≈ 10⁻⁵", why: "Hata eşikten büyüktür, küçük değil."}
+    presets:
+      - {name: "Halka, γ = 0.9", params: {kind: 2, S: 20, A: 3, g: 0.9, ltol: -3}, note: "Politika ilk kez 4'te, kalıcı olarak 17'de en iyi; durma 65'te."}
+      - {name: "Halka, γ = 0.97, 40 durum", params: {kind: 2, S: 40, A: 3, g: 0.97, ltol: -3}, note: "Politika 71'de, durma 227'de."}
+      - {name: "γ = 0.99", params: {kind: 2, S: 20, A: 3, g: 0.99, ltol: -3}, note: "662 yineleme; gerçek hata ≈ 0.1."}
+      - {name: "Yoğun rastgele", params: {kind: 0, S: 20, A: 3, g: 0.9, ltol: -3}, note: "Politika ilk yinelemede doğru."}
+      - {name: "Seyrek, 40 durum", params: {kind: 1, S: 40, A: 3, g: 0.9, ltol: -3}, note: "Politika 14. yinelemede en iyi."}
+      - {name: "Sıkı eşik", params: {kind: 2, S: 20, A: 3, g: 0.9, ltol: -6}, note: "130 yineleme; politika çoktan en iyi."}
+    questions:
+      - q: "Açgözlü politika neden değerler henüz uzaktayken en iyi politikaya oturuyor?"
+        a: "Politika yalnız eylemlerin Q değerlerinin sırasına bağlıdır. Değer hatası her durumda aynı yönde ve yaklaşık aynı büyüklükte (V₀ = 0'dan gelen sabit kayma) olduğunda eylemlerin sırası değişmez. Sınır 2γε/(1 − γ) en kötü durumu verir; sonlu MDP'de en iyi ile en iyi olmayan eylemler arasında pozitif bir boşluk vardır ve değer hatası bu boşluğun yarısının altına inince politika tam olarak en iyidir."
+    limits: "Ödüller [−1, 1] düzgün; V* politika yinelemesiyle kesin hesaplanıyor; politika değeri her yinelemede doğrusal sistemle çözülüyor. Yapılar örnek: yoğun (üstel ağırlıklar), seyrek (her eylem iki ardıl), halka (±1 adım, 0.1 yerinde kalma)."
 
 practice:
   - id: p1
@@ -202,7 +246,25 @@ practice:
     hints:
       - "Yarın ne olacağını bilmek için bugün neleri bilmen gerekir?"
     solution: |-
-      Durum: $s=(\text{stok},\ \text{yolda olan siparişler } o_1,o_2,o_3,\ \text{gün})$; yalnız stok yetmez, çünkü 3 gün sonra gelecek sipariş geleceği belirler — durumu genişletmek Markov özelliğini geri getirir. Eylem: (fiyat, sipariş). Geçiş: talep $D\sim\mathrm{Poisson}(\lambda(\text{fiyat}))$, stok $\leftarrow\max(\text{stok}-D,0)+o_1$. Ödül: $\text{fiyat}\cdot\min(D,\text{stok})-h\cdot\text{stok}-c\cdot\max(D-\text{stok},0)$. γ ≈ 0.99 (günlük, uzun ufuk). Modül anlatımındaki perakende örneği bunun en basit hâli.
+      Durum: stok, yolda olan siparişler ($o_1,o_2,o_3$) ve gün; yalnız stok yetmez, çünkü 3 gün sonra gelecek sipariş geleceği belirler — durumu genişletmek Markov özelliğini geri getirir. Eylem: (fiyat, sipariş). Geçiş: talep $D\sim\mathrm{Poisson}(\lambda(\text{fiyat}))$, stok $\leftarrow\max(\text{stok}-D,0)+o_1$. Ödül: $\text{fiyat}\cdot\min(D,\text{stok})-h\cdot\text{stok}-c\cdot\max(D-\text{stok},0)$. γ ≈ 0.99 (günlük, uzun ufuk). Modül anlatımındaki perakende örneği bunun en basit hâli.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Açgözlü politikanın kaybı
+    goal: Çıkarılan politikanın sınırını kanıtlamak
+    needs: Büzülme, $H_{\pi_n}V_n=H^*V_n$, üçgen eşitsizliği
+    q: |-
+      Değer yinelemesi $\|V_n-V_{n-1}\|_\infty\le\epsilon$ olunca durduruluyor ve $\pi_n$, $V_n$'ye göre açgözlü politika olarak çıkarılıyor. $\|V^{\pi_n}-V^*\|_\infty\le2\gamma\epsilon/(1-\gamma)$ olduğunu gösterin.
+    rubric:
+      - "π_n açgözlü olduğu için H_{π_n} V_n = H* V_n olduğunu belirttim"
+      - "‖V^{π_n} − V_n‖ ≤ γ‖V^{π_n} − V_n‖ + ‖H*V_n − H*V_{n−1}‖ yazıp ‖V^{π_n} − V_n‖ ≤ γε/(1 − γ) buldum"
+      - "‖V* − V_n‖ ≤ γε/(1 − γ) sınırını (kalan adımların geometrik toplamı) gösterdim"
+      - "Üçgen eşitsizliğiyle 2γε/(1 − γ) sonucuna vardım"
+    hints:
+      - "$V^{\\pi_n}=H_{\\pi_n}V^{\\pi_n}$ ve $V_n=H^*V_{n-1}$ yazıp farkı iki parçaya bölün."
+    solution: |-
+      $\|V^{\pi_n}-V_n\|\le\|H_{\pi_n}V^{\pi_n}-H_{\pi_n}V_n\|+\|H^*V_n-H^*V_{n-1}\|\le\gamma\|V^{\pi_n}-V_n\|+\gamma\epsilon$, dolayısıyla $\|V^{\pi_n}-V_n\|\le\gamma\epsilon/(1-\gamma)$. Ayrıca $\|V^*-V_n\|\le\sum_{k\ge1}\gamma^k\epsilon=\gamma\epsilon/(1-\gamma)$. Toplam: $2\gamma\epsilon/(1-\gamma)$. Kaynaktaki $2\epsilon/(1-\gamma)$ geçerli ama $1/\gamma$ kat gevşek.
+
 pitfalls:
   - wrong: "γ yalnız matematiksel bir kolaylıktır."
     right: "γ aynı zamanda problemin tanımıdır: küçük γ kısa vadeli, büyük γ uzun vadeli davranış ister ve yakınsamayı yavaşlatır."
@@ -210,8 +272,13 @@ pitfalls:
     right: "Greedy politika genellikle değerlerden çok önce sabitlenir (deney: 'Erken durdurma'); bu politika iterasyonunun hızlı olmasının nedenidir."
   - wrong: "Ödül her zaman pozitif olmalı."
     right: "Negatif adım ödülü (ceza) 'hızlı bitir' demektir; ödül tasarımı istenen davranışı belirler, tuhaf kısayollara da açabilir."
+  - wrong: "Değer yinelemesi ‖V_n − V_{n−1}‖∞ ≤ ε olunca durduğunda değerlerin hatası en çok ε'dur."
+    right: "Kalan adımların toplamı γε/(1 − γ) kadar olabilir: γ = 0.99'da 99ε. ε-en iyi bir politika için ‖V_n − V_{n−1}‖ < ε(1 − γ)/(2γ) olana dek yinelenir."
+
 whatif:
   - q: "Geçiş olasılıkları bilinmiyorsa?"
     a: "Değer iterasyonu doğrudan uygulanamaz; deneyimden öğrenen modelsiz yöntemler (MC, TD, Q-öğrenme — M11.4–11.5) ya da modeli öğrenip planlama (Dyna, M11.10) gerekir."
   - q: "Durum sayısı 10¹⁰ olsaydı?"
     a: "Tablo tutulamaz; değer fonksiyonu yaklaşık temsil edilir (doğrusal ya da sinir ağı, M11.6) ve büzülme garantisi kaybolabilir (ölümcül üçlü)."
+  - q: "Sonsuz ufukta γ = 1 alınsaydı?"
+    a: "Bellman operatörü büzülme olmaz ve indirimsiz toplam sonsuz olabilir; değer yinelemesi yakınsamayabilir. İki çıkış yolu var: her politikanın olasılık 1 ile bir son duruma ulaştığı problemlerde (en kısa yol) indirimsiz toplam sonludur ve yineleme yine yakınsar; sürekli işleyen sistemlerde ise ortalama ödül ölçütü (adım başına uzun dönem kazanç) kullanılır ve göreli değer yinelemesiyle çözülür."

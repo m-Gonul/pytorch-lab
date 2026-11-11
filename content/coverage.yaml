@@ -192,7 +192,7 @@ groups:
         pages: [m11-2-mdp-vi, m11-3-policy-iteration]
         status: genis
         gap: "—"
-        done: "Değer iterasyonu deneyi (γ-büzülme, kayma olasılığı, greedy politika)."
+        done: "Değer iterasyonu deneyi (γ-büzülme, kayma olasılığı, greedy politika). M11.2 konu anlatımı lect_3'ün (1–28) ve lect_4'ün (1–24) bütün slaytlarını işliyor: MDP bileşenleri ve zaman çizelgesi, politika, ödül fonksiyonu, planlama varsayımları, robot süpürge örneği ve durum tanımı, indirim ve sonluluğu, beklenen fayda ve değer fonksiyonu, geriye doğru değer yinelemesi ve Bellman denklemi, kalan-adım indeksi, perakende stok örneği (tam tablo, zaman bağımlılığı), sonlu/sonsuz ufuk ve durağanlık, matris biçimi ve devrik geçiş matrisi, politika değerlendirme ve tersinirlik, ∞-norm, Lemma 1–2 ve Teorem 1–4 (çıkarılan politika sınırının kanıtı dahil), durma kuralı, yineleme sayısı, karmaşıklık; retaildp ve vibounds deneyleri. Kaynak düzeltmeleri: planlamanın varsayımı belirlenimcilik değil modelin bilinmesi; robot süpürgede konum durumda olmalı; γ = 1 ve sonsuz ufukta toplam sonlu değil; beklenen faydada P(s_t | s_0, π); stok örneğinin t = 2 ve t = 1 ara terimlerindeki yazım hataları ve t ≤ 3; T^a'nın üçüncü satırı; γ < 1'de (I − γT)⁻¹ her zaman var; büzülme γ < 1 ister; Teorem 2'nin sıkı sınırı γε/(1 − γ); Teorem 4'ün boş kanıtı ve sıkı sınırı 2γε/(1 − γ)."
       - src: "lect_6, lect_7 — Modelsiz değerlendirme ve kontrol, fonksiyon yaklaşımı"
         topics: "MC ve TD değerlendirme, ajan bileşenleri ve türleri, keşif–sömürü ve yöntemleri, SARSA, Q-öğrenme, yakınsama, Q yaklaşımı, DQN"
         pages: [m11-4-mc-td, m11-5-sarsa-q, m11-6-dqn]
