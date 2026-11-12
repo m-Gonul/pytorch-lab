@@ -19,6 +19,10 @@ sources:
   - {title: "Stanford CS229 — Lecture notes: LMS, batch vs stochastic gradient descent", url: "https://cs229.stanford.edu/main_notes.pdf", license: "doğrulanmadı", use: link}
   - {title: "Dive into Deep Learning §12.4–12.6 SGD, Minibatch SGD, Momentum", url: "https://d2l.ai/chapter_optimization/index.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
   - {title: "Goh — Why Momentum Really Works (Distill)", url: "https://distill.pub/2017/momentum/", license: "CC BY 4.0", use: link}
+  - {title: "Polyak — Some methods of speeding up the convergence of iteration methods (1964, ağır top)", url: "https://www.sciencedirect.com/science/article/pii/0041555364901375", license: "doğrulanmadı", use: link}
+  - {title: "Nesterov — A method for solving the convex programming problem with convergence rate O(1/k²) (1983)", url: "https://link.springer.com/article/10.1007/BF00905429", license: "doğrulanmadı", use: link}
+  - {title: "Polyak & Juditsky — Acceleration of Stochastic Approximation by Averaging (1992)", url: "https://epubs.siam.org/doi/10.1137/0322046", license: "doğrulanmadı", use: link}
+  - {title: "Sutskever, Martens, Dahl, Hinton — On the importance of initialization and momentum in deep learning (ICML 2013)", url: "https://proceedings.mlr.press/v28/sutskever13.html", license: "doğrulanmadı", use: link}
   - {title: "PyTorch — torch.optim.SGD (momentum formülü)", url: "https://docs.pytorch.org/docs/stable/generated/torch.optim.SGD.html", license: "BSD-3", use: link}
 
 hand:
@@ -71,6 +75,16 @@ quiz:
       - {t: "Sabit sıra, ardışık batch'ler arasında korelasyon yaratır (ör. sınıfa göre sıralı veri); gradyan tahmini yanlı ve salınımlı olur", ok: true, why: "Sıralı veride model önce hep bir sınıfı, sonra diğerini görür ve her blokta bir öncekini unutur."}
       - {t: "Hızlandırmak için", why: "Karıştırmanın küçük bir maliyeti var; amaç istatistiksel."}
       - {t: "Gerekli değil, yalnız alışkanlık", why: "Sıralı verilerde belirgin şekilde kötü sonuç verir."}
+  - q: "β = 0.99 (etkin bellek 1/(1−β) = 100 adım) ne zaman tehlikeli?"
+    options:
+      - {t: "Gürültülü gradyanda: momentum gürültüyü de ≈ 1/(1−β²) oranında biriktirir ve az sönümlü uzun salınımlar yapar", ok: true, why: "1/(1−β²) ≈ 50; ayrıca spiral bandın √β ≈ 0.995 çarpanı çok yavaş (l4'ün 'sınır dibinde uzun spiral' senaryosu)."}
+      - {t: "Hiçbir zaman: daha büyük bellek her zaman iyi", why: "Gürültü birikimi ve az sönüm pratikte zarar verir."}
+      - {t: "Yalnız κ = 1'de", why: "κ = 1'de bile minimum çevresinde uzun salınımlar olur."}
+  - q: "EMA biçimi v ← βv + (1−β)g ile ağır top v ← βv + g, aynı (η, β) ile karşılaştırıldığında ne olur?"
+    options:
+      - {t: "EMA biçimi etkin öğrenme oranını (1−β) ile ölçekler: aynı η'da daha küçük adım", ok: true, why: "Sabit g'de EMA hızı g'ye, ağır topunki g/(1−β)'ye gider; EMA + η ≈ ağır top + η(1−β)."}
+      - {t: "Birebir aynı davranış", why: "Hız çarpanı farklı: g/(1−β) ≠ g."}
+      - {t: "EMA biçimi her zaman daha hızlı yakınsar", why: "Aynı η'da adımı küçültür: daha yavaş; farkı kapatmak için η büyütülür."}
 
 homework:
   - title: "Robbins & Monro (1951) ve Polyak & Juditsky (1992): stokastik yaklaşım ve ortalama"
@@ -158,6 +172,71 @@ labs:
       - q: "Nesterov ile ağır top arasındaki fark ne zaman belirginleşir?"
         a: "β büyük ve η sınıra yakınken: ağır top minimumu aşıp salınırken Nesterov ileri bakış gradyanıyla erken düzeltir."
     limits: "İki boyutlu kesin kuadratik; gürültü her adımda eklenen bağımsız Gauss'tur. Gerçek ağlarda eğrilik ve gürültü konuma göre değişir."
+
+  - id: l4
+    lab: hbmap
+    title: "Ağır topun kararlılık haritası: (η, β) düzleminde mercek"
+    goal: |
+      Kanıt kutusundaki $2\times2$ blok $M_\lambda=\begin{bmatrix}1-\eta\lambda&-\eta\beta\\ \lambda&\beta\end{bmatrix}$'ın spektral yarıçapı $\rho$. Harita, dik ($\lambda_{\max}=1$) ve yatık ($\lambda_{\min}=1/\kappa$) blokların en kötü $\rho$'sunu $(\eta,\beta)$ düzleminde boyar; eğriler ıraksama $\eta\lambda=2(1+\beta)$ ve spiral bandın sınırları $\eta\lambda=(1\mp\sqrt\beta)^2$. Sağ grafik iki yönün $|x_t|$'ini blok çarpanı $\rho^t$ teorisiyle karşılaştırır.
+    predict:
+      q: "κ = 100'de mercek ucundaki (β*, η*) çiftiyle en kötü yönün adım başına sönüm çarpanı yaklaşık kaç?"
+      options:
+        - {t: "0.818 = (√κ−1)/(√κ+1)", ok: true, why: "Uçta her iki blok da spiral bandın sınırında; çarpan √β* = (√κ−1)/(√κ+1)."}
+        - {t: "0.669 = β*", why: "β* spiral bandın karesi; çarpan kareköküdür."}
+        - {t: "0.980 — GD'nin en iyi çarpanı", why: "GD'nin en iyisi (√κ değil) (κ−1)/(κ+1) = 0.980; momentum bunu 0.818'e indirir."}
+    presets:
+      - {name: "Mercek ucunda, κ = 100", params: {kappa: 100, lr: 3.31, beta: 0.67, T: 150}, note: "η* = (2/(1+0.1))² ≈ 3.31, β* = (9/11)² ≈ 0.67: her iki yön ±√β* çarpanıyla sönümlenir; ~35 adımda 10⁻³."}
+      - {name: "Yavaş bölge (η küçük, β büyük)", params: {kappa: 100, lr: 0.05, beta: 0.9, T: 300}, note: "ηλ_min = 0.0005 < (1−√0.9)² ≈ 0.0026: yatık yön spiral dışında, gerçek-yavaş köklerde; dik yön spiralde. Pratikte sık görülen 'az hızlanan' bölge."}
+      - {name: "Sınır dibinde uzun spiral", params: {kappa: 100, lr: 0.5, beta: 0.98, T: 300}, note: "Her iki yön de mercek içinde ama √β ≈ 0.99: minimum çevresinde uzun dönüşler."}
+      - {name: "Iraksama", params: {kappa: 25, lr: 3.5, beta: 0.6, T: 150}, note: "ηλ_max = 3.5 > 2(1+β) = 3.2: ıraksama bölgesi — GD'nin 2'sinden genişleyen sınırın ötesi."}
+      - {name: "GD (β = 0)", params: {kappa: 25, lr: 0.5, beta: 0, T: 150}, note: "β = 0'da blok köşegenleşir: çarpan 1 − ηλ; spiral bandı daralır, mercek bir noktaya iner."}
+    questions:
+      - q: "β sabitken κ büyütülünce mercek ne olur?"
+        a: "Üst kenar (1+√β)²/λ_max λ_max'la aşağı iner, alt kenar (1−√β)²/λ_min de 1/λ_min ile aşağı iner: pencere daralır. Büyük κ'da kabul edilebilir (η, β) bölgesi hızla küçülür — koşul sayısının bedeli."
+      - q: "Neden ucta iki yön de ±√β çarpanıyla sönümlenir?"
+        a: "Uçta her iki bloğun diskriminantı tr² − 4β = 0: özdeğerler çakışır, |μ| = √β. Dik yön spiral üst sınırında, yatık yön spiral alt sınırındadır; en kötü çarpan mümkün en küçük √β'dır."
+      - q: "Iraksama eğrisi neden η = 2(1+β)/λ_max?"
+        a: "Gerçek köklerde Jüry koşulu |tr| < 1 + det (det = β): 1 − ηλ + β < 1 + β ⟺ ηλ < 2(1+β). Karmaşık köklerde |μ| = √β < 1 zaten sönümlüdür; ıraksama yalnız gerçek kök bölgesinin dışında başlar."
+    limits: "Gürültüsüz kuadratik, özuzayda ayrık bloklar. Gürültülü gradyanda momentum gürültüyü ≈ 1/(1−β²) oranında biriktirir; dışbükey olmayan kayıplarda eğrilik konuma göre değişir."
+
+  - id: l5
+    lab: sweepmap
+    title: "48'lik (lr, β) ızgarası: Aşama E'nin haritası"
+    goal: |
+      Aşama E'deki `sweep`'in tarayıcı karşılığı: aynı veri ($n=250$, sütun ölçekleri $1$ ve $s$, $y=2x_1+0.3x_2$), 6 η × 8 β = 48 kombinasyon, tam batch momentum GD, son kayıp ısı haritası. Üzerine $H=2X^\top X/n$'in gerçek özdeğerleriyle kararlılık eğrisi ve mercek ucu bindirilir.
+    predict:
+      q: "Izgarada β = 0 sütunu neden yüksek kayıpta kalıyor?"
+      options:
+        - {t: "Yatık yönde etkin adım ηλ_min çok küçük; momentum bu etkin adımı η/(1−β) katına çıkarır", ok: true, why: "κ ≈ s² büyüdükçe GD'nin yatık yön çarpanı 1 − ηλ_min → 1 olur; momentum λ_min yönünde biriken hızı büyütür."}
+        - {t: "β = 0'da gradyan hesaplanamaz", why: "GD'nin gradyanı tam; sorun hız yokluğu."}
+        - {t: "β = 0'da kararlılık sınırı daha dardır", why: "Sınır 2(1+β)/λ_max β ile büyür; β = 0 en dar — ama ızgarada sınıra hiç yaklaşılmıyor."}
+    presets:
+      - {name: "Aşama E'nin ayarı", params: {steps: 100, s: 8}, note: "En iyi kombinasyon mercek ucuna yakın çıkar; PyTorch'taki sweep ile aynı sayılar."}
+      - {name: "Daha kötü koşullu (s = 16)", params: {steps: 150, s: 16}, note: "κ ≈ 256: uygun η penceresi daralır; en iyi η küçülür, en iyi β yükselir."}
+      - {name: "Uzun eğitim (300 adım)", params: {steps: 300, s: 8}, note: "Adım bütçesi artınca en iyi β kayar: yatık yönün yavaş sönümü artık darboğaz."}
+    questions:
+      - q: "En iyi β neden ızgara ucu 0.95 değil?"
+        a: "β → 1'de dik yön spiral bandında √β ≈ 0.975 çarpanıyla ağır döner; yatık yön hızlanır ama dik yönün yavaşlaması toplam kaybı bozar. En iyi β, iki yönün daralmasını dengeleyen mercek ucuna yakındır."
+      - q: "Harita ile Aşama E'nin yazdırdığı 6×8 tablo arasında uyum var mı?"
+        a: "Aynı problem ve aynı ızgara; tarayıcı sürümü float64 ile benzer sonuç verir. Bu yüzden harita, yazdırdığın tensörün görsel doğrulamasıdır (küçük yuvarlama farkları olabilir)."
+    limits: "Gürültüsüz, tam batch; kayıp kesin kuadratik. Mini-batch gürültüsü eklenseydi taban ησ²/B ile yükselir ve en iyi çift kayardı."
+
+  - id: l6
+    lab: gddrag
+    title: "Parabol üzerinde elle adım: sürükle ve at"
+    goal: |
+      $f(x)=\tfrac a2x^2$ eğrisinde noktayı sürükle: başlangıç $x_0$'ı sen seç, adımları düğmelerle tek tek at. Her adım $x_{t+1}=x_t-\eta f'(x_t)=(1-\eta a)x_t$; yatay parça $-\eta f'(x_t)$ uzaklığı, dikey parça eğriye iniş. L1'in dört rejimini şekil üzerinde görmek için ηa'yı 1'in altına, 1–2 arasına ve 2'nin üstüne götür.
+    presets:
+      - {name: "Tekdüze (ηa = 0.6)", params: {a: 2, lr: 0.3, x0: 4}, note: "Her adım kalan mesafenin 0.4 katını siler: merdiven içe sarar."}
+      - {name: "Newton (ηa = 1)", params: {a: 2, lr: 0.5, x0: -4}, note: "Tek adım tam minimuma: 0."}
+      - {name: "Salınım (ηa = 1.8)", params: {a: 2, lr: 0.9, x0: 4}, note: "Her dik iniş karşı yamaça geçer; merdiven zikzaklı ama küçülür."}
+      - {name: "Iraksama (ηa = 2.4)", params: {a: 2, lr: 1.2, x0: 2}, note: "Her adım |x|'i 1.4 katına çıkarır: dışa sarar."}
+    questions:
+      - q: "Adım atarken η'yı değiştirirsem geçmiş merdivene ne olur?"
+        a: "Çizilen adımlar geçmişte kalır; yeni adımlar yeni ηa çarpanıyla atılır. Kötü bir η ile açılan merdiveni kurtarmak için η'yı 1/a'ya çekip tek adımda minimuma inebilirsin."
+      - q: "Neden yatay parça hep f(x_t) yüksekliğinde?"
+        a: "Adım yatay eksende atılır: $x$ değişir, $f(x_t)$ eski değer. Yatay uzaklık $-\\eta f'(x_t)$; dikey iniş sonrasında $f(x_{t+1})$'e iner. Salınımlı rejimde zikzak bu yüzden belirgindir."
+    limits: "Tek boyutlu, gürültüsüz kuadratik; L1'deki tablo ve formüllerle birebir aynı model."
 practice:
   - id: p1
     type: çözülmüş
@@ -277,6 +356,58 @@ practice:
       - "Bir adımın maliyeti ve gürültüsü B ile nasıl değişir?"
     solution: |-
       Adım maliyeti ∝ B, gürültü std'si ∝ $1/\sqrt B$: B'yi 4 katına çıkarmak gürültüyü yalnız yarıya indirir. Donanım belli bir B'ye kadar neredeyse bedava paralel çalıştığı için (GPU doluluğu) o noktaya kadar B'yi büyütmek kazançlıdır; ötesinde örnek başına verim düşer. Mini-batch bu dengedir.
+  - id: p8
+    type: hesap
+    level: 1
+    title: Momentumda etkin adım
+    goal: Etkin adım η/(1 − β) formülünü uygulamak
+    needs: P1, momentum güncellemesi
+    q: |-
+      Sabit bir gradyan altında momentum sabitlenir: $v\to g/(1-\beta)$, adım $\eta v\to \eta g/(1-\beta)$. $\beta=0.9$, $\eta=0.1$ iken adım, $\eta$'nın kaç katıdır?
+    answer: 10.0
+    calc: "1/(1-0.9)"
+    mistakes:
+      - {answer: 0.9, msg: "Çarpan β değil: etkin adım η/(1−β)."}
+      - {answer: 1.9, msg: "1 + β ile karıştırdın: formül η/(1−β)."}
+    hints:
+      - "$1/(1-\\beta)$ kaç?"
+    solution: |-
+      $\dfrac{\eta}{1-\beta}=\dfrac{0.1}{0.1}=10$: aynı $\eta$ ile ağır top, tutarlı bir yönde 10 kat uzun adım atar. Kararlılık sınırının da $2(1+\beta)/\lambda_{\max}$ ile genişlediğini hatırla; bedeli $\beta\to1$'de az sönüm ve uzun salınımlar (l4'te mercek dışı bölgeler).
+  - id: p9
+    type: hesap
+    level: 2
+    title: κ = 64'te gereken adım sayısı
+    goal: Mercek ucunun daralma çarpanından adım sayısına geçmek
+    needs: P1, logaritma
+    q: |-
+      $\kappa=64$'lük kuadratikte momentumun (mercek ucundaki $\beta^*,\eta^*$ ile) hatayı $10^{-3}$'e indirmesi için gereken en küçük tamsayı adım sayısı kaç? (Çarpan $\frac{\sqrt\kappa-1}{\sqrt\kappa+1}$.)
+    answer: 28.0
+    calc: "math.ceil(math.log(1e-3)/math.log(7/9))"
+    mistakes:
+      - {answer: 222.0, msg: "Bu GD'nin adımı: çarpan (κ−1)/(κ+1) = 63/65 ile 221.04 → 222."}
+      - {answer: 27.0, msg: "Aşağı yuvarladın: 27 adımda hata 10⁻³'ün üstünde; yukarı yuvarla."}
+    hints:
+      - "Çarpan (√64−1)/(√64+1) = 7/9. $|x_t| = (7/9)^t|x_0| \\le 10^{-3}$."
+      - "Logaritmanın iki yanını al; taban 1'den küçük."
+    solution: |-
+      $\sqrt\kappa=8$: çarpan $7/9\approx0.778$. $t\ge\ln10^{-3}/\ln(7/9)=27.48$ → $t=28$. GD aynı soruda çarpan $63/65$ ile $222$ adım isterdi: ~8 kat kazanç $\approx\sqrt\kappa$.
+  - id: p10
+    type: yorumla
+    level: 2
+    title: ηₜ = c/t^0.6 Robbins–Monro'yu sağlar mı?
+    goal: Takvim koşullarını ayrıştırmak
+    needs: Robbins–Monro koşulları, p-harmonik seri
+    q: |-
+      $\eta_t=c/t^{0.6}$ takvimi için hangisi doğru?
+    choices:
+      - {t: "Σηₜ = ∞ ve Σηₜ² < ∞: ikisi de sağlanır; sabit gürültü tabanı olmadan yakınsır", ok: true, why: "Σ1/t^0.6 ıraksar (0.6 ≤ 1), Σ1/t^1.2 yakınsar (1.2 > 1): tam istenen çift. Pratikte α ∈ (1/2, 1) dengesi budur."}
+      - {t: "Σηₜ² = ∞: gürültü birikir, yakınsamaz", why: "Σ1/t^1.2 yakınsar; 1.2 > 1."}
+      - {t: "η çok hızlı küçülür: Σηₜ yakınsar, yol biter", why: "Σ1/t^0.6 ıraksar; bu α > 1 olsaydı olurdu."}
+    hints:
+      - "Σ1/tᵖ yalnız p > 1'de yakınsar."
+      - "İki seri: t⁻⁰·⁶ ve t⁻¹·²."
+    solution: |-
+      $\sum t^{-0.6}$ ıraksar ($\alpha=0.6\le1$), $\sum t^{-1.2}$ yakınsar ($2\alpha=1.2>1$): Robbins–Monro koşullarının ikisi de sağlanır. Bu, $\alpha\in(\frac12,1)$ bandının tipik üyesidir; Polyak–Ruppert ortalamasıyla $O(1/t)$ hıza ulaşılır (ayrıntı kutusuna bak).
 pitfalls:
   - wrong: "Kayıp düşmüyorsa öğrenme oranını büyüt."
     right: "Önce kaybın salınıp salınmadığına bak: salınım ya da büyüme η'nın **fazla** olduğunu gösterir."
@@ -288,5 +419,7 @@ pitfalls:
 whatif:
   - q: "Batch boyutunu 4 katına çıkarırsan η'yı nasıl değiştirmelisin?"
     a: "Gürültü varyansı 4 kat azalır. SGD için yaygın sezgisel kural η'yı da (kararlılık sınırına kadar) 4 katına çıkarmak (doğrusal ölçekleme; Goyal ve ark. 2017), ısınma (warmup) ile. Adam gibi uyarlamalı yöntemlerde √4 = 2 kat daha güvenli bir başlangıçtır. Kararlılık sınırı $2/\\lambda_{max}$ yine de aşılamaz."
+  - q: "Gürültülü gradyanda β seçimi nasıl değişmeli?"
+    a: "Momentum gürültüyü de biriktirir: hız varyansı kabaca $1/(1-\\beta^2)$ ile büyür ve gürültü, mercekteki spiral salınımlarla birleşip hız kazancını yutar. Gürültü baskınken β'yı düşürmek (0.8–0.9 bandı) daha iyi denge kurar; l3'teki 'Gürültülü momentum' senaryosu ve l4'ün sağ grafiğindeki spiral kıvrımlar bunu gösterir."
   - q: "Kayıp dışbükey değilse 2/a sınırı ne anlama gelir?"
     a: "Yerel eğriliğe göre bir sınırdır; eğitim boyunca eğrilik değişir. Derin ağlarda büyük η ile eğitim sıklıkla tam bu sınırın civarında dolaşır ('kararlılığın kıyısı', Cohen ve ark. 2021)."

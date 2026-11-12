@@ -1,5 +1,15 @@
 # Değişiklik günlüğü
 
+## 2026-11 · M1.2 derinleştirme: kararlılık bölgesi türetimi, üç yeni deney, görsel genişletmeler
+
+M1.2 (gradient descent varyantları) ekleme odaklı genişletildi; hiçbir mevcut içerik kaldırılmadı.
+
+- **Teorik eklentiler (lesson.md):** ağır toptaki 2×2 blok $M_\lambda$'nın özdeğer analiziyle kararlılık bölgesi kanıtı (Jüry koşulu → $\eta\lambda<2(1+\beta)$, spiral bandı $\eta\lambda=(1\mp\sqrt\beta)^2$, mercek ve ucu $\beta^*,\eta^*$'ın geometrik türetimi); κ → adım sayısı tablosu (GD vs momentum, 10⁻³'e); Nesterov'un erken frenleyen $1-\eta\beta\lambda$ terimine kısa türetim; EMA-biçimi $v\leftarrow\beta v+(1-\beta)g$ ile ağır top arasındaki $\eta(1-\beta)$ eşdeğerliği kutusu; Polyak–Ruppert ortalaması ayrıntı kutusu; Robbins–Monro takvim tablosu (sabit, 1/t, 1/√t, t^−α, basamaklı); karıştırma tanım kutusuna sıralı veri uyarısı.
+- **Mevcut deneylerin genişletmesi:** gd1d'e kobweb diyagramı (y = x karşı y = (1−ηa)·x) ve (η, a) rejim haritası + $|1-\eta a|^T$ ölçümü; sgdnoise'a adım bazlı kayıp grafiği, birinci mertebe teorik taban $(\eta/4)\operatorname{tr}\Sigma_g$ referans çizgisi (sayısal doğrulandı) ve "x'e göre sıralı" veri seçeneği (karıştırmanın zararının canlı gösterimi); optim2d'e karşılaştırma katmanı (SGD + Momentum + Nesterov aynı η, β ve gürültü akışıyla üst üste), dik-yön zaman serisi ve (η, β) kararlılık haritası + blok spektral yarıçap ölçümü.
+- **Üç yeni deney:** l4 hbmap (ağır topun (η, β) kararlılık haritası: ıraksama, spiral bandı ve mercek eğrileri, yön ayrık $\rho^t$ sönüm serileri), l5 sweepmap (Aşama E'nin 48'lik PyTorch sweep ızgarasının tarayıcı haritası: son kayıp ısı haritası + H = 2XᵀX/n'in gerçek özdeğerleriyle kararlılık eğrisi ve mercek ucu), l6 gddrag (sürüklenebilir x₀ ile parabol üzerinde elle adım; selfTest'li custom lab).
+- **Sorular ve kaynaklar:** +3 pratik (p8 etkin adım η/(1−β), p9 κ = 64'te adım sayısı ~√κ kazancı, p10 ηₜ = c/t^0.6'nın Robbins–Monro koşulları), +2 quiz (β = 0.99'un tehlikesi; EMA/ağır top biçim farkı), +1 what-if (gürültülü gradyanda β seçimi); kaynaklara Polyak (1964), Nesterov (1983), Polyak & Juditsky (1992), Sutskever vd. (2013) eklendi.
+- **Sayısal doğrulama:** mercek ucu formüllerinin (β*, η*) sayısal optimumla birebir çakıştığı; η* = (2/(√λmax+√λmin))²'nin iki sınır eğrisinin kesişimi olduğunu; 1-B gürültü tabanı E[L−L*] = ηs²/(4B) ≈ (η/4)·tr Σg yaklaşımının Monte Carlo ile doğrulandığı (0.0260 ölçüm, 0.0263 teori).
+
 ## 2026-11 (3. tur, devam) · M1.1 derinleştirme: türetimler, şekiller, yeni deneyler ve ek alıştırma
 
 M1.1 (doğrusal regresyon) içeriği ölçümle doğrulanarak genişletildi. Ekleme odaklı çalışıldı; hiçbir mevcut içerik kaldırılmadı.
