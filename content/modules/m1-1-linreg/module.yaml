@@ -20,6 +20,7 @@ sources:
   - {title: "ISLP — An Introduction to Statistical Learning (Python), Bölüm 3", url: "https://www.statlearning.com/", license: "doğrulanmadı", use: link}
   - {title: "Dive into Deep Learning §3.1–3.5 Linear Regression (scratch + concise)", url: "https://d2l.ai/chapter_linear-regression/index.html", license: "CC BY-SA 4.0 / MIT-0", use: adapt}
   - {title: "PyTorch — nn.Linear, torch.optim.SGD", url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Linear.html", license: "BSD-3", use: adapt}
+  - {title: "Anscombe — Graphs in Statistical Analysis (The American Statistician 27(1), 1973)", url: "https://doi.org/10.1080/00031305.1973.10478966", license: "doğrulanmadı", use: link}
 
 hand:
   groups:
@@ -59,6 +60,24 @@ stages:
   d: {engine: torch}
   e: {engine: torch}
 
+hints:
+  b:
+    - "gd_step'te kayıp ve gradyanı aynı döngüde biriktir: her örnek için e = w*x + b − y; loss += e*e/n; gw += 2*e*x/n; gb += 2*e/n."
+    - "Güncellemeyi döngü bittikten sonra yap: w = w − lr*gw. Kayıp, güncellemeden önceki (w, b) ile hesaplanmalı (yazılımdaki sözleşme bu)."
+    - "fit, gd_step'i steps kez çağırır; closed_form'da x̄, ȳ ve iki toplamı tek geçişte hesapla."
+  c:
+    - "Tasarım matrisi: Xt = np.column_stack([X, np.ones(len(X))]) — bias hilesi; sonra np.linalg.lstsq (inv alma)."
+    - "fit_gd'de örnek döngüsü kalkar: e = X @ w + b − y; w = w − lr*(2/n)*(X.T @ e). Tek katman döngü yalnız adımlar içindir."
+    - "fit_df'te katsayıları özellik isimleriyle döndür: pd.Series(w, index=feats.columns)."
+  d:
+    - "one_step_grads'ta w ve b'yi torch.tensor(0.0, requires_grad=True) yarat; pred = w*x + b; pred'in (n,) olduğundan emin ol."
+    - "loss.backward() sonrası w.grad, b.grad'e bak; .grad birikir, her adımda opt.zero_grad() şart."
+    - "fit_torch'ta pred = model(X).squeeze(-1): (n,1) ile y (n,) karşılaştırılırsa yayılım (n,n) üretir ve kayıp sessizce yanlış olur."
+  e:
+    - "W: (L, d) ve b: (L,) tensörler; tahmin X @ W.T + b → (n, L): her sütun bir model."
+    - "Kayıplar her model için ayrı: ((pred - y[:, None]) ** 2).mean(dim=0) → (L,)."
+    - "loss.sum().backward() yeter: her W[:, j] yalnız kendi kaybında yer alır (sınamanın 3. sorusu). Güncelleme: W -= lrs[:, None] * W.grad."
+
 quiz:
   - q: "Özellikleri standardize etmeden (ör. biri metre, biri milimetre) gradient descent neden yavaş yakınsar?"
     options:
@@ -75,6 +94,16 @@ quiz:
       - {t: "Her modelin kaybı yalnız kendi parametrelerine bağlı; toplamın $W_\\ell$'ye göre türevi yalnız $L_\\ell$'nin türevi", ok: true, why: "$\\partial(\\sum_k L_k)/\\partial W_\\ell=\\partial L_\\ell/\\partial W_\\ell$ çünkü $k\\ne\\ell$ için $L_k$, $W_\\ell$'yi içermez. Ortalama alsaydın gradyanlar $1/L$ ile ölçeklenirdi."}
       - {t: "Toplam kaybı küçültmek her modelin kaybını eşit küçültür", why: "Asıl neden parametrelerin ayrık olması; kayıpların eşit azalması gerekmez."}
       - {t: "Doğru vermez; her model için ayrı backward şart", why: "Parametreler paylaşılmadığı sürece tek backward yeterli. Bu, M0.3'teki toplam hilesinin aynısı."}
+  - q: "Kararlılık sınırı η < 2/λ_max'ta tam η = 2/λ_max seçersen λ_max yönünde ne olur?"
+    options:
+      - {t: "Hata hiç sönmez: |1 − ηλ_max| = 1, işaret değiştiren sabit büyüklüklü salınım sürer", ok: true, why: "Sınırın üstünde |1 − ηλ| > 1: hata büyür (ıraksama), tam sınırdaysa büyüklük korunur. λ_min yönünde yine ilerler. l1 deneyinde η'yi sınıra getirerek gör."}
+      - {t: "Tek adımda optimuma gider", why: "Tek adım ancak H çapraz olduğunda (standartlaştırılmış, η = 1/2) tüm yönlerde eşzamanlı mümkündür."}
+      - {t: "η büyüdükçe her zaman hızlanır", why: "Kararlılık sınırına kadar hızlanır; sınırda salınım, üstünde ıraksama."}
+  - q: "pred'in shape'i (n, 1), y'ninki (n,). (pred − y).mean() hesabı neden yanlış?"
+    options:
+      - {t: "Yayılım eksenleri hizalar: sonuç (n, n) olur; kayıp çapraz hataların ortalamasıdır", ok: true, why: "(n,1) − (n,) → (n,n). MSE'nin değeri yanlış, backward'ı da bozuk. Önce squeeze(-1) ya da reshape şart."}
+      - {t: "PyTorch bunu otomatik düzeltir", why: "nn.MSELoss bu durumda uyarı basar; elle yazılan kayıpta hata tamamen sessizdir."}
+      - {t: "Sonuç yine (n,) olur, sorun yok", why: "(n,1) ile (n,) çıkarımında son eksen kaldırılmaz; çıkarım (n,n)'e yayınlanır."}
 
 homework:
   - title: "Golub & Reinsch (1970): SVD ve en küçük kareler"
@@ -204,6 +233,45 @@ practice:
       - "Çok boyutta: iki öznitelik birbirinin katıysa ne olur?"
     solution: |-
       Örnek: $x=[2,2,2]$, $y=[1,2,3]$. $\sum(x_i-\bar x)^2=0$; $w$ belirsiz: her $w$ için $b=\bar y-2w$ aynı kaybı verir (hepsi $\hat y=2$ tahmin eder). Matris dilinde $X^\top X$ tekil, normal denklemlerin sonsuz çözümü var. Seçim: en küçük normlu çözüm $\theta=X^+y$ (`np.linalg.lstsq` bunu verir) ya da ridge ($X^\top X+\lambda I$ tersinir). Pratikte daha sık görülen hâl "neredeyse tekil": çok ilişkili öznitelikler katsayıları kararsız ve dev yapar.
+  - id: p8
+    type: hesap
+    level: 2
+    title: Özdeğerlerden en iyi learning rate
+    goal: Kararlılık ve hız formüllerini uygulamak
+    needs: Kararlılık türetimi, özdeğer kavramı
+    q: |-
+      Tek öznitelikli bir veride $H=\frac2n\tilde X^\top\tilde X$'in özdeğerleri $\lambda_{\max}=25$, $\lambda_{\min}=1$ olsun. Kararlılık üst sınırı $2/\lambda_{\max}$'ın hemen altında duran, ama **en iyi sabit** olan $\eta^*=\frac2{\lambda_{\max}+\lambda_{\min}}$ kaç? (ondalıklı yaz, 3 basamak)
+    answer: 0.07692307692307693
+    tol: 0.0006
+    calc: "2/(25+1)"
+    mistakes:
+      - {answer: 0.08, msg: "2/λ_max = 0.08 kararlılık **üst sınırıdır**, en iyi sabit değil; hız için 2/(λ_max+λ_min)."}
+      - {answer: 0.04, msg: "1/λ_max çok muhafazakâr: λ_min yönünde gereksiz yavaş sürünür."}
+      - {answer: 1.0, msg: "1/(λ_min) yönünde kararlılık sınırını (0.08) aşar: ıraksarsın."}
+    hints:
+      - "Kararlılık: $0<\\eta<2/\\lambda_{\\max}$."
+      - "En iyi sabit: $\\eta^*=\\frac2{\\lambda_{\\max}+\\lambda_{\\min}}$ — iki ucu da dengeleyen değer."
+      - "Kontrol: $\\kappa=25$, daralma $\\frac{\\kappa-1}{\\kappa+1}=\\frac{24}{26}$."
+    solution: |-
+      $\eta^*=\frac2{26}\approx0.0769$ — ıraksama sınırı $0.08$'in hemen altında. Bu seçimle daralma oranı $\rho=\frac{24}{26}\approx0.923$: her adımda hata ~%7.7 azalır; $10^{-6}$'ya inmek $\ln(10^{-6})/\ln(0.923)\approx80$ adım. $\eta=0.08$ (sınırda) λ_max yönünde hiç sönmez; $\eta=0.04$ (1/λ_max) yaklaşık iki kat yavaştır. l1 deneyinde bu üç η'yi tek tek dene.
+  - id: p9
+    type: yorumla
+    level: 2
+    title: R² 0.9 diyor, desen U çiziyor
+    goal: Artık deseninden model yanlışlığını tanımak
+    needs: Değerlendirme bölümü, R² tanımı
+    q: |-
+      l4 deneyinde "karesel gerçek" senaryosunu seç. Doğrusal uydurmanın $R^2$'si 0.9'a yakın çıkabilir ama artıklar U deseni çizer.
+      (a) $R^2$ neden bu kadar yüksek kalabiliyor? (b) Artıklardaki desen eksik terimi nasıl, katsayısıyla birlikte nasıl ele veriyor?
+    choices:
+      - {t: "(a) R² yalnız açıklanan varyans oranıdır, biçim doğruluğu değil; (b) U deseni eksik x²'yi, imza katsayısı değerini verir", ok: true, why: "$R^2$ yanlış biçimli bir modelde de yüksek olabilir (Anscombe, Şekil 3). Artık $r\\approx-0.8(x^2-\\bar{x^2})$ kalır; deney tablosundaki imza (artıkları merkezlenmiş x²'ye uyduran katsayı) tam bu değeri döndürür."}
+      - {t: "(a) R² yanlış hesaplanıyor; (b) desen rastgele gürültüdür", why: "R² tanımı doğru; gürültü desensizdir, desen sistematik yanlışlıktır."}
+      - {t: "(a) Aykırı değerler R²'yi yükseltir; (b) aykırıları atmak gerekir", why: "Senaryoda aykırı yok; sorun ortalama fonksiyonun biçimindedir. Aykırı atmak desen sorunu için ilaç değildir."}
+    hints:
+      - "$R^2=1-\\sum e_i^2/\\sum(y_i-\\bar y)^2$: payda $y$'nin varyansı. Kimin varyansı açıklanıyor?"
+      - "Artıkları $x^2$'ye (merkezlenmiş) uydur; deneyin tablosundaki imza bu."
+    solution: |-
+      (a) $R^2$, toplam varyansın ne kadarının açıklandığını ölçer; $x$ terimi varyansın çoğunu açıkladığı için eksik $x^2$ bile yüksek $R^2$ bırakır — **açıklanan oran** ile **yanlış biçim** ayrı sorulardır. (b) Doğrusal model $\\hat y=wx+b$ uydurunca $r=\\hat y-y$ içinde $-0.8(x^2-\\bar{x^2})$ kalır (artık, uydurulan alt-uzama diktir; $x^2$ o uzamda yok). Merkezleme şarttır: $x^2$'nin ortalaması bias'a emilir, ham $x^2$'ye uydurmak katsayıyı düşük gösterir. Çözüm öznitelik genişletmek: $[x, x^2]$ ile aynı formüller — E1 alıştırmasında kodla.
   - id: p7
     type: uyarla
     level: 3
@@ -235,6 +303,11 @@ whatif:
     a: "MSE'nin olabilirlik gerekçesi kalkar; birkaç uç nokta çözümü sürükler. Sağlam kayıplar (MAE, Huber) ya da RANSAC (M9.15) gerekir."
   - q: "Bir öznitelik başka bir özniteliğin tam kopyası olsaydı?"
     a: "$X^\\top X$ tekil olur, sonsuz çözüm vardır; katsayılar ikisi arasında keyfi bölüşülür. Tahminler değişmez, yorum anlamsızlaşır. Ridge ya da öznitelik eleme."
+  - q: "η'yi tam olarak $2/\\lambda_{\\max}$ seçseydik?"
+    a: "λ_max yönünde $|1-\\eta\\lambda|=1$: hata hiç sönmez, işaret değiştiren sabit büyüklüklü bir salınım sürer; λ_min yönü yavaş ilerlemeye devam eder. Sınır kesin bir eşiktir, çünkü bu kayıp tam ikinci derecedendir. l1 deneyinde η'yi 2/λ_max'ın hemen altına ve üstüne getirerek iki davranışı da görebilirsin."
+
+extras:
+  - {id: x1, title: "Polinom öznitelik genişletme: U desenini kodla", engine: browser}
 
 labs:
   - id: l1
@@ -283,3 +356,41 @@ labs:
       - q: "Aykırı değerler hep yukarı kaydırıldı. Simetrik (yarısı yukarı yarısı aşağı) olsaydı MSE ne yapardı?"
         a: "Ortalama etkisi kabaca birbirini götürürdü (yan küçük), ama varyans artardı: doğru tohumdan tohuma daha çok oynardı. Tek yönlü bozulma en zararlı durumdur."
     limits: "Uydurma IRLS ile yapılır (100 yineleme). MAE'nin çözümü tek olmayabilir; IRLS bunlardan birini bulur. Tek öznitelikli model."
+  - id: l3
+    lab: dragfit
+    title: "Noktaları sürükle: en küçük kareler veriye nasıl tepki verir?"
+    goal: |
+      Veri noktalarını fareyle, dokunarak ya da ok tuşlarıyla sürükle; kapalı form doğrusu, ağırlık merkezi (x̄, ȳ) ve artıklar her sürüklemede yeniden hesaplanır. Grafikte boş bir yere çift tıklamak nokta ekler. Doğru her sürüklemeye rağmen (x̄, ȳ)'den geçmeye devam eder — bunu bozamazsın; deneyin amacı bunu görmen.
+    presets:
+      - {name: "Temiz doğrusal", params: {n: 9, c: 0, out: 0, seed: 1}, note: "Desensiz artıklar: model doğru. Bir noktayı çok uzağa taşı ve doğrunun (x̄, ȳ)'den geçmeye devam ettiğini izle."}
+      - {name: "x'leri sağa kaydır", params: {n: 9, c: 1.6, out: 0, seed: 1}, note: "Aynı veri, x'i +1.6 kaydırılmış: kapalı forma yeni çözüm kaymaya uyar ama kayıp yüzeyinin koşul sayısı büyür — linregfit deneyinde bu etkiyi izle."}
+      - {name: "Tek aykırı değer", params: {n: 9, c: 0, out: 1, seed: 1}, note: "Bir nokta 3.4 birim yukarı çekildi: doğru kendine döner. Aynı veriyle kaybı Huber yapmanın (robustfit) etkisini önce tahmin et, sonra orada dene."}
+      - {name: "Az veri: 3 nokta", params: {n: 3, c: 0, out: 0, seed: 1}, note: "n = 3'te doğru üç nokta arasına sıkışır; tohumu değiştir — kestirim tohumdan tohuma oynar. Optimizasyon değil, veri sınırlayıcı."}
+    questions:
+      - q: "Doğruyu (x̄, ȳ)'den geçmemeye zorlayabilir misin?"
+        a: "Geçiremezsin: b* = ȳ − w*x̄, normal denklemlerin doğrudan sonucudur. Sürüklenen her nokta hem hatayı hem de (x̄, ȳ)'yi aynı anda güncellediği için denklem hep sağlanır. Tek istisna: bütün x'ler aynıysa eğim tanımsızdır (P6) — o zaman doğru hiç çizilemez."
+      - q: "Bir noktayı y'de ±3 birim taşı. Aynı büyüklükteki taşımayı x'te yapsan doğru daha mı çok oynar?"
+        a: "x'te taşıma iki şeyi birden değiştirir: o örneğin hatasını ve ağırlık merkezi x̄'yi — ve x uçlardaysa x'lerle çarpılan hata katkısı (e_i·x_i) büyük olur. Dene: uçtaki bir noktayı yatayda sürüklemek, dikeyde sürüklemekten genellikle daha sert tepki üretir. Gradyan tanımındaki x_i ağırlığı işte budur."
+    limits: "Tek öznitelik, tam-batch kapalı form; GD ve kayıp yüzeyi bu deneyde yok (l1'de). Eğimin tanımlı olması için en az iki farklı x gerekir; bütün x'ler aynıysa tablo boş gelir (P6). Noktalar pencere içinde kalır."
+  - id: l4
+    lab: linresid
+    title: "Artıklarla modeli tanı: U deseni ve huni"
+    goal: |
+      Doğrusal modeli üç farklı gerçek modele zorlarsın: doğrusal (ideal), karesel (eksik öznitelik) ve hunimsi gürültü (heteroskedastik). Sol grafik veri + uydurma, orta grafik artık–x, sağ grafik artık histogramı. Karesel senaryoda R² ~0.9'da kalır ama yanlış biçimi artıklar ele verir: U deseni ve tablodaki "(x²−x̄²) imzası" — artıkları merkezlenmiş x²'ye uyduran katsayı, eksik terimin katsayısını geri verir.
+    predict:
+      q: "Karesel gerçek modelde doğrusal uydurmanın artıkları ne gösterir?"
+      options:
+        - {t: "U deseni: uçlarda bir işaret, ortada tersi", ok: true, why: "Eksik x² terimi artıklarda kalır: r ≈ −0.8(x²−x̄²). Tablodaki imza katsayıyı geri verir."}
+        - {t: "Desensiz bulut", why: "Bu ancak gerçek model de doğrusalsa olur."}
+        - {t: "Huni: yayılım x'le büyür", why: "Huni gürültünün varyansının x'e bağlılığındandır; karesel senaryoda gürültü homoskedastik."}
+    presets:
+      - {name: "Doğrusal, temiz", params: {gercek: 0, n: 60, sigma: 0.3}, note: "Artıklar desensiz, imza ≈ 0: model doğru, Gauss varsayımı tutarlı."}
+      - {name: "Karesel gerçek", params: {gercek: 1, n: 60, sigma: 0.4}, note: "U deseni; imza ≈ −0.8. R² ~0.9'da kalır: R² yanlış biçimi gizler (Anscombe şekli)."}
+      - {name: "Huni", params: {gercek: 2, n: 60, sigma: 0.6}, note: "Yansız ama varyans sabit değil: standart hata formülleri geçersiz; ağırlıklı en küçük kareler (ayrıntı kutusu)."}
+      - {name: "Az veri, çok gürültü", params: {gercek: 1, n: 15, sigma: 1.4}, note: "n = 15'te U deseni gürültüye gömülür: artık grafiğini okumak için de veri gerekir."}
+    questions:
+      - q: "σ'yı büyütürken R²'yi izle: desen değişir mi, imza değişir mi?"
+        a: "σ büyüdükçe R² düşer (açıklanamayan varyans artar) ama desenin biçimi değişmez: U hâlâ U'dur ve imza gerçek katsayıya yakın kalır. Sistematik yanlışlık ile rastgele gürültü ölçekten bağımsız ayrı katmanlardır."
+      - q: "U deseninde imza neden tam −0.8 (gerçek katsayı) çıkıyor?"
+        a: "Doğrusal model ŷ = wx + b uydurunca artık, uydurulan düzleminkine dik kalır; eksik terim x² o uzamda olmadığından imzası artıklarda yaşar. Merkezleme gerekti: x²'nin ortalaması bias'a emildiği için imzayı (x²−x̄²)'ye uydurarak ölçeriz — o zaman tam katsayı çıkar. Bu, 'eksik öznitelik artıklarda kalır' cümlesinin nicel hâlidir."
+    limits: "Tek öznitelik, tam-batch kapalı form; gerçek model üç senaryodan biridir. Histogram 15 sabit kutu kullanır; n küçükken düzensizdir. Huni senaryosunda gürültü |x|'e orantılıdır. İmza, merkezlenmiş x²'ye uydurulur; ham x²'ye uydurmak katsayıyı düşük gösterir."

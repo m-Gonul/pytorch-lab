@@ -1,5 +1,17 @@
 # Değişiklik günlüğü
 
+## 2026-11 (3. tur, devam) · M1.1 derinleştirme: türetimler, şekiller, yeni deneyler ve ek alıştırma
+
+M1.1 (doğrusal regresyon) içeriği ölçümle doğrulanarak genişletildi. Ekleme odaklı çalışıldı; hiçbir mevcut içerik kaldırılmadı.
+
+- **Teorik eklentiler (lesson.md):** MSE = Gauss gürültüsü altında en çok olabilirlik türetimi; öznitelik genişletme bölümü (artıklarda kalan eksik terim); hunimsi yayılımda ağırlıklı en küçük kareler ayrıntı kutusu; kararlılık türetimine κ → adım sayısı tablosu (κ = 10 → 69, κ = 100 → 691, κ = 10⁴ → 69 078 adım); mini-batch gradyan varyansının Var(gᵢ)/B ile ölçeklenmesi.
+- **Yeni şekiller:** Anscombe dörlüsü (değerlendirme bölümüne) ve kayıp yüzeyi konturu + GD yolu (özdeğerler λ_max = 22.58, λ_min = 1.42, η = 0.07 betikle hesaplandı). linregfit ısı haritasına özvektör yön çizgileri eklendi (ekran-uzayında doğru ölçekleme).
+- **Karesel gerçek model düzeltmesi:** "saf 0.8x² − 1" hipotezi ölçümle çürütüldü (doğrusal fit'te R² ≈ 0.03); gerçek model y = 3x + 0.8x² − 1 + ε olarak güncellendi (doğrusal fit'te R² ≈ 0.91 ve U deseni). U imzasının merkezlenmiş x²'ye uydurulması gerektiği (ham x² katsayıyı düşük gösterir) anlatıma işlendi.
+- **İki yeni deney:** l3 dragfit (noktaları sürükle: kapalı form veriye tepki verir, doğru (x̄, ȳ)'den geçmeye zorlanır; selfTest'li custom lab) ve l4 linresid (artık tanılama: doğrusal/karesel/huni senaryoları, (x²−x̄²) imzası, R²'yi izleme).
+- **Ek alıştırma E1 (x1):** polinom öznitelik genişletmeyi kodlama — Vandermonde φ(x, deg), lstsq ile fit_poly, rmse, artık ve merkezlenmiş x² imzası; U desenli veride imza ≈ −0.87 → ~0, RMSE 1.13 → 0.30, R² (doğrusal) ≈ 0.91 ama biçim yanlış.
+- **Sorular ve pratikler:** +2 quiz (η = 2/λ_max sınırı; (n,1) − (n,) broadcasting tuzağı), +2 pratik (p8 özdeğerlerden η* = 2/(λ_max+λ_min), p9 "R² 0.9 ama U deseni" yorumlaması), +1 what-if (η tam 2/λ_max), b–e aşamalarına ipuçları; kaynaklara Anscombe (1973) eklendi.
+- **Araç zinciri:** notebook üreticisi kaynak metinleri satır sonu bağımsız okuyor (Windows checkout'unda CRLF kaynaklar notebook'lara \r\n gömüyordu; --check Linux'ta bunu yanlış bayatlık sayardı). M1.1 notebook'u yenilendi (E1 dahil) ve uçtan uca geçti.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 10
 
 Faz 10'un (paralel programlama ve GPU) 7 modülünün hepsine tam konu anlatımı yazıldı. Kaynak, BİL 455/533 Parallel Processing dersinin dokuz slayt destesi (lect_01–lect_09) ve dört alıştırma föyüdür (Ex. 1–4). Her deste sayfa sayfa işlendi. Slayt metni kopyalanmadı. Konular yeniden anlatıldı, türetimler eklendi ve slaytlardaki hatalar "Kaynak düzeltmesi" kutularında gerekçeleriyle düzeltildi. C++ thread ve CUDA kodları tarayıcıda çalışmadığı için deneyler, ölçüm ya da simülasyonla kurulmuş maliyet modelleridir. Her deneyin sınırları kendi kutusunda yazılıdır.

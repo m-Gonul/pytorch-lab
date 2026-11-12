@@ -55,6 +55,16 @@ export default {
     const nx = 50, ny = 50, z = [];
     for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) z.push(mse(x, y, wl[0] + ((i + 0.5) * (wl[1] - wl[0])) / nx, bl[0] + ((j + 0.5) * (bl[1] - bl[0])) / ny));
     const inWin = (a, lo, hi) => Math.max(lo - (hi - lo), Math.min(hi + (hi - lo), a));
+    // Hessian özvektör yönleri: kayıp yüzeyinin eksenleri — uzun vadi (λ_min) ve dik duvar (λ_max).
+    // Yön ekran uzayında doğru kalmalı: her ekseni piksel ölçeğiyle birleştir.
+    const a2 = (2 / n) * x.reduce((s, v) => s + v * v, 0), c2 = (2 / n) * x.reduce((s, v) => s + v, 0);
+    const [ev1, ev2] = [lmax, lmin].map((l) => { const v = [c2, l - a2], m = Math.hypot(...v) || 1; return [v[0] / m, v[1] / m]; });
+    const PLW = 380, PLH = 370, SPAN = 430; // grafik iç boyutu ve çizgi uzunluğu (piksel)
+    const leg = (e) => {
+      const dw = e[0] * SPAN * (wl[1] - wl[0]) / PLW, db = e[1] * SPAN * (bl[1] - bl[0]) / PLH;
+      return [{ w: opt.w - dw, b: opt.b - db }, { w: opt.w + dw, b: opt.b + db }];
+    };
+    const u1 = leg(ev1), u2 = leg(ev2);
     return {
       plots: [
         { title: "Veri ve doğrular (orijinal x ekseni)", xlabel: "x", ylabel: "y", series: [
@@ -65,7 +75,11 @@ export default {
         ] },
         { title: `Kayıp yüzeyi ${q.std === 1 ? "(w′, b′) — standartlaştırılmış" : "(w, b)"} ve GD yolu`, xlabel: q.std === 1 ? "w′" : "w", ylabel: q.std === 1 ? "b′" : "b", size: { w: 380, h: 370 }, xlim: wl, ylim: bl,
           field: { x0: wl[0], x1: wl[1], y0: bl[0], y1: bl[1], nx, ny, z, log: true },
-          series: [{ name: "GD yolu", x: pw.map((v) => inWin(v, ...wl)), y: pb.map((v) => inWin(v, ...bl)), c: 2, dots: pw.length < 60 }, { name: "optimum", x: [opt.w], y: [opt.b], kind: "scatter", c: 1, r: 5 }] },
+          series: [
+            { name: "λ_min yönü (uzun vadi)", x: [u1[0].w, u1[1].w], y: [u1[0].b, u1[1].b], c: 4, dash: true },
+            { name: "λ_max yönü (dik duvar)", x: [u2[0].w, u2[1].w], y: [u2[0].b, u2[1].b], c: 4, dash: true },            { name: "GD yolu", x: pw.map((v) => inWin(v, ...wl)), y: pb.map((v) => inWin(v, ...bl)), c: 2, dots: pw.length < 60 },
+            { name: "optimum", x: [opt.w], y: [opt.b], kind: "scatter", c: 1, r: 5 },
+          ] },
         { title: "Kayıp − en küçük kayıp (log)", xlabel: "adım", ylabel: "L − L*", ylog: true, series: [{ name: "GD", x: range(loss.length), y: loss.map((v) => Math.max(v - Lopt, 1e-16)), c: 2 }] },
       ],
       stats: [
@@ -76,7 +90,7 @@ export default {
         { label: "Koşul sayısı κ = λ_max/λ_min", value: kappa },
         { label: "Kararlılık sınırı η < 2/λ_max", value: 2 / lmax },
       ],
-      note: `${diverged ? `<b>Iraksama:</b> η = ${fmt(q.lr)} > 2/λ_max = ${fmt(2 / lmax)}. ` : ""}MSE'nin Hessian'ı sabittir: H = (2/n)·X̃ᵀX̃. GD, en dik yönde (λ_max) kararlı kalacak kadar küçük adım atmak zorundadır; en yatık yönde (λ_min) ise her adımda yalnız ~η·λ_min oranında ilerler. Koşul sayısı κ büyükse vadi uzun ve dardır, GD zikzak yapar ya da sürünür. ${q.std === 1 ? "Standartlaştırmada x̄ = 0 ve s = 1 olduğu için H = 2I: κ = 1, tüm yönler eşit hızda yakınsar." : `Merkez c = ${fmt(q.c)}: w ve b aynı işi yapmaya çalışıyor (x hep pozitif), bu yüzden κ ≈ ${fmt(kappa, 3)}. 'Standartlaştırılmış x'i seç.`}`,
+      note: `${diverged ? `<b>Iraksama:</b> η = ${fmt(q.lr)} > 2/λ_max = ${fmt(2 / lmax)}. ` : ""}MSE'nin Hessian'ı sabittir: H = (2/n)·X̃ᵀX̃. GD, en dik yönde (λ_max) kararlı kalacak kadar küçük adım atmak zorundadır; en yatık yönde (λ_min) ise her adımda yalnız ~η·λ_min oranında ilerler. Isı haritasındaki kesikli çizgiler Hessian'ın özvektör yönleridir — kayıp yüzeyi tam olarak bu eksenlere hizalı elipslerdir. Koşul sayısı κ büyükse vadi uzun ve dardır, GD zikzak yapar ya da sürünür. ${q.std === 1 ? "Standartlaştırmada x̄ = 0 ve s = 1 olduğu için H = 2I: κ = 1, tüm yönler eşit hızda yakınsar." : `Merkez c = ${fmt(q.c)}: w ve b aynı işi yapmaya çalışıyor (x hep pozitif), bu yüzden κ ≈ ${fmt(kappa, 3)}. 'Standartlaştırılmış x'i seç.`}`,
     };
   },
 };

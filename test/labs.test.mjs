@@ -4,17 +4,20 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import YAML from "yaml";
 
 const root = join(import.meta.dirname, "..");
 const labDir = join(root, "site/js/labs");
-const { rng, plot } = await import(join(labDir, "plot.js"));
-const { evaluate, defaults } = await import(join(labDir, "runtime.js"));
+// Windows'ta mutlak yol import'u "d:" URL şeması hatası verir; file:// URL'e çevir.
+const labImport = (f) => import(pathToFileURL(join(labDir, f)).href);
+const { rng, plot } = await labImport("plot.js");
+const { evaluate, defaults } = await labImport("runtime.js");
 // görüntü çizimi için en küçük DOM taklidi
 globalThis.document = { createElement: () => ({ getContext: () => ({ createImageData: (w, h) => ({ data: new Uint8ClampedArray(w * h * 4) }), putImageData() {} }), toDataURL: () => "data:image/png;base64," }) };
 
 const specs = {};
-for (const f of readdirSync(labDir)) if (!["plot.js", "runtime.js"].includes(f)) specs[f.replace(/\.js$/, "")] = (await import(join(labDir, f))).default;
+for (const f of readdirSync(labDir)) if (!["plot.js", "runtime.js"].includes(f)) specs[f.replace(/\.js$/, "")] = (await labImport(f)).default;
 
 const finiteDeep = (o, path = "") => {
   if (typeof o === "number") { assert.ok(!Number.isNaN(o), `NaN: ${path}`); return; }

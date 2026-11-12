@@ -7,7 +7,9 @@ import { join } from "node:path";
 import YAML from "yaml";
 
 const root = join(import.meta.dirname, "..");
-const read = (p) => readFileSync(p, "utf8");
+// Satır sonlarını normalize et: kaynaklar Windows checkout'ta CRLF olabilir;
+// notebook'lara gömülen metin her platformda aynı olmalı (LF), yoksa --check Linux'ta patlar.
+const read = (p) => readFileSync(p, "utf8").replace(/\r\n/g, "\n");
 const site = YAML.parse(read(join(root, "content/site.yaml")));
 const labcheck = read(join(root, "site/py/labcheck.py"));
 const STAGE_NAMES = { a: "Elle", b: "Döngü (saf Python)", c: "NumPy / pandas", d: "PyTorch", e: "Vektörize + hız" };
