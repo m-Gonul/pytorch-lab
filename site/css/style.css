@@ -766,6 +766,7 @@ button.cv-c { cursor: pointer; }
 .df-lb { fill: var(--c-q); font-size: 12px; font-weight: 700; }
 .df-read { margin-top: 6px; }
 .df-read .lab-tbl td:first-child { color: var(--ink-2); }
+.gd-next { stroke: var(--c-p); stroke-width: 2; stroke-dasharray: 5 3; }
 
 /* sayfa tablolarında (değişiklik günlüğü vb.) dar ekranda yatay kaydırma */
 .prose table { display: block; max-width: 100%; overflow-x: auto; }
