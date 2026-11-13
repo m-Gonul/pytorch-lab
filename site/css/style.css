@@ -624,6 +624,12 @@ svg.dd { width: 100%; height: auto; background: var(--paper); border: 1px solid 
 .dd-h:focus { outline: none; stroke: var(--ink); stroke-width: 3; }
 .dd-pos { fill: var(--c-b); fill-opacity: 0.1; } .dd-hyp { stroke: var(--c-b); stroke-dasharray: 6 4; stroke-width: 2; }
 .dd-unit { fill: none; stroke: var(--ink-3); stroke-dasharray: 3 3; }
+/* shrinklab (M1.3): sürüklenebilir z, küçültme eğrileri */
+.sl-zero { fill: var(--c-a); fill-opacity: 0.1; }
+.sl-zh { stroke: var(--ink-2); stroke-dasharray: 4 3; }
+.sl-h { fill: var(--c-p); cursor: grab; stroke: var(--paper); stroke-width: 2; }
+.sl-h:focus { outline: none; stroke: var(--ink); stroke-width: 3; }
+.sl-read { font-size: 0.92rem; margin-top: 6px; }
 figure.fig { max-width: 440px; }
 .lesson-body h3 { font-size: 1.28rem; }
 .lesson-body h4 { font-size: 1.05rem; }

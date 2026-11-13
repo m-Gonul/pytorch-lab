@@ -1,5 +1,16 @@
 # Değişiklik günlüğü
 
+## 2026-11 · M1.3 derinleştirme: elastic net ve erken durdurma türetimleri, üç yeni deney, CV ile λ seçimi
+
+M1.3 (regularization) ekleme odaklı genişletildi; hiçbir mevcut içerik kaldırılmadı.
+
+- **Teorik eklentiler (lesson.md):** elastic net'in tek koordinat türetimi ($w^\star=S(z,\lambda_1)/(1+\lambda_2)$, $\lambda_1=\alpha\lambda$, $\lambda_2=(1-\alpha)\lambda$: önce L1 eşiği, sonra L2'nin paydaya girdiği oransal büzülme); erken durdurma–ridge eşdeğerliği türetimi (ηη sabit adımda k adımdan sonra etkin ceza $\lambda\approx 1/(k\eta)$); standartlaştırmanın önemine 10⁴ oranlı sayısal örnek (aynı katsayı, birimsiz öznitelikte ceza birimli olandan 10⁴ kat küçük).
+- **Mevcut deneyin genişletmesi:** l1l2geom'a (L1/L2 topu) p = 2 elastic net seçeneği eklendi: ISTA ile çözüm, bisection ile λ(t) (yarıçapın kesin karşılanması) ve $\alpha\|w\|_1+(1-\alpha)\|w\|^2/2=t$ top şekli; α kaydırıcısıyla köşelerden yuvarlağa geçiş canlı izlenir.
+- **Üç yeni deney:** l4 shrinklab (tek koordinatta lasso $S(z,\lambda)$, ridge $z/(1+\lambda)$ ve elastic net eğrileri; sürüklenebilir z, gölgeli sıfırlama bölgesi; selfTest'li custom lab), l5 svdlab (ridge'in SVD bakışı: yön-yön çarpanlar $s_j^2/(s_j^2+n\lambda)$, df(λ) etkili serbestlik ve koşul sayısı iyileşmesi tablosu), l6 cvlab (k-fold CV ile λ seçimi ve 1-SE kuralı; merkezleme her fold'un yalnız eğitim kısmından — sızıntı yok; ridge yolu, fold'un merkezlenmiş Gram matrisinin özdeğer ayrışımıyla $w(\lambda)=V\,\text{diag}(1/(\mu+\lambda))\,V^\top c$ biçiminde tüm λ'lar için birden hesaplanır).
+- **Ek alıştırma E1 (x1):** elastic net'i koordinat inişiyle kodlama — λ_max ≈ 2.27'ye inen path, ilişkili grup için gruplama etkisi (özdeş katsayılar, fark < 10⁻⁶), ilişkisiz grupta lasso'nun split davranışı; çözüm check'ten geçer, boş iskelet geçmez.
+- **Sorular:** +2 quiz (5'e; k-fold CV'de standartlaştırma sızıntısı, elastic net tek koordinat çözümü), +2 pratik (p7 elastic net tek koordinat hesabı, p8 1-SE kuralı ile λ seçimi), +1 what-if (η'yi yarılayıp k'yi ikiye katlamanın erken durdurma cezasına etkisi), +1 yanlılık (CV'de tüm veride standartlaştırmak).
+- **Sayısal doğrulama:** üç yeni deneyin aritmetiği referans script'lerle doğrulandı (cvlab: Gram hilesi doğrudan çözümle her λ'da < 10⁻⁹ çakışıyor; shrinklab: selfTest; svdlab: df ve çarpanlar kapalı formla); 705 deney testinin tümü geçti, modül testi temiz, M1.3 notebook'u yenilendi ve uçtan uca geçti.
+
 ## 2026-11 · M1.2 derinleştirme: kararlılık bölgesi türetimi, üç yeni deney, görsel genişletmeler
 
 M1.2 (gradient descent varyantları) ekleme odaklı genişletildi; hiçbir mevcut içerik kaldırılmadı.

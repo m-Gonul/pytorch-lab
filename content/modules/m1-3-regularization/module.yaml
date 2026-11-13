@@ -78,6 +78,16 @@ quiz:
       - {t: "$\\frac{wd}{2}\\lVert w\\rVert^2$; çünkü gradyana $wd\\cdot w$ ekler", ok: true, why: "$\\nabla\\frac{wd}{2}\\lVert w\\rVert^2=wd\\cdot w$. Kayıpta $\\lambda\\lVert w\\rVert^2$ kullanıyorsan $wd=2\\lambda$. Adam'da ise eşdeğerlik bozulur; AdamW bunu düzeltir (M3.4)."}
       - {t: "$wd\\cdot\\lVert w\\rVert^2$", why: "Gradyanı $2wd\\cdot w$ olurdu; PyTorch yalnız $wd\\cdot w$ ekler."}
       - {t: "$wd\\cdot\\lVert w\\rVert_1$", why: "L1 cezası için ayrı bir parametre yok; elle eklenir."}
+  - q: "k-fold CV'de standartlaştırma (ortalama/std) nerede yapılmalı?"
+    options:
+      - {t: "Her fold'un yalnız eğitim kısmıyla; doğrulama kısmına o fold'un istatistikleriyle uygulanır", ok: true, why: "Tüm veride standartlaştırıp bölmek, doğrulama bilgisini eğitime sızdırır ve CV hatasını iyimser gösterir (veri sızıntısı)."}
+      - {t: "Tüm veride bir kez, bölmeden önce", why: "En yaygın hata bu: doğrulama fold'unun ortalaması/std'si eğitime sızar."}
+      - {t: "Fark etmez; CV hatası ölçeklemeden bağımsız", why: "Etkilenir: sızıntı küçük görünür ama sistematik iyimserlik yaratır."}
+  - q: "Elastic net'in tek koordinat çözümü (ölçekli öznitelikte) nedir?"
+    options:
+      - {t: "S(z, λ₁)/(1+λ₂): önce λ₁ eşiği, sonra λ₂'nin paydaya girdiği oransal büzülme", ok: true, why: "Türev w − z + λ₁·sign(w) + λ₂w = 0'dan gelir; λ₁ seyreklik, λ₂ kararlılık ve gruplama etkisi sağlar."}
+      - {t: "S(z, λ₁ + λ₂): iki ceza tek eşikte toplanır", why: "λ₂ eşiklemez, paydaya girer; L2 cezasının türevi 2λ₂w sıfırlanmaz."}
+      - {t: "S(z, λ₁)·(1+λ₂): büzülme çarpılarak güçlenir", why: "Ters yön: λ₂ w'yi daha çok küçültmez, w = S/(1+λ₂) ile böler."}
 
 homework:
   - title: "Tibshirani (1996): Lasso"
@@ -164,6 +174,78 @@ labs:
       - q: "Yüksek boyutta seyreklik neden daha olası?"
         a: "L1 topunun köşeleri ve düşük boyutlu yüzleri (bazı koordinatların sıfır olduğu kısımlar), yüzeyin büyük bölümünün 'yakalama alanını' oluşturur; rastgele bir elips büyük olasılıkla böyle bir yüze değer."
     limits: "İki boyut; kayıp kesin kuadratik. Çözüm izdüşümlü gradyan inişiyle (4000 adıma kadar) bulunur; sınırda sayısal hata ~10⁻⁹."
+
+  - id: l4
+    lab: shrinklab
+    title: "Tek koordinatta küçültme: lasso, ridge ve elastic net"
+    goal: |
+      Cezasız çözüm z'yi sürükle, λ ve α ile cezayı ayarla. Üç eğri: lasso $S(z,\lambda)$ — sabit $\lambda$ kaydırma, küçük değerleri **tam sıfıra** çarpar; ridge $z/(1+\lambda)$ — oransal küçültme, sıfırlamaz; elastic net $S(z,\alpha\lambda)/(1+(1-\alpha)\lambda)$ — ikisinin çarpımı. Gölgeli bölge $\lvert z\rvert\le\lambda_1$: elastic net'in tam sıfır dediği alan.
+    predict:
+      q: "z = 0.5, λ = 1, α = 0.5 iken elastic net çıktısı kaçtır?"
+      options:
+        - {t: "0 — λ₁ = αλ = 0.5, |z| ≤ λ₁: soft-threshold tam sıfır verir", ok: true, why: "Eşik tam |z|'ye denk gelince w* = 0. Sınırda alt-gradyan koşulu sağlanır (ders metnindeki türetim)."}
+        - {t: "1/3 — ridge küçültmesi z/(1+λ)", why: "Bu α = 0 (saf ridge) davranışı; λ₁ sıfır olmadığı sürece eşik devrede."}
+        - {t: "0.25 — lasso küçültmesi S(z, λ)", why: "S(0.5, 1) zaten 0; üstelik elastic net paydaya (1+λ₂) da koyar."}
+    presets:
+      - {name: "Saf lasso (α = 1)", params: {lam: 1, alpha: 1, z: 0.7}, note: "S(0.7, 1) = 0: z λ'nın altında, katsayı tam sıfır. Ridge eğrisi z/(1+λ) ile küçülür ama sıfıra inmez."}
+      - {name: "Saf ridge (α = 0)", params: {lam: 1, alpha: 0, z: 0.7}, note: "λ₁ = 0: lasso eğrisi kimliğe (S(z,0) = z) döner; ridge 0.7'yi 0.35'e indirir — yarıya böldü, sıfırlamadı."}
+      - {name: "Elastic net (α = 0.5)", params: {lam: 1, alpha: 0.5, z: 0.7}, note: "w = S(0.7, 0.5)/1.5 = 0.2/1.5 ≈ 0.13: hem eşiğin hem oransal büzülmenin izi."}
+      - {name: "Eşik üstü", params: {lam: 1, alpha: 0.5, z: 2.5}, note: "|z| = 2.5 > λ₁ = 0.5: katsayı hayatta kalır ama S ile λ₁ kayar, sonra (1+λ₂) ile oransal küçülür: 2/1.5 ≈ 1.33."}
+      - {name: "λ büyüt", params: {lam: 2.5, alpha: 0.5, z: 0.7}, note: "λ₁ = 1.25, λ₂ = 1.25: sıfırlama bölgesi genişledi ve büzülme sertleşti — daha basit modeller."}
+    questions:
+      - q: "λ büyüdükçe lasso eğrisinin kırılma noktası (köşesi) nereye gider?"
+        a: "Kırılma |z| = λ'dadır: λ büyüdükçe köşe sıfırdan uzaklaşır, daha geniş bir z aralığı tam sıfıra gider. Elastic net'te bu eşik λ₁ = αλ'dır."
+      - q: "α'yı 1'e çekersen hangi eğri hangisiyle çakışır?"
+        a: "λ₁ = λ, λ₂ = 0: elastic net eğrisi lasso eğrisiyle çakışır; ridge eğrisi z/(1+λ)'dan kimliğe, yani cezasız çözüme gider. α = 0'da tersi."
+    limits: "Tek koordinat, (1/n)‖x‖² = 1 ölçeklemesi (öznitelikler standartlaştırılmış varsayımı); ders metnindeki tek koordinat türetimiyle birebir aynı formüller. z aralığı −4..4."
+
+  - id: l5
+    lab: svdlab
+    title: "Ridge'in SVD bakışı: hangi yönler küçülür?"
+    goal: |
+      Ridge her tekil yönü kendi çarpanıyla küçültür: $s_j^2/(s_j^2+n\lambda)$. Sol grafik çubukları yön başına çarpanı, sağ grafik df(λ) = Σ çarpanlar — etkili serbestlik derecesini gösterir. Büyük tekil değerli (bilgi yüklü) yönler korunur; küçük olanlar (gürültü baskın) bastırılır. Koşul sayısının iyileşmesini de ölçüm tablosunda oku.
+    predict:
+      q: "s₁ = 5, s₆ = 0.3, n = 40, λ = 0.5 iken hangisi doğrudur?"
+      options:
+        - {t: "Büyük yön çoğunlukla korunur (çarpan ≈ 0.56), küçük yön fiilen sıfırlanır (≈ 0.004)", ok: true, why: "Çarpan s²/(s²+nλ): 25/(25+20) ≈ 0.56, 0.09/(0.09+20) ≈ 0.004. Ridge bilgi azlığına göre bastırır."}
+        - {t: "Tüm yönler aynı oranda küçülür", why: "Sabit çarpan yalnız tüm tekil değerler eşitse olur; çarpan s_j'ye bağlıdır."}
+        - {t: "Küçük yönler korunur, büyükler küçülür", why: "Tersi: verinin az değiştiği yönler gürültüye açıktır; ridge tam onları bastırır."}
+    presets:
+      - {name: "İyi koşullu", params: {sb: 5, ss: 2, n: 40, lam: 0.5}, note: "κ = 6.25: tüm çarpanlar 0.5'in üstünde, ridge hafif dokunuyor, df yüksek."}
+      - {name: "Kötü koşullu", params: {sb: 5, ss: 0.1, n: 40, lam: 0.5}, note: "κ = 2500: küçük yönler bastırılır; koşul sayısı 2500'den çok daha küçük bir değere iner — çözüm kararlılaşır."}
+      - {name: "λ küçük", params: {sb: 5, ss: 0.3, n: 40, lam: 0.01}, note: "nλ = 0.4: çarpanlar 1'e yakın, df ≈ 6 = d. Ceza fiilen yok."}
+      - {name: "λ büyük", params: {sb: 5, ss: 0.3, n: 40, lam: 50}, note: "nλ = 2000: herkes bastırılır, df → 0; model ortalamayı tahmin eden sabite yaklaşır."}
+      - {name: "Çok veri", params: {sb: 5, ss: 0.3, n: 200, lam: 0.5}, note: "nλ = 100 büyüdü: aynı λ çok daha sert vurur — ceza veriyle ölçeklenir, λ'yı n'ye göre seçmek gerekir."}
+    questions:
+      - q: "df(λ) neden model karmaşıklığının daha iyi ölçüsü?"
+        a: "Ridge d parametre bildirir ama hiçbirini tam serbest bırakmaz: etkin serbestlik df(λ) = Σ s²/(s²+nλ). Cp/AIC türü ölçütler cezayı df ile verir; λ büyüdükçe model 'd parametreli' değil, df(λ) parametreli davranır."
+      - q: "n büyüyünce aynı λ'nın etkisi neden artar?"
+        a: "Çarpan s²/(s²+nλ)'da λ n ile ölçeklenir. Veri büyürken λ'yı sabit tutmak cezayı sertleştirir; pratikte λ n ile (ya da standartlaştırılmış ölçekte) taranır."
+    limits: "6 tekil yön, geometrik alçalan spektrum (sb → ss arası). Gerçek problemlerde spektrum verinin şekline bağlıdır; burada yön kavramını net göstermek için basit spektrum kullanılıyor."
+
+  - id: l6
+    lab: cvlab
+    title: "k-fold çapraz doğrulama ile λ seçimi; 1-SE kuralı"
+    goal: |
+      Veri k fold'a bölünür; her fold içinde merkezleme **yalnız eğitim kısmından** öğrenilir (sızıntı yok). Her λ için ridge yolu, o fold'un eğitim kısmından tek özdeğer ayrışımıyla tüm λ'lar için birden hesaplanır. Sol grafik ortalama CV hatası ± 1 std bandı; işaretler min kuralı ile 1-SE kuralının λ'ları. Sağ grafik fold'ların ayrı ayrı eğrileri — saçılmışlık, λ seçiminin belirsizliğidir.
+    predict:
+      q: "1-SE kuralı neden en iyi λ yerine daha büyük bir λ seçebilir?"
+      options:
+        - {t: "En iyinin bir standart hatası içinde kalan en büyük λ'yı (en basit modeli) seçer: benzer hata, daha az karmaşıklık", ok: true, why: "Eşik = min MSE + SE(min). Eşiğin altında kalan λ'ların en büyüğü seçilir; hata istatistiksel olarak aynı, model daha basit ve daha kararlı."}
+        - {t: "Hata çok yüksek olduğu için", why: "Seçilen λ'nın hatası en iyiyle istatistiksel olarak ayrışmaz; fark basitlikte."}
+        - {t: "Fold sayısı az olduğu için", why: "k daha çok fold = daha kararlı ölçüm; 1-SE kuralının mantığı fold sayısına bağlı değildir."}
+    presets:
+      - {name: "Temel", params: {k: 5, n: 60, d: 6, ktrue: 2, rho: 0.3, noise: 1}, note: "min ve 1-SE yakında: seçim kararlı, U eğrisi belirgin."}
+      - {name: "Az veri", params: {k: 5, n: 30, d: 6, ktrue: 2, rho: 0.3, noise: 1}, note: "Fold eğrileri saçılıyor; 1-SE basitliği daha belirgin tercih eder."}
+      - {name: "Gürültülü", params: {k: 5, n: 60, d: 6, ktrue: 2, rho: 0.3, noise: 2}, note: "σ² = 4 tabanı: en iyi CV hatası ona yaklaşır ama asla altına inemez."}
+      - {name: "İlişkili öznitelikler", params: {k: 5, n: 60, d: 6, ktrue: 2, rho: 0.9, noise: 1}, note: "ρ = 0.9: küçük özdeğerli yönler çok — ridge'in faydası geniş λ bölgesinde görünür."}
+      - {name: "10 fold", params: {k: 10, n: 60, d: 6, ktrue: 2, rho: 0.3, noise: 1}, note: "Daha çok fold: ortalama daha kararlı; ama her turda eğitim kümesi küçüldüğü için hata biraz yukarı kayabilir."}
+    questions:
+      - q: "Standartlaştırmayı tüm veride yapıp sonra fold'lara bölsaydık ne olurdu?"
+        a: "Doğrulama fold'unun ortalama/std'si eğitime sızardı: CV hatası iyimser çıkar. Merkezleme ve ölçekleme her fold'un yalnız eğitim kısmıyla yapılır — bu deney de öyle yapıyor."
+      - q: "k = n (leave-one-out) seçmek ne değiştirir?"
+        a: "Her fold'da n−1 örnek eğitim: eğitimler birbirine çok benzer, CV tahmini az yanlı ama fold'lar bağımsız değil. Doğrusal modelde ridge yolu ucuz olduğundan hesap maliyeti kabul edilebilir; küçük k ise daha bağımsız fold'lar verir."
+    limits: "Ridge yolu, her fold'un merkezlenmiş Gram matrisinin özdeğer ayrışımından (Jacobi) tüm λ'lar için birden hesaplanır — e aşamasındaki SVD formülünün Gram hilesi hâli. λ ızgarası 33 nokta (10⁻³…10), büyükten küçüğe. Sentetik veri ortak faktörlü Gauss, ön karıştırma yok: fold i, idx[i::k]."
 practice:
   - id: p1
     type: çözülmüş
@@ -264,6 +346,42 @@ practice:
       - "Her iki tarafı $-2\\sigma^2$ ile çarp."
     solution: |-
       $-\log p(w|y)=\frac1{2\sigma^2}\|Xw-y\|^2+\frac1{2\tau^2}\|w\|^2+c$. $2\sigma^2$ ile çarp: $\|Xw-y\|^2+\frac{\sigma^2}{\tau^2}\|w\|^2$ → ridge, $\lambda=\sigma^2/\tau^2$. Gürültü büyük ya da önsel dar → ceza büyük. Laplace önseli $p(w)\propto e^{-|w|/b}$ log'da $|w|/b$ verir → lasso, $\lambda=2\sigma^2/b$. **Fark:** MAP tek bir nokta verir; tam Bayes çözümü belirsizliği de taşır (posterior Gauss, ortalaması ridge çözümü).
+  - id: p7
+    type: hesap
+    level: 1
+    title: Elastic net'in tek koordinat çözümü
+    goal: Payda ve eşiğin sırasını doğru kurmak
+    needs: P3
+    q: |-
+      Standartlaştırılmış tek öznitelik: $\frac1n\lVert x\rVert^2=2$, $z=\frac1nx^\top y=1.2$. Elastic net $\lambda_1=1$, $\lambda_2=0.5$ iken katsayı $w$ kaç?
+    answer: 0.08
+    calc: "(1.2-1)/2.5"
+    mistakes:
+      - {answer: 0.1, msg: "Payda (1/n)‖x‖² = 2 yalnız; λ₂ paydaya eklenmeli: 2 + 0.5 = 2.5."}
+      - {answer: 0.2, msg: "Paydayı tamamen unuttun: bu S(z, λ₁) sonucunun kendisi."}
+      - {answer: 0.13333333333333333, msg: "Payda (1+λ₂) alındı; λ₂ ½‖w‖² cezasının paydasıdır: (1/n)‖x‖² + λ₂ = 2.5."}
+    hints:
+      - "Önce soft-threshold, sonra payda: S(z, λ₁)/((1/n)‖x‖² + λ₂)."
+    solution: |-
+      $S(1.2,\,1)=0.2$; payda $\frac1n\lVert x\rVert^2+\lambda_2=2+0.5=2.5$; $w=0.2/2.5=0.08$. Sıra önemli: önce eşik (L1), sonra oransal büzülme (L2'nin paydaya girişi). λ₂ = 0 olsaydı saf lasso formülüyle $w=0.2/2=0.1$ olurdu.
+  - id: p8
+    type: hesap
+    level: 2
+    title: 1-SE kuralı ile λ seçimi
+    goal: CV çıktısından kuralı doğru uygulamak
+    needs: P6, çapraz doğrulama
+    q: |-
+      5-fold CV üç λ'da şu ortalamaları (std) verdi: λ = 0.3 → 2.00 (0.50), λ = 0.1 → 1.90 (0.30), λ = 0.03 → 1.85 (0.20). 1-SE kuralı hangi λ'yı seçer?
+    answer: 0.1
+    calc: "0.1"
+    mistakes:
+      - {answer: 0.03, msg: "En düşük ortalamayı seçtin: bu min kuralı. 1-SE eşiği 1.85 + 0.20/√5 ≈ 1.94; 0.1 bu eşiğin içindeki en büyük λ."}
+      - {answer: 0.3, msg: "0.3'ün ortalaması 2.00, eşik ≈ 1.94'ün üstünde: bütçe dışı. Std'si de yüksek."}
+      - {answer: 1.85, msg: "1.85 bir λ değil, en iyi MSE'nin kendisi; kural λ'lar arasında seçim yapar."}
+    hints:
+      - "Eşik = min ort + std(min)/√k. Sonra eşiğin altında kalan λ'ların en büyüğü."
+    solution: |-
+      SE(min) = 0.20/√5 ≈ 0.089; eşik 1.85 + 0.089 ≈ 1.94. Eşiğin altında kalanlar: λ = 0.03 (1.85) ve λ = 0.1 (1.90). Aralarından **en büyük** λ seçilir: λ = 0.1. Hata istatistiksel olarak en iyiden ayrışmaz ama model daha basit, λ'ya karşı daha az hassastır.
 pitfalls:
   - wrong: "Kesişim terimini (bias) de cezalandır."
     right: "Kesişimi cezalandırma; aksi hâlde model y'nin ortalamasını kaydırmak için cezalandırılır ve sonuç y'nin ölçeğine/öteleme seçimine bağlı olur."
@@ -271,8 +389,15 @@ pitfalls:
     right: "Ceza katsayılara eşit davranır; birimi küçük (değerleri büyük) özniteliğin katsayısı küçük olacağı için az cezalanır. Önce standartlaştır."
   - wrong: "λ'yı test kümesinde en iyi sonucu verene göre seç."
     right: "λ bir hiperparametredir: doğrulama kümesi ya da çapraz doğrulamayla seçilir; test kümesi yalnız son raporlama içindir (M3.9 sızıntı)."
+  - wrong: "k-fold CV'de standartlaştırmayı tüm veriye uygulayıp sonra fold'lara bölmek sorun değil."
+    right: "Doğrulama fold'unun ortalama/std'si eğitime sızar; CV hatası iyimser çıkar. Merkezleme ve ölçekleme her fold'un yalnız eğitim kısmıyla yapılır (l6 deneyi bunu birebir uygular)."
 whatif:
   - q: "n ≫ d (çok veri, az öznitelik) olsaydı ridge'e ihtiyaç kalır mı?"
     a: "Varyans terimi ≈ dσ²/n zaten küçüktür; en iyi λ 0'a yaklaşır. Ama öznitelikler çok ilişkiliyse (küçük tekil değerler) ridge yine kararlılık kazandırır."
   - q: "Ceza ‖w‖₂ (karesiz) olsaydı?"
     a: "Hâlâ dışbükey ama sıfırda türevlenemez; grup lasso'nun bir grubuna karşılık gelir: tüm vektörü birden sıfıra çekebilir (grup düzeyinde seyreklik)."
+  - q: "Erken durdurmayı λ yerine süreyle ayarlayıp öğrenme oranını yarıya indirse idik ne değişirdi?"
+    a: "Eşdeğer λ ≈ 1/(kη)'de η yarıya, k iki katına çıkarsa çarpım değişmez: aynı ≈ λ, yalnız süre iki kat. Erken durdurmanın cezası süre × öğrenme oranı çarpımıyla belirlenir — bu yüzden küçük η ile uzun eğitim, büyük η ile erken durdurmaya tercih edilir; aynı cezayı daha kısa sürede alırsın."
+
+extras:
+  - {id: x1, title: "Elastic net: koordinat inişi ve gruplama etkisi", engine: browser}
