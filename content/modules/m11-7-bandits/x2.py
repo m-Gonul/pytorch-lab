@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def nonstationary(n_runs, n_steps, alpha=None, seed=0):
+def nonstationary(n_runs, n_steps, alpha=None, seed=0, return_reward=False):
     ...
 
 

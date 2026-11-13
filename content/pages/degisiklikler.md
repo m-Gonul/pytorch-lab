@@ -1,5 +1,22 @@
 # Değişiklik günlüğü
 
+## 2026-11-13 · Yeni kaynak: Sutton ve Barto, Bölüm 2 (s. 25–45)
+
+M11.7 mevcut içeriği korunarak genişletildi. Kitabın ilk iki bölümü işlendi; bütün kitap henüz tamamlanmadı. Yeni modül açılmadı.
+
+- **Defter:** Bölüm 2 için 106 birim: 104 eklendi, 1 genişletildi, 1 düzeltildi; vardı / bekliyor / kapsam-dışı 0. İlk iki bölüm toplamı 265 birim. Kaynak s.25–45 ve altı şekil bağımsız ikinci okumayla denetlendi; 18 ayrıntı kaydı, Denklem 2.13 eşlemesi ve Kumar'ın Bayesçi/Bayesçi olmayan ayrımı düzeltildi.
+- **Anlatım:** değerlendirici/öğretici geri bildirim, kaynak gösterimi eşlemesi, örnek ortalaması ve sabit bellek türetimi, üstel ve değişken-adım ağırlıkları, yakınsama koşulları, iyimser başlangıç, UCB deney koşulları, softmax türevi ve gradyan bandit, bağlam ipucu, Bayesçi bilgi durumu ve kaynak tarihindeki bütün atıf–işlev ilişkileri.
+- **Sorular:** 2.1–2.11, bütün değer/koşul ve alt sorularıyla p7–p17. Mevcut 6 kart korundu; toplam 17. 2.5 için x2, ödül eğrisini de döndüren isteğe bağlı arayüzle genişletildi; varsayılan eski dönüş korundu. 2.11 için tam .md/.py/.sol.py/.check.py dörtlüsüyle x4 eklendi. Sayısal 2.1, 2.2, 2.3 ve 2.10; ağırlık kanıtları ve taban düzeltmesi çalıştırılarak doğrulandı.
+- **Altı şekil:** 2.1 için kendi Gauss çekilişimizden hesaplanan SVG; 2.2–2.6 için suttonbandits/l4 içinde ayrı kaynak ön ayarları. Beş grafik senaryosu gerçek örneklerden yeniden hesaplanır, 2000 görev × 1000 adım ve kaynak parametreleri korunur. 11. adımı kaybetmemek için ilk 30 nokta saklanır. Kendi tohumumuz kaynak eğrisinin rastgele gürültüsünü aynen kopyalamaz.
+- **Uzun deneyler:** 2.5, 2000 görev × 10000 adım, tohum 1. Son 1000 adımda örnek ortalaması/sabit α=0.1 için ortalama ödül 1.087398/1.343691, doğru kol oranı %46.46005/%76.21655. 2.11, 8 tekrar × 200000 adım, 32 yöntem/parametre ayarı, tohum 1; ölçüm yalnız 100001–200000 aralığı. Bu koşuda en yüksek ortalama sabit α=0.1, ε=1/128 için 5.787817. Sekiz tekrar bir kaynak sabiti değil açık hesap bütçesidir; sonuç bütün problemler için üstünlük iddiası değildir. Ham ölçümler ve yeniden üretim betiği notes/sutton-2018 altında.
+- **Kaynak düzeltmesi:** s.37–40, güncel ödül dahil örnek ortalaması tabanı ile tam gradyan eşitliğinde (1−1/t) çarpanı eksiktir. Cebir ve bağımsız üç kollu sonlu farkla doğrulandı. Kaynak eğrilerini üreten kod güncel ödül dahil tabanı kullanır; değişen etkin adım açıklanır. Gauss ödüllerine sınırlı ödül Hoeffding kanıtının doğrudan taşınamayacağı kaynak notunda ayrıldı.
+- **Ölçümle düzeltilen taslak:** PDF metni 2.2 içindeki −1 ve −2 işaretlerini atlıyordu; sayfa görüntüsünden geri alındı. Kaynak 2.13 numarası yanlışlıkla performans toplamına eşlenmişti; tam gradyan adımı olarak düzeltildi. Gürültüsüz ödül kontrolünde kayan nokta toplamı 1.0000000000000007 verdi; sınır kontrolüne 10⁻¹² sayısal tolerans eklendi. Yoğunluk görselinin aralığı kuyrukları kesmeyecek biçimde düzenlendi. Kumar'ın kategori ayrımı sıklıkçı diye daraltılmadı.
+- **Mevcut x2 düzeltmesi:** bütün q* değerleri başlangıçta eşitken argmax yalnız ilk kolu optimal sayıyordu. Gerçek değer eşitliğiyle bütün en iyi kollar artık doğru sayılıyor; ilk adımın %100 olması bağımsız kontrolde doğrulanıyor. Bu değişiklik son 1000 adım ölçümlerini değiştirmiyor.
+- **Sözlük:** 16 tanım eklendi; M5.5 ve M11.7 içinde ilk kullanım ipuçları bağlandı.
+- **Doğrulama:** 736/736 Node testi; son eksen düzenlemesinden sonra ilgili 3 lab testi tekrar geçti. M11.7 gerçek CPU PyTorch modül testi ve güncel notebook testi 1/1 temiz. 265 birim hedefi ve bölüm tür sayıları doğrulandı; 1280/390 px görüntüler incelendi, taşma ve tarayıcı hatası yok. İlk notebook kontrolü eski sınır kontrolünü içerdiği için düşmüştü; notebook yeniden üretilip uçtan uca test edildi.
+- **Kalan:** Bölüm 3–17, ön sayfalar, tam kaynakça ve dizin henüz işlenmedi. Kaynağın bütünü için tamlık veya yayın tamamlandı iddiası yok.
+
+
 ## 2026-11-13 · Yeni kaynak: Sutton ve Barto, Bölüm 1 (s. 1–22)
 
 Kitabın aktarımı başladı; bütün kaynak henüz tamamlanmadı. M5.5 mevcut içeriği korunarak genişletildi. Yeni modül açılmadı.

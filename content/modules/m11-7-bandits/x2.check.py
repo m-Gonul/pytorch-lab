@@ -3,6 +3,8 @@ from labcheck import need, ensure
 
 def check(ns, R_):
     def t():
+        first = need(ns, "nonstationary")(16, 1, None, 1)
+        ensure(first[0] == 1, "Başlangıçta bütün gerçek değerler eşit: ilk seçilen her kol optimaldir.")
         a = need(ns, "nonstationary")(1000, 5000, None, 1)
         b = ns["nonstationary"](1000, 5000, 0.1, 1)
         ensure(b[-500:].mean() > a[-500:].mean() + 0.1, "sabit α durağan olmayan durumda daha iyi")

@@ -1,0 +1,112 @@
+[
+  {
+    "mode": 0,
+    "runs": 2000,
+    "steps": 1000,
+    "scale": 1,
+    "seed": 1,
+    "milliseconds": 2552.9343719999997,
+    "stats": [
+      {
+        "label": "Ölçülen aralık",
+        "value": "1–1000"
+      },
+      {
+        "label": "Bu koşudaki en yüksek ortalama",
+        "value": 1.3040971610015144
+      },
+      {
+        "label": "Bu koşudaki yöntem",
+        "value": "ε = 0.1"
+      }
+    ]
+  },
+  {
+    "mode": 1,
+    "runs": 2000,
+    "steps": 1000,
+    "scale": 1,
+    "seed": 1,
+    "milliseconds": 1554.7502799999997,
+    "stats": [
+      {
+        "label": "Ölçülen aralık",
+        "value": "1–1000"
+      },
+      {
+        "label": "Bu koşudaki en yüksek ortalama",
+        "value": 1.2898006867373564
+      },
+      {
+        "label": "Bu koşudaki yöntem",
+        "value": "iyimser Q₀ = 5"
+      }
+    ]
+  },
+  {
+    "mode": 2,
+    "runs": 2000,
+    "steps": 1000,
+    "scale": 1,
+    "seed": 1,
+    "milliseconds": 3099.6561089999996,
+    "stats": [
+      {
+        "label": "Ölçülen aralık",
+        "value": "1–1000"
+      },
+      {
+        "label": "Bu koşudaki en yüksek ortalama",
+        "value": 1.3947413004548195
+      },
+      {
+        "label": "Bu koşudaki yöntem",
+        "value": "UCB c = 2"
+      }
+    ]
+  },
+  {
+    "mode": 3,
+    "runs": 2000,
+    "steps": 1000,
+    "scale": 1,
+    "seed": 1,
+    "milliseconds": 22701.645079,
+    "stats": [
+      {
+        "label": "Ölçülen aralık",
+        "value": "1–1000"
+      },
+      {
+        "label": "Bu koşudaki en yüksek ortalama",
+        "value": 5.394639744096397
+      },
+      {
+        "label": "Bu koşudaki yöntem",
+        "value": "α = 0.4, taban var"
+      }
+    ]
+  },
+  {
+    "mode": 4,
+    "runs": 2000,
+    "steps": 1000,
+    "scale": 1,
+    "seed": 1,
+    "milliseconds": 62336.296867,
+    "stats": [
+      {
+        "label": "Ölçülen aralık",
+        "value": "1–1000"
+      },
+      {
+        "label": "Bu koşudaki en yüksek ortalama",
+        "value": 1.478896767392788
+      },
+      {
+        "label": "Bu koşudaki yöntem",
+        "value": "UCB"
+      }
+    ]
+  }
+]

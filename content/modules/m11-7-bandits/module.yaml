@@ -56,6 +56,9 @@ extras:
   - {id: x1, title: "Hoeffding sınırı ne kadar sıkı?", engine: browser}
   - {id: x2, title: "Durağan olmayan haydut: örnek ortalaması vs sabit α", engine: browser}
   - {id: x3, title: "Reklam yerleştirme ve Bayesçi A/B testi", engine: browser}
+  - id: x4
+    title: 'Sutton 2.11: 200000 adımda durağan olmayan parametre taraması'
+    engine: browser
 
 quiz:
   - q: "Sabit ε ile ε-açgözlü neden doğrusal pişmanlık verir?"
@@ -159,6 +162,88 @@ labs:
       - q: "Hiç denenmemiş C1, ortalaması 0.54 olan C2'ye karşı neden 0.46 olasılıkla seçiliyor, ve bu iyi bir şey mi?"
         a: "C1'in sonsalı önselin kendisidir (Beta(1, 1), düzgün): θ₁'in C2'nin örneğinden büyük çıkma olasılığı yaklaşık P(U > 0.54) ≈ 0.46. Bilgi eksikliği keşfe dönüşür; az bilinen kol, iyi olma olasılığıyla orantılı denenir. Bu iyidir, çünkü C1 gerçekten daha iyi olabilir; kötüyse birkaç denemede sonsalı daralır ve seçilme olasılığı hızla düşer."
     limits: "İki kol; olasılıklar 20 000 tekrarlı tohumlu Monte Carlo ile (±0.01). Önsel iki kol için aynı Beta(α₀, α₀)."
+  - id: l4
+    lab: suttonbandits
+    title: 'Sutton: on kollu deney yatağı ve kaynak şekilleri'
+    goal: Gauss ödüllerinde örnek ortalaması, iyimserlik, UCB ve gradyan yöntemini kaynak katsayılarıyla ölç.
+      Durağanlık ve ölçüm aralığını değiştir; tek koşunun bir üstünlük kanıtı olmadığını gör.
+    predict:
+      q: 10 kolda ε=0.1 için tek en iyi kol öğrenildikten sonra seçim olasılığı kaçtır?
+      options:
+      - t: '0.91'
+        ok: true
+        why: 1−ε+ε/10 = 0.91; keşif en iyi kolu da seçebilir.
+      - t: '0.9'
+        why: Rastgele dalın en iyi kol payı da eklenir.
+      - t: '1'
+        why: Sabit keşif sürüyor.
+    presets:
+    - name: Şekil 2.2
+      params:
+        mode: 0
+        T: 1000
+        runs: 2000
+        scale: 1
+      note: 'Kaynak s. 29, Şekil 2.2: 2000 bağımsız görev × 1000 adım; algoritma parametre çarpanı 1. Kendi tohumumuzla
+        yeniden hesaplanır.'
+    - name: Şekil 2.3
+      params:
+        mode: 1
+        T: 1000
+        runs: 2000
+        scale: 1
+      note: 'Kaynak s. 34, Şekil 2.3: 2000 bağımsız görev × 1000 adım; algoritma parametre çarpanı 1. Kendi tohumumuzla
+        yeniden hesaplanır.'
+    - name: Şekil 2.4
+      params:
+        mode: 2
+        T: 1000
+        runs: 2000
+        scale: 1
+      note: 'Kaynak s. 36, Şekil 2.4: 2000 bağımsız görev × 1000 adım; algoritma parametre çarpanı 1. Kendi tohumumuzla
+        yeniden hesaplanır.'
+    - name: Şekil 2.5
+      params:
+        mode: 3
+        T: 1000
+        runs: 2000
+        scale: 1
+      note: 'Kaynak s. 38, Şekil 2.5: 2000 bağımsız görev × 1000 adım; algoritma parametre çarpanı 1. Kendi tohumumuzla
+        yeniden hesaplanır.'
+    - name: Şekil 2.6
+      params:
+        mode: 4
+        T: 1000
+        runs: 2000
+        scale: 1
+      note: 'Kaynak s. 42, Şekil 2.6: 2000 bağımsız görev × 1000 adım; algoritma parametre çarpanı 1. Kendi tohumumuzla
+        yeniden hesaplanır.'
+    - name: Alıştırma 2.5
+      params:
+        mode: 5
+        T: 10000
+        runs: 2000
+        scale: 1
+      note: 'Kaynak s.33: eşit 0 başlangıç, σ_yürüyüş=0.01, ε=0.1, α=0.1; 10000 adım.'
+    - name: Alıştırma 2.11
+      params:
+        mode: 6
+        T: 200000
+        runs: 8
+        scale: 1
+      note: 'Kaynak s.44: 200000 adım, son 100000 ortalaması; 8 tekrar açıkça seçilen hesap bütçesidir.'
+    questions:
+    - q: Parametre taramasının dikey ekseni neden son adım ödülü değil?
+      a: Şekil 2.6 bütün 1000 adımın ortalamasını kullanır. Alıştırma 2.11 yalnız son 100000 adımı kullanır.
+        Bunlar farklı öğrenme evrelerini ölçer.
+    - q: Ön ayarda eğri neden kaynakla piksel piksel aynı değil?
+      a: Dağılım ve katsayılar aynı; bağımsız görev çekilişimiz, ödül gürültüsü ve tohum farklı. Monte Carlo
+        gürültüsü nedeniyle sayılar değişir.
+    limits: 10 kollu Gauss ortamı. Durağanda q* ~ N(0,1), gradyan karşılaştırmasında N(4,1); ödül standart sapması
+      1. Değişen ortam bütün q*=0 ile başlar ve her adım bağımsız σ=0.01 yürür. Kaynak ayarları parametre çarpanı
+      1 ile kullanılır. Çizgi grafikleri ilk 30 adımı ve sonra seyreltilmiş noktaları gösterir; tarama ortalaması
+      bütün ilgili ödülleri kullanır. Büyük ayar bütçesi açıklamalı reddedilir. Kaynak uzun deneyleri tarayıcıda
+      zaman alabilir; kısa ön izleme onların yerine geçmez.
 
 practice:
   - id: p1
@@ -254,6 +339,276 @@ practice:
       - "Her adımda yanlış bir sınır en çok bir hata yapar; hata olasılıklarının toplamı sonlu olmalı."
     solution: |-
       (a) $c=\sqrt{\ln(1/\delta)/(2n_a)}$. (b) $\sqrt{4\ln n/(2n_a)}=\sqrt{2\ln n/n_a}$. (c) Sınır ihlali bir adımda yanlış kolu seçtirebilir. Birleşim sınırıyla $t$ adımında ihlal olasılığı $O(t\cdot t^{-4})$'tür ve $\sum_tt^{-3}<\infty$: ihlallerin pişmanlığa katkısı sabittir; geriye $8\ln n/\Delta^2$ terimi kalır.
+  - id: p7
+    type: hesap
+    level: 1
+    title: 'Sutton 2.1: rastgele seçim de açgözlü olabilir'
+    goal: rastgele seçim de açgözlü olabilir
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'İki eylem ve ε = 0.5 için ε-açgözlü kuralın tek açgözlü eylemi seçme olasılığı nedir?
+
+      (Kaynak: Sutton ve Barto, s. 28, Alıştırma 2.1.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: Açgözlü dalın olasılığı 1 − ε = 0.5. Rastgele dalda aynı eylem ε/2 = 0.25 olasılıkla gelir. Toplam
+      0.75. İki eylemin değerleri eşitse ikisi de açgözlüdür; bu durumda bir açgözlü eylem seçme olasılığı 1
+      olur. Sorudaki tek açgözlü eylem yorumu burada açık tutuldu.
+    answer: 0.75
+    calc: 1-0.5+0.5/2
+    tol: 1.0e-09
+    mistakes:
+    - answer: 0.5
+      msg: Bu yalnız açgözlü dal; rastgele seçim de aynı kolu seçebilir.
+  - id: p8
+    type: yorumla
+    level: 2
+    title: 'Sutton 2.2: hangi adımlar kesin keşif?'
+    goal: hangi adımlar kesin keşif?
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'Dört kol, bütün Q₁ = 0, örnek ortalaması ve ε-açgözlü seçim kullanılıyor. Gözlemler (A₁,R₁)=(1,−1), (A₂,R₂)=(2,1),
+      (A₃,R₃)=(2,−2), (A₄,R₄)=(2,2), (A₅,R₅)=(3,0). Hangi adımlarda rastgele ε dalı kesin gerçekleşmiştir? Hangi
+      adımlarda gerçekleşmiş olabilir?
+
+      (Kaynak: Sutton ve Barto, s. 30, Alıştırma 2.2.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: 'Karardan ÖNCE tabloları sırala: t=1 için (0,0,0,0), t=2 için (−1,0,0,0), t=3 için (−1,1,0,0),
+      t=4 için (−1,−0.5,0,0), t=5 için (−1,1/3,0,0). Açgözlü kümeler sırasıyla {1,2,3,4}, {2,3,4}, {2}, {3,4},
+      {2}. Seçimler 4 ve 5 adımlarında bu kümenin dışında olduğundan ε dalı kesindir. Rastgele dal bütün kolları
+      seçebildiği için 1–5 adımlarının hepsinde mümkün olabilir. Özellikle t=3 açgözlü görünmesi onun kesin yararlanma
+      olduğunu kanıtlamaz. Kaynak PDF metin çıkarımında kaybolabilen −1/−2 işaretleri sayfa görüntüsünden doğrulandı.'
+    rubric:
+    - Verilen tüm koşulları kullanır.
+    - Ara adımları ve sonucu açıklar.
+    - Sonucun hangi koşullarda geçerli olduğunu belirtir.
+  - id: p9
+    type: hesap
+    level: 2
+    title: 'Sutton 2.3: uzun vadeli fark'
+    goal: uzun vadeli fark
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'Şekil 2.2 içindeki yöntemlerden hangisi uzun vadede birikimli ödül ve en iyi eylemi seçme bakımından
+      öne çıkar? Farkı sayısallaştır. Sayısal alana en iyi kol olasılıkları arasındaki farkı gir.
+
+      (Kaynak: Sutton ve Barto, s. 30, Alıştırma 2.3.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: Durağanlık, sonsuz ziyaret ve örnek ortalaması yakınsamasıyla ε=0.01 için P(en iyi)=0.99+0.001=0.991;
+      ε=0.1 için 0.9+0.01=0.91. Fark 0.081, yani 8.1 yüzde puan. Bir görevde limit ödül hızı (1−ε)q*max+ε·ortalama(q*)
+      olur; fark 0.09(q*max−ortalama(q*)). Görevler üzerinden E[ortalama(q*)]=0. On standart normalin maksimumunun
+      beklenen değeri sayısal integralle 1.538752730835; hızlar 1.523365203527 ve 1.384877457752, fark 0.138487745775.
+      Kaynağın yaklaşık 1.55 değeri kullanılırsa fark yaklaşık 0.1395 olur. Uzun T için birikimli farkın baskın
+      terimi bu hız farkı × T olur; bu, her sonlu ufukta üstünlük garantisi değildir. ε=0 kaynak koşusunda yaklaşık
+      1 ödülde ve üçte bir görevde en iyi kolda kilitlenir.
+    answer: 0.081
+    calc: 0.991-0.91
+    tol: 1.0e-09
+    rubric:
+    - "En iyi kol olasılıklarını ve 8.1 yüzde puan farkını hesaplar."
+    - "Ödül hızı farkını ve uzun vadeli birikimli ödülle ilişkisini ayrıca hesaplar."
+  - id: p10
+    type: kanıt
+    level: 2
+    title: 'Sutton 2.4: değişken adım ağırlıkları'
+    goal: değişken adım ağırlıkları
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'Adım büyüklükleri αₙ sabit değilse, Denklem 2.6 benzeri biçimde önceki her ödülün Qₙ içindeki ağırlığını
+      α dizisi cinsinden bul.
+
+      (Kaynak: Sutton ve Barto, s. 33, Alıştırma 2.4.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: 'Qₙ₊₁=(1−αₙ)Qₙ+αₙRₙ ile başla. Her yerine koymada önceki bütün ağırlıklar (1−αₙ) ile çarpılır;
+      yeni ödül αₙ alır. İndüksiyonla
+
+      $$Q_{n+1}=\prod_{j=1}^{n}(1-\alpha_j)Q_1+\sum_{i=1}^{n}\alpha_i\prod_{j=i+1}^{n}(1-\alpha_j)R_i.$$
+
+      Başlangıç n=1 güncellemenin kendisidir. İndüksiyon adımında dışarıdaki (1−αₙ) bütün çarpımlara eklenir
+      ve yeni αₙRₙ terimi gelir. Boş çarpım 1. Sorudaki Qₙ için n yerine n−1 kullan: Rᵢ ağırlığı αᵢ∏ⱼ₌ᵢ₊₁ⁿ⁻¹(1−αⱼ).
+      αᵢ=1/i durumunda bütün ödül ağırlıkları 1/(n−1), ilk-değer ağırlığı 0 çıkar.'
+    rubric:
+    - Başlangıç değerinin çarpımını da gösterir.
+    - Her ödülün indekslerini ve boş çarpımı doğru yazar.
+    - İndüksiyon veya yerine koymayla kanıtlar.
+  - id: p11
+    type: kod
+    level: 2
+    title: 'Sutton 2.5: durağan olmayan ortamı çalıştır'
+    goal: durağan olmayan ortamı çalıştır
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: '10 kolun gerçek değerleri eşit başlasın; her adımda her kola bağımsız N(0,0.01²) artış ekle. ε=0.1 ile
+      artımlı örnek ortalamasını ve sabit α=0.1 yöntemini karşılaştır. 10000 adımlık çalıştırmalar ve Şekil 2.2
+      benzeri ödül/optimal kol grafikleri hazırla.
+
+      (Kaynak: Sutton ve Barto, s. 33, Alıştırma 2.5.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: 'Çalıştırılabilir çözüm x2 içindeki nonstationary fonksiyonudur; return_reward=True hem reward
+      hem optimal dizilerini döndürür. İki çağrı: nonstationary(2000,10000,None,1,return_reward=True) ve nonstationary(2000,10000,0.1,1,return_reward=True).
+      Her çıktıda iki diziyi 1–10000 adımına karşı çiz; l4 içindeki Alıştırma 2.5 ön ayarı bu grafikleri üretir.
+      Aynı tohum kullanımı, farklı seçimler rastgele sayı tüketimini değiştirebildiğinden otomatik eşlenmiş çevre
+      garantisi değildir; l4 ise yöntemler arasında aynı gerçek kol yürüyüşünü paylaşır. Örnek ortalaması bütün
+      geçmişi, sabit α yakın geçmişi ağırlıklandırır. Sonuçları tekrar/tohumla raporla; tek tohumdan evrensel
+      bir üstünlük çıkarma.'
+    rubric:
+    - Eşit başlangıç ve bağımsız 0.01 standart sapmalı yürüyüşü korur.
+    - ε=0.1, α=0.1 ve 10000 adımı kullanır.
+    - Hem ortalama ödül hem optimal seçim eğrilerini üretir.
+  - id: p12
+    type: açıkla
+    level: 2
+    title: 'Sutton 2.6: iyimser eğrinin erken salınımları'
+    goal: iyimser eğrinin erken salınımları
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'Şekil 2.3 eğrileri 2000 rastgele görev ortalaması olduğuna göre, iyimser yöntem neden erken adımlarda
+      düzenli sıçrama ve salınım gösterir? Bazı erken adımları ortalamada daha iyi/kötü yapan ortak mekanizmayı
+      açıkla.
+
+      (Kaynak: Sutton ve Barto, s. 35, Alıştırma 2.6.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: Ortalama almak, görevler arasında aynı sırada ortaya çıkan geçişi silmez. Q₁=5 ve α=0.1 iken bir
+      kolun ilk olağan ödülü değerini yaklaşık 4.5 çevresine indirir; denenmemiş kollar 5 olarak kalır. Böylece
+      çoğu görev önce 10 kolu yaklaşık bir kez tarar. Sonraki seçimlerde iyi ilk ödül alan kollara geçiş başarıyı
+      yükseltir. Aynı kol tekrar seçildikçe başlangıç iyimserliği daha fazla azalır; daha az denenmiş başka kollar
+      yeniden çekici olur ve ortak tarama dalgaları doğar. Normal dağılım sınırsız olduğundan tam 10 adımda bütün
+      kolların bir kez denenmesi kesin bir yasa değildir. Sıçrama Monte Carlo hatası olmak zorunda değildir;
+      ortak başlatma ve sayım mekanizmasının ortalamadaki etkisidir.
+    rubric:
+    - Verilen tüm koşulları kullanır.
+    - Ara adımları ve sonucu açıklar.
+    - Sonucun hangi koşullarda geçerli olduğunu belirtir.
+  - id: p13
+    type: kanıt
+    level: 2
+    title: 'Sutton 2.7: ilk-değer yanlılığını kaldır'
+    goal: ilk-değer yanlılığını kaldır
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'α>0 sabit, o₀=0, oₙ=oₙ₋₁+α(1−oₙ₋₁), βₙ=α/oₙ olsun. βₙ ile ödül güncellemenin başlangıç yanlılığı taşımayan
+      üstel yakın-geçmiş ortalaması verdiğini Denklem 2.6 benzeri analizle göster.
+
+      (Kaynak: Sutton ve Barto, s. 35, Alıştırma 2.7.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: 'Yakın-geçmiş ağırlıklı ortalama yorumu için 0<α≤1 al. İlk özyinelemeden oₙ=1−(1−α)ⁿ ve β₁=1 bulunur;
+      böylece Q₁ ağırlığı hemen sıfırlanır. Ayrıca
+
+      $$1-\beta_j=\frac{(1-\alpha)[1-(1-\alpha)^{j-1}]}{1-(1-\alpha)^j}.$$
+
+      Genel ağırlık formülünde α yerine β koy; çarpım teleskopik olur:
+
+      $$\beta_i\prod_{j=i+1}^{n}(1-\beta_j)=\frac{\alpha(1-\alpha)^{n-i}}{1-(1-\alpha)^n}.$$
+
+      Böylece Qₙ₊₁ bu ağırlıklarla R₁…Rₙ toplamıdır. Payda üstel ağırlıkların toplamıdır; ağırlıklar normalize,
+      başlangıç katkısı sıfırdır. α=1 için sadece son ödül kalır. α>1 genel olarak pozitif-ağırlıklı ortalama
+      yorumu vermez; kaynak önceki sabit adım bölümünün koşulu burada önemlidir.'
+    rubric:
+    - oₙ kapalı formunu ve β₁=1 sonucunu bulur.
+    - Teleskopik ağırlık çarpımını gösterir.
+    - Normalize üstel ağırlıkları ve başlangıç teriminin yokluğunu açıklar.
+  - id: p14
+    type: açıkla
+    level: 2
+    title: 'Sutton 2.8: UCB 11. adımda neden sıçrar ve geri iner?'
+    goal: UCB 11. adımda neden sıçrar ve geri iner?
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'Şekil 2.4 içinde UCB performansı 11. adımda yükseliyor, sonraki adımlarda düşüyor. İki yönü de açıkla.
+      c=1 iken sıçramanın daha az belirgin olması açıklamana uysun.
+
+      (Kaynak: Sutton ve Barto, s. 36, Alıştırma 2.8.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: İlk 10 adımda denenmemiş kollara öncelik verilir. 11. adım öncesinde her N=1 olduğundan bonuslar
+      eşittir; seçim ilk gözlemi en yüksek koladır. Bu gözlem hem daha yüksek gerçek değere hem olumlu gürültüye
+      işaret edebilir; ortalama ödül yükselir. Ardından o kolun N sayısı 2 olur ve c√(ln t/N) bonusu düşer; diğer
+      kollar büyük bonusla seçilir. Tek yüksek gözlemin ortalaması sonraki ödülle gerilerken keşif daha düşük
+      beklenen ödüllü kolları da getirir; eğri düşebilir. c küçülünce bonus farkı daha azdır, seçilen iyi kolun
+      terk edilmesi daha az zorlanır ve ortak sıçrama/düşüş zayıflar. Sadece “ilk tur bitti” demek düşüşü açıklamaz.
+    rubric:
+    - Verilen tüm koşulları kullanır.
+    - Ara adımları ve sonucu açıklar.
+    - Sonucun hangi koşullarda geçerli olduğunu belirtir.
+  - id: p15
+    type: kanıt
+    level: 2
+    title: 'Sutton 2.9: iki kollu softmax sigmoid olur'
+    goal: iki kollu softmax sigmoid olur
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'İki eylem için softmax dağılımının istatistik ve sinir ağlarında kullanılan lojistik/sigmoid fonksiyonla
+      aynı olduğunu göster.
+
+      (Kaynak: Sutton ve Barto, s. 37, Alıştırma 2.9.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: 'İlk olasılığın pay ve paydasını eᴴ¹ ile böl:
+
+      $$\pi(1)=\frac{e^{H_1}}{e^{H_1}+e^{H_2}}=\frac1{1+e^{-(H_1-H_2)}}=\sigma(H_1-H_2).$$
+
+      İkincisi σ(H₂−H₁)=1−π(1). Tek tercihin sigmoidi değil, tercih farkının sigmoidi olduğu önemlidir. Ortak
+      sabit eklemek farkı ve olasılığı değiştirmez.'
+    rubric:
+    - Verilen tüm koşulları kullanır.
+    - Ara adımları ve sonucu açıklar.
+    - Sonucun hangi koşullarda geçerli olduğunu belirtir.
+  - id: p16
+    type: hesap
+    level: 2
+    title: 'Sutton 2.10: bağlam ipucunun değeri'
+    goal: bağlam ipucunun değeri
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'Her adımda 0.5 olasılıkla A durumunda gerçek değerler (0.1,0.2), 0.5 olasılıkla B durumunda (0.9,0.8)
+      geliyor. Hangi durumda olduğunu bilmiyorsan en iyi beklenen başarı ve uygun davranış nedir? A/B etiketi
+      veriliyor ama değerler hâlâ bilinmiyorsa öğrenilebilecek en iyi başarı ve davranış nedir? Sayısal alana
+      ipuçlu limit başarıyı gir.
+
+      (Kaynak: Sutton ve Barto, s. 41, Alıştırma 2.10.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: 'İpucusuz kol 1 ortalaması 0.5×0.1+0.5×0.9=0.5; kol 2 de 0.5×0.2+0.5×0.8=0.5. Geçmiş, bağımsız
+      seçilen o anki A/B durumunu bildirmiyorsa herhangi bir sabit seçim veya karışım en fazla 0.5 verir. Etiket
+      gelince iki ayrı problem öğrenilebilir: A durumunda kol 2 (0.2), B durumunda kol 1 (0.9). Limit ortalaması
+      0.5×0.2+0.5×0.9=0.55, artış 0.05. Değerler başlangıçta bilinmediği için bu politikayı deneyimle öğrenmek
+      gerekir; 0.55 ilk adım garantisi değildir.'
+    answer: 0.55
+    calc: 0.5*0.2+0.5*0.9
+    tol: 1.0e-09
+  - id: p17
+    type: kod
+    level: 2
+    title: 'Sutton 2.11: 200000 adımlık parametre taraması'
+    goal: 200000 adımlık parametre taraması
+    needs: Sutton Bölüm 2 deney modeli ve ilgili anlatım.
+    q: 'Alıştırma 2.5 durağan olmayan ortamı için Şekil 2.6 benzeri parametre taraması üret. Örnek ortalamalı
+      yöntemlere sabit α=0.1 ε-açgözlüyü de kat. Her çalıştırma 200000 adım olsun; her yöntem/ayarın ölçütü son
+      100000 adımın ortalama ödülü olsun.
+
+      (Kaynak: Sutton ve Barto, s. 44, Alıştırma 2.11.)'
+    hints:
+    - Kaynaktaki varsayımları ve gözlem sırasını yaz.
+    - İlgili değer güncellemesini veya olasılık hesabını adım adım uygula.
+    solution: Tam çözüm x4 içindeki bandit_sweep fonksiyonudur. ε için 2**p, p=−7…−2; gradyan α için p=−5…2;
+      UCB c için p=−4…2; iyimser Q için p=−2…2 kullan. Aynı ε aralığını constant yöntemi için de ekle. configs=[(yöntem,parametre),…]
+      listesini oluşturup bandit_sweep(8,200000,configs,seed=1) çağır. Her yöntemin sonuçlarını kendi parametresine
+      karşı logaritmik eksende çiz. l4 Alıştırma 2.11 ön ayarı aynı ufuk ve son-yarı ölçütünü grafikle verir.
+      Sekiz tekrar kaynakta belirtilen bir sabit değildir; burada açık raporlanan hesap bütçesidir. Daha fazla
+      tekrar istatistiksel belirsizliği azaltır. Kısa x4 denetiminin geçmesi, uzun deneyin yapıldığını tek başına
+      kanıtlamaz.
+    rubric:
+    - Önceki yürüyüş ortamını ve 200000 adımı korur.
+    - Ölçümü sadece son 100000 ödülden yapar.
+    - Sabit α=0.1 yöntemini ekler ve farklı parametreleri tarar.
+    - Tekrar, tohum ve ölçütü grafiğe/notuna yazar.
+
 pitfalls:
   - wrong: "Sabit küçük bir ε ile ε-açgözlü uzun vadede neredeyse en iyidir."
     right: "Sabit ε sonsuza dek ε oranında rastgele kol çeker: pişmanlık doğrusaldır (ε = 0.1'de 1000 adımda ≈ 20 ekler; Şekil 1). Logaritmik pişmanlık için ε azaltılmalı."

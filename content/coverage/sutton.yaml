@@ -26,12 +26,12 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: Bölüm 1 ikinci okuma tamamlandı; yayın denetimi sürüyor. Bölüm 2–17 işlenmedi. Bütün kitap için tamlık
-    iddiası yok.
+  note: Bölüm 1–2 işlendi; yayın CI denetimi ayrıca izleniyor. Bölüm 3–17, ön sayfalar ve tam kaynakça/dizin
+    işlenmedi; bütün kitap tamamlanmadı.
   processed_chapters:
   - 1
-  unprocessed_chapters:
   - 2
+  unprocessed_chapters:
   - 3
   - 4
   - 5
@@ -104,10 +104,10 @@ chapters:
   title: Çok kollu banditler
   pdf_pages:
   - 47
-  - 68
+  - 67
   pages:
   - 25
-  - 46
+  - 45
   exercises:
   - number: '2.1'
     pdf_page: 50
@@ -176,7 +176,21 @@ chapters:
   - m11-7-bandits
   - m11-8-contextual-bandits
   mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  content_status: işlendi; yayın denetimi sürüyor
+  recorded_units: 106
+  second_read:
+    pages:
+    - 25
+    - 45
+    pdf_pages:
+    - 47
+    - 67
+    independent: true
+    findings_resolved: true
+    note: Altı şekil ve eksi işaretleri görüntüden denetlendi; 18 ayrıntı eklendi, Denklem 2.13 ve Kumar kategori
+      kaydı düzeltildi.
+    final_followup: 106 kayıt yeniden denetlendi; önceki içerik bulguları kapandı, ek belirgin eksik bulunmadı;
+      s.32–33 aralığı da eklendi.
 - chapter: 3
   title: Sonlu Markov karar süreçleri
   pdf_pages:
@@ -1792,6 +1806,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 0
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 48
   printed_page: 26
   text_sha256: 9bacfa5226b79e0583539bde356022eba8085745c593a0b004131fcef39016a8
@@ -1799,6 +1814,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 49
   printed_page: 27
   text_sha256: e65fdce5412629e607523a2a6a0b721eeffad2ed8ef19e206dfb66a6619167c5
@@ -1806,27 +1822,31 @@ page_audit:
   embedded_images: 0
   drawing_paths: 3
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 50
   printed_page: 28
   text_sha256: a87a58d21b3013f35ff62952cf06360f2c147d013e2a6a98b2110d4423e68eb2
   text_characters: 2953
   embedded_images: 0
   drawing_paths: 53
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 51
   printed_page: 29
   text_sha256: b61fcfd159134bc3118056f5f3a697cf83322e444374970d71317b15c7806b8e
   text_characters: 2690
   embedded_images: 0
   drawing_paths: 39
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 52
   printed_page: 30
   text_sha256: 9a0f35387a721f07e812b4d90b440cd4f030d5d0d8e4ef9bdcf51b3061227999
   text_characters: 3532
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 53
   printed_page: 31
   text_sha256: 034ea9390253effbd51fb1bddb5519f77701287e8408c2e7ebde232d47fce87f
@@ -1834,6 +1854,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 9
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 54
   printed_page: 32
   text_sha256: 2b241ac22d023af81e577bf4b24cd1521b95e391355fb6b494f127dd8cb05018
@@ -1841,6 +1862,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 5
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 55
   printed_page: 33
   text_sha256: 3b74e93e3e109657e48488f1f2ebae62349772c26209328f485d9899bc5794ee
@@ -1848,13 +1870,15 @@ page_audit:
   embedded_images: 0
   drawing_paths: 3
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 56
   printed_page: 34
   text_sha256: 43a8cd7bb859251da4cb34e7276b90ddec8ec6fcc2532d7f652470238bc8fc99
   text_characters: 3488
   embedded_images: 0
   drawing_paths: 26
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 57
   printed_page: 35
   text_sha256: d4a9904cf0bff6153bf9222f2f5c1581b148aa0d22a76e7ca80cbb4f60776d97
@@ -1862,13 +1886,15 @@ page_audit:
   embedded_images: 0
   drawing_paths: 3
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 58
   printed_page: 36
   text_sha256: 48f4d8738cb91e1ba05eebc9a328dd48f001d90c0599ffebaab12f2716aed91c
   text_characters: 2930
   embedded_images: 2
   drawing_paths: 17
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 59
   printed_page: 37
   text_sha256: d80cd16bde3151ef59463bf89f1f680d7f891c9d81572727340dd6131d7d7933
@@ -1876,13 +1902,15 @@ page_audit:
   embedded_images: 0
   drawing_paths: 2
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 60
   printed_page: 38
   text_sha256: 94f4b9b6a820c61e3ddd8f1e0dd0e983b4ffa40a40a9b8d2f3c5fc553a9f2963
   text_characters: 2238
   embedded_images: 4
   drawing_paths: 22
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 61
   printed_page: 39
   text_sha256: 83aba51ab31e2195b323654eb0e900c07dd4559561be5a88cbfa61d623def404
@@ -1890,6 +1918,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 13
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 62
   printed_page: 40
   text_sha256: 8e9f15d80cab2bf2681e6648f4b4cff4f3fe8b1c257455c981a5ee9f03325bfe
@@ -1897,6 +1926,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 20
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 63
   printed_page: 41
   text_sha256: ba08a635c7ce41bb9652e5f1eeca751c4c0a41f706db8d2769933e89f20a70a9
@@ -1904,13 +1934,15 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 64
   printed_page: 42
   text_sha256: 490d8436b5f8e06289048f656865c72728e4218991462facc4bc6582c4c5ca30
   text_characters: 3167
   embedded_images: 0
   drawing_paths: 25
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 65
   printed_page: 43
   text_sha256: 205fb816485feb4f14c011108a6c773f6a5001d23acb73de442ec527bd2aaffd
@@ -1918,6 +1950,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 66
   printed_page: 44
   text_sha256: 8ad45402d04455b1cd32606ede0275da82b6865a667231bed07b0b2f1ba65097
@@ -1925,6 +1958,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 67
   printed_page: 45
   text_sha256: 59958f3ca7e284ed546ea9d01aa0a625e41c757f68f33dea364427b6a3082113
@@ -1932,6 +1966,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
 - pdf_page: 68
   printed_page: 46
   text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -6495,6 +6530,866 @@ items:
   what: XOX zamansal fark yönteminin kitabın Bölüm 6 konusuna bağlantısı.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch2-p25-i1
+  page: 25
+  pdf_page: 47
+  kind: tanım
+  what: Değerlendirici geri bildirim seçilmiş eylemin iyiliğini, öğretici geri bildirim doğru eylemi eylemden
+    bağımsız bildirir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p25-i2
+  page: 25
+  pdf_page: 47
+  kind: bilgi
+  what: Örüntü sınıflandırma, ağlar ve sistem tanılama öğretici geri bildirimi kullanabilir; iki tür birleşebilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p25-i3
+  page: 25
+  pdf_page: 47
+  kind: bilgi
+  what: Tek durumlu ilişkilendirmesiz kurgu, değerlendirme ve keşfi tam RL karmaşıklığından yalıtır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p25-i4
+  page: 25
+  pdf_page: 47
+  kind: tanım
+  what: Tekrarlanan k seçenekte kola bağlı durağan ödül dağılımından 1000 adım gibi ufukta toplam beklenen
+    ödül ençoklanır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p25-i5
+  page: 25
+  pdf_page: 47
+  kind: tanım
+  what: Değerlendirici geri bildirim seçilen eylemin mümkün en iyi veya en kötü olup olmadığını söylemez.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p26-i1
+  page: 26
+  pdf_page: 48
+  kind: örnek
+  what: Kollu kumar makinesi ve deneysel tedaviler/hasta iyilik hali bandit benzetimleridir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p26-i2
+  page: 26
+  pdf_page: 48
+  kind: formül
+  what: q*(a)=E[R_t|A_t=a], gerçek kol değeridir; Q_t onu kestirir; bilinse en yüksek gerçek değer seçilirdi.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p26-i3
+  page: 26
+  pdf_page: 48
+  kind: tanım
+  what: Açgözlü eylem en büyük kestirimli koldur; diğer eylem keşiftir, kalan ufuk ve belirsizlik dengeyi etkiler.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p26-i4
+  page: 26
+  pdf_page: 48
+  kind: bilgi
+  what: Belirsiz fakat yakın-değerli kolu şimdi denemek kısa vadeli kayıp karşılığında gelecekte ödül sağlayabilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p26-i5
+  page: 26
+  pdf_page: 48
+  kind: bilgi
+  what: Bandit sözcüğünün daha geniş kullanımları vardır; kitap özgün basit anlamı seçer.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p27-i1
+  page: 27
+  pdf_page: 49
+  kind: bilgi
+  what: Durağanlık ve ön bilgi varsayımlı sınırlar, varsayımları doğrulanamayan tam RL uygulamasına otomatik
+    taşınmaz.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
+- id: ch2-p27-i2
+  page: 27
+  pdf_page: 49
+  kind: formül
+  what: Denklem 2.1 göstergeyle seçilmiş kol ödüllerinin toplamı/sayımı; sıfır sayımda başlangıç değeri kullanılır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p27-i3
+  page: 27
+  pdf_page: 49
+  kind: bilgi
+  what: Yeterli durağan örnek altında örnek ortalaması gerçek ortalamaya büyük sayılar yasasıyla yakınsar.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p27-i4
+  page: 27
+  pdf_page: 49
+  kind: formül
+  what: Denklem 2.2 argmax seçiminde eşitlik keyfi veya rastgele bozulabilir; yalnız yararlanma yetersiz kalabilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p28-i1
+  page: 28
+  pdf_page: 50
+  kind: bilgi
+  what: ε dalı bütün kolları eşit seçer; tek en iyi kola limit olasılığı 1−ε+ε/k, asimptotik sonuç hızlı öğrenme
+    garantisi değildir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p28-i2
+  page: 28
+  pdf_page: 50
+  kind: şekil
+  what: 'Şekil 2.1: 10 eylem, N(0,1) gerçek ortalamalar, N(q*,1) ödül dağılımları; q*(1)…q*(10), ödül −3…3
+    ve eylem 1…10 eksenleri.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+  figure: türetildi
+  source_number: '2.1'
+  note: Kaynak sayfası görüntü olarak incelendi; 2.1 SVG, 2.2–2.6 l4 içinde aynı numaralı ön ayar.
+- id: ch2-p28-i3
+  page: 28
+  pdf_page: 50
+  kind: alıştırma
+  source_number: '2.1'
+  what: İki eylem ve ε = 0.5 için ε-açgözlü kuralın tek açgözlü eylemi seçme olasılığı nedir?
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p7
+- id: ch2-p28-i4
+  page: 28
+  pdf_page: 50
+  kind: bilgi
+  what: Sabit pozitif ε her kola sonsuz ziyaret sağlar; durağan örnek ortalamaları gerçek değerlere yakınsar.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p29-i1
+  page: 29
+  pdf_page: 51
+  kind: bilgi
+  what: 10 kollu deney yatağında 2000 bağımsız görev, her görevde 1000 adım; iki ayrı birim varyansın anlamı.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+- id: ch2-p29-i2
+  page: 29
+  pdf_page: 51
+  kind: şekil
+  what: 'Şekil 2.2: ε=0/.01/.1, örnek ortalaması, 2000×1000; üstte ortalama ödül, altta en iyi seçim yüzdesi,
+    adım ekseni.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#lab:l4
+  figure: türetildi
+  source_number: '2.2'
+  note: Kaynak sayfası görüntü olarak incelendi; 2.1 SVG, 2.2–2.6 l4 içinde aynı numaralı ön ayar.
+- id: ch2-p29-i3
+  page: 29
+  pdf_page: 51
+  kind: bilgi
+  what: Kaynak açgözlü eğrisi başlangıçta hızlıdır, yaklaşık 1 ödülde kalır; yaklaşık 1.55 mümkün en iyi değerden
+    düşüktür.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+- id: ch2-p30-i1
+  page: 30
+  pdf_page: 52
+  kind: bilgi
+  what: Kaynakta açgözlü yaklaşık üçte bir görevde en iyi kolu bulur; kötü ilk örnek daha sonra dönmeyi önler.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+- id: ch2-p30-i2
+  page: 30
+  pdf_page: 52
+  kind: bilgi
+  what: ε=.1 hızlı öğrenir, doğru kol limiti %91; ε=.01 yavaş fakat limit %99.1, ε zamanla azaltılabilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+- id: ch2-p30-i3
+  page: 30
+  pdf_page: 52
+  kind: bilgi
+  what: Ödül varyansı 10 olduğunda daha çok keşif; sıfır varyansta denenen kol tek gözlemle bilinir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+- id: ch2-p30-i4
+  page: 30
+  pdf_page: 52
+  kind: bilgi
+  what: Değişen kollar gürültüsüzken de keşif ister; sabit dış görevde öğrenen politika etkili durağan olmamaya
+    yol açar.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+- id: ch2-p30-i5
+  page: 30
+  pdf_page: 52
+  kind: alıştırma
+  source_number: '2.2'
+  what: Dört kol, bütün Q₁ = 0, örnek ortalaması ve ε-açgözlü seçim kullanılıyor. Gözlemler (A₁,R₁)=(1,−1),
+    (A₂,R₂)=(2,1), (A₃,R₃)=(2,−2), (A₄,R₄)=(2,2), (A₅,R₅)=(3,0). Hangi adımlarda rastgele ε dalı kesin gerçekleşmiştir?
+    Hangi adımlarda gerçekleşmiş olabilir?
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p8
+- id: ch2-p30-i6
+  page: 30
+  pdf_page: 52
+  kind: alıştırma
+  source_number: '2.3'
+  what: Şekil 2.2 yöntemlerini uzun vadeli birikimli ödül ve en iyi kol seçme olasılığı yönünden ayrı ayrı
+    karşılaştırıp iki farkı nicelleştir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p9
+- id: ch2-p30-i7
+  page: 30
+  pdf_page: 52
+  kind: bilgi
+  what: Gürültüsüz durağanda uygun ziyaretlerle açgözlü yöntem keşfi bırakıp en iyi performansı gösterebilir;
+    bu zorunlu değildir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p31-i1
+  page: 31
+  pdf_page: 53
+  kind: türetim
+  what: 'Denklem 2.3: n ödülün toplamını R_n+(n−1)Q_n diye ayırıp Q_{n+1}=Q_n+(R_n−Q_n)/n elde edilir.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p31-i2
+  page: 31
+  pdf_page: 53
+  kind: bilgi
+  what: Q ve n saklamak kol başına sabit bellek/güncelleme; n=1 başlangıç değerini siler.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p31-i3
+  page: 31
+  pdf_page: 53
+  kind: formül
+  what: Denklem 2.4 eski kestirim+adım×(hedef−eski); gürültülü hedefe yönelen hata düzeltmesi.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p31-i4
+  page: 31
+  pdf_page: 53
+  kind: tanım
+  what: R_i belirli kolun i. çekiliş ödülü, Q_n o kol n−1 kez seçildikten sonraki kestirimdir; genel zaman
+    t ile n ayrılır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p32-i1
+  page: 32
+  pdf_page: 54
+  kind: kod
+  what: 'Basit bandit sözde kodu: Q=N=0; ε/rastgele eşitlikli argmax; ödül; sayımı artır; seçili kolu 1/N ile
+    güncelle.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
+- id: ch2-p32-i2
+  page: 32
+  pdf_page: 54
+  kind: formül
+  what: Denklem 2.5 sabit α güncellemesi yakın geçmişe ağırlık verir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p32-i3
+  page: 32
+  pdf_page: 54
+  kind: türetim
+  what: Denklem 2.6 ardışık yerine koymayla başlangıç (1−α)^n Q1 ve α(1−α)^{n−i} ödül ağırlıklarını verir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p32-i4
+  page: 32
+  pdf_page: 54
+  kind: bilgi
+  what: Üstel ağırlıklı ortalama koşulu 0<α≤1; Denklem 2.7 kaynakta uygun stokastik koşullarla olasılık 1 yakınsamayı
+    amaçlar.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+  note: Bağımsız ikinci okuma ayrıntısı.
+  pages:
+  - 32
+  - 33
+  pdf_pages:
+  - 54
+  - 55
+- id: ch2-p33-i1
+  page: 33
+  pdf_page: 55
+  kind: bilgi
+  what: Ağırlık toplamı 1, geçmiş ağırlığı üstel azalır; α=1 sınırında boş çarpım/0^0=1 ile son ödül kalır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p33-i2
+  page: 33
+  pdf_page: 55
+  kind: formül
+  what: 'Denklem 2.7: her kol için Σα_n=∞ ve Σα_n²<∞; başlangıcı aşma ve gürültüyü azaltma rolleri.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p33-i3
+  page: 33
+  pdf_page: 55
+  kind: bilgi
+  what: 1/n iki koşulu sağlar; sabit α ikinciyi sağlamaz ve değişen ortamı izler; teorik diziler yavaş/ayara
+    hassas olabilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p33-i4
+  page: 33
+  pdf_page: 55
+  kind: alıştırma
+  source_number: '2.4'
+  what: Adım büyüklükleri αₙ sabit değilse, Denklem 2.6 benzeri biçimde önceki her ödülün Qₙ içindeki ağırlığını
+    α dizisi cinsinden bul.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p10
+- id: ch2-p33-i5
+  page: 33
+  pdf_page: 55
+  kind: alıştırma
+  source_number: '2.5'
+  what: 10 kolun gerçek değerleri eşit başlasın; her adımda her kola bağımsız N(0,0.01²) artış ekle. ε=0.1
+    ile artımlı örnek ortalamasını ve sabit α=0.1 yöntemini karşılaştır. 10000 adımlık çalıştırmalar ve Şekil
+    2.2 benzeri ödül/optimal kol grafikleri hazırla.
+  status: genişletildi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p11
+  note: x2 ödül eğrisine genişletildi; eşit gerçek başlangıç değerlerinde her kolun optimal sayılması da düzeltildi
+    ve otomatik kontrol edildi.
+- id: ch2-p34-i1
+  page: 34
+  pdf_page: 56
+  kind: bilgi
+  what: Başlangıç kestirimi yanlılık ve ön bilgi taşır; örnek ortalamasında ilk gözlemde silinir, sabit α sonlu
+    adımda azalan etki taşır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p34-i2
+  page: 34
+  pdf_page: 56
+  kind: örnek
+  what: Q1=+5, N(0,1) gerçek ortalamalara göre iyimserdir; hayal kırıklığıyla başka kollara geçilir, açgözlü
+    seçim bile keşfeder.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p34-i3
+  page: 34
+  pdf_page: 56
+  kind: şekil
+  what: 'Şekil 2.3: iyimser Q1=5/ε=0 ile gerçekçi Q1=0/ε=.1; ikisinde α=.1; 2000×1000 optimal seçim oranı.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#lab:l4
+  figure: türetildi
+  source_number: '2.3'
+  note: Kaynak sayfası görüntü olarak incelendi; 2.1 SVG, 2.2–2.6 l4 içinde aynı numaralı ön ayar.
+- id: ch2-p34-i4
+  page: 34
+  pdf_page: 56
+  kind: bilgi
+  what: Başlangıç değerleri sıfır seçilse bile kullanıcının seçtiği ek parametrelerdir; bu bir ayar dezavantajıdır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p34-i5
+  page: 34
+  pdf_page: 56
+  kind: bilgi
+  what: Şekil 2.3 kaynağında iyimser yöntem başta çok keşifle geride, keşif azaldıkça sonradan daha iyidir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p35-i1
+  page: 35
+  pdf_page: 57
+  kind: bilgi
+  what: Başlangıç iyimserliği geçici keşif dürtüsüdür; yeni değişim başlangıcı yeniden yaratmaz; ortalama da
+    başlangıcı özel sayar.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p35-i2
+  page: 35
+  pdf_page: 57
+  kind: formül
+  what: Denklem 2.8–2.9 o0=0, o_n=o_{n−1}+α(1−o_{n−1}), β_n=α/o_n ile başlangıçsız üstel ortalama.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
+- id: ch2-p35-i3
+  page: 35
+  pdf_page: 57
+  kind: bilgi
+  what: UCB tahminin büyüklüğüyle belirsizliğini birleştirir; ε rastgele keşfi bunlar arasında ayrım yapmaz.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ucb
+- id: ch2-p35-i4
+  page: 35
+  pdf_page: 57
+  kind: formül
+  what: Denklem 2.10 Q_t(a)+c√(ln t/N_t(a)); N=0 kola öncelik, c>0 keşif katsayısı.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ucb
+- id: ch2-p35-i5
+  page: 35
+  pdf_page: 57
+  kind: alıştırma
+  source_number: '2.6'
+  what: Şekil 2.3 eğrileri 2000 rastgele görev ortalaması olduğuna göre, iyimser yöntem neden erken adımlarda
+    düzenli sıçrama ve salınım gösterir? Bazı erken adımları ortalamada daha iyi/kötü yapan ortak mekanizmayı
+    açıkla.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p12
+- id: ch2-p35-i6
+  page: 35
+  pdf_page: 57
+  kind: alıştırma
+  source_number: '2.7'
+  what: α>0 sabit, o₀=0, oₙ=oₙ₋₁+α(1−oₙ₋₁), βₙ=α/oₙ olsun. βₙ ile ödül güncellemenin başlangıç yanlılığı taşımayan
+    üstel yakın-geçmiş ortalaması verdiğini Denklem 2.6 benzeri analizle göster.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p13
+- id: ch2-p36-i1
+  page: 36
+  pdf_page: 58
+  kind: tanım
+  what: ln doğal log, e≈2.71828; kol seçilince sayım artar/bonus azalır, seçilmezken ln t bonusu yavaş ve sınırsız
+    büyütür.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ucb
+- id: ch2-p36-i2
+  page: 36
+  pdf_page: 58
+  kind: şekil
+  what: 'Şekil 2.4: UCB c=2 ile ε=.1, ödül-adım eksenleri, ilk 10 denenmemiş kol ve 11. adım sıçraması.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#lab:l4
+  figure: türetildi
+  source_number: '2.4'
+  note: Kaynak sayfası görüntü olarak incelendi; 2.1 SVG, 2.2–2.6 l4 içinde aynı numaralı ön ayar.
+- id: ch2-p36-i3
+  page: 36
+  pdf_page: 58
+  kind: bilgi
+  what: UCB'yi durağan olmayan görev, büyük durum uzayı ve yaklaşıma taşımanın kaynak kapsamındaki güçlükleri.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ucb
+- id: ch2-p36-i4
+  page: 36
+  pdf_page: 58
+  kind: alıştırma
+  source_number: '2.8'
+  what: Şekil 2.4 içinde UCB performansı 11. adımda yükseliyor, sonraki adımlarda düşüyor. İki yönü de açıkla.
+    c=1 iken sıçramanın daha az belirgin olması açıklamana uysun.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p14
+- id: ch2-p36-i5
+  page: 36
+  pdf_page: 58
+  kind: bilgi
+  what: UCB skoru olası gerçek değer üst sınırı, karekök belirsizlik bonusu, c güven ölçeğidir; tüm kollar
+    tekrar seçilir, düşük/sık denenmişler seyrekleşir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ucb
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p36-i6
+  page: 36
+  pdf_page: 58
+  kind: bilgi
+  what: Şekil 2.4 ilk k adımda denenmemiş kollar arasında rastgele seçim; kaynak ölçümünde sonra çoğunlukla
+    ε-açgözlüden yüksek ödül.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-ucb
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p37-i1
+  page: 37
+  pdf_page: 59
+  kind: tanım
+  what: H eylem tercihi ödül değeri değildir; yalnız farkları etkilidir, bütün H'lere 1000 eklemek olasılıkları
+    korur.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p37-i2
+  page: 37
+  pdf_page: 59
+  kind: formül
+  what: Denklem 2.11 Gibbs/Boltzmann softmax, başlangıç H=0 ile eşit seçim; π_t eylem olasılığı gösterimidir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p37-i3
+  page: 37
+  pdf_page: 59
+  kind: formül
+  what: Denklem 2.12 seçili H için α(R−B)(1−π), diğerleri için −α(R−B)π güncellemesi.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p37-i4
+  page: 37
+  pdf_page: 59
+  kind: bilgi
+  what: Ödül tabanın üstündeyse seçilen olasılık artar; altındaysa azalır; diğer tercihler ters yöne gider.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p37-i5
+  page: 37
+  pdf_page: 59
+  kind: bilgi
+  what: Kaynak tabanı güncel ödül dahil örnek ortalamasıdır; değişen ortamda yakın-geçmiş ortalaması seçilebilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p37-i6
+  page: 37
+  pdf_page: 59
+  kind: bilgi
+  what: Ortak ödül kayması aynı ödüllerin ortalama tabanıyla farkı değiştirmez; taban 0 bırakılırsa davranış
+    değişir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p37-i7
+  page: 37
+  pdf_page: 59
+  kind: alıştırma
+  source_number: '2.9'
+  what: İki eylem için softmax dağılımının istatistik ve sinir ağlarında kullanılan lojistik/sigmoid fonksiyonla
+    aynı olduğunu göster.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p15
+- id: ch2-p38-i1
+  page: 38
+  pdf_page: 60
+  kind: şekil
+  what: 'Şekil 2.5: N(4,1) gerçek ortalamalar, α=.1/.4 tabanlı ve tabansız dört optimal-seçim eğrisi, 1–1000
+    adım.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#lab:l4
+  figure: türetildi
+  source_number: '2.5'
+  note: Kaynak sayfası görüntü olarak incelendi; 2.1 SVG, 2.2–2.6 l4 içinde aynı numaralı ön ayar.
+- id: ch2-p38-i2
+  page: 38
+  pdf_page: 60
+  kind: formül
+  what: Denklem 2.13 H_{t+1}(a)=H_t(a)+α∂E[R_t]/∂H_t(a) tam gradyan adımıdır; performansın numarasız açılımı
+    J=Σπq* gerçek değerleri gerektirir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p38-i3
+  page: 38
+  pdf_page: 60
+  kind: bilgi
+  what: 'Şekil 2.5: tabanlı α=.4 başlangıçta hızlı, α=.1 sonda yüksek; tabansızlar düşük, tabansız α=.4 daha
+    kötüdür.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p39-i1
+  page: 39
+  pdf_page: 61
+  kind: türetim
+  what: J türevinde eylemden bağımsız B çıkarılabilir çünkü Σ∂π=0; π/π ile ifade beklentiye çevrilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p39-i2
+  page: 39
+  pdf_page: 61
+  kind: türetim
+  what: E[R|A]=q*(A) ile örnek ödül kullanılır; skorla çarpılan R−B gradyan kestirimini verir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p39-i3
+  page: 39
+  pdf_page: 61
+  kind: bilgi
+  what: Güncel ödül dahil taban geçmişe göre bağımsız değildir; kaynak eşitliğinde (1−1/t) çarpanı gerekir.
+  status: düzeltildi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p40-i1
+  page: 40
+  pdf_page: 62
+  kind: türetim
+  what: Bölüm kuralı ve üstel türevinden ∂π(x)/∂H(a)=π(x)([x=a]−π(a)) adım adım elde edilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p40-i2
+  page: 40
+  pdf_page: 62
+  kind: bilgi
+  what: Geçmişe göre belirli eylem/ödülden bağımsız taban beklenen gradyanı korur; 0/1000 geçerli, varyans
+    ve hız değişir; ortalama her zaman en iyi taban değildir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p40-i3
+  page: 40
+  pdf_page: 62
+  kind: bilgi
+  what: Beklenen gradyan yönü tek başına sabit adımlı örnek yörüngesinin kesin yakınsamasını garanti etmez.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
+- id: ch2-p41-i1
+  page: 41
+  pdf_page: 63
+  kind: örnek
+  what: Rastgele farklı bandit görevleri kimlik ipucusuz hızlı değişen tek görev görünür; renk ipucuyla kırmızı→kol1/yeşil→kol2
+    politikası öğrenilebilir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p41-i2
+  page: 41
+  pdf_page: 63
+  kind: tanım
+  what: Associative search/contextual bandit, deneme-yanılma ile durum-eylem ilişkisini birleştirir; eylem
+    yalnız anlık ödülü etkiler.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p41-i3
+  page: 41
+  pdf_page: 63
+  kind: bilgi
+  what: Eylem sonraki durumu da etkilerse tam RL olur; bağlamın ayrıntıları M11.8 bağlantısında.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p41-i4
+  page: 41
+  pdf_page: 63
+  kind: alıştırma
+  source_number: '2.10'
+  what: Her adımda 0.5 olasılıkla A durumunda gerçek değerler (0.1,0.2), 0.5 olasılıkla B durumunda (0.9,0.8)
+    geliyor. Hangi durumda olduğunu bilmiyorsan en iyi beklenen başarı ve uygun davranış nedir? A/B etiketi
+    veriliyor ama değerler hâlâ bilinmiyorsa öğrenilebilecek en iyi başarı ve davranış nedir? Sayısal alana
+    ipuçlu limit başarıyı gir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p16
+- id: ch2-p41-i5
+  page: 41
+  pdf_page: 63
+  kind: bilgi
+  what: Hızlı görev değişimi izleme yöntemlerini zorlar; renk ipucu görev kimliğini bildirir, gerçek eylem
+    değerlerini bildirmez.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p42-i1
+  page: 42
+  pdf_page: 64
+  kind: tanım
+  what: Parametre taraması bir öğrenme eğrisini ilk 1000 adımın ortalaması/alanıyla tek sayıya indirger.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-deneyler
+- id: ch2-p42-i2
+  page: 42
+  pdf_page: 64
+  kind: şekil
+  what: 'Şekil 2.6: ε, α, c ve Q0 için ayrı yöntemler; iki katlık parametreler 1/128–4 log ekseni; ortalama
+    ilk 1000 ödülü, iyimserde α=.1.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#lab:l4
+  figure: türetildi
+  source_number: '2.6'
+  note: Kaynak sayfası görüntü olarak incelendi; 2.1 SVG, 2.2–2.6 l4 içinde aynı numaralı ön ayar.
+- id: ch2-p42-i3
+  page: 42
+  pdf_page: 64
+  kind: bilgi
+  what: 'Şekil 2.6 aralıkları: ε 1/128–1/4, gradyan α 1/32–4, UCB c 1/16–4, iyimser Q 1/4–4; Q0/Q1 aynı ilk
+    kestirimdir.'
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-deneyler
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p43-i1
+  page: 43
+  pdf_page: 65
+  kind: bilgi
+  what: Kaynak taramasında ara optimumlar ve yaklaşık bir mertebe iyi ayar bölgesi; sadece tepe değil parametre
+    hassasiyeti önemlidir; UCB o ölçümde öndedir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-deneyler
+- id: ch2-p43-i2
+  page: 43
+  pdf_page: 65
+  kind: bilgi
+  what: Basit yöntemlerin en ileri düzey sayılması 2018 yazar görüşüdür; karmaşıklık/varsayım maliyeti tam
+    RL hedefinde önemlidir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p43-i3
+  page: 43
+  pdf_page: 65
+  kind: bilgi
+  what: Gittins bilinen önsel ve özel indirgeme koşullarında optimal olabilir; tam RL'ye kuram ve hesap taşınabilirliği
+    sınırlıdır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p43-i4
+  page: 43
+  pdf_page: 65
+  kind: bilgi
+  what: Bayesçi güncelleme genel olarak karmaşık, eşlenik ailede kolaydır; sonsaldan en iyi olma olasılığıyla
+    seçim Thompson yaklaşımıdır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p43-i5
+  page: 43
+  pdf_page: 65
+  kind: tanım
+  what: Eylem/ödülle evrilen sonsal bilgi durumudur; 1000 adım, 2 eylem ve 2 ödül 4^1000=2^2000 yaprak verir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p43-i6
+  page: 43
+  pdf_page: 65
+  kind: bilgi
+  what: Tam Bayesçi olasılıklarla optimal denge planlanabilir, ağaç maliyeti büyür; yaklaşık RL yaklaşımı kaynakta
+    ileri araştırma konusudur.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+- id: ch2-p43-i7
+  page: 43
+  pdf_page: 65
+  kind: bilgi
+  what: Bayesçi yaklaşım bilinen başlangıç dağılımı, durağan gerçek değerler ve her adım tam sonsal güncelleme
+    varsayar; posterior sampling Thompson eş adıdır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p43-i8
+  page: 43
+  pdf_page: 65
+  kind: bilgi
+  what: Kaynak, Thompson yönteminin iyi dağılım varsaymayan yöntemlerle benzer performans gösterebildiğini
+    değerlendirir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p44-i1
+  page: 44
+  pdf_page: 66
+  kind: kaynakça
+  what: Thompson 1933/1934, Robbins 1952, Bellman 1956 ardışık deney; Berry–Fristedt 1985 istatistik; Narendra–Thathachar
+    1989 mühendislik; Bush–Mosteller 1955 ve Estes 1950 psikoloji.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p44-i2
+  page: 44
+  pdf_page: 66
+  kind: kaynakça
+  what: Pearl 1984 greedy arama; Witten 1976b tanılama-kontrol; Feldbaum 1965 dual control; Holland 1975 kullanım-yeni
+    bilgi çatışması.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p44-i3
+  page: 44
+  pdf_page: 66
+  kind: kaynakça
+  what: Thathachar–Sastry 1985 eylem değerli estimator algorithms; Watkins 1989 action value ve s.187 erken
+    ε-açgözlü, daha eski kullanım olasılığı açık.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p44-i4
+  page: 44
+  pdf_page: 66
+  kind: kaynakça
+  what: Bertsekas–Tsitsiklis 1996 stokastik yineleme; Sutton 1996 iyimser başlatma.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p44-i5
+  page: 44
+  pdf_page: 66
+  kind: kaynakça
+  what: Lai–Robbins 1985, Kaelbling 1993b, Agrawal 1995 UCB öncüleri; Auer–Cesa-Bianchi–Fischer 2002 UCB1.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p44-i6
+  page: 44
+  pdf_page: 66
+  kind: kaynakça
+  what: Williams 1992 gradyan ailesi; Balaraman Ravindran iletişiminin kitap sunumuna etkisi.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p44-i7
+  page: 44
+  pdf_page: 66
+  kind: alıştırma
+  source_number: '2.11'
+  what: Alıştırma 2.5 durağan olmayan ortamı için Şekil 2.6 benzeri parametre taraması üret. Örnek ortalamalı
+    yöntemlere sabit α=0.1 ε-açgözlüyü de kat. Her çalıştırma 200000 adım olsun; her yöntem/ayarın ölçütü son
+    100000 adımın ortalama ödülü olsun.
+  status: eklendi
+  where: content/modules/m11-7-bandits/module.yaml#practice:p17
+- id: ch2-p44-i8
+  page: 44
+  pdf_page: 66
+  kind: kaynakça
+  what: Thathachar–Sastry 1985 bu bandit için ilk eylem-değeri yöntemleri; Feldbaum 1965 belirsizlikte eşzamanlı
+    tanılama/kontrol; Williams 1992 sonraki aktör–eleştirmen/PG ailesi.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p45-i1
+  page: 45
+  pdf_page: 67
+  kind: kaynakça
+  what: Greensmith–Bartlett–Baxter 2002/2004, Dick 2015 taban seçimi; Sutton 1984 erken sistematik deney; Bridle
+    1990 softmax adı, Luce 1959 seçim kuralı.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p45-i2
+  page: 45
+  pdf_page: 67
+  kind: kaynakça
+  what: Barto–Sutton–Brouwer 1981 associative search; Barto–Anandan 1985 ve Sutton 1984 associative reinforcement
+    learning adlandırma ayrımı.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p45-i3
+  page: 45
+  pdf_page: 67
+  kind: tanım
+  what: Thorndike etki yasasında durum-eylem bağları; Skinner 1938 discriminative stimulus mevcut pekiştirme
+    koşulunu bildirir ve duruma karşılık gelir.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p45-i4
+  page: 45
+  pdf_page: 67
+  kind: kaynakça
+  what: Bellman 1956 Bayesçi DP; Gittins–Jones 1974 indis; Duff 1995 RL ile indis öğrenme; Kumar 1985 Bayesçi/Bayesçi
+    olmayan tarama; Lovejoy 1991 bilgi durumu.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p45-i5
+  page: 45
+  pdf_page: 67
+  kind: tanım
+  what: Denetimli örnek karmaşıklığı hedef doğruluk için örnek sayısı; Kakade 2003 RL keşif karmaşıklığı yakın-optimal
+    seçilmeyen adımların sayısıdır.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p45-i6
+  page: 45
+  pdf_page: 67
+  kind: kaynakça
+  what: Li 2012 keşif verimliliği ölçütleri; Russo–Van Roy–Kazerouni–Osband–Wen 2018 Thompson incelemesi.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+- id: ch2-p45-i7
+  page: 45
+  pdf_page: 67
+  kind: bilgi
+  what: Yazarlar associative reinforcement learning adını tam RL eş anlamlısı olarak ayırmayı tercih eder.
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+  note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch2-p45-i8
+  page: 45
+  pdf_page: 67
+  kind: kaynakça
+  what: Kaynağa göre Bellman 1956 Bayesçi dengeyi DP ile optimal hesaplamayı ilk gösterir; information state
+    terimi kısmi gözlenen MDP literatüründendir (Lovejoy 1991).
+  status: eklendi
+  where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
+  note: Bağımsız ikinci okuma ayrıntısı.
 chapter_counts:
   '1':
     items: 159
@@ -6503,6 +7398,11 @@ chapter_counts:
     unnumbered_figures: 1
     exercises: 5
     code: 0
+  '2':
+    items: 106
+    figures: 6
+    exercises: 11
+    code: 1
 part_dividers:
 - pdf_pages:
   - 45

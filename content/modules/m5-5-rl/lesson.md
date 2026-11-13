@@ -91,13 +91,13 @@ Kaynak: Sutton ve Barto, s. 4–5; kaynak notu s. 22. Birim dönüşümü hesapl
 
 ### Politika, ödül, değer ve model {#sutton-bilesenler}
 
-**Politika** algılanan durumdan eyleme veya eylem olasılıklarına gider. Basit bir tablo, bir fonksiyon ya da pahalı bir arama işlemi olabilir; psikolojideki uyarıcı–tepki bağlantısını andırır. Davranışı belirlemek için politika yeterlidir. Politika kuran her sistemin ayrıca açık bir değer tablosu tutması gerekmez.
+**[[politika|Politika]]** algılanan durumdan eyleme veya eylem olasılıklarına gider. Basit bir tablo, bir fonksiyon ya da pahalı bir arama işlemi olabilir; psikolojideki uyarıcı–tepki bağlantısını andırır. Davranışı belirlemek için politika yeterlidir. Politika kuran her sistemin ayrıca açık bir değer tablosu tutması gerekmez.
 
-**Ödül sinyali** ortamın her adımda verdiği tek sayıdır. Sorunun hangi olayları iyi veya kötü saydığını ve uzun vadede neyin artırılacağını belirler. Haz ve acı benzetmesi sezgiseldir. Sinyal, durum ve eylemin rastgele bir fonksiyonu olabilir. Düşük ödül bir politika değişikliğini tetikleyebilir; tek gözlem tek başına eylemin kötü olduğunu kanıtlamaz.
+**[[ödül|Ödül sinyali]]** ortamın her adımda verdiği tek sayıdır. Sorunun hangi olayları iyi veya kötü saydığını ve uzun vadede neyin artırılacağını belirler. Haz ve acı benzetmesi sezgiseldir. Sinyal, durum ve eylemin rastgele bir fonksiyonu olabilir. Düşük ödül bir politika değişikliğini tetikleyebilir; tek gözlem tek başına eylemin kötü olduğunu kanıtlamaz.
 
-**Değer**, bir durumdan başlayınca gelecekte beklenen toplam ödülü tahmin eder. Anlık ödülü düşük olan bir durum, bol ödüllü durumlara kapı açtığı için yüksek değerli olabilir; tersi de mümkündür. Ödül amaç açısından birincildir, değer bu amacın öngörüsüdür. Eylem seçerken yalnız anlık ödülü değil uzun vadeli değeri dikkate alırız. Ödül doğrudan gözlenir; değeri ise uzun gözlem dizilerinden tekrar tekrar kestirmek gerekir. Bu güçlük, değer öğrenmesini pek çok RL algoritmasının merkezine koyar.
+**[[değer fonksiyonu|Değer]]**, bir durumdan başlayınca gelecekte beklenen toplam ödülü tahmin eder. Anlık ödülü düşük olan bir durum, bol ödüllü durumlara kapı açtığı için yüksek değerli olabilir; tersi de mümkündür. Ödül amaç açısından birincildir, değer bu amacın öngörüsüdür. Eylem seçerken yalnız anlık ödülü değil uzun vadeli değeri dikkate alırız. Ödül doğrudan gözlenir; değeri ise uzun gözlem dizilerinden tekrar tekrar kestirmek gerekir. Bu güçlük, değer öğrenmesini pek çok RL algoritmasının merkezine koyar.
 
-**Ortam modeli**, durum ve eylemden sonraki duruma ve ödüle ilişkin çıkarım yapmayı sağlar. Gerçek deneyimden önce olası gelecekleri değerlendirmek **planlama**dır. Model tabanlı yöntem model kullanır; modelsiz yöntem örneklerle ilerler. M11.10 içindeki Dyna, etkileşimden hem değer hem model öğrenip modelle planlamayı birleştirir. RL bu nedenle düşük düzeyli deneme–yanılmadan uzun vadeli planlamaya uzanır.
+**[[ortam modeli|Ortam modeli]]**, durum ve eylemden sonraki duruma ve ödüle ilişkin çıkarım yapmayı sağlar. Gerçek deneyimden önce olası gelecekleri değerlendirmek **planlama**dır. Model tabanlı yöntem model kullanır; modelsiz yöntem örneklerle ilerler. M11.10 içindeki Dyna, etkileşimden hem değer hem model öğrenip modelle planlamayı birleştirir. RL bu nedenle düşük düzeyli deneme–yanılmadan uzun vadeli planlamaya uzanır.
 
 Kaynak: Sutton ve Barto, s. 6–7 (§1.3).
 
