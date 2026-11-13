@@ -3,7 +3,7 @@
 - **Doğru arama:** iyileşme yönü bul (gradyan), adım uzunluğu seç (geri izleme, Armijo).
 - **Güven bölgesi:** $f$'yi basit bir $\tilde f$ ile yaklaşıkla, $\tilde f$'ye güvendiğin bölge $R_t$ seç, $\tilde x^*=\arg\min_{x\in R_t}\tilde f(x)$.
 
-$\tilde f$ ikinci dereceden Taylor: $\tilde f(x)=f(c)+\nabla f^\top(x-c)+\tfrac12(x-c)^\top H(x-c)$ — $H$ $d_x\times d_x$: büyük modellerde sorun. Taylor $c$ yakınında doğru → bölge hiperküre $\|x-c\|\le\delta$. $H$ pozitif yarı tanımlıysa dışbükey alt problem (basit, global çözüm); değilse iyileşmeyi garanti eden sezgiseller (Cauchy noktası: gradyan yönünde bölge içinde en iyi nokta; dogleg; Steihaug-CG). Oran $\rho=\dfrac{f(x)-f(x+p)}{\tilde f(x)-\tilde f(x+p)}$ yarıçapı yönetir.
+$\tilde f$ ikinci dereceden Taylor: $\tilde f(x)=f(c)+\nabla f^\top(x-c)+\tfrac12(x-c)^\top H(x-c)$ — $H$ $d_x\times d_x$: büyük modellerde sorun. Taylor $c$ yakınında doğru → bölge hiperküre $\|x-c\|\le\delta$. $H$ pozitif yarı tanımlıysa dışbükey alt problem (basit, global çözüm); değilse alt problem dışbükey olmasa da global çözülebilir ($(H+\lambda I)p=-g$, $H+\lambda I\succeq0$, tek boyutlu λ araması). Büyük boyutta ucuz yaklaşıklar: Cauchy noktası (gradyan yönünde bölge içinde en iyi nokta), dogleg ($H\succ0$ iken), Steihaug-CG. Oran $\rho=\dfrac{f(x)-f(x+p)}{\tilde f(x)-\tilde f(x+p)}$ yarıçapı yönetir.
 
 **Politikalarda:** mesafeyi davranışla ölç: $\mathrm{KL}(\pi_\theta\|\pi_{\theta+d})\approx\tfrac12d^\top F d$, $F=\mathbb E[\nabla\log\pi\,\nabla\log\pi^\top]$. KL bölgesinde doğrusal amacın çözümü **doğal gradyan** $F^{-1}g$ (Kakade 2001), adım $\beta=\sqrt{2\delta/(g^\top F^{-1}g)}$.
 

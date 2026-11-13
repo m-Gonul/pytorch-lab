@@ -103,3 +103,194 @@ homework:
     accept:
       - "Kırpılmış ε = 0.2 en iyi ya da en iyiye yakın (makale Tablo 1 nitel)."
       - "Kırpmasız sürüm bazı tohumlarda çöker."
+
+labs:
+  - id: l1
+    lab: trustregion
+    title: "Güven bölgesi, Newton ve gradyan inişi iki boyutta"
+    goal: |
+      Üç fonksiyonda (Rosenbrock, eyer noktalı, iki çukurlu) beş yöntemi karşılaştır: sabit adımlı gradyan inişi, korumasız Newton, ve alt problemi Cauchy noktası, dogleg ya da tam olarak çözen güven bölgesi. Yolu, f − f*'ı ve bölge yarıçapının ρ oranıyla nasıl büyüyüp küçüldüğünü izle.
+    predict:
+      q: "Eyer noktalı x² − y² + y⁴/4 fonksiyonunda (0.6, 0.02)'den başlayan korumasız Newton nereye gider?"
+      options:
+        - {t: "En küçük noktalardan birine, (0, ±1.414)", why: "Başlangıçta Hessian belirsiz (özdeğerler 2 ve ≈ −2); Newton adımı modelin durağan noktasına, yani eyerine gider."}
+        - {t: "(0, 0) eyer noktasına; orada gradyan sıfır olduğu için durur", ok: true, why: "2 adımda f = 0'a varır; en küçük değer −1. Tam güven bölgesi aynı noktadan 3 adımda en küçüğe iner."}
+        - {t: "Iraksar", why: "Bu fonksiyonda adımlar sınırlı kalır; sorun yanlış durağan noktaya çekilmesi."}
+    presets:
+      - {name: "Rosenbrock, dogleg", params: {fn: 0, m: 3, st: 0, d0: 0.5, N: 60}, note: "12 adımda 10⁻⁶; bir adım reddediliyor."}
+      - {name: "Rosenbrock, Newton", params: {fn: 0, m: 1, st: 0, N: 60}, note: "Hessian yol boyunca pozitif tanımlı: 7 adım."}
+      - {name: "Yalnız Cauchy noktası", params: {fn: 0, m: 2, st: 0, d0: 0.5, N: 60}, note: "60 adımda f = 0.016: en dik iniş kadar yavaş."}
+      - {name: "Gradyan inişi", params: {fn: 0, m: 0, st: 0, eta: 0.02, N: 60}, note: "60 adımda f = 0.24."}
+      - {name: "Eyer: Newton", params: {fn: 1, m: 1, st: 1, N: 60}, note: "Eyer noktasında takılıyor (f = 0, en küçük −1)."}
+      - {name: "Eyer: tam çözüm", params: {fn: 1, m: 4, st: 1, d0: 0.5, N: 60}, note: "Negatif eğriliği kullanıp 3 adımda (0, 1.414)."}
+      - {name: "İki çukur: Newton", params: {fn: 2, m: 1, st: 2, N: 60}, note: "(0, 0) eyerine gidiyor, f = 1."}
+      - {name: "İki çukur: dogleg", params: {fn: 2, m: 3, st: 2, d0: 0.5, N: 60}, note: "6 adımda (1, 0) çukuru."}
+    questions:
+      - q: "Rosenbrock'ta tam alt problem çözümü δ₀ = 0.05 ile 13 adımda, δ₀ = 2 ile de 13 adımda yakınsıyor (12'ye karşı). Başlangıç yarıçapı neden bu kadar az önemli?"
+        a: "Yarıçap ρ ile kendini ayarlıyor. Küçük başlayınca model iyi çalıştığı ve adımlar sınıra dayandığı için her adımda iki katına çıkıyor (δ₀ = 0.05'te son yarıçap 1.6, hiç ret yok). Büyük başlayınca ilk adımlarda ρ küçük çıkıyor, iki adım reddediliyor ve yarıçap dörtte birine iniyor. Birkaç adımlık bir kayıpla uygun ölçeğe varılıyor; doğru aramadaki adım uzunluğu seçiminin karşılığı budur."
+    limits: "İki boyut; Hessian analitik. ρ kuralı: ρ < 0.25 → δ/4, ρ > 0.75 ve sınırda → 2δ (en çok 2), ρ > 0.1 ise kabul. Dogleg belirsiz Hessian'da Cauchy noktasına düşer; tam çözüm λ'da ikiye bölmeyle (zor durum dahil). Öngörülen azalma 10⁻¹³'ün altına inince durulur."
+  - id: l2
+    lab: ppoclip
+    title: "PPO kırpması, KL cezası ve kırpmasız vekil"
+    goal: |
+      K kollu bir haydutta softmax politikayı üç vekil amaçla eğit. Her yinelemede eski politikadan B örnek topla ve aynı yığın üzerinde E epoch gradyan yükselişi yap. Gerçek amacı J (beklenen ödül) ve her yinelemede politikanın ne kadar değiştiğini, KL(π_eski‖π_yeni)'yi karşılaştır.
+    predict:
+      q: "Varsayılan ayarlarda (aynı yığında 10 epoch, α = 2) 40 yineleme sonunda hangi vekil en yüksek J'ye ulaşır?"
+      options:
+        - {t: "Kırpmasız vekil: kısıtsız olduğu için en hızlı ilerler", why: "İlk yinelemede KL 1.18: tek yığının şansına göre aşırı itiliyor, 30 tekrarın 10'u J < 0.9'da kalıyor (J = 0.871)."}
+        - {t: "PPO kırpması", ok: true, why: "J = 0.966; ilk KL 0.028. Kırpılmamış 0.871, KL cezası (β = 1) 0.847."}
+        - {t: "Üçü aynı: hepsi aynı gradyanla başlar", why: "Bu yalnız E = 1'de doğru (r = 1); birden çok epoch'ta ayrışırlar."}
+    presets:
+      - {name: "Varsayılan", params: {K: 10, B: 32, E: 10, lr: 2, eps: 0.2, beta: 1, noise: 1, I: 40}, note: "J: 0.871 / 0.966 / 0.847."}
+      - {name: "Tek epoch", params: {K: 10, B: 32, E: 1, lr: 2, eps: 0.2, beta: 1, noise: 1, I: 40}, note: "r = 1'de başlıyor: üçü de ≈ 0.953."}
+      - {name: "Çok epoch", params: {K: 10, B: 32, E: 30, lr: 2, eps: 0.2, beta: 1, noise: 1, I: 40}, note: "Kırpmasız 0.763'e düşüyor; PPO 0.973."}
+      - {name: "Büyük adım", params: {K: 10, B: 32, E: 10, lr: 5, eps: 0.2, beta: 1, noise: 1, I: 40}, note: "Kırpmasız 0.789, KL cezası 0.74; PPO 0.972."}
+      - {name: "Gürültüsüz ödül", params: {K: 10, B: 32, E: 10, lr: 2, eps: 0.2, beta: 1, noise: 0, I: 40}, note: "Sömürülecek şans yok: üçü de ≥ 0.99."}
+      - {name: "Geniş kırpma", params: {K: 10, B: 32, E: 10, lr: 2, eps: 0.5, beta: 1, noise: 1, I: 40}, note: "İlk KL 0.124: kırpma KL'yi kesin sınırlamıyor."}
+      - {name: "Güçlü KL cezası", params: {K: 10, B: 32, E: 10, lr: 2, eps: 0.2, beta: 5, noise: 1, I: 40}, note: "β = 5 çok frenliyor: J = 0.754, 27 tekrar J < 0.9'da."}
+    questions:
+      - q: "KL cezasında β = 1 az frenliyor, β = 5 çok frenliyor. PPO makalesindeki uyarlamalı β kuralı bu sorunu nasıl çözer, kırpmadan farkı ne kalır?"
+        a: "Uyarlamalı kural her güncellemeden sonra ölçülen KL'yi hedefle karşılaştırır: hedefin 1.5 katını aşarsa β iki katına çıkar, 1.5'te birinin altına inerse yarıya düşer. Böylece β, problemin ölçeğine kendiliğinden ayarlanır. Fark şudur: ceza bütün örneklere yumuşak ve sürekli etki eder, kırpma ise yalnız iyileştirme yönünde sınırı aşmış örneklerin gradyanını keser. Makalenin MuJoCo karşılaştırmasında kırpma (0.82) uyarlamalı cezadan (0.74) biraz iyi çıktı."
+    limits: "Tek adımlı RL (haydut); kol ortalamaları 1.0'dan 0.2'ye doğrusal, ödüle N(0, σ²) gürültü. Avantaj = ödül − yığın ortalaması. Tam yığın gradyanı (mini yığın yok); 30 tohumlu tekrarın ortalaması."
+  - id: l3
+    lab: gae
+    title: "GAE: kusurlu eleştirmenle yanlılık–varyans dengesi"
+    goal: |
+      Bir zincirde politika olasılık p ile sağa gider; sağ uç +1 verir. Eleştirmen gerçek değerin bozulmuş bir kopyasıdır: V̂ = κV + σ_V·z. Başlangıçtaki iki eylemin avantaj farkını GAE(λ) ile kestir. Her λ için yanlılığın karesini, varyansı ve ortalama kare hatayı (HKO) ölç.
+    predict:
+      q: "σ_V = 0.2 ve M = 30 yörüngenin ortalamasıyla en küçük HKO hangi λ'dadır?"
+      options:
+        - {t: "λ = 0: varyans en küçük", why: "λ = 0'da yanlılık² 0.046, varyansın (0.006) sekiz katı."}
+        - {t: "≈ 0.7", ok: true, why: "λ = 0'da yanlılık, λ = 1'de varyans (0.097) baskın; en iyi nokta arada."}
+        - {t: "λ = 1: yansız", why: "Yansız ama varyansı 0.097; HKO λ = 0.7'deki 0.020'nin beş katı."}
+    presets:
+      - {name: "Varsayılan", params: {S: 10, p: 0.5, g: 0.98, sr: 0.3, sv: 0.2, kap: 1, M: 30, lam: 0.95}, note: "En iyi λ = 0.7."}
+      - {name: "Tek örnek", params: {S: 10, p: 0.5, g: 0.98, sr: 0.3, sv: 0.2, kap: 1, M: 1, lam: 0.95}, note: "Varyans baskın: en iyi λ = 0.15."}
+      - {name: "Çok örnek", params: {S: 10, p: 0.5, g: 0.98, sr: 0.3, sv: 0.2, kap: 1, M: 300, lam: 0.95}, note: "Varyans 10 kat küçük: en iyi λ = 0.9."}
+      - {name: "Kusursuz eleştirmen", params: {S: 10, p: 0.5, g: 0.98, sr: 0.3, sv: 0, kap: 1, M: 30, lam: 0.95}, note: "Yanlılık yok: en iyi λ = 0."}
+      - {name: "Ölçek hatası", params: {S: 10, p: 0.5, g: 0.98, sr: 0.3, sv: 0, kap: 0.3, M: 100, lam: 0.95}, note: "V̂ = 0.3V: en iyi λ = 0.85."}
+      - {name: "Gürültüsüz ödül", params: {S: 10, p: 0.5, g: 0.98, sr: 0, sv: 0.2, kap: 1, M: 30, lam: 0.95}, note: "Varyans yalnız yörüngeden: en iyi λ = 0.9."}
+    questions:
+      - q: "Eleştirmen ölçeği κ = 0 (V̂ ≡ 0) olsaydı λ = 0 ve λ = 1 kestirimleri neye dönüşürdü?"
+        a: "λ = 0'da Â = r_t: yalnız anlık ödül. Bu zincirde ara ödüllerin ortalaması 0 olduğundan, kestirim uçtan bir adım uzakta değilse eylemlerin farkını hiç görmez: çok yanlıdır. λ = 1'de Â = Σγ^l r_{t+l}, V̂'den bağımsız Monte Carlo getirisi: yansız ama gürültülü. Ara λ'lar uzak ödülleri (γλ)^l ile indirir. Bu, V̂ yokken bile λ'nın bir ufuk kısaltması (ek indirim) olarak yanlılık–varyans düğmesi olduğunu gösterir."
+    limits: "1..S durumlu zincir, s0 ortada; uçlarda bölüm biter. Her eleştirmen çekiliminde 600 yörünge (eylem başına) ile ortalama ve tek örnek varyansı ölçülür; M'lik ortalamanın HKO'su yanlılık² + varyans/M. 10 eleştirmen çekiliminin ortalaması. λ ızgarası 0.05 adımlı."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Cauchy noktası
+    goal: Cauchy noktası formülünü uygulamak
+    needs: $p_C=-\tau\delta g/\|g\|$
+    q: |-
+      $g=(3,4)$, $H=I$, $\delta=1$. Cauchy noktası, model değeri $m(p_C)=g^\top p+\tfrac12p^\top Hp$ ve Newton noktası nedir? Tam çözüm Cauchy noktasından farklı mı?
+    solution: |-
+      $\|g\|=5$, $g^\top Hg=25$, $\tau=\min(125/(1\cdot25),1)=1$. $p_C=-(3,4)/5=(-0.6,-0.8)$, $m=-5+0.5=-4.5$. Newton noktası $-H^{-1}g=(-3,-4)$, normu 5: bölge dışında. $H=I$ iken $(H+\lambda I)p=-g$ çözümü $-g/(1+\lambda)$'dır; $\lambda=4$ ile sınıra varılır ve tam çözüm Cauchy noktasıyla aynıdır. Yön ancak $H$'nin özdeğerleri farklıysa değişir.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Güven oranı ρ
+    goal: Gerçek ve öngörülen azalmayı karşılaştırmak
+    needs: $\rho=\dfrac{f(x)-f(x+p)}{m(0)-m(p)}$
+    q: |-
+      $f(x)=x^4$, merkez $c=1$, $\delta=0.5$. İkinci dereceden modelin bölgedeki en küçüğüne giden adım için $\rho$ nedir?
+    answer: 1.2037037
+    calc: "(1-(2/3)**4)/(2/3)"
+    mistakes:
+      - {answer: 0.8024691, msg: "Bu gerçek azalma; öngörülen azalmaya bölünmeli."}
+      - {answer: 0.8307692, msg: "Oran ters alınmış: öngörülen/gerçek."}
+      - {answer: 1.875, msg: "Adım −0.5 (bölge sınırı) alınmış; kısıtsız en küçük −1/3 bölgenin içinde."}
+    hints:
+      - "$g=4$, $H=12$; kısıtsız adım $-g/H$."
+    solution: |-
+      Adım $p=-1/3$ (bölgede). Öngörülen azalma $-(4\cdot(-1/3)+6/9)=2/3$, gerçek azalma $1-16/81=65/81$. $\rho=(65/81)/(2/3)=1.204$. Model iyidir, ama adım sınırda olmadığı için yarıçap büyütülmez.
+  - id: p3
+    type: hesap
+    level: 1
+    title: Fisher ile KL yaklaşımı
+    goal: KL ≈ ½dᵀFd'yi bir Bernoulli politikasında uygulamak
+    needs: $F=\pi(1-\pi)$
+    q: |-
+      İki eylemli politika $\pi(1)=\sigma(\theta)$. $\theta=2$'den $d=0.5$ adım atılıyor. İkinci dereceden yaklaşımla $\mathrm{KL}(\pi_\theta\|\pi_{\theta+d})$ nedir?
+    answer: 0.0131242
+    calc: "0.5*(1/(1+exp(-2)))*(1-1/(1+exp(-2)))*0.25"
+    mistakes:
+      - {answer: 0.03125, msg: "F = 0.25 θ = 0'daki değer; θ = 2'de σ(2) = 0.881."}
+      - {answer: 0.0262485, msg: "½ çarpanı unutulmuş."}
+    hints:
+      - "$\\sigma(2)=0.8808$."
+    solution: |-
+      $F=0.8808\cdot0.1192=0.1050$, $\mathrm{KL}\approx\tfrac12\cdot0.1050\cdot0.25=0.0131$. Aynı adım θ = 0'da 0.031 KL verirdi: politika uca yaklaştıkça parametreye duyarlılığı azalır, doğal gradyan bu yüzden orada daha uzun adım atar.
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Yeni eleştirmenle GAE
+    goal: λ'nın eleştirmen kalitesine bağlılığını kullanmak
+    needs: GAE yanlılık–varyans
+    q: |-
+      Bir ekip PPO'yu uzun ufuklu, seyrek ödüllü bir görevde çalıştırıyor. Değer ağı rastgele başlatılmış ve ilk binlerce güncellemede çok kötü. Avantajlar λ = 0 ile ($\hat A_t=\delta_t$) hesaplanıyor ve politika hiç ilerlemiyor. Önce neyi değiştirirsiniz?
+    choices:
+      - {t: "γ'yı 0.9'a indirmek", why: "Ufku kısaltır; seyrek ödülü daha da görünmez yapar ve amacı değiştirir."}
+      - {t: "λ'yı 0.95 civarına çıkarmak: λ = 0'da avantaj tamamen kötü eleştirmene dayanıyor, büyük λ gerçek getiriye yaslanır", ok: true, why: "λ = 1'e yaklaştıkça ara V̂'ler sadeleşir; yanlılık eleştirmenden bağımsızlaşır."}
+      - {t: "Kırpma ε'unu büyütmek", why: "Sorun adımın boyu değil, avantajın kendisinin yanlış olması."}
+    hints:
+      - "λ = 0'da $\\hat A_t$ hangi büyüklüklere bağlı?"
+    solution: |-
+      $\delta_t=r_t+\gamma\hat V(s_{t+1})-\hat V(s_t)$: seyrek ödüllü bir görevde $r_t$ neredeyse hep 0'dır ve sinyal yalnız $\hat V$'den gelir, o da rastgeledir. λ = 0.95 ile ödül sinyali onlarca adım geriye taşınır. Eleştirmen iyileştikçe λ azaltılarak varyans düşürülebilir.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Hiç kırpmayan PPO
+    goal: Oranın paydasının saklanması gerektiğini görmek
+    needs: $r_t=\pi_\theta/\pi_{\text{eski}}$
+    q: |-
+      Bir PPO uygulamasında her mini yığında şu satırlar var:
+
+      ```python
+      logp = policy(s).log_prob(a)
+      logp_old = policy(s).log_prob(a).detach()
+      ratio = (logp - logp_old).exp()
+      loss = -torch.min(ratio * A, ratio.clamp(0.8, 1.2) * A).mean()
+      ```
+
+      Ekip, kırpılan örnek oranının her zaman %0 olduğunu ve 10 epoch'ta politikanın kararsızlaştığını görüyor. Neden?
+    choices:
+      - {t: "clamp sınırları ters", why: "0.8 ve 1.2 doğru."}
+      - {t: "logp_old güncel politikayla yeniden hesaplanıyor: oran her zaman 1, kırpma hiç devreye girmez ve her epoch sınırsız bir politika gradyanı adımı olur. logp_old veri toplanırken saklanmalı", ok: true, why: "Oranın paydası veri toplayan politikadır ve epoch'lar boyunca sabit kalmalıdır."}
+      - {t: "detach yüzünden gradyan akmıyor", why: "Gradyan logp üzerinden akıyor; detach yalnız paydada."}
+    hints:
+      - "İkinci epoch'ta logp_old hangi parametrelerle hesaplanıyor?"
+    solution: |-
+      Değer 1 olan ama gradyanı $\nabla\log\pi$ olan oran, sıradan politika gradyanını verir; kırpma sınırları hiç aşılmaz. Her epoch'ta politika eskisinden biraz daha uzaklaşır ama ölçü hep "şimdiki" politikaya göre alındığı için hiç fark edilmez. Doğrusu: toplama sırasında `logp_old`'u bir tamponda saklamak (lab l2'deki kırpmasız vekilin davranışı).
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Kırpılmış amaç kötümser bir alt sınırdır
+    goal: L^CLIP'in yapısını kanıtlamak
+    needs: min, clip
+    q: |-
+      Tek bir örnek için $\ell(r)=\min\bigl(rA,\operatorname{clip}(r,1-\epsilon,1+\epsilon)A\bigr)$, $\epsilon\in(0,1)$. Gösterin: (a) her $r>0$ için $\ell(r)\le rA$; (b) $|r-1|\le\epsilon$ iken $\ell(r)=rA$; (c) $A>0$ ve $r>1+\epsilon$ iken $\ell'(r)=0$, ama $A>0$ ve $r<1-\epsilon$ iken $\ell'(r)=A$; (d) bu yüzden $r=1$ çevresinde $\ell$'in gradyanı kırpılmamış vekilinkine eşittir.
+    rubric:
+      - "(a) min'in tanımından ℓ(r) ≤ rA olduğunu yazdım"
+      - "(b) |r − 1| ≤ ε'da clip(r) = r olduğundan iki terimin eşit olduğunu gösterdim"
+      - "(c) A > 0, r > 1 + ε'da clip terimi (1 + ε)A < rA olduğundan min'in sabit terimi seçtiğini; r < 1 − ε'da rA < (1 − ε)A olduğundan rA'nın seçildiğini gösterdim"
+      - "(d) r = 1 bir iç nokta olduğu için ilk gradyan adımının (ε'dan bağımsız) olağan politika gradyanı olduğunu, A < 0 durumunun simetrik olduğunu belirttim"
+    hints:
+      - "A > 0 ve A < 0 durumlarını ayrı inceleyin."
+    solution: |-
+      (a) Tanım gereği. (b) $|r-1|\le\epsilon$'da kırpma etkisizdir. (c) $A>0$: $r>1+\epsilon$'da $(1+\epsilon)A<rA$ ve min sabittir, türev 0; $r<1-\epsilon$'da $rA<(1-\epsilon)A$ ve min $rA$'dır, türev $A$. Yani iyileştirme yönünde aşırıya gidiş ödüllendirilmez, kötüleştirme yönündeki sapma tam cezalandırılır. $A<0$ için rolleri değişir. (d) Her yinelemenin ilk adımında $r=1$ olduğundan PPO, TRPO ve sıradan politika gradyanı aynı yönden başlar; farkı sonraki epoch'lar yaratır (lab l2, E = 1).
+pitfalls:
+  - wrong: "Hessian belirsizse güven bölgesi alt problemi dışbükey olmadığı için yalnız sezgisellerle yaklaşık çözülebilir."
+    right: "Alt problem belirsiz H'de de global çözülebilir: (H + λI)p = −g, H + λI ⪰ 0, λ(δ − ‖p‖) = 0 koşulları tek boyutlu bir λ aramasına iner. Sezgisellerin nedeni büyük boyutlardaki maliyettir."
+  - wrong: "PPO'nun kırpması KL ıraksamasını ε ile sınırlar; TRPO'nun KL kısıtının aynısıdır."
+    right: "Kırpma yalnız sınırı aşan örneklerin gradyanını sıfırlar; politikayı geri çekmez ve KL'yi kesin sınırlamaz (lab l2: ε = 0.5'te ilk KL 0.124). Pratikte KL izlenir ve gerekirse epoch'lar erken kesilir."
+  - wrong: "GAE'de λ = 1 yansız olduğu için her zaman en iyi seçimdir."
+    right: "λ = 1 yansızdır ama bütün gelecek ödüllerin gürültüsünü toplar. Eleştirmen makulse ara bir λ ortalama kare hatayı küçültür (lab l3: σ_V = 0.2, M = 30'da en iyi λ = 0.7)."
+  - wrong: "TRPO, teoremindeki C·KL^max cezasıyla monoton iyileşmeyi pratikte de garanti eder."
+    right: "C = 4εγ/(1 − γ)² çok büyüktür (γ = 0.99'da ε başına 39 600); bu cezayla adımlar yok denecek kadar küçük olurdu. Pratik TRPO ortalama KL ≤ δ kısıtı, örneklem tahminleri ve yaklaşık çözüm kullanır; garanti teorik motivasyondur."
+whatif:
+  - q: "Eylem uzayı sürekli olsaydı (Gauss politikası)?"
+    a: "Oran olasılık yoğunluklarının oranı olur, PPO aynen çalışır. İki Gauss arasındaki KL kapalı biçimde hesaplanır; ortalamaya göre Fisher matrisi Σ⁻¹'dir, yani doğal gradyan ortalamayı varyansla ölçekler. Log-standart sapma genellikle duruma bağlı olmayan bir parametredir; TRPO ve PPO'nun MuJoCo deneyleri bu kurulumu kullandı."
+  - q: "PPO'da ε → 0 ya da ε → ∞ olsaydı?"
+    a: "ε → ∞: kırpma hiç devreye girmez ve aynı veride birçok epoch kırpmasız vekili aşırı en büyükler (lab l2'de çok epoch'ta J 0.763). ε → 0: ilk gradyan adımından sonra neredeyse bütün örnekler kırpılan bölgeye düşer ve sonraki epoch'lar hiçbir şey yapmaz; her yineleme tek bir politika gradyanı adımına iner, öğrenme yavaşlar."
+  - q: "Klasik güven bölgesindeki ρ ile yarıçap uyarlaması politika yöntemlerine taşınsaydı?"
+    a: "Gerçek iyileşme (yeni verilerle ölçülen getiri) ile vekil iyileşmenin oranına göre δ büyütülüp küçültülürdü. TRPO'nun çizgi araması bunun yalnız ret kısmını yapar; PPO'nun uyarlamalı KL cezası ise ölçülen KL'yi bir hedefe çeker. Gerçek iyileşmeyi ölçmek yeni etkileşim gerektirdiği ve gürültülü olduğu için, politika yöntemleri bölgeyi genellikle KL hedefiyle sabit tutar."
