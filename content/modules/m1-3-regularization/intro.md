@@ -18,3 +18,5 @@ w_j \leftarrow \frac{S\!\left(\tfrac1n x_j^\top r_j,\ \lambda\right)}{\tfrac1n\l
 $$
 
 Bu adımı koordinatlar üzerinde tekrarlamak **coordinate descent**; glmnet ve scikit-learn'ün `Lasso`'su bunu yapar. Bias (intercept) cezalandırılmaz: veriyi ortalayıp sonra $b=\bar y-\bar x^\top w$ ile geri koyarız.
+
+İki cezayı birleştiren **elastic net** ($\lambda_1\lVert w\rVert_1+\lambda_2\lVert w\rVert_2^2$) L1'in seyrekliğiyle L2'nin kararlılığını taşır ve ilişkili öznitelikleri birlikte seçer; tek koordinatta çözümü lasso adımının hemen üzerine oturur (aşağıda türetiyoruz). λ değerini elle tutmak yerine k-fold çapraz doğrulama ile seçeriz — [[cross-validation|cross-validation]] bölümünde 1-SE kuralına kadar gidiyoruz.
