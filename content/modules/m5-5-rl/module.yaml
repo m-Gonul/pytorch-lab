@@ -139,6 +139,58 @@ labs:
       - q: "Bu ortamda tüm ödüller negatif. Taban çizgisi olmadan REINFORCE neden yine de öğrenebiliyor?"
         a: "Her bölümde seçilen eylemlerin olasılığı düşürülür, ama kısa (iyi) bölümlerde bu itme daha zayıftır. Beklentide fark doğru yönü verir; yalnız tek tek güncellemeler çok gürültülüdür. Taban çizgisi 'beklenenden iyi/kötü' ayrımını doğrudan yapar."
     limits: "Tek parametreli politika, γ = 1, bölüm en fazla 200 adım. R çalıştırmanın ortalaması gösteriliyor; tek bir çalıştırma çok daha gürültülüdür."
+  - id: l3
+    lab: explorevalue
+    title: Keşifli davranış ile açgözlü hedefin değeri
+    goal: 'Küçük bir karar ağacında güvenli ve riskli dalı karşılaştır. Keşifli
+
+      davranışın gerçek başarısını tam olasılık hesabıyla ölç; hedef politika
+
+      ile davranış politikasının neden farklı değerler taşıdığını gör.
+
+      '
+    predict:
+      q: 'ε = 0.3, güvenli başarı 0.8: kökte güvenliyi önceleyen keşifli davranışın gerçek başarısı nedir?'
+      options:
+      - t: '0.77'
+        ok: true
+        why: 0.7 × 0.8 + 0.3 × 0.7 = 0.77; riskli dalda da keşif sürer.
+      - t: '0.8'
+        why: Kökteki keşif bazen riskli dalı seçer; güvenli dalın değeri kökün değeri değildir.
+      - t: '1'
+        why: Bu, riskli dalın ileride hiç keşif yapılmadığı varsayımı altındaki değeridir.
+    presets:
+    - name: Keşif sürüyor
+      params:
+        epsilon: 0.3
+        safe: 0.8
+      note: Riskli dal 0.7; iki kök davranışının başarıları 0.73 ve 0.77 (tam hesap).
+    - name: Keşif yok
+      params:
+        epsilon: 0
+        safe: 0.8
+      note: İki hedef de riskli dalı seçer; başarı 1.
+    - name: Eşik
+      params:
+        epsilon: 0.2
+        safe: 0.8
+      note: İki dalın gerçek değeri 0.8; kökte iki seçim de 0.8 verir.
+    - name: Güvenli dal daha zayıf
+      params:
+        epsilon: 0.3
+        safe: 0.4
+      note: İki hedef de riskli dalı önceleyerek 0.61 verir.
+    questions:
+    - q: Keşifli hedef her ayarda daha iyi mi?
+      a: Bu ağaçta ε ≤ 0.5 için daha düşük değildir; güvenli dalı öncelemek yalnız güvenli > 1 − ε iken fark
+        yaratır. Bu, bütün RL algoritmalarının yakınsama veya örnek verimliliği hakkında bir sonuç değildir.
+    - q: Neden kaynak XOX grafiğinin yeniden üretimi denmiyor?
+      a: Ağaç, Alıştırma 1.4 içindeki değer hedefi ayrımını yalıtan ek bir örnektir. XOX rakibi, eğitim süreci
+        ve başlangıç değer tablosu burada modellenmez.
+    limits: İki aşamalı, tam bilinen bir karar ağacı; güvenli dal tek adımda bitiyor. Keşif iki eylemden açgözlü
+      olmayanı seçiyor. Aynı ε kökte ve riskli dalda kullanılıyor; ε en fazla 0.5. Eğitim benzetimi, örnekleme
+      hatası veya yakınsama iddiası yok.
+
 practice:
   - id: p1
     type: çözülmüş
@@ -221,6 +273,249 @@ practice:
       - "$\\pi\\nabla\\log\\pi=\\nabla\\pi$."
     solution: |-
       $\mathbb E_a[\nabla\log\pi(a|s)\,b(s)]=b(s)\sum_a\pi(a|s)\frac{\nabla\pi(a|s)}{\pi(a|s)}=b(s)\nabla\sum_a\pi(a|s)=b(s)\nabla1=0$. Eyleme bağlı bir $b(s,a)$ toplamın dışına çıkamaz ve yanlılık getirir (bu yüzden Q'ya bağlı kontrol değişkenleri ayrıca düzeltilir).
+  - id: p6
+    type: açıkla
+    level: 2
+    title: 'Sutton 1.1: iki taraf da öğrenirse'
+    goal: Kendine karşı oyunda değişen rakip ile sabit rakibi ayırmak.
+    needs: Hamle sonrası değer tablosu ve keşif.
+    q: 'Yukarıdaki XOX oyuncusunun rastgele rakip yerine kendisiyle oynadığını
+
+      ve iki tarafın da öğrendiğini düşün. Süreçte ne olmasını beklersin?
+
+      Hamle seçme politikası farklılaşır mı?
+
+      (Kaynak: Sutton ve Barto, 2. baskı, s. 12, Alıştırma 1.1.)'
+    hints:
+    - Bir oyuncunun güncellemesi diğerinin karşılaştığı ortamı değiştirir.
+    - Kusursuz XOX oyununun sonucu ile hata yapan rakibe karşı kazanmayı ayır.
+    rubric:
+    - İki öğrenen taraf nedeniyle ortamın diğer oyuncu açısından durağan olmadığını belirtir.
+    - Sabit rakip için yakınsama argümanını doğrudan kullanmaz.
+    - Yeterli keşifle güçlü/berabere oyun beklenebileceğini, ama bunun verilen kuraldan otomatik bir yakınsama
+      kanıtı olmadığını açıklar.
+    - Rastgele rakibin hatalarını sömüren politika ile güçlü rakibe karşı yenilmez politika arasındaki farkı
+      kurar.
+    solution: '1. Artık hedef aynı kalmaz: her taraf, diğerinin değişen politikasından
+
+      yeni örnekler alır. Sabit rakibe ait kazanma olasılıklarının yakınsama
+
+      koşulları doğrudan uygulanamaz; döngü, unutma veya dalgalanma mümkündür.
+
+      2. İki oyuncu da iyi hamleleri yeterince dener ve başarısızlıklarından
+
+      öğrenirse bariz hatalar azalır. XOX içinde iki kusursuz oyuncunun
+
+      oyunu beraberliktir; bunu makul bir beklenen davranış olarak söylemek,
+
+      bu özel öğrenme kuralının yakınsadığını kanıtlamak değildir.
+
+      3. Rastgele rakibe karşı işe yarayan tuzak, öğrenen rakip artık
+
+      düşmediğinde değer kaybeder. Bu yüzden politika farklılaşabilir.
+
+      Keşif eğitim boyunca sürüyorsa eğitim oyunlarının hepsinin beraberlik
+
+      olması da gerekmez. Değerlendirmede keşfi kapatmak ayrı bir karardır.'
+  - id: p7
+    type: açıkla
+    level: 2
+    title: 'Sutton 1.2: simetrileri birleştirmek ne zaman doğru?'
+    goal: Temsil paylaşımının çevre simetrisine bağlı olduğunu görmek.
+    needs: XOX değer tablosu ve rakip politikası.
+    q: 'Döndürülmüş veya yansıtılmış pek çok XOX tahtası aynı oyunu temsil eder.
+
+      Öğrenmeyi bu simetrilerden nasıl yararlandırırsın ve ne kazanırsın?
+
+      Rakip simetrileri kullanmıyorsa bu birleştirme yine doğru mudur?
+
+      Simetrik iki konumun değeri zorunlu olarak eşit midir?
+
+      (Kaynak: Sutton ve Barto, s. 12, Alıştırma 1.2.)'
+    hints:
+    - Karenin dört dönmesini ve bunların yansımalarını düşün.
+    - Kuralların simetrisi ile belirli bir rakibin davranış simetrisini ayır.
+    rubric:
+    - Sekiz dönüşümden kanonik temsil veya paylaşılan değer önerir.
+    - Bellek azalması ve bir konumun deneyiminin benzerlerini de güncellemesini açıklar.
+    - Rakibin dönüşümle uyumlu davranmasının gerekliliğini tartışır.
+    - Rakip uygulamasının simetriyi açıkça kodlamaması ile davranışının gerçekten simetrik olmamasını ayırır.
+    solution: '1. Tahtanın dört döndürmesini ve her birinin yansımasını üret. Örneğin
+
+      sözlüksel olarak en küçük diziyi tablo anahtarı seç; eylemi de aynı
+
+      dönüşümle taşı. Böylece bir deneyim en fazla sekiz konuma bilgi taşır.
+
+      Simetrik tahtaların yörüngeleri farklı boyutta olabildiği için tam
+
+      sekiz kat bellek kazancı garanti değildir.
+
+      2. Rakibin politikası dönüşümlere uyuyorsa ve ödül/kurallar da
+
+      korunuyorsa dönüşmüş yörüngeler aynı olasılık ve sonuca sahiptir.
+
+      Bu koşulda simetrik durum değerleri eşittir.
+
+      3. Rakip örneğin ekranın solunu tercih ediyorsa, bir tahtayı döndürmek
+
+      rakibin aynı anlamdaki hamleyi seçmesini sağlamaz. Gerçek rakibe karşı
+
+      kazanma olasılıkları farklı olabilir; zorunlu paylaşım bu asimetriyi
+
+      silip sömürülebilecek bir zayıflığı kaçırabilir.
+
+      Rakibin kodunda simetri özelliği olmaması tek başına sorun değildir:
+
+      boş hücreler üzerinde düzgün rastgele seçim zaten davranış olarak
+
+      simetriktir. Gerekli koşul kodlama tekniği değil politika eşdeğişkenliğidir.'
+  - id: p8
+    type: açıkla
+    level: 1
+    title: 'Sutton 1.3: yalnız açgözlü oynamanın riski'
+    goal: Yetersiz keşfin değer öğrenmesini neden bozduğunu açıklamak.
+    needs: Başlangıç değeri 0.5 ve açgözlü hamle seçimi.
+    q: 'Oyuncu her seferinde en iyi değerlendirdiği konuma giden hamleyi seçsin.
+
+      Böyle bir oyuncu keşif yapan oyuncudan daha iyi veya daha kötü
+
+      öğrenebilir mi? Hangi sorunları beklersin?
+
+      (Kaynak: Sutton ve Barto, s. 12, Alıştırma 1.3.)'
+    hints:
+    - Düşük tahmin edilen ama aslında iyi bir hamle hiç seçilmezse ne olur?
+    - Tek bir eğitim koşusunun başarısıyla garanti edilen keşfi ayır.
+    rubric:
+    - İyi bir eylemin hiç denenmeyebileceğini söyler.
+    - Başlangıç değerleri, eşitlik bozma ve rakip rastgeleliğinin etkisini belirtir.
+    - Keşifsiz oyuncunun her durumda daha kötü olduğu gibi mutlak bir sonuç çıkarmaz.
+    solution: 'Açgözlü oyuncu öğrendiği iyi hamleyi hemen kullanır ve bazı koşularda
+
+      daha çok kazanabilir. Ancak az örnekten gelen yanlış sıralama kalıcı
+
+      olabilir: hiç seçilmeyen daha iyi hamlenin değeri düzeltilmez.
+
+      Başlangıçta bütün sonlanmamış durumların 0.5 olması ve eşitliklerin
+
+      nasıl bozulduğu hangi alt ağacın görüleceğini etkiler. Rakibin
+
+      rastgeleliği bazı konumları gösterse bile her kendi eyleminin yeterli
+
+      denendiğini garanti etmez. Keşif eğitimde hata yaptırır fakat bu
+
+      kilitlenme riskini azaltır. Dolayısıyla örnek verimliliği ve kısa
+
+      vadeli kazanma açısından tek yönlü evrensel bir sıralama yoktur.'
+  - id: p9
+    type: açıkla
+    level: 2
+    title: 'Sutton 1.4: keşifli politikanın kazanma olasılığı'
+    goal: Davranış politikasının değeri ile açgözlü hedefi ayırmak.
+    needs: Hamle sonrası TD güncellemesi; keşif olasılığı.
+    q: 'Değer güncellemeleri keşif hamleleri dahil bütün hamlelerden sonra
+
+      yapılsın. Adım büyüklüğü uygun biçimde azalsın, fakat keşif eğilimi
+
+      azalmadan sürsün. Keşiften öğrenildiğinde ve öğrenilmediğinde
+
+      kavramsal olarak hangi iki kazanma olasılığı kestirilir? Keşif
+
+      sürecekse hangisini öğrenmek daha yararlı olabilir ve hangisi daha
+
+      fazla galibiyet getirir?
+
+      (Kaynak: Sutton ve Barto, s. 12–13, Alıştırma 1.4.)'
+    hints:
+    - Gelecekte de keşif yüzünden kötü hamle yapılabileceğini hesaba kat.
+    - Riskli devamı kusursuz oynamakla, gerçek davranışın onu oynamasını ayır.
+    rubric:
+    - Bütün hamlelerden öğrenmenin keşifli davranışın değerine yöneldiğini açıklar.
+    - Keşif dışındaki güncellemelerin açgözlü devamı hedeflediğini belirtir.
+    - Bu ayrımın koşullarını ve politikayla hedefin birlikte değiştiğini tartışır.
+    - Sürekli keşifte güvenli devamın üstün olabileceğini, genel bir galibiyet garantisi olmadığını belirtir.
+    solution: 'Sabit bir rakip ve sabitlenmiş bir davranış politikası düşün.
+
+      Keşifli hamleleri de örnekleyen hedef, gelecekte aynı keşifli davranış
+
+      sürdüğünde kazanma olasılığıdır. Keşif hamlesinin geçişini hedefe
+
+      katmayan kural ise açgözlü devamın başarı olasılığına yönelir.
+
+      Kontrol sırasında politika da değişiyorsa bu kavramsal hedef ayrımı
+
+      tek başına yakınsama teoremi değildir.
+
+
+      Keşif değerlendirmede de sürecekse, kendi gelecekteki hatalarını
+
+      hesaba katan değerler yararlı olabilir. Örneğin ek deneyde güvenli
+
+      dalın başarısı 0.8; riskli dal doğru hamlede 1, keşif hamlesinde 0.
+
+      ε = 0.3 için gerçek riskli değer 0.7. Açgözlü devam hedefi riskliyi
+
+      önceleyince kökteki keşif dahil başarı 0.7×0.7 + 0.3×0.8 = 0.73;
+
+      gerçek davranış değerine göre güvenliyi önceleyince
+
+      0.7×0.8 + 0.3×0.7 = 0.77 (tam hesap).
+
+
+      Böyle bir farkın mümkün olması her rakipte, her başlangıçta ve her
+
+      örnek bütçesinde daha çok galibiyet garantilemez. Keşif sonradan
+
+      kapatılacaksa açgözlü hedef uygun olabilir. Soru iki farklı geleceği
+
+      karşılaştırmayı ister; tek bir yöntemi koşulsuz üstün ilan etmeyi değil.'
+  - id: p10
+    type: açıkla
+    level: 2
+    title: 'Sutton 1.5: XOX oyuncusunu geliştirmek'
+    goal: Öneriyi bilgi, hesap ve hedef koşullarıyla değerlendirmek.
+    needs: Tablosal değer, rakip modeli, simetri ve keşif.
+    q: 'Öğrenen XOX oyuncusunu başka hangi yollarla geliştirebilirsin?
+
+      Sorunun verildiği hali için daha iyi bir çözüm yöntemi önerebilir misin?
+
+      (Kaynak: Sutton ve Barto, s. 13, Alıştırma 1.5.)'
+    hints:
+    - Rakibin modeli öğrenilebiliyorsa küçük oyun ağacının tamamını çözmeyi düşün.
+    - Her önerinin hangi varsayımla ve hangi ölçüte göre daha iyi olduğunu belirt.
+    rubric:
+    - En az iki uygulanabilir geliştirme ve gerekçesi verir.
+    - Bilinmeyen hata yapan rakip koşulunu korur.
+    - Minimax ile gerçek rakibe karşı kazanmayı en çoklamanın farkını belirtir.
+    - Önerilerin örnek maliyetini, bellek veya hesap karşılığını açıklar.
+    solution: 'Tek zorunlu cevap yoktur. Rakip davranışı simetrikse kanonik tahtayla
+
+      paylaşım yap; ziyaret sayılarına göre keşif ve adım büyüklüğü kullan;
+
+      aynı sonuca giden oyun yollarını tek tablo girdisinde birleştir;
+
+      terminal değerlerini sabitle; gerekiyorsa rakip değişimini izlemek
+
+      için eski deneyimi azalt. Bunlar hangi bilgiden yararlandığını açıklar.
+
+
+      XOX ağacı küçük olduğu için gözlenen her konumda rakibin hamle
+
+      olasılıklarını kestirip bütün ağacı beklenen değerle çözmek de
+
+      uygulanabilir. Olasılıklar bilinmiyorken bu yaklaşım önce veri ister;
+
+      öğrenilmiş model hatası ve rakibin değişimi izlenmelidir. Tam model
+
+      verilmişse beklenen kazanma olasılığı için dinamik programlama
+
+      kesin çözüm verir. Minimax, en kötü rakibe karşı yenilmezlik için
+
+      uygundur; hata yapan belirli rakibe karşı en çok galibiyet sorusunun
+
+      otomatik çözümü değildir. Bu nedenle “daha iyi” demek için örnek
+
+      sayısı, hesap bütçesi ve değerlendirme rakibi belirtilmelidir.'
+
 pitfalls:
   - wrong: "REINFORCE kaybında taban çizgisine de gradyan akabilir."
     right: "Taban çizgisi (ör. değer ağı) ayrıca eğitilir; politika kaybında `.detach()` edilmelidir, yoksa politika kaybı taban çizgisini bozar."

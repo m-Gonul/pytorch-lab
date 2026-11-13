@@ -1,0 +1,6518 @@
+source: sutton
+title: 'Sutton ve Barto — Reinforcement Learning: An Introduction, 2. baskı (2018)'
+files:
+- name: Reinforcement Learning_ An Introduction, 2nd Edition .pdf
+  sha256: fc702eea257ddcd77f7fa46e556d460ebfe89c4cc77b0ffe32204c5216dc3d6d
+  bytes: 7823919
+counts:
+  pages: 548
+  figures: 104
+  exercises: 140
+  code: 38
+  tables: 1
+counts_scope:
+  figures: Yalnız numaralı şekiller; numarasız çizimler ayrıca çıkarılacak.
+  exercises: 1.1–17.1 etiketli alıştırmalar; bölüm içindeki numara dizileri kesintisiz.
+  code: Gri kutulardaki 38 sözde-kod listesi; metin içi algoritmalar ayrıca çıkarılacak.
+  tables: Yalnız Table etiketi taşıyan numaralı tablo; numarasız tablolar ayrıca çıkarılacak.
+license:
+  name: CC BY-NC-ND 2.0
+  verified: true
+  use: link
+  evidence_pdf_page: 4
+  url: https://creativecommons.org/licenses/by-nc-nd/2.0/
+  note: Kaynak metin ve görseller yayımlanmaz; teknik olgular özgün anlatımla işlenir.
+progress:
+  complete: false
+  unit_inventory_complete: false
+  second_read_complete: false
+  note: Bölüm 1 ikinci okuma tamamlandı; yayın denetimi sürüyor. Bölüm 2–17 işlenmedi. Bütün kitap için tamlık
+    iddiası yok.
+  processed_chapters:
+  - 1
+  unprocessed_chapters:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+chapters:
+- chapter: 1
+  title: Giriş
+  pdf_pages:
+  - 23
+  - 44
+  pages:
+  - 1
+  - 22
+  exercises:
+  - number: '1.1'
+    pdf_page: 34
+    page: 12
+  - number: '1.2'
+    pdf_page: 34
+    page: 12
+  - number: '1.3'
+    pdf_page: 34
+    page: 12
+  - number: '1.4'
+    pdf_page: 34
+    page: 12
+  - number: '1.5'
+    pdf_page: 35
+    page: 13
+  figures:
+  - number: '1.1'
+    pdf_page: 32
+    page: 10
+  code_boxes: []
+  candidate_modules:
+  - m5-5-rl
+  - m11-4-mc-td
+  - m11-11-alphazero
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlendi; yayın denetimi sürüyor
+  recorded_units: 159
+  source_unnumbered_figures:
+  - pdf_page: 30
+    page: 8
+    what: XOX kazanan tahta
+  second_read:
+    pages:
+    - 1
+    - 22
+    pdf_pages:
+    - 23
+    - 44
+    independent: true
+    findings_resolved: true
+    note: Sayfa sayfa kaynak/defter karşılaştırması; 26 ayrıntı kaydı ve beş sorunun alt koşulları genişletildi.
+    final_followup: İki kalan ilişki ve özgün §9.6 atfı defterde açıklandı; beş alıştırmanın bütün alt soruları
+      denetlendi.
+- chapter: 2
+  title: Çok kollu banditler
+  pdf_pages:
+  - 47
+  - 68
+  pages:
+  - 25
+  - 46
+  exercises:
+  - number: '2.1'
+    pdf_page: 50
+    page: 28
+  - number: '2.2'
+    pdf_page: 52
+    page: 30
+  - number: '2.3'
+    pdf_page: 52
+    page: 30
+  - number: '2.4'
+    pdf_page: 55
+    page: 33
+  - number: '2.5'
+    pdf_page: 55
+    page: 33
+  - number: '2.6'
+    pdf_page: 57
+    page: 35
+  - number: '2.7'
+    pdf_page: 57
+    page: 35
+  - number: '2.8'
+    pdf_page: 58
+    page: 36
+  - number: '2.9'
+    pdf_page: 59
+    page: 37
+  - number: '2.10'
+    pdf_page: 63
+    page: 41
+  - number: '2.11'
+    pdf_page: 66
+    page: 44
+  figures:
+  - number: '2.1'
+    pdf_page: 50
+    page: 28
+  - number: '2.2'
+    pdf_page: 51
+    page: 29
+  - number: '2.3'
+    pdf_page: 56
+    page: 34
+  - number: '2.4'
+    pdf_page: 58
+    page: 36
+  - number: '2.5'
+    pdf_page: 60
+    page: 38
+  - number: '2.6'
+    pdf_page: 64
+    page: 42
+  code_boxes:
+  - id: p54-box1
+    pdf_page: 54
+    printed_page: 32
+    bbox:
+    - 62.62
+    - 160.25
+    - 441.39
+    - 286.86
+    kind: sözde-kod
+    source_title: A simple bandit algorithm
+  candidate_modules:
+  - m11-7-bandits
+  - m11-8-contextual-bandits
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 3
+  title: Sonlu Markov karar süreçleri
+  pdf_pages:
+  - 69
+  - 94
+  pages:
+  - 47
+  - 72
+  exercises:
+  - number: '3.1'
+    pdf_page: 73
+    page: 51
+  - number: '3.2'
+    pdf_page: 73
+    page: 51
+  - number: '3.3'
+    pdf_page: 73
+    page: 51
+  - number: '3.4'
+    pdf_page: 75
+    page: 53
+  - number: '3.5'
+    pdf_page: 77
+    page: 55
+  - number: '3.6'
+    pdf_page: 78
+    page: 56
+  - number: '3.7'
+    pdf_page: 78
+    page: 56
+  - number: '3.8'
+    pdf_page: 78
+    page: 56
+  - number: '3.9'
+    pdf_page: 78
+    page: 56
+  - number: '3.10'
+    pdf_page: 78
+    page: 56
+  - number: '3.11'
+    pdf_page: 80
+    page: 58
+  - number: '3.12'
+    pdf_page: 80
+    page: 58
+  - number: '3.13'
+    pdf_page: 80
+    page: 58
+  - number: '3.14'
+    pdf_page: 82
+    page: 60
+  - number: '3.15'
+    pdf_page: 82
+    page: 60
+  - number: '3.16'
+    pdf_page: 83
+    page: 61
+  - number: '3.17'
+    pdf_page: 83
+    page: 61
+  - number: '3.18'
+    pdf_page: 84
+    page: 62
+  - number: '3.19'
+    pdf_page: 84
+    page: 62
+  - number: '3.20'
+    pdf_page: 88
+    page: 66
+  - number: '3.21'
+    pdf_page: 88
+    page: 66
+  - number: '3.22'
+    pdf_page: 88
+    page: 66
+  - number: '3.23'
+    pdf_page: 88
+    page: 66
+  - number: '3.24'
+    pdf_page: 88
+    page: 66
+  - number: '3.25'
+    pdf_page: 88
+    page: 66
+  - number: '3.26'
+    pdf_page: 88
+    page: 66
+  - number: '3.27'
+    pdf_page: 89
+    page: 67
+  - number: '3.28'
+    pdf_page: 89
+    page: 67
+  - number: '3.29'
+    pdf_page: 89
+    page: 67
+  figures:
+  - number: '3.1'
+    pdf_page: 70
+    page: 48
+  - number: '3.2'
+    pdf_page: 82
+    page: 60
+  - number: '3.3'
+    pdf_page: 83
+    page: 61
+  - number: '3.4'
+    pdf_page: 86
+    page: 64
+  - number: '3.5'
+    pdf_page: 87
+    page: 65
+  code_boxes: []
+  candidate_modules:
+  - m11-2-mdp-vi
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 4
+  title: Dinamik programlama
+  pdf_pages:
+  - 95
+  - 112
+  pages:
+  - 73
+  - 90
+  exercises:
+  - number: '4.1'
+    pdf_page: 98
+    page: 76
+  - number: '4.2'
+    pdf_page: 98
+    page: 76
+  - number: '4.3'
+    pdf_page: 98
+    page: 76
+  - number: '4.4'
+    pdf_page: 104
+    page: 82
+  - number: '4.5'
+    pdf_page: 104
+    page: 82
+  - number: '4.6'
+    pdf_page: 104
+    page: 82
+  - number: '4.7'
+    pdf_page: 104
+    page: 82
+  - number: '4.8'
+    pdf_page: 106
+    page: 84
+  - number: '4.9'
+    pdf_page: 106
+    page: 84
+  - number: '4.10'
+    pdf_page: 107
+    page: 85
+  figures:
+  - number: '4.1'
+    pdf_page: 99
+    page: 77
+  - number: '4.2'
+    pdf_page: 103
+    page: 81
+  - number: '4.3'
+    pdf_page: 106
+    page: 84
+  code_boxes:
+  - id: p97-box1
+    pdf_page: 97
+    printed_page: 75
+    bbox:
+    - 62.62
+    - 423.44
+    - 441.39
+    - 561.17
+    kind: sözde-kod
+    source_title: Iterative Policy Evaluation, for estimating V ⇡v⇡
+  - id: p102-box1
+    pdf_page: 102
+    printed_page: 80
+    bbox:
+    - 62.62
+    - 367.73
+    - 441.39
+    - 607.93
+    kind: sözde-kod
+    source_title: Policy Iteration (using iterative policy evaluation) for estimating π ⇡π⇤
+  - id: p105-box1
+    pdf_page: 105
+    printed_page: 83
+    bbox:
+    - 62.62
+    - 369.47
+    - 441.39
+    - 525.99
+    kind: sözde-kod
+    source_title: Value Iteration, for estimating π ⇡π⇤
+  candidate_modules:
+  - m11-2-mdp-vi
+  - m11-3-policy-iteration
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 5
+  title: Monte Carlo yöntemleri
+  pdf_pages:
+  - 113
+  - 140
+  pages:
+  - 91
+  - 118
+  exercises:
+  - number: '5.1'
+    pdf_page: 116
+    page: 94
+  - number: '5.2'
+    pdf_page: 116
+    page: 94
+  - number: '5.3'
+    pdf_page: 119
+    page: 97
+  - number: '5.4'
+    pdf_page: 121
+    page: 99
+  - number: '5.5'
+    pdf_page: 127
+    page: 105
+  - number: '5.6'
+    pdf_page: 130
+    page: 108
+  - number: '5.7'
+    pdf_page: 130
+    page: 108
+  - number: '5.8'
+    pdf_page: 130
+    page: 108
+  - number: '5.9'
+    pdf_page: 131
+    page: 109
+  - number: '5.10'
+    pdf_page: 131
+    page: 109
+  - number: '5.11'
+    pdf_page: 133
+    page: 111
+  - number: '5.12'
+    pdf_page: 133
+    page: 111
+  - number: '5.13'
+    pdf_page: 137
+    page: 115
+  - number: '5.14'
+    pdf_page: 137
+    page: 115
+  figures:
+  - number: '5.1'
+    pdf_page: 116
+    page: 94
+  - number: '5.2'
+    pdf_page: 122
+    page: 100
+  - number: '5.3'
+    pdf_page: 128
+    page: 106
+  - number: '5.4'
+    pdf_page: 129
+    page: 107
+  - number: '5.5'
+    pdf_page: 134
+    page: 112
+  code_boxes:
+  - id: p114-box1
+    pdf_page: 114
+    printed_page: 92
+    bbox:
+    - 62.62
+    - 457.11
+    - 441.39
+    - 607.93
+    kind: sözde-kod
+    source_title: First-visit MC prediction, for estimating V ⇡v⇡
+  - id: p121-box1
+    pdf_page: 121
+    printed_page: 99
+    bbox:
+    - 62.62
+    - 87.81
+    - 441.39
+    - 272.5
+    kind: sözde-kod
+    source_title: Monte Carlo ES (Exploring Starts), for estimating π ⇡π⇤
+  - id: p123-box1
+    pdf_page: 123
+    printed_page: 101
+    bbox:
+    - 62.62
+    - 222.89
+    - 441.39
+    - 445.44
+    kind: sözde-kod
+    source_title: On-policy ﬁrst-visit MC control (for ε-soft policies), estimates π ⇡π⇤
+  - id: p132-box1
+    pdf_page: 132
+    printed_page: 110
+    bbox:
+    - 62.62
+    - 87.81
+    - 441.39
+    - 277.7
+    kind: sözde-kod
+    source_title: Oﬀ-policy MC prediction (policy evaluation) for estimating Q ⇡q⇡
+  - id: p133-box1
+    pdf_page: 133
+    printed_page: 111
+    bbox:
+    - 62.62
+    - 79.51
+    - 441.39
+    - 291.66
+    kind: sözde-kod
+    source_title: Oﬀ-policy MC control, for estimating π ⇡π⇤
+  candidate_modules:
+  - m11-4-mc-td
+  - m11-5-sarsa-q
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 6
+  title: Zamansal fark öğrenmesi
+  pdf_pages:
+  - 141
+  - 162
+  pages:
+  - 119
+  - 140
+  exercises:
+  - number: '6.1'
+    pdf_page: 143
+    page: 121
+  - number: '6.2'
+    pdf_page: 145
+    page: 123
+  - number: '6.3'
+    pdf_page: 148
+    page: 126
+  - number: '6.4'
+    pdf_page: 148
+    page: 126
+  - number: '6.5'
+    pdf_page: 148
+    page: 126
+  - number: '6.6'
+    pdf_page: 148
+    page: 126
+  - number: '6.7'
+    pdf_page: 150
+    page: 128
+  - number: '6.8'
+    pdf_page: 151
+    page: 129
+  - number: '6.9'
+    pdf_page: 152
+    page: 130
+  - number: '6.10'
+    pdf_page: 153
+    page: 131
+  - number: '6.11'
+    pdf_page: 154
+    page: 132
+  - number: '6.12'
+    pdf_page: 154
+    page: 132
+  - number: '6.13'
+    pdf_page: 158
+    page: 136
+  - number: '6.14'
+    pdf_page: 159
+    page: 137
+  figures:
+  - number: '6.1'
+    pdf_page: 145
+    page: 123
+  - number: '6.2'
+    pdf_page: 149
+    page: 127
+  - number: '6.3'
+    pdf_page: 155
+    page: 133
+  - number: '6.4'
+    pdf_page: 156
+    page: 134
+  - number: '6.5'
+    pdf_page: 157
+    page: 135
+  code_boxes:
+  - id: p142-box1
+    pdf_page: 142
+    printed_page: 120
+    bbox:
+    - 62.62
+    - 270.64
+    - 441.39
+    - 417.58
+    kind: sözde-kod
+    source_title: Tabular TD(0) for estimating v⇡
+  - id: p152-box1
+    pdf_page: 152
+    printed_page: 130
+    bbox:
+    - 62.62
+    - 87.81
+    - 441.39
+    - 234.75
+    kind: sözde-kod
+    source_title: Sarsa (on-policy TD control) for estimating Q ⇡q⇤
+  - id: p153-box1
+    pdf_page: 153
+    printed_page: 131
+    bbox:
+    - 62.62
+    - 472.96
+    - 441.39
+    - 607.93
+    kind: sözde-kod
+    source_title: Q-learning (oﬀ-policy TD control) for estimating π ⇡π⇤
+  - id: p158-box1
+    pdf_page: 158
+    printed_page: 136
+    bbox:
+    - 62.62
+    - 246.25
+    - 445.2
+    - 428.95
+    kind: sözde-kod
+    source_title: Double Q-learning, for estimating Q1 ⇡Q2 ⇡q⇤
+  candidate_modules:
+  - m11-4-mc-td
+  - m11-5-sarsa-q
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 7
+  title: n adımlı önyükleme
+  pdf_pages:
+  - 163
+  - 180
+  pages:
+  - 141
+  - 158
+  exercises:
+  - number: '7.1'
+    pdf_page: 165
+    page: 143
+  - number: '7.2'
+    pdf_page: 165
+    page: 143
+  - number: '7.3'
+    pdf_page: 167
+    page: 145
+  - number: '7.4'
+    pdf_page: 170
+    page: 148
+  - number: '7.5'
+    pdf_page: 172
+    page: 150
+  - number: '7.6'
+    pdf_page: 173
+    page: 151
+  - number: '7.7'
+    pdf_page: 173
+    page: 151
+  - number: '7.8'
+    pdf_page: 173
+    page: 151
+  - number: '7.9'
+    pdf_page: 173
+    page: 151
+  - number: '7.10'
+    pdf_page: 173
+    page: 151
+  - number: '7.11'
+    pdf_page: 175
+    page: 153
+  figures:
+  - number: '7.1'
+    pdf_page: 164
+    page: 142
+  - number: '7.2'
+    pdf_page: 167
+    page: 145
+  - number: '7.3'
+    pdf_page: 168
+    page: 146
+  - number: '7.4'
+    pdf_page: 169
+    page: 147
+  - number: '7.5'
+    pdf_page: 177
+    page: 155
+  code_boxes:
+  - id: p166-box1
+    pdf_page: 166
+    printed_page: 144
+    bbox:
+    - 62.62
+    - 86.7
+    - 441.39
+    - 321.32
+    kind: sözde-kod
+    source_title: n-step TD for estimating V ⇡v⇡
+  - id: p169-box1
+    pdf_page: 169
+    printed_page: 147
+    bbox:
+    - 62.62
+    - 86.7
+    - 441.39
+    - 381.1
+    kind: sözde-kod
+    source_title: n-step Sarsa for estimating Q ⇡q⇤or q⇡
+  - id: p171-box1
+    pdf_page: 171
+    printed_page: 149
+    bbox:
+    - 62.62
+    - 312.92
+    - 441.39
+    - 607.93
+    kind: sözde-kod
+    source_title: q g Oﬀ-policy n-step Sarsa for estimating Q ⇡q⇤or q⇡
+  - id: p176-box1
+    pdf_page: 176
+    printed_page: 154
+    bbox:
+    - 62.62
+    - 86.7
+    - 441.39
+    - 415.62
+    kind: sözde-kod
+    source_title: n-step Tree Backup for estimating Q ⇡q⇤or q⇡
+  - id: p178-box1
+    pdf_page: 178
+    printed_page: 156
+    bbox:
+    - 62.62
+    - 140.11
+    - 441.39
+    - 519.64
+    kind: sözde-kod
+    source_title: Oﬀ-policy n-step Q(σ) for estimating Q ⇡q⇤or q⇡
+  candidate_modules:
+  - m11-4-mc-td
+  - m11-5-sarsa-q
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 8
+  title: Tablolu yöntemlerle planlama ve öğrenme
+  pdf_pages:
+  - 181
+  - 216
+  pages:
+  - 159
+  - 194
+  exercises:
+  - number: '8.1'
+    pdf_page: 188
+    page: 166
+  - number: '8.2'
+    pdf_page: 190
+    page: 168
+  - number: '8.3'
+    pdf_page: 190
+    page: 168
+  - number: '8.4'
+    pdf_page: 190
+    page: 168
+  - number: '8.5'
+    pdf_page: 190
+    page: 168
+  - number: '8.6'
+    pdf_page: 196
+    page: 174
+  - number: '8.7'
+    pdf_page: 199
+    page: 177
+  - number: '8.8'
+    pdf_page: 199
+    page: 177
+  figures:
+  - number: '8.1'
+    pdf_page: 185
+    page: 163
+  - number: '8.2'
+    pdf_page: 187
+    page: 165
+  - number: '8.3'
+    pdf_page: 187
+    page: 165
+  - number: '8.4'
+    pdf_page: 189
+    page: 167
+  - number: '8.5'
+    pdf_page: 189
+    page: 167
+  - number: '8.6'
+    pdf_page: 194
+    page: 172
+  - number: '8.7'
+    pdf_page: 196
+    page: 174
+  - number: '8.8'
+    pdf_page: 198
+    page: 176
+  - number: '8.9'
+    pdf_page: 205
+    page: 183
+  - number: '8.10'
+    pdf_page: 208
+    page: 186
+  - number: '8.11'
+    pdf_page: 212
+    page: 190
+  code_boxes:
+  - id: p183-box1
+    pdf_page: 183
+    printed_page: 161
+    bbox:
+    - 62.62
+    - 350.14
+    - 441.39
+    - 433.31
+    kind: sözde-kod
+    source_title: Random-sample one-step tabular Q-planning
+  - id: p186-box1
+    pdf_page: 186
+    printed_page: 164
+    bbox:
+    - 62.62
+    - 160.91
+    - 441.39
+    - 315.91
+    kind: sözde-kod
+    source_title: Tabular Dyna-Q
+  - id: p192-box1
+    pdf_page: 192
+    printed_page: 170
+    bbox:
+    - 62.62
+    - 86.71
+    - 441.39
+    - 289.43
+    kind: sözde-kod
+    source_title: Prioritized sweeping for a deterministic environment
+  candidate_modules:
+  - m11-10-planning
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 9
+  title: Yaklaşımla politika üstü tahmin
+  pdf_pages:
+  - 219
+  - 264
+  pages:
+  - 197
+  - 242
+  exercises:
+  - number: '9.1'
+    pdf_page: 231
+    page: 209
+  - number: '9.2'
+    pdf_page: 233
+    page: 211
+  - number: '9.3'
+    pdf_page: 233
+    page: 211
+  - number: '9.4'
+    pdf_page: 243
+    page: 221
+  - number: '9.5'
+    pdf_page: 245
+    page: 223
+  figures:
+  - number: '9.1'
+    pdf_page: 226
+    page: 204
+  - number: '9.2'
+    pdf_page: 230
+    page: 208
+  - number: '9.3'
+    pdf_page: 234
+    page: 212
+  - number: '9.4'
+    pdf_page: 235
+    page: 213
+  - number: '9.5'
+    pdf_page: 236
+    page: 214
+  - number: '9.6'
+    pdf_page: 237
+    page: 215
+  - number: '9.7'
+    pdf_page: 237
+    page: 215
+  - number: '9.8'
+    pdf_page: 238
+    page: 216
+  - number: '9.9'
+    pdf_page: 239
+    page: 217
+  - number: '9.10'
+    pdf_page: 240
+    page: 218
+  - number: '9.11'
+    pdf_page: 241
+    page: 219
+  - number: '9.12'
+    pdf_page: 242
+    page: 220
+  - number: '9.13'
+    pdf_page: 243
+    page: 221
+  - number: '9.14'
+    pdf_page: 246
+    page: 224
+  - number: '9.15'
+    pdf_page: 249
+    page: 227
+  code_boxes:
+  - id: p224-box1
+    pdf_page: 224
+    printed_page: 202
+    bbox:
+    - 62.62
+    - 292.67
+    - 441.39
+    - 405.91
+    kind: sözde-kod
+    source_title: Gradient Monte Carlo Algorithm for Estimating ˆv ⇡v⇡
+  - id: p225-box1
+    pdf_page: 225
+    printed_page: 203
+    bbox:
+    - 62.62
+    - 147.7
+    - 441.39
+    - 308.76
+    kind: sözde-kod
+    source_title: Semi-gradient TD(0) for estimating ˆv ⇡v⇡
+  - id: p231-box1
+    pdf_page: 231
+    printed_page: 209
+    bbox:
+    - 62.62
+    - 227.3
+    - 441.39
+    - 473.96
+    kind: sözde-kod
+    source_title: n-step semi-gradient TD for estimating ˆv ⇡v⇡
+  - id: p252-box1
+    pdf_page: 252
+    printed_page: 230
+    bbox:
+    - 62.62
+    - 88.8
+    - 441.39
+    - 287.62
+    kind: sözde-kod
+    source_title: LSTD for estimating ˆv = w>x(·) ⇡v⇡(O(d2) version)
+  candidate_modules:
+  - m11-6-dqn
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 10
+  title: Yaklaşımla politika üstü kontrol
+  pdf_pages:
+  - 265
+  - 278
+  pages:
+  - 243
+  - 256
+  exercises:
+  - number: '10.1'
+    pdf_page: 270
+    page: 248
+  - number: '10.2'
+    pdf_page: 270
+    page: 248
+  - number: '10.3'
+    pdf_page: 270
+    page: 248
+  - number: '10.4'
+    pdf_page: 272
+    page: 250
+  - number: '10.5'
+    pdf_page: 272
+    page: 250
+  - number: '10.6'
+    pdf_page: 273
+    page: 251
+  - number: '10.7'
+    pdf_page: 274
+    page: 252
+  - number: '10.8'
+    pdf_page: 274
+    page: 252
+  - number: '10.9'
+    pdf_page: 277
+    page: 255
+  figures:
+  - number: '10.1'
+    pdf_page: 267
+    page: 245
+  - number: '10.2'
+    pdf_page: 268
+    page: 246
+  - number: '10.3'
+    pdf_page: 270
+    page: 248
+  - number: '10.4'
+    pdf_page: 270
+    page: 248
+  - number: '10.5'
+    pdf_page: 274
+    page: 252
+  code_boxes:
+  - id: p266-box1
+    pdf_page: 266
+    printed_page: 244
+    bbox:
+    - 62.62
+    - 350.6
+    - 441.39
+    - 535.67
+    kind: sözde-kod
+    source_title: Episodic Semi-gradient Sarsa for Estimating ˆq ⇡q⇤
+  - id: p269-box1
+    pdf_page: 269
+    printed_page: 247
+    bbox:
+    - 62.62
+    - 252.59
+    - 441.39
+    - 547.16
+    kind: sözde-kod
+    source_title: p p g Episodic semi-gradient n-step Sarsa for estimating ˆq ⇡q⇤or q⇡
+  - id: p273-box1
+    pdf_page: 273
+    printed_page: 251
+    bbox:
+    - 62.62
+    - 86.71
+    - 441.39
+    - 259.62
+    kind: sözde-kod
+    source_title: Diﬀerential semi-gradient Sarsa for estimating ˆq ⇡q⇤
+  - id: p277-box1
+    pdf_page: 277
+    printed_page: 255
+    bbox:
+    - 62.62
+    - 266.06
+    - 441.39
+    - 464.07
+    kind: sözde-kod
+    source_title: Diﬀerential semi-gradient n-step Sarsa for estimating ˆq ⇡q⇡or q⇤
+  candidate_modules:
+  - m11-6-dqn
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 11
+  title: Yaklaşımla politika dışı yöntemler
+  pdf_pages:
+  - 279
+  - 308
+  pages:
+  - 257
+  - 286
+  exercises:
+  - number: '11.1'
+    pdf_page: 281
+    page: 259
+  - number: '11.2'
+    pdf_page: 281
+    page: 259
+  - number: '11.3'
+    pdf_page: 286
+    page: 264
+  - number: '11.4'
+    pdf_page: 297
+    page: 275
+  figures:
+  - number: '11.1'
+    pdf_page: 283
+    page: 261
+  - number: '11.2'
+    pdf_page: 284
+    page: 262
+  - number: '11.3'
+    pdf_page: 289
+    page: 267
+  - number: '11.4'
+    pdf_page: 299
+    page: 277
+  - number: '11.5'
+    pdf_page: 302
+    page: 280
+  - number: '11.6'
+    pdf_page: 305
+    page: 283
+  code_boxes: []
+  candidate_modules:
+  - m11-6-dqn
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 12
+  title: Uygunluk izleri
+  pdf_pages:
+  - 309
+  - 342
+  pages:
+  - 287
+  - 320
+  exercises:
+  - number: '12.1'
+    pdf_page: 312
+    page: 290
+  - number: '12.2'
+    pdf_page: 312
+    page: 290
+  - number: '12.3'
+    pdf_page: 317
+    page: 295
+  - number: '12.4'
+    pdf_page: 317
+    page: 295
+  - number: '12.5'
+    pdf_page: 319
+    page: 297
+  - number: '12.6'
+    pdf_page: 327
+    page: 305
+  - number: '12.7'
+    pdf_page: 331
+    page: 309
+  - number: '12.8'
+    pdf_page: 331
+    page: 309
+  - number: '12.9'
+    pdf_page: 331
+    page: 309
+  - number: '12.10'
+    pdf_page: 333
+    page: 311
+  - number: '12.11'
+    pdf_page: 333
+    page: 311
+  - number: '12.12'
+    pdf_page: 333
+    page: 311
+  - number: '12.13'
+    pdf_page: 334
+    page: 312
+  - number: '12.14'
+    pdf_page: 336
+    page: 314
+  figures:
+  - number: '12.1'
+    pdf_page: 311
+    page: 289
+  - number: '12.2'
+    pdf_page: 312
+    page: 290
+  - number: '12.3'
+    pdf_page: 313
+    page: 291
+  - number: '12.4'
+    pdf_page: 314
+    page: 292
+  - number: '12.5'
+    pdf_page: 315
+    page: 293
+  - number: '12.6'
+    pdf_page: 317
+    page: 295
+  - number: '12.7'
+    pdf_page: 318
+    page: 296
+  - number: '12.8'
+    pdf_page: 321
+    page: 299
+  - number: '12.9'
+    pdf_page: 326
+    page: 304
+  - number: '12.10'
+    pdf_page: 328
+    page: 306
+  - number: '12.11'
+    pdf_page: 328
+    page: 306
+  - number: '12.12'
+    pdf_page: 335
+    page: 313
+  - number: '12.13'
+    pdf_page: 336
+    page: 314
+  - number: '12.14'
+    pdf_page: 340
+    page: 318
+  code_boxes:
+  - id: p315-box1
+    pdf_page: 315
+    printed_page: 293
+    bbox:
+    - 62.62
+    - 209.62
+    - 441.39
+    - 406.35
+    kind: sözde-kod
+    source_title: Semi-gradient TD(λ) for estimating ˆv ⇡v⇡
+  - id: p322-box1
+    pdf_page: 322
+    printed_page: 300
+    bbox:
+    - 62.62
+    - 363.01
+    - 441.39
+    - 607.93
+    kind: sözde-kod
+    source_title: True online TD(λ) for estimating w>x ⇡v⇡
+  - id: p327-box1
+    pdf_page: 327
+    printed_page: 305
+    bbox:
+    - 62.62
+    - 99.21
+    - 441.39
+    - 391.59
+    kind: sözde-kod
+    source_title: Sarsa(λ) with binary features and linear function approximation for estimating w>x ⇡q⇡or
+      q⇤
+  - id: p329-box1
+    pdf_page: 329
+    printed_page: 307
+    bbox:
+    - 62.62
+    - 88.8
+    - 441.39
+    - 381.54
+    kind: sözde-kod
+    source_title: True online Sarsa(λ) for estimating w>x ⇡q⇡or q⇤
+  candidate_modules:
+  - m11-4-mc-td
+  - m11-5-sarsa-q
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 13
+  title: Politika gradyanı yöntemleri
+  pdf_pages:
+  - 343
+  - 360
+  pages:
+  - 321
+  - 338
+  exercises:
+  - number: '13.1'
+    pdf_page: 346
+    page: 324
+  - number: '13.2'
+    pdf_page: 350
+    page: 328
+  - number: '13.3'
+    pdf_page: 351
+    page: 329
+  - number: '13.4'
+    pdf_page: 358
+    page: 336
+  - number: '13.5'
+    pdf_page: 358
+    page: 336
+  figures:
+  - number: '13.1'
+    pdf_page: 350
+    page: 328
+  - number: '13.2'
+    pdf_page: 352
+    page: 330
+  code_boxes:
+  - id: p350-box1
+    pdf_page: 350
+    printed_page: 328
+    bbox:
+    - 62.62
+    - 87.81
+    - 441.39
+    - 203.43
+    kind: sözde-kod
+    source_title: 'REINFORCE: Monte-Carlo Policy-Gradient Control (episodic) for π⇤'
+  - id: p352-box1
+    pdf_page: 352
+    printed_page: 330
+    bbox:
+    - 62.62
+    - 151.52
+    - 441.39
+    - 303.18
+    kind: sözde-kod
+    source_title: REINFORCE with Baseline (episodic), for estimating πθ ⇡π⇤
+  - id: p354-box1
+    pdf_page: 354
+    printed_page: 332
+    bbox:
+    - 62.62
+    - 87.81
+    - 441.39
+    - 279.68
+    kind: sözde-kod
+    source_title: One-step Actor–Critic (episodic), for estimating πθ ⇡π⇤
+  - id: p354-box2
+    pdf_page: 354
+    printed_page: 332
+    bbox:
+    - 62.62
+    - 366.38
+    - 441.39
+    - 607.93
+    kind: sözde-kod
+    source_title: p p g g Actor–Critic with Eligibility Traces (episodic), for estimating πθ ⇡π⇤
+  - id: p355-box1
+    pdf_page: 355
+    printed_page: 333
+    bbox:
+    - 62.62
+    - 371.26
+    - 441.39
+    - 607.93
+    kind: sözde-kod
+    source_title: Actor–Critic with Eligibility Traces (continuing), for estimating πθ ⇡π⇤
+  candidate_modules:
+  - m11-9-actor-critic
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 14
+  title: Psikoloji
+  pdf_pages:
+  - 363
+  - 398
+  pages:
+  - 341
+  - 376
+  exercises: []
+  figures:
+  - number: '14.1'
+    pdf_page: 373
+    page: 351
+  - number: '14.2'
+    pdf_page: 376
+    page: 354
+  - number: '14.3'
+    pdf_page: 377
+    page: 355
+  - number: '14.4'
+    pdf_page: 378
+    page: 356
+  - number: '14.5'
+    pdf_page: 387
+    page: 365
+  code_boxes: []
+  candidate_modules: []
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 15
+  title: Sinirbilim
+  pdf_pages:
+  - 399
+  - 442
+  pages:
+  - 377
+  - 420
+  exercises: []
+  figures:
+  - number: '15.1'
+    pdf_page: 408
+    page: 386
+  - number: '15.2'
+    pdf_page: 410
+    page: 388
+  - number: '15.3'
+    pdf_page: 411
+    page: 389
+  - number: '15.4'
+    pdf_page: 413
+    page: 391
+  - number: '15.5'
+    pdf_page: 418
+    page: 396
+  code_boxes: []
+  candidate_modules: []
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 16
+  title: Uygulamalar ve vaka incelemeleri
+  pdf_pages:
+  - 443
+  - 480
+  pages:
+  - 421
+  - 458
+  exercises: []
+  figures:
+  - number: '16.1'
+    pdf_page: 445
+    page: 423
+  - number: '16.2'
+    pdf_page: 450
+    page: 428
+  - number: '16.3'
+    pdf_page: 455
+    page: 433
+  - number: '16.4'
+    pdf_page: 457
+    page: 435
+  - number: '16.5'
+    pdf_page: 465
+    page: 443
+  - number: '16.6'
+    pdf_page: 467
+    page: 445
+  - number: '16.7'
+    pdf_page: 470
+    page: 448
+  - number: '16.8'
+    pdf_page: 475
+    page: 453
+  - number: '16.9'
+    pdf_page: 476
+    page: 454
+  - number: '16.10'
+    pdf_page: 478
+    page: 456
+  code_boxes: []
+  candidate_modules:
+  - m11-6-dqn
+  - m11-8-contextual-bandits
+  - m11-11-alphazero
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+- chapter: 17
+  title: Açık araştırma alanları
+  pdf_pages:
+  - 481
+  - 502
+  pages:
+  - 459
+  - 480
+  exercises:
+  - number: '17.1'
+    pdf_page: 486
+    page: 464
+  figures:
+  - number: '17.1'
+    pdf_page: 489
+    page: 467
+  code_boxes: []
+  candidate_modules: []
+  mapping_status: aynı derinlik denetimi yapılmadı
+  content_status: işlenmedi
+page_audit:
+- pdf_page: 1
+  printed_page: null
+  text_sha256: 57702189f9cd8e9790d16de62cf9d264c0ab58f387e6e5fe36daeecd62058580
+  text_characters: 3
+  embedded_images: 2
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 2
+  printed_page: null
+  text_sha256: bb5bd23345738bf7c0c78b58aca38c8e85f5adf7dbe54216d71926cabe88baa2
+  text_characters: 334
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 3
+  printed_page: null
+  text_sha256: 68f363e65fbd0c92be65bda19887d800a2456c26d8418db14091d127cb634341
+  text_characters: 160
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 4
+  printed_page: null
+  text_sha256: ee4f33baf23b1c8227bc5ea18553d08413f71bbf689adfd5ab51cdcec19372cb
+  text_characters: 1075
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: görüntü olarak incelendi
+- pdf_page: 5
+  printed_page: null
+  text_sha256: 3e5244f51786a67aea1ea8c56b0becff508d68ce02b0d91d02e5ad6c5c1b0d52
+  text_characters: 28
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 6
+  printed_page: null
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 7
+  printed_page: null
+  text_sha256: 9673d0fde29528ef6cc34cf03ed4ea996aaddf6ce5f9afcf8b9e90da2c9aa69c
+  text_characters: 2154
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 8
+  printed_page: null
+  text_sha256: 7d0f95c7793be1924e3a1bd8f7bc0a462cd3f40775ac11c41b3b1502e3eaf8ca
+  text_characters: 3527
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 9
+  printed_page: null
+  text_sha256: d8c878f300596c034ac8b096d1a91456eecace584c24d015ef223137c2e18423
+  text_characters: 3451
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 10
+  printed_page: null
+  text_sha256: d46a53ec9b6c1da439c475747014d19d9d14f7d627b86ec4033788c636755c20
+  text_characters: 3367
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 11
+  printed_page: null
+  text_sha256: be61f3ccbcf94ae2c38e7052f482094a5212be9c342108e9873fa63a67e6dae6
+  text_characters: 3355
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 12
+  printed_page: null
+  text_sha256: 7f325adfa4bb3662556d478ee12436de1158486b6f2a0f9270dadcfd23c1f13c
+  text_characters: 1920
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 13
+  printed_page: null
+  text_sha256: 07e97297c6dbe0ae3ad42fe9fabfb4caaa964536a1b74f07b948aec3e566edc6
+  text_characters: 2998
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 14
+  printed_page: null
+  text_sha256: 040d201b1c6e2c8d9def99948aad6fb539ddc77334cdc8c0471736bd77e32c88
+  text_characters: 4033
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 15
+  printed_page: null
+  text_sha256: e88740977873cf91fd508cabd4b2665b49611e8ef9b5eb1796e98a9a8d31eb4f
+  text_characters: 3894
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 16
+  printed_page: null
+  text_sha256: 9d581618dfa8fa783f43127b5ed9d03d73a2cb15944cd486149165a2abc68690
+  text_characters: 3946
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 17
+  printed_page: null
+  text_sha256: 4577a160f8c30fde51b41efd429c507722dec93fef2165e5c9561b23a5d3fb17
+  text_characters: 2890
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 18
+  printed_page: null
+  text_sha256: 1a94a760bc744cf03aebe42dfe4fbad471a36e75baccf29fa816389e1283d431
+  text_characters: 3429
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 19
+  printed_page: null
+  text_sha256: 77a661bd542505680a5d2ebd8e18ede079c3c7d5361a3441013a03bde22907b6
+  text_characters: 2064
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 20
+  printed_page: null
+  text_sha256: 43e6bdc8e815d9cf9b43f05a0213af7b79f5f36691b07dd4736a1dc022ded7b1
+  text_characters: 2527
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 21
+  printed_page: null
+  text_sha256: d16d1d41f81c11c66dac7147e935bfe600a0fcd6cb866083cd9524dabe0d5db9
+  text_characters: 3042
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 22
+  printed_page: null
+  text_sha256: 5bfa8307b423255b526295de1ad6d9478d679ac1855eb3d54111127fa8eb42ec
+  text_characters: 1333
+  embedded_images: 0
+  drawing_paths: 10
+  visual_review: incelenmedi
+- pdf_page: 23
+  printed_page: 1
+  text_sha256: 80133d44424e6185edb914161d6c6cf1f413e498f59cd0bd268889e9c9eac791
+  text_characters: 2140
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 24
+  printed_page: 2
+  text_sha256: 37f5c6725267e77d0e24daf823282974d38736856bcbcaa5ab4fe63fc3b04aed
+  text_characters: 3858
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 25
+  printed_page: 3
+  text_sha256: 5f956eeb2f466c63fbc0156c06328c330c071d5070eb7455ee871ab6d2016533
+  text_characters: 3857
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 26
+  printed_page: 4
+  text_sha256: b51bbb761a6a6f6bcb461d147fc1bc01b2fc68c04f26e62a7b8c1d17fef3f9e3
+  text_characters: 3489
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 27
+  printed_page: 5
+  text_sha256: 013314b83e08e61b020528d62406d27caf5a27c90b7dedaf514779d9b17e1bb0
+  text_characters: 3691
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 28
+  printed_page: 6
+  text_sha256: ed41394356e190bd47fb5a11964b910f5752b3a170e5d10eabe73af46180379f
+  text_characters: 3708
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 29
+  printed_page: 7
+  text_sha256: 23c96a885b4209cc9d22f19143e746b322fa32597f3379f8c45b431ee9d335e2
+  text_characters: 3530
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 30
+  printed_page: 8
+  text_sha256: de8b5d0dd0bf8783d8890b965127650d586d7db53296306e34c3ba9cf50bf0d0
+  text_characters: 3410
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 31
+  printed_page: 9
+  text_sha256: e44ddc0f864946c44e61f507df926d72c0914ac92db2a70b0bf0ff7a1f368f5e
+  text_characters: 3729
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 32
+  printed_page: 10
+  text_sha256: 1128938f0d07bbb8fcc2d49f6850294439be2f0038f12d92f6ecca00622731b0
+  text_characters: 3393
+  embedded_images: 0
+  drawing_paths: 101
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 33
+  printed_page: 11
+  text_sha256: 876bac75ce1223c8c264eab7684d984af497fb6b6e1170d295c1a99ea962ba64
+  text_characters: 3820
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 34
+  printed_page: 12
+  text_sha256: 803603a7567a5ed58eb02556c8ef94f8382a3115c58429344d4c00275a302db9
+  text_characters: 3734
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 35
+  printed_page: 13
+  text_sha256: 8e32ed26aa0a9b92f16aad3282d6713d18ad45d2118919a12667f204d715c26a
+  text_characters: 3217
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 36
+  printed_page: 14
+  text_sha256: d25ac92510e4c358b5282fceaad07b8c0e51a2678afbb30ede57238fe6073cad
+  text_characters: 3764
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 37
+  printed_page: 15
+  text_sha256: f5fe27a7bb7178e4c61fb36abea02867f24af80f3e0dd40d74df1f3852cb081f
+  text_characters: 3825
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 38
+  printed_page: 16
+  text_sha256: 018b2d890367506aa48467bd4951dded6aea7b3f02a2c305d0f8dca0ab74a17c
+  text_characters: 3636
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 39
+  printed_page: 17
+  text_sha256: f20d24039fd3608feeff1b3f376d3a98a982aab1c9fc1c4edddc0cec39be05c6
+  text_characters: 3717
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 40
+  printed_page: 18
+  text_sha256: 76dbd085fdda6b3f0eb2fb496d7edefefc726a7afebf4a1de2ba4a6edaa55021
+  text_characters: 3792
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 41
+  printed_page: 19
+  text_sha256: fae1c348c91ba36bb27e4492d79fbbdfb2e9b75b7a0e1d637ab3edb2f6f52eea
+  text_characters: 3911
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 42
+  printed_page: 20
+  text_sha256: 36da418551c676c33f18860f22460201273a15448073066469db7b46eaeb8bc6
+  text_characters: 3767
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 43
+  printed_page: 21
+  text_sha256: fc756a024d7997ac47d03bc7d2b215c8dad42e229e139e46eb2773cd7c861a64
+  text_characters: 3813
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 44
+  printed_page: 22
+  text_sha256: 9b678108590484699b9be80cca9ebcb0c09c2a2be1c76cd0fed1bf058b0930e8
+  text_characters: 1203
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+- pdf_page: 45
+  printed_page: 23
+  text_sha256: 9424f27674af2135452a4806edfb0bc7c51faba5d9410a50c32707f460a5f1c2
+  text_characters: 2389
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 46
+  printed_page: 24
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 47
+  printed_page: 25
+  text_sha256: 45287e520d09428582a244b995725096d1e0d964f2fa51cac2307e5f3aeb2fba
+  text_characters: 2321
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 48
+  printed_page: 26
+  text_sha256: 9bacfa5226b79e0583539bde356022eba8085745c593a0b004131fcef39016a8
+  text_characters: 3605
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 49
+  printed_page: 27
+  text_sha256: e65fdce5412629e607523a2a6a0b721eeffad2ed8ef19e206dfb66a6619167c5
+  text_characters: 3352
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 50
+  printed_page: 28
+  text_sha256: a87a58d21b3013f35ff62952cf06360f2c147d013e2a6a98b2110d4423e68eb2
+  text_characters: 2953
+  embedded_images: 0
+  drawing_paths: 53
+  visual_review: incelenmedi
+- pdf_page: 51
+  printed_page: 29
+  text_sha256: b61fcfd159134bc3118056f5f3a697cf83322e444374970d71317b15c7806b8e
+  text_characters: 2690
+  embedded_images: 0
+  drawing_paths: 39
+  visual_review: incelenmedi
+- pdf_page: 52
+  printed_page: 30
+  text_sha256: 9a0f35387a721f07e812b4d90b440cd4f030d5d0d8e4ef9bdcf51b3061227999
+  text_characters: 3532
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 53
+  printed_page: 31
+  text_sha256: 034ea9390253effbd51fb1bddb5519f77701287e8408c2e7ebde232d47fce87f
+  text_characters: 2994
+  embedded_images: 0
+  drawing_paths: 9
+  visual_review: incelenmedi
+- pdf_page: 54
+  printed_page: 32
+  text_sha256: 2b241ac22d023af81e577bf4b24cd1521b95e391355fb6b494f127dd8cb05018
+  text_characters: 2293
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 55
+  printed_page: 33
+  text_sha256: 3b74e93e3e109657e48488f1f2ebae62349772c26209328f485d9899bc5794ee
+  text_characters: 3767
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 56
+  printed_page: 34
+  text_sha256: 43a8cd7bb859251da4cb34e7276b90ddec8ec6fcc2532d7f652470238bc8fc99
+  text_characters: 3488
+  embedded_images: 0
+  drawing_paths: 26
+  visual_review: incelenmedi
+- pdf_page: 57
+  printed_page: 35
+  text_sha256: d4a9904cf0bff6153bf9222f2f5c1581b148aa0d22a76e7ca80cbb4f60776d97
+  text_characters: 3326
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 58
+  printed_page: 36
+  text_sha256: 48f4d8738cb91e1ba05eebc9a328dd48f001d90c0599ffebaab12f2716aed91c
+  text_characters: 2930
+  embedded_images: 2
+  drawing_paths: 17
+  visual_review: incelenmedi
+- pdf_page: 59
+  printed_page: 37
+  text_sha256: d80cd16bde3151ef59463bf89f1f680d7f891c9d81572727340dd6131d7d7933
+  text_characters: 3170
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 60
+  printed_page: 38
+  text_sha256: 94f4b9b6a820c61e3ddd8f1e0dd0e983b4ffa40a40a9b8d2f3c5fc553a9f2963
+  text_characters: 2238
+  embedded_images: 4
+  drawing_paths: 22
+  visual_review: incelenmedi
+- pdf_page: 61
+  printed_page: 39
+  text_sha256: 83aba51ab31e2195b323654eb0e900c07dd4559561be5a88cbfa61d623def404
+  text_characters: 2891
+  embedded_images: 0
+  drawing_paths: 13
+  visual_review: incelenmedi
+- pdf_page: 62
+  printed_page: 40
+  text_sha256: 8e9f15d80cab2bf2681e6648f4b4cff4f3fe8b1c257455c981a5ee9f03325bfe
+  text_characters: 3442
+  embedded_images: 0
+  drawing_paths: 20
+  visual_review: incelenmedi
+- pdf_page: 63
+  printed_page: 41
+  text_sha256: ba08a635c7ce41bb9652e5f1eeca751c4c0a41f706db8d2769933e89f20a70a9
+  text_characters: 3629
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 64
+  printed_page: 42
+  text_sha256: 490d8436b5f8e06289048f656865c72728e4218991462facc4bc6582c4c5ca30
+  text_characters: 3167
+  embedded_images: 0
+  drawing_paths: 25
+  visual_review: incelenmedi
+- pdf_page: 65
+  printed_page: 43
+  text_sha256: 205fb816485feb4f14c011108a6c773f6a5001d23acb73de442ec527bd2aaffd
+  text_characters: 3651
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 66
+  printed_page: 44
+  text_sha256: 8ad45402d04455b1cd32606ede0275da82b6865a667231bed07b0b2f1ba65097
+  text_characters: 3278
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 67
+  printed_page: 45
+  text_sha256: 59958f3ca7e284ed546ea9d01aa0a625e41c757f68f33dea364427b6a3082113
+  text_characters: 3160
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 68
+  printed_page: 46
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 69
+  printed_page: 47
+  text_sha256: b171a249aedd27229979d5dfff42be9f9f1ea90346b70b5aa38210a129b64e58
+  text_characters: 2096
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 70
+  printed_page: 48
+  text_sha256: a9f021a1596e472a54f656966a3858de4af4c5edbfd7a90d5248240410efc503
+  text_characters: 3203
+  embedded_images: 8
+  drawing_paths: 26
+  visual_review: incelenmedi
+- pdf_page: 71
+  printed_page: 49
+  text_sha256: f214ec4c9ce7621047488983f306bcf19086b2a2fdf5fc6737beb405ae68989b
+  text_characters: 3292
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 72
+  printed_page: 50
+  text_sha256: b6aed7ffeb05c98240452959c59d73485d088526d35746ff5d67da5c51d510d2
+  text_characters: 3740
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 73
+  printed_page: 51
+  text_sha256: f1ad8e7a813b8588f94e76a9769e49efc5c6cfbc30bfefb9ba6241a6f4e97469
+  text_characters: 3479
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 74
+  printed_page: 52
+  text_sha256: 69cf47b690ebd671ef116a23f23c3c9c02eec6280cd5b90837951eb17e167a16
+  text_characters: 4403
+  embedded_images: 0
+  drawing_paths: 58
+  visual_review: incelenmedi
+- pdf_page: 75
+  printed_page: 53
+  text_sha256: 3c93b5cb99caf60ca77727a01a7ae74a070153159d7b1f663cb8324f5c16bb02
+  text_characters: 3393
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 76
+  printed_page: 54
+  text_sha256: 16e93876d816cf9cb6c6816c1701aa147afdd8459605631f94c6b7f0e86ed289
+  text_characters: 3416
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 77
+  printed_page: 55
+  text_sha256: df08724a0556b3d880aacf8b9f4007f841995880add77b845943489a69930a57
+  text_characters: 3113
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 78
+  printed_page: 56
+  text_sha256: 2ae010a047638c61500a5f804f4372ee94c17f0d903120458712f03a74d430d2
+  text_characters: 2629
+  embedded_images: 0
+  drawing_paths: 14
+  visual_review: incelenmedi
+- pdf_page: 79
+  printed_page: 57
+  text_sha256: af6eaabc9fbcb0bf6eb97a890d466cc654413915c4b50121cbe9dd9b36d58def
+  text_characters: 3472
+  embedded_images: 0
+  drawing_paths: 25
+  visual_review: incelenmedi
+- pdf_page: 80
+  printed_page: 58
+  text_sha256: 3981182cdf0c8c6562b681cd0b60d74c296470adba12bfbb61e35b5772c81215
+  text_characters: 3564
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 81
+  printed_page: 59
+  text_sha256: 539536fac18995588301a5214eb4be9bab17898406837d4b17b8dccef5f2d4f4
+  text_characters: 3847
+  embedded_images: 0
+  drawing_paths: 48
+  visual_review: incelenmedi
+- pdf_page: 82
+  printed_page: 60
+  text_sha256: 0a45c5a1a4bd02a6e0fd32bd5b06154065466d8be6913446d4e4e56a71739e97
+  text_characters: 3542
+  embedded_images: 0
+  drawing_paths: 34
+  visual_review: incelenmedi
+- pdf_page: 83
+  printed_page: 61
+  text_sha256: 0c98cc7390b436b227255bf3ec95ba187f65caad9582750ace2c11188d1e2a92
+  text_characters: 4792
+  embedded_images: 0
+  drawing_paths: 79
+  visual_review: incelenmedi
+- pdf_page: 84
+  printed_page: 62
+  text_sha256: df4144bb2d8de7f17691b69d5380aef43863da58c2915b8495fb227b9ab495e7
+  text_characters: 3269
+  embedded_images: 0
+  drawing_paths: 54
+  visual_review: incelenmedi
+- pdf_page: 85
+  printed_page: 63
+  text_sha256: 25cfec69d378e0f42ee6a848f4c29755c898795e121f0540c5f08ae8d0f640bb
+  text_characters: 3567
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 86
+  printed_page: 64
+  text_sha256: cef6b913fadb5e6e6b4c7a04b652dd603617cf55d64a4001db0c3d15c91824d3
+  text_characters: 3576
+  embedded_images: 0
+  drawing_paths: 85
+  visual_review: incelenmedi
+- pdf_page: 87
+  printed_page: 65
+  text_sha256: 8c49846a59516cd5c73ba13288e28ad9442b826aa04957532000f0888115c788
+  text_characters: 3175
+  embedded_images: 0
+  drawing_paths: 128
+  visual_review: incelenmedi
+- pdf_page: 88
+  printed_page: 66
+  text_sha256: f727f8b38fbf9bffc4b73e56616745a3055e6e51153641d3c6ef6d582bd12a13
+  text_characters: 3509
+  embedded_images: 0
+  drawing_paths: 39
+  visual_review: incelenmedi
+- pdf_page: 89
+  printed_page: 67
+  text_sha256: 120b923022346d284235cc8ac77997785a8eec20a5c9e046f56b35a429949f08
+  text_characters: 3432
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 90
+  printed_page: 68
+  text_sha256: a770a9167db15efa7f35aa14feb9d96cb95b3937e4cc90092fc8c2f7f6ff78dd
+  text_characters: 3614
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 91
+  printed_page: 69
+  text_sha256: c904e12757bb7f2c277cf6e46c4a199da99ba5b85c2372d72fc726c67ad6b3e8
+  text_characters: 3477
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 92
+  printed_page: 70
+  text_sha256: 9860b7899c6964304837aab3bfd2972dca75a6c00449b06c33aefbaa14e620cf
+  text_characters: 3340
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 93
+  printed_page: 71
+  text_sha256: cda53fa180a6e73e789063364b5abe33e9bfb9d07473b620f7f4de0ad4f95c59
+  text_characters: 1384
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 94
+  printed_page: 72
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 95
+  printed_page: 73
+  text_sha256: a5eb7dbb95adf23b9e9c96bcc04d90338b05d88d49405383e5fbd6888b4c78e0
+  text_characters: 2797
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 96
+  printed_page: 74
+  text_sha256: 7342f2e3f042b4610d0e2b2f75b044eb0b01858cff254a8b38908a07ddd85529
+  text_characters: 3131
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 97
+  printed_page: 75
+  text_sha256: 59bf7586b3ced74dec48282666a407ae364ad9e916b4aae17d4e6e9a2a491d15
+  text_characters: 2799
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 98
+  printed_page: 76
+  text_sha256: c06c0f66530b94f735852300de67383e419deff6059ab3abeff725e8cd521862
+  text_characters: 3060
+  embedded_images: 0
+  drawing_paths: 11
+  visual_review: incelenmedi
+- pdf_page: 99
+  printed_page: 77
+  text_sha256: d76313a0878283bde0632273061a30402ce0270e6458f2583383a26316cf3cdd
+  text_characters: 2515
+  embedded_images: 0
+  drawing_paths: 39
+  visual_review: incelenmedi
+- pdf_page: 100
+  printed_page: 78
+  text_sha256: 4fce82067c54ae33909c101b03067bf43d34a3d611e63fde4ed66f0809e9b7e7
+  text_characters: 3168
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 101
+  printed_page: 79
+  text_sha256: 042af7c6c514de73263701e220c4ab5d2aa4af30ec2d75b3d5d8b881a97f88bb
+  text_characters: 3509
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 102
+  printed_page: 80
+  text_sha256: 07809dc78ccf53b93d56c87f7de0ff36d4339da5bdeafdaa157f2e7278bcfa48
+  text_characters: 2414
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 103
+  printed_page: 81
+  text_sha256: 639deaaf687ca6372cab492b8bd73c08f3ebbd782bab93f3ea9474d7c4e1468c
+  text_characters: 10127
+  embedded_images: 0
+  drawing_paths: 46
+  visual_review: incelenmedi
+- pdf_page: 104
+  printed_page: 82
+  text_sha256: b7cec8cbb8cef5016cebc8167cb9f310eea8e1d8c4bddd1646cec02288c274da
+  text_characters: 3606
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 105
+  printed_page: 83
+  text_sha256: da25c972de0a1014d6b40320479d1cf9897b81c0be002733f58c292b201ad918
+  text_characters: 2900
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 106
+  printed_page: 84
+  text_sha256: a9a97f0490b58cb74f07422461d0dc74b506263d500ad56dd43d1b21809bd985
+  text_characters: 3757
+  embedded_images: 0
+  drawing_paths: 28
+  visual_review: incelenmedi
+- pdf_page: 107
+  printed_page: 85
+  text_sha256: c37816bdf934d1d9ad47be47f2985dae510b844b272f8cf370ba7ec6d7326e7a
+  text_characters: 3393
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 108
+  printed_page: 86
+  text_sha256: dbb7fabdd4c9b43fe1b5a96a32284ac75b64691ef4f63652caa8ceef1d148301
+  text_characters: 3423
+  embedded_images: 0
+  drawing_paths: 18
+  visual_review: incelenmedi
+- pdf_page: 109
+  printed_page: 87
+  text_sha256: 5fe6cf7ce76fd0f715fe5fa4455b3f5fb8bb8e2811bf6ba0d30ed95c6a9ac37d
+  text_characters: 3460
+  embedded_images: 0
+  drawing_paths: 45
+  visual_review: incelenmedi
+- pdf_page: 110
+  printed_page: 88
+  text_sha256: e4ba03af2a3cbc9caf574b1d12ca4d6691f679269e2aed28bfc9d818203df04f
+  text_characters: 3442
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 111
+  printed_page: 89
+  text_sha256: 036afe8ec92ff25fb1fe837b293cc5d046c6aa5eac96f0cbc990bf9dd00c7f1d
+  text_characters: 3468
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 112
+  printed_page: 90
+  text_sha256: fd936dc67ea50d672ef36f80deb9a22e6bbb032d51700f40f443463aff49adee
+  text_characters: 2085
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 113
+  printed_page: 91
+  text_sha256: ed5dae76bad8b3bf7a4c9f782d6dc0425b05a4d14f6d9c7cf9509656f5144daf
+  text_characters: 2522
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 114
+  printed_page: 92
+  text_sha256: 2a904945984f0ec5f9ad381d11456e971e946609e39dbb6c627a87442aee86d3
+  text_characters: 2972
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 115
+  printed_page: 93
+  text_sha256: 41b9069e9516b88246f87e87fb3223b84865f6449642edd54ab56faafb5967bb
+  text_characters: 3606
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 116
+  printed_page: 94
+  text_sha256: bb889b38e09033c6dea47bc714311be4564d6b99598e0a68ccde1e1c255fae18
+  text_characters: 3300
+  embedded_images: 0
+  drawing_paths: 43
+  visual_review: incelenmedi
+- pdf_page: 117
+  printed_page: 95
+  text_sha256: 40506e2f549a9aa41ab3446fbece95dd05c4fbcda377381f9177201fb1aae1c5
+  text_characters: 3299
+  embedded_images: 2
+  drawing_paths: 34
+  visual_review: incelenmedi
+- pdf_page: 118
+  printed_page: 96
+  text_sha256: 367b5fab7488f6301a050ad2930e77981882fa32fdbe7ec545450825d3618a55
+  text_characters: 3540
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 119
+  printed_page: 97
+  text_sha256: f3cc971e8eecd8d08010779f5f8806062c63dd046b19b277e53a952f8d4267b8
+  text_characters: 3115
+  embedded_images: 0
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 120
+  printed_page: 98
+  text_sha256: 76ce7186695f07b3170e3be7d3cfabb0ac51cb78dd3dc80999ac095a0110dfe7
+  text_characters: 3381
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 121
+  printed_page: 99
+  text_sha256: debe5f5dbaf78ef68809d23a1f6c07a7a2365e096f21b06b8cd5e19255d7aa5e
+  text_characters: 3115
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 122
+  printed_page: 100
+  text_sha256: 0bad66a1c8095ae8c381e4528072ced5fc3936699112a8b96f2b9f11a87b2383
+  text_characters: 5424
+  embedded_images: 0
+  drawing_paths: 62
+  visual_review: incelenmedi
+- pdf_page: 123
+  printed_page: 101
+  text_sha256: d194965a4ae227cbdcb81c0f39e43ff4100715d43722889dbe7e51841bdd9e6c
+  text_characters: 2855
+  embedded_images: 0
+  drawing_paths: 7
+  visual_review: incelenmedi
+- pdf_page: 124
+  printed_page: 102
+  text_sha256: 5c2c9335d350a944a8639a6872fe7d8bf96960be57c532c1c747804fa7c8147f
+  text_characters: 3470
+  embedded_images: 0
+  drawing_paths: 7
+  visual_review: incelenmedi
+- pdf_page: 125
+  printed_page: 103
+  text_sha256: 13ede55160ed3166afc09302b6736c68f7e1ce19a22bc6a4eb0f910ea91b6be0
+  text_characters: 3528
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 126
+  printed_page: 104
+  text_sha256: 817e146933bc166d2d410e4b23fde33d16673030655d3255f28a848e04becde5
+  text_characters: 3354
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 127
+  printed_page: 105
+  text_sha256: 3cc698696e117dcc6ea8bc22f48bcb3386edaaadba769c0522ee46065acc3200
+  text_characters: 3598
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 128
+  printed_page: 106
+  text_sha256: efa0815eb26dfe3a26e265eadeaa0d8b9cfbe87df45cb0f7a5f98cd88e5cdd44
+  text_characters: 3102
+  embedded_images: 2
+  drawing_paths: 17
+  visual_review: incelenmedi
+- pdf_page: 129
+  printed_page: 107
+  text_sha256: fa3653c95390bb577e864c9b4bd0abf5821ead04e70502834dc15ea1ada221e9
+  text_characters: 3140
+  embedded_images: 2
+  drawing_paths: 36
+  visual_review: incelenmedi
+- pdf_page: 130
+  printed_page: 108
+  text_sha256: 7d11495346ce4bc9816960014565a82cc76e4b778a951ceba11d278bfd2aa083
+  text_characters: 2931
+  embedded_images: 0
+  drawing_paths: 15
+  visual_review: incelenmedi
+- pdf_page: 131
+  printed_page: 109
+  text_sha256: ca49a21a5f97aae6bf6b162d735d283d51c7a15872e57b52adaf8554abe0f610
+  text_characters: 2865
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 132
+  printed_page: 110
+  text_sha256: 6774c04cf283b0b89d3d66a7dae388e642522d4d5bfdecdb8075034bf2f73cf2
+  text_characters: 2722
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 133
+  printed_page: 111
+  text_sha256: 313cf4c4335cfd45ffd47a71627b134714d2a2dc83a0c4fd9027bb22e83072d7
+  text_characters: 3108
+  embedded_images: 0
+  drawing_paths: 7
+  visual_review: incelenmedi
+- pdf_page: 134
+  printed_page: 112
+  text_sha256: 8861c65c25cedc397a8975bc6865646a45b652ed0777a1ea63e8710c63fcbeed
+  text_characters: 2636
+  embedded_images: 0
+  drawing_paths: 123
+  visual_review: incelenmedi
+- pdf_page: 135
+  printed_page: 113
+  text_sha256: da1e92c0bf8fa8db0cc33b189a5878a61cbdcaeef44dac171993707e809a36d2
+  text_characters: 3586
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 136
+  printed_page: 114
+  text_sha256: f1a5f70d1cdf920eb66665e9ae52f2cab6ac6b6d1a2a7bdf5cf85e5cf6dd7e32
+  text_characters: 2914
+  embedded_images: 0
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 137
+  printed_page: 115
+  text_sha256: c45c488fc7b4d3c0ef9eabe094d75d8ad6c17d9a8b680f6fdcfb4e5d88cea00b
+  text_characters: 3503
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 138
+  printed_page: 116
+  text_sha256: 65795b6dc35e16ab08508030769770829a0d911daacb29fcd298dd8f8f1fe417
+  text_characters: 3214
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 139
+  printed_page: 117
+  text_sha256: c336ea94ab85199fca7934ababd947fbd865294346c92fd7ed6112315a8075d3
+  text_characters: 2259
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 140
+  printed_page: 118
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 141
+  printed_page: 119
+  text_sha256: 86b324c3e46e1f3fa09fbc62dc8db11c34a4fe56e2410b2d93414da432926d48
+  text_characters: 2072
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 142
+  printed_page: 120
+  text_sha256: e996c62eb7b072d1face7005087e919681cfd1e6c541139daac4251357e1f967
+  text_characters: 2806
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 143
+  printed_page: 121
+  text_sha256: 89064e74743d4dde553d8e4fc5e0abf317ed34e6d291de433fd33206ee4e64c3
+  text_characters: 3558
+  embedded_images: 0
+  drawing_paths: 14
+  visual_review: incelenmedi
+- pdf_page: 144
+  printed_page: 122
+  text_sha256: 906e8de75f02e87fdf878c00c5cac731013da4f93753fea00aa02184b0998a5f
+  text_characters: 3893
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 145
+  printed_page: 123
+  text_sha256: e9f5abf8a8efa143b1e18efdefbea2b172841805fa81ddfbac1e192278146ed4
+  text_characters: 3247
+  embedded_images: 0
+  drawing_paths: 49
+  visual_review: incelenmedi
+- pdf_page: 146
+  printed_page: 124
+  text_sha256: ae3e61fe06d096e2ea68da7d778f10252cc3585bddb614b129eaffea6bfd76af
+  text_characters: 2931
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 147
+  printed_page: 125
+  text_sha256: 915b591251ef3a37a281c67c1d0b07bf984b52e3368b6b31d41d7316e93bbc20
+  text_characters: 4137
+  embedded_images: 0
+  drawing_paths: 66
+  visual_review: incelenmedi
+- pdf_page: 148
+  printed_page: 126
+  text_sha256: 8fe6a8fb313b45ab6a5e90b7305f204bf45db363a6aaef36dab4b0eed8389145
+  text_characters: 3523
+  embedded_images: 0
+  drawing_paths: 6
+  visual_review: incelenmedi
+- pdf_page: 149
+  printed_page: 127
+  text_sha256: 1ac64c2b5317ee8bcff719384a166cf107bb3ebb84188726fb87ff343d42b812
+  text_characters: 3115
+  embedded_images: 0
+  drawing_paths: 23
+  visual_review: incelenmedi
+- pdf_page: 150
+  printed_page: 128
+  text_sha256: eedbe32696c348ba3002ff3b6005b9096c7aba9937091e9d5be91d4a64fddb05
+  text_characters: 3647
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 151
+  printed_page: 129
+  text_sha256: 892b5e67e1679a8e882112c618dcb8c7b49586b7143431a950d4ccfa23429a8d
+  text_characters: 3561
+  embedded_images: 0
+  drawing_paths: 32
+  visual_review: incelenmedi
+- pdf_page: 152
+  printed_page: 130
+  text_sha256: 268576bc156fc124b964bb495bf5d3e398e150af1d8bfebd37298d92acd676f2
+  text_characters: 2941
+  embedded_images: 0
+  drawing_paths: 31
+  visual_review: incelenmedi
+- pdf_page: 153
+  printed_page: 131
+  text_sha256: 01530cc4b79bdc736c9b5535a39a5cfc1e3454e9ab52edddeaabf18cadc21904
+  text_characters: 2872
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 154
+  printed_page: 132
+  text_sha256: 3318bcd369d2fa74fd9db6be0f23c0eeaf2c1c006dd522f6939466f2bb7e190d
+  text_characters: 3111
+  embedded_images: 0
+  drawing_paths: 44
+  visual_review: incelenmedi
+- pdf_page: 155
+  printed_page: 133
+  text_sha256: 2751e2cc2547d2f2bdf50bfba4fe4f47b1aa9ecf1d051a80867f082e71b2be9b
+  text_characters: 3981
+  embedded_images: 0
+  drawing_paths: 249
+  visual_review: incelenmedi
+- pdf_page: 156
+  printed_page: 134
+  text_sha256: ff4da40692d312148f5d4ad8e6b8c15af68c2a17d50d80c423b95ae27c6eefc6
+  text_characters: 2962
+  embedded_images: 0
+  drawing_paths: 48
+  visual_review: incelenmedi
+- pdf_page: 157
+  printed_page: 135
+  text_sha256: c287abfa28bc266469a7d30c14cef33dc44b3e8adcb94f0a9cd0351934ae3570
+  text_characters: 3490
+  embedded_images: 6
+  drawing_paths: 43
+  visual_review: incelenmedi
+- pdf_page: 158
+  printed_page: 136
+  text_sha256: e749a3af41a8a400617a9daa8ed9eaec96b4d8e6fc5e4db32e118dde019f3380
+  text_characters: 2745
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 159
+  printed_page: 137
+  text_sha256: ecc345317fec2ceec8c18e7d8fc1d6f7a8d0e085a0aeec9afdb99a7e0b21dbef
+  text_characters: 2744
+  embedded_images: 0
+  drawing_paths: 10
+  visual_review: incelenmedi
+- pdf_page: 160
+  printed_page: 138
+  text_sha256: e81ee7e93c81edf747a0b025a4f65f266d79a3e13c9a9cf8f10c89ddbeb48637
+  text_characters: 3547
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 161
+  printed_page: 139
+  text_sha256: 18112ff66ddfe8142c2d3672616ef1ef7b9fa2e7ef2259340989854370606f71
+  text_characters: 3327
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 162
+  printed_page: 140
+  text_sha256: e25cbc2d5ec20036277d07226c96cec2948a0ea620f27932b65d878af4f25e28
+  text_characters: 1656
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 163
+  printed_page: 141
+  text_sha256: d201008e88c9212d218c3eb402b8c5e305ffe2d3859438178378e4d835099bc2
+  text_characters: 2106
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 164
+  printed_page: 142
+  text_sha256: 368726b81dc698b1f0bd24e054d656e91e55add67931fa35ba3bbff7228dc762
+  text_characters: 2415
+  embedded_images: 0
+  drawing_paths: 166
+  visual_review: incelenmedi
+- pdf_page: 165
+  printed_page: 143
+  text_sha256: 239ed77bbb746f443bb53b7265a3c06b2870fe26d564b556858e1457679ad209
+  text_characters: 3459
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 166
+  printed_page: 144
+  text_sha256: 9e7c8aa2d5f36935a0636eaf70959d370feb2383845465c5ea4fd1ecee287092
+  text_characters: 2670
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 167
+  printed_page: 145
+  text_sha256: 4882799650e3e47298a25c509d73a0dc1a8e00f8a91c7e2566cd0f59f5866754
+  text_characters: 2893
+  embedded_images: 2
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 168
+  printed_page: 146
+  text_sha256: 08f19c54c91312ad71418d7793131bc391af04d7c8d9fe3c6255912bfcdf3ca4
+  text_characters: 2111
+  embedded_images: 0
+  drawing_paths: 210
+  visual_review: incelenmedi
+- pdf_page: 169
+  printed_page: 147
+  text_sha256: b9d2ef7e127b01eb8193eedb104826d3256b68a85c89b0c8a06d2006ccb9ef1b
+  text_characters: 2286
+  embedded_images: 0
+  drawing_paths: 93
+  visual_review: incelenmedi
+- pdf_page: 170
+  printed_page: 148
+  text_sha256: f5afac35e1bfba59f2357db7a33a2d4b3128d1a4e86f0f7c21189b778632e7fa
+  text_characters: 2980
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 171
+  printed_page: 149
+  text_sha256: 2c1c8aa6b7e52f295161cd3cea53dd07cc2c95ef7883eff83391d20bf11f23ef
+  text_characters: 3020
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 172
+  printed_page: 150
+  text_sha256: 0c51195fa60ea88f822b1dc8e565a397ef31217da62d6b5c3440738030bb1284
+  text_characters: 3446
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 173
+  printed_page: 151
+  text_sha256: aa7d134855c687322eda52bf2fafe0b81fe333d22ee4f3dda139a8685338c90d
+  text_characters: 3620
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 174
+  printed_page: 152
+  text_sha256: d4213e0aa807c55a10f9b148ee5901abd7240bb4207578bfacc6e7fe4878e3ff
+  text_characters: 3319
+  embedded_images: 0
+  drawing_paths: 67
+  visual_review: incelenmedi
+- pdf_page: 175
+  printed_page: 153
+  text_sha256: c50d7968eddd1ebe1b6f4e3e85758c4082d35e2c1a3d2e4c66d5ce16c38e767c
+  text_characters: 2711
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 176
+  printed_page: 154
+  text_sha256: 724405c7bbab42552c71d434dbbfa98af3bdd03301380cbb58f7882be4ee9a15
+  text_characters: 2432
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 177
+  printed_page: 155
+  text_sha256: 26f35a561d2d54c30cb60ef2307d091e03b21ff2ec90240592fe1ee5a6aec479
+  text_characters: 2886
+  embedded_images: 0
+  drawing_paths: 263
+  visual_review: incelenmedi
+- pdf_page: 178
+  printed_page: 156
+  text_sha256: a0d20d22bbedca4a8d503e19dd67f284ece6543bd444a0d2fc153e359ee6e014
+  text_characters: 1884
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 179
+  printed_page: 157
+  text_sha256: c08fb6511804684e80361a3225311f922bfeee1f09e1645d56ff8ba974892a48
+  text_characters: 2741
+  embedded_images: 0
+  drawing_paths: 120
+  visual_review: incelenmedi
+- pdf_page: 180
+  printed_page: 158
+  text_sha256: 261f5d30193919ef22cf514c01fce2bce03692f4b4b3d5d3d3633680f95a8c34
+  text_characters: 1484
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 181
+  printed_page: 159
+  text_sha256: cc62a7b0bdd0cf15d922d5a0bacd1135034c925a641f64c9c38aa8fb0635f8e5
+  text_characters: 2138
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 182
+  printed_page: 160
+  text_sha256: 9c528ad768e3463fa2ee6139947ff49392b6219c6e4582c98865fe14507b4885
+  text_characters: 3743
+  embedded_images: 0
+  drawing_paths: 11
+  visual_review: incelenmedi
+- pdf_page: 183
+  printed_page: 161
+  text_sha256: dea7277f317a6f70f4b2b1605f8a6c24817ff7ca20ad39eb1f54f986202bf293
+  text_characters: 3155
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 184
+  printed_page: 162
+  text_sha256: 6e7a735e71ff78ad29e3e91250855ab54f878f20937d7d4eaaeaf1b79ad8580d
+  text_characters: 3968
+  embedded_images: 0
+  drawing_paths: 16
+  visual_review: incelenmedi
+- pdf_page: 185
+  printed_page: 163
+  text_sha256: 1b3fbfb7c6141c13f0b0de670ee8d5e570a1ef4c3a29ecf2c581ee690a1e6b52
+  text_characters: 3107
+  embedded_images: 0
+  drawing_paths: 22
+  visual_review: incelenmedi
+- pdf_page: 186
+  printed_page: 164
+  text_sha256: 04625f9e334fb26a1da1e82de92677e8ed15c7c9df0fc8f6e857008bca7eda82
+  text_characters: 3095
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 187
+  printed_page: 165
+  text_sha256: 17300d463f8795dddd19ae3487151959c52d5439625723ad16ba2abc0239b43c
+  text_characters: 2271
+  embedded_images: 0
+  drawing_paths: 157
+  visual_review: incelenmedi
+- pdf_page: 188
+  printed_page: 166
+  text_sha256: ec8b1690f2b5566081d02bd2d3a3ad0cc313994e348a6c413ebbe51e015385a4
+  text_characters: 3360
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 189
+  printed_page: 167
+  text_sha256: 773ac9cb7de5f8140eb2af73ced0e34f47d1433cf3348d0cd29e0c027de6f5ec
+  text_characters: 2738
+  embedded_images: 0
+  drawing_paths: 36
+  visual_review: incelenmedi
+- pdf_page: 190
+  printed_page: 168
+  text_sha256: 22a0d35f7d210878ace26e252d6d51846730b138047de0d825e4ec2a318f951d
+  text_characters: 3608
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 191
+  printed_page: 169
+  text_sha256: 85f53da2687d99da9f9af9853ca961983d35df4a5f4375c96cd7fcc4540235b8
+  text_characters: 3843
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 192
+  printed_page: 170
+  text_sha256: de2d693ab74d87ebb4541cafba2f8712fe990221d65efbcb5c65715ae5277fa1
+  text_characters: 2882
+  embedded_images: 0
+  drawing_paths: 9
+  visual_review: incelenmedi
+- pdf_page: 193
+  printed_page: 171
+  text_sha256: b9fde950b1c62f5a54098dce41c837b252d9f0f8ad6f5d8411db04966d398cc5
+  text_characters: 2678
+  embedded_images: 0
+  drawing_paths: 415
+  visual_review: incelenmedi
+- pdf_page: 194
+  printed_page: 172
+  text_sha256: 59fd7d30827bbada718dc2f46081b1104f860f00b0007b81c98e36f1dbaa7c3a
+  text_characters: 4172
+  embedded_images: 0
+  drawing_paths: 197
+  visual_review: incelenmedi
+- pdf_page: 195
+  printed_page: 173
+  text_sha256: 2bf844f15a5652baba14ebd2a28f5b15bf0078d3599f14a25458683d7befaae3
+  text_characters: 3774
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 196
+  printed_page: 174
+  text_sha256: ba7bc8af0bc468ca5bc5f1cd3fe6e1a13192268fdf76ea1752ebea1b44cf078b
+  text_characters: 2889
+  embedded_images: 0
+  drawing_paths: 30
+  visual_review: incelenmedi
+- pdf_page: 197
+  printed_page: 175
+  text_sha256: d1dd97290003ca4277ccc4c3a337beed5e04010aa7fb5c1fdcc30596e03406b9
+  text_characters: 3824
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 198
+  printed_page: 176
+  text_sha256: 21637fe859758efab8a8885e3e21438cccf948a4778eda17f4b43441e8850624
+  text_characters: 4539
+  embedded_images: 0
+  drawing_paths: 15
+  visual_review: incelenmedi
+- pdf_page: 199
+  printed_page: 177
+  text_sha256: 2d056a61eb1e61300875021c39079c1955de42a627698d234e0445f975d9fec5
+  text_characters: 3503
+  embedded_images: 0
+  drawing_paths: 16
+  visual_review: incelenmedi
+- pdf_page: 200
+  printed_page: 178
+  text_sha256: 5ae61087cab369b51b84fc75dd312714b9a281b5044f2daa41a1789880edc586
+  text_characters: 3611
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 201
+  printed_page: 179
+  text_sha256: 72722c4f67aacc2f02e2af8e1a022debfd7d2fe388c89d789ec6b77d9d1002ec
+  text_characters: 3610
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 202
+  printed_page: 180
+  text_sha256: 3cb7c75675103fc7da95a9b6d8ff82877496570247b136034379cd97762c1c37
+  text_characters: 3516
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 203
+  printed_page: 181
+  text_sha256: f982e1180a50526898d7ee6c99f18082370496fe11687e9da1198f0424c4c9a1
+  text_characters: 3546
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 204
+  printed_page: 182
+  text_sha256: 63a59d5064578de72d1fbcc69aadcceb2287dbbb02cb467e575939e3c691d570
+  text_characters: 3804
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 205
+  printed_page: 183
+  text_sha256: 92848dc7806ee34ce85a2da66f2af41dcb63abdef964d4996e5de8a1b18a8632
+  text_characters: 2251
+  embedded_images: 0
+  drawing_paths: 135
+  visual_review: incelenmedi
+- pdf_page: 206
+  printed_page: 184
+  text_sha256: 7894a4fa0367a92426acc39a20a0c814a63eee5b834e0852ed254d3ef16f0e16
+  text_characters: 3801
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 207
+  printed_page: 185
+  text_sha256: 5a0ff05a092d55c5f5e5fff44641bc301bb7c72912e3e941d1a7dcf6506295ad
+  text_characters: 3564
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 208
+  printed_page: 186
+  text_sha256: 9f9e084353d6cdd9f483e8a6fa03c0783a2dbd74e300b0f6ebd5172dc0677187
+  text_characters: 2475
+  embedded_images: 0
+  drawing_paths: 321
+  visual_review: incelenmedi
+- pdf_page: 209
+  printed_page: 187
+  text_sha256: 8b02edabe201c4ec101a089647f66fd6226fe41f9df44556d077ca047098676d
+  text_characters: 3396
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 210
+  printed_page: 188
+  text_sha256: a122e2a5be35954d40adfa4de6cd680c4f57c9a0e5c9d6e3128e4db8513d8f1c
+  text_characters: 3540
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 211
+  printed_page: 189
+  text_sha256: 1efd9a100ce452b746282acf664f8693a4e086dfe8cd82772fbc4eaaab4e5320
+  text_characters: 3608
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 212
+  printed_page: 190
+  text_sha256: 0abd8d1af8f20450b246538ca58f24ff33f73d35462c5780955929b89a013cdd
+  text_characters: 2270
+  embedded_images: 8
+  drawing_paths: 118
+  visual_review: incelenmedi
+- pdf_page: 213
+  printed_page: 191
+  text_sha256: 06a25a64a1846fd1c3867d34f5d66db24744bfd96001a1c25e662f4371b981a9
+  text_characters: 2889
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 214
+  printed_page: 192
+  text_sha256: 08c7a3f5164c52c2f21f171cdd161b0947a0be63da9ce25603a361a8b5b41775
+  text_characters: 3402
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 215
+  printed_page: 193
+  text_sha256: fb4b47fbce1fd79a2f32b1c6cf159d8d361cb4f36eb61b8cd09a09efef153fb6
+  text_characters: 2614
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 216
+  printed_page: 194
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 217
+  printed_page: 195
+  text_sha256: dcac20b09170a139937569fcfb45f5abb71d233d7eecec94d20a49e99be7212a
+  text_characters: 2920
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 218
+  printed_page: 196
+  text_sha256: 14f610c9b116dc57c05bfdc3ee369654635977377a8aab9c3619f4d9ed2b0ed5
+  text_characters: 704
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 219
+  printed_page: 197
+  text_sha256: 597c80d9f7d584975d14e93bb0a09266803af095d2455a9bf51b3975e7b40fc4
+  text_characters: 2278
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 220
+  printed_page: 198
+  text_sha256: 53869883aaf6923173566fca2a209e62908675d0bed4428912c60a7757439c2d
+  text_characters: 3517
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 221
+  printed_page: 199
+  text_sha256: 9b54e261350cbceeeeb4d14c36d0695fe15d8697bc2ba7f149b5072d03b7271c
+  text_characters: 3058
+  embedded_images: 0
+  drawing_paths: 10
+  visual_review: incelenmedi
+- pdf_page: 222
+  printed_page: 200
+  text_sha256: 6deb80903aca3bec6bfeb5144c607730b7406d3e339088b06579a32bae007ac3
+  text_characters: 3645
+  embedded_images: 0
+  drawing_paths: 12
+  visual_review: incelenmedi
+- pdf_page: 223
+  printed_page: 201
+  text_sha256: 33f8e49f7ab4d74f5a3e3d1c34b9c67d984ec3d706bb7113c7ca2a781b40b2dc
+  text_characters: 3699
+  embedded_images: 0
+  drawing_paths: 7
+  visual_review: incelenmedi
+- pdf_page: 224
+  printed_page: 202
+  text_sha256: 0f7ecac08cd8c226b98843b6aec8b6b5e4610940970b041f0bfebe885b8526c6
+  text_characters: 3230
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 225
+  printed_page: 203
+  text_sha256: b7e8a29492eef47a1a9d56ee2d7c91553015d8f81f9e68cd7598642db0906de9
+  text_characters: 3074
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 226
+  printed_page: 204
+  text_sha256: 4ff41d5df2fa9d26ed87d57cfe2da6fcfaff561f3b44cd3ed05c89dea305b14e
+  text_characters: 2796
+  embedded_images: 2
+  drawing_paths: 26
+  visual_review: incelenmedi
+- pdf_page: 227
+  printed_page: 205
+  text_sha256: 255ef2563cf08126de0ad20078925e0e881c33b2295ba3c000d837fc4f59e9a6
+  text_characters: 3108
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 228
+  printed_page: 206
+  text_sha256: 4ec7d20a160e1825b6d7b6a61cf6df4e0bbc0bc896de92ad56f5a65ddca2ddda
+  text_characters: 2992
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 229
+  printed_page: 207
+  text_sha256: 13dae732472936c1676f67d4c00ffa275385648548b50ae795aba929b68be5e4
+  text_characters: 3122
+  embedded_images: 0
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 230
+  printed_page: 208
+  text_sha256: e7772c951192d32cddd1302205b35b8e5e06afa4fc5ffd41d8e8881fc912d2bd
+  text_characters: 4541
+  embedded_images: 4
+  drawing_paths: 20
+  visual_review: incelenmedi
+- pdf_page: 231
+  printed_page: 209
+  text_sha256: cc24251812485f32ef37bed511e2d0884a82155b2e0f930ce34445bbb46012bf
+  text_characters: 2385
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 232
+  printed_page: 210
+  text_sha256: 726f0dfec79ddcc322ce42a67b7aad8215072549aca2ef453fa8997a79ece733
+  text_characters: 3637
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 233
+  printed_page: 211
+  text_sha256: 82cc064d3308a0e6c1d5cfc7e9c330b847d346b13532556350553a992ff0db8c
+  text_characters: 3254
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 234
+  printed_page: 212
+  text_sha256: ea9d840a0d952f52a02969516c39e70b194f444423c9032a9b348948a2617de2
+  text_characters: 5977
+  embedded_images: 0
+  drawing_paths: 259
+  visual_review: incelenmedi
+- pdf_page: 235
+  printed_page: 213
+  text_sha256: 4b8aed9c7ca50ccc92717954aa0f7b5b0ee8a366ba5d9a85ed206c0e17b09446
+  text_characters: 3561
+  embedded_images: 17
+  drawing_paths: 43
+  visual_review: incelenmedi
+- pdf_page: 236
+  printed_page: 214
+  text_sha256: 9abd665b337bf25b9a671dd14054ae512028583142072a92c0394bf4d38c592b
+  text_characters: 2838
+  embedded_images: 2
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 237
+  printed_page: 215
+  text_sha256: a0689e4d486f503405bf39ad46e13d23fa64723bb83d3518f019c73919c48f63
+  text_characters: 2335
+  embedded_images: 0
+  drawing_paths: 80
+  visual_review: incelenmedi
+- pdf_page: 238
+  printed_page: 216
+  text_sha256: e0af36c0565cc7e0fc7cae6b46fdf1e6d58ed59a3aba53e3dc4aa7dd7db59f23
+  text_characters: 2938
+  embedded_images: 0
+  drawing_paths: 28
+  visual_review: incelenmedi
+- pdf_page: 239
+  printed_page: 217
+  text_sha256: 0e395700ec29770a0763cecbc3c740b9c570584e5858e4602caad0f1af5cdfdb
+  text_characters: 3382
+  embedded_images: 0
+  drawing_paths: 115
+  visual_review: incelenmedi
+- pdf_page: 240
+  printed_page: 218
+  text_sha256: f03422954478a4e963f10fabbbbd5f6c70b8dad6f9d0269852182a092049416c
+  text_characters: 3253
+  embedded_images: 2
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 241
+  printed_page: 219
+  text_sha256: 62f22f1d24203b863d7f97385c56be92e34a7850fa5a0bd1ba7a16fbb04ef89f
+  text_characters: 1720
+  embedded_images: 0
+  drawing_paths: 191
+  visual_review: incelenmedi
+- pdf_page: 242
+  printed_page: 220
+  text_sha256: 01d6c0535a5b6887f30a1ab94b97a15820fed5262e6ae8a9a4fc985a69cd2874
+  text_characters: 3228
+  embedded_images: 0
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 243
+  printed_page: 221
+  text_sha256: 3b6d23df47df3cf6d6397218bb1971b527c9a62668eb42cba20ed9e5a6a744c1
+  text_characters: 2715
+  embedded_images: 0
+  drawing_paths: 25
+  visual_review: incelenmedi
+- pdf_page: 244
+  printed_page: 222
+  text_sha256: cbf37032fb9a10e3798d49d99bc9562425b844b9c2bd7d37283cc5a58b7af25d
+  text_characters: 3636
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 245
+  printed_page: 223
+  text_sha256: 3f4f6fc95cb706f00d58f71af22d1b81e0e8198ad71a5630a72e3339e6d41501
+  text_characters: 3340
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 246
+  printed_page: 224
+  text_sha256: 4e0c4ae6032c5f0f862979a6398ae4d9a7e7678caa194a5f9e068142923d7e82
+  text_characters: 2390
+  embedded_images: 0
+  drawing_paths: 166
+  visual_review: incelenmedi
+- pdf_page: 247
+  printed_page: 225
+  text_sha256: 64738bd6fec4f20a9374448046d9fe8bc4affd90293712c51279e671144030ad
+  text_characters: 3746
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 248
+  printed_page: 226
+  text_sha256: d06034243b797d44548246e5f3f45a9d15353eb90d96c8fea87ff62e6b9d0dba
+  text_characters: 3874
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 249
+  printed_page: 227
+  text_sha256: 3de6de66da2ca4d01426601a8015b7322986c36eea81201b1ce1ae3b53ee812c
+  text_characters: 2997
+  embedded_images: 2
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 250
+  printed_page: 228
+  text_sha256: 7d32a2248fb92662a7a8eb03377253025ecac0e8cfa5b1d849e7e87c214b55b0
+  text_characters: 3131
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 251
+  printed_page: 229
+  text_sha256: dcb1a605cdfd8a6b79942e67a51fed089598ae22295fe283ac23aeb9f8469f0d
+  text_characters: 3614
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 252
+  printed_page: 230
+  text_sha256: 6ee6c4b5415c54ecb94cccd9ef56bf63cbc6adbb1cb290c3fb75af0d3e32d40f
+  text_characters: 2737
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 253
+  printed_page: 231
+  text_sha256: 227ae202bc15176998c6d061b9160161580914ec6f9ea4678f2a9eea87e5d841
+  text_characters: 3626
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 254
+  printed_page: 232
+  text_sha256: 53a6f4178839b61000fb6f91f70a8648f154b00d699b765442e9bca5545eb527
+  text_characters: 3346
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 255
+  printed_page: 233
+  text_sha256: 318a33827665d0a943f1f4eeb2816be6f1967c43a5289189f814825c439c5e16
+  text_characters: 3205
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 256
+  printed_page: 234
+  text_sha256: f7653f65beb03a4c9a14fb3be2c8d75ee72b33e197c7930fc9285cbecda13423
+  text_characters: 3155
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 257
+  printed_page: 235
+  text_sha256: a7b41abfdd92bf196f672d29e99a26c3ba0228416aaaef8008d081051a4f3470
+  text_characters: 2834
+  embedded_images: 0
+  drawing_paths: 25
+  visual_review: incelenmedi
+- pdf_page: 258
+  printed_page: 236
+  text_sha256: 73350bf73ceed048cb78fdc274435a5c856b8ad69eec8828b1346ee0330cda30
+  text_characters: 3658
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 259
+  printed_page: 237
+  text_sha256: 1d301d3173b467cf1401f025139b4d3c96f4e3ae61e85509bd363f3f9a088bcf
+  text_characters: 3263
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 260
+  printed_page: 238
+  text_sha256: 1b3f9c18a35d654e82969d6fbdb2bf0e54d02d651d75925490ad9d9186335bd6
+  text_characters: 3682
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 261
+  printed_page: 239
+  text_sha256: 01ad9738460a68db32b2ab0cb44608641a7e9ba1248f3a7c1ed8797ea8080b06
+  text_characters: 3471
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 262
+  printed_page: 240
+  text_sha256: 20392891936a1109bf9ed157c16a7f16186a9e353fffe86cd4071cdbd96e9ff9
+  text_characters: 3415
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 263
+  printed_page: 241
+  text_sha256: 3e81923a7fd341266c819f27b20ffb16560999c4dc81e5412a653db80043b1be
+  text_characters: 3686
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 264
+  printed_page: 242
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 265
+  printed_page: 243
+  text_sha256: 84a876bf76d935a26ebfe7a55957dca1faf3bd595f6b8bebcf7457289a5ff3da
+  text_characters: 2079
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 266
+  printed_page: 244
+  text_sha256: cd95a961f508a9e276005cac0e8810e10059e7cde633f7f74aa29121c8f0ba35
+  text_characters: 2836
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 267
+  printed_page: 245
+  text_sha256: 742c0e447b61a4d7bdbd8b0ccf84f460b05bdb7a867fdd10c818b314b0cef3e8
+  text_characters: 5461
+  embedded_images: 1
+  drawing_paths: 26
+  visual_review: incelenmedi
+- pdf_page: 268
+  printed_page: 246
+  text_sha256: 727d2f308d625a5ca462087d6bef9f141284098ea424e93ab8e49bfa503384dd
+  text_characters: 2689
+  embedded_images: 2
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 269
+  printed_page: 247
+  text_sha256: b2f9e88da4f545984195b3a9a81eb27c3e984be6119c2308cea4f2c2732f79b9
+  text_characters: 2516
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 270
+  printed_page: 248
+  text_sha256: e491a9c96f6ed13404969e4495316e5dfa9908bf84348473a0a349aa5080271e
+  text_characters: 2850
+  embedded_images: 4
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 271
+  printed_page: 249
+  text_sha256: 420a99193e6951af0bcab877065ab0ebac69bb6f5bdff3be3d02f7468ed13be5
+  text_characters: 3200
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 272
+  printed_page: 250
+  text_sha256: 1ed083c7e1fde33c287057ef3ed252febb7ec642b30c7c9da40938ee813c8122
+  text_characters: 2995
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 273
+  printed_page: 251
+  text_sha256: fe3f6446b6ab623d32067cc62b9ca04bba10ebbe0db13a00b7337f0763dcdda0
+  text_characters: 2888
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 274
+  printed_page: 252
+  text_sha256: 8a1ee0e53c7271b08e5fafb9519919319d881db096c23ccb9b080132e425f9c4
+  text_characters: 3324
+  embedded_images: 2
+  drawing_paths: 20
+  visual_review: incelenmedi
+- pdf_page: 275
+  printed_page: 253
+  text_sha256: 7173ad3e6b9a3a3b25e14a9fc7f74309944f8a87b16735ca84e00a192d279746
+  text_characters: 3517
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 276
+  printed_page: 254
+  text_sha256: 6a8edbb8f01d8f4ec51463618ebc368806b9685112f5f38210ab49056154eea7
+  text_characters: 3013
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 277
+  printed_page: 255
+  text_sha256: 12c7f5a10282af4ba2dd42d07cd855c55da605a4072776a14a8126e088924526
+  text_characters: 2745
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 278
+  printed_page: 256
+  text_sha256: 061a140bae45276aab45e1c2ce14329736798ca10d5d8debd3219161ca9cbe07
+  text_characters: 3010
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 279
+  printed_page: 257
+  text_sha256: 1475d7fbea0fc14c6f9920ac87882db703286def1fc28e9d942d4704303ba9b9
+  text_characters: 2452
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 280
+  printed_page: 258
+  text_sha256: 2902e199c97e1ada1932b88063ef268e19df86f5fe6d7757991635ed4465942e
+  text_characters: 3078
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 281
+  printed_page: 259
+  text_sha256: 991c456181d9ccdc92990906038932382d9605eabd3b95ff47b4eb9b95e3ffc5
+  text_characters: 3279
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 282
+  printed_page: 260
+  text_sha256: 0dd92de23d2c01a452575013a8ec5e288b0fbdd0cea1a5b64192e28823e3195b
+  text_characters: 3339
+  embedded_images: 0
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 283
+  printed_page: 261
+  text_sha256: 9be223c5ab73fe3847c8d792f5a902028d27ecf6c05cdd8aec6cad8fd941146b
+  text_characters: 3140
+  embedded_images: 0
+  drawing_paths: 69
+  visual_review: incelenmedi
+- pdf_page: 284
+  printed_page: 262
+  text_sha256: f8360672fda001e521a0aff66d7c12f69e5c09c1f9bded8fb59a8d69cd15ecfc
+  text_characters: 2745
+  embedded_images: 3
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 285
+  printed_page: 263
+  text_sha256: 3b0ffc8b16f805b727b694721ceba4dd590ea58f2d36e102aa65a26efc411f00
+  text_characters: 3217
+  embedded_images: 0
+  drawing_paths: 19
+  visual_review: incelenmedi
+- pdf_page: 286
+  printed_page: 264
+  text_sha256: 36f9352fe95666aada9945be9beb7b0509c3b74ae0f148f9e6fe1a2616a64ee4
+  text_characters: 2984
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 287
+  printed_page: 265
+  text_sha256: a96e83b240cd04815c56cceb49e4f9c5c33b716e4507e5a94a343fc60eff9956
+  text_characters: 3623
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 288
+  printed_page: 266
+  text_sha256: e741c30c91e83e3530f8b988e93850dfec2aad2539078e1728866c92ec1a11df
+  text_characters: 3600
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 289
+  printed_page: 267
+  text_sha256: 79883f7cee439c1009d6a679b9a6d2c56cd738b68d36dd3ba26bd62824d57e4a
+  text_characters: 4111
+  embedded_images: 0
+  drawing_paths: 82
+  visual_review: incelenmedi
+- pdf_page: 290
+  printed_page: 268
+  text_sha256: fd4b71c7eb3aaa9affafb58645798a2582cbb36cf96fea27731f8461ff68d8a6
+  text_characters: 2823
+  embedded_images: 0
+  drawing_paths: 10
+  visual_review: incelenmedi
+- pdf_page: 291
+  printed_page: 269
+  text_sha256: 9c5ad633e197231cb3b48aed9c51dc8ec977d85855997a7a77502e7a81f1b6ad
+  text_characters: 3061
+  embedded_images: 0
+  drawing_paths: 6
+  visual_review: incelenmedi
+- pdf_page: 292
+  printed_page: 270
+  text_sha256: 978121a07198d8c56c55f847acf009ed3d4ec6bb774f517dc324a56421795de5
+  text_characters: 3319
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 293
+  printed_page: 271
+  text_sha256: 0c00d2205c0fff23f033cae8f4dcec8ee8d3998af6ab99ebff3d55945f6cec18
+  text_characters: 3740
+  embedded_images: 0
+  drawing_paths: 56
+  visual_review: incelenmedi
+- pdf_page: 294
+  printed_page: 272
+  text_sha256: eebc4dbb4eed326bf84c7a239391c9e179b8798068772634ca3ff7d4f7c99cbc
+  text_characters: 3516
+  embedded_images: 0
+  drawing_paths: 7
+  visual_review: incelenmedi
+- pdf_page: 295
+  printed_page: 273
+  text_sha256: 7ad079bc6e47a2ffe5871532d2aaf5fd8eedeafb6805e529450127d741064bd8
+  text_characters: 3402
+  embedded_images: 0
+  drawing_paths: 37
+  visual_review: incelenmedi
+- pdf_page: 296
+  printed_page: 274
+  text_sha256: 3f0917ff7c9e37d84a080d55dc55ace1bc1507145800eadeae2123f5b5b56dc5
+  text_characters: 3195
+  embedded_images: 0
+  drawing_paths: 27
+  visual_review: incelenmedi
+- pdf_page: 297
+  printed_page: 275
+  text_sha256: 5f9a813d26fa4e33ec0477a48c310897d90a2e21c39a88cbf284c95590f78f2c
+  text_characters: 3706
+  embedded_images: 0
+  drawing_paths: 19
+  visual_review: incelenmedi
+- pdf_page: 298
+  printed_page: 276
+  text_sha256: afdce54ec865e542a560b6b2745cebbf48c68110721fd3aee15028c897bffd3d
+  text_characters: 3410
+  embedded_images: 0
+  drawing_paths: 51
+  visual_review: incelenmedi
+- pdf_page: 299
+  printed_page: 277
+  text_sha256: 2559541b0c4a481df3107d7f0a5adaccc9605144a045772411b42fed217aaf69
+  text_characters: 3600
+  embedded_images: 0
+  drawing_paths: 86
+  visual_review: incelenmedi
+- pdf_page: 300
+  printed_page: 278
+  text_sha256: bd408da30bc17906de789f7e6d618220c1978f49ca4bd460418fff0aad95f695
+  text_characters: 2943
+  embedded_images: 0
+  drawing_paths: 6
+  visual_review: incelenmedi
+- pdf_page: 301
+  printed_page: 279
+  text_sha256: be0caa59708d97af8025af2edc9e81136c326eda2b023993122bfd3d4157c391
+  text_characters: 3755
+  embedded_images: 0
+  drawing_paths: 6
+  visual_review: incelenmedi
+- pdf_page: 302
+  printed_page: 280
+  text_sha256: a58053eeb04982d78f64f26b747a423cc7cfc69c80fe40451fdb211e683ddd2d
+  text_characters: 3658
+  embedded_images: 3
+  drawing_paths: 18
+  visual_review: incelenmedi
+- pdf_page: 303
+  printed_page: 281
+  text_sha256: fbd74b1d17870e98d2304a49e0f094345239157f85657ae50dabf024bbe9418e
+  text_characters: 3751
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 304
+  printed_page: 282
+  text_sha256: a5f6c4ebd99eb39988f431b22c1ec1e4b42719065bae0a236f808b611d4d06c6
+  text_characters: 3327
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 305
+  printed_page: 283
+  text_sha256: 27b2c9694fdf8000563759326acf3de61411c68f9397619ca03a1b3cc9ec76d1
+  text_characters: 2758
+  embedded_images: 2
+  drawing_paths: 15
+  visual_review: incelenmedi
+- pdf_page: 306
+  printed_page: 284
+  text_sha256: 8095b2317133347f24f7f5a3c9af1f38d12624fb91df553bf29d0bb8e99bd9dc
+  text_characters: 3354
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 307
+  printed_page: 285
+  text_sha256: fe39860b1807e6567fc7b0faa2a88caafee3704cbb115378fb0a38357394a2b2
+  text_characters: 3296
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 308
+  printed_page: 286
+  text_sha256: 8c4ce379c49234aa68c8d4ce69ebf43f5e7cb495348a5ccf450e1b98fd67906b
+  text_characters: 1941
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 309
+  printed_page: 287
+  text_sha256: a33e4d3c39cba91b94e247e03468e83f0484a3e5e9999ce06b736ba9b4902114
+  text_characters: 2529
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 310
+  printed_page: 288
+  text_sha256: 8d85427ce03cd14cada1ad4b80a05db2ce5be4fa191aa23abd1db13d0ed6f8b3
+  text_characters: 3467
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 311
+  printed_page: 289
+  text_sha256: 35a79bc68f94457dcec422b776522731a9db7e5cb6db53700d8c320d1d7a797b
+  text_characters: 3087
+  embedded_images: 0
+  drawing_paths: 183
+  visual_review: incelenmedi
+- pdf_page: 312
+  printed_page: 290
+  text_sha256: 3d310b378c9153d9ed074d44eeaa8044f3050e986b5fa9c2d0494017fdb03114
+  text_characters: 3112
+  embedded_images: 0
+  drawing_paths: 33
+  visual_review: incelenmedi
+- pdf_page: 313
+  printed_page: 291
+  text_sha256: d32d93de652a08ebb8273fdbbe52889cc752152121f69c03529b4a5ac83abf02
+  text_characters: 4217
+  embedded_images: 4
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 314
+  printed_page: 292
+  text_sha256: 5a7808227efa918d46fda3d425187c46631a9b6734b2d6e34088e5953276ec1c
+  text_characters: 3175
+  embedded_images: 0
+  drawing_paths: 59
+  visual_review: incelenmedi
+- pdf_page: 315
+  printed_page: 293
+  text_sha256: 2b49ad48f6ba0531861c8a6f61f50297cd63089f5bcd913cd2788305e2aeb703
+  text_characters: 2101
+  embedded_images: 0
+  drawing_paths: 61
+  visual_review: incelenmedi
+- pdf_page: 316
+  printed_page: 294
+  text_sha256: 7343ff8fde1d3e92398a32d8336902157fdc7e214fb59b50dee4570d70bf27cb
+  text_characters: 3739
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 317
+  printed_page: 295
+  text_sha256: 717a383ad71d7391c2189ce94dd22571f52f21b4e0cf2e8c85c97ea5b1800c7b
+  text_characters: 4262
+  embedded_images: 4
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 318
+  printed_page: 296
+  text_sha256: 020806f64a91d34a086ecf6467350c4cee00d07eb1bdb0d0aa97c20b77fc5ee6
+  text_characters: 3221
+  embedded_images: 0
+  drawing_paths: 138
+  visual_review: incelenmedi
+- pdf_page: 319
+  printed_page: 297
+  text_sha256: 7a81f362a83615b4121908cb9b2bf8d9614809d46dd1d19c312e4910e8362ae5
+  text_characters: 2807
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 320
+  printed_page: 298
+  text_sha256: 7e4042bebb96bb9bfbb3c2fae3afa430a0dcb3b25d8778ea692cc18bdc769b93
+  text_characters: 3651
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 321
+  printed_page: 299
+  text_sha256: 4917ad605f6c0b3215e22cddad1d2798c5e9a95fccb0f939672d08f59f4716b0
+  text_characters: 3699
+  embedded_images: 4
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 322
+  printed_page: 300
+  text_sha256: d77040e4d7b447be2fc39483d07f929f56bfa5f5e80aa46d4d59e99e1dc36280
+  text_characters: 2734
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 323
+  printed_page: 301
+  text_sha256: 6a5e9b6b0b1736f79ea84f2f6a5bfe7c5fd73c98bd68fe13ee42463d94a4f0bb
+  text_characters: 3282
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 324
+  printed_page: 302
+  text_sha256: c3d383c4ec0487271009e5b07b2cd608ac2b78e0d757890bb285b091a313c98f
+  text_characters: 2793
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 325
+  printed_page: 303
+  text_sha256: a532a99d2b992169d9abebbdfcbead64f3011b58cf014fb5be754097affed211
+  text_characters: 2785
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 326
+  printed_page: 304
+  text_sha256: b87fc30e4682fc264f6dea982a4e1a7d7ffd5af3847915527c64880198481581
+  text_characters: 3431
+  embedded_images: 0
+  drawing_paths: 346
+  visual_review: incelenmedi
+- pdf_page: 327
+  printed_page: 305
+  text_sha256: 96d9df4086720d2e5f33543b5385cada092fd80cbf2fc3197362bf686831e867
+  text_characters: 2562
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 328
+  printed_page: 306
+  text_sha256: 979b4d6c8a6bdde930ddb25c8d3d1118fc618ff2eb7d0aa18a89b46374839f5f
+  text_characters: 4586
+  embedded_images: 5
+  drawing_paths: 105
+  visual_review: incelenmedi
+- pdf_page: 329
+  printed_page: 307
+  text_sha256: bc66339e6dade0e1716235b2206d39f4488b42ed701ad82737b12ea9a33c6496
+  text_characters: 2218
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 330
+  printed_page: 308
+  text_sha256: d6d289f5f08986c9a06cab4cb4f347b0fe5ddbe3567cf96291234c9c50ae183a
+  text_characters: 3573
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 331
+  printed_page: 309
+  text_sha256: 85b0a3047e3afb23cd6cfdd7d37b2131daa83fd62075300f027bd244822e9842
+  text_characters: 3240
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 332
+  printed_page: 310
+  text_sha256: d4956eca86886b29c0ed0ff9e69c331997cfd8247af1901027ac660023bca684
+  text_characters: 3949
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 333
+  printed_page: 311
+  text_sha256: f18d211ccd780b7e0ddb872cd3fe44ef4a09373e13bcdd12f5f986f34263338b
+  text_characters: 3582
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 334
+  printed_page: 312
+  text_sha256: b2f5f891bce81b1b5a9eb3f6bcafb4b6c0db39cd3e63833a1fc12047f6d76074
+  text_characters: 3443
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 335
+  printed_page: 313
+  text_sha256: 08362e26054f5c2968b84f177c2743e47decc01577b9b29c70a8655c93bcaca7
+  text_characters: 3531
+  embedded_images: 0
+  drawing_paths: 155
+  visual_review: incelenmedi
+- pdf_page: 336
+  printed_page: 314
+  text_sha256: c84395294b2e88bc98d1222150ae8e68d6b0c7f9f8bd4474b61ffd39021531f4
+  text_characters: 2917
+  embedded_images: 0
+  drawing_paths: 251
+  visual_review: incelenmedi
+- pdf_page: 337
+  printed_page: 315
+  text_sha256: a4b9ba0e22d4722205f37fcc19b4f57cfaf36d5e5e3bef3e13ee49c3ac65b36a
+  text_characters: 2989
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 338
+  printed_page: 316
+  text_sha256: 5ccbe39b2727c87723946dfdeefa79244cac2c916f884d002c69a1ca27b5b0ef
+  text_characters: 3064
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 339
+  printed_page: 317
+  text_sha256: 85c8e7fda5c7612776edf0ac8e33b8290fefde9a0ed4f909f073aaf5394f78f1
+  text_characters: 3523
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 340
+  printed_page: 318
+  text_sha256: b95c96f0717fd838fa2e194f453cba25d5eb9a7f35f5d27d0a50f180b8224db1
+  text_characters: 3219
+  embedded_images: 0
+  drawing_paths: 99
+  visual_review: incelenmedi
+- pdf_page: 341
+  printed_page: 319
+  text_sha256: bee5be5370fdf4bf88c47d79cfab9250fba518d211167cecd898048679bb53ea
+  text_characters: 2888
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 342
+  printed_page: 320
+  text_sha256: 27a8a3aaba3e8768f51bf8f04cbee5d7e97e1e4a5cb82db6d7caafe062bf199b
+  text_characters: 2508
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 343
+  printed_page: 321
+  text_sha256: 9945d92633a73d94efb6da2e7699ee02d40445fb8a2d7519b8c2388b203f0e38
+  text_characters: 2656
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 344
+  printed_page: 322
+  text_sha256: d46e1a318a077d115f43cafd786a63f66904f7d2c6939e61101a38a54c6cb2c3
+  text_characters: 3559
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 345
+  printed_page: 323
+  text_sha256: 5e2662a8b350fe2a6c2c345ebebc662f559a8be7c80fed960618e1d89d2c6f61
+  text_characters: 3168
+  embedded_images: 10
+  drawing_paths: 33
+  visual_review: incelenmedi
+- pdf_page: 346
+  printed_page: 324
+  text_sha256: ffc0ec7ae60d478a7b70770e6e333a0b41351f12d49858bb08b4a3b7d713758a
+  text_characters: 3419
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 347
+  printed_page: 325
+  text_sha256: 47e8d849b1814ccb54040241c622e9ecc4bec9b2c67cc1969e9058240a8e50fa
+  text_characters: 3443
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 348
+  printed_page: 326
+  text_sha256: 7fbace48dbfb47805d7ca5c9574ae273f87275f4a82cd1d8153c0bc55edea6ef
+  text_characters: 3095
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 349
+  printed_page: 327
+  text_sha256: 37939414b4714eaa31242ef56648e5c981db68a4bb3022a9f9ad606781393ded
+  text_characters: 3621
+  embedded_images: 0
+  drawing_paths: 7
+  visual_review: incelenmedi
+- pdf_page: 350
+  printed_page: 328
+  text_sha256: 607a4a73222475e454e97a581149c9ee3337ad5b1670944e7af9d017beb45a25
+  text_characters: 2570
+  embedded_images: 2
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 351
+  printed_page: 329
+  text_sha256: 0a1458fa8fc8861aec6b8be77d3ed520a168b8851e15e565c42bb2935815c024
+  text_characters: 3098
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 352
+  printed_page: 330
+  text_sha256: b4390fc6402d81282660e9e3816538065fee40a01cc294d2ad20a4f0fb0f05c6
+  text_characters: 2904
+  embedded_images: 2
+  drawing_paths: 7
+  visual_review: incelenmedi
+- pdf_page: 353
+  printed_page: 331
+  text_sha256: 757ea151b3fad0c0eb189cfe676658be51c0c43504e0e58020f4e3317c11a943
+  text_characters: 3338
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 354
+  printed_page: 332
+  text_sha256: 1f9e213f3c38580fc9704d7b8dcecdf2ea89588cac13f082708b61a28e2f1f92
+  text_characters: 2510
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 355
+  printed_page: 333
+  text_sha256: 6c915e8d10ac339f708535b0ead07622506a5e3dc3ba5b2b5cbd44130838d6f7
+  text_characters: 2297
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 356
+  printed_page: 334
+  text_sha256: 9f694e250a6f26551528f35c9545e51a259851f1090ec6b9c4b66af241c84473
+  text_characters: 3404
+  embedded_images: 0
+  drawing_paths: 4
+  visual_review: incelenmedi
+- pdf_page: 357
+  printed_page: 335
+  text_sha256: 0e9ca613df594c47db4ed40e16f8319b6576808d131302eb790da57da73bf2be
+  text_characters: 3894
+  embedded_images: 0
+  drawing_paths: 142
+  visual_review: incelenmedi
+- pdf_page: 358
+  printed_page: 336
+  text_sha256: 3079bcccb3cc7bfdc76334e8c602d847558052d783d5ce3ab9dd5f8e0c766b6c
+  text_characters: 3061
+  embedded_images: 0
+  drawing_paths: 5
+  visual_review: incelenmedi
+- pdf_page: 359
+  printed_page: 337
+  text_sha256: 72cbe5a261c42603cf28ae9144037229e7140b01940e9c24b1a1417bb4f15890
+  text_characters: 3380
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 360
+  printed_page: 338
+  text_sha256: 314af0401ca008e1d6b7bd102968fce92ee170ef9c9977b6ae161ba310f162c6
+  text_characters: 2844
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 361
+  printed_page: 339
+  text_sha256: ec4ccae54a32315ba7b88d87d788f1049a75391bf40dd5db3d1bc73d7ea2343e
+  text_characters: 409
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 362
+  printed_page: 340
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 363
+  printed_page: 341
+  text_sha256: 3bb9b5c8e43159c95cea681d99547eb4a325adb015dc673b39b9a252fd711731
+  text_characters: 2598
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 364
+  printed_page: 342
+  text_sha256: 5cd39dfa5129f6906c35177ab35336f2f1c81a5a9d8e3e8a1b981f3a573a4783
+  text_characters: 3569
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 365
+  printed_page: 343
+  text_sha256: d70d29dc35eb5bb1eeb5a218e8628af32803591d9984d2e83dae37cc7f9e8906
+  text_characters: 3482
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 366
+  printed_page: 344
+  text_sha256: a71c3b885b386373bcbd412c94e8c18a7017ee0febf0a6d06ebf7d364d9bf17c
+  text_characters: 3142
+  embedded_images: 0
+  drawing_paths: 15
+  visual_review: incelenmedi
+- pdf_page: 367
+  printed_page: 345
+  text_sha256: cd7e4ad6d7e3496223efe034a308bf27ea898780c426cb54fb663bc7ac7ddb23
+  text_characters: 3927
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 368
+  printed_page: 346
+  text_sha256: 9919fbcff46789fc9a4f10aea25c40808cfcf73651f33d912a81158c60eeb6e2
+  text_characters: 3369
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 369
+  printed_page: 347
+  text_sha256: efdec70b2cfb428319ae8b60afacf2101b84bd10ea55bd12fe9b415b4ca71e61
+  text_characters: 3614
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 370
+  printed_page: 348
+  text_sha256: c125c3de9273b38a16953eb85dddfdaa75c5f189dc066c6e621311c9b0ad21a5
+  text_characters: 3395
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 371
+  printed_page: 349
+  text_sha256: dd6433e1a8c809354447338e60fac47de19517e68a7c78a5bcee958398153e87
+  text_characters: 3487
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 372
+  printed_page: 350
+  text_sha256: b0c05dcdddb7bcdcb0a2000ebc0eb69163fe973ae44c53b1ef385aed84ee213e
+  text_characters: 3264
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 373
+  printed_page: 351
+  text_sha256: 3559edcbced250b10a9ed3ce4e85f0800a908a7393cde581b19cecfdd5bdd9d3
+  text_characters: 2735
+  embedded_images: 0
+  drawing_paths: 36
+  visual_review: incelenmedi
+- pdf_page: 374
+  printed_page: 352
+  text_sha256: fced2937d50ae243a5992a8c4835e99f18367ca6a98d809b466ac25a1ba44510
+  text_characters: 4061
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 375
+  printed_page: 353
+  text_sha256: 9691bd0818c9107df0ccbd034919daea9331f13bd5ffff1a91a60d97afb98096
+  text_characters: 2260
+  embedded_images: 3
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 376
+  printed_page: 354
+  text_sha256: 109c5c879652f6cb3c2453d3a94f698958bc6925cce57043c3bdb0a8c1916725
+  text_characters: 3151
+  embedded_images: 1
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 377
+  printed_page: 355
+  text_sha256: 148c61ecf041053329f0db236971cefd5da5801cd320ec9de9524f6b62546dbe
+  text_characters: 3892
+  embedded_images: 1
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 378
+  printed_page: 356
+  text_sha256: 2a16890ddaf2b8a84bf041eac1fe1033d1b15104af427ef0c42bce464fd74003
+  text_characters: 3020
+  embedded_images: 1
+  drawing_paths: 11
+  visual_review: incelenmedi
+- pdf_page: 379
+  printed_page: 357
+  text_sha256: b82035dfcd5c4e9a08ada74ed5ad2ff672df039323c8edbfecde2bcf69ff0d39
+  text_characters: 3484
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 380
+  printed_page: 358
+  text_sha256: dcd62080b6e26dceb632b8c33dee9d2a898b66300b78e848965118de7a42e611
+  text_characters: 3426
+  embedded_images: 2
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 381
+  printed_page: 359
+  text_sha256: 89f443ef301f376dcd5f337b96f18d2c33f0d86be7136c3b39ab6ebdfbd4b91d
+  text_characters: 3855
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 382
+  printed_page: 360
+  text_sha256: d56e28405b4f3cb9e198435e0e3e089ce2c4645d2c6646309b93aa3e7fe11ca4
+  text_characters: 3759
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 383
+  printed_page: 361
+  text_sha256: d52ba25232a0f3724fbdb5c6056e4e20cd81ff99050f76952cd3cc057dabc697
+  text_characters: 3494
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 384
+  printed_page: 362
+  text_sha256: 2789682e2e43a78db745d74f2135b912776f4f73bed6e6e2fb538d1ae20fb32f
+  text_characters: 3689
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 385
+  printed_page: 363
+  text_sha256: a302a3bf6014fb0653fb89b5bdfab3f0b2fd7351ad641ddae082f9c2e1a687b0
+  text_characters: 3600
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 386
+  printed_page: 364
+  text_sha256: 6eca94ad8737ee28d944599c9afb0f3e165c5b48958c3bfa2cb3972235686362
+  text_characters: 3595
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 387
+  printed_page: 365
+  text_sha256: 718ed3b6cb7fdbfb071f94cf96ed68235f9980e6d8343dca13ed4e7f887c2c25
+  text_characters: 3734
+  embedded_images: 30
+  drawing_paths: 91
+  visual_review: incelenmedi
+- pdf_page: 388
+  printed_page: 366
+  text_sha256: 5d27c492c9dc8a470d15abd15d8d3f20c3de639c442baf114c371556250eaab6
+  text_characters: 3796
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 389
+  printed_page: 367
+  text_sha256: eb705e697696564b8d41a86b55d00daef826ef7250f37444ab61f2847f5c7395
+  text_characters: 3848
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 390
+  printed_page: 368
+  text_sha256: 32dedf207869c415b274642dfaeeac85f52ae464b1173a3477627ac386129932
+  text_characters: 3527
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 391
+  printed_page: 369
+  text_sha256: c3fa6ffd4af2051eeb0d3c2f3183c18a8e8cc582821c2cf7531275bfd0687e7e
+  text_characters: 3724
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 392
+  printed_page: 370
+  text_sha256: f4c3c4c78051cb40f38f86e40777ec49f940410724202d5868b48d5cc8351859
+  text_characters: 3013
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 393
+  printed_page: 371
+  text_sha256: f1edb19571b2f570e5e37df0ad765acb241865023d301b40d5d17aeaf575f002
+  text_characters: 3454
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 394
+  printed_page: 372
+  text_sha256: 6dab7422149e70b08364030398376032b28cee4ec94f92476d8166b401c433ed
+  text_characters: 3597
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 395
+  printed_page: 373
+  text_sha256: eb2691bf292c90e56c947858914a6750663eafb1f610dfffab51b2c5674a6663
+  text_characters: 3599
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 396
+  printed_page: 374
+  text_sha256: 1d39799d3a7e6440261f2cedeaee84de54561be36ee745cad99f3b5090f6b113
+  text_characters: 3874
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 397
+  printed_page: 375
+  text_sha256: 94aa905ada4f11c25e7b138894aa312ad8a5959e7678085e6ced43c9fee6737d
+  text_characters: 3750
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 398
+  printed_page: 376
+  text_sha256: fd8a537c121b6871a16ed351b59b91087e8cd74c0431069792da0bdd86f5e943
+  text_characters: 1992
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 399
+  printed_page: 377
+  text_sha256: 3fcdb18c97c2f8e56ecce93a54b9ad446f55534353c5c8b315feb8dbbdfabdc6
+  text_characters: 2615
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 400
+  printed_page: 378
+  text_sha256: 12a2bb07721a21d8e22059a3ce75a332904ffe8030e4bbe2933881bf7e86fdcc
+  text_characters: 3150
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 401
+  printed_page: 379
+  text_sha256: 8bab327e1d77032cae29d497250dc9b0d829248605ee194243e579b17de9db6b
+  text_characters: 3636
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 402
+  printed_page: 380
+  text_sha256: e75775b22bf60ea87b210e04ca057a4e3ed0e501e8e9b22aede58922d9d19e22
+  text_characters: 3790
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 403
+  printed_page: 381
+  text_sha256: 28d0e76e32e716285982c5526254ef4ddd402603d9f2155ebd215418531ab043
+  text_characters: 3637
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 404
+  printed_page: 382
+  text_sha256: 98f07cbb039f396c20bf12810d620edcdc8c74a3d7335981cef5449a341904ed
+  text_characters: 3861
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 405
+  printed_page: 383
+  text_sha256: e452e559596a8e312fa5854a6a6ac1dbc53d2ec5d271ce90af6a2792e55a61fb
+  text_characters: 3569
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 406
+  printed_page: 384
+  text_sha256: d0e6e95abc2d2aa182b7a0a20a92ed24fe3f999bcbcf0a423b29c6a1aa0b5b70
+  text_characters: 3800
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 407
+  printed_page: 385
+  text_sha256: 8a75447f14680adafa3e9da999c8f052af0c6297ff9a99fe3016c2e3277d16e7
+  text_characters: 3170
+  embedded_images: 2
+  drawing_paths: 8
+  visual_review: incelenmedi
+- pdf_page: 408
+  printed_page: 386
+  text_sha256: df5805d29e6d636ff6720dac0cab0a63f884e0e774b3d24269b00a9fd0ddc9ab
+  text_characters: 2819
+  embedded_images: 2
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 409
+  printed_page: 387
+  text_sha256: 752c2f636d91063830a2484e92c927c1ddc5f80a6d0afeb0cf78258bb4907402
+  text_characters: 3443
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 410
+  printed_page: 388
+  text_sha256: 652c5255c2fbedf4b89680ce7d431ac59b7b6402d83e05cf32251df185824d82
+  text_characters: 2461
+  embedded_images: 1
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 411
+  printed_page: 389
+  text_sha256: db22b18deeeacfe19f003ebf345b15d3ea38ec353508810315c8a8ddd74cab51
+  text_characters: 3029
+  embedded_images: 1
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 412
+  printed_page: 390
+  text_sha256: 7fdfeec9317ea0ff3c93dffbc41db1f73ca644d70219f54820af1833ac776e96
+  text_characters: 3596
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 413
+  printed_page: 391
+  text_sha256: a91b8b5a1e6be6a125393988502bcc014b69bfa422b25eee1f440339558e001f
+  text_characters: 2856
+  embedded_images: 1
+  drawing_paths: 24
+  visual_review: incelenmedi
+- pdf_page: 414
+  printed_page: 392
+  text_sha256: 6d18f92d32fff9a448ccb8298cc6cf063c43b8aa7ec5ce92ff24939625229746
+  text_characters: 3852
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 415
+  printed_page: 393
+  text_sha256: 37f9559d5e1c2abd9fdd8ae08d518f9e404455b8142465b20b1a4e554d998b71
+  text_characters: 3780
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 416
+  printed_page: 394
+  text_sha256: 4823f3a0a3f482f405041e147d10267e25ca898c2caaaeb54a1f3c01cfbe80ea
+  text_characters: 3744
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 417
+  printed_page: 395
+  text_sha256: 98a441957adb308127ae160a2b979afb1ff7bc02f8bb8a63641e549c22088f4a
+  text_characters: 3422
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 418
+  printed_page: 396
+  text_sha256: f7e2e29c85d33a6b5c934a431da91a5b4a29de73436fedd1e519a06d81f37bd3
+  text_characters: 5345
+  embedded_images: 19
+  drawing_paths: 151
+  visual_review: incelenmedi
+- pdf_page: 419
+  printed_page: 397
+  text_sha256: ff2c2a8ea9af67833d08ad7da0680f39f0263c46974fb418200912309669c08b
+  text_characters: 3825
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 420
+  printed_page: 398
+  text_sha256: af1b92c01b064419e0faea44f9f66c4f8848c18cf41e4c3b211e9638d989ee61
+  text_characters: 3518
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 421
+  printed_page: 399
+  text_sha256: 1922f5100039481aa33bf7a11766bea3206dcb5ef47f6d815580afaa50ad7023
+  text_characters: 3368
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 422
+  printed_page: 400
+  text_sha256: f5b494a6de5a23c9908f424715b9e2e8097d029e7f1a20b21ea564a82cb9a3e0
+  text_characters: 3765
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 423
+  printed_page: 401
+  text_sha256: 4ea3e0346dad7a3705522fcfaeb5db111c7ef2d772e55768fb40b9a0ab8023a6
+  text_characters: 3787
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 424
+  printed_page: 402
+  text_sha256: 6953849b4d3c8cc14adf99681bc1d84660ff62f2cd740ce1c1a9ec961f7294e4
+  text_characters: 3556
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 425
+  printed_page: 403
+  text_sha256: 3af84ff69dbfe84f2c7cac5319455b1a7cc36a0b1f40123adfa819db744e9d2a
+  text_characters: 3871
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 426
+  printed_page: 404
+  text_sha256: 06e1dfa88c69c71bfc986d6ed74ea5fef7818790ebf77b1fd8711ecfc4122d1a
+  text_characters: 3591
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 427
+  printed_page: 405
+  text_sha256: 72ff9954cc75882b0bb40e0ce168274be70e503825fcee226c72834e7ca32193
+  text_characters: 3789
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 428
+  printed_page: 406
+  text_sha256: d97edd4f931b7dd9c6d308aefbb5cfefcd3a233b8e8d094b76dd9c58ee4e9020
+  text_characters: 3864
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 429
+  printed_page: 407
+  text_sha256: 21a8f8c635ee5ac1e0853a3ab176020de2f09cde92ca6252c72e7a1355960800
+  text_characters: 3474
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 430
+  printed_page: 408
+  text_sha256: f80a7cca8d59b5c4f13d904902db96df7dbd2962628eacec9d5258dfb858175f
+  text_characters: 3742
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 431
+  printed_page: 409
+  text_sha256: 47c79016a28e6120c5bde824b2a04378dd1cee255842c9537ad4d110ab8347a4
+  text_characters: 3465
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 432
+  printed_page: 410
+  text_sha256: f84f20f0e3bd31d90483637c397ccee5212b33eb854d5571d009b8ba17eed3fe
+  text_characters: 3502
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 433
+  printed_page: 411
+  text_sha256: fe28404ba2795c1619ba9e6087b24e3396fda42667d74a845be7c5a7910e383b
+  text_characters: 3855
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 434
+  printed_page: 412
+  text_sha256: 18c97367c41d26add300665a641cf454cbda91783bbec10b555818084d9d7e27
+  text_characters: 3329
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 435
+  printed_page: 413
+  text_sha256: 4c76a534857173d2ac0fb74b868256b62377eb326747bcefab0f84c738602223
+  text_characters: 3553
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 436
+  printed_page: 414
+  text_sha256: 8da8d7dff2cd0f3f8d3f3b02d6ee8756568a1e25a2cfa63d3946e2ee3fa84948
+  text_characters: 3655
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 437
+  printed_page: 415
+  text_sha256: b8754e6cc749b864ab598b2464616e496185e380b2174e08bfa0a377a28ac197
+  text_characters: 3618
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 438
+  printed_page: 416
+  text_sha256: 420e1fb087998db60a816c05f322aa6f1849641bb618cd464554520560d79c17
+  text_characters: 3545
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 439
+  printed_page: 417
+  text_sha256: a374c1ab3b8a81cf4e1b57ad94c4dba39d862373d0aa5f4f102e3ee85e44ca5b
+  text_characters: 3831
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 440
+  printed_page: 418
+  text_sha256: e705cd2c83569a586f38e0571233b73242103946ae1d30474f36b3c12aad8bbf
+  text_characters: 3464
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 441
+  printed_page: 419
+  text_sha256: 719a6600c92b6ea453b24f652228056dbf1f6aa3f5bf0bb9fd18d85ba55b6718
+  text_characters: 3297
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 442
+  printed_page: 420
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 443
+  printed_page: 421
+  text_sha256: 73168ef3baaf9ee47520a5cb51fe7f44cb12c47f14ce578849764f6959aa31f9
+  text_characters: 2257
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 444
+  printed_page: 422
+  text_sha256: f52f69da3366776664d828fea9bebf9811162d8b96513f1f51c63bed61b185f6
+  text_characters: 3660
+  embedded_images: 0
+  drawing_paths: 112
+  visual_review: incelenmedi
+- pdf_page: 445
+  printed_page: 423
+  text_sha256: 9c683e3c0e41c3982bb8c7b7c8fe781ced55feafbae2bbb5ec2b49505dc2eb5f
+  text_characters: 4250
+  embedded_images: 0
+  drawing_paths: 72
+  visual_review: incelenmedi
+- pdf_page: 446
+  printed_page: 424
+  text_sha256: b71c5d4399fa2c1f1306bfa058f81dd65950ff3fa0515da969c61e78f695f782
+  text_characters: 3456
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 447
+  printed_page: 425
+  text_sha256: b5e84f854e36ce0fc9694d639af1dc3d45a989b5eb676ac991cfb9cd31bed442
+  text_characters: 3379
+  embedded_images: 0
+  drawing_paths: 51
+  visual_review: incelenmedi
+- pdf_page: 448
+  printed_page: 426
+  text_sha256: 03a73bda51af4ca3aa8d42d8123e29104cf916b84dd4c29c45cdf74f5ab25aef
+  text_characters: 3455
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 449
+  printed_page: 427
+  text_sha256: da23bc3fbabfbbfab2760fc7814fab1a67392c47b8259f4d1e4a4e961ff6f7b7
+  text_characters: 3736
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 450
+  printed_page: 428
+  text_sha256: 8b08cc7864668c9b6767ab0107d86269f178730951859bdb5b782d2bae7b43be
+  text_characters: 2613
+  embedded_images: 0
+  drawing_paths: 75
+  visual_review: incelenmedi
+- pdf_page: 451
+  printed_page: 429
+  text_sha256: 5069c6aa318ba80967fbd8d53ad19e2645b49e60c5399c93405d9ded17efcf0d
+  text_characters: 3391
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 452
+  printed_page: 430
+  text_sha256: 92b99ecc61357f74d5b848f03840b0fd3f5ca624e37ba0cdfbd72f7a74c815be
+  text_characters: 3696
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 453
+  printed_page: 431
+  text_sha256: 0369fe2cb637fe9aed07e5cea08cf5104999784ced92455e2e033e796663692d
+  text_characters: 3729
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 454
+  printed_page: 432
+  text_sha256: c94528f47837b2ecfce3e872858b9bcba041f9da9b45727b4ea4203a38fab37d
+  text_characters: 3478
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 455
+  printed_page: 433
+  text_sha256: c4ab383203899e78471ffdee76fa058ad7dfd3240b1f6a061fac7e15fc3ca3b0
+  text_characters: 2758
+  embedded_images: 2
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 456
+  printed_page: 434
+  text_sha256: b70d6770293a376ca574e169f5e2a37bb447d461697e4437a40474283dd05fac
+  text_characters: 3823
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 457
+  printed_page: 435
+  text_sha256: 0b50e6db9034a179a210a2a87a6ea8d2543574347460f4688edfc0f438a39572
+  text_characters: 3133
+  embedded_images: 2
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 458
+  printed_page: 436
+  text_sha256: cbec40ffd7e672cc6fce4edec51174cf6415bd7600666577e5d86a56a5dc5a53
+  text_characters: 3586
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 459
+  printed_page: 437
+  text_sha256: c40e1b00184c99506744e887186dcc1e8f5b1f80f8f23eaf7381742371440b2b
+  text_characters: 3708
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 460
+  printed_page: 438
+  text_sha256: 1e0632be1f3908f3b0b8ac8c7e76fb7c10a42d321af1650a2b21d7a17ce26f6f
+  text_characters: 3674
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 461
+  printed_page: 439
+  text_sha256: 40ec870d5ae5a2587cddd763a2fcaab538c152b397df88c73a7f3471e610d311
+  text_characters: 3806
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 462
+  printed_page: 440
+  text_sha256: 72189aac16ab177f6e0eef791bd0bbea943e2607c290e168a0d7ff63535eb577
+  text_characters: 3916
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 463
+  printed_page: 441
+  text_sha256: b47f1c881ca0c2c2666202b31cbdee706facef3bc949cc4d42223dcd6ece43bb
+  text_characters: 3546
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 464
+  printed_page: 442
+  text_sha256: b7977f33b31ac519746781f30fac810b93122cc694014018f95c219f5e6fd512
+  text_characters: 3090
+  embedded_images: 0
+  drawing_paths: 141
+  visual_review: incelenmedi
+- pdf_page: 465
+  printed_page: 443
+  text_sha256: bc4ebcaaf028255a54ca16890f8f41c7cd012c7af2aa49e58f905ed8cc2c8a96
+  text_characters: 3400
+  embedded_images: 0
+  drawing_paths: 86
+  visual_review: incelenmedi
+- pdf_page: 466
+  printed_page: 444
+  text_sha256: e3192b550ffc417fe8a44841096c0e79bb2ef7731cf609c0456a4c971bc59acb
+  text_characters: 3479
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 467
+  printed_page: 445
+  text_sha256: 48b200c42128bd9016396e19112b8e10c1b97800b11026c00c87052205c8d7f3
+  text_characters: 5470
+  embedded_images: 5
+  drawing_paths: 923
+  visual_review: incelenmedi
+- pdf_page: 468
+  printed_page: 446
+  text_sha256: 17763fdddf502b0caae02c18949428eed1f6dbeb98e5559abd9c478fdabb392f
+  text_characters: 3645
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 469
+  printed_page: 447
+  text_sha256: e8366c43587bf55933c09a5aef08e75a4bb88e006a7a1ed9322cf7d7494c50b4
+  text_characters: 3540
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 470
+  printed_page: 448
+  text_sha256: a5a55212c1fd6c71df464091c99717bd5d3e2dd9e733ed8a166addc7340b8ad1
+  text_characters: 2345
+  embedded_images: 1
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 471
+  printed_page: 449
+  text_sha256: ce3f0196a7df658456a40c7c937ba3fad36847467a945bdb71a2f6340ce69da7
+  text_characters: 3871
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 472
+  printed_page: 450
+  text_sha256: 87b1a620b6b37ed27e6e4dae77287d4253bc839f50c9346f0e6c5a3643814229
+  text_characters: 3441
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 473
+  printed_page: 451
+  text_sha256: 1f9ef9491ba3b3c692b00e400fc589e2d6210ba2933fa0f7901100e1237015b6
+  text_characters: 3925
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 474
+  printed_page: 452
+  text_sha256: e23e712edb7575551f961aaf815d558ce2151238bc39a696cfcec49c6e707040
+  text_characters: 3638
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 475
+  printed_page: 453
+  text_sha256: 8ffeac9c7a30da3745b89259f457b0f7b7d41837955b8f23dadd2df6a96eda24
+  text_characters: 2683
+  embedded_images: 2
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 476
+  printed_page: 454
+  text_sha256: 8932340524fef20caaa77bd91ea60bab03bca1d8f340c33f023b7425be74660a
+  text_characters: 3373
+  embedded_images: 2
+  drawing_paths: 52
+  visual_review: incelenmedi
+- pdf_page: 477
+  printed_page: 455
+  text_sha256: 28173ecd8802ff9cbf5825f7801b585236ee4ebd099bab5479cacd52051811ab
+  text_characters: 3763
+  embedded_images: 0
+  drawing_paths: 3
+  visual_review: incelenmedi
+- pdf_page: 478
+  printed_page: 456
+  text_sha256: 7910024ae7ba56f1b71c40254324d9059472e5ef45fd5018df8963ceed87547c
+  text_characters: 2580
+  embedded_images: 2
+  drawing_paths: 10
+  visual_review: incelenmedi
+- pdf_page: 479
+  printed_page: 457
+  text_sha256: 649a8bdc726f36efa2aee1c310a4007719f3f40255a6754139552683e7867933
+  text_characters: 1535
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 480
+  printed_page: 458
+  text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  text_characters: 0
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 481
+  printed_page: 459
+  text_sha256: 92b8f0ae200bab5e88121e6d2a9eab2b72bbe90361b5b5391b7a90f6f6f37199
+  text_characters: 2221
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 482
+  printed_page: 460
+  text_sha256: 06c8d9ce6265fe0be10c403a2063fa2470c51cd63077e7218eb88a046042f2eb
+  text_characters: 3724
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 483
+  printed_page: 461
+  text_sha256: 2c52f38ed1f2b533001d39fd03cbe3c5b653b10e51164e3feb9d623fda540508
+  text_characters: 3592
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 484
+  printed_page: 462
+  text_sha256: d442be676a50fade6861b8eba0823236a5ffdd0919fdf1fa77e11cf1522c1cfe
+  text_characters: 3622
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 485
+  printed_page: 463
+  text_sha256: f1e2bb6876c0a15869867e065f5eec155d6655fe1c5c8fcb757082dfe7b0b0b7
+  text_characters: 3652
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 486
+  printed_page: 464
+  text_sha256: 083e08b3041efb1cde44983e4d6b36f18dfb9149d501031dd3395b304e2e0642
+  text_characters: 3470
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 487
+  printed_page: 465
+  text_sha256: ff93cae73466d84655fa2bbf2e5fcfe4f69167a2fd7d22e2c91b79699f63ca53
+  text_characters: 3521
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 488
+  printed_page: 466
+  text_sha256: 1aafd3a4372e6cfc2dca9d8eba6303902b2b9e8a4df37a22665f1a7606a3f306
+  text_characters: 3661
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 489
+  printed_page: 467
+  text_sha256: 6ee6e5ee2f96ace91d08369a231210a84e49f51e2b8da1ee134c69fbcdaab4da
+  text_characters: 3059
+  embedded_images: 9
+  drawing_paths: 44
+  visual_review: incelenmedi
+- pdf_page: 490
+  printed_page: 468
+  text_sha256: 9e83f629de959f52c41079485894283cb8920aca96e3011ff95e7f0c903564e3
+  text_characters: 3494
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 491
+  printed_page: 469
+  text_sha256: db826b14863a711b602b91e45b54fa687e58acf58381883b52f2b71494a6c1f5
+  text_characters: 3797
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 492
+  printed_page: 470
+  text_sha256: 826ed386965e5ca4d2f122a8c536d95554f4894aed1ba0656d216f0aeb80c453
+  text_characters: 3893
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 493
+  printed_page: 471
+  text_sha256: 50207368c223cef7164001dc8c3c0b6147ba34122353b1004a00bcb6c36fd1eb
+  text_characters: 3800
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 494
+  printed_page: 472
+  text_sha256: ad7988a34eae20fb44fcf08c140b9ee200d37a540d3cc4dce7190b827659f120
+  text_characters: 3725
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 495
+  printed_page: 473
+  text_sha256: 5f92e48c64cff34d9ea50f5249c2e3b891bfbb40153f537bf37883e72334a4c6
+  text_characters: 3828
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 496
+  printed_page: 474
+  text_sha256: a1bba106b4a2121872933da97efeb20285e8272a4479bfff2e1f490e886f8539
+  text_characters: 3886
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 497
+  printed_page: 475
+  text_sha256: 76e532ead4c300559dec7721bb01c5476711c8dc52d25c446c2587b9b79efc7d
+  text_characters: 3702
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 498
+  printed_page: 476
+  text_sha256: 907aa278910dc848cbffe71b2c6ba5d9a0c66ec2a572ca3b7905869aa8f97a2f
+  text_characters: 3777
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 499
+  printed_page: 477
+  text_sha256: 67628e49b84527febb7ed19e566c94f8648ce0c253e1d139b116959acda32014
+  text_characters: 4011
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 500
+  printed_page: 478
+  text_sha256: 99e0939b3202f82c2b94f215b1d597267f56433e8a9f3b7ce396c7b83b28bca7
+  text_characters: 1715
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 501
+  printed_page: 479
+  text_sha256: 68d4590b6388e50b763699b0651075d4df597cd87f7e327d9b209bbe08d9fe51
+  text_characters: 3271
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 502
+  printed_page: 480
+  text_sha256: 02bd998fa501db04d24624bffe8f6140cc861012ad96ece2a28fa4e8edac3597
+  text_characters: 3180
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 503
+  printed_page: 481
+  text_sha256: 3f3208fb2456cc2ed012c2e8f99597e9bb31be4c363a5f4ea6dfd86cf4e1ef56
+  text_characters: 2823
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 504
+  printed_page: 482
+  text_sha256: 22a24c99bcfded253dfc3c461b244e666222c2bc2465a5523e58c816a13ea764
+  text_characters: 3478
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 505
+  printed_page: 483
+  text_sha256: 8c81ac3cf6d5ba65c773700b6ab260450bb1e750df5cd212ec6d45a809250ee8
+  text_characters: 3714
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 506
+  printed_page: 484
+  text_sha256: 6c21c139c2a4dd5e11635e3075f502b03502132ad894e6553b0878b18b3cc190
+  text_characters: 3728
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 507
+  printed_page: 485
+  text_sha256: 125e28a79a4f56c54995ed7f53dbcd1205bdf8f0721125e828e42a5698153663
+  text_characters: 3454
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 508
+  printed_page: 486
+  text_sha256: fd952d4a92e3522161e9879cda94d9b63a089c6e040b3de46928501a31c24f60
+  text_characters: 3652
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 509
+  printed_page: 487
+  text_sha256: 576e0f31b9e961657cf6d9abbba8458f2931e145c28c82e52d26ea1a71283e58
+  text_characters: 3780
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 510
+  printed_page: 488
+  text_sha256: aba6cfcdd955630b8fcbb3fa59d407d49f3684fa19c4415a56c10dc8c5589495
+  text_characters: 3419
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 511
+  printed_page: 489
+  text_sha256: f8069ef03a641f14f5a7006ac51a4477bb0d7af78e17919fb73313adfc25a4c2
+  text_characters: 3605
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 512
+  printed_page: 490
+  text_sha256: 7141e3f89db0e71ee6446c9831c4c211ef6bc391e8ca443dd1dbc186d4746d08
+  text_characters: 3483
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 513
+  printed_page: 491
+  text_sha256: 87e8b6b9a8ca7a8f06475cee3b7da52f396aeb79eac0ee19a2b9454dbb189e01
+  text_characters: 3708
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 514
+  printed_page: 492
+  text_sha256: 82c71be5318d23b3306fdf1ace46e45c704ae70a1401999d0c1c24fe40c84b02
+  text_characters: 3528
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 515
+  printed_page: 493
+  text_sha256: 3965d0e263a788d70158f7aba594489ebcaa2a15cf69d44082382528c3d19c65
+  text_characters: 3459
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 516
+  printed_page: 494
+  text_sha256: 6c28d770d0fa1955b9d6e89e34598075b437fe49dd689fa20ade73bdecf65482
+  text_characters: 3566
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 517
+  printed_page: 495
+  text_sha256: 896f10e14b907f3b4257e484586f926afdc21d50c831b24d95e0c30ae083e1e7
+  text_characters: 3632
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 518
+  printed_page: 496
+  text_sha256: e050c1e892fa02f8faba5b270e5dc000a7af9e2efc5b97e8b09a9d09ba66c4f8
+  text_characters: 3523
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 519
+  printed_page: 497
+  text_sha256: 3c1a984bda6a092c97559f41038ed01e9e0fbd45e5f0e772f95e478526c2218a
+  text_characters: 3692
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 520
+  printed_page: 498
+  text_sha256: 64fd416ade33d117c15dd3c5affe8704232b37850cbb5ba60d145dad46bc7c1c
+  text_characters: 3754
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 521
+  printed_page: 499
+  text_sha256: 195a514b6f2ed017ae8167c27e1acf649fe8d5a4c2af254911ca41680e1c64dd
+  text_characters: 3546
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 522
+  printed_page: 500
+  text_sha256: 23de8b25b357a748eb7a4b5522aa6bee7b9859e05acb8426ba9bc284ce8ebd97
+  text_characters: 3677
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 523
+  printed_page: 501
+  text_sha256: 50b3e3426b809363a3c1aac2c10a7285ef1c653a46f40adee6228e9281944ff3
+  text_characters: 3814
+  embedded_images: 0
+  drawing_paths: 2
+  visual_review: incelenmedi
+- pdf_page: 524
+  printed_page: 502
+  text_sha256: 39a3637be0657f5c1ab351b0c636be6d7da8fa47070d5b4a022444480c08ffc2
+  text_characters: 3731
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 525
+  printed_page: 503
+  text_sha256: a76e4d322d4d918c97b86c4dfed716dd60112393bafb41086c3fb39c3319e4af
+  text_characters: 3804
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 526
+  printed_page: 504
+  text_sha256: 0c3bea7224bebb86dbf5a0c29acbe7226b074595bc4656b63dcf7e30f4f9aa74
+  text_characters: 3779
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 527
+  printed_page: 505
+  text_sha256: f640f5e3c8e9c8aa55fe6ebb7446d6beb5a6636a24d4238eb9dfb900a84a1702
+  text_characters: 3361
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 528
+  printed_page: 506
+  text_sha256: c1b4c1c545cfd347e855990a34d264e62f769262ad5959b795d7b1a6e8da4d1b
+  text_characters: 3572
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 529
+  printed_page: 507
+  text_sha256: 55b7cc82cdc62607700a5fe03bebc301ef6f2c34f84113d8c474a8dd8694335c
+  text_characters: 3719
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 530
+  printed_page: 508
+  text_sha256: f827dee1e077bd2a580ba7413fd2074c8eb99bb72aa4d32f58850f460e7e6000
+  text_characters: 3609
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 531
+  printed_page: 509
+  text_sha256: 8154c3113203988db7a5a24427ff58b10cee1d91a87e0651ed9f76d10e3a8d2b
+  text_characters: 3717
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 532
+  printed_page: 510
+  text_sha256: e17a657baa0731ec0493029af80a78cd498f6a6568c744963beb79fe5b083800
+  text_characters: 3647
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 533
+  printed_page: 511
+  text_sha256: 406541e40fff8bd78969c7815b0d1e2e074c7360c4f800ce551a444f038b5074
+  text_characters: 3675
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 534
+  printed_page: 512
+  text_sha256: e138032a2b9f2eaefff3bccae6cd968ed8ce67986f813b41bbc11a471bdfa00a
+  text_characters: 3889
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 535
+  printed_page: 513
+  text_sha256: 335e0a32e2a718fb6521f4d065b215085b1f32c429155fa877c831c7557feec0
+  text_characters: 3612
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 536
+  printed_page: 514
+  text_sha256: b9eb9b8dfd4a4e1b181cac6f17f82ab66a8764c4523067ba4003a6a0d9d350b9
+  text_characters: 3441
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 537
+  printed_page: 515
+  text_sha256: d40723f858814dea3805935957186ac90808c93d4560e2aba0ce57fe335587f4
+  text_characters: 3740
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 538
+  printed_page: 516
+  text_sha256: 56c4f1b870adaa3323a6ed9214b1452d8dd22057c9794dff58208c0b7512d5c5
+  text_characters: 3508
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 539
+  printed_page: 517
+  text_sha256: 4aa3db4806b256e18344a3bc0771b11fd1bea582e478b0b1dc4a6807a4b12aa1
+  text_characters: 3444
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 540
+  printed_page: 518
+  text_sha256: 8c1e2624859976c034e1c3f0b40cb7294be120042caef2d9c0e4e29afa5990fe
+  text_characters: 2800
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 541
+  printed_page: 519
+  text_sha256: 2d7f1e1c0506fb7a834279f516e11c69cefc090e91baea56507af7bdc8330481
+  text_characters: 3858
+  embedded_images: 0
+  drawing_paths: 0
+  visual_review: incelenmedi
+- pdf_page: 542
+  printed_page: 520
+  text_sha256: e8a82af5769aeeb52e084af5be30d7f70b673e462caa5727105f11f0e252c893
+  text_characters: 4060
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 543
+  printed_page: 521
+  text_sha256: bf5c72afd1a50eabd787b8758ad04a25b9cee5c41cf0fcccce17eb0e22e53157
+  text_characters: 3804
+  embedded_images: 0
+  drawing_paths: 6
+  visual_review: incelenmedi
+- pdf_page: 544
+  printed_page: 522
+  text_sha256: d2fd066491fe891086fe812a714ed329647831171e9ce9240b9365c9370fec8f
+  text_characters: 3952
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 545
+  printed_page: 523
+  text_sha256: aa988f65456e9797596854f4634ec4ca406086c5343237ad5f2a76ecbf3dc523
+  text_characters: 3877
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 546
+  printed_page: 524
+  text_sha256: 7b5ff59b357558a96664d2cc3246c78f120e79364de165af42754f8eb4182c27
+  text_characters: 3240
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 547
+  printed_page: 525
+  text_sha256: d172ce82550f279a52263a41558976d3ffb210befd16390dca76e4ef62120297
+  text_characters: 1301
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+- pdf_page: 548
+  printed_page: 526
+  text_sha256: a0b5ddd462c4c51a6e5f929b2d1b0ae67fd1df52e10a2e1e235f4925f02dbe9a
+  text_characters: 873
+  embedded_images: 0
+  drawing_paths: 1
+  visual_review: incelenmedi
+items:
+- id: ch1-p1-i1
+  page: 1
+  pdf_page: 23
+  kind: örnek
+  what: Bebek, sürüş ve konuşmada duyusal-motor etkileşimden neden-sonuç öğrenilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p1-i2
+  page: 1
+  pdf_page: 23
+  kind: bilgi
+  what: Amaçlı etkileşim hesaplamalı olarak ideal görevler, matematik ve deneyle incelenir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p1-i3
+  page: 1
+  pdf_page: 23
+  kind: dipnot
+  what: Psikoloji ve sinirbilim bağlantıları kitabın Bölüm 14–15 konusudur.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p1-i4
+  page: 1
+  pdf_page: 23
+  kind: tanım
+  what: RL, durumlarda ne yapılacağını sayısal uzun vadeli ödülle öğrenme problemidir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p2-i1
+  page: 2
+  pdf_page: 24
+  kind: bilgi
+  what: Deneme-yanılma ve eylemin sonraki durum üzerinden gecikmiş ödülleri etkilemesi ayırt edicidir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p2-i2
+  page: 2
+  pdf_page: 24
+  kind: tanım
+  what: RL adı problem, çözüm yöntemleri ve araştırma alanı için kullanılır; bunlar ayrılır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p2-i3
+  page: 2
+  pdf_page: 24
+  kind: bilgi
+  what: MDP, duyum, eylem ve amacı basitleştirilmiş ama etkili bir karar çerçevesinde birleştirir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p2-i4
+  page: 2
+  pdf_page: 24
+  kind: tanım
+  what: Denetimli öğrenmede doğru etiketli örneklerden görülmeyen durumlara genellenir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p2-i5
+  page: 2
+  pdf_page: 24
+  kind: bilgi
+  what: Etkileşimde doğru ve temsil edici davranış örnekleri çoğu kez hazır değildir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p2-i6
+  page: 2
+  pdf_page: 24
+  kind: tanım
+  what: Denetimsiz yapı keşfi ile ödül artırmak farklı amaçlardır; yapı RL için araç olabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p2-i7
+  page: 2
+  pdf_page: 24
+  kind: bilgi
+  what: Eksik bilinen MDP optimal kontrolü biçimindeki formelleştirme ve kaynak Bölüm 3 bağlantısı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p3-i1
+  page: 3
+  pdf_page: 25
+  kind: tanım
+  what: Keşif yeni bilgi, yararlanma bilinen iyi eylemle ödül getirir; yalnız biri yetmez.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p3-i2
+  page: 3
+  pdf_page: 25
+  kind: bilgi
+  what: Stokastik ödülleri güvenilir kestirmek için aynı eylem tekrar denenir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p3-i3
+  page: 3
+  pdf_page: 25
+  kind: bilgi
+  what: Saf denetimli ve denetimsiz kurguda veri üreten eylemin keşif dengesi bulunmaz.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p3-i4
+  page: 3
+  pdf_page: 25
+  kind: bilgi
+  what: Tam amaçlı ajan yaklaşımı, alt problem yöntemlerinin gerçek zaman ve model edinmeyle bağını ister.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p3-i5
+  page: 3
+  pdf_page: 25
+  kind: örnek
+  what: Batarya yöneticisi bir ajandır; robotun geri kalanı ve dış dünya onun ortamıdır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p3-i6
+  page: 3
+  pdf_page: 25
+  kind: bilgi
+  what: Keşif dengesinin uzun matematik araştırmasına rağmen genel açık sorun olduğu kaynak değerlendirmesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p4-i1
+  page: 4
+  pdf_page: 26
+  kind: bilgi
+  what: RL istatistik, optimizasyon, kontrol ve yöneylem araştırmasıyla bütünleşir; yaklaşım boyut maliyetini
+    azaltabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p4-i2
+  page: 4
+  pdf_page: 26
+  kind: bilgi
+  what: Biyolojiden esinlenen algoritmalar psikoloji ve beynin ödül sistemi için geri model üretir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p4-i3
+  page: 4
+  pdf_page: 26
+  kind: bilgi
+  what: Özel bilgi birikimi ile genel öğrenme-arama ilkeleri arasındaki güçlü/zayıf yöntem tartışması.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p4-i4
+  page: 4
+  pdf_page: 26
+  kind: örnek
+  what: Satranç kararı arama ve öğrenilmiş konum sezgisini birleştirir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p4-i5
+  page: 4
+  pdf_page: 26
+  kind: örnek
+  what: Rafineri marjinal maliyetlerle verim-maliyet-kaliteyi gerçek zamanda ayarlar; başlangıç set noktalarına
+    bağlı kalmaz.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p5-i1
+  page: 5
+  pdf_page: 27
+  kind: örnek
+  what: Ceylan birkaç dakikada ayağa kalkar; yarım saat sonraki 20 mil/saat betimlemesi korunur.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p5-i2
+  page: 5
+  pdf_page: 27
+  kind: örnek
+  what: Çöp robotu keşif ile şarj arasında batarya ve şarjı bulma deneyimine göre karar verir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p5-i3
+  page: 5
+  pdf_page: 27
+  kind: örnek
+  what: Kahvaltıda dolap, kutu, kâse, kaşık, süt, kavrama, taşıma sırası ve bakışlar iç içe alt amaçlardır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p5-i4
+  page: 5
+  pdf_page: 27
+  kind: bilgi
+  what: Beslenme, açlık ve tercihler karar durumuna dahildir; süt taşmasını gözleme geri bildirimdir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p5-i5
+  page: 5
+  pdf_page: 27
+  kind: bilgi
+  what: Örneklerde belirsiz ortam, gelecekteki seçenekleri değiştiren eylem ve gecikmiş sonuç ortaktır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p5-i6
+  page: 5
+  pdf_page: 27
+  kind: bilgi
+  what: Öngörü tek başına yetmez; ajan çevreyi sık izleyip düzeltir, ilerlemeyi algılayabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p5-i7
+  page: 5
+  pdf_page: 27
+  kind: bilgi
+  what: Ön bilgi öğrenme kolaylığını etkiler; deneyim sezgi, koşu ve iş sırasını geliştirir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p6-i1
+  page: 6
+  pdf_page: 28
+  kind: tanım
+  what: Politika, durumdan eylem veya eylem dağılımına eşlemedir; tablo, fonksiyon veya arama olabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p6-i2
+  page: 6
+  pdf_page: 28
+  kind: bilgi
+  what: Politika uyarıcı-tepki ilişkisine benzer ve davranışı belirlemeye yeterlidir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p6-i3
+  page: 6
+  pdf_page: 28
+  kind: tanım
+  what: Tek sayılık ödül problem amacını tanımlar; uzun vadeli toplam artırılır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p6-i4
+  page: 6
+  pdf_page: 28
+  kind: bilgi
+  what: Ödül rastgele durum/eylem fonksiyonu olabilir; haz-acı benzetmesi ve politika değişimiyle ilişkisi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p6-i5
+  page: 6
+  pdf_page: 28
+  kind: tanım
+  what: Değer, bir durumdan sonraki toplam ödülün kestirimidir; anlık ödülle sıralaması farklı olabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p6-i6
+  page: 6
+  pdf_page: 28
+  kind: bilgi
+  what: Ödül birincil, değer öngörüsel ve araçsaldır; değerler gözlem dizilerinden sürekli yeniden kestirilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p7-i1
+  page: 7
+  pdf_page: 29
+  kind: bilgi
+  what: Verimli değer kestirimi pek çok RL yönteminin merkezindedir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p7-i2
+  page: 7
+  pdf_page: 29
+  kind: tanım
+  what: Model, durum ve eylemden sonraki durum/ödül hakkında çıkarım yapar; planlama deneyimden önce gelecek
+    değerlendirmedir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p7-i3
+  page: 7
+  pdf_page: 29
+  kind: bilgi
+  what: Model tabanlı ve modelsiz yöntemler; model öğrenme, değer öğrenme ve planlama birlikte yapılabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-bilesenler
+- id: ch1-p7-i4
+  page: 7
+  pdf_page: 29
+  kind: tanım
+  what: Durum sinyali politika/değere girdi, modele girdi/çıktıdır; hazır ön işleme nominal olarak ortamda
+    sayılır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-kapsam
+- id: ch1-p7-i5
+  page: 7
+  pdf_page: 29
+  kind: bilgi
+  what: Kitap karar vermeye odaklanır; durum temsilinin önemi ve §17.3 kapsam notu korunur.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-kapsam
+- id: ch1-p7-i6
+  page: 7
+  pdf_page: 29
+  kind: bilgi
+  what: Genetik algoritma, genetik programlama ve tavlama değer kestirmeden politika arayabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-kapsam
+- id: ch1-p7-i7
+  page: 7
+  pdf_page: 29
+  kind: bilgi
+  what: 'Evrimsel nesil: ayrı ortam kopyasında sabit politika; toplam ödülle seçim ve rastgele varyasyonları
+    sonraki nesle taşıma.'
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-kapsam
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p8-i1
+  page: 8
+  pdf_page: 30
+  kind: bilgi
+  what: Küçük/yapılı politika uzayı, bol zaman veya eksik gözlem evrimsel aramayı yararlı kılabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-kapsam
+- id: ch1-p8-i2
+  page: 8
+  pdf_page: 30
+  kind: bilgi
+  what: Politika başına toplam sonuç, ziyaret edilen durum ve eylem bilgisini atar; bu bilgi bazen yanıltıcı
+    olsa da verim sağlayabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-kapsam
+- id: ch1-p8-i3
+  page: 8
+  pdf_page: 30
+  kind: bilgi
+  what: Evrim ile yaşam boyu öğrenme birleşebilir; kitap tek başına evrimsel aramayı geliştirmez.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-kapsam
+- id: ch1-p8-i4
+  page: 8
+  pdf_page: 30
+  kind: tanım
+  what: XOX sıra, boş hücre, yatay/dikey/çapraz üçlü ve beraberlik kuralları.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p8-i5
+  page: 8
+  pdf_page: 30
+  kind: şekil
+  what: Numarasız XOX tahtasında XOO/OXX/··X dizilimi ve kazanan çapraz.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+  figure: türetildi
+  note: Kaynak görsel görüntü olarak incelendi; hesapla üretilen özgün SVG.
+- id: ch1-p8-i6
+  page: 8
+  pdf_page: 30
+  kind: bilgi
+  what: Hata yapan sabit rakibe karşı kazanmak hedeflenir; beraberlik ile yenilgi eşit değerdedir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p8-i7
+  page: 8
+  pdf_page: 30
+  kind: bilgi
+  what: Minimax en kötü rakibi varsayar; gerçek rakibin hatalarını sömüren politika farklı olabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p8-i8
+  page: 8
+  pdf_page: 30
+  kind: bilgi
+  what: Tam rakip politikası bilinse DP, bilinmese deneyimden model kestirme ve DP kullanılabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p9-i1
+  page: 9
+  pdf_page: 31
+  kind: örnek
+  what: XOX politikaları çok oyunla değerlendirilip tepe tırmanma veya popülasyonla aranabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p9-i2
+  page: 9
+  pdf_page: 31
+  kind: tanım
+  what: Tahta başına V kazanma olasılığıdır; X kazanmışsa 1, O kazanmış veya beraberlikse 0, diğer başlangıçlar
+    0.5.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p9-i3
+  page: 9
+  pdf_page: 31
+  kind: bilgi
+  what: Kendi hamlesinden sonraki tahtalar değerlendirilir; çoğunlukla açgözlü, bazen diğer hamlelerden rastgele
+    seçim.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p9-i4
+  page: 9
+  pdf_page: 31
+  kind: formül
+  what: Açgözlü sonraki hamle sonrası değer, önceki kendi hamlemizden sonraki değere α oranıyla yedeklenir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p10-i1
+  page: 10
+  pdf_page: 32
+  kind: şekil
+  what: Şekil 1.1 a–g oynanan yol, c*, e*, g*, rakip/biz sırası, kesikli alternatifler ve c→a/g→e öğrenme okları.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+  figure: türetildi
+  note: Kaynak görsel görüntü olarak incelendi; hesapla üretilen özgün SVG.
+- id: ch1-p10-i2
+  page: 10
+  pdf_page: 32
+  kind: tanım
+  what: α öğrenme hızı parametresidir; TD ardışık başarı kestirimlerinin farkını kullanır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p10-i3
+  page: 10
+  pdf_page: 32
+  kind: bilgi
+  what: Sabit rakipte uygun adım azalması ve yeterli örneklemeyle açgözlü optimal değerler; sıfırlanmayan adım
+    yavaş değişimi izler.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p10-i4
+  page: 10
+  pdf_page: 32
+  kind: bilgi
+  what: Sabit politikanın çok oyundaki kazanma sıklığı yansızdır; evrimsel değerlendirme oyun sonlarını kullanır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p10-i5
+  page: 10
+  pdf_page: 32
+  kind: bilgi
+  what: d→e keşif hamlesinde e→c öğrenmesi yapılmaz; e* daha değerli seçilmeyen kardeştir; c=c* ve g=g*.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p11-i1
+  page: 11
+  pdf_page: 33
+  kind: bilgi
+  what: Politika toplam puanı oynanmamış hamleleri bile paylaşır; değerler konum başına katkı atar.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p11-i2
+  page: 11
+  pdf_page: 33
+  kind: bilgi
+  what: Değer öğrenmesi rakip modeli veya açık gelecek araması olmadan çok hamleli tuzak davranışı üretebilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p11-i3
+  page: 11
+  pdf_page: 33
+  kind: bilgi
+  what: RL dış rakip gerektirmez; bitmeyen görev, ara ödül, sürekli zaman ve sonsuz durum kümelerine uzanır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p11-i4
+  page: 11
+  pdf_page: 33
+  kind: örnek
+  what: TD-Gammon yaklaşık 10^20 tavla durumunda ağla genelleme yapar; Tesauro 1992/1995 başarıları.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p11-i5
+  page: 11
+  pdf_page: 33
+  kind: bilgi
+  what: Genellemede denetimli öğrenme araçları yararlıdır; sinir ağı tek veya zorunlu en iyi seçenek değildir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p11-i6
+  page: 11
+  pdf_page: 33
+  kind: bilgi
+  what: Büyük durum uzayının yalnız küçük kısmı görülür; başarı uygun genellemeye bağlıdır, sürekli zaman teorisi
+    daha karmaşık ve giriş kapsamı dışındadır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p11-i7
+  page: 11
+  pdf_page: 33
+  kind: bilgi
+  what: TD-Gammon ayrıntısı kaynak §16.1; sinir ağı atfının §9.7 olması gerektiği aynı PDF başlıklarından denetlendi.
+  status: düzeltildi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ag-atif
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi. Özgün s.11 atfı §9.6; aynı PDF başlıklarıyla
+    doğru hedef §9.7 olarak saptandı.
+- id: ch1-p12-i1
+  page: 12
+  pdf_page: 34
+  kind: bilgi
+  what: RL sıfır ön bilgi gerektirmez; §9.5/13.1/17.4 temsil, politika ve ödül tasarımına örnektir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p12-i2
+  page: 12
+  pdf_page: 34
+  kind: bilgi
+  what: Gizli veya aynı gözlenen durumlarda da RL yapılabilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p12-i3
+  page: 12
+  pdf_page: 34
+  kind: bilgi
+  what: Oyuncu kendi hamlesinin tahta etkisini modelleyebilirken rakibe göre modelsizdir; tamamen modelsiz
+    yöntemler de vardır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p12-i4
+  page: 12
+  pdf_page: 34
+  kind: bilgi
+  what: Doğru model kurmak darboğazsa modelsizlik yararlı; modelsiz yöntemler model tabanlı sistemlerde yapı
+    taşıdır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p12-i5
+  page: 12
+  pdf_page: 34
+  kind: bilgi
+  what: Bir eylem alt problem çözücüsü olabilir; hiyerarşinin birkaç düzeyinde eşzamanlı öğrenilebilir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+- id: ch1-p12-i6
+  page: 12
+  pdf_page: 34
+  kind: alıştırma
+  source_number: '1.1'
+  what: İki taraf öğrenirken ne olur; rastgele rakibe göre farklı hamle politikası öğrenilir mi?
+  status: eklendi
+  where: content/modules/m5-5-rl/module.yaml#practice:p6
+- id: ch1-p12-i7
+  page: 12
+  pdf_page: 34
+  kind: alıştırma
+  source_number: '1.2'
+  what: Simetriyi nasıl kullanırız; hangi öğrenme kazançları var; rakip asimetrikse paylaşmalı mıyız; değerler
+    zorunlu eşit mi?
+  status: eklendi
+  where: content/modules/m5-5-rl/module.yaml#practice:p7
+- id: ch1-p12-i8
+  page: 12
+  pdf_page: 34
+  kind: alıştırma
+  source_number: '1.3'
+  what: Sürekli açgözlü oyuncu keşifli oyuncudan daha iyi veya kötü öğrenebilir mi; hangi sorunlar çıkar?
+  status: eklendi
+  where: content/modules/m5-5-rl/module.yaml#practice:p8
+- id: ch1-p12-i9
+  page: 12
+  pdf_page: 34
+  kind: alıştırma
+  source_number: '1.4'
+  what: 'Keşif dahil bütün hamlelerden öğrenme ile keşiften öğrenmeme: adım azalır, keşif sürer; iki kazanma
+    olasılığı, yararlılık ve daha çok galibiyet alt soruları.'
+  status: eklendi
+  where: content/modules/m5-5-rl/module.yaml#practice:p9
+  pages:
+  - 12
+  - 13
+  pdf_pages:
+  - 34
+  - 35
+- id: ch1-p13-i1
+  page: 13
+  pdf_page: 35
+  kind: bilgi
+  what: Örnek davranış ve tam model gerektirmeyen amaçlı öğrenme, yazarların alan tanımı ve önem değerlendirmesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p13-i2
+  page: 13
+  pdf_page: 35
+  kind: bilgi
+  what: MDP neden-sonuç, belirsizlik ve açık amacı temsil eder; değerler politika aramasını verimli kılar.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-problem
+- id: ch1-p13-i3
+  page: 13
+  pdf_page: 35
+  kind: bilgi
+  what: Deneme-yanılma, optimal kontrol ve TD hatları 1980 sonlarında birleşir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p13-i4
+  page: 13
+  pdf_page: 35
+  kind: alıştırma
+  source_number: '1.5'
+  what: Oyuncuyu başka nasıl iyileştiririz; verilen bilinmeyen hata yapan rakip problemine daha iyi yöntem
+    var mı?
+  status: eklendi
+  where: content/modules/m5-5-rl/module.yaml#practice:p10
+- id: ch1-p13-i5
+  page: 13
+  pdf_page: 35
+  kind: bilgi
+  what: Deneme-yanılma psikolojiden erken AI ve 1980 başı canlanmaya; optimal kontrol çoğunlukla öğrenmesiz,
+    TD önce iki hattı kısmen bağlar.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p14-i1
+  page: 14
+  pdf_page: 36
+  kind: bilgi
+  what: Optimal kontrol adı 1950 sonlarında kullanılır; Hamilton–Jacobi, Bellman denklemi ve DP kökeni.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p14-i2
+  page: 14
+  pdf_page: 36
+  kind: bilgi
+  what: Bellman 1957a DP, 1957b MDP ve Howard 1960 politika yinelemesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p14-i3
+  page: 14
+  pdf_page: 36
+  kind: tanım
+  what: Boyut laneti hesap gereksiniminin durum değişkeni sayısıyla üstel büyümesidir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p14-i4
+  page: 14
+  pdf_page: 36
+  kind: kaynakça
+  what: Lovejoy 1991; White 1985/1988/1993; Rust 1996; Bertsekas 1982/1983 gelişim alanları.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p14-i5
+  page: 14
+  pdf_page: 36
+  kind: kaynakça
+  what: Bertsekas 2005/2012; Puterman 1994; Ross 1983; Whittle 1982/1983; Bryson 1996 okuma önerileri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p14-i6
+  page: 14
+  pdf_page: 36
+  kind: bilgi
+  what: Disiplin ayrımı, tam model/çevrimdışı bakış ve zamanda geriye hesap, öğrenmeyle bağlantıyı geciktirdi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p14-i7
+  page: 14
+  pdf_page: 36
+  kind: kaynakça
+  what: Bellman–Dreyfus 1959, Witten 1977, Werbos 1987 ve Watkins 1989 bağlantıyı kuran çalışmalar.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p14-i8
+  page: 14
+  pdf_page: 36
+  kind: tanım
+  what: Optimal kontrol, dinamik davranışın zaman boyunca ölçütünü en aza/en çoğa çıkaran kontrolcü tasarlar;
+    DP Bellman denklemi çözümünü kullanır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p14-i9
+  page: 14
+  pdf_page: 36
+  kind: bilgi
+  what: Genel stokastik kontrolde DP uygulanabilirliği konusunda kaynağın tarihsel değerlendirmesi koşullu
+    aktarılır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p14-i10
+  page: 14
+  pdf_page: 36
+  kind: kaynakça
+  what: Lovejoy 1991 kısmi gözlem; White 1985/1988/1993 uygulama; Rust 1996 yaklaşım; Bertsekas 1982/1983 asenkron;
+    Bryson 1996 kontrol tarihi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p15-i1
+  page: 15
+  pdf_page: 37
+  kind: tanım
+  what: Bertsekas–Tsitsiklis 1996 neurodynamic programming; approximate dynamic programming adlandırması.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p15-i2
+  page: 15
+  pdf_page: 37
+  kind: bilgi
+  what: Tam ve eksik modelli DP yöntemlerinin ortak problemi ve yinelemeli teorileri birlikte ele alınır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p15-i3
+  page: 15
+  pdf_page: 37
+  kind: kaynakça
+  what: Woodworth 1938 aktarımıyla Bain 1850 dönemi ve Morgan 1894 deneme-yanılma kökeni.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p15-i4
+  page: 15
+  pdf_page: 37
+  kind: tanım
+  what: Thorndike 1911 etki yasası; doyum/rahatsızlık, bağın güçlenmesi/zayıflaması ve sonraki tepki olasılığı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p15-i5
+  page: 15
+  pdf_page: 37
+  kind: bilgi
+  what: Thorndike sonraki bulgularla yasayı değiştirdi; ödül ve ceza etkileri simetrik değildir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p15-i6
+  page: 15
+  pdf_page: 37
+  kind: kaynakça
+  what: Gallistel, Herrnstein, Kimble, Mazur tartışmaları; Hilgard–Bower, Dennett, Campbell, Cziko davranış
+    ilkesi yorumu.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p15-i7
+  page: 15
+  pdf_page: 37
+  kind: tanım
+  what: Neurodynamic programming DP ile yapay sinir ağlarını birleştirir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p15-i8
+  page: 15
+  pdf_page: 37
+  kind: bilgi
+  what: 'Thorndike 1911 s.244: doyum/rahatsızlık büyüklüğü bağ değişimini artırır; ayrıntılı tarih §14.3.'
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p15-i9
+  page: 15
+  pdf_page: 37
+  kind: kaynakça
+  what: Gallistel 2005; Herrnstein 1970; Kimble 1961/1967; Mazur 1994; Hilgard–Bower 1975; Dennett 1978; Campbell
+    1960; Cziko 1995.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p16-i1
+  page: 16
+  pdf_page: 38
+  kind: kaynakça
+  what: Hull 1943/1952 teorileri ve Skinner 1938 deneyleri etki yasası mirasındadır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p16-i2
+  page: 16
+  pdf_page: 38
+  kind: tanım
+  what: Pavlov 1927 çevirisindeki pekiştirme; zamansal bağ, sonradan zayıflama/kaldırma ve kalıcılık koşulu.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p16-i3
+  page: 16
+  pdf_page: 38
+  kind: örnek
+  what: Turing 1948 haz-acı taslağı; rastgele geçici eylem kayıtlarını silme veya kalıcılaştırma.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p16-i4
+  page: 16
+  pdf_page: 38
+  kind: kaynakça
+  what: Ross 1933, Walter 1950/1951, Shannon 1951/1952 Theseus ve Deutsch 1953/1954 makineleri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p16-i5
+  page: 16
+  pdf_page: 38
+  kind: tanım
+  what: Minsky 1954 SNARC, sinaps benzeri değişebilir analog bileşenler; cyberneticzoo.com kaynak adresi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p16-i6
+  page: 16
+  pdf_page: 38
+  kind: kaynakça
+  what: Farley–Clark 1954 sayısal RL benzetimi; Clark–Farley 1955 örüntü tanımaya yöneliş.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p16-i7
+  page: 16
+  pdf_page: 38
+  kind: örnek
+  what: Ross 1933 yolu anahtarda; Walter 1951 öğrenen kaplumbağa; Theseus 1952 yolu zemindeki mıknatıs/rölede
+    saklar; Deutsch 1954, 1953 davranış teorisine dayanır. Deutsch model tabanlı RL ile ortak özellikler taşır
+    (kaynak Bölüm 8).
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p16-i8
+  page: 16
+  pdf_page: 38
+  kind: tanım
+  what: SNARC açılımı Stochastic Neural-Analog Reinforcement Calculator; kaynak çoğul Calculators kullanır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p17-i1
+  page: 17
+  pdf_page: 39
+  kind: bilgi
+  what: Rosenblatt 1962 ve Widrow–Hoff 1960 ödül diline karşın denetimli algoritmalardır; hata düzeltmek RL
+    demek değildir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p17-i2
+  page: 17
+  pdf_page: 39
+  kind: bilgi
+  what: Kavramsal karışıklık ve 1960–1970 döneminde gerçek deneme-yanılma çalışmalarının görece azlığı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p17-i3
+  page: 17
+  pdf_page: 39
+  kind: kaynakça
+  what: 'Mühendislikte terim kullanımı: Waltz–Fu 1965, Mendel 1966, Fu 1970, Mendel–McClaren 1970.'
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p17-i4
+  page: 17
+  pdf_page: 39
+  kind: tanım
+  what: Minsky 1961 tahmin, beklenti ve karmaşık sistemlerde başarıya katkı atama problemi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p17-i5
+  page: 17
+  pdf_page: 39
+  kind: kaynakça
+  what: Andreae 1963/1969 STeLLA model/iç monolog; 1977 öğretmen ve yenilik; 1998 leakback; 2017a,b değerlendirmeleri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p17-i6
+  page: 17
+  pdf_page: 39
+  kind: tanım
+  what: Michie 1961/1963 MENACE, konum başına kibrit kutusu ve hamle başına renkli boncuk.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p17-i7
+  page: 17
+  pdf_page: 39
+  kind: bilgi
+  what: Andreae 1969a,b; iç monolog gizli durumu, leakback yedeklemeli katkı atamayı hedefler; tanınmayan çalışmanın
+    sonraki etkisi sınırlıdır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p17-i8
+  page: 17
+  pdf_page: 39
+  kind: tanım
+  what: MENACE açılımı Matchbox Educable Naughts and Crosses Engine.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p18-i1
+  page: 18
+  pdf_page: 40
+  kind: örnek
+  what: MENACE oyun sonunda kullanılan kutulara boncuk ekleyip çıkarır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i2
+  page: 18
+  pdf_page: 40
+  kind: kaynakça
+  what: Michie–Chambers 1968 GLEE ve BOXES; Widrow–Smith 1964 öğretmenli araba-direk farkı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i3
+  page: 18
+  pdf_page: 40
+  kind: kaynakça
+  what: Barto–Sutton–Anderson 1983, Sutton 1984 ve Michie 1974 üzerindeki denge görevi etkisi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i4
+  page: 18
+  pdf_page: 40
+  kind: tanım
+  what: Widrow–Gupta–Maitra 1973 selective bootstrap adaptation, LMS'den başarı/başarısızlıkla blackjack ve
+    critic terimi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i5
+  page: 18
+  pdf_page: 40
+  kind: kaynakça
+  what: Buchanan–Mitchell–Smith–Johnson 1978; Dietterich–Buchanan 1984 uzman sistem critic anlamı farklıdır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i6
+  page: 18
+  pdf_page: 40
+  kind: tanım
+  what: Tsetlin 1960 dönemi/1973 öğrenen otomat, k kollu banditte düşük bellekli saf seçim öğrenmesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i7
+  page: 18
+  pdf_page: 40
+  kind: kaynakça
+  what: Narendra–Thathachar 1974/1989; Harth–Tzanakou 1974 Alopex; Barto–Sutton–Brouwer 1981 etkisi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i8
+  page: 18
+  pdf_page: 40
+  kind: kaynakça
+  what: Estes 1950, Bush–Mosteller 1955 ve Sternberg 1963 istatistiksel psikoloji öncülleri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p18-i9
+  page: 18
+  pdf_page: 40
+  kind: bilgi
+  what: MENACE mevcut kutudan rastgele boncukla hamle seçer; BOXES yalnız direk düşmesi veya ray sonuyla başarısızlık
+    sinyali alır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p18-i10
+  page: 18
+  pdf_page: 40
+  kind: tanım
+  what: GLEE açılımı Game Learning Expectimaxing Engine; Alopex açılımı Algorithm of Pattern Extraction.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p18-i11
+  page: 18
+  pdf_page: 40
+  kind: bilgi
+  what: Öğrenen otomat ödülle eylem olasılıklarını günceller; Alopex eylem-pekiştirme korelasyonu saptar; Tsetlin
+    1973 yayını ölüm sonrasıdır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p19-i1
+  page: 19
+  pdf_page: 41
+  kind: kaynakça
+  what: Cross 1973 ekonomi uygulaması; Arthur 1991 insana benzer ajan; Camerer 2011 değerlendirmesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i2
+  page: 19
+  pdf_page: 41
+  kind: bilgi
+  what: Ekonomi hattı AI'dan büyük ölçüde ayrı gelişti; stratejik oyun teorisi oyun oynayan programla aynı
+    konu değildir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i3
+  page: 19
+  pdf_page: 41
+  kind: kaynakça
+  what: Nowé–Vrancx–De Hauwere 2012 çok ajanlı bakış ve Szita 2012 oyun uygulaması değerlendirmesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i4
+  page: 19
+  pdf_page: 41
+  kind: tanım
+  what: Holland 1975, 1976/1986 classifier systems; bucket brigade katkı atar, genetik algoritma temsil üretir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i5
+  page: 19
+  pdf_page: 41
+  kind: kaynakça
+  what: Urbanowicz–Moore 2009 değerlendirmesi; Fogel–Owens–Walsh 1966, Koza 1992 evrimsel hesaplama örnekleri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i6
+  page: 19
+  pdf_page: 41
+  kind: bilgi
+  what: Klopf 1972/1975/1982 hazcı amaçlı uyarlanmayı ve denetimlinin kaçırdığı yönü vurguladı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i7
+  page: 19
+  pdf_page: 41
+  kind: kaynakça
+  what: Barto–Sutton 1981a değerlendirmesi; 1981b/Brouwer 1981/Anandan 1985 RL-denetimli ayrımı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i8
+  page: 19
+  pdf_page: 41
+  kind: kaynakça
+  what: Barto–Anderson–Sutton 1982, Barto–Anderson 1985, Barto 1985/1986 ve Barto–Jordan 1987 çok katmanlı
+    ağ öğrenmesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p19-i9
+  page: 19
+  pdf_page: 41
+  kind: bilgi
+  what: Cross 1973 özellikle Bush–Mosteller teorisini ekonomik modellere taşır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p19-i10
+  page: 19
+  pdf_page: 41
+  kind: bilgi
+  what: Holland erken ilişkilendirmesiz seçimden, ilişkilendirme ve değer içeren classifier systems yaklaşımına
+    geçer; Klopf §15.9 ve ağ öğrenmesi §15.10 bağlantıları.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p20-i1
+  page: 20
+  pdf_page: 42
+  kind: tanım
+  what: TD aynı büyüklüğün ardışık tahmin farklarını kullanır; ikincil pekiştirici birincille eşleşerek etki
+    kazanır.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p20-i2
+  page: 20
+  pdf_page: 42
+  kind: kaynakça
+  what: Minsky 1954 erken yorum; Samuel 1959 dama uygulaması; Shannon 1950 çevrimiçi değerlendirme önerisi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p20-i3
+  page: 20
+  pdf_page: 42
+  kind: bilgi
+  what: Samuel Minsky bağlantısını belirtmedi; Shannon–Bellman etkisi için kaynakta kanıt yok; Minsky 1961
+    ilişkilendirdi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p20-i4
+  page: 20
+  pdf_page: 42
+  kind: tanım
+  what: Klopf 1972 genelleştirilmiş pekiştirmede her nöron uyarıcıyı ödül, baskılayıcıyı ceza sayar; bu modern
+    TD değildir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p20-i5
+  page: 20
+  pdf_page: 42
+  kind: kaynakça
+  what: Sutton 1978a/b/c; Sutton–Barto 1981a; Barto–Sutton 1982 ve sonraki klasik koşullanma TD modelleri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p20-i6
+  page: 20
+  pdf_page: 42
+  kind: kaynakça
+  what: Klopf 1988, Moore ve ark. 1986, Sutton–Barto 1987/1990 koşullanma modelleri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p20-i7
+  page: 20
+  pdf_page: 42
+  kind: kaynakça
+  what: Hawkins–Kandel, Byrne–Gingrich–Baxter, Gelperin–Hopfield–Tank, Tesauro ve Friston sinirbilim modelleri;
+    benzerlik tarihsel bağ demek değildir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p20-i8
+  page: 20
+  pdf_page: 42
+  kind: bilgi
+  what: Kaynağa göre Samuel 1959 TD fikirlerini ilk önerip uygular; Minsky–Samuel sonrası yaklaşık on yılda
+    hesaplamalı TD görünüşe göre yoktur; §16.2.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p20-i9
+  page: 20
+  pdf_page: 42
+  kind: bilgi
+  what: Klopf yerel pekiştirmeyi büyük sistem alt bileşenlerinin birbirini eğitmesi için tasarlar.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p20-i10
+  page: 20
+  pdf_page: 42
+  kind: kaynakça
+  what: Hawkins–Kandel 1984; Byrne–Gingrich–Baxter 1990; Gelperin–Hopfield–Tank 1985; Tesauro 1986.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p21-i1
+  page: 21
+  pdf_page: 43
+  kind: kaynakça
+  what: 1981 aktör–eleştirmen; Barto–Sutton–Anderson 1983 araba-direk, Sutton 1984 ve Anderson 1986 tezleri.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p21-i2
+  page: 21
+  pdf_page: 43
+  kind: kaynakça
+  what: Holland 1986 TD bucket brigade; Sutton 1988 genel tahmin olarak TD(λ) ve yakınsama sonuçları.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p21-i3
+  page: 21
+  pdf_page: 43
+  kind: bilgi
+  what: 'Witten 1976a/1977 TD(0): 1974 dergi gönderimi, 1976 tez, Andreae kökeni ve yazarların 1981 keşfi.'
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p21-i4
+  page: 21
+  pdf_page: 43
+  kind: bilgi
+  what: Watkins 1989 Q-öğrenmesi ve Werbos 1987 bütünleşme; Tesauro 1992 ilgi artışı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p21-i5
+  page: 21
+  pdf_page: 43
+  kind: kaynakça
+  what: Friston 1994, Barto 1995a, Houk–Adams–Barto 1995, Montague–Dayan–Sejnowski 1996, Schultz–Dayan–Montague
+    1997 TD/dopamin hattı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+- id: ch1-p21-i6
+  page: 21
+  pdf_page: 43
+  kind: bilgi
+  what: Anderson 1986 aktör–eleştirmeni geri yayılımlı ağlara genişletir; Witten TD(0) MDP uyarlamalı kontrolünde
+    görünüşe göre en erken yayımlanmış kural; Werbos 1977 sonrası birleşmeyi savunur.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-tarih
+  note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
+- id: ch1-p22-i1
+  page: 22
+  pdf_page: 44
+  kind: kaynakça
+  what: Szepesvári 2010, Bertsekas–Tsitsiklis 1996, Kaelbling 1993a, Sugiyama–Hachiya–Morimura 2013 genel RL
+    okumaları.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-okumalar
+- id: ch1-p22-i2
+  page: 22
+  pdf_page: 44
+  kind: kaynakça
+  what: Si–Barto–Powell–Wunsch 2004, Powell 2011, Lewis–Liu 2012, Bertsekas 2012 kontrol/yöneylem bakışı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-okumalar
+- id: ch1-p22-i3
+  page: 22
+  pdf_page: 44
+  kind: kaynakça
+  what: Cao 2009 stokastik dinamik sistemlerde öğrenme ve optimizasyon çerçevesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-okumalar
+- id: ch1-p22-i4
+  page: 22
+  pdf_page: 44
+  kind: kaynakça
+  what: Machine Learning özel sayıları Sutton 1992a, Kaelbling 1996, Singh 2002.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-okumalar
+- id: ch1-p22-i5
+  page: 22
+  pdf_page: 44
+  kind: kaynakça
+  what: Barto 1995b, Kaelbling–Littman–Moore 1996, Keerthi–Ravindran 1997 taramaları; Wiering–van Otterlo 2012
+    derlemesi.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-okumalar
+- id: ch1-p22-i6
+  page: 22
+  pdf_page: 44
+  kind: kaynakça
+  what: Kahvaltı örneği Agre 1988 çalışmasından esinlenir.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-ornekler
+- id: ch1-p22-i7
+  page: 22
+  pdf_page: 44
+  kind: bilgi
+  what: XOX zamansal fark yönteminin kitabın Bölüm 6 konusuna bağlantısı.
+  status: eklendi
+  where: content/modules/m5-5-rl/lesson.md#sutton-xox
+chapter_counts:
+  '1':
+    items: 159
+    figures: 2
+    numbered_figures: 1
+    unnumbered_figures: 1
+    exercises: 5
+    code: 0
+part_dividers:
+- pdf_pages:
+  - 45
+  - 46
+  what: I. kısım başlığı ve boş sayfa
+- pdf_pages:
+  - 217
+  - 218
+  what: II. kısım başlığı ve boş sayfa
+- pdf_pages:
+  - 361
+  - 362
+  what: III. kısım başlığı ve boş sayfa

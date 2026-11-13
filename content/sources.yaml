@@ -40,7 +40,7 @@ groups:
       - {key: esl, title: "Hastie, Tibshirani, Friedman — Elements of Statistical Learning", url: "https://hastie.su.domains/ElemStatLearn/", license: "doğrulanmadı", use: link, verified: false}
       - {key: goodfellow, title: "Goodfellow, Bengio, Courville — Deep Learning", url: "https://www.deeplearningbook.org/", license: "doğrulanmadı", use: link, verified: false}
       - {key: bishop, title: "Bishop & Bishop — Deep Learning: Foundations and Concepts", url: "https://www.bishopbook.com/", license: "doğrulanmadı", use: link, verified: false}
-      - {key: sutton, title: "Sutton & Barto — Reinforcement Learning: An Introduction", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "doğrulanmadı", use: link, verified: false}
+      - {key: sutton, title: "Sutton & Barto — Reinforcement Learning: An Introduction", url: "http://incompleteideas.net/book/the-book-2nd.html", license: "CC BY-NC-ND 2.0 (yüklenen 2018 PDF, lisans sayfası 4)", use: link, verified: true}
       - {key: b3b1, title: "3Blue1Brown — Essence of Linear Algebra", url: "https://www.3blue1brown.com/topics/linear-algebra", license: "©", use: link}
   - title: Türkçe kaynaklar
     items:

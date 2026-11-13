@@ -1,5 +1,21 @@
 # Değişiklik günlüğü
 
+## 2026-11-13 · Yeni kaynak: Sutton ve Barto, Bölüm 1 (s. 1–22)
+
+Kitabın aktarımı başladı; bütün kaynak henüz tamamlanmadı. M5.5 mevcut içeriği korunarak genişletildi. Yeni modül açılmadı.
+
+- **Envanter:** 548 PDF sayfası, 17 bölüm; 140 numaralı alıştırma, 104 numaralı şekil, 38 kutulu sözde-kod listesi, 1 numaralı tablo. Bunlar etiketli öğe sayılarıdır; numarasız çizimler, tablolar ve metin içi algoritmalar bütün kitapta henüz taranmadı. Kaynak dosya özeti ve sayfa bazında metin karmaları `content/coverage/sutton.yaml` içinde kayıtlıdır.
+- **Bölüm 1 defteri:** 159 birim: 158 eklendi, 1 düzeltildi; vardı / genişletildi / bekliyor / kapsam-dışı durumlarının her biri 0. Bu sayılar yalnız işlenen bölümün birimleridir. Diğer bölümlerdeki eksikler, hazır hedeflerde yanlış biçimde “bekliyor” olarak kapatılmadı.
+- **Anlatım:** problem/yöntem/alan ayrımı; beş kaynak örneği; politika, ödül, değer, model; temsil ve evrimsel politika araması; XOX başlangıç değerleri, hamle sonrası TD ve keşif; üç tarihsel hat ve Bölüm 1 kaynak notları. 9 yeni çapa.
+- **Sorular:** Alıştırma 1.1–1.5, bütün alt soruları ve adım adım çözümleriyle p6–p10 kartlarına eklendi. Var olan 5 pratik kartı korundu; toplam 10. Kaynak soruları açık uçlu olduğu için cevap türleri korunmuştur.
+- **Görseller:** numarasız XOX tahtası ve Şekil 1.1, iki özgün SVG ile karşılandı. Tahtadaki kazanan çapraz ile örnek yörüngenin yasallığı tam oyun ağacında hesaplandı. Açgözlü c/g seçimi, daha iyi ama seçilmeyen e*, keşifte güncelleme yapılmaması, c→a ve g→e öğrenme okları korundu. Kaynak görüntüler yayımlanmadı.
+- **Deney:** explorevalue (l3), keşifli davranış ile açgözlü hedefi tam olasılık hesabıyla ayırır; dört ön ayar, tahmin sorusu ve sınırlar eklendi. ε = 0.3, güvenli başarı 0.8 için riskli dal 0.7; kök başarıları 0.73 ve 0.77. ε = 0 durumunda ikisi de 1; güvenli başarı 0.4 durumunda ikisi de 0.61. Bu bir XOX eğitim benzetimi değildir.
+- **Kaynak düzeltmesi:** s. 11 içindeki sinir ağı atfı §9.6 yerine §9.7 olmalıdır; aynı PDF içindeki s. 222–223 başlıklarıyla doğrulandı. Lisans, yüklenen PDF 4 üzerinden CC BY-NC-ND 2.0 olarak doğrulandı; kullanım link olarak kaldı.
+- **Ölçümle düzeltilen taslak:** masaüstü/mobil görüntü denetiminde yeni SVG düğüm yazıları küçük, kesikli dallar ve tahta çizgileri soluktu; yazı boyutu ve çizgi karşıtlığı artırıldı. Bağımsız ikinci okumada 26 ayrıntı kaydı ve kaynak soruların alt koşulları defterde genişletildi.
+- **Doğrulama:** 733/733 Node testi, değişen M5.5 için gerçek CPU PyTorch ile modül testi; build ve notebook güncellik denetimi geçti. 1280 ve 390 px tarayıcı denetiminde yatay taşma, taşan satır içi matematik, yinelenen HTML kimliği veya sayfa hatası yok. Sayısal deney ön ayarları bağımsız yaprak olasılık toplamıyla doğrulandı. Son metin/kapsam değişikliklerinden sonra 7 site testi tekrar geçti.
+- **Kalan:** Bölüm 2–17, ön sayfalar ve kitabın tam kaynakça/dizin içeriği işlenmedi. Bütün kitap için ikinci okuma veya sıfır kayıp tamamlık iddiası yok. Eski Toygar slaytları bu kaynak dosyaları arasında olmadığından yeniden görsel denetim yapılmadı.
+
+
 ## 2026-11 · M1.3 derinleştirme: elastic net ve erken durdurma türetimleri, üç yeni deney, CV ile λ seçimi
 
 M1.3 (regularization) ekleme odaklı genişletildi; hiçbir mevcut içerik kaldırılmadı.
