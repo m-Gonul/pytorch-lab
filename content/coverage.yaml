@@ -204,7 +204,7 @@ groups:
         pages: [m11-9-actor-critic, m11-11-alphazero, m5-5-rl]
         status: genis
         gap: "—"
-        done: "M11.9 konu anlatımı lect_8'in politika gradyanı kısmını (1–10) ve lect_9'un bütün slaytlarını (1–15) işliyor: değer/politika tabanlı ve aktör–eleştirmen ayrımı, rastgele politika (softmax, Gauss, log-olabilirlik gradyanları), taklit ve RL amacı, REINFORCE, politika gradyanı teoremi ve kanıtı, log-türev hilesi, kısa koridor, taban çizgisinin yansızlığı ve varyans etkisi, avantaj, taban çizgili REINFORCE, aktör–eleştirmen, A2C (standart biçim), DPG teoremi ve LQR, DDPG, CartPole; reinforce, pgvar ve dpglqr deneyleri. Kaynak düzeltmeleri: amacın koşullu yazılması; teoremin sol tarafı ∇J ve sezgisel açıklamanın eksikliği; eleştirmen güncellemesinde γⁿ; A2C ve DPG'de max hedefi; DPG'de keşif."
+        done: "M11.9 konu anlatımı lect_8'in politika gradyanı kısmını (1–10) ve lect_9'un bütün slaytlarını (1–15) işliyor: değer/politika tabanlı ve aktör–eleştirmen ayrımı, rastgele politika (softmax, Gauss, log-olabilirlik gradyanları), taklit ve RL amacı, REINFORCE, politika gradyanı teoremi ve kanıtı, log-türev hilesi, kısa koridor, taban çizgisinin yansızlığı ve varyans etkisi, avantaj, taban çizgili REINFORCE, aktör–eleştirmen, A2C (standart biçim), DPG teoremi ve LQR, DDPG, CartPole; reinforce, pgvar ve dpglqr deneyleri. Kaynak düzeltmeleri: amacın koşullu yazılması; teoremin sol tarafı ∇J ve sezgisel açıklamanın eksikliği; eleştirmen güncellemesinde γⁿ; A2C ve DPG'de max hedefi; DPG'de keşif. M11.11 konu anlatımı lect_8'in AlphaGo kısmını (slayt 11–20) ve lect_12'nin AlphaGo slaytlarını işliyor: Go kuralları ve komi, aramanın genişlik/derinlik sorunu, DeepMind ve AlphaGo sürümleri, SL politika ağı ve rollout politikası, kendine karşı oyunla REINFORCE, değer ağı ve korelasyon kaynaklı aşırı uyum, APV-MCTS (PUCT, genişletme, karışık yaprak değeri, sanal kayıp), AlphaGo Zero (tek ağ, kayıp, sıcaklık, Dirichlet gürültüsü, %55 kapısı, simetri, teslim olma), politika iyileştirme operatörü türetimi, AlphaZero ve MuZero, Elo/Bradley–Terry; rootnoise, elogate ve aztab deneyleri. Kaynak düzeltmeleri: RL adımında uzman hamlesi yerine oynanan hamle; değer ağı güncellemesinin işareti; Ke Jie maçı AlphaGo Master'ındır; kazanma kuralında komi."
       - src: "lect_10, lect_11 — Haydutlar"
         topics: "keşif–sömürü, pişmanlık, ε-greedy, UCB (belirsizlik karşısında iyimserlik), Hoeffding, Thompson örneklemesi, Beta–Bernoulli, endüstri kullanımı"
         pages: [m11-7-bandits, m11-8-contextual-bandits]
@@ -227,6 +227,7 @@ groups:
       - src: "Silver ve ark. 2016, 2017 — AlphaGo, AlphaGo Zero"
         pages: [m11-11-alphazero]
         status: genis
+        done: "M11.11: 2016 makalesinin dört aşaması ve sayıları (%57.0 / %55.7 isabet, rollout %24.2 ve 2 µs, RL %80 / Pachi %85, değer ağı MSE 0.19/0.37 ve 0.226/0.234, λ = 0.5, %99.8, Fan Hui 5–0), 2017 makalesinin yöntemi (17 düzlemli girdi, ResNet, kayıp, 1600 simülasyon, τ, Dir(0.03), ε = 0.25, 400 oyunda %55, %5 teslim olma eşiği) ve sonuçları (36 h, 100–0, 89–11, Elo 5185 / 4858 / 3739 / 3144 / 3055) anlatılıyor; ödevler korundu."
       - src: "Vaswani ve ark. 2017 — Attention Is All You Need"
         pages: [m4-7-transformer, m4-14-transformer-ed]
         status: genis

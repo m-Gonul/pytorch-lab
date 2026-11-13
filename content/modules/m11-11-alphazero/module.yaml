@@ -100,3 +100,179 @@ homework:
     accept:
       - "Elo düzenli artar; birleşik ağ ayrı ağlardan iyi (makale Şekil 4 nitel)."
       - "Son ağ + 800 benzetim, d aşamasındaki rastgele-oyunlu UCT'yi ≥ %90 yener."
+
+labs:
+  - id: l1
+    lab: rootnoise
+    title: "Kökte keşif: Dirichlet gürültüsü ve sıcaklık"
+    goal: |
+      Ağın önselinin neredeyse sıfır verdiği ama gerçekte en iyi olan bir "gizli hamle" düşün. Kökte PUCT araması yap; Dirichlet gürültüsünün payı ε ve biçimi α ile simülasyon sayısının bu hamlenin denenme ve seçilme olasılığını nasıl değiştirdiğini, sıcaklık τ'nun ziyaret sayılarını nasıl bir politikaya çevirdiğini gör.
+    predict:
+      q: "30 hamleli bir kökte 400 simülasyonla, gürültü yokken gizli hamlenin ziyaret payı yaklaşık ne olur; ε = 0.25 gürültüyle ne olur?"
+      options:
+        - {t: "İkisinde de ≈ 0: önsel %0.1", why: "Gürültüyle pay belirgin biçimde artıyor."}
+        - {t: "≈ %3'ten ≈ %14'e çıkar", ok: true, why: "200 tekrarda gürültüsüz %3.2, gürültüyle %13.7; denenme olasılığı %49."}
+        - {t: "Gürültüsüz de ≈ %40: arama zaten bulur", why: "Ziyaret edilmemiş hamlenin Q'su bilinmez; bonus önselle orantılı olduğu için nadiren denenir."}
+    presets:
+      - {name: "Go ayarı (α = 0.03)", params: {K: 30, eps: 0.25, alpha: 0.03, S: 400, tau: 1}, note: "Gizli hamle payı %13.7, denenme %49."}
+      - {name: "Gürültüsüz", params: {K: 30, eps: 0, alpha: 0.03, S: 400, tau: 1}, note: "Pay ≈ %5, denenme %25."}
+      - {name: "Düzgüne yakın gürültü", params: {K: 30, eps: 0.25, alpha: 1, S: 400, tau: 1}, note: "Bu küçük kökte daha iyi: pay %32, denenme %92."}
+      - {name: "Az simülasyon", params: {K: 30, eps: 0.25, alpha: 0.03, S: 50, tau: 1}, note: "50 simülasyonda gürültü bile yetmiyor: denenme %9."}
+      - {name: "Soğuk seçim", params: {K: 30, eps: 0.25, alpha: 0.03, S: 400, tau: 0.1}, note: "τ = 0.1: seçilme olasılığı ziyaret payından büyük (en çok ziyaret edilene yığılır)."}
+    questions:
+      - q: "Gürültü yalnız kökte ve yalnız kendine karşı oyunda eklenir. Neden ağacın her düğümüne ya da değerlendirme maçlarına da eklenmez?"
+        a: "Amaç oynanan hamlenin ve dolayısıyla eğitim verisinin çeşitlenmesidir; bunun için kökteki seçim yeter. Derin düğümlere gürültü eklemek, aramanın kötü hamleleri reddetme yeteneğini her düzeyde bozar ve değer kestirimlerini kirletir. Değerlendirme maçlarında amaç en güçlü oyunu ölçmektir: gürültü ve τ = 1 kapatılır (τ → 0)."
+    limits: "Tek bir kök; çocukların gerçek değerleri sabit, her ziyaret gürültülü bir değerlendirme (σ = 0.5); ziyaret edilmemiş çocuğun Q'su 0; c_puct = 1.5. Ağaç derinleşmiyor."
+  - id: l2
+    lab: elogate
+    title: "Elo, Bradley–Terry ve %55 kapısı"
+    goal: |
+      Gerçek güç farkı bilinen iki oyuncu arasında maç simüle et. Skordan Elo kestirimini ve güven aralığını hesapla; AlphaGo Zero'nun "400 oyunda %55'ten fazla" kabul kuralının, gerçek farka göre yeni bir ağı hangi olasılıkla kabul ettiğini gör.
+    predict:
+      q: "Gerçek fark 0 Elo iken (yeni ağ eskisinden güçlü değil) 400 oyunluk %55 kapısı yeni ağı hangi olasılıkla kabul eder?"
+      options:
+        - {t: "%50", why: "Bu eşik 0.5 olsaydı."}
+        - {t: "≈ %2", ok: true, why: "Skorun standart hatası 0.025; 0.55 iki standart hata uzakta."}
+        - {t: "%0: güçlü değilse asla kabul edilmez", why: "Gürültü yüzünden küçük bir olasılık kalır."}
+    presets:
+      - {name: "Eşikte", params: {d: 35, n: 400, b: 0, gate: 0.55}, note: "Kabul ≈ %47; kabulün yarı yarıya olduğu fark 35 Elo."}
+      - {name: "Eşit güç", params: {d: 0, n: 400, b: 0, gate: 0.55}, note: "Yanlış kabul %2."}
+      - {name: "Belirgin üstün", params: {d: 100, n: 400, b: 0, gate: 0.55}, note: "Kabul %100."}
+      - {name: "Kısa maç", params: {d: 35, n: 50, b: 0, gate: 0.55}, note: "Elo aralığı ± 100: tek bir kısa maç çok gürültülü."}
+      - {name: "Beraberlikli oyun", params: {d: 35, n: 400, b: 0.4, gate: 0.55}, note: "Beraberlik varyansı düşürür: aralık ± 27."}
+    questions:
+      - q: "AlphaZero bu kapıyı kaldırıp her zaman en son ağla oynadı. Bunun riski ve getirisi nedir?"
+        a: "Risk: gürültü ya da kararsız eğitim yüzünden geçici olarak zayıflamış bir ağ veri üretir; daha kötü veri, daha kötü ağ döngüsüne girilebilir. Getiri: değerlendirme maçlarının maliyeti (her 1000 adımda 400 oyun × 1600 simülasyon) ortadan kalkar ve her iyileşme hemen veriye yansır. AlphaZero'nun deneyleri, yeterli veri tamponu ve küçük adımlarla sürekli güncellemenin kararlı kaldığını gösterdi."
+    limits: "Bağımsız oyunlar, sabit güç farkı; beraberlik olasılığı kazanç ve kayıptan eşit alınır. Kabul eğrisi normal yaklaşımla, seçili nokta 400 tekrarlık simülasyonla."
+  - id: l3
+    lab: aztab
+    title: "Tablo tabanlı mini AlphaZero: aramayla kendine karşı oyun"
+    goal: |
+      Tic-tac-toe'nun her konumu için bir politika ve değer tutan bir tabloyu yalnız kendine karşı oyunla eğit. Her hamlede PUCT araması ziyaret sayılarından bir hedef politika üretir, oyun sonucu değer hedefidir. Arama simülasyonu sayısının, oyun sayısının ve öğrenme oranının tablonun doğru hamle oranına etkisini minimax ile ölç.
+    predict:
+      q: "1000 kendine karşı oyunda, aramasız (S = 0) ve 25 simülasyonluk aramayla görülen konumlarda doğru hamle oranı ne olur?"
+      options:
+        - {t: "İkisi de ≈ %90: oyun sonucu yeterli sinyal", why: "Aramasız politika hedefi tablonun kendi kopyası; politika hiç değişmez."}
+        - {t: "≈ %53'e karşı ≈ %91", ok: true, why: "Arama politika iyileştirme operatörüdür; onsuz kendine karşı oyun yerinde sayar."}
+        - {t: "Aramalı daha kötü: arama gürültü ekler", why: "Arama gürültü değil, iyileşmiş bir hedef verir."}
+    presets:
+      - {name: "Varsayılan", params: {G: 1000, S: 25, eta: 0.3}, note: "Görülen konumlarda %91, bütün konumlarda %70."}
+      - {name: "Aramasız", params: {G: 1000, S: 0, eta: 0.3}, note: "%53: politika başlangıçtaki düzgün tablodan ayrılmıyor."}
+      - {name: "Sığ arama", params: {G: 1000, S: 5, eta: 0.3}, note: "%82, ama yalnız 537 konum görülüyor."}
+      - {name: "Uzun eğitim", params: {G: 3000, S: 50, eta: 0.3}, note: "%97.5 (1994 konum)."}
+      - {name: "Az oyun", params: {G: 100, S: 25, eta: 0.3}, note: "%80 (338 konum)."}
+      - {name: "Tam kopyalama", params: {G: 1000, S: 25, eta: 1}, note: "η = 1: tablo her seferinde son hedefi kopyalar; %92."}
+    questions:
+      - q: "Bütün 4520 konum üzerinden oran neden görülen konumlardakinden çok daha düşük, ve sinir ağı bunu nasıl değiştirir?"
+        a: "Tablo yalnız kendine karşı oyunda ziyaret edilen konumları günceller; iyi oyunda hiç ortaya çıkmayan konumlar (ör. bir oyuncunun bariz hatalarından sonrakiler) başlangıç değerlerinde kalır. Sinir ağı benzer konumlar arasında genelleme yapar: görülen konumlardan öğrenilen örüntüler (iki taşı engelle, çatal kur) görülmemiş konumlara da uygulanır. Go'da konumların neredeyse hiçbiri tekrar görülmediği için genelleme zorunludur."
+    limits: "Tablo 'ağ', PUCT c = 1.5, kökte Dir(0.3) ve ε = 0.25, ilk 4 hamlede τ = 1; değerlendirici kapısı yok (AlphaZero gibi). Doğru hamle ölçütü minimax'a göre oyun değerini koruyan hamle."
+practice:
+  - id: p1
+    type: çözülmüş
+    level: 0
+    title: Yaprak değeri ve PUCT bonusu
+    goal: AlphaGo aramasının iki formülünü elle uygulamak
+    needs: $(1-\lambda)v_\theta+\lambda z$, PUCT
+    q: |-
+      Bir yaprakta $v_\theta=-0.2$ ve hızlı oyunun sonucu $z=+1$; $\lambda=0.5$. Kökte bir hamlenin önseli $P=0.3$, ziyaret sayısı $N(s,a)=4$, kardeşlerin toplam ziyareti $\sum_bN=64$, $c_{\text{puct}}=5$, $Q=0.1$. Yaprak değeri ve hamlenin seçim skoru nedir?
+    solution: |-
+      Yaprak: $0.5\cdot(-0.2)+0.5\cdot1=0.4$. Bonus: $5\cdot0.3\cdot\sqrt{64}/(1+4)=5\cdot0.3\cdot8/5=2.4$; skor $Q+u=2.5$. Erken aşamada önsel ve az ziyaret bonusu, $Q$'dan çok daha büyüktür.
+  - id: p2
+    type: hesap
+    level: 1
+    title: Sıcaklıklı kök politikası
+    goal: π ∝ N^{1/τ}'yu hesaplamak
+    needs: Normalizasyon
+    q: |-
+      Kökte ziyaret sayıları $N=(20,30,50)$. $\tau=0.5$ ile en çok ziyaret edilen hamlenin olasılığı nedir?
+    answer: 0.6578947
+    calc: "50**2/(20**2+30**2+50**2)"
+    mistakes:
+      - {answer: 0.5, msg: "Bu τ = 1: ziyaret oranı."}
+      - {answer: 1, msg: "Bu τ → 0."}
+    hints:
+      - "$1/\\tau=2$: sayıların karesi."
+    solution: |-
+      $2500/(400+900+2500)=0.658$. τ küçüldükçe politika en çok ziyaret edilen hamleye yoğunlaşır.
+  - id: p3
+    type: hesap
+    level: 1
+    title: AlphaGo Zero kaybı
+    goal: Kaybın iki terimini hesaplamak
+    needs: $(z-v)^2-\pi^\top\log p$
+    q: |-
+      $z=-1$, $v=0.2$, $\boldsymbol\pi=(0.8,0.2)$, $\mathbf p=(0.5,0.5)$, $c=0$. Kayıp nedir?
+    answer: 2.1331472
+    calc: "(-1-0.2)**2 + 0.8*log(2) + 0.2*log(2)"
+    mistakes:
+      - {answer: 1.8931472, msg: "(z − v)² yerine |z − v| kullanılmış."}
+      - {answer: 1.44, msg: "Çapraz entropi terimi unutulmuş."}
+    hints:
+      - "$-\\boldsymbol\\pi^\\top\\log\\mathbf p=-\\sum_a\\pi_a\\log p_a$."
+    solution: |-
+      $1.44+\ln2=2.133$. Çapraz entropinin en küçüğü $\mathbf p=\boldsymbol\pi$'dedir: $0.8\ln(1/0.8)+0.2\ln(1/0.2)=0.500$ (π'nin entropisi).
+  - id: p4
+    type: yöntem-seç
+    level: 2
+    title: Yeni bir oyunda kendine karşı öğrenme
+    goal: AlphaZero bileşenlerinin işlevini seçmek
+    needs: Arama, gürültü, kapı
+    q: |-
+      Yeni bir tahta oyunu için AlphaZero kuruyorsunuz. İlk denemede ağ birkaç bin oyundan sonra hep aynı açılışı oynuyor ve gücü durmuş görünüyor. Önce neyi değiştirirsiniz?
+    choices:
+      - {t: "Ağı büyütmek", why: "Veri çeşitliliği yoksa büyük ağ da aynı açılışı öğrenir."}
+      - {t: "Kökteki Dirichlet gürültüsünü (ε, α) ve ilk hamlelerdeki τ = 1 örneklemesini denetlemek: keşif kapalı ya da yetersiz olabilir", ok: true, why: "Kendine karşı oyunun tek keşif kaynağı bunlardır."}
+      - {t: "Simülasyon sayısını sıfıra indirmek", why: "Arama politika iyileştirme operatörüdür; onsuz ilerleme durur (lab l3)."}
+    hints:
+      - "Kendine karşı oyun yeni açılışları nereden öğrenir?"
+    solution: |-
+      Keşif yoksa veri hep aynı açılışlardan gelir ve ağ kendi kör noktalarını hiç görmez. α'yı yasal hamle sayısına göre ayarla (≈ 10/K), ilk hamlelerde τ = 1 örneklemesinin açık olduğunu denetle.
+  - id: p5
+    type: hata-bul
+    level: 2
+    title: Ezberleyen değer ağı
+    goal: Değer ağı verisinin korelasyonunu tanımak
+    needs: Aşırı uyum
+    q: |-
+      Bir ekip değer ağını 10 000 kendine karşı oyunun bütün konumlarıyla eğitiyor. Eğitim MSE'si hızla düşüyor ama yeni oyunlarda değer tahminleri neredeyse rastgele. Neden?
+    choices:
+      - {t: "Öğrenme oranı küçük", why: "Eğitim hatası düşüyor; sorun genelleme."}
+      - {t: "Aynı oyunun ardışık konumları neredeyse aynı ve hepsi aynı z'yi taşıyor; ağ konumları değil oyunları ezberliyor. Her oyundan tek (ya da az) konum örneklemek gerekir", ok: true, why: "AlphaGo'da bütün KGS konumlarıyla test MSE 0.37, her biri ayrı oyundan 30 milyon konumla 0.234."}
+      - {t: "z yerine v_θ'nın kendisine regresyon yapılmalı", why: "Bu bootstrapping olurdu; sorun verinin korelasyonu."}
+    hints:
+      - "10 000 oyunda kaç bağımsız sonuç var?"
+    solution: |-
+      Etkin örnek sayısı konum sayısı değil oyun sayısıdır. Her oyundan rastgele tek konum alınır ve daha çok oyun üretilir; simetri artırımı da etkin veriyi çoğaltır.
+  - id: p6
+    type: kanıt
+    level: 3
+    title: Elo'nun lojistik regresyon olduğu
+    goal: Bradley–Terry olabilirliğini kurmak
+    needs: Lojistik fonksiyon
+    q: |-
+      Oyuncu puanları $e_i$ ve maç sonuçları $(i,j,y)$ ($y=1$: $i$ kazandı) verilsin. $P(i\text{ yener }j)=\sigma\bigl(k(e_i-e_j)\bigr)$, $k=\ln10/400$. (a) Log-olabilirliğin bir lojistik regresyon olduğunu, (b) gradyanın $\sum(y-\hat p)$ biçiminde olduğunu, (c) puanların yalnız bir sabite kadar belirlendiğini gösterin.
+    rubric:
+      - "(a) Her maçı x = e_i − e_j göstergeli bir örnek olarak yazıp log L = Σ[y log σ(kx) + (1 − y) log(1 − σ(kx))] elde ettim"
+      - "(b) ∂ log L/∂e_i = k Σ_maçlar (y − σ) (i'nin oynadığı maçlarda işaretle) buldum"
+      - "(c) Bütün e_i'lere aynı sabit eklenince olasılıkların değişmediğini, bu yüzden bir oyuncunun puanının sabitlenmesi gerektiğini belirttim"
+      - "1/(1 + 10^(−d/400)) = σ(d ln10/400) eşitliğini gösterdim"
+    hints:
+      - "$\\sigma'(x)=\\sigma(x)(1-\\sigma(x))$."
+    solution: |-
+      $10^{-d/400}=e^{-d\ln10/400}$, dolayısıyla Elo olasılığı $\sigma(kd)$. Log-olabilirlik lojistik regresyondur; gradyan $k\sum(y-\hat p)$ (kazanılan beklenenden fazlaysa puan artar). Fark yalnız $e_i-e_j$ ile girdiği için ölçek kaydırmaya karşı değişmezdir; makalelerde ölçek Fan Hui'nin 2908 puanına bağlandı.
+pitfalls:
+  - wrong: "AlphaGo'nun RL aşamasında politika gradyanı uzman hamlelerinin log-olabilirliğiyle hesaplanır."
+    right: "Kendine karşı oyunda uzman yoktur: gradyan, oynanan hamlenin log-olabilirliği ile oyun sonucu z'nin çarpımıdır (REINFORCE)."
+  - wrong: "Aramada önsel olarak en güçlü politika (RL ağı) her zaman en iyisidir."
+    right: "AlphaGo'da önselde SL ağı RL ağından daha iyi çalıştı: arama için önselin çeşitliliği, tek hamleye yoğunlaşmış bir güçten daha değerlidir."
+  - wrong: "AlphaGo Zero'da arama yalnız oyun oynamak için kullanılır; öğrenme saf REINFORCE'tur."
+    right: "Arama öğrenmenin kendisidir: ziyaret sayılarından gelen π politika hedefi, z değer hedefidir. Aramasız kendine karşı oyunda politika iyileşmez (lab l3: %53'e karşı %91)."
+  - wrong: "Yeni ağ eskisinden bir maçta %51 skor aldıysa daha güçlüdür."
+    right: "400 oyunda skorun standart hatası ≈ 0.025'tir; %51 gürültü içindedir. AlphaGo Zero bu yüzden %55 eşiği kullandı (eşit güçte yanlış kabul ≈ %2)."
+whatif:
+  - q: "Oyun iki oyunculu değil de tek oyunculu (ör. bir bulmaca) olsaydı?"
+    a: "Değer işaret değiştirmeden yayılır ve kazanç/kayıp yerine ödül ölçeklidir; PUCT'taki Q'lar normalize edilmelidir (MuZero min-max normalizasyonu). Kendine karşı oyun yoktur; keşif ve 'rakip' çeşitliliği yerine ödül ölçeği ve uzun ufuk zorlukları öne çıkar."
+  - q: "Hamle uzayı çok büyük ya da sürekli olsaydı?"
+    a: "Kökte bütün hamleleri genişletmek imkânsız olur. Önselden örneklenen bir alt küme genişletilir (Sampled MuZero) ya da ilerlemeli genişletme kullanılır: ziyaret arttıkça yeni çocuklar eklenir. PUCT'un önseli bu örneklemeyi yönlendirir."
+  - q: "Ağ sonucun yerine kazanma olasılığı yerine skor farkını öğrenseydi?"
+    a: "Go'da kazanmak için bir puan yeter; skoru en çoklamak gereksiz riskler aldırır. AlphaGo ve Zero bu yüzden kazanma olasılığını (z = ±1) hedefledi; önde olduğunda güvenli ve 'yavaş' görünen hamleler seçmesi bundandır. Skor hedefi (KataGo gibi) ek bir yardımcı başlık olarak kullanılabilir."
