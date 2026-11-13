@@ -26,13 +26,13 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: Bölüm 1–2 işlendi; yayın CI denetimi ayrıca izleniyor. Bölüm 3–17, ön sayfalar ve tam kaynakça/dizin
-    işlenmedi; bütün kitap tamamlanmadı.
+  note: Bölüm 1–3 işlendi; yayın CI denetimi ayrıca izleniyor. Bölüm 4–17, ön/arka sayfalar ve kısım ayırıcıları
+    henüz tümüyle işlenmedi; bütün kitap tamamlanmadı.
   processed_chapters:
   - 1
   - 2
-  unprocessed_chapters:
   - 3
+  unprocessed_chapters:
   - 4
   - 5
   - 6
@@ -81,7 +81,8 @@ chapters:
   - m5-5-rl
   - m11-4-mc-td
   - m11-11-alphazero
-  mapping_status: aynı derinlik denetimi yapılmadı
+  mapping_status: Birimlerin kesin ders/kart/lab hedefleri ve kaynak derinliği doğrulandı; bağımsız ikinci
+    okuma tamamlandı.
   content_status: işlendi; yayın denetimi sürüyor
   recorded_units: 159
   source_unnumbered_figures:
@@ -175,7 +176,8 @@ chapters:
   candidate_modules:
   - m11-7-bandits
   - m11-8-contextual-bandits
-  mapping_status: aynı derinlik denetimi yapılmadı
+  mapping_status: Birimlerin kesin ders/kart/lab hedefleri ve kaynak derinliği doğrulandı; bağımsız ikinci
+    okuma tamamlandı.
   content_status: işlendi; yayın denetimi sürüyor
   recorded_units: 106
   second_read:
@@ -195,10 +197,10 @@ chapters:
   title: Sonlu Markov karar süreçleri
   pdf_pages:
   - 69
-  - 94
+  - 93
   pages:
   - 47
-  - 72
+  - 71
   exercises:
   - number: '3.1'
     pdf_page: 73
@@ -306,8 +308,14 @@ chapters:
   code_boxes: []
   candidate_modules:
   - m11-2-mdp-vi
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  mapping_status: Birimlerin kesin ders/kart/lab hedefleri ve kaynak derinliği doğrulandı; bağımsız ikinci
+    okuma tamamlandı.
+  content_status: işlendi; bağımsız ikinci okuma tamamlandı
+  recorded_units: 179
+  second_read: Bağımsız ajan yalnız PDF69–93 ve birim defteriyle bütün 25 metin sayfasını ve 12 şekilli sayfa
+    görüntüsünü okudu; 29 alıştırma,13 görsel,10satırlı tabloyu doğruladı. Anlam, koşul, alt soru ve konum
+    bulguları eklendi; takip okumada iki kısaltılmış koşul geri kondu ve MC sayfa aralığı genişletildi. Markov
+    koşullu bağımsızlığı ile temsil-kısıtı ayrı birimler olarak netleştirildi.
 - chapter: 4
   title: Dinamik programlama
   pdf_pages:
@@ -1981,13 +1989,15 @@ page_audit:
   embedded_images: 0
   drawing_paths: 0
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 70
   printed_page: 48
   text_sha256: a9f021a1596e472a54f656966a3858de4af4c5edbfd7a90d5248240410efc503
   text_characters: 3203
   embedded_images: 8
   drawing_paths: 26
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 71
   printed_page: 49
   text_sha256: f214ec4c9ce7621047488983f306bcf19086b2a2fdf5fc6737beb405ae68989b
@@ -1995,6 +2005,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 2
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 72
   printed_page: 50
   text_sha256: b6aed7ffeb05c98240452959c59d73485d088526d35746ff5d67da5c51d510d2
@@ -2002,6 +2013,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 73
   printed_page: 51
   text_sha256: f1ad8e7a813b8588f94e76a9769e49efc5c6cfbc30bfefb9ba6241a6f4e97469
@@ -2009,20 +2021,23 @@ page_audit:
   embedded_images: 0
   drawing_paths: 3
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 74
   printed_page: 52
   text_sha256: 69cf47b690ebd671ef116a23f23c3c9c02eec6280cd5b90837951eb17e167a16
   text_characters: 4403
   embedded_images: 0
   drawing_paths: 58
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 75
   printed_page: 53
   text_sha256: 3c93b5cb99caf60ca77727a01a7ae74a070153159d7b1f663cb8324f5c16bb02
   text_characters: 3393
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 76
   printed_page: 54
   text_sha256: 16e93876d816cf9cb6c6816c1701aa147afdd8459605631f94c6b7f0e86ed289
@@ -2030,6 +2045,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 2
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 77
   printed_page: 55
   text_sha256: df08724a0556b3d880aacf8b9f4007f841995880add77b845943489a69930a57
@@ -2037,20 +2053,23 @@ page_audit:
   embedded_images: 0
   drawing_paths: 2
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 78
   printed_page: 56
   text_sha256: 2ae010a047638c61500a5f804f4372ee94c17f0d903120458712f03a74d430d2
   text_characters: 2629
   embedded_images: 0
   drawing_paths: 14
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 79
   printed_page: 57
   text_sha256: af6eaabc9fbcb0bf6eb97a890d466cc654413915c4b50121cbe9dd9b36d58def
   text_characters: 3472
   embedded_images: 0
   drawing_paths: 25
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 80
   printed_page: 58
   text_sha256: 3981182cdf0c8c6562b681cd0b60d74c296470adba12bfbb61e35b5772c81215
@@ -2058,34 +2077,39 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 81
   printed_page: 59
   text_sha256: 539536fac18995588301a5214eb4be9bab17898406837d4b17b8dccef5f2d4f4
   text_characters: 3847
   embedded_images: 0
   drawing_paths: 48
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 82
   printed_page: 60
   text_sha256: 0a45c5a1a4bd02a6e0fd32bd5b06154065466d8be6913446d4e4e56a71739e97
   text_characters: 3542
   embedded_images: 0
   drawing_paths: 34
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 83
   printed_page: 61
   text_sha256: 0c98cc7390b436b227255bf3ec95ba187f65caad9582750ace2c11188d1e2a92
   text_characters: 4792
   embedded_images: 0
   drawing_paths: 79
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 84
   printed_page: 62
   text_sha256: df4144bb2d8de7f17691b69d5380aef43863da58c2915b8495fb227b9ab495e7
   text_characters: 3269
   embedded_images: 0
   drawing_paths: 54
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 85
   printed_page: 63
   text_sha256: 25cfec69d378e0f42ee6a848f4c29755c898795e121f0540c5f08ae8d0f640bb
@@ -2093,27 +2117,31 @@ page_audit:
   embedded_images: 0
   drawing_paths: 2
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 86
   printed_page: 64
   text_sha256: cef6b913fadb5e6e6b4c7a04b652dd603617cf55d64a4001db0c3d15c91824d3
   text_characters: 3576
   embedded_images: 0
   drawing_paths: 85
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 87
   printed_page: 65
   text_sha256: 8c49846a59516cd5c73ba13288e28ad9442b826aa04957532000f0888115c788
   text_characters: 3175
   embedded_images: 0
   drawing_paths: 128
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 88
   printed_page: 66
   text_sha256: f727f8b38fbf9bffc4b73e56616745a3055e6e51153641d3c6ef6d582bd12a13
   text_characters: 3509
   embedded_images: 0
   drawing_paths: 39
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 89
   printed_page: 67
   text_sha256: 120b923022346d284235cc8ac77997785a8eec20a5c9e046f56b35a429949f08
@@ -2121,6 +2149,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 90
   printed_page: 68
   text_sha256: a770a9167db15efa7f35aa14feb9d96cb95b3937e4cc90092fc8c2f7f6ff78dd
@@ -2128,6 +2157,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 91
   printed_page: 69
   text_sha256: c904e12757bb7f2c277cf6e46c4a199da99ba5b85c2372d72fc726c67ad6b3e8
@@ -2135,6 +2165,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 92
   printed_page: 70
   text_sha256: 9860b7899c6964304837aab3bfd2972dca75a6c00449b06c33aefbaa14e620cf
@@ -2142,6 +2173,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 93
   printed_page: 71
   text_sha256: cda53fa180a6e73e789063364b5abe33e9bfb9d07473b620f7f4de0ad4f95c59
@@ -2149,6 +2181,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 94
   printed_page: 72
   text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -2156,6 +2189,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 0
   visual_review: incelenmedi
+  text_review: metin boş; bölüm sonu boş sayfa
 - pdf_page: 95
   printed_page: 73
   text_sha256: a5eb7dbb95adf23b9e9c96bcc04d90338b05d88d49405383e5fbd6888b4c78e0
@@ -7390,6 +7424,1414 @@ items:
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
   note: Bağımsız ikinci okuma ayrıntısı.
+- id: ch3-p47-i1
+  page: 47
+  pdf_page: 69
+  kind: bilgi
+  what: MDP eylemi sonraki durumu ve gecikmiş ödülü değiştirir; ilişkisel ve değerlendirici öğrenme birlikte
+    gerekir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p47-i2
+  page: 47
+  pdf_page: 69
+  kind: bilgi
+  what: Sonlu MDP hesaplanabilir idealizasyondur; gerçek büyük problemlerde yaklaşık temsil gerekir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p47-i3
+  page: 47
+  pdf_page: 69
+  kind: tanım
+  what: Karar veren ajan ve etkileşen geri kalan ortam ayrımı
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p47-i4
+  page: 47
+  pdf_page: 69
+  kind: bilgi
+  what: Bandit q*(a) yerine MDP q*(s,a),v*(s) gerekir; uzun vadeli katkı eyleme yapıldığı durum içinde atanır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p48-i1
+  page: 48
+  pdf_page: 70
+  kind: şekil
+  what: '3.1: ajan eylem At, ortam birlikte yeni St+1 ve Rt+1 üretir; mevcut St ve Rt ajana gider'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+  source_number: '3.1'
+- id: ch3-p48-i2
+  page: 48
+  pdf_page: 70
+  kind: tanım
+  what: Kesikli karar zamanları, duruma bağlı geçerli eylem kümesi ve sonraki ödül/durum
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p48-i3
+  page: 48
+  pdf_page: 70
+  kind: formül
+  what: 3.1 yörünge S0,A0,R1,S1,A1,R2…
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p48-i4
+  page: 48
+  pdf_page: 70
+  kind: tanım
+  what: Sonlu MDP içinde durum, eylem ve burada ödül kümeleri sonludur
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p48-i5
+  page: 48
+  pdf_page: 70
+  kind: formül
+  what: 3.2 dört argümanlı ortak geçiş–ödül olasılığı; noktalı eşitlik tanım
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p48-i6
+  page: 48
+  pdf_page: 70
+  kind: bilgi
+  what: p sıradan belirlenimci fonksiyondur; koşul çizgisi dağılımı hatırlatır
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p48-i7
+  page: 48
+  pdf_page: 70
+  kind: dipnot
+  what: '1: ajan/ortam/eylem ile denetleyici/tesis/kontrol sinyali adlarının eşlemesi'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p48-i8
+  page: 48
+  pdf_page: 70
+  kind: dipnot
+  what: '2: kesikli zaman sadeleştirme; sürekli zaman Bertsekas–Tsitsiklis1996 ve Doya1996'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p48-i9
+  page: 48
+  pdf_page: 70
+  kind: dipnot
+  what: '3: A(s) sabitse A kısaltması'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p48-i10
+  page: 48
+  pdf_page: 70
+  kind: dipnot
+  what: '4: Rt+1 yeni durumla ortak belirlenmeyi vurgular; Rt konvansiyonu da yaygındır'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p49-i1
+  page: 49
+  pdf_page: 71
+  kind: formül
+  what: 3.3 her geçerli s,a için bütün s′,r olasılıklarının toplamı1
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p49-i2
+  page: 49
+  pdf_page: 71
+  kind: tanım
+  what: 'Markov yeterliliği: son durum ve eylem verildiğinde ortak gelecek dağılımı daha eski geçmişten bağımsızdır.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p49-i3
+  page: 49
+  pdf_page: 71
+  kind: bilgi
+  what: Kitap genel olarak Markov varsayar; Kısım II ile başlayan bazı yaklaşık yöntemler buna dayanmaz; Bölüm
+    17 temsil kurmayı işler.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p49-i4
+  page: 49
+  pdf_page: 71
+  kind: türetim
+  what: 3.4 ödülü marjinalleyerek p(s′|s,a) bulma
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p49-i5
+  page: 49
+  pdf_page: 71
+  kind: türetim
+  what: 3.5 ortak dağılımdan beklenen sonraki ödül r(s,a)
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p49-i6
+  page: 49
+  pdf_page: 71
+  kind: türetim
+  what: 3.6 sonraki duruma da koşullanan ödül; pozitif olasılık paydası gerekir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p49-i7
+  page: 49
+  pdf_page: 71
+  kind: bilgi
+  what: Durum/eylem farklı fiziksel ve bilişsel ölçeklerde olabilir; tek motor/sensör biçimi zorunlu değil
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p49-i8
+  page: 49
+  pdf_page: 71
+  kind: bilgi
+  what: Karar adımı sabit gerçek süre olmak zorunda değildir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p49-i9
+  page: 49
+  pdf_page: 71
+  kind: örnek
+  what: Motor gerilimi, öğle yemeği/lisansüstü seçimi ve iç dikkat/hesap eylemi
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+  pages:
+  - 49
+  - 50
+  pdf_pages:
+  - 71
+  - 72
+- id: ch3-p49-i10
+  page: 49
+  pdf_page: 71
+  kind: örnek
+  what: Durum sensör, sembol, geçmiş özeti, belirsizlik/şaşkınlık bilgisi içerebilir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+  pages:
+  - 49
+  - 50
+  pdf_pages:
+  - 71
+  - 72
+- id: ch3-p49-i11
+  page: 49
+  pdf_page: 71
+  kind: bilgi
+  what: Markov özelliği karar sürecinden çok durum temsiline konan kısıttır; geçmişin geleceğe etkili bütün
+    bilgisi tutulur.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p50-i1
+  page: 50
+  pdf_page: 72
+  kind: bilgi
+  what: Ajan sınırı beden sınırı değildir; kas, iskelet, motor, sensör ve ödül hesabı ortam olabilir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p50-i2
+  page: 50
+  pdf_page: 72
+  kind: bilgi
+  what: Sınır bilgi/bilgisizlik değil doğrudan seçim ve onun sonucudur; bilinen Rubik küpü zor olabilir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p50-i3
+  page: 50
+  pdf_page: 72
+  kind: bilgi
+  what: Alt/üst denetleyiciler ve hiyerarşik ajanların ayrı sınırları
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p51-i1
+  page: 51
+  pdf_page: 73
+  kind: bilgi
+  what: Durum/eylem temsili tasarım işidir; kitap seçilmiş temsilde davranış öğrenme ilkelerine odaklanır
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
+- id: ch3-p51-i2
+  page: 51
+  pdf_page: 73
+  kind: örnek
+  what: 3.1 biyoreaktör sıcaklık/karıştırma hedefleri ve alt denetleyiciler
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p51-i3
+  page: 51
+  pdf_page: 73
+  kind: örnek
+  what: 3.1 süzülmüş/gecikmiş sensörler, girdiler/hedef kimyasal; üretim hızı skaler ödül
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p51-i4
+  page: 51
+  pdf_page: 73
+  kind: bilgi
+  what: Yapılı durum/eylem vektörlerine karşı tek sayılı ödül
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p51-i5
+  page: 51
+  pdf_page: 73
+  kind: örnek
+  what: 3.2 al–yerleştir robotu doğrudan eklem gerilimleri, düşük gecikmeli açı/hız durumu
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p51-i6
+  page: 51
+  pdf_page: 73
+  kind: örnek
+  what: 3.2 taşınan nesne+1 ve anlık sarsıntı cezasıyla hızlı/düzgün hareket
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
+- id: ch3-p51-i7
+  page: 51
+  pdf_page: 73
+  kind: alıştırma
+  source_number: '3.1'
+  what: Kendi seçtiğin üç olabildiğince farklı görevi MDP çerçevesinde kur; her birinin durumlarını, eylemlerini
+    ve ödüllerini tanımla. En az bir örnekte çerçevenin sınırlarını zorla.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p7
+- id: ch3-p51-i8
+  page: 51
+  pdf_page: 73
+  kind: alıştırma
+  source_number: '3.2'
+  what: MDP çerçevesi, amaç yönelimli bütün öğrenme görevlerini yararlı biçimde temsil etmeye yeter mi? Açık
+    istisnalar veya sınırlar öner.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p8
+- id: ch3-p51-i9
+  page: 51
+  pdf_page: 73
+  kind: alıştırma
+  source_number: '3.3'
+  what: Sürüşte eylem; gaz–direksiyon–fren konumu, lastik torkları, kas komutları veya gidilecek yer seçimi
+    olabilir. Ajan–ortam sınırı için doğru düzey hangisidir? Birini diğerine tercih etmenin ölçütleri ve temel
+    bir zorunluluk olup olmadığını tartış.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p9
+- id: ch3-p52-i1
+  page: 52
+  pdf_page: 74
+  kind: örnek
+  what: 3.3 kutu robotunun kol/tutucu/hazne/sensör alt sistemi ve üst düzey pil kararı
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i2
+  page: 52
+  pdf_page: 74
+  kind: tanım
+  what: Yüksek/düşük iki pil durumu; yüksek ara/bekle, düşük ara/bekle/şarj eylemleri
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i3
+  page: 52
+  pdf_page: 74
+  kind: bilgi
+  what: Yüksek pilde arama α ile yüksek,1−α ile düşük; her iki dal ortalama rs
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i4
+  page: 52
+  pdf_page: 74
+  kind: bilgi
+  what: Düşük pilde arama β ile düşük/rs,1−β ile kurtarma/yüksek/−3; o adım kutu yok
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i5
+  page: 52
+  pdf_page: 74
+  kind: bilgi
+  what: Bekleme pili sabit tutar, ortalama rw; rs>rw
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i6
+  page: 52
+  pdf_page: 74
+  kind: bilgi
+  what: Şarj yüksek pile götürür, kutu yok ve ödül0
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i7
+  page: 52
+  pdf_page: 74
+  kind: tablo
+  what: Robotun10satırlı P ve koşullu ortalama ödül tablosu, sıfır olasılıklı tüm üç satır dahil
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i8
+  page: 52
+  pdf_page: 74
+  kind: şekil
+  what: 'Numarasız robot geçiş grafiği: iki durum,beş eylem,yedi pozitif dal,olasılık/ödül etiketleri'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p52-i9
+  page: 52
+  pdf_page: 74
+  kind: bilgi
+  what: Sıfır olasılıklı geçişte koşullu ödül belirtilmez; uç α/β için de geçerli
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p52-i10
+  page: 52
+  pdf_page: 74
+  kind: bilgi
+  what: Bekle, yerinde birinin kutu getirmesini beklemektir; her kutu bir ödül, rs/rw beklenen kutu sayısıdır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p53-i1
+  page: 53
+  pdf_page: 75
+  kind: tanım
+  what: Açık büyük durum ve küçük dolu durum–eylem düğümleri; her eylemde ortam dalları toplam1
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p53-i2
+  page: 53
+  pdf_page: 75
+  kind: bilgi
+  what: Koşullu ortalamalar tam ortak dağılımı belirlemez; Alıştırma3.4 ek belirlenimci ödül varsayımı gerektirir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
+- id: ch3-p53-i3
+  page: 53
+  pdf_page: 75
+  kind: tanım
+  what: Ödül hipotezi beklenen birikimli skaler ödülle amacı temsil etme hipotezidir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-odul-amac
+- id: ch3-p53-i4
+  page: 53
+  pdf_page: 75
+  kind: bilgi
+  what: Amaç anlık en büyük ödül değil uzun vadeli birikimdir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-odul-amac
+- id: ch3-p53-i5
+  page: 53
+  pdf_page: 75
+  kind: örnek
+  what: Yürümede ileri hareket,labirentte kaçış öncesi−1,kutu+1/çoğu0/çarpma veya bağırma negatif
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-odul-amac
+- id: ch3-p53-i6
+  page: 53
+  pdf_page: 75
+  kind: örnek
+  what: Satranç/dama kazanma+1,kaybetme−1,beraberlik ve bitmemiş hamle0
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-odul-amac
+- id: ch3-p53-i7
+  page: 53
+  pdf_page: 75
+  kind: alıştırma
+  source_number: '3.4'
+  what: Örnek 3.3 geri dönüşüm robotu için s, a, s′, r ve p(s′,r|s,a) sütunlu, olasılığı pozitif her dörtlüyü
+    içeren bir tablo kur. Yüksek/düşük pil, α/β, rₛ>r𝓌, kurtarma −3 ve şarj ödülü 0 koşullarını koru.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p10
+- id: ch3-p54-i1
+  page: 54
+  pdf_page: 76
+  kind: bilgi
+  what: Ödül ne istendiğini belirtir,nasıl davranılacağını zorlamaz; taş/merkez bonusu kaybettirebilir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-odul-amac
+- id: ch3-p54-i2
+  page: 54
+  pdf_page: 76
+  kind: dipnot
+  what: '5: ön bilgi başlangıç politika veya değer tahminine konabilir'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-odul-amac
+- id: ch3-p54-i3
+  page: 54
+  pdf_page: 76
+  kind: dipnot
+  what: '6: ödül tasarımı ayrıntıları§17.4'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-odul-amac
+- id: ch3-p54-i4
+  page: 54
+  pdf_page: 76
+  kind: tanım
+  what: Getiri gelecekteki ödüllerin fonksiyonudur; bölümlü görev doğal terminal ve sıfırlama taşır
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p54-i5
+  page: 54
+  pdf_page: 76
+  kind: formül
+  what: 3.7 sonlu bölüm getirisi Rt+1…RT toplamı, rastgeleT
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p54-i6
+  page: 54
+  pdf_page: 76
+  kind: bilgi
+  what: Kazanma/kaybetme tek terminalde farklı son ödülle temsil edilebilir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p54-i7
+  page: 54
+  pdf_page: 76
+  kind: bilgi
+  what: Her bölüm standart duruma veya standart dağılımdan yeni örneğe sıfırlanır; başlangıç önceki bölümün
+    bitişinden bağımsızdır. S/S+ terminal ayrımı.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p54-i8
+  page: 54
+  pdf_page: 76
+  kind: dipnot
+  what: '7: episode için trial terimi de kullanılır'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p54-i9
+  page: 54
+  pdf_page: 76
+  kind: tanım
+  what: Doğal bitişi olmayan devam eden görev; sonsuz +1 toplamı diverge eder
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+  pages:
+  - 54
+  - 55
+  pdf_pages:
+  - 76
+  - 77
+- id: ch3-p55-i1
+  page: 55
+  pdf_page: 77
+  kind: alıştırma
+  source_number: '3.5'
+  what: Denklem 3.3 devam eden görevde her (s,a) için geçerlidir. Bölümlü görev için küçük ama gerekli değişiklik
+    nedir? Değişmiş denklemi yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p11
+- id: ch3-p55-i2
+  page: 55
+  pdf_page: 77
+  kind: formül
+  what: 3.8 indirimli sonsuz getiri ve γ∈[0,1]
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p55-i3
+  page: 55
+  pdf_page: 77
+  kind: türetim
+  what: Sınırlı ödüller ve γ<1 altında mutlak toplam sonlu,üst sınır Rmax/(1−γ)
+  status: vardı
+  where: content/modules/m11-2-mdp-vi/lesson.md#indirim
+- id: ch3-p55-i4
+  page: 55
+  pdf_page: 77
+  kind: bilgi
+  what: k-adım sonraki ödülün ağırlığıγ^(k−1); γ0 miyop,γyakın1 uzak sonuçları ağırlıklandırır
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p55-i5
+  page: 55
+  pdf_page: 77
+  kind: bilgi
+  what: Eylem geleceği değiştirmiyorsa miyop seçim yeterli olabilir; genelMDP için yetmez
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p55-i6
+  page: 55
+  pdf_page: 77
+  kind: türetim
+  what: 3.9 ilk ödülü ayırarak Gt=Rt+1+γGt+1; son adımdaGT=0
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p55-i7
+  page: 55
+  pdf_page: 77
+  kind: türetim
+  what: 3.10 sürekli1 ödülde geometrik seri1/(1−γ),sonlu kısmi toplamla kanıt
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p56-i1
+  page: 56
+  pdf_page: 78
+  kind: örnek
+  what: 3.4 çubuk dengesi açı/ray başarısızlığı ve dik konuma sıfırlama
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p56-i2
+  page: 56
+  pdf_page: 78
+  kind: örnek
+  what: 3.4 bölümlü başarısız-olmayan-adım+1 ile hayatta kalma süresi, hiç bitmezse sonsuz
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p56-i3
+  page: 56
+  pdf_page: 78
+  kind: örnek
+  what: Devam eden çubuk dengesinde başarısızlık −1, diğer ödüller 0; kaynak −γ^K terimini kalan adımla ilişkilendirir.
+    Tek ceza tüm devam eden getiri değildir; K indeks seçimi açıklanır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p56-i4
+  page: 56
+  pdf_page: 78
+  kind: şekil
+  what: 'Numarasız kaynak çizimi: ray, araba ve eğik çubuk. Özgün geometriye kuvvet oku/açı etiketi öğretim
+    için eklendi.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p56-i5
+  page: 56
+  pdf_page: 78
+  kind: alıştırma
+  source_number: '3.6'
+  what: 'Çubuk dengesini bölümlü ve indirimli ele al: başarısızlıkta −1, diğer bütün ödüller 0 olsun. Her andaki
+    getiri nedir? Devam eden ve indirimli formülasyondan farkı nedir?'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p12
+- id: ch3-p56-i6
+  page: 56
+  pdf_page: 78
+  kind: alıştırma
+  source_number: '3.7'
+  what: Labirent robotuna kaçışta +1, diğer zamanlarda 0 veriliyor; görev bölümlü ve Denklem 3.7 indirimsiz
+    getirisi en çoklanıyor. Bir süre sonra hızlı kaçışta gelişme görünmüyor. Amaç etkili iletilmiş mi; sorun
+    ne olabilir?
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p13
+- id: ch3-p56-i7
+  page: 56
+  pdf_page: 78
+  kind: alıştırma
+  source_number: '3.8'
+  what: γ=0.5, T=5, R₁=−1, R₂=2, R₃=6, R₄=3, R₅=2. G₀,G₁,…,G₅ değerlerini tersten hesapla. Sayısal alana G₀
+    gir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p14
+- id: ch3-p56-i8
+  page: 56
+  pdf_page: 78
+  kind: alıştırma
+  source_number: '3.9'
+  what: γ=0.9, önce R₁=2, sonra sonsuza dek her ödül 7. G₁ ve G₀ nedir? Sayısal alana G₀ gir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p15
+- id: ch3-p56-i9
+  page: 56
+  pdf_page: 78
+  kind: alıştırma
+  source_number: '3.10'
+  what: Denklem 3.10 içindeki ikinci eşitliği, Σₖ₌₀^∞γᵏ=1/(1−γ), kanıtla; gerekli γ koşulunu belirt.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p16
+- id: ch3-p57-i1
+  page: 57
+  pdf_page: 79
+  kind: bilgi
+  what: Bölüm indeksi i ile St,i,At,i,Rt,i,πt,i,Ti; her bölüm zamanı 0 ile başlar, gerekmeyince i düşürülür.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p57-i2
+  page: 57
+  pdf_page: 79
+  kind: tanım
+  what: Terminali kendisine dönen sıfır ödüllü soğurucu durumla temsil
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p57-i3
+  page: 57
+  pdf_page: 79
+  kind: şekil
+  what: 'Numarasız soğurucu şema: açık S0→S1→S2 daireleri, dolu terminal kare; +1,+1,+1 ardından karede öz
+    döngü, R4=R5=…=0, T=3.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p57-i4
+  page: 57
+  pdf_page: 79
+  kind: bilgi
+  what: Sonsuz sıfır kuyruğu indirimli veya indirimsiz sonlu toplamı değiştirmez
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p57-i5
+  page: 57
+  pdf_page: 79
+  kind: formül
+  what: 3.11 ortakgetiriΣk=t+1..T γ^(k−t−1)Rk; T∞veyaγ1 ama temelmodeldeikisi birlikte değil
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p57-i6
+  page: 57
+  pdf_page: 79
+  kind: bilgi
+  what: Devam eden indirimsiz ortalama ödül formülasyonuBölüm10
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
+- id: ch3-p58-i1
+  page: 58
+  pdf_page: 80
+  kind: tanım
+  what: Değer gelecekteki beklenen getiriyle iyiliktir ve izlenen politikaya bağlıdır
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p58-i2
+  page: 58
+  pdf_page: 80
+  kind: tanım
+  what: Stokastik politikaπ(a|s) sıradan fonksiyon,durum başına dağılım; deneyimle değişir
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p58-i3
+  page: 58
+  pdf_page: 80
+  kind: formül
+  what: 3.12 vπ(s) koşullu beklenen getiri ve sonsuz indirimli toplam açılımı
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p58-i4
+  page: 58
+  pdf_page: 80
+  kind: formül
+  what: 3.13 qπ(s,a) ilk eylem sabit sonraπ; terminal değer0
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p58-i5
+  page: 58
+  pdf_page: 80
+  kind: bilgi
+  what: Monte Carlo, belirli sabit π izlenirken gerçek getirileri durum/eylem bazında ortalar; yeterli ziyaret
+    ve koşullarla yakınsar. Yöntemler Bölüm 5.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+  pages:
+  - 58
+  - 59
+  pdf_pages:
+  - 80
+  - 81
+- id: ch3-p58-i6
+  page: 58
+  pdf_page: 80
+  kind: alıştırma
+  source_number: '3.11'
+  what: Şimdiki durum Sₜ olsun ve eylemler stokastik π ile seçilsin. E[Rₜ₊₁|Sₜ] beklentisini π ve dört argümanlı
+    p (3.2) ile yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p17
+- id: ch3-p58-i7
+  page: 58
+  pdf_page: 80
+  kind: alıştırma
+  source_number: '3.12'
+  what: vπ değerini qπ ve π cinsinden veren bir eşitlik yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p18
+- id: ch3-p58-i8
+  page: 58
+  pdf_page: 80
+  kind: alıştırma
+  source_number: '3.13'
+  what: qπ değerini vπ ve dört argümanlı p cinsinden yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p19
+- id: ch3-p59-i1
+  page: 59
+  pdf_page: 81
+  kind: bilgi
+  what: Çokdurumda ayrı ortalama yerine daha az parametreli yaklaşım; doğruluk sınıfa bağlı,KısımII
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p59-i2
+  page: 59
+  pdf_page: 81
+  kind: türetim
+  what: 3.14 getiriözyinelemesi,toplamolasılık,Markov yeterliliğiyleV Bellman beklenti denklemi
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p59-i3
+  page: 59
+  pdf_page: 81
+  kind: bilgi
+  what: π(a|s)p(s′,r|s,a) üçlü olasılık ağırlıkları,Σs′,r birleşiktoplam ve uygunS/S+
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p59-i4
+  page: 59
+  pdf_page: 81
+  kind: bilgi
+  what: Sabit politika Bellman çözümü koşullu tektir; γ1 için sonlanma/sonlugetiri koşulu
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p59-i5
+  page: 59
+  pdf_page: 81
+  kind: şekil
+  what: 'Numarasız vπ backup: açık durumdan üç dolu eyleme π; her eylemden iki açık ardıla p/r dalları.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p60-i1
+  page: 60
+  pdf_page: 82
+  kind: tanım
+  what: Backup ardıl değerleri köke taşır; aynı durum birden çok düğümde ve kendisinin ardılı olarak görünebilir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+- id: ch3-p60-i2
+  page: 60
+  pdf_page: 82
+  kind: örnek
+  what: 'Örnek 3.5: deterministik 5×5, dört yön; sınırda kalma −1, normal geçiş 0; A→A′ +10, B→B′ +5.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-izgara
+- id: ch3-p60-i3
+  page: 60
+  pdf_page: 82
+  kind: şekil
+  what: 'Şekil 3.2: özel geçişli ızgara, dört yön, π=1/4 ve γ=0.9 ile doğrusal çözümün bütün 25 yuvarlanmış
+    değeri.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#lab:l4
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+  source_number: '3.2'
+- id: ch3-p60-i4
+  page: 60
+  pdf_page: 82
+  kind: bilgi
+  what: Alt kenar değerleri negatif; A<10 çünkü A′ devamı negatif, B>5 çünkü B′ devamı pozitif.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-izgara
+- id: ch3-p60-i5
+  page: 60
+  pdf_page: 82
+  kind: alıştırma
+  source_number: '3.14'
+  what: Şekil 3.2 rastgele politika ızgarasının orta değeri +0.7; komşu değerleri +2.3,+0.4,−0.4,+0.7 (bir
+    ondalık). γ=0.9 ve her eylem 1/4. Bellman (3.14) eşitliğini sayısal göster. Sayısal alana yuvarlanmış komşularla
+    bulunan değeri gir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p20
+- id: ch3-p60-i6
+  page: 60
+  pdf_page: 82
+  kind: alıştırma
+  source_number: '3.15'
+  what: Ödül işaretleri mi farkları mı önemlidir? Denklem 3.8 ile herhangi bir π altında her ödüle c eklemenin
+    bütün V değerlerine aynı vc sabitini eklediğini kanıtla; göreli değerlerin değişmediğini göster ve vc(c,γ)
+    bul.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p21
+  pages:
+  - 60
+  - 61
+  pdf_pages:
+  - 82
+  - 83
+  note: Soru s.60 sonunda başlayıp s.61 başında tamamlanır.
+- id: ch3-p61-i1
+  page: 61
+  pdf_page: 83
+  kind: örnek
+  what: 'Örnek 3.6: golfte durum topun yeri, eylem sopa; nişan/salınım öğrenilmez, vuruş −1 ve delik 0.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-golf
+- id: ch3-p61-i2
+  page: 61
+  pdf_page: 83
+  kind: bilgi
+  what: Putter kesin ve kısa menzilli; green −1, dış halkalar −2…−6, tee altı vuruş, kum −∞.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-golf
+- id: ch3-p61-i3
+  page: 61
+  pdf_page: 83
+  kind: şekil
+  what: 'Şekil 3.3: üst v_putt ve alt q*_driver; delik, green, tee, iki kum, küçük driver −1 ve −2/−3 bölgeleri.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-golf
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+  source_number: '3.3'
+- id: ch3-p61-i4
+  page: 61
+  pdf_page: 83
+  kind: şekil
+  what: 'Numarasız qπ backup: dolu kök; ortam p/r ile iki açık ardıl duruma, her ardıldan π ile üç eyleme dallanır.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p61-i5
+  page: 61
+  pdf_page: 83
+  kind: alıştırma
+  source_number: '3.16'
+  what: Labirent gibi bölümlü görevde bütün ödüllere c eklenirse önceki sorudaki gibi görev değişmeden kalır
+    mı? Neden? Bir örnek ver.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p22
+- id: ch3-p61-i6
+  page: 61
+  pdf_page: 83
+  kind: alıştırma
+  source_number: '3.17'
+  what: qπ(s,a) değerini olası sonraki durum–eylem çiftlerinin qπ(s′,a′) değerleriyle veren Bellman denklemini
+    yaz. Denklem 3.14 türetimine benzer biçimde, sağdaki Q geri taşıma şemasını kullanarak adım dizisini göster.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p23
+- id: ch3-p62-i1
+  page: 62
+  pdf_page: 84
+  kind: şekil
+  what: 'Alıştırma 3.18 tek katmanlı V: açık s kökünden üç dolu a1,a2,a3 yaprağı; π olasılıkları ve qπ değerleri.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p62-i2
+  page: 62
+  pdf_page: 84
+  kind: şekil
+  what: 'Alıştırma 3.19 tek katmanlı Q şeması: dolu s,a kökünden üç açık s′ yaprağına, koşullu beklenen r1,r2,r3
+    ödülleri; kaynakta p etiketi yoktur.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p62-i3
+  page: 62
+  pdf_page: 84
+  kind: tanım
+  what: Politikalar bütün durumlardaki V üstünlüğüyle kısmi sıralanır; bazı çiftler karşılaştırılamaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p62-i4
+  page: 62
+  pdf_page: 84
+  kind: bilgi
+  what: Uygun sonlu MDP koşullarında her durumda en iyi politika vardır; birden çok π* aynı değerleri paylaşır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p62-i5
+  page: 62
+  pdf_page: 84
+  kind: formül
+  what: 'Denklem 3.15: v*(s)=max_π vπ(s).'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p62-i6
+  page: 62
+  pdf_page: 84
+  kind: alıştırma
+  source_number: '3.18'
+  what: St=s verildiğinde vπ(s) ile qπ(s,a) yaprakları ilişkisini önce π izlemeye koşullanan beklenti, sonra
+    açık π toplamıyla yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p24
+- id: ch3-p62-i7
+  page: 62
+  pdf_page: 84
+  kind: alıştırma
+  source_number: '3.19'
+  what: Sₜ=s,Aₜ=a verildiğinde qπ(s,a) değerini bir sonraki ödül Rₜ₊₁ ve sonraki durum değeri vπ(Sₜ₊₁) ile
+    yaz. Önce π izlenmesine ayrıca koşullanmayan beklenti, sonra beklenti sembolsüz p toplamı ver.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p25
+- id: ch3-p63-i1
+  page: 63
+  pdf_page: 85
+  kind: formül
+  what: 'Denklem 3.16: q*(s,a)=max_π qπ(s,a).'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p63-i2
+  page: 63
+  pdf_page: 85
+  kind: formül
+  what: 'Denklem 3.17: ilk eylem sabit, sonra en iyi devam; q*=E[R+γv*].'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p63-i3
+  page: 63
+  pdf_page: 85
+  kind: örnek
+  what: 'Örnek 3.7: driver uzun menzil ve değişken iniş; küçük −1 bölgesi, green’e yeten −2, tee iki drive+putt
+    ile −3.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-golf
+- id: ch3-p63-i4
+  page: 63
+  pdf_page: 85
+  kind: bilgi
+  what: Driver −2 bölgesinden inişin driver −1 bölgesine olması gerekmez; sonraki sopa putter olabilir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-golf
+- id: ch3-p63-i5
+  page: 63
+  pdf_page: 85
+  kind: bilgi
+  what: q*_putter hep-putter V değildir; yalnız ilk putt zorunlu, sonra sopa seçimi serbesttir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-golf
+- id: ch3-p63-i6
+  page: 63
+  pdf_page: 85
+  kind: türetim
+  what: 'Denklem 3.18: v*=max_a q*, bir adım ödül ve en iyi devam beklentisinden türetilir.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p63-i7
+  page: 63
+  pdf_page: 85
+  kind: formül
+  what: 'Denklem 3.19: V Bellman en iyiliğinde ajan seçimi max, ortam sonucu beklentidir.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p63-i8
+  page: 63
+  pdf_page: 85
+  kind: formül
+  what: 'Denklem 3.20: Q Bellman en iyiliğinde ortam geçişinden sonra duruma göre a′ maksimumu.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p64-i1
+  page: 64
+  pdf_page: 86
+  kind: şekil
+  what: 'Şekil 3.4: v* için üç eylem × iki ardıl, q* için iki ardıl × iki eylem; yalnız ajan seçiminde max
+    yayı, ortamda p/r beklentisi.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+  source_number: '3.4'
+- id: ch3-p64-i2
+  page: 64
+  pdf_page: 86
+  kind: bilgi
+  what: n durum için n bilinmeyenli doğrusal olmayan Bellman sistemi; bilinen modelle çözüm ve γ<1 için teklik.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p64-i3
+  page: 64
+  pdf_page: 86
+  kind: bilgi
+  what: v* ile r+γv* beklentisini en çoklayan eylemlerden herhangi biri veya karışımı uzun vadede en iyidir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p64-i4
+  page: 64
+  pdf_page: 86
+  kind: bilgi
+  what: 'Bilgisayar bilimindeki miyop açgözlülük uyarısı: gerçek v* zaten bütün geleceği içerdiğinden burada
+    bir adım yeter.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch3-p64-i5
+  page: 64
+  pdf_page: 86
+  kind: bilgi
+  what: q* gelecek bakışını önceden saklar; daha çok bellekle, eylem seçerken modele bakma ihtiyacını kaldırır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+  pages:
+  - 64
+  - 65
+  pdf_pages:
+  - 86
+  - 87
+- id: ch3-p65-i1
+  page: 65
+  pdf_page: 87
+  kind: örnek
+  what: 'Örnek 3.8: aynı 5×5 ızgaranın en iyi değerleri ve A/B istisna dinamiği.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-izgara
+- id: ch3-p65-i2
+  page: 65
+  pdf_page: 87
+  kind: şekil
+  what: 'Şekil 3.5: ızgara, bütün 25 V* değeri ve her hücrede tüm eşit en iyi politika okları, γ=0.9.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#lab:l4
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+  source_number: '3.5'
+- id: ch3-p65-i3
+  page: 65
+  pdf_page: 87
+  kind: türetim
+  what: '3.9 yüksek pil: max{α[rs+γVh]+(1−α)[rs+γVl], rw+γVh}; arama ortak rs ile sadeleşir.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot-optimal
+- id: ch3-p65-i4
+  page: 65
+  pdf_page: 87
+  kind: türetim
+  what: 'Örnek 3.9 düşük pil: aramada βrs−3(1−β)+γ[(1−β)Vh+βVl], beklemede rw+γVl, şarjda γVh.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot-optimal
+- id: ch3-p65-i5
+  page: 65
+  pdf_page: 87
+  kind: bilgi
+  what: Geçerli α,β ve 0≤γ<1 için robot Bellman denklemlerinin tek Vh,Vl çifti vardır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot-optimal
+- id: ch3-p66-i1
+  page: 66
+  pdf_page: 88
+  kind: bilgi
+  what: Açık Bellman çözümü doğru model, yeterli hesap kaynağı ve Markov özelliği ister.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p66-i2
+  page: 66
+  pdf_page: 88
+  kind: örnek
+  what: Tavlada yaklaşık 10^20 durum; binlerce yıl ifadesi 2018 tarihli ölçektir. Modeli bilmek hesap engelini
+    çözmez.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p66-i3
+  page: 66
+  pdf_page: 88
+  kind: bilgi
+  what: Sezgisel arama derinlik boyunca ağaç açıp yaprak V değerini yaklaştırır; A* çoğunlukla bölümlü görev
+    içindir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p66-i4
+  page: 66
+  pdf_page: 88
+  kind: bilgi
+  what: Dinamik programlama ve gerçek geçiş örnekleriyle RL, Bellman en iyiliğine yaklaşmanın ilişkili yollarıdır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p66-i5
+  page: 66
+  pdf_page: 88
+  kind: şekil
+  what: 'Alıştırma 3.22 numarasız üç durumlu MDP: sol çevrim +1/0, sağ çevrim 0/+2; yalnız üstte seçim.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot-optimal
+  figure: türetildi
+  note: Kaynak sayfası görüntü olarak incelendi. Özgün grafik/modelden SVG; 3.2 ve 3.5 l4 kaynak ön ayarları.
+- id: ch3-p66-i6
+  page: 66
+  pdf_page: 88
+  kind: alıştırma
+  source_number: '3.20'
+  what: Golf örneği için en iyi durum-değer fonksiyonunu çiz veya sözle tarif et.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p26
+- id: ch3-p66-i7
+  page: 66
+  pdf_page: 88
+  kind: alıştırma
+  source_number: '3.21'
+  what: Golf için q*(s,putter) en iyi eylem-değer konturlarını çiz veya tarif et.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p27
+- id: ch3-p66-i8
+  page: 66
+  pdf_page: 88
+  kind: alıştırma
+  source_number: '3.22'
+  what: Şekildeki devam eden üç durumlu MDP içinde tek karar üst durumdadır. Sol eylem +1 ile sol alt duruma,
+    oradan zorunlu 0 ile üste döner; sağ eylem 0 ile sağ alta, oradan zorunlu +2 ile üste döner. İki deterministik
+    politika π_sol ve π_sağ var. γ=0, γ=0.9 ve γ=0.5 için hangi politika en iyidir?
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p28
+- id: ch3-p66-i9
+  page: 66
+  pdf_page: 88
+  kind: alıştırma
+  source_number: '3.23'
+  what: Geri dönüşüm robotunun q* Bellman en iyilik denklemini yaz; iki yüksek-pil ve üç düşük-pil eylemini
+    açık göster.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p29
+- id: ch3-p66-i10
+  page: 66
+  pdf_page: 88
+  kind: alıştırma
+  source_number: '3.24'
+  what: Şekil 3.5 en iyi ızgara durumunun değerini bir ondalıkla 24.4 verir. En iyi politikayı ve Denklem 3.8
+    bilgisini kullanarak sembolik değerini yaz, sonra üç ondalığa hesapla. γ=0.9. Sayısal alana üç ondalıklı
+    sonucu gir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p30
+- id: ch3-p66-i11
+  page: 66
+  pdf_page: 88
+  kind: alıştırma
+  source_number: '3.25'
+  what: v* değerini q* cinsinden veren bir eşitlik yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p31
+- id: ch3-p66-i12
+  page: 66
+  pdf_page: 88
+  kind: alıştırma
+  source_number: '3.26'
+  what: q* değerini v* ve dört argümanlı p cinsinden yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p32
+- id: ch3-p67-i1
+  page: 67
+  pdf_page: 89
+  kind: bilgi
+  what: En iyilik teoriyi düzenleyen idealdir; pratik davranış çoğunlukla ona yaklaşık ulaşır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p67-i2
+  page: 67
+  pdf_page: 89
+  kind: bilgi
+  what: Satranç gibi bir oyun için bile büyük özel bilgisayarlarla tam en iyi hamleleri hesaplamak güçtür.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p67-i3
+  page: 67
+  pdf_page: 89
+  kind: bilgi
+  what: Karar başına hesap gücü ve bellek; değer, politika ve model yaklaşımlarını kısıtlar.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p67-i4
+  page: 67
+  pdf_page: 89
+  kind: tanım
+  what: Küçük sonlu uzayda durum/eylem başına bir girdi tabular yöntemdir; büyük uzay kompakt parametreli temsil
+    ister.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p67-i5
+  page: 67
+  pdf_page: 89
+  kind: bilgi
+  what: Seyrek ziyaret edilen durumlardaki hatalar elde edilen toplam ödülü az etkileyebilir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p67-i6
+  page: 67
+  pdf_page: 89
+  kind: örnek
+  what: TD-Gammon uzman oyunlarında az görülen birçok durumda kötü seçim yapabilse de güçlü oynar.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p67-i7
+  page: 67
+  pdf_page: 89
+  kind: bilgi
+  what: Çevrimiçi RL sık ziyaret edilen durumlara daha çok çaba ayırabilir; her durumda en iyilik tanımı yine
+    ayrıdır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p67-i8
+  page: 67
+  pdf_page: 89
+  kind: alıştırma
+  source_number: '3.27'
+  what: π* politikasını q* cinsinden veren bir eşitlik yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p33
+- id: ch3-p67-i9
+  page: 67
+  pdf_page: 89
+  kind: alıştırma
+  source_number: '3.28'
+  what: π* politikasını v* ve dört argümanlı p cinsinden yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p34
+- id: ch3-p67-i10
+  page: 67
+  pdf_page: 89
+  kind: alıştırma
+  source_number: '3.29'
+  what: vπ,v*,qπ,q* için dört Bellman denklemini, üç argümanlı p(s′|s,a) (3.4) ve iki argümanlı r(s,a) (3.5)
+    ile yeniden yaz.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/module.yaml#practice:p35
+- id: ch3-p68-i1
+  page: 68
+  pdf_page: 90
+  kind: bilgi
+  what: 'Bölüm özeti: ajan/ortam, eylem–durum–ödül, MDP dinamiği, politika, getiri, V/Q ve en iyilik bağları.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p68-i2
+  page: 68
+  pdf_page: 90
+  kind: tanım
+  what: Tam bilgide dört argümanlı p doğru ve eksiksiz bilinir; eksik bilgide tam ve doğru ortam modeli yoktur.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p69-i1
+  page: 69
+  pdf_page: 91
+  kind: bilgi
+  what: 'Özet devamı: deneyimden değer/politika/model yaklaşımı, büyük durum uzayı ve tablo sınırı.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
+- id: ch3-p69-i2
+  page: 69
+  pdf_page: 91
+  kind: kaynakça
+  what: En iyi kontrol ve psikoloji kökleri; RL yaklaşım/eksik bilgi, AI planlamada daha genel amaç ve belirsizlik.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p69-i3
+  page: 69
+  pdf_page: 91
+  kind: kaynakça
+  what: 'MDP kuramı: Bertsekas (2005), White (1969), Whittle (1982,1983), Puterman (1994); Ross (1983) özellikle
+    sonlu durumun kısa sunumu.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p69-i4
+  page: 69
+  pdf_page: 91
+  kind: kaynakça
+  what: 'Uyarlamalı stokastik kontrol: Kumar (1985), Kumar–Varaiya (1986).'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p69-i5
+  page: 69
+  pdf_page: 91
+  kind: kaynakça
+  what: Çok aşamalı/ardışık örnekleme kökleri Thompson (1933,1934), Robbins (1952); çok durumlu bandit prototip
+    MDP.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p69-i6
+  page: 69
+  pdf_page: 91
+  kind: kaynakça
+  what: Yazarların bildiği ilk RL–MDP tartışması Andreae (1969b); Witten–Corbin (1973) deneylerini Witten (1977,1976a)
+    sonradan MDP ile analiz eder.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p69-i7
+  page: 69
+  pdf_page: 91
+  kind: kaynakça
+  what: Werbos (1977) MDP adını açık kullanmadan yaklaşık stokastik kontrol önerir; 1982,1987,1988,1989,1992
+    devamı ve geç tanınan önemi.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p69-i8
+  page: 69
+  pdf_page: 91
+  kind: kaynakça
+  what: Watkins (1989), en etkili RL–MDP bütünleştirmesi olarak anılır.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i1
+  page: 70
+  pdf_page: 92
+  kind: kaynakça
+  what: Ortak p ile standart P/ortalama r gösterimi farkı; örnek ödül ihtiyacı ve St/Rt ortak indeksinin pedagojisi.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i2
+  page: 70
+  pdf_page: 92
+  kind: kaynakça
+  what: 'Sistem kuramındaki durum kavramının sezgisi: Minsky (1967).'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i3
+  page: 70
+  pdf_page: 92
+  kind: kaynakça
+  what: Biyoreaktör Ungar (1990), Miller–Williams (1992); robot Connell (1989); robotik derlemesi Kober–Peters
+    (2012).
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i4
+  page: 70
+  pdf_page: 92
+  kind: kaynakça
+  what: 'Ödül hipotezi: Michael Littman ile kişisel iletişim.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i5
+  page: 70
+  pdf_page: 92
+  kind: tanım
+  what: Bölümlü≈belirsiz ufuk, devam eden≈sonsuz ufuk. Sabit/sonunda biten/bitmeyen ufuklar; etkileşim doğası
+    ile amaç fonksiyonu ayrımı zorunlu eşleşmez.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i6
+  page: 70
+  pdf_page: 92
+  kind: kaynakça
+  what: 'Çubuk dengesi: Michie–Chambers (1968), Barto–Sutton–Anderson (1983).'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i7
+  page: 70
+  pdf_page: 92
+  kind: kaynakça
+  what: 'Uzun vadeli değerin kökleri, 1950’ler kontrol ve 19. yüzyıl mekaniği: Schultz–Melsa (1967); Shannon
+    (1950) satranç değerlendirmesi.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p70-i8
+  page: 70
+  pdf_page: 92
+  kind: kaynakça
+  what: Watkins (1989) Q-learning ile eylem değerini yaygınlaştırınca Q-functions adı yerleşir (Bölüm 6); Shannon
+    (1950) h(P,M) ile araştırılmaya değer hamleyi değerlendirir.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+  pages:
+  - 70
+  - 71
+  pdf_pages:
+  - 92
+  - 93
+- id: ch3-p71-i1
+  page: 71
+  pdf_page: 93
+  kind: kaynakça
+  what: 'Eylem değeri kökleri: Michie (1961,1963) MENACE, Michie–Chambers (1968) BOXES.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p71-i2
+  page: 71
+  pdf_page: 93
+  kind: kaynakça
+  what: 'Hamilton asal fonksiyonu ve açgözlü Newton dinamiği: Goldstein (1957); Denardo (1967) büzülmeli dinamik
+    programlama.'
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p71-i3
+  page: 71
+  pdf_page: 93
+  kind: kaynakça
+  what: Bellman (1957a) temel fonksiyonel denklem; sürekli zaman ve durum için HJB/HJ karşılığı, Schultz–Melsa
+    (1967).
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch3-p71-i4
+  page: 71
+  pdf_page: 93
+  kind: kaynakça
+  what: Golf örneği Chris Watkins tarafından önerildi.
+  status: eklendi
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 chapter_counts:
   '1':
     items: 159
@@ -7403,6 +8845,14 @@ chapter_counts:
     figures: 6
     exercises: 11
     code: 1
+  '3':
+    items: 179
+    figures: 13
+    numbered_figures: 5
+    unnumbered_figures: 8
+    tables: 1
+    exercises: 29
+    code: 0
 part_dividers:
 - pdf_pages:
   - 45

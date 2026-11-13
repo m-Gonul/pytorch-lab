@@ -3,7 +3,7 @@ intro: |
 
   **Nasıl denetlendi:** 82 PDF'in metni çıkarıldı (toplam ≈ 31 700 satır); her slayt başlığı ilgili modülün tüm dosyalarında (anlatım, alıştırma, kontrol, kod) aranıp eşleşmeyenler elle incelendi. **Erişim sınırı:** slaytlardaki şekil ve ekran görüntüleri metin olarak okunamadı; yalnız başlık, metin ve formüllerin metne dökülebilen kısmı karşılaştırıldı. Görsel içerikli slaytlar (ör. görüntü örnekleri, mimari çizimleri) konu başlığı üzerinden eşlendi.
 
-  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–2 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60 ve 64) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
+  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–3 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87 ve 88) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
 
   **Durumlar:** *kapsandı* — kaynaktaki konu sitede en az aynı derinlikte; *kapsandı + genişletildi* — sitede kaynakta olmayan türetim, alıştırma ya da deney de var; *kısmen* — konu var ama kaynaktaki bir alt başlık bilinçli olarak yüzeysel; *bilinçli olarak farklı* — kaynaktaki araç yerine başka bir araç (ör. Keras yerine PyTorch). Yeni kaynak geldikçe tablo genişletilir; tamamlanmış satırlar geri alınmaz.
 groups:
@@ -259,9 +259,9 @@ groups:
         status: genis
         done: "M9.16: Haar benzeri öznitelikler (24×24 pencerede 160 000'den fazla), integral görüntü, AdaBoost ile öznitelik seçimi ve ağırlık güncellemesi, 38 katmanlı kaskat ve yanlış alarm oranının çarpımla düşmesi, çok ölçekli tarama, yaklaşık 15 kare/s; haarfeat ve adaboostlab deneyleri; üç slayt düzeltmesi (dört dikdörtgenli öznitelik, başlangıç ağırlıkları, aydınlatma dayanıklılığı)."
   - title: 'Sutton ve Barto — Reinforcement Learning: An Introduction, 2. baskı (2018)'
-    note: 'Yüklenen PDF 548 sayfa. Envanterde 140 numaralı alıştırma, 104 numaralı şekil, 38 kutulu sözde-kod listesi
-      var. Sayılar numarasız çizim, tablo ve metin içi algoritmaların tamamlık sayımı değildir. Bölüm 1–2 işlendi;
-      kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
+    note: 'Yüklenen PDF 548 sayfa. Envanterde 140 numaralı alıştırma, 104 numaralı şekil, 38 kutulu sözde-kod
+      listesi var. Sayılar numarasız çizim, tablo ve metin içi algoritmaların tamamlık sayımı değildir. Bölüm
+      1–2 işlendi; kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
     rows:
     - src: Sutton ve Barto (2018), Bölüm 1 — Giriş (s. 1–22)
       topics: 5 numaralı alıştırma; 1 numaralı şekil. Numarasız XOX tahtası da işlendi.
@@ -269,25 +269,29 @@ groups:
       - m5-5-rl
       status: genis
       gap: —
-      done: '159 birim; 5/5 alıştırma ve çözüm; 2 hesaplanmış SVG; explorevalue deneyi; kaynak §9.6 → §9.7 atıf düzeltmesi.
-        Bağımsız ikinci okuma s. 1–22. Birim defteri: content/coverage/sutton.yaml.'
+      done: '159 birim; 5/5 alıştırma ve çözüm; 2 hesaplanmış SVG; explorevalue deneyi; kaynak §9.6 → §9.7 atıf
+        düzeltmesi. Bağımsız ikinci okuma s. 1–22. Birim defteri: content/coverage/sutton.yaml.'
     - src: Sutton ve Barto (2018), Bölüm 2 — Çok kollu banditler (s. 25–45)
-      topics: 11 numaralı alıştırma, 6 şekil, 1 sözde-kod kutusu; örnek ortalaması, izleme, iyimserlik, UCB, gradyan,
-        bağlam ve parametre taraması.
+      topics: 11 numaralı alıştırma, 6 şekil, 1 sözde-kod kutusu; örnek ortalaması, izleme, iyimserlik, UCB,
+        gradyan, bağlam ve parametre taraması.
       pages:
       - m11-7-bandits
       status: genis
       gap: —
       done: 106 birim; 11/11 sorunun alt koşulları ve çözümleri; 1 SVG + 5 kaynak grafik senaryosu (l4); x2 genişletildi,
-        x4 eklendi. 2000×10000 ve 8×200000 adımlık kaynak deneyleri çalıştırıldı. Güncel ödül içeren tabanın (1−1/t)
-        gradyan katsayısı düzeltildi. Bağımsız ikinci okuma s.25–45. Bütün kitabın defteri henüz tamamlanmadı.
-    - src: Sutton ve Barto (2018), Bölüm 3 — Sonlu Markov karar süreçleri (s. 47–72)
-      topics: 29 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
+        x4 eklendi. 2000×10000 ve 8×200000 adımlık kaynak deneyleri çalıştırıldı. Güncel ödül içeren tabanın
+        (1−1/t) gradyan katsayısı düzeltildi. Bağımsız ikinci okuma s.25–45. Bütün kitabın defteri henüz tamamlanmadı.
+    - src: Sutton ve Barto (2018), Bölüm 3 — Sonlu Markov karar süreçleri (s. 47–71; s.72 boş)
+      topics: 29 alıştırma; 5 numaralı ve 8 numarasız görsel; 10 satırlı tablo. Ortak model, ödül/getiri, stokastik
+        politika, V/Q, Bellman beklenti ve en iyilik, golf, ızgara, robot, tarih.
       pages:
       - m11-2-mdp-vi
-      status: eksik
-      gap: Kaynağın bu bölümü henüz aktarılmadı; hedefler yalnız konu eşlemesi adaylarıdır.
-      done: Sayfa ve numaralı öğe envanteri çıkarıldı. İçerik kapsamı tamamlanmış sayılmadı.
+      status: genis
+      gap: —
+      done: 179 birim; 29/29 çözümlü kart p7–p35; 6 yeni SVG grubu ve suttongrid/l4, recyclingmdp/l5 ile 13 kaynak
+        görseli. Kaynak 3.2/3.5 için 25 hücre ve tüm optimal oklar hesaplandı. 3.4 ortak dağılım belirsizliği
+        ek varsayımla ayrıldı; γ=1 teklik koşulu açıklandı. Bağımsız ikinci okuma s.47–71 ve 12 görüntü. Bütün
+        kitap tamamlanmadı.
     - src: Sutton ve Barto (2018), Bölüm 4 — Dinamik programlama (s. 73–90)
       topics: 10 numaralı alıştırma; 3 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
       pages:

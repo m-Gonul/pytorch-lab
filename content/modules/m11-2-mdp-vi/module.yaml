@@ -162,6 +162,104 @@ labs:
       - q: "Açgözlü politika neden değerler henüz uzaktayken en iyi politikaya oturuyor?"
         a: "Politika yalnız eylemlerin Q değerlerinin sırasına bağlıdır. Değer hatası her durumda aynı yönde ve yaklaşık aynı büyüklükte (V₀ = 0'dan gelen sabit kayma) olduğunda eylemlerin sırası değişmez. Sınır 2γε/(1 − γ) en kötü durumu verir; sonlu MDP'de en iyi ile en iyi olmayan eylemler arasında pozitif bir boşluk vardır ve değer hatası bu boşluğun yarısının altına inince politika tam olarak en iyidir."
     limits: "Ödüller [−1, 1] düzgün; V* politika yinelemesiyle kesin hesaplanıyor; politika değeri her yinelemede doğrusal sistemle çözülüyor. Yapılar örnek: yoğun (üstel ağırlıklar), seyrek (her eylem iki ardıl), halka (±1 adım, 0.1 yerinde kalma)."
+  - id: l4
+    lab: suttongrid
+    title: 'Sutton ızgarası: rastgele V, en iyi V ve bütün en iyi oklar'
+    goal: Kaynak Şekil 3.2 ve 3.5 içindeki aynı 5×5 modeli hesapla. A/B sıçramaları, sınır cezası ve dört eylem
+      korunur. Rastgele politika doğrusal çözülür, en iyi değer büzülmeli yinelemeyle bulunur.
+    predict:
+      q: A durumunda kaç eylem en iyidir?
+      options:
+      - t: Dördü de
+        ok: true
+        why: Dördü de +10 ile A′ konumuna götürür.
+      - t: Yalnız aşağı
+        why: A özel durumdur; normal yön kuralı uygulanmaz.
+      - t: Hiçbiri
+        why: A terminal değildir.
+    presets:
+    - name: Şekil 3.2
+      params:
+        g: 0.9
+        optimal: 0
+        shift: 0
+      note: 'Kaynak s.60: eşit olasılıklı rastgele politika, γ=0.9; bir ondalık değerler aynı modelden hesaplanır.'
+    - name: Şekil 3.5
+      params:
+        g: 0.9
+        optimal: 1
+        shift: 0
+      note: 'Kaynak s.65: en iyi değerler ve her hücrede bütün eşit en iyi eylemler.'
+    - name: Her ödüle +1
+      params:
+        g: 0.9
+        optimal: 0
+        shift: 1
+      note: 'Alıştırma 3.15: kaynak rastgele V tablosunun bütün değerlerine 1/(1−0.9)=10 eklenir.'
+    - name: Yalnız hemen gelen
+      params:
+        g: 0
+        optimal: 1
+        shift: 0
+      note: A değeri 10, B değeri 5; normal hücrelerde anlık ödül belirleyicidir.
+    questions:
+    - q: A neden 10 değerinden küçük, B neden 5 değerinden büyük?
+      a: Rastgele politikada A′ devamı negatif, B′ devamı pozitiftir; özel hücrenin değeri yalnız ilk ödülü değildir.
+    - q: Bir ondalıkla verilen komşular Bellman eşitliğini tam sağlamalı mı?
+      a: Yuvarlamadan ötürü küçük fark olabilir. Lab tam değerlerle çözer, görünümde bir ondalığa yuvarlar.
+    limits: Kaynağın deterministik sonlu ızgarası. γ en çok 0.99; bütün kaydırılmış ödüller sınırlı. Rastgele
+      politika 25×25 doğrusal sistemle, en iyi değer tolerans 10⁻¹² ve en çok 5000 yinelemeyle çözülür. Golf
+      veya l1 hedef/çukur ortamı değildir.
+  - id: l5
+    lab: recyclingmdp
+    title: 'Geri dönüşüm robotu: iki V ve beş Q'
+    goal: İki durumlu robotta altı deterministik politikayı ayrı değerlendir. Kurtarma riski, kutu ödülü ve indirim
+      değişince en iyi seçimin nasıl değiştiğini hesapla.
+    predict:
+      q: Düşük pilde aramanın beklenen anlık ödülü hangisidir?
+      options:
+      - t: β·rₛ − 3(1−β)
+        ok: true
+        why: Arama tamamlanırsa rₛ, pil biterse kutu yok ve kurtarma −3.
+      - t: rₛ − 3
+        why: İki olayı olasılıklarıyla ağırlıklandırmalıyız.
+      - t: β·rₛ
+        why: Kurtarma cezası atlanmış.
+    presets:
+    - name: Özgün sayısal örnek
+      params:
+        a: 0.8
+        b: 0.5
+        rs: 1
+        rw: 0.2
+        g: 0.9
+      note: Kaynak parametreleri semboliktir. Bu seçilmiş örnekte Vh=8.474576, Vl=7.627119; yüksek pilde ara,
+        düşükte şarj.
+    - name: Kurtarma riski yok
+      params:
+        a: 0.8
+        b: 1
+        rs: 1
+        rw: 0.2
+        g: 0.9
+      note: 'β=1: düşük pilde arama biten pil cezası üretmez.'
+    - name: Yalnız bir adım
+      params:
+        a: 0.8
+        b: 0.5
+        rs: 1
+        rw: 0.2
+        g: 0
+      note: 'Anlık değerler: yüksek arama 1; düşük arama −1, bekleme 0.2, şarj 0. Şarjın gelecekteki yararı γ=0
+        ile kaybolur.'
+    questions:
+    - q: Neden yüksek pilde şarj çubuğu yok?
+      a: Kaynak model A(h) içine bu eylemi koymaz; toplam beş durum–eylem çifti vardır.
+    - q: Kutuların tüm ödül dağılımını bilmeden bu hesap yapılabilir mi?
+      a: Beklenen indirimli toplam için P ve beklenen ödüller yeterlidir. Ortak dağılımı tekil belirlemek içinse
+        ek bilgi gerekir.
+    limits: İki pil düzeyi, kurtarma ödülü −3 ve şarj 0. rₛ>r𝓌 kaynak varsayımıdır; ihlal seçilirse uyarı gösterilir.
+      γ<1 ve geçerli olasılıklar. Model bilinir; örneklerle politika öğrenme deneyi değildir.
 
 practice:
   - id: p1
@@ -264,6 +362,717 @@ practice:
       - "$V^{\\pi_n}=H_{\\pi_n}V^{\\pi_n}$ ve $V_n=H^*V_{n-1}$ yazıp farkı iki parçaya bölün."
     solution: |-
       $\|V^{\pi_n}-V_n\|\le\|H_{\pi_n}V^{\pi_n}-H_{\pi_n}V_n\|+\|H^*V_n-H^*V_{n-1}\|\le\gamma\|V^{\pi_n}-V_n\|+\gamma\epsilon$, dolayısıyla $\|V^{\pi_n}-V_n\|\le\gamma\epsilon/(1-\gamma)$. Ayrıca $\|V^*-V_n\|\le\sum_{k\ge1}\gamma^k\epsilon=\gamma\epsilon/(1-\gamma)$. Toplam: $2\gamma\epsilon/(1-\gamma)$. Kaynaktaki $2\epsilon/(1-\gamma)$ geçerli ama $1/\gamma$ kat gevşek.
+  - id: p7
+    type: uyarla
+    level: 2
+    title: 'Sutton 3.1: üç farklı görev kur'
+    goal: üç farklı görev kur
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Kendi seçtiğin üç olabildiğince farklı görevi MDP çerçevesinde kur; her birinin durumlarını, eylemlerini
+      ve ödüllerini tanımla. En az bir örnekte çerçevenin sınırlarını zorla.
+
+      (Kaynak: Sutton ve Barto, s.51, Alıştırma 3.1.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Örnek çözüm: (1) Soğutma denetimi: durum oda sıcaklığı, dış sıcaklık, cihaz modu; eylem güç düzeyi;
+      ödül −enerji −konfor sapması. (2) Öğrenme oturumu: durum zaman bütçesi ve konu başına yeterlik tahmini;
+      eylem konu/alıştırma seçimi; ödül oturum sonu bağımsız başarı testi eksi zaman maliyeti. Yeterlik tam gözlenmiyorsa
+      tek son cevabı durum yapmak Markov değildir; geçmiş özeti veya inanç durumu gerekir. (3) Bir ispat arayan
+      program: durum mevcut sembolik ifadeler, açık hedefler ve kalan hesap bütçesi; eylem çıkarım kuralı; ödül
+      doğrulanmış ispata +1, işlem maliyetine negatif. Bu örnek iç hesaplamayı eylem yaparak fiziksel motor örneklerinin
+      dışına çıkar. Sonlu tablo için her üçünün uzaylarını sonlu düzeylere ayır; bu ayrıştırmanın hangi bilgiyi
+      kaybettiğini açıkla. Başka üç tutarlı örnek de geçerlidir.'
+    rubric:
+    - Üç görev birbirinden belirgin farklıdır.
+    - Her biri için S/A/R açık tanımlıdır.
+    - En az biri soyut eylem, kısmi gözlem veya temsil sınırını tartışır.
+  - id: p8
+    type: karşı-örnek
+    level: 2
+    title: 'Sutton 3.2: her amaçlı görev sonlu MDP mi?'
+    goal: her amaçlı görev sonlu MDP mi?
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'MDP çerçevesi, amaç yönelimli bütün öğrenme görevlerini yararlı biçimde temsil etmeye yeter mi? Açık
+      istisnalar veya sınırlar öner.
+
+      (Kaynak: Sutton ve Barto, s.51, Alıştırma 3.2.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Sonlu, tam gözlenen, durağan MDP bütün görevlerin birebir modeli değildir. Kart oyununda gizli
+      kartlar varken son gözlem aynı olsa da rakibin gizli eli farklı gelecek dağılımları yaratır: gözlenen durum
+      Markov değildir. Sürekli konum veya sınırsız sembolik bellek sonlu küme varsayımını aşar; değişen rakip
+      durağanlığı bozabilir. Birden fazla hedefin kesin sözlüksel önceliği de tek sınırlı skaler ödüle doğrudan
+      sığmayabilir. Bazıları genişletilmiş durum, inanç dağılımı, zaman değişkeni veya yaklaşık ayrıklaştırmayla
+      MDP biçimine getirilebilir; maliyet, gözlenebilirlik ve hesaplanabilirlik kalır. Gizli fiziksel dünyanın
+      MDP olması, ajanın erişebildiği temsilin yararlı bir sonlu MDP olduğu anlamına gelmez. Bu yüzden koşulsuz
+      evet/hayır yerine hangi MDP sınıfını ve hangi yararlılık ölçüsünü kastettiğini belirt.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p9
+    type: yorumla
+    level: 2
+    title: 'Sutton 3.3: sürüşte sınırı nereye koymalı?'
+    goal: sürüşte sınırı nereye koymalı?
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Sürüşte eylem; gaz–direksiyon–fren konumu, lastik torkları, kas komutları veya gidilecek yer seçimi olabilir.
+      Ajan–ortam sınırı için doğru düzey hangisidir? Birini diğerine tercih etmenin ölçütleri ve temel bir zorunluluk
+      olup olmadığını tartış.
+
+      (Kaynak: Sutton ve Barto, s.51, Alıştırma 3.3.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: Tek fiziksel doğru sınır yoktur. Karar kuralının doğrudan seçtiği değişken ajan çıktısı, geri kalanı
+      ortamdır; beden sınırı zorunlu değildir. Kas komutu hızlı ve ayrıntılı durum/geri besleme ister, tork düzeyi
+      alt aktüatör denetimini ortamda bırakır, pedal düzeyi mevcut araç mekanizmasını kullanır, hedef seçimi
+      ise alt rota/sürüş denetleyicilerine dayanır. Gözlem yeterliliği, eylem gecikmesi, kontrol yetkisi, hesap
+      bütçesi ve çözülmek istenen görev hangi düzeyi yararlı yapar belirler. Bilinen mekanizmayı ortam saymak
+      mümkündür. Seçim serbest bir modelleme kararıdır, ancak her seçimin yeterli durum ve uygulanabilir eylem
+      sağlama yükümlülüğü vardır.
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p10
+    type: hesap
+    level: 2
+    title: 'Sutton 3.4: ortak dağılım tablosunun eksik varsayımı'
+    goal: ortak dağılım tablosunun eksik varsayımı
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Örnek 3.3 geri dönüşüm robotu için s, a, s′, r ve p(s′,r|s,a) sütunlu, olasılığı pozitif her dörtlüyü
+      içeren bir tablo kur. Yüksek/düşük pil, α/β, rₛ>r𝓌, kurtarma −3 ve şarj ödülü 0 koşullarını koru.
+
+      (Kaynak: Sutton ve Barto, s.53, Alıştırma 3.4.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Kaynak notu: örnekte rₛ/r𝓌 koşullu ortalamalardır; bütün ödül dağılımları verilmediğinden tek
+      bir ortak tablo belirlenmez. Genel çözüm, verilen ortalamalara sahip ρ(r|s,a,s′) dağılımlarıyla p(s′,r|s,a)=P(s′|s,a)ρ(r|s,a,s′)
+      yazmaktır. Ortalama 1 olan sürekli 1 ödül ile yarı yarıya 0/2 ödülü aynı kaynak tablosunu verir, farklı
+      ortak dağılım üretir.
+
+
+      Ek olarak her dal ödülünün koşullu ortalamaya eşit ve belirlenimci olduğunu VARSAYARSAK:
+
+
+      | s | a | s′ | r | p(s′,r\|s,a) |
+
+      |---|---|---|---|---|
+
+      | h | ara | h | rₛ | α |
+
+      | h | ara | l | rₛ | 1−α |
+
+      | l | ara | h | −3 | 1−β |
+
+      | l | ara | l | rₛ | β |
+
+      | h | bekle | h | r𝓌 | 1 |
+
+      | l | bekle | l | r𝓌 | 1 |
+
+      | l | şarj | h | 0 | 1 |
+
+
+      Her durum–eylem için toplam 1. α veya β uç değerdeyse sıfır olan satırları çıkar; soru yalnız pozitif dörtlüleri
+      istiyor. Diğer ödül değerlerinin olasılığı 0. Bu yedi satır kaynakta verilmemiş belirlenimci-ödül varsayımına
+      bağlıdır.'
+    rubric:
+    - Verilen ortalamaların tam dağılımı belirlemediğini saptar.
+    - Genel ρ çözümünü veya ek varsayımı açık yazar.
+    - Yedi dalı, −3 ve 0 ödüllerini ve pozitiflik koşulunu korur.
+  - id: p11
+    type: açıkla
+    level: 1
+    title: 'Sutton 3.5: terminali olasılık toplamına kat'
+    goal: terminali olasılık toplamına kat
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Denklem 3.3 devam eden görevde her (s,a) için geçerlidir. Bölümlü görev için küçük ama gerekli değişiklik
+      nedir? Değişmiş denklemi yaz.
+
+      (Kaynak: Sutton ve Barto, s.54, Alıştırma 3.5.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Terminal olmayan s∈S ve a∈A(s) için sonraki durumları terminali de içeren S⁺ üzerinden topla:
+
+      $$\sum_{s''\in\mathcal S^+}\sum_{r\in\mathcal R}p(s'',r\mid s,a)=1.$$
+
+      Terminale giriş olasılığını dışarıda bırakan S toplamı 1 değerinden küçük kalabilir. Soğurucu terminalde
+      ayrıca bir kukla eylem tanımlarsan onun kendine dönüş olasılığı 1, ödülü 0 olur.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p12
+    type: hesap
+    level: 2
+    title: 'Sutton 3.6: çubuk dengesinde ilk ceza'
+    goal: çubuk dengesinde ilk ceza
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Çubuk dengesini bölümlü ve indirimli ele al: başarısızlıkta −1, diğer bütün ödüller 0 olsun. Her andaki
+      getiri nedir? Devam eden ve indirimli formülasyondan farkı nedir?
+
+      (Kaynak: Sutton ve Barto, s.56, Alıştırma 3.6.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Sonraki başarısızlık ödülü t anından K adım sonra, Rₜ₊ₖ=−1 olarak gelsin. T=t+K, diğer ödüller
+      0 ise Gₜ=−γ^(K−1). Eşdeğer biçimde Gₜ=−γ^(T−t−1); terminalde G_T=0. γ=0 için yalnız K=1 durumunda −1, diğerlerinde
+      0 olur. Devam eden görevde sıfırlama etkileşimi bitirmez: başarısızlıklar t+K₁,t+K₂,… anlarında gelirse
+      Gₜ=−Σⱼγ^(Kⱼ−1). Dolayısıyla yalnız ilk başarısızlığın cezasını değil sonraki bölümlerin cezalarını da sayar.
+      Bu iki amaç genel olarak aynı değildir. Hiç başarısızlık yoksa her iki sıfır-ödüllü yörüngenin getirisi
+      0 olur.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p13
+    type: hata-bul
+    level: 2
+    title: 'Sutton 3.7: kaçış ödülü neden hız öğretmez?'
+    goal: kaçış ödülü neden hız öğretmez?
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Labirent robotuna kaçışta +1, diğer zamanlarda 0 veriliyor; görev bölümlü ve Denklem 3.7 indirimsiz getirisi
+      en çoklanıyor. Bir süre sonra hızlı kaçışta gelişme görünmüyor. Amaç etkili iletilmiş mi; sorun ne olabilir?
+
+      (Kaynak: Sutton ve Barto, s.56, Alıştırma 3.7.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: Her sonlu başarılı yörüngenin getirisi 1; iki adımda veya iki yüz adımda kaçmak aynı sonuçtur.
+      Bu ödül başarı olasılığını ayırabilir ama başarıya kadar geçen süreyi ayırmaz. Yalnız kaçışta ödül almak
+      keşfi de zorlaştırabilir; tek başına “öğrenme hiç olmaz” sonucu çıkarmaz. Hız hedefi için kaçış öncesi
+      her adım −1 gibi süre maliyeti veya γ<1 ile terminal +1 kullanılabilir. Bunlar yeni amaçlardır; çözümün
+      neyi optimize ettiğini açık belirtmek gerekir.
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p14
+    type: hesap
+    level: 1
+    title: 'Sutton 3.8: getirileri tersten hesapla'
+    goal: getirileri tersten hesapla
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'γ=0.5, T=5, R₁=−1, R₂=2, R₃=6, R₄=3, R₅=2. G₀,G₁,…,G₅ değerlerini tersten hesapla. Sayısal alana G₀ gir.
+
+      (Kaynak: Sutton ve Barto, s.56, Alıştırma 3.8.)'
+    hints:
+    - Terminal getiri G₅=0.
+    - Gₜ=Rₜ₊₁+0.5Gₜ₊₁ uygula.
+    solution: G₅=0. G₄=2; G₃=3+0.5×2=4; G₂=6+0.5×4=8; G₁=2+0.5×8=6; G₀=−1+0.5×6=2. Dizi (2,6,8,4,2,0). Her adımda
+      bir sonraki ödül indirimsizdir, kalan getiri 0.5 ile çarpılır. İlk ödülün −1 işareti kaynak sayfa görüntüsünden
+      doğrulandı.
+    answer: 2
+    calc: -1+0.5*(2+0.5*(6+0.5*(3+0.5*2)))
+    tol: 1.0e-09
+  - id: p15
+    type: hesap
+    level: 1
+    title: 'Sutton 3.9: ilk ödülden sonraki sabit kuyruk'
+    goal: ilk ödülden sonraki sabit kuyruk
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'γ=0.9, önce R₁=2, sonra sonsuza dek her ödül 7. G₁ ve G₀ nedir? Sayısal alana G₀ gir.
+
+      (Kaynak: Sutton ve Barto, s.56, Alıştırma 3.9.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: G₁=7+0.9×7+…=7/(1−0.9)=70. G₀=2+0.9G₁=65. Kuyruğun ilk 7 ödülü G₁ içinde indirimsiz, G₀ içinde
+      bir kez indirimlidir.
+    answer: 65
+    calc: 2+0.9*7/(1-0.9)
+    tol: 1.0e-08
+  - id: p16
+    type: kanıt
+    level: 2
+    title: 'Sutton 3.10: sonsuz geometrik seriyi kanıtla'
+    goal: sonsuz geometrik seriyi kanıtla
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Denklem 3.10 içindeki ikinci eşitliği, Σₖ₌₀^∞γᵏ=1/(1−γ), kanıtla; gerekli γ koşulunu belirt.
+
+      (Kaynak: Sutton ve Barto, s.56, Alıştırma 3.10.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 0≤γ<1 al. Sₙ=1+γ+…+γⁿ; γSₙ=γ+…+γⁿ⁺¹. Çıkarınca (1−γ)Sₙ=1−γⁿ⁺¹. γⁿ⁺¹→0 ve 1−γ>0 olduğundan limit
+      1/(1−γ). γ=0 doğrudan 1, γ=1 ise kısmi toplam n+1 büyür ve eşitlik sonlu bir toplam vermez. Daha genel
+      olarak |γ|<1 için de aynı seri kanıtı çalışır.
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p17
+    type: açıkla
+    level: 2
+    title: 'Sutton 3.11: bir sonraki ödül beklentisi'
+    goal: bir sonraki ödül beklentisi
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Şimdiki durum Sₜ olsun ve eylemler stokastik π ile seçilsin. E[Rₜ₊₁|Sₜ] beklentisini π ve dört argümanlı
+      p (3.2) ile yaz.
+
+      (Kaynak: Sutton ve Barto, s.58, Alıştırma 3.11.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Sₜ=s verildiğinde önce eylem, sonra ortak sonraki durum/ödül üzerinden koşulla:
+
+      $$\mathbb E_\pi[R_{t+1}\mid S_t=s]=\sum_{a\in\mathcal A(s)}\pi(a\mid s)\sum_{s'',r}r\,p(s'',r\mid s,a).$$
+
+      Bu ayrıca Σₐπ(a|s)r(s,a). Sonraki durum toplamı bölümlü görevde S⁺ üzerindedir. İndirimin yeri yoktur:
+      istenen tek sonraki ödüldür, bütün getiri değildir.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p18
+    type: açıkla
+    level: 1
+    title: 'Sutton 3.12: V değerini Q ile yaz'
+    goal: V değerini Q ile yaz
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'vπ değerini qπ ve π cinsinden veren bir eşitlik yaz.
+
+      (Kaynak: Sutton ve Barto, s.58, Alıştırma 3.12.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Durumda ilk eylem π ile seçilir; qπ o eylemden sonra aynı politikayla devam eden getiridir. Toplam
+      beklentiyle
+
+      $$v_\pi(s)=\sum_{a\in\mathcal A(s)}\pi(a\mid s)q_\pi(s,a).$$
+
+      Ağırlıklı ortalamadır; maksimum ancak en iyi değer/politika koşuluyla gelir.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p19
+    type: açıkla
+    level: 1
+    title: 'Sutton 3.13: Q değerini V ile yaz'
+    goal: Q değerini V ile yaz
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'qπ değerini vπ ve dört argümanlı p cinsinden yaz.
+
+      (Kaynak: Sutton ve Barto, s.58, Alıştırma 3.13.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'İlk eylem a sabit; ödül ve sonraki durum ortamdan gelir. Oradan itibaren π izlenir:
+
+      $$q_\pi(s,a)=\sum_{s'',r}p(s'',r\mid s,a)[r+\gamma v_\pi(s'')].$$
+
+      Aynı satırda ilk a için ayrıca π(a|s) ile çarpma: qπ zaten bu eylemin yapılmasına koşulludur. Terminal
+      yaprağın V değeri 0 olur.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p20
+    type: hesap
+    level: 1
+    title: 'Sutton 3.14: ızgaranın orta hücresini denetle'
+    goal: ızgaranın orta hücresini denetle
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Şekil 3.2 rastgele politika ızgarasının orta değeri +0.7; komşu değerleri +2.3,+0.4,−0.4,+0.7 (bir ondalık).
+      γ=0.9 ve her eylem 1/4. Bellman (3.14) eşitliğini sayısal göster. Sayısal alana yuvarlanmış komşularla
+      bulunan değeri gir.
+
+      (Kaynak: Sutton ve Barto, s.60, Alıştırma 3.14.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: Ortadaki bütün geçişlerin ödülü 0. Sağ taraf 0.9×(2.3+0.4−0.4+0.7)/4=0.675. Bir ondalığa yuvarlayınca
+      0.7. Kaynak komşuları zaten yuvarlandığı için 0.675 ile yazılı 0.7 arasında tam eşitlik beklenmez. 25×25
+      doğrusal sistemi tam çözersek orta değer 0.673113259838 bulunur; o da 0.7 yuvarlanır. Kaynak görüntüsünde
+      negatif komşu −0.4 doğrulandı.
+    answer: 0.675
+    calc: 0.9*(2.3+0.4-0.4+0.7)/4
+    tol: 1.0e-09
+  - id: p21
+    type: kanıt
+    level: 2
+    title: 'Sutton 3.15: devam eden görevde sabit ödül kayması'
+    goal: devam eden görevde sabit ödül kayması
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Izgarada bazı ödüller pozitif, kenar ödülleri negatif, diğerleri 0. Her ödüle sabit c eklemek, herhangi
+      bir politika altındaki bütün durum değerlerine aynı v_c sabitini ekler mi? Denklem 3.8 ile kanıtla, v_c
+      değerini c ve γ ile ver; göreli değerler etkilenir mi?
+
+      (Kaynak: Sutton ve Barto, s.60–61, Alıştırma 3.15.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Devam eden sınırlı ödüllü görev ve 0≤γ<1 için her yörüngede
+
+      $$G''_t=\sum_{k\ge0}\gamma^k(R_{t+k+1}+c)=G_t+\frac{c}{1-\gamma}.$$
+
+      Beklenti alınca v′π(s)=vπ(s)+v_c, v_c=c/(1−γ). Aynı sonuç Q için de geçer; her politika ve durum aynı miktar
+      kayar. Durumların göreli değerleri ve politika/eylem sıralaması değişmez. γ=1 devam eden toplamda bu sonlu
+      sabit yoktur. İşaretlerin mutlak sıfırı yerine ödüller arasındaki farkların önemli olması burada kullanılan
+      ortak sonsuz zaman çizelgesine bağlıdır.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p22
+    type: karşı-örnek
+    level: 2
+    title: 'Sutton 3.16: bölüm uzunluğu ödül kaymasını değiştirir'
+    goal: bölüm uzunluğu ödül kaymasını değiştirir
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Labirent gibi bölümlü görevde bütün ödüllere c eklenirse önceki sorudaki gibi görev değişmeden kalır
+      mı? Neden? Bir örnek ver.
+
+      (Kaynak: Sutton ve Barto, s.61, Alıştırma 3.16.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Genelde değişir: terminale kadar eklenen miktar cΣₖ₌₀^(T−t−1)γᵏ; T politikaya/yörüngeye bağlıysa
+      ortak sabit değildir. İndirimsiz bir görevde a hemen +1 ile bitirsin, b önce 0 sonra +1 ile iki adımda
+      bitsin. Başta ikisi de 1. Her terminal-öncesi geçiş ödülüne c=1 ekleyince a=2, b=3 olur; uzunu tercih eder.
+      c=−1 için a=0, b=−1 ve kısayı tercih eder. Terminalden sonraki soğurucu döngülere de c eklemek farklı bir
+      görev tanımlar; o döngüler artık sıfır değildir. Sabit bilinen bölüm uzunluğunda veya bütün sonsuz kuyruğa
+      aynı kayma uygulanan devam eden modelde ortak-sabit sonucu geri gelebilir.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p23
+    type: kanıt
+    level: 3
+    title: 'Sutton 3.17: Q için Bellman beklenti denklemi'
+    goal: Q için Bellman beklenti denklemi
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'qπ(s,a) değerini olası sonraki durum–eylem çiftlerinin qπ(s′,a′) değerleriyle veren Bellman denklemini
+      yaz. Denklem 3.14 türetimine benzer biçimde, sağdaki Q geri taşıma şemasını kullanarak adım dizisini göster.
+
+      (Kaynak: Sutton ve Barto, s.61, Alıştırma 3.17.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Önce ilk eylemi sabitle:
+
+      $$q_\pi(s,a)=\mathbb E_\pi[G_t\mid S_t=s,A_t=a]=\mathbb E_\pi[R_{t+1}+\gamma G_{t+1}\mid S_t=s,A_t=a].$$
+
+      Ortamın ortak sonucu üzerinden aç:
+
+      $$=\sum_{s'',r}p(s'',r\mid s,a)\left[r+\gamma\mathbb E_\pi[G_{t+1}\mid S_{t+1}=s'']\right].$$
+
+      Sonraki eylem Aₜ₊₁ için toplam beklenti uygula:
+
+      $$q_\pi(s,a)=\sum_{s'',r}p(s'',r\mid s,a)\left[r+\gamma\sum_{a''}\pi(a''\mid s'')q_\pi(s'',a'')\right].$$
+
+      Şemada kök dolu durum–eylem düğümüdür; önce ortam p ve r ile açık durumlara dallanır, sonra π ile sonraki
+      dolu eylem düğümlerine. İlk eylem sabit olduğundan kökte π(a|s) çarpanı bulunmaz.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p24
+    type: açıkla
+    level: 1
+    title: 'Sutton 3.18: V için tek katmanlı iki yazım'
+    goal: V için tek katmanlı iki yazım
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Sₜ=s verildiğinde, kök durum değeri vπ(s) ile ilk eylem yaprakları qπ(s,a) arasında bir beklenti eşitliği
+      yaz. Sonra beklenti sembolü olmadan π ile açık toplamını yaz.
+
+      (Kaynak: Sutton ve Barto, s.62, Alıştırma 3.18.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'İstenen iki ayrı biçim:
+
+      $$v_\pi(s)=\mathbb E_\pi[q_\pi(s,A_t)\mid S_t=s],$$
+
+      $$v_\pi(s)=\sum_{a\in\mathcal A(s)}\pi(a\mid s)q_\pi(s,a).$$
+
+      Kök açık s, yapraklar a₁,a₂,a₃ gibi dolu durum–eylem düğümleridir. Her dalın ağırlığı π(a|s). Q yaprağı
+      zaten ilk ödül ile kalan getiriyi içerdiğinden ayrıca ödül veya γ eklenmez.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p25
+    type: açıkla
+    level: 2
+    title: 'Sutton 3.19: Q için tek katmanlı iki yazım'
+    goal: Q için tek katmanlı iki yazım
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Sₜ=s,Aₜ=a verildiğinde qπ(s,a) değerini bir sonraki ödül Rₜ₊₁ ve sonraki durum değeri vπ(Sₜ₊₁) ile yaz.
+      Önce π izlenmesine ayrıca koşullanmayan beklenti, sonra beklenti sembolsüz p toplamı ver.
+
+      (Kaynak: Sutton ve Barto, s.62, Alıştırma 3.19.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'İstenen biçimler:
+
+      $$q_\pi(s,a)=\mathbb E[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t=s,A_t=a],$$
+
+      $$q_\pi(s,a)=\sum_{s'',r}p(s'',r\mid s,a)[r+\gamma v_\pi(s'')].$$
+
+      Bu beklenti ortamın bir geçişi üzerindedir; π sonrasının bilgisi vπ içinde bulunduğundan beklentiyi Eπ
+      diye ayrıca koşullamak gerekli değildir. Şema dolu kökten açık s′₁,s′₂,s′₃ yapraklarına gider, dalların
+      p ağırlıkları ve r ödülleri vardır.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p26
+    type: yorumla
+    level: 2
+    title: 'Sutton 3.20: golfün en iyi durum değerini tarif et'
+    goal: golfün en iyi durum değerini tarif et
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Golf örneği için en iyi durum-değer fonksiyonunu çiz veya sözle tarif et.
+
+      (Kaynak: Sutton ve Barto, s.66, Alıştırma 3.20.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Her yerde v*(s)=max{q*(s,putter),q*(s,driver)}. Delik 0, tek putt ile bitirilen green −1. Green
+      dışında driver ile bir sonraki vuruşu green içine kesin indirebilen yerlerde iki vuruş yeterliyse değer
+      −2; daha uzakta gerektiğinde −3 ve sonraki bölgeler vardır. Tee için kaynak iki drive ve bir putt olanağını
+      gösterir: en iyi değer −3, hep putter değeriyse −6. Kumdan driver çıkabiliyorsa v* artık −∞ değildir. En
+      iyi konturlar iki sopanın erişim bölgelerinin iyi olanını birleştirir. Kaynak tam koordinat ve iniş dağılımları
+      vermediği için tekil sayısal sınır çizgisi çıkarılamaz; bu nitel tarif veya koşullarını açıklayan özgün
+      model geçerlidir.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p27
+    type: yorumla
+    level: 2
+    title: 'Sutton 3.21: ilk putt, sonra en iyi sopa'
+    goal: ilk putt, sonra en iyi sopa
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Golf için q*(s,putter) en iyi eylem-değer konturlarını çiz veya tarif et.
+
+      (Kaynak: Sutton ve Barto, s.66, Alıştırma 3.21.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'İlk vuruş putter zorunlu, devamında iki sopa serbest:
+
+      $$q_*(s,\mathrm{putter})=-1+\mathbb E[v_*(S'')\mid s,\mathrm{putter}]$$
+
+      (burada γ=1). Putter kesin geçiş sağlıyorsa −1+v*(f_putt(s)) olur. Delikten önceki tek-putt bölgesinde
+      −1; daha dışarıda ilk putt hangi en iyi V bölgesine indiriyorsa onun bir eksiği. Bu konturlar hep-putter
+      v_putt halkalarıyla genel olarak aynı değildir: ileride driver kullanmak yolu kısaltır. Kumda putter topu
+      yerinde bırakır ve driver ile çıkmak mümkünse q*putter=−1+v*(s) sonludur; hep-putter değeri ise −∞. Özgün
+      sonlu modelde kumdan driver ile bitirmek iki vuruş, önce boşa putt sonra driver/putt üç vuruştur: −3. Tam
+      saha geometrisi verilmediği için biricik koordinatlı kontur iddiası kurulmaz.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p28
+    type: yorumla
+    level: 2
+    title: 'Sutton 3.22: üç durumda indirim eşiği'
+    goal: üç durumda indirim eşiği
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Şekildeki devam eden üç durumlu MDP içinde tek karar üst durumdadır. Sol eylem +1 ile sol alt duruma,
+      oradan zorunlu 0 ile üste döner; sağ eylem 0 ile sağ alta, oradan zorunlu +2 ile üste döner. İki deterministik
+      politika π_sol ve π_sağ var. γ=0, γ=0.9 ve γ=0.5 için hangi politika en iyidir?
+
+      (Kaynak: Sutton ve Barto, s.66, Alıştırma 3.22.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Üst durum değerleri geometrik seridir:
+
+      $$V^{\mathrm{sol}}=1+\gamma^2+\cdots=\frac1{1-\gamma^2},\qquad V^{\mathrm{sağ}}=2\gamma+2\gamma^3+\cdots=\frac{2\gamma}{1-\gamma^2}.$$
+
+      γ=0: sol 1, sağ 0 → sol. γ=0.9: sol 5.263158, sağ 9.473684 → sağ. γ=0.5: ikisi de 4/3 → her iki deterministik
+      politika ve üst durumda aralarındaki her stokastik karışım en iyi. Ortak payda pozitif olduğundan eşik
+      1=2γ, yani γ=1/2. Alt durumlar bir ödül ve üste dönüşten ibaret olduğundan üst değerdeki bu üstünlük onların
+      değerlerinde de korunur (γ=0 için altlar eşit).'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p29
+    type: açıkla
+    level: 2
+    title: 'Sutton 3.23: robotun beş Q en iyilik denklemi'
+    goal: robotun beş Q en iyilik denklemi
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Geri dönüşüm robotunun q* Bellman en iyilik denklemini yaz; iki yüksek-pil ve üç düşük-pil eylemini açık
+      göster.
+
+      (Kaynak: Sutton ve Barto, s.66, Alıştırma 3.23.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'M_h=max{q*(h,ara),q*(h,bekle)}, M_l=max{q*(l,ara),q*(l,bekle),q*(l,şarj)} tanımla. Beş denklem:
+
+      $$\begin{aligned}
+
+      q_*(h,\mathrm{ara})&=r_s+\gamma[\alpha M_h+(1-\alpha)M_l],\\
+
+      q_*(h,\mathrm{bekle})&=r_w+\gamma M_h,\\
+
+      q_*(l,\mathrm{ara})&=\beta r_s-3(1-\beta)+\gamma[(1-\beta)M_h+\beta M_l],\\
+
+      q_*(l,\mathrm{bekle})&=r_w+\gamma M_l,\\
+
+      q_*(l,\mathrm{şarj})&=\gamma M_h.
+
+      \end{aligned}$$
+
+      Düşük pilde aramada kurtarma yüksek pile götürür; onun olasılığı 1−β. Şarj anında kutu toplanmadığı için
+      anlık ödül 0. M_h ve M_l sonraki durumda geçerli eylemler üzerinden maksimumdur.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p30
+    type: hesap
+    level: 2
+    title: 'Sutton 3.24: 24.4 değerinin tam karşılığı'
+    goal: 24.4 değerinin tam karşılığı
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'Şekil 3.5 en iyi ızgara durumunun değerini bir ondalıkla 24.4 verir. En iyi politikayı ve Denklem 3.8
+      bilgisini kullanarak sembolik değerini yaz, sonra üç ondalığa hesapla. γ=0.9. Sayısal alana üç ondalıklı
+      sonucu gir.
+
+      (Kaynak: Sutton ve Barto, s.66, Alıştırma 3.24.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'A durumundan her eylem hemen +10 ile A′ konumuna taşır; A′ konumundan A konumuna dört normal adımda
+      dönülür. +10 ödülleri beş adım aralıklıdır. Dolayısıyla
+
+      $$v_*(A)=10+10\gamma^5+10\gamma^{10}+\cdots=\frac{10}{1-\gamma^5}.$$
+
+      γ=0.9 için 24.419428096994; üç ondalık 24.419. Kaynaktaki 24.4 yalnız yuvarlamadır. Dönüşe dört adım gerektiği
+      için kuvvet 4 değil, ödüller arasındaki toplam süre olan 5 kullanılır.'
+    answer: 24.419
+    calc: round(10/(1-0.9**5),3)
+    tol: 1.0e-05
+  - id: p31
+    type: açıkla
+    level: 1
+    title: 'Sutton 3.25: V yıldızı Q yıldızıyla yaz'
+    goal: V yıldızı Q yıldızıyla yaz
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'v* değerini q* cinsinden veren bir eşitlik yaz.
+
+      (Kaynak: Sutton ve Barto, s.66, Alıştırma 3.25.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Her durumda en iyi ilk eylemi seç:
+
+      $$v_*(s)=\max_{a\in\mathcal A(s)}q_*(s,a).$$
+
+      Ortalama değil maksimumdur; birden fazla maksimum varsa aynı V değeri elde edilir.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p32
+    type: açıkla
+    level: 1
+    title: 'Sutton 3.26: Q yıldızını V yıldızıyla yaz'
+    goal: Q yıldızını V yıldızıyla yaz
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'q* değerini v* ve dört argümanlı p cinsinden yaz.
+
+      (Kaynak: Sutton ve Barto, s.66, Alıştırma 3.26.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'İlk eylem sabit; sonraki durumdan en iyi devam edilir:
+
+      $$q_*(s,a)=\sum_{s'',r}p(s'',r\mid s,a)[r+\gamma v_*(s'')].$$
+
+      Kökte bir max yoktur; o eylem verilmiştir. Sonraki en iyilik v* içinde bulunur.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p33
+    type: açıkla
+    level: 2
+    title: 'Sutton 3.27: Q yıldızından en iyi politika'
+    goal: Q yıldızından en iyi politika
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'π* politikasını q* cinsinden veren bir eşitlik yaz.
+
+      (Kaynak: Sutton ve Barto, s.67, Alıştırma 3.27.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'B(s)=argmaxₐq*(s,a) olsun. π*(a|s)>0 ancak a∈B(s) ise, ve Σₐπ*(a|s)=1 olacak şekilde seç. Belirlenimci
+      bir çözüm a*(s)∈B(s) seçip π*(a|s)=1{a=a*(s)} yazmaktır. Tüm eşit en iyi eylemler üzerinde düzgün dağılım
+      da mümkündür: π*(a|s)=1{a∈B(s)}/|B(s)|. Argmax bir küme olabileceği için bağ kırma kuralını veya karışımı
+      belirtmek gerekir.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p34
+    type: açıkla
+    level: 2
+    title: 'Sutton 3.28: V yıldızından en iyi politika'
+    goal: V yıldızından en iyi politika
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'π* politikasını v* ve dört argümanlı p cinsinden yaz.
+
+      (Kaynak: Sutton ve Barto, s.67, Alıştırma 3.28.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Bir adımlık eylem puanı F(s,a)=Σₛ′,ᵣp(s′,r|s,a)[r+γv*(s′)] olsun. B(s)=argmaxₐF(s,a). π*(·|s)
+      yalnız B(s) üzerinde olasılık taşıyan herhangi bir dağılımdır; örneğin π*(a|s)=1{a∈B(s)}/|B(s)|. v* geleceği
+      zaten içerdiği için bu bir adımlık seçim uzun vadede en iyidir. Yalnız en büyük v*(s′) durumunu seçmek
+      yetmez: geçiş olasılıkları, anlık ödüller ve bütün sonuçlar hesaba katılmalıdır.'
+    rubric:
+    - Verilen koşulları ve istenen bütün parçaları kullanır.
+    - Ara adımları gerekçelendirir.
+    - Sonucun geçerlilik koşulunu belirtir.
+  - id: p35
+    type: açıkla
+    level: 3
+    title: 'Sutton 3.29: dört Bellman denklemini marjinal modelle yaz'
+    goal: dört Bellman denklemini marjinal modelle yaz
+    needs: MDP ortak modeli, getiri ve ilgili Sutton Bölüm 3 anlatımı.
+    q: 'vπ,v*,qπ,q* için dört Bellman denklemini, üç argümanlı p(s′|s,a) (3.4) ve iki argümanlı r(s,a) (3.5)
+      ile yeniden yaz.
+
+      (Kaynak: Sutton ve Barto, s.67, Alıştırma 3.29.)'
+    hints:
+    - Önce hangi değişkenin sabit, hangisinin rastgele olduğunu yaz.
+    - Getiri özyinelemesi veya toplam olasılık kuralıyla ilgili anlatımdaki bağıntıyı aç.
+    solution: 'Ödül terimi ortak modelden r(s,a) olarak, geleceğin ağırlığı ise marjinal P=p(s′|s,a) olarak çıkar:
+
+      $$v_\pi(s)=\sum_a\pi(a\mid s)\left[r(s,a)+\gamma\sum_{s''}p(s''\mid s,a)v_\pi(s'')\right],$$
+
+      $$v_*(s)=\max_a\left[r(s,a)+\gamma\sum_{s''}p(s''\mid s,a)v_*(s'')\right],$$
+
+      $$q_\pi(s,a)=r(s,a)+\gamma\sum_{s''}p(s''\mid s,a)\sum_{a''}\pi(a''\mid s'')q_\pi(s'',a''),$$
+
+      $$q_*(s,a)=r(s,a)+\gamma\sum_{s''}p(s''\mid s,a)\max_{a''}q_*(s'',a'').$$
+
+      Bölümlü durumda sonraki durumlar S⁺, terminal değer 0. Bu dönüşüm, ödül ile sonraki durum bağımsızmış varsayımına
+      dayanmaz; r(s,a) zaten ortak dağılım üzerinden beklenen ödüldür. Sonraki değer ödüle değil s′ değişkenine
+      bağlı olduğundan toplamlar ayrılabilir.'
+    rubric:
+    - Dört değer fonksiyonu için ayrı doğru denklem yazar.
+    - Politika ortalaması ve maksimumun yerini korur.
+    - Beklenen ödülü yanlışlıkla her sonraki durum için yeniden toplamıyor.
+    - Bağımsızlık varsayımı eklemez.
 
 pitfalls:
   - wrong: "γ yalnız matematiksel bir kolaylıktır."

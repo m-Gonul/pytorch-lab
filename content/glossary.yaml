@@ -209,3 +209,18 @@ terms:
   bilgi durumu: Bayesçi kararda gözlemlerle güncellenen sonsal gibi, gelecek kararlar için gerekli belirsizlik bilgisini taşıyan durum.
   bağlamsal bandit: Her kararda bağlamı gözleyip anlık ödül için eylem seçme problemi; eylem sonraki bağlamı etkilemez.
   üstel yakın-geçmiş ortalaması: Sabit adımlı güncellemenin eski gözlemlere yaşlarıyla üstel azalan ağırlık verdiği kestirim.
+
+  Markov özelliği: Sonraki durum ve ödülün dağılımını belirlemek için geçmişten yalnız şimdiki durum ve eylemin yeterli olması.
+  ortak geçiş–ödül dağılımı: 'p(s′,r|s,a): bir eylemden sonra yeni durum ve ödülün birlikte gelme olasılığı.'
+  stokastik politika: Her durum için eylemlere toplamı 1 olan bir olasılık dağılımı veren karar kuralı π(a|s).
+  ödül hipotezi: Amaçların beklenen birikimli skaler ödülün en çoklanmasıyla ifade edilebileceğini öne süren modelleme hipotezi.
+  bölümlü görev: Doğal bir terminalle biten ve yeniden başlatılabilen etkileşim; getiri o bölümün son ödülünü de kapsar.
+  devam eden görev: Doğal terminali olmayan etkileşim; indirimli toplam veya ortalama ödül gibi uygun bir ölçüt gerektirir.
+  soğurucu durum: Girildikten sonra kendisine dönen durum; bölüm sonunu ortak getiri gösteriminde sıfır ödüllü döngüyle temsil
+    edebilir.
+  durum-değer fonksiyonu: 'vπ(s): s durumundan başlayıp π politikasını izleyince beklenen getiri.'
+  eylem-değer fonksiyonu: 'qπ(s,a): s durumunda önce a eylemini yapıp sonra π izleyince beklenen getiri.'
+  geri taşıma: Ardıl değerleri ödül ve geçiş/politika ağırlıklarıyla önceki durum veya durum–eylem değerine taşıyan backup hesabı.
+  kısmi sıralama: Her iki öğenin mutlaka karşılaştırılamadığı sıralama; politikaların bütün durumlardaki V üstünlüğü buna örnektir.
+  açgözlü politika: Verilen eylem puanını en çoklayan eylemleri seçen politika; gerçek q* için uzun vadede en iyidir, yaklaşık
+    Q için aynı garanti kendiliğinden gelmez.

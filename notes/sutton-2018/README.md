@@ -35,3 +35,19 @@ python3 -I notes/sutton-2018/measure_ch2.py /tmp/sutton-measurements.json
 NumPy ile tarayıcının rastgele üreteçleri farklıdır. İkisinde tohum 1 seçmek
 aynı ortam ve ödül yörüngeleri üretmez; eşleşen dağılım, parametre ve ölçüm
 aralığına rağmen sayısal ortalamaların farklı çıkması beklenir.
+
+## Bölüm 3
+
+Basılı s.47–71 / PDF69–93, sonraki s.72 boş. 179 bilgi birimi, 29 alıştırma, 13 kaynak görseli (5 numaralı/8 numarasız), 10 satırlı numarasız tablo. Bağımsız ikinci okuma yalnız kaynak ve defter üzerinden yapıldı; alt sorular, sayfa aralıkları, tarih ayrıntıları ve şemaların dalları tamamlandı.
+
+Özgün SVG gruplarını ve bağımsız NumPy kontrollerini yeniden üret:
+
+```bash
+python3 -I notes/sutton-2018/generate_ch3.py /tmp/sutton-ch3
+```
+
+Çıktı f3.html…f8.html ve measurements_ch3.json. Kayıtlı JSON; 25 rastgele V, 25 optimal V, tüm optimal eylem kümeleri, altı robot politikasının değerleri, 3.8/3.9/3.14/3.24 hesapları ve özgün golf modelini içerir. Tarayıcıdaki suttongrid sayıları ayrı JS çözücüsüyle bunlara karşı doğrulandı.
+
+Golfün tam geometrisi ve driver iniş olasılıkları kitapta verilmediğinden 15 durumlu özgün model kullanıldı: 13 mesafe düzeyi ve iki kum durumu. Putter iki düzey ilerler; driver iki olası yere iner. Tee için 6 putt veya 2 drive+putt sayıları hesaplandı; driver için ara kesirli değer de gösterildi. Bu model kaynak şekle ölçülmemiş koordinatlar veya biricik olasılıklar atfetmez. Robotun başlangıç sayısal parametreleri de kaynak sabitleri değil deney seçimidir.
+
+Alıştırma 3.4 tablosu yalnız koşullu beklenen ödüllerle tekil belirlenemez; genel ρ çözümü ve açık belirlenimci-ödül ek varsayımı ayrı verilir. Bellman tekliği sınırlı sonlu model/γ<1 koşuluyla yazılır; γ=1 için karşı örnek ve sonlanma gereksinimi belirtilir. Bölüm 4–17 ve ön/arka materyal henüz tamamlanmadı.
