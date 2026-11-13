@@ -33,6 +33,62 @@ M1.1 (doğrusal regresyon) içeriği ölçümle doğrulanarak genişletildi. Ekl
 - **Sorular ve pratikler:** +2 quiz (η = 2/λ_max sınırı; (n,1) − (n,) broadcasting tuzağı), +2 pratik (p8 özdeğerlerden η* = 2/(λ_max+λ_min), p9 "R² 0.9 ama U deseni" yorumlaması), +1 what-if (η tam 2/λ_max), b–e aşamalarına ipuçları; kaynaklara Anscombe (1973) eklendi.
 - **Araç zinciri:** notebook üreticisi kaynak metinleri satır sonu bağımsız okuyor (Windows checkout'unda CRLF kaynaklar notebook'lara \r\n gömüyordu; --check Linux'ta bunu yanlış bayatlık sayardı). M1.1 notebook'u yenilendi (E1 dahil) ve uçtan uca geçti.
 
+## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 11
+
+Faz 11'in (pekiştirmeli öğrenme) 12 modülünün hepsine tam konu anlatımı yazıldı. Kaynaklar şunlardır:
+
+- YAP 446/BİL 562 Reinforcement Learning dersinin slayt desteleri (lect_2–lect_13);
+- DQN makalesi (Mnih ve ark. 2013);
+- AlphaGo makaleleri (Silver ve ark. 2016, 2017);
+- güven bölgesi modülü için TRPO, PPO ve GAE makaleleri (Schulman ve ark. 2015, 2016, 2017), Kakade (2001) ve Nocedal & Wright (Bölüm 4).
+
+Her deste sayfa sayfa işlendi. Slayt metni kopyalanmadı, türetimler eklendi ve slaytlardaki hatalar "Kaynak düzeltmesi" kutularında gerekçeleriyle düzeltildi. Deneylerin hepsi tarayıcıda çalışan küçük ölçekli simülasyonlardır. Not metinleri ve ön ayar açıklamaları ölçülen sonuçlara göre yazıldı.
+
+| modül | şekil | deneyler | öne çıkan türetimler |
+|---|---|---|---|
+| M11.1 Markov zincirleri | 3 | markovlab, ar1lab | AR(1) durağan varyansı, n adımlık geçiş = matris kuvveti, iki durumlu zincirin kapalı çözümü, temel matris, sayım oranlarının en çok olabilirliği |
+| M11.2 MDP ve değer yinelemesi | 2 | valueiter, retaildp, vibounds | indirimli toplamın sonluluğu, iki büzülme lemması, sonlu yineleme sınırı, 2γε/(1 − γ) politika sınırı |
+| M11.3 politika yinelemesi | 2 | pimpi, gridpe | politika iyileştirme teoremi, sonlu adımda yakınsama, Bellman artığıyla sınırlar |
+| M11.4 Monte Carlo ve TD | 2 | mctd, batchmctd | artımlı ortalama, Robbins–Monro koşulları, ileri ve geri bakış (uygunluk izleri) |
+| M11.5 SARSA ve Q-öğrenme | 2 | cliffwalk, maxbias | maksimizasyon yanlılığı ve çift Q |
+| M11.6 fonksiyon yaklaşımı ve DQN | 1 | baird, replaylab | yarı-gradyanın neden gradyan olmadığı, ölümcül üçlü |
+| M11.7 çok kollu haydutlar | 2 | bandit, ucbbound, betapost | ε-açgözlünün doğrusal pişmanlığı, iyimser stratejinin yakınsaması |
+| M11.8 bağlamsal haydutlar | 1 | linucb, ope | Bayesçi doğrusal regresyon, Sherman–Morrison, IPS'nin yansızlığı ve DR'nin iki kez sağlamlığı |
+| M11.9 politika gradyanı | 1 | reinforce, pgvar, dpglqr | politika gradyanı teoreminin kanıtı, REINFORCE kestiricisi, taban çizgisinin yansızlığı |
+| M11.10 modelli RL ve planlama | 2 | dynamaze, mctsttt | sayım kestiriminin en çok olabilirliği, UCT'nin haydut azaltımı |
+| M11.11 AlphaGo'dan AlphaZero'ya | 2 | rootnoise, elogate, aztab | aramanın politika iyileştirme operatörü olması, Elo'nun lojistik regresyon yorumu |
+| M11.12 güven bölgesi, TRPO, PPO, GAE | 2 | trustregion, ppoclip, gae | Moré–Sorensen koşulları, KL ≈ ½dᵀFd, doğal gradyan, performans farkı lemması, GAE teleskopu |
+
+- **Faz 11'de 29 deney (26'sı yeni; valueiter, bandit ve reinforce önceden vardı) ve 22 şekil.** Şekillerdeki bütün sayılar betikle hesaplandı.
+- **Kaynak düzeltmeleri** (her biri ilgili modülde kutu içinde):
+  - M11.1: "durağan Markov süreci" ile geniş anlamda durağanlığın karıştırılması; hesap karmaşıklığı; "bu zincirde herkes satın alır" sonucu.
+  - M11.2: "eylemler belirlenimci" varsayımı; ara terimlerdeki yazım hataları; Teorem 2'nin son adımı.
+  - M11.3: yakınsama hızları ve değiştirilmiş politika yinelemesinin sınırları.
+  - M11.5: $Q^\pi$'nin tanımı ve Q-öğrenmenin yakınsama koşulları.
+  - M11.6: doğrusal Q-öğrenme her zaman yakınsamaz; DQN'nin 2013 ve 2015 sürümleri.
+  - M11.7: Beta dağılımının yorumu.
+  - M11.8: öngörü dağılımı.
+  - M11.9: amacın koşullu yazılması; teoremin sol tarafı; eleştirmen güncellemesinde γⁿ; A2C ve DPG sözde kodlarında max.
+  - M11.10: planlama çiftleri görülmüş olmalı; "tampon genelleme yapmaz" ifadesinin nüansı; düğüm değeri tanımı; PUCT bonusunda eksik √N.
+  - M11.11: RL adımında uzman hamlesi yerine oynanan hamle; değer ağı güncellemesinin işareti; Ke Jie maçı AlphaGo Master'ındır; kazanma kuralında komi.
+  - M11.12: Taylor açılımının yazımı; genel algoritmada adım kabulü, oran ölçütü ve sınırda büyütme eksik; belirsiz Hessian'da alt problem global çözülebilir (sezgiseller maliyet içindir), dogleg yalnız $H\succ0$ iken tanımlıdır.
+- **Ölçümle düzeltilen ya da anlatıma giren sonuçlar** (ayrıntılar commit mesajlarında):
+  - M11.2: yoğun rastgele MDP'lerde açgözlü politika hep ilk yinelemede doğru çıkıyordu; varsayılan halka yapısına alındı.
+  - M11.3: PI'ın her ayarda kazanması yoğun matris varsayımından geliyordu; seyrek geçişlerde MPI'nin üstünlüğü göründü.
+  - M11.5: çift Q'nun yavaşlığı yanlılıktan değil verinin iki tabloya bölünmesinden geliyor.
+  - M11.6: tekrar deneyinde "unutma" yerel özniteliklerle görünmüyordu; küresel Fourier öznitelikleri eklendi.
+  - M11.9: DPG gradyanı yalnız başlangıç durumundan hesaplanıyordu; indirimli ziyaret ağırlığı eklendi ve sonlu farklarla doğrulandı.
+  - M11.10: "X engellemeli" konum aslında tek hamlede kazandıran çift tehdit konumu; "kötü önsel keşfi yavaşlatır" iddiası ölçümde tutmadı.
+  - M11.11: kök arama deneyinde ziyaret edilmemiş çocuklara gerçek Q veriliyordu; AlphaGo Zero'daki gibi 0 yapıldı.
+  - M11.12: GAE deneyinin ilk sürümü varyansı tek örnekten ölçüyordu (hata yanlılığa yazılıyordu). Ayrıca kırpma, KL'yi kesin sınırlamıyor: ε = 0.5'te ilk KL 0.124 ölçüldü.
+- **Bakım:**
+  - M1.3 derinleştirmesi `main`'e alındı. Eski kalan M1.3 notebook'u yenilendi.
+  - Rubrik satırlarındaki uzun formüller mobilde taşıyordu; satır metni ayrı bir kutuya alındı.
+  - svdlab'de çubuklar üst üste biniyordu; yan yana dizildi.
+  - M11.12'nin d aşaması denetimi tek bir tohuma bağlıydı: aynı kod bir makinede PPO için 170, ötekinde 450'den fazla veriyordu. İlk tohum eşiğin altında kalırsa ikinci tohum deneniyor.
+  - M11.12 girişindeki "belirsiz Hessian'da yalnız sezgiseller" cümlesi düzeltildi.
+- **Kalan:** kapsam tablosunun final denetimi.
+
 ## 2026-11 (3. tur, devam) · Konu anlatımları: Faz 10
 
 Faz 10'un (paralel programlama ve GPU) 7 modülünün hepsine tam konu anlatımı yazıldı. Kaynak, BİL 455/533 Parallel Processing dersinin dokuz slayt destesi (lect_01–lect_09) ve dört alıştırma föyüdür (Ex. 1–4). Her deste sayfa sayfa işlendi. Slayt metni kopyalanmadı. Konular yeniden anlatıldı, türetimler eklendi ve slaytlardaki hatalar "Kaynak düzeltmesi" kutularında gerekçeleriyle düzeltildi. C++ thread ve CUDA kodları tarayıcıda çalışmadığı için deneyler, ölçüm ya da simülasyonla kurulmuş maliyet modelleridir. Her deneyin sınırları kendi kutusunda yazılıdır.

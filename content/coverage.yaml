@@ -231,6 +231,7 @@ groups:
       - src: "Vaswani ve ark. 2017 — Attention Is All You Need"
         pages: [m4-7-transformer, m4-14-transformer-ed]
         status: genis
+        done: "M4.14 makalenin yapısını izliyor: yalnız dikkatin gerekçesi (paralellik, yol uzunluğu), kodlayıcı–kod çözücü mimarisi, üç dikkat türü ve maskeler, ölçekli nokta çarpımı ve 1/√d_k'nın nedeni, çok başlı dikkat, sinüs konum kodlaması, eğitim tarifi (Adam, 4000 adımlık ısınmalı öğrenme oranı takvimi, etiket yumuşatma, dropout) ve WMT 2014 sonuçları (EN–DE 28.4, EN–FR 41.8 BLEU); maskviz, posenc, noamlr ve labelsmooth deneyleri. M4.7 yalnız kod çözücülü GPT çizgisini aynı makaleden türetiyor (gptcount, sampler, lnplace, kvcache)."
       - src: "Dosovitskiy ve ark. 2021 — ViT"
         pages: [m4-15-vit]
         status: genis
@@ -238,15 +239,20 @@ groups:
       - src: "Lin ve ark. 2017 — Feature Pyramid Networks"
         pages: [m4-9-detection]
         status: genis
+        done: "M4.9'un öznitelik piramidi bölümü: yukarıdan aşağı yol ve yanal bağlantılarla her ölçekte anlamca güçlü haritalar (P2–P5), görüntü piramidi ve tek ölçekli haritayla karşılaştırma, nesne boyutuna göre düzey seçimi; tespit bağlamı (IoU, NMS, YOLO, AP/mAP) ve nmsviz, apcurve, anchorkm deneyleri."
       - src: "Dalal & Triggs 2005 — HOG; Bay ve ark. 2006 — SURF"
         pages: [m9-14-features]
         status: genis
+        done: "M9.14: HOG'un dört adımı (gradyan, 9 bölmeli 0–180° hücre histogramları, blok normalizasyonu ve L2-Hys, 64×128 pencerede 3780 boyut), yaya tespiti bağlamı; SURF'ün Fast-Hessian'ı, kutu süzgeçleri ve 0.9 ağırlığı, süzgeç büyüterek ölçek uzayı, Haar yön ataması, 64 boyutlu betimleyici ve U-SURF; dogscale ve hoglab deneyleri (skimage ile 10⁻⁷ düzeyinde aynı)."
       - src: "Wang ve ark. 2004 — SSIM"
         pages: [m9-13-quality]
         status: genis
+        done: "M9.13: MSE/PSNR'ın sınırları, SSIM'in parlaklık, karşıtlık ve yapı karşılaştırmaları (C₁ = (K₁L)², K₁ = 0.01), σ = 1.5 Gauss pencereli yerel SSIM haritası ve ortalama, MS-SSIM ve referanssız ölçütler; eqmse (aynı MSE, farklı SSIM) ve ssimparts deneyleri; sınırlılığın ≤ 1 olduğu düzeltmesi."
       - src: "Barnich & Van Droogenbroeck — ViBe"
         pages: [m9-18-background]
         status: genis
+        done: "M9.18'in ViBe bölümü: piksel başına N = 20 örnekli model, R yarıçapı ve #min eşleşme kuralı, φ = 16 ile rastgele (bellekli olmayan) güncelleme ve komşuya yayılma, tek kareden başlatma ve hayalet sorunu; Stauffer–Grimson GMM ile karşılaştırma; bgsub ve vibeghost deneyleri."
       - src: "Viola & Jones 2001"
         pages: [m9-16-viola-jones]
         status: genis
+        done: "M9.16: Haar benzeri öznitelikler (24×24 pencerede 160 000'den fazla), integral görüntü, AdaBoost ile öznitelik seçimi ve ağırlık güncellemesi, 38 katmanlı kaskat ve yanlış alarm oranının çarpımla düşmesi, çok ölçekli tarama, yaklaşık 15 kare/s; haarfeat ve adaboostlab deneyleri; üç slayt düzeltmesi (dört dikdörtgenli öznitelik, başlangıç ağırlıkları, aydınlatma dayanıklılığı)."
