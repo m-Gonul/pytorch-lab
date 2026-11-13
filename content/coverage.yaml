@@ -3,7 +3,7 @@ intro: |
 
   **Nasıl denetlendi:** 82 PDF'in metni çıkarıldı (toplam ≈ 31 700 satır); her slayt başlığı ilgili modülün tüm dosyalarında (anlatım, alıştırma, kontrol, kod) aranıp eşleşmeyenler elle incelendi. **Erişim sınırı:** slaytlardaki şekil ve ekran görüntüleri metin olarak okunamadı; yalnız başlık, metin ve formüllerin metne dökülebilen kısmı karşılaştırıldı. Görsel içerikli slaytlar (ör. görüntü örnekleri, mimari çizimleri) konu başlığı üzerinden eşlendi.
 
-  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–3 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87 ve 88) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
+  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–4 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108 ve 109) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
 
   **Durumlar:** *kapsandı* — kaynaktaki konu sitede en az aynı derinlikte; *kapsandı + genişletildi* — sitede kaynakta olmayan türetim, alıştırma ya da deney de var; *kısmen* — konu var ama kaynaktaki bir alt başlık bilinçli olarak yüzeysel; *bilinçli olarak farklı* — kaynaktaki araç yerine başka bir araç (ör. Keras yerine PyTorch). Yeni kaynak geldikçe tablo genişletilir; tamamlanmış satırlar geri alınmaz.
 groups:
@@ -293,13 +293,18 @@ groups:
         ek varsayımla ayrıldı; γ=1 teklik koşulu açıklandı. Bağımsız ikinci okuma s.47–71 ve 12 görüntü. Bütün
         kitap tamamlanmadı.
     - src: Sutton ve Barto (2018), Bölüm 4 — Dinamik programlama (s. 73–90)
-      topics: 10 numaralı alıştırma; 3 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
+      topics: 10 numaralı alıştırma ve 1 numarasız soru; 3 numaralı +4 numarasız görsel,3 kutulu sözde-kod. PE/PI/VI,stokastik
+        ve ε-yumuşak iyileştirme,Jack,kumarbaz,asenkron DP,GPI,verim ve tarih.
       pages:
-      - m11-2-mdp-vi
       - m11-3-policy-iteration
-      status: eksik
-      gap: Kaynağın bu bölümü henüz aktarılmadı; hedefler yalnız konu eşlemesi adaylarıdır.
-      done: Sayfa ve numaralı öğe envanteri çıkarıldı. İçerik kapsamı tamamlanmış sayılmadı.
+      - m11-2-mdp-vi
+      status: genis
+      gap: —
+      done: 102 kaynak birimi;99 eklendi,2 vardı,1 genişletildi. 10/10 alıştırma ve numarasız politika ailesi
+        sorusu çözümü. Mevcut p5 genişletildi,10 kart/3 deney/x4 eklendi. Şekil4.1 tüm hücre/okları,4.2 tüm politika
+        dizisi ve değer yüzeyi,4.3 tarama eğrileri yeniden hesaplandı. 441 durumlu özgün ve4.7 robot değil araba
+        modelleri;0.25/0.55 kumarbaz koşuları. Bağımsız ikinci okuma ve kaynak/öğretim ayrımı tamamlandı;kitabın
+        bütünü tamamlanmadı.
     - src: Sutton ve Barto (2018), Bölüm 5 — Monte Carlo yöntemleri (s. 91–118)
       topics: 14 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
       pages:

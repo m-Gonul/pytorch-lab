@@ -1,5 +1,21 @@
 # Değişiklik günlüğü
 
+## 2026-11-13 · Yeni kaynak: Sutton ve Barto, Bölüm 4 (s. 73–90)
+
+M11.3 mevcut içeriği korunarak genişletildi; M11.2 içindeki aynı V*/Q* denklemlerine kesin bağlantı verildi. İlk dört bölüm işlendi, bütün kitap tamamlanmadı. Yeni modül yok.
+
+- **Defter:** 102 kaynak birimi:99 eklendi,2 vardı,1 genişletildi;düzeltildi/bekliyor/kapsam-dışı0. İlk dört bölüm toplam546 birim. Poisson kuyruk/matris türetimi kaynak sayfada verilmediği için öğretim eki olarak ayrı tutuldu,102 sayısına katılmadı. Kaynakta10 numaralı alıştırma,1 numarasız soru,7 görsel ve3 kutulu sözde-kod tamamlandı.
+- **Anlatım:** Bellman eşitliğini atamaya çevirme;beklenen güncelleme;PE için ortak p/Jacobi/Gauss–Seidel/durma;getiri açılımlı iyileştirme kanıtı;stokastik bağlar;PI/VI sözde-kodlarının bütün aşamaları;ε-yumuşak kısıt;Jack/kumarbaz;asenkron sıra ve ziyaret koşulları;GPI rekabet/işbirliği;verim,boyut laneti,özyükleme ve bütün tarih atıfları.
+- **Kartlar:** 10 yeni kartla toplam 16. Kaynak4.4 sorusu aynı mevcut p5 kartıyla birleştirildi;eski metin/seçenekler korundu,köken ve tam döngü düzeltmesi eklendi. 4.1–4.3→p7–p9;4.5–4.10→p10–p15;numarasız bütün optimal aile sorusu→p16. Bu yüzden kaynak11 sorusu için11 yeni tekrar kartı üretilmedi.
+- **Görseller:** 3 yeni deney ve2 SVG grubu. gridpefig/l3:Şekil 4.1 k0/1/2/3/10/limit için bütün sayılar/oklar ve kurulum ızgarası. jackrental/l4:Şekil 4.2 π0…π4 ve son3B değer yüzeyi;4.7 varyantı. gamblerfig/l5:Şekil 4.3 1/2/3/32 tarama,sonV ve politika;4.9 için0.25/0.55/gevşekθ. PI zinciri ve iki GPI şeması hesaplanan özgün SVG;ikincisinde gerçek izdüşüm okları kullanıldı.
+- **Programlama:** x4 tam .md/.py/.sol.py/.check.py ile4.7. Özgün ve değişmiş problem441 durumda;özgün V(0,0)=421.414063,V(20,20)=636.989607;değişmiş429.946305/603.536701. İkisinde5 politika değerlendirmesi,son sabitlik denetimi dahil. İlk1→2 araba ücretsiz,ters yön ücretli,taşıma sonrası >10 için şube başına 4. x3 gösterimi/arayüzü korunup4.9 ikiolasılık/üçeşik/grafik yönergesi eklendi.
+- **Bağımsız sayısal denetim:** NumPy ve JS bütün882 Jack değeri,iki modelin bütün politika dizileri,3 kumarbaz V/politika sonucu ve1/2/3/32 izleri,5 ızgara taraması üzerinden eşleşti. Ek durum15 her iki4.2 dinamiğinde−20;qπ(11,aşağı)=−1,qπ(7,aşağı)=−15. p_h=0.55 çözümünün bir-birim bahis kapalı formuna en büyük farkı8.99×10⁻¹¹. 0.25/0.55 için θ10⁻⁶→10⁻¹² en büyükV farkları0/0.000093520231;9ondalıklı bağ kırmayla politika değişimi0. B*(26)={1,24,26},B*(51)={1,49} sayısal doğrulandı. Mevcut x3 eşzamanlı kodu da 0.25/0.55 ve üç eşikte doğrudan çalıştırıldı; en büyük V farkları 1.74812×10⁻⁷ / 0.000189500726, politika değişimi 0.
+- **Kaynak notları:** 0 bahis veγ1,sonlanmayan öz döngüye yol açabilir;pozitif bahis veya proper politika gereksinimi açıklandı. V100=1 sınır değeriyle hedef+1 ödülü birlikte çift sayılmaz. Kaynak−1.75→−1.7 yarımda sıfıra doğru yuvarlama seçimiyle yeniden üretildi. Polinom/LPyaklaşık100kat/milyonlarca durum iddiaları koşulları ve2018 bağlamıyla yazıldı. Tam Poisson kuyruğu ve bağımsız sayımların standart problem yorumu açık belirtildi;kaynakta olmayan türetim ona atfedilmedi.
+- **İkinci okuma:** bağımsız ajan yalnız PDF95–112 ve defteri okudu;18sayfa/9görüntü denetlendi. Numarasız aile sorusu,VI keyfi başlangıç/deterministik çıktı,GPI her iki süreçte kapsam,Werbos/Minsky tarih nüansları,Şekil 4.2 etiketleri ve sayfa aralıkları tamamlandı. Takip okumadaki iki kısalma da geri kondu.
+- **Doğrulama:**745/745 Node testi;M11.3 gerçek CPU PyTorch modül1/1 ve notebook1/1 temiz. Son build/notebook üretimi ve site7/7. 1280/390 px bütün yeni deney ön ayarları/görselleri incelendi;sayfa taşması,KaTeX hatası veya yinelenen kimlik yok. Eski geniş karşılaştırma tablosu kendi alanında yatay kaydırılır;bu mevcut davranış korunmuştur. Altı sözlük tanımı eklendi.
+- **Kalan:** Bölüm 5–17,ön/arka materyal,kısım ayırıcıları ve tam kaynakça/dizin henüz tamamlanmadı. Küresel complete/unit_inventory_complete/second_read_complete false kalır. Önceki bölümün CI yayını ayrıca izlenir;push tek başına yayın sayılmaz.
+
+
 ## 2026-11-13 · Yeni kaynak: Sutton ve Barto, Bölüm 3 (s. 47–71)
 
 M11.2 mevcut anlatımı, el hesabı, aşamaları, ekleri, kartları ve deneyleri korunarak genişletildi. Kitabın ilk üç bölümü işlendi; bütün kitap tamamlanmadı. Yeni modül açılmadı.

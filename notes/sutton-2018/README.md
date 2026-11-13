@@ -51,3 +51,22 @@ python3 -I notes/sutton-2018/generate_ch3.py /tmp/sutton-ch3
 Golfün tam geometrisi ve driver iniş olasılıkları kitapta verilmediğinden 15 durumlu özgün model kullanıldı: 13 mesafe düzeyi ve iki kum durumu. Putter iki düzey ilerler; driver iki olası yere iner. Tee için 6 putt veya 2 drive+putt sayıları hesaplandı; driver için ara kesirli değer de gösterildi. Bu model kaynak şekle ölçülmemiş koordinatlar veya biricik olasılıklar atfetmez. Robotun başlangıç sayısal parametreleri de kaynak sabitleri değil deney seçimidir.
 
 Alıştırma 3.4 tablosu yalnız koşullu beklenen ödüllerle tekil belirlenemez; genel ρ çözümü ve açık belirlenimci-ödül ek varsayımı ayrı verilir. Bellman tekliği sınırlı sonlu model/γ<1 koşuluyla yazılır; γ=1 için karşı örnek ve sonlanma gereksinimi belirtilir. Bölüm 4–17 ve ön/arka materyal henüz tamamlanmadı.
+
+## Bölüm 4
+
+Basılı s.73–90 / PDF95–112. 102 kaynak birimi,10 alıştırma,1 numarasız soru,7 görsel,3 sözde-kod. Ayrı teaching_extensions alanındaki Poisson türetimi kaynak birimi sayılarına katılmaz.
+
+Sayısal bütün referansları yeniden üret (NumPy):
+
+```bash
+OPENBLAS_NUM_THREADS=1 python3 -I notes/sutton-2018/measure_ch4.py /tmp/measurements_ch4.json
+python3 -I notes/sutton-2018/generate_ch4.py /tmp/sutton-ch4-figures
+```
+
+measurements_ch4.json;özgün/değişmiş441 durumlu Jack politikaları ve değerleri,ızgara durumları,kumarbaz0.4/0.25/0.55 tarama izleri ve azalan eşik koşularını saklar. JS çözücüleri bütün değer/politika/izlerle karşılaştırıldı. 0.55 bir-birim bahis için kapalı form(1−r^s)/(1−r^100),r=0.45/0.55 ek bağımsız denetimdir.
+
+Şekil 4.1 kaynak yarımda sıfıra doğru iki anlamlı yuvarlama ile çizilir;hesaplar yuvarlanmaz. Jack sayımları bağımsız Poisson varsayımıyla ve tam doyan kuyruk kütleleriyle kurulur;kaynak tüm ortak bağımlılıkları ayrı belirtmez. Kumarbaz labı yerinde,eski x3 aşaması eşzamanlı günceller. Pozitif bahisler sonlanan politikalar içindir;0 bahis veγ1 nüansı anlatımda açıklanır. GPI izdüşüm şekli bir geometri benzetmesidir,yakınsama kanıtı değildir.
+
+İlk dört bölüm işlendi;Bölüm 5–17 ve ön/arka materyal henüz tamamlanmadı.
+
+Mevcut x3 eşzamanlı kodu da doğrudan 0.25/0.55 ve üç eşikte çalıştırıldı. 10⁻⁶→10⁻¹² en büyük V farkları 1.74812×10⁻⁷ / 0.000189500726; politika değişimi 0. Bunlar yerinde tarama ölçümleriyle karıştırılmaz; x3_synchronous alanında bütün diziler saklıdır.

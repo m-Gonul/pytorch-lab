@@ -127,6 +127,174 @@ VI, PI ve MPI ortak bir kalıbın örnekleridir. Bir değer tahmini ile bir poli
 
 Sutton ve Barto bu kalıba **genelleştirilmiş politika yinelemesi** (GPI) adını verir. Değerlendirme tam ya da kısmi, eşzamanlı ya da yerinde olabilir. Hatta bir durumun değeri diğerlerinden önce güncellenebilir (asenkron DP). İki süreç birbirini izlediği sürece sabit nokta en iyi değer ve en iyi politikadır. Sonraki modüllerin neredeyse hepsi bu kalıbın modelsiz biçimidir. MC ve TD (M11.4) değerlendirmeyi örneklerden yapar. SARSA ve Q-öğrenme (M11.5) iyileştirmeyi her adımda küçük parçalar hâlinde yapar. Actor–critic (M11.9) değerlendirmeyi bir "eleştirmen", iyileştirmeyi bir "aktör" ağına verir.
 
+### Sutton: Bellman eşitliğini güncellemeye çevirmek {#sutton-dp}
+
+**Sutton ve Barto (2018), Bölüm 4, s.73–90 / PDF95–112** için temel fikir şudur: değer fonksiyonu yalnız iyi davranışın tanımı değildir; onu bulmayı düzenleyen bir hesap aracıdır. **Dinamik programlama (DP)**, MDP olarak verilen doğru ve eksiksiz ortam modelinden en iyi politikayı hesaplayan yöntemler ailesidir. Klasik DP tam model ve çok hesap istediği için büyük öğrenme problemlerinde sınırlıdır; yine de daha az hesap ve model varsayımı isteyen RL yöntemlerinin kuramsal temelidir. DP adı yalnız MDP çözümüne özgü değildir; burada o uygulamasını inceliyoruz.
+
+Temel durum sonlu $\mathcal S,\mathcal A,\mathcal R$ ve bilinen $p(s',r\mid s,a)$ modelidir; bölümlü görevde sonraki durum terminal dahil $\mathcal S^+$ içinde olur. Sürekli uzaylarda da DP fikri kullanılabilir, fakat tam çözüm özel durumlarla sınırlıdır. Bir yaklaşım, durum ve eylemleri **nicemleyip** sonlu DP uygulamaktır; kaynak Bölüm 9 fonksiyon yaklaşımı bu yaklaşımın önemli bir genişlemesidir. Tamlık/teklik ifadelerinde önceki modüldeki $\gamma<1$, sınırlı ödül veya uygun sonlanma koşulları geçerlidir.
+
+Kaynak (4.1) ve (4.2), önceki modülün [V/Q Bellman en iyilik denklemleridir](m11-2-mdp-vi.html#sutton-optimal). Sağ taraftaki gerçek $v_*,q_*$ yerine mevcut tahmini koyup sol tarafı **atamak**, onları algoritmaya dönüştürür. Aynı dönüşüm sabit politika için de yapılır. **[[beklenen güncelleme|Beklenen güncelleme]]**, bütün mümkün sonraki durum/ödül sonuçlarını olasılıklarıyla toplar; tek bir örnek sonraki durumu kullanmaz. Kök durum veya durum–eylem olabilir; ardıl değerlerin politika ortalaması veya maksimumla birleştirilmesi farklı güncellemeler üretir. Kaynak Bölüm 3 backup şemaları bu ayrımı zaten gösteriyor.
+
+### Politika değerlendirme: iki dizi, bir dizi, durma {#sutton-degerlendirme}
+
+Belirli $\pi$ için $v_\pi$ hesaplamak **tahmin / politika değerlendirme** problemidir. Kaynak (4.3)–(4.4), $v_\pi(s)=\mathbb E_\pi[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t=s]$ ve ortak $p$ açılımıdır; türetimi [M11.2 içinde](m11-2-mdp-vi.html#sutton-politika-deger) var. Model biliniyorsa $|\mathcal S|$ bilinmeyenli doğrusal sistem çözülür. Yinelemeli alternatif, terminal değeri 0 kalacak biçimde herhangi bir $v_0$ ile başlar:
+$$v_{k+1}(s)=\sum_a\pi(a\mid s)\sum_{s',r}p(s',r\mid s,a)[r+\gamma v_k(s')].\tag{4.5}$$
+$v_\pi$ bunun sabit noktasıdır. İndirimin büzülme sağladığı veya ilgili bölümlü modelin uygun olduğu koşullarda yinelemeler bu değere yakınsar. Her durumu bir kez güncellemek bir **tarama**dır. İki diziyle yeni değerlerin hepsi eski diziden hesaplanır; eşzamanlı/Jacobi biçimi budur. Tek dizide yeni değeri hemen yazınca aynı tarama içinde sonraki hesaplar onu kullanabilir: yerinde/Gauss–Seidel biçimi. Yerinde hesap da uygun koşullarda yakınsar; çoğu kez daha hızlıdır, hızı durum sırasına bağlıdır. Bu, kaynakta genellikle varsayılan uygulamadır.
+
+Kaynak s.75 sözde-kodunun kendi gösterimimizle tam akışı:
+
+```text
+Girdi π; doğruluk eşiği θ > 0
+Bütün V(s) değerlerini seç; V(terminal)=0 tut
+tekrarla:
+    Δ = 0
+    her terminal olmayan s için:
+        eski = V(s)
+        V(s) = Σa π(a|s) Σs′,r p(s′,r|s,a) [r + γV(s′)]
+        Δ = max(Δ, |eski − V(s)|)
+Δ < θ olunca V değerini döndür
+```
+
+Burada sağ taraf aynı dizinin o anda bulunan değerleridir. Teorik limit sonsuz yineleme gerektirebilir; program sonlu eşikle durur. Bu eşik “herhangi bir $\gamma$ için gerçek hata en çok $\theta$” demek değildir. $\gamma<1$ için gerçek hata ve politika kaybı [önceki sınırlarla](m11-2-mdp-vi.html#buzulme) değerlendirilir; $\gamma=1$ sonlu bölümde aynı $1/(1-\gamma)$ formülü kullanılamaz.
+
+**Örnek 4.1** dört yönlü 4×4 ızgaradır: terminal olmayan durumlar 1–14; sol üst ve sağ alt gölgeli hücreler **aynı terminalin iki çizimidir**. Sınır dışına eylem aynı hücrede bırakır. Terminale giriş dahil her geçiş −1; $\gamma=1$. Örneğin $p(6,-1\mid5,\text{sağ})=1$, $p(7,-1\mid7,\text{sağ})=1$; $p(10,r\mid5,\text{sağ})=0$ bütün ödüller için. Rastgele politikada her yön 1/4. Son değerler beklenen bitiş adımı sayısının eksi işaretlisidir:
+$$\begin{pmatrix}0&-14&-20&-22\\-14&-18&-20&-20\\-20&-20&-18&-14\\-22&-20&-14&0\end{pmatrix}.$$
+Mevcut b aşaması, el hesabı ve l2 bunu hesaplıyor; aşağıdaki tamamlayıcı görünüm kaynak şeklinin **her hücresini ve her eşit açgözlü okunu** birlikte gösterir.
+
+::lab l3
+
+Kaynak Şekil 4.1 ön ayarları $k=0,1,2,3,10,\infty$ durumlarıdır. Sonuncusu 400 taramayla sayısal olarak yaklaştırılır; -14/-20/-22 tam değerlerine uzaklık $10^{-7}$ altındadır. Gösterim iki anlamlı basamaktır. Kaynak tam −1.75 değerini −1.7 gösterir; bu yarımda sıfıra doğru yuvarlama tercihini kaynak görünümü için açıkça kullandık. Diğer hesaplar tam değerlerle yürür. $k=0$ için dört ok rastgele politikayı temsil edebilir. Sonraki oklar $v_k$ tahminine göre açgözlüdür. $k=3$ ile değerler henüz kaba olmasına karşın bütün bu oklar en kısa terminal yollarını verir. Limit değerine göre açgözlü olmak genel olarak yalnız **iyileşme** garantiler; bu örnekte zaten en iyiliğe ulaşılır. Yeni politikanın değerleri −1,−2,−3 iken rastgele politikanın terminal olmayan değerleri en çok −14 olur.
+
+### Bir kez iyi görünen eylemi her gelişte seçmek {#sutton-iyilestirme}
+
+Mevcut $\pi$ biliniyor olsun. Bir durumda farklı $a$ eylemini **bir kez** yapıp sonra $\pi$ izlemek
+$$q_\pi(s,a)=\mathbb E[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t=s,A_t=a]=\sum_{s',r}p(s',r\mid s,a)[r+\gamma v_\pi(s')]\tag{4.6}$$
+verir. Eğer bu $v_\pi(s)$ değerinden büyükse aynı seçimi o duruma her gelişte yapmak da politikayı iyileştirir. Daha genel koşul, her durumda
+$$q_\pi(s,\pi'(s))\ge v_\pi(s)\quad\Rightarrow\quad v_{\pi'}(s)\ge v_\pi(s).\tag{4.7–4.8}$$
+İlk eşitsizlik bir durumda kesin ise yeni değer orada da kesin daha büyüktür. Kaynak bunu getiri açılımıyla kanıtlar; önceki [monoton operatör kanıtı](#monoton) aynı sonucu başka açıdan veriyor.
+
+:::türetim Kaynağın adım adım getiri kanıtı
+Koşulu önce şimdiki duruma, sonra $\pi'$ izlenirken karşılaşılan her ardıla uygula:
+$$\begin{aligned}
+v_\pi(s)&\le q_\pi(s,\pi'(s))\\
+&=\mathbb E_{\pi'}[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t=s]\\
+&\le\mathbb E_{\pi'}[R_{t+1}+\gamma q_\pi(S_{t+1},\pi'(S_{t+1}))\mid S_t=s]\\
+&=\mathbb E_{\pi'}[R_{t+1}+\gamma R_{t+2}+\gamma^2v_\pi(S_{t+2})\mid S_t=s]\\
+&\le\mathbb E_{\pi'}\!\left[\sum_{j=1}^{n}\gamma^{j-1}R_{t+j}+\gamma^nv_\pi(S_{t+n})\mid S_t=s\right].
+\end{aligned}$$
+Sınırlı değer ve $\gamma<1$ için kuyruk sıfıra gider; uygun sonlanan görevde terminalin 0 değeri aynı işi görür. Limit $v_{\pi'}(s)$ olur. İlk adımda kesin fark varsa sonraki adımlar bu kazanımı geri almaz. Böylece tek durumdaki eylem değişikliği de, bütün durumlarda aynı anda değişiklik de kapsanır.
+:::
+
+Açgözlü iyileştirme her durumda bu koşulu sağlar:
+$$\pi'(s)\in\arg\max_a q_\pi(s,a)=\arg\max_a\sum_{s',r}p(s',r\mid s,a)[r+\gamma v_\pi(s')].\tag{4.9}$$
+Yeni politika eskisinden iyi değil ama tam eşit değerdeyse $v_{\pi'}=v_\pi$ yerine konur; aynı değer kendi Bellman en iyilik denklemini sağlar. O halde ikisi de en iyidir. Stokastik politika için koşul $\sum_a\pi'(a\mid s)q_\pi(s,a)\ge v_\pi(s)$ olur. Birden fazla maksimum varsa yalnız onların üzerinde kalan **her** olasılık paylaşımı açgözlüdür; tek eylem seçmek zorunlu değildir.
+
+### Politika döngüsü ve araba kiralama {#sutton-politika-dongusu}
+
+Değerlendirme E ve iyileştirme I art arda uygulanır. Her yeni değerlendirmeyi sıfır yerine önceki politika değerinden başlatmak genellikle hesabı hızlandırır; politikalar yakınsa değerler de yakın olabilir. Sonlu adımda sonlanma kanıtı belirlenimci politika kümesini ve eşitliklerin tutarlı ele alınmasını kullanır. Rastgele bağ kırma, eşdeğer politikalar arasında döngü yaratabilir; kaynağın Alıştırma 4.4 sorusu bunun düzeltilmesini ister.
+
+<figure class="fig wide"><svg viewBox="0 0 640 285" role="img" aria-label="ch4-policy-sequence"><defs><marker id="ch4-policy-sequence" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="currentColor"/></marker></defs><text x="75" y="73" text-anchor="middle" style="font-size:27px">π₀</text><text x="235" y="73" text-anchor="middle" style="font-size:27px">vπ₀</text><text x="395" y="73" text-anchor="middle" style="font-size:27px">π₁</text><text x="555" y="73" text-anchor="middle" style="font-size:27px">vπ₁</text><text x="555" y="198" text-anchor="middle" style="font-size:27px">π₂</text><text x="395" y="198" text-anchor="middle" style="font-size:27px">…</text><text x="235" y="198" text-anchor="middle" style="font-size:27px">π*</text><text x="75" y="198" text-anchor="middle" style="font-size:27px">v*</text><path d="M109.0,65.0 L201.0,65.0" fill="none" stroke="currentColor" marker-end="url(#ch4-policy-sequence)"/><text x="155.0" y="53.0" text-anchor="middle" style="font-size:22px">E</text><path d="M269.0,65.0 L361.0,65.0" fill="none" stroke="currentColor" marker-end="url(#ch4-policy-sequence)"/><text x="315.0" y="53.0" text-anchor="middle" style="font-size:22px">I</text><path d="M429.0,65.0 L521.0,65.0" fill="none" stroke="currentColor" marker-end="url(#ch4-policy-sequence)"/><text x="475.0" y="53.0" text-anchor="middle" style="font-size:22px">E</text><path d="M555.0,99.0 L555.0,156.0" fill="none" stroke="currentColor" marker-end="url(#ch4-policy-sequence)"/><text x="580.0" y="115.5" text-anchor="middle" style="font-size:22px">I</text><path d="M521.0,190.0 L429.0,190.0" fill="none" stroke="currentColor" marker-end="url(#ch4-policy-sequence)"/><text x="475.0" y="178.0" text-anchor="middle" style="font-size:22px">E/I</text><path d="M361.0,190.0 L269.0,190.0" fill="none" stroke="currentColor" marker-end="url(#ch4-policy-sequence)"/><text x="315.0" y="178.0" text-anchor="middle" style="font-size:22px">E/I</text><path d="M201.0,190.0 L109.0,190.0" fill="none" stroke="currentColor" marker-end="url(#ch4-policy-sequence)"/><text x="155.0" y="178.0" text-anchor="middle" style="font-size:22px">E</text><text x="320" y="258" text-anchor="middle" style="font-size:20px">E: politika değerlendirme; I: açgözlü iyileştirme</text></svg><figcaption>Şekil 3 — E ve I adımlarıyla politika/değer zinciri. Mevcut iki durumlu el hesabında π₀=(kal,kal), Vπ₀=(0,4); π₁=(git,kal), Vπ₁=(3,4) hesaplanır ve sabitlenir. Ok grafiği bu güncelleme dizisinden üretildi. (Kaynak: s.80, numarasız politika yineleme zinciri.)</figcaption></figure>
+
+Kaynak s.80 sözde-kodu, Alıştırma 4.4 düzeltmesi eklenmiş biçimde:
+
+```text
+V ve her durumda geçerli π(s) seç; terminal değerini 0 tut
+tekrarla:
+    π sabitken önceki V ile başla
+    Δ < θ olana kadar yerinde politika değerlendirme taramaları yap
+    sabit = doğru
+    her s için:
+        eski_eylem = π(s)
+        Q(a) = Σs′,r p(s′,r|s,a) [r + γV(s′)]
+        eski_eylem maksimumsa koru; değilse sabit sıralı argmax seç
+        π(s) değiştiyse sabit = yanlış
+sabit olunca V,π döndür
+```
+
+Tam değerlendirmede bu bağ kuralı eşdeğer politika döngüsünü önler. Kayan noktada küçük bir eşitlik toleransı kullanılır; sonlu değerlendirme eşiğinin çıktıyı yaklaşık yapabileceği ayrıca bilinmelidir. **Q için tam algoritma** ve **ε-yumuşak politikalarla sınırlı iyileştirme** p10–p11 kartlarında verilir; bunlar V algoritmasındaki aşamaları aynen kopyalamaz, ilgili beklentileri değiştirir.
+
+**Örnek 4.2: Jack’in iki şubesi.** Durum gün sonundaki $(n_1,n_2)$ araba sayısıdır; her şubede 0–20, toplam 441 durum. Gece eylemi birinci şubeden ikinciye net taşınacak tam sayı $a$; negatif değer ters yön, gecede en çok 5. Kaynak şubede olmayan araba taşınamaz. Kapasite üstü arabalar ulusal şirkete döner ve modelden çıkar. Kiralanan araba başına +10, taşınan araba başına −2. Araç yoksa talep kaybedilir; iade edilen araç ancak sonraki gün kiralanabilir. Talep Poisson ortalamaları $(3,4)$, iade ortalamaları $(3,2)$; $\Pr(N=n)=e^{-\lambda}\lambda^n/n!$. Gün zaman adımıdır, görev devam eder ve $\gamma=0.9$.
+
+:::türetim Öğretim eki: Poisson modelini kuyruk kaybetmeden hesaplamak
+$n$ araba varken kiralanan sayı $K=\min(D,n)$. Dolayısıyla $k<n$ için Poisson olasılığını aynen kullan, son kovaya $\Pr(D\ge n)$ koy. Beklenen kira $10\mathbb E[K]$. İadede de kapasitede doyan bütün olayları son kovaya kat. Bu **olasılık kesip atmak değildir**; aynı sonraki duruma götüren kuyruğu birleştirir. Her tek-şube geçiş matrisi satırı 1 toplar. Hesap, şubelerin ve günlerin talep/iade sayımlarını bağımsız kabul eden standart problem yorumunu kullanır. Kaynak ortak bağımlılıkları ayrıca vermediği için bu varsayım açık tutulur. Bağımsız iki şube için
+$$\mathbb E[V(N'_1,N'_2)\mid m_1,m_2]=(T_1VT_2^\top)_{m_1,m_2}.$$
+Burada $(m_1,m_2)$ taşımadan sonra kapasiteye kesilmiş stoktur. $Q(s,a)$, iki şubenin beklenen kirası eksi taşıma/otopark maliyeti artı bu beklentinin $\gamma$ katıdır. Böylece bütün 441×441 geçişleri tek tek saklamadan aynı hesap yapılır. d aşaması özgün modeli gerçek PyTorch ile çözer; yeni x4 iki modeli NumPy ile tekrar kurar.
+:::
+
+::lab l4
+
+Kaynak Şekil 4.2, hiç taşımayan $\pi_0$ ile başlayan $\pi_0,\ldots,\pi_4$ ve son değer yüzeyini gösterir. Aynı parametrelerle hesaplanan politika sınırları ve işaretler yukarıdadır. Tam Poisson kuyruklarıyla $V(0,0)=421.414063$, $V(20,20)=636.989607$; beş değerlendirme, son sabitlik denetimi dahil. Kaynak yüzeyindeki 420/612 yazıları bütün yüzeyin minimum/maksimumunun kesin tanımı olarak alınmadı; deneyin kendi sayısal uçları açık veriliyor.
+
+**Alıştırma 4.7** iki değişikliği birlikte ister: 1→2 yönünde ilk araba ücretsiz, aynı yöndeki ek arabalar ve bütün ters yön arabaları 2; taşımadan sonra bir şubede **10’dan fazla** araba varsa o şube için sabit 4 otopark maliyeti. İki şube de eşiği aşarsa 8; araba başına 4 değildir. Kod maliyeti
+$$c(a,m_1,m_2)=2\begin{cases}\max(a-1,0)&a>0\\|a|&a\le0\end{cases}+4\mathbf1\{m_1>10\}+4\mathbf1\{m_2>10\}$$
+olarak kurar. x4 önce özgün problemi, sonra bu değişmiş problemi tam kapasitede çözer. Değişmiş modelde $V(0,0)=429.946305$, $V(20,20)=603.536701$; beş değerlendirme. Bu tür doğrusal olmayan maliyetler ve keyfî dinamikler DP içinde aynı beklenti hesabına girer; kaynak bu esnekliği vurgular.
+
+### Kesilmiş değerlendirme, değer yinelemesi ve kumarbaz {#sutton-deger-yinelemesi}
+
+Politika değerlendirmesini sonsuza kadar beklemek gerekmez. Tek tarama sonrası açgözlü iyileştirme, ikisini tek güncellemede birleştirir:
+$$v_{k+1}(s)=\max_a\sum_{s',r}p(s',r\mid s,a)[r+\gamma v_k(s')].\tag{4.10}$$
+Bu, Bellman en iyilik eşitliğinin atamaya dönüşmesidir; politika değerlendirmesinden farkı $\pi$ ortalaması yerine max olmasıdır. Backup farkı da yalnız ajan seçimindedir. Birden çok değerlendirme taramasını iyileştirme aralarına koymak MPI ailesini verir; kaynak indirimli sonlu MDP için bu kesilmiş türlerin yakınsadığını söyler. Yöntemler ve işlem maliyetleri [mevcut MPI bölümünde](#mpi) karşılaştırılıyor.
+
+Kaynak s.83 üçüncü sözde-kod kutusunun akışı:
+
+```text
+θ > 0 seç; V değerlerini başlat, V(terminal)=0
+tekrarla:
+    Δ = 0
+    her s için:
+        eski = V(s)
+        V(s) = max_a Σs′,r p(s′,r|s,a) [r + γV(s′)]
+        Δ = max(Δ, |eski − V(s)|)
+Δ < θ olunca V’ye göre bir adımlık açgözlü π çıkar ve döndür
+```
+
+Bu kutu yerinde günceller; (4.10) alt indisleriyle yazılan iki dizili biçimle aynı sıra değildir. Terminal değeri 0 kalmak üzere herhangi bir başlangıçtan uygun koşullarda v* limitine gidilir; çıktı için bir maksimum eylem seçilerek deterministik politika elde edilir. İki güncelleme sırası aynı limite gider, ara tarama eğrileri farklı olabilir.
+
+**Örnek 4.3: kumarbaz.** Sermaye $s\in\{1,\ldots,99\}$, hedef 100, iflas 0. Yazı olasılığı $p_h$, yazıda yatırılan $a$ kazanılır, turada kaybedilir; bahis tam sayıdır ve $a\le\min(s,100-s)$. Hedefe giriş +1, diğer ödüller 0, $\gamma=1$; $v_*(s)$ hedefe ulaşmanın en büyük olasılığıdır. $p_h$ bilinirse bütün model bilinir. Kaynak Şekil 4.3, $p_h=0.4$ için 1/2/3/32 tarama eğrilerini, son V ve son bahis politikasını gösterir. Politika tek değildir; eşit Q değerleri farklı şekilli en iyi politikalar verebilir. Kaynağın numarasız “bütün aile nasıl görünür?” sorusu da p16 kartında çözülür.
+
+::lab l5
+
+:::uyarı Kaynak notu: sıfır bahis ve terminal değerinin iki yazımı
+Kaynak eylem kümesine 0 bahis de yazar. $\gamma=1$ için bu eylem sıfır ödüllü öz döngüdür: kendi Q değeri her mevcut V değerine eşittir. Körlemesine argmax seçip her yerde 0 bahis kullanmak oyunu hiç bitirmez ve kazanma olasılığı 0 olur; sonlanan en iyi politikanın değerini bu politikaya atayamayız. Mevcut x3 ve deney **pozitif bahislerle sonlanan politika** arar; sıfırı dışarıda tuttuğu açık belirtilmiştir. Bu, önceki modüldeki indirimsiz Bellman/sonlanma koşulunun somut örneğidir.
+
+Asıl ödül modelinde terminalin V değeri 0, hedefe girişte ödül +1 olur. Alıştırma 4.9 ise eşdeğer bir sınır-değer hesabı önerir: kukla $V(0)=0,V(100)=1$ ve geçişte ayrıca +1 yok. İkisini aynı anda kullanmak kazanma ödülünü iki kez sayar. Böylece güncelleme $\max_a[p_hV(s+a)+(1-p_h)V(s-a)]$ olur.
+:::
+
+$p_h=0.4$ için 50 sermayede 50 bahis, 51 sermayede küçük bahis seçilebilmesi çelişki değildir. $V(50)=0.4$; 51 düzeyinde tamamını yatırmak zaten a≤49 sınırı yüzünden geçerli değildir; 1 veya 49 gibi farklı en iyi bahisler olabilir. 1 bahis ile sonuçlar 50/52, 49 ile 2/100 olur; aynı en iyi kazanma olasılığına ulaşabilirler. Politika çizgisi bağ kırma tercihine bağlıdır, “daha az risk her zaman iyi” gibi bir kural değildir. **Alıştırma 4.9**, $p_h=0.25$ ve $0.55$ için değer/politika grafiklerini ve $\theta\to0$ kararlılığını ister. x3 bu iki çağrıyı destekler; deney yerinde taramayla kaynak eğrilerini, kod aşaması eşzamanlı taramayla aynı limitleri üretir. Dokuz ondalıkta Q bağ kırma kuralı ayrıca raporlanır; yakın değer kararlılığı tekil politika kararlılığı demek değildir.
+
+### Asenkron DP ve iki etkileşen hedef {#sutton-asenkron}
+
+Tam tarama çok büyükse algoritma tek tarama bitmeden ilerleyebilmelidir. Kaynağın örneğinde tavla $10^{20}$ üzerinde durum taşır; saniyede bir milyon durum güncellemek bile bir tarama için bin yıldan fazladır. Tam $10^{20}$ ile aritmetik yaklaşık **3.17 milyon yıl** verir; bu kitabın alt sınırını güçlendiren bir ölçek hesabıdır, bir güncel donanım ölçümü değildir.
+
+**Asenkron DP**, sistematik tarama yerine elindeki güncel veya eski değerlerle durumlardan istediğini yerinde günceller; bazıları diğerlerinden daha sık seçilebilir. $0\le\gamma<1$ için tek-durum VI, her durum sonsuz kez güncellendiğinde en iyi değere yakınsar; sıra rastgele de olabilir. Hiçbir durum belli bir andan sonra kalıcı olarak dışlanamaz. İndirimsiz bölümlü görevde bazı sıralar sorun yaratabilir, ek koşul/sıra gerekir. Değerlendirme ve en iyilik güncellemeleri ince ölçekte karıştırılıp asenkron kesilmiş PI kurulabilir.
+
+Tarama kullanmamak otomatik olarak daha az toplam hesap demek değildir; kazanç, dev bir tur tamamlanmadan değer/politika bilgisini iyileştirebilme serbestliğidir. Sırayı bilgi verimli yayılacak biçimde seçmek, bazı durumları daha az güncellemek veya amaç için ilgisiz olanları ayıklamak mümkündür; kaynak Bölüm 8 bu fikirleri ilerletir. Bütün durumlarda yakınsama teoremi ile yalnız ilgili ziyaret bölgesinde iyi davranış arayışını karıştırmamalıyız. Gerçek etkileşim de eşzamanlı sürebilir: ziyaret edilen durumlar hesap sırasını seçer, son V/π bilgisi ajanın kararını yönlendirir. Böylece hesap gerçek yörüngelerde yararlı olan bölgeye yoğunlaşır.
+
+**GPI**, değerlendirme ve iyileştirme süreçlerinin ayrıntısı veya adım büyüklüğü ne olursa olsun etkileşmesidir. Tam PI sırayla ikisini bitirir, VI tek taramayı yeter görür, asenkron yöntem tek durumdan sonra süreci değiştirebilir. Her iki süreç de bütün durumları güncellemeyi sürdürmelidir; yalnız birinde kalıcı olarak bazı durumları dışlamak bu genel beklentinin koşulunu bozar. İkisi de sabitlenirse V politikayla tutarlı ve politika V’ye göre açgözlüdür; Bellman en iyilik koşulu sağlanır. Çoğu RL yöntemi bu kalıpla açıklanır. Ancak sırf GPI adını vermek her yaklaşık algoritma için yakınsama kanıtı değildir; kaynak özeti bazı biçimlerin kanıtlı, bazılarının yalnız açıklayıcı olduğunu ayrıca belirtir.
+
+<figure class="fig wide"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px"><svg viewBox="0 0 320 370" role="img" aria-label="ch4-gpi-loop"><defs><marker id="ch4-gpi-loop" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="currentColor"/></marker></defs><text x="35" y="130" text-anchor="middle" style="font-size:25px">π</text><text x="285" y="130" text-anchor="middle" style="font-size:25px">V</text><path d="M45,107 Q160,-2 275,107" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-loop)"/><path d="M275,145 Q160,254 45,145" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-loop)"/><text x="160" y="30" text-anchor="middle" style="font-size:20px">değerlendirme</text><text x="160" y="65" text-anchor="middle" style="font-size:20px">V → vπ</text><text x="160" y="215" text-anchor="middle" style="font-size:20px">π → greedy(V)</text><text x="160" y="249" text-anchor="middle" style="font-size:20px">iyileştirme</text><text x="160" y="285" text-anchor="middle" style="font-size:25px">⋮</text><text x="35" y="330" text-anchor="middle" style="font-size:24px">π*</text><text x="285" y="330" text-anchor="middle" style="font-size:24px">v*</text><path d="M60,317 L260,317" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-loop)"/><path d="M260,337 L60,337" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-loop)"/></svg><svg viewBox="0 0 320 370" role="img" aria-label="ch4-gpi-constraints"><defs><marker id="ch4-gpi-constraints" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="currentColor"/></marker></defs><path d="M40,50 L270,160 L40,270" fill="none" stroke="currentColor"/><text x="138" y="48" text-anchor="middle" style="font-size:20px">V = vπ</text><text x="138" y="290" text-anchor="middle" style="font-size:20px">π = greedy(V)</text><text x="270" y="144" text-anchor="middle" style="font-size:20px">v*, π*</text><path d="M40.0,270.0 L125.63,90.95" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><path d="M125.63,90.95 L179.38,203.34" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><path d="M179.38,203.34 L213.12,132.8" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><path d="M213.12,132.8 L234.3,177.08" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><path d="M234.3,177.08 L247.59,149.28" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><path d="M247.59,149.28 L255.93,166.73" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><path d="M255.93,166.73 L261.17,155.78" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><path d="M261.17,155.78 L264.46,162.65" fill="none" stroke="currentColor" marker-end="url(#ch4-gpi-constraints)"/><text x="160" y="334" text-anchor="middle" style="font-size:17px">eğik kısıtlara ardışık izdüşüm</text><text x="160" y="357" text-anchor="middle" style="font-size:17px">geometri benzetmesi, kanıt değil</text></svg></div><figcaption>Şekil 4 — Değerlendirme ve iyileştirmenin ortak sabit noktası. Sol döngü her iki hedefi ve en iyi çifti gösterir. Sağ oklar iki eğik doğruya gerçekten hesaplanan izdüşümlerdir: tam adımlar PI benzetmesi, eksik adımlar GPI serbestliği. Gerçek politika/değer uzayı bu iki doğruyla özdeş değildir. (Kaynak: s.86–87, iki numarasız GPI şekli; yeniden türetildi.)</figcaption></figure>
+
+Süreçler hem rekabet eder hem işbirliği yapar: politikayı değiştirmek eski V değerini artık yanlış kılar; V’yi politikaya uydurmak politikanın açgözlülüğünü bozabilir. Bir hedefe ilerlemek öbüründen geçici uzaklaşabilir. Kaynaktaki iki eğik çizgi benzetmesi, dik olmayan iki kısıtın ortak kesişimini aramayı gösterir. PI okları her hedefe tam ulaşır; GPI küçük eksik adımlar da atabilir. Gerçek politika/değer uzayının geometrisi bundan daha karmaşıktır; şekil tek başına yakınsama kanıtı değildir.
+
+### Hesap verimliliği ve özyükleme {#sutton-verim}
+
+Kaynak DP’yi büyük problemler için pahalı bulsa da, bütün $k^n$ belirlenimci politikayı tek tek denemeye göre çok daha verimli görür ($n$ durum, $k$ eylem). Kitabın “teknik ayrıntılar yok sayıldığında polinom zaman” ifadesinde indirim, doğruluk, girdi bit uzunluğu ve hangi DP yöntemi olduğunun koşulları önemlidir; her PI/VI çeşidine koşulsuz güçlü polinom iddiası taşımaz. Bu modülün Ye (2011) ödevi **sabit indirim** koşulunu açık kullanır. Doğrusal programlama da MDP çözer, bazı en kötü durum garantileri daha güçlü olabilir. “Yaklaşık 100 kat daha küçük durumda pratik olmaktan çıkar” ve “milyonlarca durum çözülebilir” sözleri 2018 kitabının uygulama ölçeği yorumlarıdır; evrensel oran veya bugünkü donanım kıyası olarak alınmaz. Bu tarihli kıyasta yazarlar en büyük problemler için yalnız DP yöntemlerini uygulanabilir görür.
+
+**[[boyut laneti|Boyut laneti]]**, durum sayısının durum değişkenleriyle üstel büyümesidir; problemin temsil güçlüğüdür, DP’ye özgü bir kusur değildir. PI ve VI yaygındır; hangisinin genel olarak daha iyi olduğu söylenemez. İyi başlangıç politika/değerleriyle pratikte en kötü durumdan çok daha hızlı bitebilirler. Büyük uzayda her durum için bir taramanın belleği/hesabı bile fazla olabilirken az sayıda ilgili yörüngeyi öne alan asenkron GPI yararlı politikaya daha hızlı ulaşabilir.
+
+Son ayırt edici fikir **özyükleme (bootstrapping)**: bir değeri başka tahmini değerleri kullanarak güncellemek. DP bunu yapar ve tam model ister; model ihtiyacı ile özyükleme ayrı özelliklerdir. Kaynak Bölüm 5 Monte Carlo modeli zorunlu kılmaz ve tam getiriyi kullanarak özyükleme yapmaz. Bölüm 6 TD modeli zorunlu kılmaz ama tahminden tahmine güncellediği için özyükler. Dört V/Q türünün dört Bellman eşitliği ve dört beklenen güncellemesi vardır; tahmin/iyileştirme/GPI ayrımı bunları tek çerçevede toplar.
+
+### Bölüm 4: kaynak ve tarih notları {#sutton-tarih}
+
+- Bellman (1957a), “dinamik programlama” adını ve geniş uygulama alanını yaygınlaştırır. Genel kaynaklar Bertsekas (2005,2012), Bertsekas–Tsitsiklis (1996), Dreyfus–Law (1977), Ross (1983), White (1969), Whittle (1982,1983); MDP dışındaki DP için Kumar–Kanal (1988).
+- Yazarların bildiği ilk DP–RL bağı Minsky (1961) tarafından Samuel’in dama oyuncusuna ilişkin dipnotta kurulur: kapalı analitik biçimde yapılabilen geri taşımanın DP ile ilişkisi. Bu ifade DP yalnız analitik çözülebilen problemlere yararmış ve dolayısıyla yapay zekâ için büyük ölçüde ilgisizmiş gibi yanlış bir izlenim bırakmış olabilir. Andreae (1969b) RL bağlamında özellikle PI’yi anar ama öğrenme algoritmalarıyla ayrıntılı bağ kurmaz.
+- Werbos (1977), sürekli durumda gradyan inişini vurgulayan “sezgisel dinamik programlama” yaklaşımını önerir; devamı Werbos (1982,1987,1988,1989,1992). Watkins (1989), bazı RL yöntemlerini “artımlı dinamik programlama” diye açık ilişkilendirir.
+- Politika iyileştirme teoremi ve PI Bellman (1957a), Howard (1960); yerel iyileştirme sunumu Watkins (1989) etkisi taşır. Kesilmiş PI olarak VI yaklaşımı Puterman–Shin (1978) değiştirilmiş PI ailesine dayanır. VI ile sonlu zamanda en iyi politika bulma analizi Bertsekas (1987).
+- İki dizili değerlendirme klasik ardışık yaklaşımın Jacobi/eşzamanlı, tek dizili değerlendirme Gauss–Seidel biçimidir. İkinci dizi, paralel güncellemeyi sırayla çalışan bilgisayarda taklit eder. Diğer DP yöntemlerinin de bu biçimleri vardır; performans farkları Bertsekas–Tsitsiklis (1989) içinde incelenir.
+- Asenkron/dağıtık DP Bertsekas (1982,1983): başlangıç motivasyonu, haberleşme gecikmeli çok işlemcide ortak saat olmadan hesap yapmaktır. Bertsekas–Tsitsiklis (1989) kapsamlı kaynak; Jacobi ve Gauss–Seidel bu geniş ailenin özel biçimleridir. Williams–Baird (1990), güncelleme işlemini bile daha küçük asenkron parçalara ayırır.
+- Verimlilik bölümü Michael Littman yardımıyla Littman–Dean–Kaelbling (1995) temeline dayanır. “Boyut laneti” Bellman (1957a) terimidir. RL için doğrusal programlama yaklaşımının temel işleri Daniela de Farias (2002), de Farias–Van Roy (2003).
+
+
 ### Özet {#ozet}
 
 - PI iki adımı dönüşümlü uygular: tam politika değerlendirme ($V^\pi=(I-\gamma T^\pi)^{-1}R_\pi$) ve açgözlü iyileştirme. Politika değişmeyince durur; eşitliklerde mevcut eylem korunmalıdır.

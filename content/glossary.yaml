@@ -224,3 +224,12 @@ terms:
   kısmi sıralama: Her iki öğenin mutlaka karşılaştırılamadığı sıralama; politikaların bütün durumlardaki V üstünlüğü buna örnektir.
   açgözlü politika: Verilen eylem puanını en çoklayan eylemleri seçen politika; gerçek q* için uzun vadede en iyidir, yaklaşık
     Q için aynı garanti kendiliğinden gelmez.
+
+  beklenen güncelleme: Bir değer tahminini modeldeki bütün olası sonraki durum/ödülleri olasılıklarıyla toplayarak güncelleme;
+    tek örnek geçiş güncellemesinden ayrılır.
+  asenkron dp: Sistematik tam taramalar yerine seçilen durumları mevcut veya eski ardıl değerlerle yerinde güncelleyen dinamik
+    programlama ailesi.
+  boyut laneti: Durum değişkenleri arttıkça durum sayısının üstel büyümesi; yalnız belirli bir algoritmanın kusuru değildir.
+  özyükleme: Bir tahmini başka tahminleri kullanarak güncelleme (bootstrapping); DP ve TD yapar, tam getirili Monte Carlo yapmaz.
+  önyükleme: 'RL içinde özyükleme ile aynı bootstrapping kavramı: tahminden tahmin güncellemesi.'
+  nicemleme: Sürekli bir niceliği sonlu temsil düzeylerine ayırmak; ayrıntı kaybı karşılığında sonlu modelle hesap sağlar.

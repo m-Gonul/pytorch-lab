@@ -1,0 +1,35 @@
+import {fmt} from './plot.js';
+function capped(lam,n){const p=Array(n+1).fill(0);p[0]=Math.exp(-lam);for(let k=1;k<=n;k++)p[k]=p[k-1]*lam/k;p[n]=1-p.slice(0,n).reduce((a,b)=>a+b,0);return p;}
+export function location(req,ret){const T=Array.from({length:21},()=>Array(21).fill(0)),r=Array(21).fill(0),pr=capped(ret,20);for(let n=0;n<=20;n++){const pq=capped(req,n);for(let k=0;k<=n;k++){r[n]+=10*k*pq[k];for(let j=0;j<=20;j++)T[n][Math.min(20,n-k+j)]+=pq[k]*pr[j];}}return {T,r};}
+const L1=location(3,3),L2=location(4,2),memo=new Map();
+function future(V){const W=Array(441).fill(0),F=Array(441).fill(0);for(let x=0;x<21;x++)for(let j=0;j<21;j++)for(let i=0;i<21;i++)W[x*21+j]+=L1.T[x][i]*V[i*21+j];for(let x=0;x<21;x++)for(let y=0;y<21;y++)for(let j=0;j<21;j++)F[x*21+y]+=W[x*21+j]*L2.T[y][j];return F;}
+export function solveJack(g=.9,modified=false){
+ const key=`${g}/${modified}`;if(memo.has(key))return memo.get(key);
+ const rows=Array.from({length:441},(_,s)=>{const n1=Math.floor(s/21),n2=s%21,out=[];for(let a=-5;a<=5;a++){if(a>n1||-a>n2)continue;const x=Math.min(20,n1-a),y=Math.min(20,n2+a),cost=2*(modified&&a>0?Math.max(0,a-1):Math.abs(a)),park=modified?4*(Number(x>10)+Number(y>10)):0;out.push({a,t:x*21+y,r:L1.r[x]+L2.r[y]-cost-park});}return out;});
+ let V=Array(441).fill(0),policy=Array(441).fill(0);const history=[];
+ for(let it=0;it<30;it++){
+  const selected=rows.map((r,s)=>r.find(x=>x.a===policy[s]));let sweeps=0;
+  for(;sweeps<10000;sweeps++){const F=future(V),W=selected.map(x=>x.r+g*F[x.t]),err=Math.max(...W.map((v,s)=>Math.abs(v-V[s])));V=W;if(err<1e-10)break;}
+  history.push({policy:[...policy],V:[...V],sweeps:sweeps+1});const F=future(V);let residual=0;
+  const next=rows.map((r,s)=>{const Q=r.map(x=>x.r+g*F[x.t]),m=Math.max(...Q);residual=Math.max(residual,Math.abs(m-V[s]));return Q[r.findIndex(x=>x.a===policy[s])]>=m-1e-9?policy[s]:r[Q.indexOf(m)].a;});
+  if(next.every((a,s)=>a===policy[s])){const d={V,policy,history,residual};memo.set(key,d);return d;}policy=next;
+ }
+ throw new Error('Politika sonlanmadı');
+}
+function map(p,k){let s=`<svg viewBox="0 0 320 335" role="img" aria-label="Politika ${k}: birinci şubeden ikinciye taşınacak araba"><text x="160" y="24" text-anchor="middle" style="font-size:20px;fill:var(--ink)">π${k}</text>`;const palette=['#633e7b','#79528c','#916e9f','#ad91b7','#cfbfd4','#f4f5f2','#c5d6e9','#9bb9d9','#719bc7','#4a7fb2','#276099'];
+ for(let n1=0;n1<=20;n1++)for(let n2=0;n2<=20;n2++){const a=p[n1*21+n2],x=45+n2*11,y=265-n1*11;s+=`<rect x="${x}" y="${y}" width="11" height="11" fill="${palette[a+5]}"><title>n₁=${n1}, n₂=${n2}: taşıma ${a}</title></rect>`;if(n1<20&&a!==p[(n1+1)*21+n2])s+=`<path d="M${x},${y} h11" stroke="var(--ink)" stroke-width=".7"/>`;if(n2<20&&a!==p[n1*21+n2+1])s+=`<path d="M${x+11},${y} v11" stroke="var(--ink)" stroke-width=".7"/>`;}
+ for(const a of [...new Set(p)]){const cells=p.flatMap((v,s)=>v===a?[s]:[]),n=cells[Math.floor(cells.length/2)],x=50.5+n%21*11,y=272-Math.floor(n/21)*11;s+=`<text x="${x}" y="${y}" text-anchor="middle" style="font-size:15px;fill:${Math.abs(a)>2?'#fff':'#122333'};paint-order:stroke;stroke:${Math.abs(a)>2?'#122333':'#fff'};stroke-width:2px">${a}</text>`;}
+ return s+`<text x="45" y="296" text-anchor="middle" style="font-size:15px;fill:var(--ink)">0</text><text x="275" y="296" text-anchor="middle" style="font-size:15px;fill:var(--ink)">20</text><text x="26" y="276" style="font-size:15px;fill:var(--ink)">0</text><text x="20" y="46" style="font-size:15px;fill:var(--ink)">20</text><text x="160" y="322" text-anchor="middle" style="font-size:16px;fill:var(--ink)">ikinci şubedeki araba n₂</text><text transform="translate(14,170) rotate(-90)" text-anchor="middle" style="font-size:16px;fill:var(--ink)">birinci şube n₁</text></svg>`;
+}
+function surface(V){const lo=Math.min(...V),hi=Math.max(...V),point=(i,j)=>[48+7*j+4.5*i,275-3*i-((V[i*21+j]-lo)/(hi-lo||1))*170];let s='<svg viewBox="0 0 320 335" role="img" aria-label="Son politikanın hesaplanan üç boyutlu değer yüzeyi"><text x="160" y="24" text-anchor="middle" style="font-size:18px;fill:var(--ink)">Son Vπ: değer yüzeyi</text>';
+ for(let axis=0;axis<2;axis++)for(let a=0;a<=20;a++){const points=Array.from({length:21},(_,b)=>point(axis?a:b,axis?b:a).join(',')).join(' ');s+=`<polyline points="${points}" fill="none" stroke="var(--ink-3)" stroke-width=".6"/>`;}
+ s+=`<path d="M48,275 V65 M48,275 L188,275 L278,215" fill="none" stroke="var(--ink)"/><text x="6" y="279" style="font-size:14px;fill:var(--ink)">${lo.toFixed(0)}</text><text x="6" y="107" style="font-size:14px;fill:var(--ink)">${hi.toFixed(0)}</text><text x="120" y="307" text-anchor="middle" style="font-size:15px;fill:var(--ink)">n₂: 0 → 20</text><text x="250" y="258" text-anchor="middle" style="font-size:15px;fill:var(--ink)">n₁: 0 → 20</text></svg>`;return s;}
+let serial=0;
+export default {
+ custom:true,keys:['g','modified'],
+ selfTest(a){for(const l of [L1,L2])a.ok(l.T.every(row=>Math.abs(row.reduce((s,p)=>s+p,0)-1)<1e-12));const d=solveJack();a.equal(d.history.length,5);a.equal(d.policy[420],5);a.equal(d.policy[0],0);a.ok(Math.abs(d.V[0]-421.4140633965)<1e-7);a.ok(Math.abs(d.V[440]-636.9896068044)<1e-7);a.ok(d.residual<1e-8);a.ok(d.history.slice(1).every((h,i)=>h.V.every((v,s)=>v>=d.history[i].V[s]-1e-8)));},
+ mount(root,{init}){const q={g:.9,modified:0,...init},id=`jr-${serial++}`;root.innerHTML=`<label class="lab-p" for="${id}-g">İndirim γ<input id="${id}-g" type="number" data-key="g" min="0.5" max="0.95" step="0.05"></label><label class="lab-p sel" for="${id}-modified">Model<select id="${id}-modified" data-key="modified"><option value="0">Kaynak Örnek 4.2</option><option value="1">Alıştırma 4.7: ücretsiz taşıma ve otopark</option></select></label><p data-error role="status"></p><div data-panels style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:12px"></div><p data-note></p>`;
+ function paint(){for(const e of root.querySelectorAll('[data-key]'))e.value=q[e.dataset.key];const bad=!(q.g>=.5&&q.g<=.95&&[0,1].includes(q.modified));root.querySelector('[data-error]').textContent=bad?'γ 0.5–0.95 ve model 0/1 olmalı.':'';if(bad)return;const d=solveJack(q.g,!!q.modified);root.querySelector('[data-panels]').innerHTML=d.history.map((h,k)=>map(h.policy,k)).join('')+surface(d.V);root.querySelector('[data-note]').textContent=`${d.history.length} politika değerlendirmesi (son sabitlik denetimi dahil). V(0,0)=${fmt(d.V[0],6)}, V(20,20)=${fmt(d.V[440],6)}; Bellman artığı ${fmt(d.residual,3)}. İşaret: pozitif 1→2, negatif 2→1; bütün hücreler ve −5…+5 eylem aralığı hesaplandı. π0 hiç taşımaz. Poisson istek λ=(3,4), iade λ=(3,2); kira 10, taşıma 2, kapasite 20 ve gecede en çok 5. Eşiklerde eşitlik varsa mevcut eylem korunur. ${q.modified?'İlk 1→2 arabası ücretsiz; taşımadan sonra her şubede 10’dan fazla araba varsa o şube için sabit 4 otopark maliyeti.':'Kaynak Şekil 4.2, γ=0.9; sayıların tamamı tam Poisson kuyruklarıyla yeniden hesaplandı.'}`;}
+ root.addEventListener('input',e=>{if(e.target.dataset.key){q[e.target.dataset.key]=Number(e.target.value);paint();}});paint();return {set(p){Object.assign(q,p);paint();}};
+ }
+};

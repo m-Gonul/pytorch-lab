@@ -26,14 +26,14 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: Bölüm 1–3 işlendi; yayın CI denetimi ayrıca izleniyor. Bölüm 4–17, ön/arka sayfalar ve kısım ayırıcıları
-    henüz tümüyle işlenmedi; bütün kitap tamamlanmadı.
+  note: Bölüm 1–4 işlendi; yayın CI ayrıca izlenir. Bölüm 5–17, ön/arka materyal ve kısım ayırıcıları henüz
+    tümüyle işlenmedi; kitap tamamlanmadı.
   processed_chapters:
   - 1
   - 2
   - 3
-  unprocessed_chapters:
   - 4
+  unprocessed_chapters:
   - 5
   - 6
   - 7
@@ -399,8 +399,12 @@ chapters:
   candidate_modules:
   - m11-2-mdp-vi
   - m11-3-policy-iteration
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  mapping_status: Kesin birim hedefleri ve kaynak derinliği doğrulandı.
+  content_status: işlendi; bağımsız ikinci okuma tamamlandı
+  recorded_units: 102
+  second_read: Bağımsız ajan yalnız PDF95–112 ve defteri okuyup18sayfa ve9görüntüyü denetledi;10alıştırma,1numarasız
+    soru,7görsel,3kod doğrulandı. Koşul,alt soru,tarih,şekil ve sayfa aralığı bulguları kapatıldı;Poisson öğretim
+    türetimi kaynak birimi dışında tutuldu.
 - chapter: 5
   title: Monte Carlo yöntemleri
   pdf_pages:
@@ -2197,6 +2201,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 0
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 96
   printed_page: 74
   text_sha256: 7342f2e3f042b4610d0e2b2f75b044eb0b01858cff254a8b38908a07ddd85529
@@ -2204,27 +2209,31 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 97
   printed_page: 75
   text_sha256: 59bf7586b3ced74dec48282666a407ae364ad9e916b4aae17d4e6e9a2a491d15
   text_characters: 2799
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 98
   printed_page: 76
   text_sha256: c06c0f66530b94f735852300de67383e419deff6059ab3abeff725e8cd521862
   text_characters: 3060
   embedded_images: 0
   drawing_paths: 11
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 99
   printed_page: 77
   text_sha256: d76313a0878283bde0632273061a30402ce0270e6458f2583383a26316cf3cdd
   text_characters: 2515
   embedded_images: 0
   drawing_paths: 39
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 100
   printed_page: 78
   text_sha256: 4fce82067c54ae33909c101b03067bf43d34a3d611e63fde4ed66f0809e9b7e7
@@ -2232,6 +2241,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 101
   printed_page: 79
   text_sha256: 042af7c6c514de73263701e220c4ab5d2aa4af30ec2d75b3d5d8b881a97f88bb
@@ -2239,20 +2249,23 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 102
   printed_page: 80
   text_sha256: 07809dc78ccf53b93d56c87f7de0ff36d4339da5bdeafdaa157f2e7278bcfa48
   text_characters: 2414
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 103
   printed_page: 81
   text_sha256: 639deaaf687ca6372cab492b8bd73c08f3ebbd782bab93f3ea9474d7c4e1468c
   text_characters: 10127
   embedded_images: 0
   drawing_paths: 46
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 104
   printed_page: 82
   text_sha256: b7cec8cbb8cef5016cebc8167cb9f310eea8e1d8c4bddd1646cec02288c274da
@@ -2260,20 +2273,23 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 105
   printed_page: 83
   text_sha256: da25c972de0a1014d6b40320479d1cf9897b81c0be002733f58c292b201ad918
   text_characters: 2900
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 106
   printed_page: 84
   text_sha256: a9a97f0490b58cb74f07422461d0dc74b506263d500ad56dd43d1b21809bd985
   text_characters: 3757
   embedded_images: 0
   drawing_paths: 28
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 107
   printed_page: 85
   text_sha256: c37816bdf934d1d9ad47be47f2985dae510b844b272f8cf370ba7ec6d7326e7a
@@ -2281,20 +2297,23 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 108
   printed_page: 86
   text_sha256: dbb7fabdd4c9b43fe1b5a96a32284ac75b64691ef4f63652caa8ceef1d148301
   text_characters: 3423
   embedded_images: 0
   drawing_paths: 18
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 109
   printed_page: 87
   text_sha256: 5fe6cf7ce76fd0f715fe5fa4455b3f5fb8bb8e2811bf6ba0d30ed95c6a9ac37d
   text_characters: 3460
   embedded_images: 0
   drawing_paths: 45
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 110
   printed_page: 88
   text_sha256: e4ba03af2a3cbc9caf574b1d12ca4d6691f679269e2aed28bfc9d818203df04f
@@ -2302,6 +2321,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 111
   printed_page: 89
   text_sha256: 036afe8ec92ff25fb1fe837b293cc5d046c6aa5eac96f0cbc990bf9dd00c7f1d
@@ -2309,6 +2329,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 112
   printed_page: 90
   text_sha256: fd936dc67ea50d672ef36f80deb9a22e6bbb032d51700f40f443463aff49adee
@@ -2316,6 +2337,7 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma ve bağımsız ikinci okuma tamamlandı
 - pdf_page: 113
   printed_page: 91
   text_sha256: ed5dae76bad8b3bf7a4c9f782d6dc0425b05a4d14f6d9c7cf9509656f5144daf
@@ -8832,6 +8854,839 @@ items:
   what: Golf örneği Chris Watkins tarafından önerildi.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
+- id: ch4-p73-i1
+  page: 73
+  pdf_page: 95
+  kind: tanım
+  what: DP doğru ve tam MDP modelinden en iyi politika hesaplayan algoritmalar ailesidir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
+- id: ch4-p73-i2
+  page: 73
+  pdf_page: 95
+  kind: bilgi
+  what: Klasik DP tam model ve yüksek hesap nedeniyle RL’de sınırlı; daha az varsayımlı yöntemlerin kuramsal
+    temeli.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
+- id: ch4-p73-i3
+  page: 73
+  pdf_page: 95
+  kind: bilgi
+  what: Sonlu durum,eylem,ödül ve ortak p; bölümlü görevde S+ terminali kapsar.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
+- id: ch4-p73-i4
+  page: 73
+  pdf_page: 95
+  kind: bilgi
+  what: Sürekli uzayda tam çözüm özel; nicemleme ile sonlu DP, Bölüm9 fonksiyon yaklaşımı bunun genişlemesi.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
+- id: ch4-p73-i5
+  page: 73
+  pdf_page: 95
+  kind: bilgi
+  what: Değer fonksiyonu iyi politikayı aramayı düzenler; Bellman eşitliğini atamaya çevirme DP fikri.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
+  pages:
+  - 73
+  - 74
+  pdf_pages:
+  - 95
+  - 96
+- id: ch4-p73-i6
+  page: 73
+  pdf_page: 95
+  kind: formül
+  what: Denklem4.1 V* Bellman en iyiliği,koşullu beklenti ve ortak p açılımı.
+  status: vardı
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch4-p73-i7
+  page: 73
+  pdf_page: 95
+  kind: formül
+  what: Denklem4.2 Q* Bellman en iyiliği,ilk eylem sabit sonraki eylem max.
+  status: vardı
+  where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
+- id: ch4-p74-i1
+  page: 74
+  pdf_page: 96
+  kind: tanım
+  what: Politika değerlendirme veya tahmin,belirli π için vπ hesaplamaktır.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p74-i2
+  page: 74
+  pdf_page: 96
+  kind: formül
+  what: 4.3 koşullu bir-adım Vπ beklentisi;4.4 politika ve ortak p ile tam toplam.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p74-i3
+  page: 74
+  pdf_page: 96
+  kind: bilgi
+  what: Vπ varlık/teklik ve yakınsama:γ<1 veya bütün durumlardan uygun sonlanma; terminal0.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p74-i4
+  page: 74
+  pdf_page: 96
+  kind: bilgi
+  what: Model biliniyorsa |S| bilinmeyenli |S| doğrusal eşitlik; yinelemeli çözüm tercihi.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p74-i5
+  page: 74
+  pdf_page: 96
+  kind: türetim
+  what: 4.5 vπ yerine vk koyarak ardışık tahmin,herhangi başlangıç ve sabit nokta.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p74-i6
+  page: 74
+  pdf_page: 96
+  kind: tanım
+  what: Beklenen güncelleme bütün olası ardılları ve ödülleri olasılıkla toplar,örnek geçiş değildir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
+- id: ch4-p75-i1
+  page: 75
+  pdf_page: 97
+  kind: bilgi
+  what: Durum/durum–eylem kökü ve ardıl birleştirme biçimi dört farklı beklenen güncelleme verir; backup şeması
+    bağı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
+- id: ch4-p75-i2
+  page: 75
+  pdf_page: 97
+  kind: bilgi
+  what: İki dizi eski/yeni V ile eşzamanlı hesap;tek dizi yeni değerleri hemen kullanan yerinde hesap.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p75-i3
+  page: 75
+  pdf_page: 97
+  kind: bilgi
+  what: Yerinde biçim de yakınsar,çoğu kez hızlıdır;tarama sırası hızı etkiler,kaynak genelde bunu varsayar.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p75-i4
+  page: 75
+  pdf_page: 97
+  kind: tanım
+  what: Tarama her durumu bir kez günceller;limit sonsuz olabilir,pratik Δ<θ ile durur.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p75-i5
+  page: 75
+  pdf_page: 97
+  kind: kod
+  what: Kutulu politika değerlendirme:π girdi,θ>0,terminal0,eski değer,yerinde πp toplamı,Δmax ve durma.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p76-i1
+  page: 76
+  pdf_page: 98
+  kind: örnek
+  what: Örnek4.1:4×4,14 nonterminal,dört yön,sınırda kalma,tek terminal iki köşede gösterilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p76-i2
+  page: 76
+  pdf_page: 98
+  kind: bilgi
+  what: Her geçiş−1,γ1;r(s,a,s′)=−1;örnek p(6,−1|5,sağ)=1,p(7,−1|7,sağ)=1,p(10,r|5,sağ)=0.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p76-i3
+  page: 76
+  pdf_page: 98
+  kind: şekil
+  what: Numarasız kurulum ızgarası:1–14 hücre,dört yön,iki gölgeli köşe,her geçiş−1 etiketi.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#lab:l3
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;model hesabı ve özgün SVG/lab ile karşılandı.
+- id: ch4-p76-i4
+  page: 76
+  pdf_page: 98
+  kind: bilgi
+  what: Eşit olasılıklı rastgele politika,Vπ beklenen terminale kadar adım sayısının negatifidir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p76-i5
+  page: 76
+  pdf_page: 98
+  kind: bilgi
+  what: Vπ hesaplamanın amacı iyileştirme;bir kez başka eylem sonraπ ile devam etmeyi karşılaştırma.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+  pages:
+  - 76
+  - 78
+  pdf_pages:
+  - 98
+  - 100
+- id: ch4-p76-i6
+  page: 76
+  pdf_page: 98
+  kind: alıştırma
+  source_number: '4.1'
+  what: 'Örnek4.1 içinde dört yön eşit olasılıklı, γ=1 ve her geçiş −1. qπ(11,aşağı) ve qπ(7,aşağı) nedir?
+    Sayısal alana ikinci değeri gir.
+
+    (Kaynak: Sutton ve Barto, s.76, Alıştırma4.1.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p7
+- id: ch4-p76-i7
+  page: 76
+  pdf_page: 98
+  kind: alıştırma
+  source_number: '4.2'
+  what: '4×4 ızgaraya 13 konumunun altına yeni15 durumu ekle. Bu yeni durumda sol/yukarı/sağ/aşağı eylemleri
+    sırasıyla12,13,14,15 konumlarına götürsün. Önce eski durumların geçişleri aynı kalsın: rastgele politika
+    için Vπ(15) nedir? Sonra13 durumunun aşağı eylemi de yeni15 konumuna gitsin. Bu kez Vπ(15) nedir? Her geçiş
+    −1, γ=1. Sayısal alana ikinci sonucu gir.
+
+    (Kaynak: Sutton ve Barto, s.76, Alıştırma4.2.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p8
+- id: ch4-p76-i8
+  page: 76
+  pdf_page: 98
+  kind: alıştırma
+  source_number: '4.3'
+  what: 'qπ ve q0,q1,q2,… ardışık tahminleri için (4.3),(4.4),(4.5) denklemlerinin karşılıklarını yaz.
+
+    (Kaynak: Sutton ve Barto, s.76, Alıştırma4.3.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p9
+- id: ch4-p77-i1
+  page: 77
+  pdf_page: 99
+  kind: şekil
+  what: Şekil4.1:k0,1,2,3,10,∞ için tüm16V ve bütün eşit açgözlü oklar;iki anlamlı basamak,k0rastgele,k≥3optimal.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#lab:l3
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;model hesabı ve özgün SVG/lab ile karşılandı.
+  source_number: '4.1'
+- id: ch4-p77-i2
+  page: 77
+  pdf_page: 99
+  kind: bilgi
+  what: Kaynak−1.75 değerini−1.7 gösterir;yarımda sıfıra doğru iki anlamlı yuvarlama açıkça seçildi.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p77-i3
+  page: 77
+  pdf_page: 99
+  kind: bilgi
+  what: Limit açgözlü politika genelde yalnız iyileşir;bu ızgarada k≥3 bütün gösterilen oklar optimaldir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p78-i1
+  page: 78
+  pdf_page: 100
+  kind: formül
+  what: 4.6 qπ tek eylem sonraπ;R+γVπ beklentisi ve ortak p açılımı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+- id: ch4-p78-i2
+  page: 78
+  pdf_page: 100
+  kind: formül
+  what: 4.7 bütün durumlarda qπ(s,π′(s))≥vπ(s) koşulu,4.8 vπ′≥vπ sonucu.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+- id: ch4-p78-i3
+  page: 78
+  pdf_page: 100
+  kind: bilgi
+  what: Bir durumda ilk eşitsizlik kesin ise yeni değer orada da kesin artar;tek durum değişimi özel durumdur.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+- id: ch4-p78-i4
+  page: 78
+  pdf_page: 100
+  kind: türetim
+  what: Getiriyi adım adım açarak yeniden koşul uygulama,sonlu/indirimli kuyruğun sıfırlanmasıyla iyileştirme
+    kanıtı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+- id: ch4-p79-i1
+  page: 79
+  pdf_page: 101
+  kind: formül
+  what: 4.9 tüm durumlarda Qπ argmax;bir-adım r+γVπ açgözlü iyileştirme.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+- id: ch4-p79-i2
+  page: 79
+  pdf_page: 101
+  kind: türetim
+  what: İyileştirmede değer eşitse Bellman en iyilik eşitliği sağlanır;iki politika da optimaldir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+- id: ch4-p79-i3
+  page: 79
+  pdf_page: 101
+  kind: bilgi
+  what: Stokastik politikaya genelleme;eşit maksimumlar arasında herhangi olasılık paylaşımı,alt maksimumlara0.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-iyilestirme
+- id: ch4-p79-i4
+  page: 79
+  pdf_page: 101
+  kind: örnek
+  what: 4×4 rastgele değerleri en çok−14,iyileştirilmiş değerler−1/−2/−3;bu örnekte tek PI adımı yeter.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-degerlendirme
+- id: ch4-p80-i1
+  page: 80
+  pdf_page: 102
+  kind: tanım
+  what: PI değerlendirme ve iyileştirmeyi art arda yineler;sonlu deterministik politika ve tutarlı bağ kırmayla
+    sonlu sonlanma.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p80-i2
+  page: 80
+  pdf_page: 102
+  kind: şekil
+  what: Numarasız π0→vπ0→π1→vπ1→π2→…→π*→v* zinciri,E ve I etiketli oklar.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;model hesabı ve özgün SVG/lab ile karşılandı.
+- id: ch4-p80-i3
+  page: 80
+  pdf_page: 102
+  kind: bilgi
+  what: Her değerlendirmeyi önceki V ile başlatmak genelde hızlandırır,çünkü ardışık politikalar/değerler yakın
+    olabilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p80-i4
+  page: 80
+  pdf_page: 102
+  kind: kod
+  what: Kutulu PI:başlatma,yerinde değerlendirmeθ,policy-stable,eski eylem,argmax,değişim denetimi,döngü/çıktı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p81-i1
+  page: 81
+  pdf_page: 103
+  kind: örnek
+  what: Örnek4.2 iki şubeli kiralama:kiralama başına10,stok yoksa kayıp talep,iade ancak ertesi gün kullanılabilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p81-i2
+  page: 81
+  pdf_page: 103
+  kind: bilgi
+  what: Gece net taşıma araba başına2,iki yönde en çok5;kapasite20,fazla araba ulusal şirkete döner.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p81-i3
+  page: 81
+  pdf_page: 103
+  kind: formül
+  what: Poisson Pr(N=n)=exp(−λ)λ^n/n!;talep ortalamaları3/4,iade3/2.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p81-i4
+  page: 81
+  pdf_page: 103
+  kind: tanım
+  what: Gün zaman adımı,gün sonu(n1,n2) durum,net taşıma eylemi,devam eden sonluMDP,γ0.9.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p81-i5
+  page: 81
+  pdf_page: 103
+  kind: şekil
+  what: Şekil4.2:π0…π4 bütün politika konturları,her ardışık politika kesin iyileşir,π4optimal;son yüzey vπ4,düşey420/612,stok
+    eksenleri0–20,taşıma−4…5 ve yön işareti. π0 hiç araba taşımaz;pozitif1→2,negatif2→1 yönüdür.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#lab:l4
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;model hesabı ve özgün SVG/lab ile karşılandı.
+  source_number: '4.2'
+- id: ch4-p82-i1
+  page: 82
+  pdf_page: 104
+  kind: bilgi
+  what: PI şaşırtıcı az adımda yakınsayabilir;ızgara tek adımda en kısa terminal politikası verir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+- id: ch4-p82-i2
+  page: 82
+  pdf_page: 104
+  kind: bilgi
+  what: Tam değerlendirme çok tarama/sonsuz limit gerektirir;ızgarada ilk3 sonrası politika değişmez,değerlendirme
+    kesilebilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p82-i3
+  page: 82
+  pdf_page: 104
+  kind: alıştırma
+  source_number: '4.4'
+  what: 'Bir öğrencinin PI kodu iyileştirmede `pi_new[s] = random.choice([a for a in A if Q[s][a] == max(Q[s])])`
+    kullanıyor ve `pi_new == pi` olunca duruyor. Bazı MDP''lerde kod hiç durmuyor. Neden?
+
+    Kaynak s.80 sözde-kodu için bu döngüyü önleyen değişikliği yaz. (Sutton ve Barto,s.82,Alıştırma4.4.)'
+  status: genişletildi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p5
+- id: ch4-p82-i4
+  page: 82
+  pdf_page: 104
+  kind: alıştırma
+  source_number: '4.5'
+  what: 'S.80 V politika yinelemesine benzer biçimde q* hesaplayan tam bir Q politika yineleme algoritması
+    ver. Başlatma, değerlendirme, iyileştirme ve sonlanmayı eksiksiz belirt; bu fikir sonraki bölümlerde kullanılacak.
+
+    (Kaynak: Sutton ve Barto, s.82, Alıştırma4.5.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p10
+- id: ch4-p82-i5
+  page: 82
+  pdf_page: 104
+  kind: alıştırma
+  source_number: '4.6'
+  what: 'Her durumda her eylemin olasılığı en az ε/|A(s)| olan ε-yumuşak politikalarla sınırlısın. S.80 V politika
+    yinelemesinin sırasıyla3,2,1 adımlarında gereken değişiklikleri nitel olarak açıkla.
+
+    (Kaynak: Sutton ve Barto, s.82, Alıştırma4.6.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p11
+- id: ch4-p82-i6
+  page: 82
+  pdf_page: 104
+  kind: alıştırma
+  source_number: '4.7'
+  what: 'Önce Örnek4.2 araba kiralama sonuçlarını programla tekrar üret. Sonra çalışan her gece1.şubeden2.şubeye
+    bir arabayı ücretsiz götürsün; aynı yöndeki ek arabalar ve ters yöndeki her araba2 maliyetli. Taşımadan
+    sonra bir şubede10 adetten fazla araba varsa ek otopark için o şube başına sabit4 maliyet olsun. Politika
+    yinelemesiyle yeniden çöz.
+
+    (Kaynak: Sutton ve Barto, s.82, Alıştırma4.7.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p12
+- id: ch4-p83-i1
+  page: 83
+  pdf_page: 105
+  kind: formül
+  what: 4.10 VI:terminal0 tutulup herhangi v0 başlangıcından uygun koşullarda v* yakınsaması;tek max beklenen
+    güncelleme.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p83-i2
+  page: 83
+  pdf_page: 105
+  kind: bilgi
+  what: VI Bellman en iyiliğinin atamaya dönüşmesi;PE ile tek fark π ortalaması yerine max,backup farkı da
+    bu.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p83-i3
+  page: 83
+  pdf_page: 105
+  kind: kod
+  what: Kutulu VI:θ>0,Vterminal0,keyfi başlangıç,yerinde max güncelleme,Δmax,durma;çıktı Vden deterministik
+    açgözlüπ.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p83-i4
+  page: 83
+  pdf_page: 105
+  kind: bilgi
+  what: Değerlendirme/VI taramalarının farklı dizileri kesilmiş PI ailesidir;çok PE taraması bazen daha hızlıdır.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+  pages:
+  - 83
+  - 84
+  pdf_pages:
+  - 105
+  - 106
+- id: ch4-p84-i1
+  page: 84
+  pdf_page: 106
+  kind: bilgi
+  what: İndirimli sonlu MDP için kesilmiş PI türleri en iyi politikaya yakınsar.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p84-i2
+  page: 84
+  pdf_page: 106
+  kind: örnek
+  what: Örnek4.3 sermaye1–99,hedef100,iflas0,tam sayı bahis,min(s,100−s),yazıda kazanıp turada kaybetme.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p84-i3
+  page: 84
+  pdf_page: 106
+  kind: bilgi
+  what: Hedefe giriş+1,diğer0,γ1;Vhedefe ulaşma olasılığı,p_hbiliniyorsa model bilinir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p84-i4
+  page: 84
+  pdf_page: 106
+  kind: bilgi
+  what: Kaynak0bahis de yazar;sonlanmayan sıfır döngü/γ1nüansı,pozitif bahisli proper politika seçimi açıklanır.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p84-i5
+  page: 84
+  pdf_page: 106
+  kind: şekil
+  what: Şekil4.3 p_h0.4:1/2/3/32tarama ve son değer eğrisi;sermaye1/25/50/75/99,V0…1,bahis0…50,son politika.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#lab:l5
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;model hesabı ve özgün SVG/lab ile karşılandı.
+  source_number: '4.3'
+- id: ch4-p84-i6
+  page: 84
+  pdf_page: 106
+  kind: bilgi
+  what: Kumarbaz en iyi politika tek değil,Qargmax eşitliklerine karşılık gelen politika ailesi.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
+- id: ch4-p84-i7
+  page: 84
+  pdf_page: 106
+  kind: alıştırma
+  source_number: '4.8'
+  what: 'Kumarbazın en iyi politikası neden bu tuhaf biçimde? Özellikle50 sermayede tek atışta tamamını yatırırken51
+    sermayede neden tamamını yatırmamak iyi bir seçimdir? p_h=0.4 kaynak durumunu kullan.
+
+    (Kaynak: Sutton ve Barto, s.84, Alıştırma4.8.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p13
+- id: ch4-p84-i8
+  page: 84
+  pdf_page: 106
+  kind: alıştırma
+  source_number: '4.9'
+  what: 'Kumarbaz için değer yinelemesini uygula; p_h=0.25 ve0.55 durumlarını çöz. İstersen0 ve100 kukla terminal
+    durumlarını V0=0,V100=1 ile kullan. Şekil4.3 benzeri değer/politika grafikleri üret. θ→0 iken sonuçların
+    kararlı olup olmadığını denetle.
+
+    (Kaynak: Sutton ve Barto, s.84–85, Alıştırma4.9.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p14
+  pages:
+  - 84
+  - 85
+  pdf_pages:
+  - 106
+  - 107
+- id: ch4-p84-i9
+  page: 84
+  pdf_page: 106
+  kind: soru
+  what: Örnek4.3 numarasız soru:bütün en iyi politika ailesini tahmin edip açıkla;argmax bağları,karışımlar
+    ve sonlanma koşulu.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p16
+- id: ch4-p85-i1
+  page: 85
+  pdf_page: 107
+  kind: bilgi
+  what: 10^20üzeri tavla durumunda1milyon güncelleme/saniye bile taramayı1000yılüzerine taşır;ölçek hesabı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p85-i2
+  page: 85
+  pdf_page: 107
+  kind: tanım
+  what: AsenkronDP taramasız yerinde günceller;istenen sıra,eski/yeni değerler,bazı durumları çok sık seçme.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p85-i3
+  page: 85
+  pdf_page: 107
+  kind: bilgi
+  what: γ<1tek-durumVI her durum sonsuz güncellenirse yakınsar;sıra rastgele olabilir,kalıcı ihmal yasak.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p85-i4
+  page: 85
+  pdf_page: 107
+  kind: bilgi
+  what: İndirimsiz bölümlü durumda bazı sıralar yakınsamayabilir;ek sıra/koşul gerekir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p85-i5
+  page: 85
+  pdf_page: 107
+  kind: bilgi
+  what: PE ve VI güncellemeleri asenkron kesilmiş PI için karıştırılabilir;birkaç yapı taşı esnek algoritma
+    verir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p85-i6
+  page: 85
+  pdf_page: 107
+  kind: bilgi
+  what: Taramasızlık otomatik hesap azaltmaz;uzun tur bitmeden politika iyileştirebilme serbestliği.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p85-i7
+  page: 85
+  pdf_page: 107
+  kind: bilgi
+  what: Bilgi yayılım sırası,az güncelleme ve ilgili durum seçimi;Bölüm8 bağlantısı,küresel teoremle farklı
+    hedef.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p85-i8
+  page: 85
+  pdf_page: 107
+  kind: alıştırma
+  source_number: '4.10'
+  what: 'Denklem4.10 değer yinelemesinin qₖ₊₁(s,a) eylem-değer karşılığını yaz.
+
+    (Kaynak: Sutton ve Barto, s.85, Alıştırma4.10.)'
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/module.yaml#practice:p15
+- id: ch4-p85-i9
+  page: 85
+  pdf_page: 107
+  kind: bilgi
+  what: Gerçek etkileşim ziyaretleri güncelleme sırasını seçebilir;sonV/πkararı yönlendirir,ilgili bölgeye
+    odaklanır.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+  pages:
+  - 85
+  - 86
+  pdf_pages:
+  - 107
+  - 108
+- id: ch4-p86-i1
+  page: 86
+  pdf_page: 108
+  kind: tanım
+  what: GPI değerlendirme/iyileştirme ayrıntı ve adım büyüklüğünden bağımsız etkileşir;ikisinin de bütün durumları
+    güncellemeyi sürdürmesi gerekir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p86-i2
+  page: 86
+  pdf_page: 108
+  kind: türetim
+  what: İki süreç sabitlenirse V=vπ veπgreedy(V),dolayısıyla Bellman en iyiliği ve optimal çift.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p86-i3
+  page: 86
+  pdf_page: 108
+  kind: şekil
+  what: Numarasız GPI döngüsü:π→değerlendirme→V,iyileştirmeylegeriπ,V→vπ,π→greedy(V),sonπ*/v*çifti.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;model hesabı ve özgün SVG/lab ile karşılandı.
+- id: ch4-p86-i4
+  page: 86
+  pdf_page: 108
+  kind: bilgi
+  what: Süreçler rekabet ve işbirliği yapar;politika değişimiVyi,Vdeğişimi açgözlülüğü bozabilir,ortak çözümde
+    birleşir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p87-i1
+  page: 87
+  pdf_page: 109
+  kind: şekil
+  what: Numarasız eğik kısıt doğruları V=vπ veπ=greedy(V),tam PI okları ortak kesişim(v*,π*)yaklaşır;GPIeksik
+    adım olabilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;model hesabı ve özgün SVG/lab ile karşılandı.
+- id: ch4-p87-i2
+  page: 87
+  pdf_page: 109
+  kind: bilgi
+  what: Gerçek geometri karmaşıktır,şema benzetmedir;bir hedefe yaklaşmak diğerinden geçici uzaklaştırabilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p87-i3
+  page: 87
+  pdf_page: 109
+  kind: bilgi
+  what: n durum k eylem için k^n deterministik politika;DP’nin polinom ifadesi teknik koşullara bağlı,doğrudan
+    aramadan verimli.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+- id: ch4-p87-i4
+  page: 87
+  pdf_page: 109
+  kind: bilgi
+  what: Doğrusal programlama da çözebilir,bazı güçlü en kötü durum garantileri;100kat ölçek yorumu2018e atfedilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+- id: ch4-p87-i5
+  page: 87
+  pdf_page: 109
+  kind: tanım
+  what: Boyut laneti durum değişkenleriyle üstel durum büyümesidir,problemin güçlüğü,DP’ye özgü kusur değildir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+- id: ch4-p87-i6
+  page: 87
+  pdf_page: 109
+  kind: bilgi
+  what: 2018de milyonlarca durum yorumu;PI/VIgenelde hangisi iyi belirsiz,iyi başlangıçla en kötü durumdan
+    hızlı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+  pages:
+  - 87
+  - 88
+  pdf_pages:
+  - 109
+  - 110
+- id: ch4-p88-i1
+  page: 88
+  pdf_page: 110
+  kind: bilgi
+  what: Büyük uzayda tamtarama hesap/belleği fazla olabilir;ilgili az yörüngeye asenkron GPI odaklanabilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+- id: ch4-p88-i2
+  page: 88
+  pdf_page: 110
+  kind: bilgi
+  what: Bölüm özeti:PE,iyileştirme,PI/VI,tam modelle sonluMDP çözümü;dört Bellman/dört beklenen güncelleme.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+- id: ch4-p88-i3
+  page: 88
+  pdf_page: 110
+  kind: bilgi
+  what: GPI bazı klasik biçimlerde kanıtlı yakınsar;her yaklaşık yöntemde kanıtlı değildir,açıklayıcı kalıp
+    olarak yararlı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p88-i4
+  page: 88
+  pdf_page: 110
+  kind: bilgi
+  what: Asenkron DP rastgele sıra ve eski bilgilerle ince ölçekli GPI olabilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
+- id: ch4-p89-i1
+  page: 89
+  pdf_page: 111
+  kind: tanım
+  what: Özyükleme bir tahmini başka tahminlerle güncelleme;DP ve birçokRL bunu yapar.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+- id: ch4-p89-i2
+  page: 89
+  pdf_page: 111
+  kind: bilgi
+  what: Model ihtiyacı ve özyükleme ayrı özellikler;Bölüm5MCmodelsiz/özyüklemesiz,Bölüm6TDmodelsiz/özyüklemeli.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
+- id: ch4-p89-i3
+  page: 89
+  pdf_page: 111
+  kind: kaynakça
+  what: DP adı Bellman1957a;genel kaynaklar Bertsekas2005/2012,Bertsekas–Tsitsiklis1996,Dreyfus–Law1977,Ross1983,White1969,Whittle1982/1983.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p89-i4
+  page: 89
+  pdf_page: 111
+  kind: kaynakça
+  what: MDP dışı daha genel DP için Kumar–Kanal1988.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p89-i5
+  page: 89
+  pdf_page: 111
+  kind: kaynakça
+  what: Minsky1961 Samuel dama dipnotu yazarların bildiği ilk DP–RL bağıdır;kapalı analitik geri taşıma sözü
+    DP yalnız analitik problemlere yarar,AIiçin ilgisizdir şeklinde yanlış anlaşılabilir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p89-i6
+  page: 89
+  pdf_page: 111
+  kind: kaynakça
+  what: Andreae1969b PIyi anarken ayrıntılı öğrenme bağlantısı kurmaz. Werbos1977 sezgiselDP sürekli durum
+    ve gradyan inişini vurgular;1982,1987,1988,1989,1992 devamı.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p89-i7
+  page: 89
+  pdf_page: 111
+  kind: kaynakça
+  what: Watkins1989bazıRLyöntemlerini artımlıDPdiye açık ilişkilendirir.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p89-i8
+  page: 89
+  pdf_page: 111
+  kind: kaynakça
+  what: İyileştirme teoremi/PI Bellman1957a,Howard1960;yerelbakışWatkins1989etkisi.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p89-i9
+  page: 89
+  pdf_page: 111
+  kind: kaynakça
+  what: KesilmişPIveVI Puterman–Shin1978MPIailesi;sonlu zamanda optimalpolitika analizi Bertsekas1987.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p90-i1
+  page: 90
+  pdf_page: 112
+  kind: kaynakça
+  what: Jacobi/eşzamanlı iki dizi paraleli sırayla taklit eder;Gauss–Seidel yerinde,diğerDPtürlerinde de geçerli,Bertsekas–Tsitsiklis1989.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p90-i2
+  page: 90
+  pdf_page: 112
+  kind: kaynakça
+  what: Asenkron/dağıtıkDP Bertsekas1982/1983;çokişlemcide haberleşme gecikmesi ve ortak saat olmaması motivasyonu.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p90-i3
+  page: 90
+  pdf_page: 112
+  kind: kaynakça
+  what: Bertsekas–Tsitsiklis1989kapsam;Jacobi/Gauss–Seidelözelbiçimler,Williams–Baird1990güncellemeyi daha
+    küçük asenkron parçalara ayırır.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p90-i4
+  page: 90
+  pdf_page: 112
+  kind: kaynakça
+  what: VerimlilikMichaelLittmanyardımı,Littman–Dean–Kaelbling1995;boyutlanetiBellman1957a.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
+- id: ch4-p90-i5
+  page: 90
+  pdf_page: 112
+  kind: kaynakça
+  what: RLdoğrusalprogramlama kökleriDanieladeFarias2002,deFarias–VanRoy2003.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
 chapter_counts:
   '1':
     items: 159
@@ -8853,6 +9708,14 @@ chapter_counts:
     tables: 1
     exercises: 29
     code: 0
+  '4':
+    items: 102
+    figures: 7
+    numbered_figures: 3
+    unnumbered_figures: 4
+    exercises: 10
+    code: 3
+    questions: 1
 part_dividers:
 - pdf_pages:
   - 45
@@ -8866,3 +9729,13 @@ part_dividers:
   - 361
   - 362
   what: III. kısım başlığı ve boş sayfa
+teaching_extensions:
+- id: teaching-ch4-poisson
+  page: 81
+  pdf_page: 103
+  kind: türetim
+  what: Kapasitede doyan Poisson kuyruklarını son kovada birleştirme;T1VT2ᵀ ile iki şubenin beklentisi.
+  status: eklendi
+  where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
+  note: Öğretim eki; kaynakta bu kuyruk birleştirme ve matris türetimi yoktur. Kaynak bilgi birimi sayılarına
+    katılmaz.

@@ -70,6 +70,9 @@ extras:
   - {id: x1, title: "PI'nin adım sayısı durum sayısıyla nasıl büyür?", engine: browser}
   - {id: x2, title: "Politika iyileştirme teoremini sayısal doğrula", engine: browser}
   - {id: x3, title: "Kumarbaz problemi (Sutton Örnek 4.3)", engine: browser}
+  - id: x4
+    title: 'Sutton 4.7: ücretsiz araba ve sabit otopark'
+    engine: browser
 
 quiz:
   - q: "Politika yinelemesi neden sonlu adımda durur?"
@@ -149,6 +152,115 @@ labs:
       - q: "Yerinde güncelleme neden daha hızlı yakınsar, ama k = 3'te neden en iyi olmayan bir politika verir?"
         a: "Yerinde güncellemede bir hücrenin yeni değeri aynı taramada sonraki hücrelere hemen yayılır: bilgi bir taramada birden çok adım ilerler (Gauss–Seidel), bu yüzden 114 taramada yakınsar (eşzamanlı 173). Ama yayılma tarama sırasına bağlıdır: sol üstten başlayan taramada sol üst köşeye yakın hücrelerin değerleri hızla güncellenirken sağ alt köşeye yakın olanlar geride kalır. Simetri bozulur ve bazı hücrelerde açgözlü eylem yanlış köşeye yönelir. Bir tarama daha yapılınca bu düzelir."
     limits: "Rastgele politikanın değerlendirmesi; ızgara 4 × 4, son durumlar sabit köşeler. Açgözlü politikanın en iyiliği V*'a (değer yinelemesi) göre denetleniyor. Isı haritasında sayılar notta yazılı."
+  - id: l3
+    lab: gridpefig
+    title: 'Kaynak Şekil 4.1: bütün hücreler ve açgözlü oklar'
+    goal: Rastgele politikanın değerlerini ve onlara göre bütün açgözlü eylemleri birlikte hesapla; iki köşe
+      tek terminal, her geçiş−1, γ=1.
+    presets:
+    - name: k = 0
+      params:
+        k: 0
+        mode: 0
+      note: Kaynak s.77, Şekil 4.1; iki anlamlı basamak, yarımda sıfıra doğru yuvarlama. Limit 400 taramayla
+        yaklaştırıldı.
+    - name: k = 1
+      params:
+        k: 1
+        mode: 0
+      note: Kaynak s.77, Şekil 4.1; iki anlamlı basamak, yarımda sıfıra doğru yuvarlama. Limit 400 taramayla
+        yaklaştırıldı.
+    - name: k = 2
+      params:
+        k: 2
+        mode: 0
+      note: Kaynak s.77, Şekil 4.1; iki anlamlı basamak, yarımda sıfıra doğru yuvarlama. Limit 400 taramayla
+        yaklaştırıldı.
+    - name: k = 3
+      params:
+        k: 3
+        mode: 0
+      note: Kaynak s.77, Şekil 4.1; iki anlamlı basamak, yarımda sıfıra doğru yuvarlama. Limit 400 taramayla
+        yaklaştırıldı.
+    - name: k = 10
+      params:
+        k: 10
+        mode: 0
+      note: Kaynak s.77, Şekil 4.1; iki anlamlı basamak, yarımda sıfıra doğru yuvarlama. Limit 400 taramayla
+        yaklaştırıldı.
+    - name: k = ∞ (400)
+      params:
+        k: 400
+        mode: 0
+      note: Kaynak s.77, Şekil 4.1; iki anlamlı basamak, yarımda sıfıra doğru yuvarlama. Limit 400 taramayla
+        yaklaştırıldı.
+    questions:
+    - q: Son okların en iyi olması genel bir garanti mi?
+      a: Genelde yalnız politika iyileşmesi garantidir; bu örnekte 3 tarama sonrası en kısa yol eylemleri elde
+        edilir.
+    limits: Yalnız kaynak 4×4 modeli; γ=1 ve adım−1 sabittir. Yerinde sıra satır sırasıdır. Limit sayısaldır,
+      400 tarama.
+
+  - id: l4
+    lab: jackrental
+    title: 'Jack: kaynak politika dizisi ve Alıştırma 4.7'
+    goal: Tam 441 durumlu Poisson MDP içinde politika yinelemesini yeniden hesapla; bütün politika haritalarını
+      ve son değer yüzeyini gör.
+    presets:
+    - name: Şekil 4.2
+      params:
+        g: 0.9
+        modified: 0
+      note: 'Kaynak s.81: talep 3/4, iade 3/2, kapasite 20, gecede 5, kira 10, taşıma 2; π0=0.'
+    - name: Alıştırma 4.7
+      params:
+        g: 0.9
+        modified: 1
+      note: 'Kaynak s.82: ilk 1→2 ücretsiz, taşıma sonrası >10 araba için şube başına sabit 4.'
+    questions:
+    - q: Neden negatif eylem var?
+      a: Negatif 2→1 yönüdür; pozitif 1→2. Kapasite fazlası ulusal şirkete döner.
+    - q: Poisson kuyruğu nereye gitti?
+      a: Talep kiralanabilir stokta, iade kapasitede doyar; aynı sonuca giden kuyruk kütlesi son kovaya toplandı.
+    limits: Talep ve iadeler bağımsız Poisson. Kapasite 20, azami taşıma 5. γ0.5–0.95. Değerlendirme 10⁻¹⁰eşiği;
+      eşitlikte eski eylem korunur. Renkler−5…+5; hücre üstünde durum/eylem başlığı var.
+
+  - id: l5
+    lab: gamblerfig
+    title: 'Kumarbaz: kaynak Şekil 4.3 ve iki programlama koşusu'
+    goal: Pozitif tam sayı bahislerle kaynak 1/2/3/32 tarama değerlerini ve son politikayı hesapla; olasılık
+      ve durma eşiğini değiştir.
+    presets:
+    - name: Şekil 4.3
+      params:
+        ph: 0.4
+        tol: -12
+      note: Kaynak s.84, p_h=0.4; son politika eşit Q bağlarına göre seçilir.
+    - name: '4.9: p_h=0.25'
+      params:
+        ph: 0.25
+        tol: -12
+      note: Kaynak s.84–85 ilk istenen koşu.
+    - name: '4.9: p_h=0.55'
+      params:
+        ph: 0.55
+        tol: -12
+      note: Kaynak s.84–85 ikinci koşu; bir-birim bahis en iyidir.
+    - name: Daha gevşek θ
+      params:
+        ph: 0.55
+        tol: -6
+      note: Değer kararlılığını 10⁻¹²eşiğiyle karşılaştır; aynı 9 ondalıklı bağ kırma kullanılır.
+    questions:
+    - q: V100=1 iken hedefe ayrıca+1 ekler miyiz?
+      a: Hayır; bu iki eşdeğer gösterimi birlikte kullanmak ödülü iki kez sayar.
+    - q: 0 bahis neden kullanılmıyor?
+      a: İndirimsiz öz döngü oyunu hiç bitirmeyebilir. Sonlanan pozitif bahis politikası aranıyor; kaynak nüansı
+        anlatımda.
+    limits: Hedef 100, iflas 0, γ1. Yerinde artan-sermaye sırası. Pozitif bahisler; Q9 ondalığa yuvarlanıp en
+      küçük maksimum seçilir. θsonlu olduğundan değerler yaklaşıktır. Mevcut x3 eşzamanlı günceller; ara eğriler
+      farklı olabilir.
+
 practice:
   - id: p1
     type: çözülmüş
@@ -218,16 +330,30 @@ practice:
     title: Bitmeyen politika yinelemesi
     goal: İyileştirmede eşitlikleri doğru ele almak
     needs: Durma koşulu
-    q: |-
-      Bir öğrencinin PI kodu iyileştirmede `pi_new[s] = random.choice([a for a in A if Q[s][a] == max(Q[s])])` kullanıyor ve `pi_new == pi` olunca duruyor. Bazı MDP'lerde kod hiç durmuyor. Neden?
+    q: 'Bir öğrencinin PI kodu iyileştirmede `pi_new[s] = random.choice([a for a in A if Q[s][a] == max(Q[s])])`
+      kullanıyor ve `pi_new == pi` olunca duruyor. Bazı MDP''lerde kod hiç durmuyor. Neden?
+
+      Kaynak s.80 sözde-kodu için bu döngüyü önleyen değişikliği yaz. (Sutton ve Barto, s.82, Alıştırma 4.4.)'
     choices:
-      - {t: "Değerlendirme yeterince hassas değil", why: "Doğrusal sistem tam çözülüyor; sorun seçimde."}
-      - {t: "Eşit değerli eylemler arasında her seferinde rastgele seçim yapıldığı için politika eşdeğer politikalar arasında gidip geliyor; mevcut eylem yalnız kesin olarak daha iyi bir eylem varsa değiştirilmeli", ok: true, why: "Eşdeğer politikaların değerleri aynıdır; Lemma 1'in kesin artışı yoktur, algoritma döngüye girer."}
-      - {t: "γ = 1 kullanılmış", why: "Kod γ < 1'de de durmayabilir."}
+    - t: Değerlendirme yeterince hassas değil
+      why: Doğrusal sistem tam çözülüyor; sorun seçimde.
+    - t: Eşit değerli eylemler arasında her seferinde rastgele seçim yapıldığı için politika eşdeğer politikalar
+        arasında gidip geliyor; mevcut eylem yalnız kesin olarak daha iyi bir eylem varsa değiştirilmeli
+      ok: true
+      why: Eşdeğer politikaların değerleri aynıdır; Lemma 1'in kesin artışı yoktur, algoritma döngüye girer.
+    - t: γ = 1 kullanılmış
+      why: Kod γ < 1'de de durmayabilir.
     hints:
-      - "İki eylem aynı Q değerine sahipse politika neye göre değişiyor?"
-    solution: |-
-      `if max(Q[s]) > Q[s][pi[s]] + tol: pi_new[s] = argmax` biçiminde, yani mevcut eylem eşitlikte korunarak. Kayan nokta için küçük bir tol eklenir; ya da durma koşulu politika yerine değerlerin değişmemesine bağlanır.
+    - İki eylem aynı Q değerine sahipse politika neye göre değişiyor?
+    solution: '`if max(Q[s]) > Q[s][pi[s]] + tol: pi_new[s] = argmax` biçiminde, yani mevcut eylem eşitlikte
+      korunarak. Kayan nokta için küçük bir tol eklenir; ya da durma koşulu politika yerine değerlerin değişmemesine
+      bağlanır.
+
+
+      Tam akış: π değerlendir; her durumda eski eylem maksimumsa koru, değilse sabit sıralı argmax seç; hiçbir
+      eylem değişmediyse dur, aksi halde değerlendirmeye dön. Tam değerlendirme ve uygun MDP koşullarıyla eşit
+      politika döngüsü önlenir. Kaynak 4.4 burada mevcut kartla birleştirildi.'
+
   - id: p6
     type: kanıt
     level: 3
@@ -245,6 +371,294 @@ practice:
       - "$V\\ge U\\Rightarrow T^{\\pi'}V\\ge T^{\\pi'}U$."
     solution: |-
       $V^\pi\le H_{\pi'}V^\pi\le H_{\pi'}^2V^\pi\le\dots\to V^{\pi'}$ (monotonluk ve büzülme). $V^{\pi'}=V^\pi$ ise zincirdeki her eşitsizlik eşitliktir: $\max_a[R_a+\gamma T^aV^\pi]=V^\pi$, yani $V^\pi$ Bellman en iyilik denkleminin tek çözümü $V^*$'dır.
+  - id: p7
+    type: hesap
+    level: 1
+    title: 'Sutton 4.1: iki durum–eylem değeri'
+    goal: iki durum–eylem değeri
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'Örnek 4.1 içinde dört yön eşit olasılıklı, γ=1 ve her geçiş −1. qπ(11, aşağı) ve qπ(7, aşağı) nedir?
+      Sayısal alana ikinci değeri gir.
+
+      (Kaynak: Sutton ve Barto, s.76, Alıştırma 4.1.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: '11 konumundan aşağı terminale gidilir: qπ(11, aşağı)=−1+0=−1. 7 konumundan aşağı 11 konumuna gidilir;
+      rastgele politikanın V(11)=−14 değeridir. Bu yüzden qπ(7, aşağı)=−1−14=−15. İlk eylem sabittir, bu Q değerine
+      ayrıca 1/4 ile çarpma.'
+    answer: -15
+    calc: -1-14
+    tol: 1.0e-09
+
+  - id: p8
+    type: hesap
+    level: 2
+    title: 'Sutton 4.2: yeni durumun iki dinamiği'
+    goal: yeni durumun iki dinamiği
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: '4×4 ızgaraya 13 konumunun altına yeni 15 durumu ekle. Bu yeni durumda sol/yukarı/sağ/aşağı eylemleri
+      sırasıyla 12, 13, 14, 15 konumlarına götürsün. Önce eski durumların geçişleri aynı kalsın: rastgele politika
+      için Vπ(15) nedir? Sonra 13 durumunun aşağı eylemi de yeni 15 konumuna gitsin. Bu kez Vπ(15) nedir? Her
+      geçiş −1, γ=1. Sayısal alana ikinci sonucu gir.
+
+      (Kaynak: Sutton ve Barto, s.76, Alıştırma 4.2.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: 'İlk durumda yeni durum eski ızgarayı etkilemez. V12=−22, V13=−20, V14=−14 ve
+
+      $$V_{15}=-1+\tfrac 14(V_{12}+V_{13}+V_{14}+V_{15}).$$
+
+      3V15=−4−22−20−14=−60, yani −20. İkinci durumda eski 13 aşağı eylemi önce kendisine dönüyordu ve ardıl değeri
+      −20 idi. Yeni 15 değeri de −20 olduğundan eski bütün V değerleri ile V15=−20 yeni Bellman sistemini de
+      sağlar. Sonlu, terminale ulaşan rastgele zincirin tek çözümü bu olduğu için ikinci sonuç yine −20. Bağımsız
+      15 bilinmeyenli doğrusal çözüm de bunu verir. Buradaki yeni 15, eski çizimde iki köşede gösterilen tek
+      terminal değildir; uygulama yeni durumu ayrı indisle saklar.'
+    answer: -20
+    calc: (-4-22-20-14)/3
+    tol: 1.0e-09
+
+  - id: p9
+    type: açıkla
+    level: 2
+    title: 'Sutton 4.3: Q için üç değerlendirme eşitliği'
+    goal: Q için üç değerlendirme eşitliği
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'qπ ve q0, q1, q2, … ardışık tahminleri için (4.3), (4.4), (4.5) denklemlerinin karşılıklarını yaz.
+
+      (Kaynak: Sutton ve Barto, s.76, Alıştırma 4.3.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: 'İlk eylem a sabitlenir, sonraki Aₜ₊₁ politika π ile seçilir:
+
+      $$q_\pi(s, a)=\mathbb E_\pi[R_{t+1}+\gamma q_\pi(S_{t+1}, A_{t+1})\mid S_t=s, A_t=a].$$
+
+      Ortak p açılımı:
+
+      $$q_\pi(s, a)=\sum_{s'', r}p(s'', r\mid s, a)\left[r+\gamma\sum_{a''}\pi(a''\mid s'')q_\pi(s'', a'')\right].$$
+
+      Sonraki tahmin güncellemesi:
+
+      $$q_{k+1}(s, a)=\sum_{s'', r}p(s'', r\mid s, a)\left[r+\gamma\sum_{a''}\pi(a''\mid s'')q_k(s'', a'')\right].$$
+
+      Terminalde kukla eylem varsa Q=0 tutulur. İlk a için π(a|s) ile çarpma yok; sonraki a′ için π gerekir.
+      Son satırda gerçek qπ yerine önceki tahmin qk kullanılır.'
+    rubric:
+    - Bütün verilen koşulları ve alt soruları kullanır.
+    - Ara denklemi veya algoritma adımlarını açıklar.
+    - Sonlanma ve sayısal koşulları belirtir.
+
+  - id: p10
+    type: açıkla
+    level: 3
+    title: 'Sutton 4.5: Q ile tam politika yinelemesi'
+    goal: Q ile tam politika yinelemesi
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'S.80 V politika yinelemesine benzer biçimde q* hesaplayan tam bir Q politika yineleme algoritması ver.
+      Başlatma, değerlendirme, iyileştirme ve sonlanmayı eksiksiz belirt; bu fikir sonraki bölümlerde kullanılacak.
+
+      (Kaynak: Sutton ve Barto, s.82, Alıştırma 4.5.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: "Bir geçerli deterministik π ve bütün (s, a) için Q başlat; terminal Q=0. Sonra:\n\n```text\ntekrarla:\n\
+      \    π sabitken Δ<θ olana kadar:\n        Δ=0\n        her geçerli (s,a) için:\n            eski=Q(s,a)\n\
+      \            Q(s,a)=Σs′,r p(s′,r|s,a)[r+γQ(s′,π(s′))]\n            Δ=max(Δ,|eski−Q(s,a)|)\n    sabit=doğru\n\
+      \    her s için:\n        eski=π(s)\n        mevcut eylem Q maksimumuysa koru; değilse sabit sıralı argmax\
+      \ seç\n        değiştiyse sabit=yanlış\nsabit olunca Q,π döndür\n```\n\nStokastik değerlendirmede Q(s′,\
+      \ π(s′)) yerine Σa′π(a′|s′)Q(s′, a′) kullan. İyileştirme için artık tek-adım model bakışı gerekmez; Q değerlerinde\
+      \ doğrudan max alınır. Model değerlendirme adımında hâlâ gereklidir. Tam değerlendirme ve uygun MDP koşulları\
+      \ en iyi Q garantiler; sonlu θ pratik yaklaşık sonuç verir. Eşitlikte mevcut eylemi korumak 4.4 döngüsünü\
+      \ önler."
+    rubric:
+    - Bütün verilen koşulları ve alt soruları kullanır.
+    - Ara denklemi veya algoritma adımlarını açıklar.
+    - Sonlanma ve sayısal koşulları belirtir.
+
+  - id: p11
+    type: açıkla
+    level: 2
+    title: 'Sutton 4.6: ε-yumuşak politika kısıtı'
+    goal: ε-yumuşak politika kısıtı
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'Her durumda her eylemin olasılığı en az ε/|A(s)| olan ε-yumuşak politikalarla sınırlısın. S.80 V politika
+      yinelemesinin sırasıyla 3, 2, 1 adımlarında gereken değişiklikleri nitel olarak açıkla.
+
+      (Kaynak: Sutton ve Barto, s.82, Alıştırma 4.6.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: '3 — İyileştirme: her eyleme taban ε/m ver (m=|A(s)|), kalan 1−ε olasılığı Q açısından en iyi eylemlere
+      dağıt. Tek maksimum a* için π′(a|s)=ε/m+(1−ε)1{a=a*}; bağ varsa artan kütle maksimumlar arasında paylaşılır.
+      Bu, keyfî saf argmax değildir; tüm eylemler pozitif taban taşır.
+
+
+      2 — Değerlendirme: π artık dağılım olduğu için V(s)=Σaπ(a|s)Σs′, rp(s′, r|s, a)[r+γV(s′)] ile stokastik
+      politika değerlendirilir.
+
+
+      1 — Başlatma: geçerli herhangi bir ε-yumuşak dağılım seç; örneğin bütün eylemlere 1/m. Terminal değerini
+      0 tut. Sonuç genel en iyi politika değil, bu kısıt altında en iyi politikadır. ε=1 için tek seçenek düzgün
+      dağılım; ε=0 taban kısıtını kaldırır.'
+    rubric:
+    - Bütün verilen koşulları ve alt soruları kullanır.
+    - Ara denklemi veya algoritma adımlarını açıklar.
+    - Sonlanma ve sayısal koşulları belirtir.
+
+  - id: p12
+    type: kod
+    level: 3
+    title: 'Sutton 4.7: ücretsiz taşıma ve sabit otopark'
+    goal: ücretsiz taşıma ve sabit otopark
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'Önce Örnek 4.2 araba kiralama sonuçlarını programla tekrar üret. Sonra çalışan her gece 1.şubeden 2.şubeye
+      bir arabayı ücretsiz götürsün; aynı yöndeki ek arabalar ve ters yöndeki her araba 2 maliyetli. Taşımadan
+      sonra bir şubede 10 adetten fazla araba varsa ek otopark için o şube başına sabit 4 maliyet olsun. Politika
+      yinelemesiyle yeniden çöz.
+
+      (Kaynak: Sutton ve Barto, s.82, Alıştırma 4.7.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: 'Tam çözüm yeni x4 dörtlüsündeki jack_modified fonksiyonudur. N=20, gecede en çok 5, γ=0.9, kira
+      10, talepλ=(3, 4), iadeλ=(3, 2) korunur. modified=False çağrısı önce özgün soruyu doğrular; modified=True
+      iki değişikliği birlikte uygular. Taşıma sonrası stoklar m1, m2 için maliyet 2·max(a−1, 0) (a>0) veya 2|a|
+      (a≤0), artı 4·1{m1>10}+4·1{m2>10}. Otopark araba başına değil şube başına, eşik kesin >10.
+
+
+      Poisson kuyruklarını doyan son kovada birleştir; satırlar 1 toplasın. Politika değerlendirmede T1·V·T2ᵀ
+      beklentisini kullan, eşitlikte mevcut eylemi koru. Kaynak ve 4.7 modellerini bütün 441 durumda çalıştır.
+      Özgün V(0, 0)=421.414063, V(20, 20)=636.989607; değişmiş V(0, 0)=429.946305, V(20, 20)=603.536701. Her
+      ikisi son sabitlik denetimi dahil 5 değerlendirme. l4 iki ön ayarda bütün politika dizisini ve son yüzeyi
+      gösterir. Maliyet değişiminin neden stok durumuna göre farklı etki yarattığını açıkla.'
+    rubric:
+    - Özgün problemi önce doğrular.
+    - İlk ücretsiz arabanın yönünü doğru kullanır.
+    - Taşımadan sonra >10 eşiği ve şube başına 4 uygular.
+    - Bütün 441 durumda çözüm ve görsel politika/değer raporu üretir.
+
+  - id: p13
+    type: yorumla
+    level: 2
+    title: 'Sutton 4.8: 50 ile 51 neden farklı görünüyor?'
+    goal: 50 ile 51 neden farklı görünüyor?
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'Kumarbazın en iyi politikası neden bu tuhaf biçimde? Özellikle 50 sermayede tek atışta tamamını yatırırken
+      51 sermayede neden tamamını yatırmamak iyi bir seçimdir? p_h=0.4 kaynak durumunu kullan.
+
+      (Kaynak: Sutton ve Barto, s.84, Alıştırma 4.8.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: '50 sermayede 50 bahis başta 1 atışla hedefe 0.4 olasılıkla ulaşır; daha küçük bahislerde aleyhte
+      oyunu uzatmak zorunda kalır.51 sermayede hedefi aşmama sınırı zaten a≤49; 51 yatırmak geçerli değildir.
+      Ama kaynak çiziminin 1 gibi küçük bahis seçmesinin asıl nedeni bağlardır:1 bahis 50/52 durumlarına, 49
+      bahis 2/100 durumlarına götürür ve iki Q aynıdır.
+
+
+      Hesapla V51≈0.403098437165. Q(51, 1)=0.4V52+0.6V50≈0.403098437165; Q(51, 49)=0.4+0.6V2≈aynı değer. Bu yüzden
+      büyük veya küçük bahisle en iyi olunabilir. p_h<0.5 için cesur oyun bir en iyi politikadır ama tek politika
+      değildir. Gösterimdeki sivri şekil, Q eşitliklerini hangi kuralla bozduğumuza bağlıdır; genel “her zaman
+      küçük bahis güvenlidir” kuralı çıkarılmaz.'
+    rubric:
+    - Bütün verilen koşulları ve alt soruları kullanır.
+    - Ara denklemi veya algoritma adımlarını açıklar.
+    - Sonlanma ve sayısal koşulları belirtir.
+
+  - id: p14
+    type: kod
+    level: 3
+    title: 'Sutton 4.9: iki olasılık ve eşik kararlılığı'
+    goal: iki olasılık ve eşik kararlılığı
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'Kumarbaz için değer yinelemesini uygula; p_h=0.25 ve 0.55 durumlarını çöz. İstersen 0 ve 100 kukla terminal
+      durumlarını V0=0, V100=1 ile kullan. Şekil 4.3 benzeri değer/politika grafikleri üret. θ→0 iken sonuçların
+      kararlı olup olmadığını denetle.
+
+      (Kaynak: Sutton ve Barto, s.84–85, Alıştırma 4.9.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: 'Mevcut x3 gambler_vi(ph, eps) iki istenen olasılığı destekler. Her ph için eps=10⁻⁶, 10⁻⁹, 10⁻¹²
+      çağrıları yap; V1…V99 ve π1…π99 dizilerini sermayeye karşı çiz. l5 aynı görevi yerinde taramayla, kaynak
+      1/2/3/32 ara eğrileriyle gösterir; x3 eşzamanlıdır, limit aynı ama ara taramalar farklıdır. V100=1 kullanırken
+      hedefe ayrıca+1 ekleme. Pozitif bahisli sonlanan politikalar aranır; kaynak 0 bahis nüansı anlatımda ayrı
+      açıklanır.
+
+
+      Çalıştırılmış yerinde referansta p_h=0.25 için V50=0.25 veπ50=50; p_h=0.55 için V50≈0.999956099225 ve bir-birim
+      bahis politikası en iyi. θ=10⁻⁶ ile 10⁻¹² arasındaki en büyük V farkı bu koşuda sırasıyla 0 ve 0.000093520231;
+      9 ondalıklı Q bağ kırmayla politikalar değişmedi. Bu ölçüm bütün bağ kırma kuralları için tekil politika
+      garantisi değildir. Kaynak politikası zaten eşit en iyi eylemler yüzünden tek değildir; küçük sayısal farklar
+      görünümü değiştirebilir.'
+    rubric:
+    - İki p_h değerini de çözer.
+    - Değer ve politika grafikleri üretir.
+    - En az iki azalan θ değerini karşılaştırır.
+    - Terminal sınır/ödül hesabını çift saymaz.
+    - Bağ kırma ve sıfır bahis koşulunu raporlar.
+
+  - id: p15
+    type: açıkla
+    level: 1
+    title: 'Sutton 4.10: Q için değer yinelemesi'
+    goal: Q için değer yinelemesi
+    needs: Sutton Bölüm 4 MDP, Bellman ve ilgili örnek.
+    q: 'Denklem 4.10 değer yinelemesinin qₖ₊₁(s, a) eylem-değer karşılığını yaz.
+
+      (Kaynak: Sutton ve Barto, s.85, Alıştırma 4.10.)'
+    hints:
+    - İlk eylem ile sonraki politika veya tahmin değerini ayır.
+    - İlgili Bellman toplamını ve geçerli eylemleri açık yaz.
+    solution: 'İlk a verilmiş olduğu için kökte maksimum alınmaz; sonraki durum gözlenince a′ seçilir:
+
+      $$q_{k+1}(s, a)=\sum_{s'', r}p(s'', r\mid s, a)\left[r+\gamma\max_{a''\in\mathcal A(s'')}q_k(s'', a'')\right].$$
+
+      Terminal yaprakta devam 0. Bu modelin tüm sonuçları üzerinden beklenen güncellemedir; tek örnekle Q-learning
+      güncellemesi değildir. (4.2) içindeki q* değerlerini qk ile değiştirip atama yaparak da elde edilir.'
+    rubric:
+    - Bütün verilen koşulları ve alt soruları kullanır.
+    - Ara denklemi veya algoritma adımlarını açıklar.
+    - Sonlanma ve sayısal koşulları belirtir.
+
+  - id: p16
+    type: açıkla
+    level: 3
+    title: 'Sutton Örnek 4.3: bütün en iyi politika ailesi'
+    goal: Tek bir çizimle bütün optimal politika ailesini ayırmak
+    needs: Kumarbazın V*, Q* değerleri ve sonlanan politika.
+    q: 'p_h=0.4 kumarbaz örneğindeki çizim tek bir en iyi politikadır. Bütün en iyi politika ailesinin nasıl
+      göründüğünü tarif et. Eşit eylemler ve olasılık karışımları ne kadar serbest? (Kaynak: Sutton ve Barto,
+      s.84, Örnek 4.3 içindeki numarasız soru.)'
+    hints:
+    - Her sermayede maksimumu veren bahisler kümesini kur.
+    - Sıfır bahis eklenirse sonlanma koşulunu ayrıca denetle.
+    rubric:
+    - Her durumda argmax kümesi üzerinden tüm aileyi tanımlar.
+    - Farklı deterministik seçimleri ve stokastik karışımları kapsar.
+    - İndirimsiz 0 bahis için sonlanma koşulunu korur.
+    solution: 'Pozitif bahisler arasında $Q_*(s,a)=V_*(s)$ sağlayan küme $B_*(s)$ olsun. Burada geçerli bahisler
+      1 ile min(s,100−s) arasındadır ve
+
+      $$\begin{aligned}Q_*(s,a)&=p_hV_*(s+a)\\&\quad+(1-p_h)V_*(s-a).\end{aligned}$$
+
+      Her durumda B*(s) içinden herhangi bir bahis seçen deterministik politika veya yalnız B*(s) üzerinde olasılık
+      taşıyan herhangi bir stokastik politika en iyidir. Bu, bütün durumlarda bağımsız bağ seçimlerinin oluşturduğu
+      ailedir; tek bir sivri çizim değildir.
+
+
+      Sayısal doğrulama (p_h=0.4): B*(25)={25}, B*(26)={1, 24, 26}, B*(50)={50}, B*(51)={1, 49}. Örneğin 51 sermayede
+      1 yerine 49 seçmek V* değerini değiştirmez. Diğer durumlarda da aynı argmax testi tüm aileyi belirler;
+      yalnız “hep en büyük bahis” demek aileyi eksik tanımlar.
+
+
+      Kaynağın 0 dahil eylem kümesi kullanılırsa 0 da Q=V* eşitliğini sağlar. Ama eklenen beklemeler sonunda
+      pozitif bahse geçilen ve terminale ulaşan bir politika oluşturmalıdır. Herhangi bir pozitif sermayede sürekli
+      0 seçmek en iyi değildir. Sonlanan bu ek beklemeler indirimsiz getiriyi değiştirmez. Böylece doğru genel
+      tanım, Bellman maksimumları üzerinde destek taşıyan ve uygun sonlanma koşulunu sağlayan politikalardır.'
+
 pitfalls:
   - wrong: "Politika yinelemesi her zaman değer yinelemesinden hızlıdır, çünkü çok daha az yineleme yapar."
     right: "Bir PI yinelemesi |S|³ işlemlik bir doğrusal sistem ister; büyük ve seyrek MDP'lerde VI ya da orta K'lı MPI toplamda daha az iş yapar (lab l1)."
