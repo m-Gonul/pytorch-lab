@@ -26,10 +26,10 @@ export default {
       plots: [
         {
           title: "Yön-yön küçültme çarpanı sⱼ²/(sⱼ²+nλ): 1 = dokunulmadı, 0 = tam bastırıldı",
-          xlabel: "tekil yön j (büyük → küçük s)", ylabel: "çarpan", ylim: [0, 1.05], yzero: true,
+          xlabel: "tekil yön j (büyük → küçük s)", ylabel: "çarpan", ylim: [0, 1.05], yzero: true, xlim: [0.4, s.length + 0.6], xticks: s.map((_, i) => [i + 1, String(i + 1)]),
           series: [
-            { name: "ridge çarpanı", x: s.map((_, i) => i + 1), y: f, kind: "bar", c: 0 },
-            { name: "OLS çarpanı (λ = 0)", x: s.map((_, i) => i + 1), y: s.map(() => 1), kind: "bar", c: 4, off: 0.38, bw: 0.4 },
+            { name: "ridge çarpanı", x: s.map((_, i) => i + 1), y: f, kind: "bar", c: 0, bw: 0.4, off: -0.5 },
+            { name: "OLS çarpanı (λ = 0)", x: s.map((_, i) => i + 1), y: s.map(() => 1), kind: "bar", c: 4, bw: 0.4, off: 0.5 },
           ],
         },
         {

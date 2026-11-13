@@ -458,6 +458,7 @@ aside.box > .box-head { cursor: default; }
 .pr-msg.bad { color: var(--bad); }
 .pr-rubric { border: 1px dashed var(--line); border-radius: 7px; margin: 8px 0 0; padding: 6px 12px; font-size: 0.9rem; }
 .pr-rubric label { display: flex; gap: 8px; align-items: baseline; margin: 3px 0; }
+.pr-rubric label > span { min-width: 0; overflow-wrap: anywhere; } /* metin + KaTeX tek flex öğesi: satır kırılabilsin */
 .pr-choices { margin: 8px 0; }
 
 /* ---- yanılgılar ---- */

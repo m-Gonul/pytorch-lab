@@ -249,7 +249,7 @@ function practiceItemHTML(m, x) {
   } else if (x.rubric) {
     answer = `<div class="pr-open"><label class="sr-only" for="pr-${m.id}-${x.id}">Cevabın</label><textarea id="pr-${m.id}-${x.id}" rows="4" placeholder="Cevabını buraya yaz (bu cihazda saklanır). Sonra çözümü açıp ölçütlerle kendini değerlendir."></textarea></div>`;
   }
-  const rubric = x.rubric ? `<fieldset class="pr-rubric"><legend>Değerlendirme ölçütleri (çözümü okuduktan sonra işaretle)</legend>${x.rubric.map((r, i) => `<label><input type="checkbox" data-r="${i}"> ${md.inline(r)}</label>`).join("")}</fieldset>` : "";
+  const rubric = x.rubric ? `<fieldset class="pr-rubric"><legend>Değerlendirme ölçütleri (çözümü okuduktan sonra işaretle)</legend>${x.rubric.map((r, i) => `<label><input type="checkbox" data-r="${i}"> <span>${md.inline(r)}</span></label>`).join("")}</fieldset>` : "";
   const worked = x.level === 0;
   return `<article class="pr" id="pr-${esc(x.id)}" data-pid="${esc(x.id)}" data-level="${x.level}" data-type="${esc(x.type)}">
 <header class="pr-head"><span class="pr-level l${x.level}">${LEVEL_NAME[x.level]}</span>${x.type === "çözülmüş" ? "" : `<span class="pr-type">${PTYPES[x.type]}</span>`}${x.title ? `<h3>${md.inline(x.title)}</h3>` : ""}</header>

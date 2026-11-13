@@ -338,7 +338,7 @@ practice:
       $y_i=w^\top x_i+\varepsilon_i$, $\varepsilon_i\sim\mathcal N(0,\sigma^2)$, önsel $w\sim\mathcal N(0,\tau^2I)$. MAP kestiriminin ridge olduğunu göster ve λ'yı σ, τ cinsinden yaz. Lasso hangi önsele karşılık gelir?
     rubric:
       - "$\\log p(w|y)=\\log p(y|w)+\\log p(w)+$ sabit yazdım"
-      - "Olabilirlikten $-\\frac1{2\\sigma^2}\\|Xw-y\\|^2$, önselden $-\\frac1{2\\tau^2}\\|w\\|^2$ çıktığını gösterdim"
+      - "Olabilirlikten $-\\|Xw-y\\|^2/2\\sigma^2$, önselden $-\\|w\\|^2/2\\tau^2$ terimlerinin çıktığını gösterdim"
       - "$\\lambda=\\sigma^2/\\tau^2$ buldum ve yorumladım (geniş önsel → az ceza)"
       - "Lasso'nun Laplace önseline karşılık geldiğini söyledim"
     hints:
