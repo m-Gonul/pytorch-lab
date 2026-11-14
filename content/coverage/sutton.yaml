@@ -26,8 +26,8 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: İlk7 bölüm işlendi;bu bölümün yayın CI ayrıca izlenir. Bölüm8–17,ön/arka materyal ve kısım ayırıcıları
-    henüz tümüyle işlenmedi;kitap tamamlanmadı.
+  note: İlk8 bölüm işlendi; Bölüm8 yayın CI ayrıca izlenir. Bölüm9–17, ön/arka materyal ve kısım ayırıcıları
+    henüz tümüyle işlenmedi; kitap tamamlanmadı.
   processed_chapters:
   - 1
   - 2
@@ -36,8 +36,8 @@ progress:
   - 5
   - 6
   - 7
-  unprocessed_chapters:
   - 8
+  unprocessed_chapters:
   - 9
   - 10
   - 11
@@ -856,7 +856,7 @@ chapters:
   - m11-4-mc-td
   - m11-5-sarsa-q
   mapping_status: 83 kaydın kesin hedefleri ve kaynak derinliği doğrulandı;bağımsız ikinci okuma tamamlandı.
-  content_status: işlendi;yerel testler ve yayın CI ayrıca izlenir
+  content_status: işlendi; yayında (CI ve canlı sayfalar doğrulandı)
   recorded_units: 83
   source_unnumbered_figures:
   - page: 152
@@ -873,6 +873,17 @@ chapters:
     findings_resolved: true
     note: Ayrı ajan18metin sayfası,17görüntü ve1şekil büyütmesini yalnız kaynak/defter üzerinden okudu;koşul/etiket/ok
       ayrıntıları tamamlandı. Son4ifade de takipte doğrulandı;açık bulgu yok.
+  publication:
+    commit: e9ed9e514edb79758d6b9ad60d70af1846eccecc
+    workflow_run: 43600893283
+    build: success
+    deploy: success
+    live_verified: true
+    live_pages:
+    - https://m-gonul.github.io/pytorch-lab/m11-4-mc-td.html#sutton-nstep-hedef
+    - https://m-gonul.github.io/pytorch-lab/m11-5-sarsa-q.html#sutton-nstep-sigma
+    evidence: İki canlı sayfada n-adım/CV/Tree/Qσ çapaları, yeni kartlar/deney yerleşimleri ve yayımlanan
+      nstepwalk/controlvariate/multistepbackup JS dosyaları doğrulandı.
 - chapter: 8
   title: Tablolu yöntemlerle planlama ve öğrenme
   pdf_pages:
@@ -973,8 +984,70 @@ chapters:
     source_title: Prioritized sweeping for a deterministic environment
   candidate_modules:
   - m11-10-planning
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  mapping_status: 138 birimin kesin hedefleri doğrulandı; bağımsız ikinci okuma ve iki takipte bütün bulgular
+    kapandı.
+  content_status: işlendi; yerel testler tamamlandı, yayın CI ayrıca izlenir
+  recorded_units: 138
+  source_unnumbered_figures:
+  - page: 160
+    pdf_page: 182
+    what: model→politika
+  - page: 160
+    pdf_page: 182
+    what: model→simüle deneyim→yedek→değer→politika
+  - page: 162
+    pdf_page: 184
+    what: model/deneyim/değer ve eylem üçgeni
+  - page: 170
+    pdf_page: 192
+    what: PS/Dyna ölçek grafiği
+  - page: 171
+    pdf_page: 193
+    what: çubuk manevrası
+  - page: 177
+    pdf_page: 199
+    what: başlangıç/ilgili/ilgisiz durum kümeleri
+  second_read:
+    independent: true
+    text_pages: 35
+    rendered_pages: 34
+    blank_pages:
+    - 216
+    findings_resolved: true
+    note: Ayrı ajan yalnız PDF181–216 ve138 birimlik defteri okudu;8 alıştırma,17 görsel,3 kod,1 tablo,2
+      dipnot doğrulandı. Yerel politika koşulu, Dyna tarih atfı, qπ seçenekleri, maliyet ayrımı, iyimser
+      keşif, tohum düzeni, small-backup sırası, ödül örtük koşulu, Gelly–Silver çekincesi ve terminal
+      işaretleri açıklaştırıldı. Son dört ifade takipte doğrulandı; açık bulgu yok.
+  measurement_limits:
+  - Şekil8.8 yüksekliği özgün grafiğe eş değil; özgün modeller/tohumlar yok. Kendi model tercihi ve bağımsız
+    NumPy denetimi açık.
+  - RTDP yarış pistinin9115/599 sayıları ve25 koşu tablosu yazar raporu; tam harita verilmediğinden kendi
+    ölçümü gibi sunulmaz.
+  - PS1504 gridinde θ1e−12 ile bir koşu2m adım sınırında optimal başlangıç yoluna ulaşmadı; beşli tamamlanma
+    ortalamasına katılıp başarı diye sunulmaz.
+  - Çubuk haritası/hareket işaretleri kendi modelimiz; endpoint çarpışma denetimi süpürülen hareketi modellemez.
+  validation:
+    node_tests: 791/791
+    module_tests: 1/1 gerçek CPU torch
+    notebook_tests: 1/1 gerçek CPU torch
+    independent_numeric_tests: 5/5
+    final_site_and_numeric: 12/12
+    browser:
+      widths:
+      - 1280
+      - 390
+      presets: 22
+      combinations: 44
+      overflow: 0
+      inline_math_errors: 0
+      javascript_errors: 0
+      duplicate_ids: 0
+    independent_references:
+      full_Dyna_Q_cases: 6
+      dense_policy_values: 16
+      maximum_CPP_difference: 2.82e-12
+    note: Son çubuk genişliği düzeltmesi hedef3/3 lab testi ve iki görünümde eksen-içi konum denetimiyle
+      doğrulandı; hesap algoritması değişmedi.
 - chapter: 9
   title: Yaklaşımla politika üstü tahmin
   pdf_pages:
@@ -3046,252 +3119,324 @@ page_audit:
   text_characters: 2138
   embedded_images: 0
   drawing_paths: 0
-  visual_review: incelenmedi
+  visual_review: şekil yok; metin okundu
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 182
   printed_page: 160
   text_sha256: 9c528ad768e3463fa2ee6139947ff49392b6219c6e4582c98865fe14507b4885
   text_characters: 3743
   embedded_images: 0
   drawing_paths: 11
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 183
   printed_page: 161
   text_sha256: dea7277f317a6f70f4b2b1605f8a6c24817ff7ca20ad39eb1f54f986202bf293
   text_characters: 3155
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 184
   printed_page: 162
   text_sha256: 6e7a735e71ff78ad29e3e91250855ab54f878f20937d7d4eaaeaf1b79ad8580d
   text_characters: 3968
   embedded_images: 0
   drawing_paths: 16
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 185
   printed_page: 163
   text_sha256: 1b3fbfb7c6141c13f0b0de670ee8d5e570a1ef4c3a29ecf2c581ee690a1e6b52
   text_characters: 3107
   embedded_images: 0
   drawing_paths: 22
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 186
   printed_page: 164
   text_sha256: 04625f9e334fb26a1da1e82de92677e8ed15c7c9df0fc8f6e857008bca7eda82
   text_characters: 3095
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 187
   printed_page: 165
   text_sha256: 17300d463f8795dddd19ae3487151959c52d5439625723ad16ba2abc0239b43c
   text_characters: 2271
   embedded_images: 0
   drawing_paths: 157
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 188
   printed_page: 166
   text_sha256: ec8b1690f2b5566081d02bd2d3a3ad0cc313994e348a6c413ebbe51e015385a4
   text_characters: 3360
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 189
   printed_page: 167
   text_sha256: 773ac9cb7de5f8140eb2af73ced0e34f47d1433cf3348d0cd29e0c027de6f5ec
   text_characters: 2738
   embedded_images: 0
   drawing_paths: 36
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 190
   printed_page: 168
   text_sha256: 22a0d35f7d210878ace26e252d6d51846730b138047de0d825e4ec2a318f951d
   text_characters: 3608
   embedded_images: 0
   drawing_paths: 5
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 191
   printed_page: 169
   text_sha256: 85f53da2687d99da9f9af9853ca961983d35df4a5f4375c96cd7fcc4540235b8
   text_characters: 3843
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 192
   printed_page: 170
   text_sha256: de2d693ab74d87ebb4541cafba2f8712fe990221d65efbcb5c65715ae5277fa1
   text_characters: 2882
   embedded_images: 0
   drawing_paths: 9
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 193
   printed_page: 171
   text_sha256: b9fde950b1c62f5a54098dce41c837b252d9f0f8ad6f5d8411db04966d398cc5
   text_characters: 2678
   embedded_images: 0
   drawing_paths: 415
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 194
   printed_page: 172
   text_sha256: 59fd7d30827bbada718dc2f46081b1104f860f00b0007b81c98e36f1dbaa7c3a
   text_characters: 4172
   embedded_images: 0
   drawing_paths: 197
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 195
   printed_page: 173
   text_sha256: 2bf844f15a5652baba14ebd2a28f5b15bf0078d3599f14a25458683d7befaae3
   text_characters: 3774
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 196
   printed_page: 174
   text_sha256: ba7bc8af0bc468ca5bc5f1cd3fe6e1a13192268fdf76ea1752ebea1b44cf078b
   text_characters: 2889
   embedded_images: 0
   drawing_paths: 30
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 197
   printed_page: 175
   text_sha256: d1dd97290003ca4277ccc4c3a337beed5e04010aa7fb5c1fdcc30596e03406b9
   text_characters: 3824
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 198
   printed_page: 176
   text_sha256: 21637fe859758efab8a8885e3e21438cccf948a4778eda17f4b43441e8850624
   text_characters: 4539
   embedded_images: 0
   drawing_paths: 15
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 199
   printed_page: 177
   text_sha256: 2d056a61eb1e61300875021c39079c1955de42a627698d234e0445f975d9fec5
   text_characters: 3503
   embedded_images: 0
   drawing_paths: 16
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 200
   printed_page: 178
   text_sha256: 5ae61087cab369b51b84fc75dd312714b9a281b5044f2daa41a1789880edc586
   text_characters: 3611
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 201
   printed_page: 179
   text_sha256: 72722c4f67aacc2f02e2af8e1a022debfd7d2fe388c89d789ec6b77d9d1002ec
   text_characters: 3610
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 202
   printed_page: 180
   text_sha256: 3cb7c75675103fc7da95a9b6d8ff82877496570247b136034379cd97762c1c37
   text_characters: 3516
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 203
   printed_page: 181
   text_sha256: f982e1180a50526898d7ee6c99f18082370496fe11687e9da1198f0424c4c9a1
   text_characters: 3546
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 204
   printed_page: 182
   text_sha256: 63a59d5064578de72d1fbcc69aadcceb2287dbbb02cb467e575939e3c691d570
   text_characters: 3804
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 205
   printed_page: 183
   text_sha256: 92848dc7806ee34ce85a2da66f2af41dcb63abdef964d4996e5de8a1b18a8632
   text_characters: 2251
   embedded_images: 0
   drawing_paths: 135
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 206
   printed_page: 184
   text_sha256: 7894a4fa0367a92426acc39a20a0c814a63eee5b834e0852ed254d3ef16f0e16
   text_characters: 3801
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 207
   printed_page: 185
   text_sha256: 5a0ff05a092d55c5f5e5fff44641bc301bb7c72912e3e941d1a7dcf6506295ad
   text_characters: 3564
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 208
   printed_page: 186
   text_sha256: 9f9e084353d6cdd9f483e8a6fa03c0783a2dbd74e300b0f6ebd5172dc0677187
   text_characters: 2475
   embedded_images: 0
   drawing_paths: 321
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 209
   printed_page: 187
   text_sha256: 8b02edabe201c4ec101a089647f66fd6226fe41f9df44556d077ca047098676d
   text_characters: 3396
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 210
   printed_page: 188
   text_sha256: a122e2a5be35954d40adfa4de6cd680c4f57c9a0e5c9d6e3128e4db8513d8f1c
   text_characters: 3540
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 211
   printed_page: 189
   text_sha256: 1efd9a100ce452b746282acf664f8693a4e086dfe8cd82772fbc4eaaab4e5320
   text_characters: 3608
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 212
   printed_page: 190
   text_sha256: 0abd8d1af8f20450b246538ca58f24ff33f73d35462c5780955929b89a013cdd
   text_characters: 2270
   embedded_images: 8
   drawing_paths: 118
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 213
   printed_page: 191
   text_sha256: 06a25a64a1846fd1c3867d34f5d66db24744bfd96001a1c25e662f4371b981a9
   text_characters: 2889
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 214
   printed_page: 192
   text_sha256: 08c7a3f5164c52c2f21f171cdd161b0947a0be63da9ce25603a361a8b5b41775
   text_characters: 3402
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 215
   printed_page: 193
   text_sha256: fb4b47fbce1fd79a2f32b1c6cf159d8d361cb4f36eb61b8cd09a09efef153fb6
   text_characters: 2614
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: incelendi
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 216
   printed_page: 194
   text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   text_characters: 0
   embedded_images: 0
   drawing_paths: 0
-  visual_review: incelenmedi
+  visual_review: boş sayfa
+  text_review: sayfa metni ve birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 217
   printed_page: 195
   text_sha256: dcac20b09170a139937569fcfb45f5abb71d233d7eecec94d20a49e99be7212a
@@ -13188,6 +13333,1250 @@ items:
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-tarih
   note: 2018AAAI/farklıδσ açıklaması dış birincil doğrulama kaynağıdır;bu kitabın bilgi envanterine ek
     bir olgu diye sayılmaz.
+- id: ch8-p159-i1
+  chapter: 8
+  page: 159
+  pdf_page: 181
+  kind: bilgi
+  what: Modelli/serbest öğrenmenin ortak değer ve gelecekten yedekleme yapısı; önceki n-adım birleştirmesine
+    benzer bütünleşme.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p159-i2
+  chapter: 8
+  page: 159
+  pdf_page: 181
+  kind: tanım
+  what: Model s,a girdisinden sonraki durum/ödül öngörür; stokastik model çoklu sonucu ve olasılıkları
+    taşır.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p159-i3
+  chapter: 8
+  page: 159
+  pdf_page: 181
+  kind: tanım
+  what: Dağılım modeli tüm olasılıkları, örnek modeli olasılığına uygun tek sonucu verir; on iki zar toplamı
+    örneği.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p160-i1
+  chapter: 8
+  page: 160
+  pdf_page: 182
+  kind: örnek
+  what: DP dağılım modeli, blackjack örnek modeli; dağılım modelinden örnek üretilebilir, tersi kolay
+    değildir; on iki zarın tam dağılımına karşı simülatörü.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p160-i2
+  chapter: 8
+  page: 160
+  pdf_page: 182
+  kind: bilgi
+  what: Başlangıç s,a ile tek geçiş, s ve politika ile bir bölüm veya bütün bölümler/olasılıkları üretilebilir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p160-i3
+  chapter: 8
+  page: 160
+  pdf_page: 182
+  kind: tanım
+  what: Planlama modeli alıp etkileşim politikasını üretir/iyileştirir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p160-i4
+  chapter: 8
+  page: 160
+  pdf_page: 182
+  kind: şekil
+  what: Numarasız model→planlama→politika zinciri.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p160-i5
+  chapter: 8
+  page: 160
+  pdf_page: 182
+  kind: bilgi
+  what: Durum uzayında eylemler durumları, plan uzayında operatörler planları dönüştürür; değerler buna
+    göre tanımlanır; evrimsel ve kısmi sıralı planlama, stokastik RL güçlüğü, Russell/Norvig2010 atfı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p160-i6
+  chapter: 8
+  page: 160
+  pdf_page: 182
+  kind: şekil
+  what: Numarasız model→simüle deneyim→yedekler→değerler→politika zinciri; DP her durumun geçiş dağılımını
+    üretip yedekler.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p161-i1
+  chapter: 8
+  page: 161
+  pdf_page: 183
+  kind: bilgi
+  what: Durum uzayı planlamaları yedek türü/sırası/belleğiyle ayrılır; öğrenmede gerçek, planlamada simüle
+    deneyim; performans/deneyim esnekliği farkları.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p161-i2
+  chapter: 8
+  page: 161
+  pdf_page: 183
+  kind: kod
+  what: 'Rastgele örneklemeli tek-adım Q-planlama: rastgele S/A, örnek modelden R/S′, Q-öğrenme yedeği;
+    her çift sonsuz seçilmeli ve α uygun azalmalı.'
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p161-i3
+  chapter: 8
+  page: 161
+  pdf_page: 183
+  kind: bilgi
+  what: Küçük planlama adımları kesilip yönlendirilebilir; eyleme/model öğrenmeye kaynak ayırmayı ve büyük
+    saf planlamayı kolaylaştırır.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p161-i4
+  chapter: 8
+  page: 161
+  pdf_page: 183
+  kind: bilgi
+  what: Çevrimiçi yeni bilgi modeli değiştirir; mevcut/yakın kararları hedefleme ve model öğrenme/karar
+    verme hesap bütçesi paylaşımı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-model
+- id: ch8-p162-i1
+  chapter: 8
+  page: 162
+  pdf_page: 184
+  kind: tanım
+  what: Gerçek deneyimin model öğrenme ve doğrudan RL rolleri; model üzerinden dolaylı RL.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p162-i2
+  chapter: 8
+  page: 162
+  pdf_page: 184
+  kind: şekil
+  what: 'Numarasız üçgen: deneyim→model→değer/politika, deneyim→doğrudan değer/politika, politika→eylem→deneyim.'
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p162-i3
+  chapter: 8
+  page: 162
+  pdf_page: 184
+  kind: bilgi
+  what: Dolaylı yöntem deneyim verimliliği/model yanlılığı; doğrudan yöntem basitlik; biliş/deneme-yanılma,
+    planlı/tepkisel ve insan/hayvan tartışmasının aşırı kutuplaşmasına kaynak görüşü ve Bölüm14 atfı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p162-i4
+  chapter: 8
+  page: 162
+  pdf_page: 184
+  kind: bilgi
+  what: Dyna-Q bütün dört süreci sürekli işletir; gerçek ve simüle yedek Q-öğrenme; deterministik son-gözlem
+    tablo modeli.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p163-i1
+  chapter: 8
+  page: 163
+  pdf_page: 185
+  kind: bilgi
+  what: Olağan Dyna yalnız önceden deneyimlenmiş çiftleri sorgular; arama denetimi simülasyon başlangıç
+    S/A seçer; ortak son yol aynı RL güncellemesi.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p163-i2
+  chapter: 8
+  page: 163
+  pdf_page: 185
+  kind: şekil
+  what: 'Şekil8.1: merkezde gerçek politika/ortam döngüsü, solda doğrudan RL, sağda model öğrenme/model/arama
+    denetimi/simüle deneyim/planlama yedeği.'
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p163-i3
+  chapter: 8
+  page: 163
+  pdf_page: 185
+  kind: bilgi
+  what: Dört süreç kavramsal paralel/asenkron; seri uygulamada eylem/model/doğrudan RL az zaman, kalan
+    zamanda n planlama yedeği.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p164-i1
+  chapter: 8
+  page: 164
+  pdf_page: 186
+  kind: kod
+  what: 'Tablo Dyna-Q sırası: gerçek S,A,R,S′→doğrudan Q→son-gözlem model→n planlama; önce görülen S sonra
+    o S''de denenmiş A eşit olasılıkla; e/f kaldırılırsa Q-öğrenme.'
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p164-i2
+  chapter: 8
+  page: 164
+  pdf_page: 186
+  kind: örnek
+  what: Örnek8.1:47 durum, dört deterministik hareket, duvar/sınır öz döngüsü; G'ye+1 diğer0, hedefte
+    S'ye yeni bölüm; γ.95.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p164-i3
+  chapter: 8
+  page: 164
+  pdf_page: 186
+  kind: bilgi
+  what: Q0 α.1 ε.1 rastgele eşitlik;n0/5/50,30tekrar,hertekrarda başlangıçtohumualgoritmalararasındaaynı;ilk
+    bölüm~1700veaynıgrafiktedışarıda;α/εn0içinayar,25/5/3εoptimalgözlemi.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p165-i1
+  chapter: 8
+  page: 165
+  pdf_page: 187
+  kind: şekil
+  what: Şekil8.2:6×9 duvarlı S/G haritası, dört hareket simgesi,2–50 bölüm yatay,14–800 adım dikey,n0/5/50
+    eğrileri; gerçek 30×50 deneyimiz ve kaynak sayılarından ayrımı.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p165-i2
+  chapter: 8
+  page: 165
+  pdf_page: 187
+  kind: şekil
+  what: Şekil8.3:ikinci bölüm ortasında n0/n50 açgözlü okları,eşit dört Q için ok yok,siyah ajan karesi;
+    kaynak ajan konumları(0,5)/(4,1); kendi hesaplanan konumlar ayrı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p165-i3
+  chapter: 8
+  page: 165
+  pdf_page: 187
+  kind: bilgi
+  what: n0 tek son geçişi, n50 model yedekleriyle ajan S çevresindeyken geri doğru geniş politika; kaynakta
+    üçüncü bölüm sonunda tam optimal politika örneği, genel garanti değil.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna
+- id: ch8-p166-i1
+  chapter: 8
+  page: 166
+  pdf_page: 188
+  kind: bilgi
+  what: Dyna aynı algoritmayla gerçek/simüle deneyimi işler; küçük artımlar sürekli planlama/eylem ve
+    değişen modele uyumu sağlar.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+- id: ch8-p166-i2
+  chapter: 8
+  page: 166
+  pdf_page: 188
+  kind: alıştırma
+  what: 8.1:tek-adımın yavaşlığına karşı Bölüm7 çok-adım yöntemleri Dyna kadar iyi olabilir mi; nedenleri
+    ve garanti sınırı.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p7
+- id: ch8-p166-i3
+  chapter: 8
+  page: 166
+  pdf_page: 188
+  kind: bilgi
+  what: Model hataları stokastik az veri, fonksiyon yaklaşımı genellemesi, ortam değişimi; optimal görünen
+    model politikası gerçek ortamda altoptimal olabilir.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+- id: ch8-p166-i4
+  chapter: 8
+  page: 166
+  pdf_page: 188
+  kind: bilgi
+  what: İyimser hayali fırsatın denenerek düzelmesi; kötümser modelin gerçek iyileşmeyi saklaması ve değişimin
+    fark edilmemesi.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+- id: ch8-p166-i5
+  chapter: 8
+  page: 166
+  pdf_page: 188
+  kind: örnek
+  what: Örnek8.2 engelleme:1000.adımda sağ kısa yol kapanır/sol uzun yol açılır; toplam3000; eğri plato
+    sonra uyum; Q/Q+ kaynak gözlemi.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+- id: ch8-p167-i1
+  chapter: 8
+  page: 167
+  pdf_page: 189
+  kind: şekil
+  what: Şekil8.4:önce/sonra6×9 harita,S/G,1000 değişim,0–3000 zaman,0–150 birikimli ödül,Q/Q+ çizgileri;
+    kendi n50/κ.001/30 koşu eğrileri.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p167-i2
+  chapter: 8
+  page: 167
+  pdf_page: 189
+  kind: örnek
+  what: Örnek8.3 kısayol:eski sol uzun yol korunur,3000.adımda sağ kısa yol açılır; ε keşfinin uzun diziyi
+    bulması çok yavaş olabilir.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+- id: ch8-p167-i3
+  chapter: 8
+  page: 167
+  pdf_page: 189
+  kind: şekil
+  what: Şekil8.5:iki harita,3000 değişim,0–6000 zaman,0–400 ödül,Q/Q+; ilk evrede daralan fark dahil yorum
+    ve kendi ölçümler.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p167-i4
+  chapter: 8
+  page: 167
+  pdf_page: 189
+  kind: bilgi
+  what: Planlamada keşif/sömürü aynı zamanda doğru model edinme–modeli kullanma dengesidir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+- id: ch8-p168-i1
+  chapter: 8
+  page: 168
+  pdf_page: 190
+  kind: formül
+  what: τ gerçek son denemeden beri süre; planlama ödülü r+κ√τ, gerçek ödüle eklenmez; uzun süredir denenmeyen
+    geçişler ve erişim için uzun dizileri sınama maliyeti/kazancı.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+- id: ch8-p168-i2
+  chapter: 8
+  page: 168
+  pdf_page: 190
+  kind: dipnot
+  what: 'Q+ iki ek ayrıntı: görülen durumların hiç denenmemiş eylemleri de planlanır; başlangıç modeli
+    ödül0 aynı duruma geçiş. κ0 sıradan Q ile zorunlu eşleşmez.'
+  status: düzeltildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-dyna-degisim
+  note: Eski genel tablo-model kuralına Dyna-Q+ dipnot istisnası eklendi; olağan Dyna-Q ile bonuslu önsel
+    model ayrıldı.
+- id: ch8-p168-i3
+  chapter: 8
+  page: 168
+  pdf_page: 190
+  kind: alıştırma
+  what: 8.2:Q+ değişim öncesi bile neden daha iyi olabilir?
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p8
+- id: ch8-p168-i4
+  chapter: 8
+  page: 168
+  pdf_page: 190
+  kind: alıştırma
+  what: 8.3:Şekil8.5'in ilk bölümünde Q+–Q farkı niçin biraz daralır?
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p9
+- id: ch8-p168-i5
+  chapter: 8
+  page: 168
+  pdf_page: 190
+  kind: alıştırma
+  what: 8.4 programlama:bonus güncellemeden çıkarılıp yalnız her zaman max(Q+κ√τ) eylem seçiminde;ızgara
+    deneyinde güç/zayıflıklar.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p10
+- id: ch8-p168-i6
+  chapter: 8
+  page: 168
+  pdf_page: 190
+  kind: alıştırma
+  what: 8.5:stokastik model değişikliği, değişen ortamda kötü performans nedeni, hem stokastik hem değişen
+    ortam çözümü.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p11
+- id: ch8-p169-i1
+  chapter: 8
+  page: 169
+  pdf_page: 191
+  kind: bilgi
+  what: Düzgün Dyna ikinci bölümde sıfırdan sıfıra işe yaramaz birçok yedek; hedeften önceki değer değişimi
+    sonra faydalı sınırın büyümesi; büyük görevlerde odaksızlık.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p169-i2
+  chapter: 8
+  page: 169
+  pdf_page: 191
+  kind: tanım
+  what: Geriye odaklanma her türlü değişen değerden başlar; hedef zorunlu değil, kapanan yolun değer düşüşü
+    de öncüllere yayılır.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p169-i3
+  chapter: 8
+  page: 169
+  pdf_page: 191
+  kind: bilgi
+  what: Öncelik değişimin büyüklüğüne/stokastik olasılığa bağlı; kuyrukta çift başına büyük öncelik, eşik
+    aşan öncülleri ekle, sükûnete kadar yayılsın.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p170-i1
+  chapter: 8
+  page: 170
+  pdf_page: 192
+  kind: kod
+  what: Deterministik PS kutusu:gerçek geçiş→model/öncül→|R+γmaxQ−Q| öncelik; θ üstünü kuyruğa al;n kez
+    en büyük çifti Q güncelle/öncülleri yeniden önceliklendir; ayrı doğrudan Q yedeği yok.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p170-i2
+  chapter: 8
+  page: 170
+  pdf_page: 192
+  kind: örnek
+  what: Örnek8.4 değişen grid çözünürlüğünde PS tipik5–10kat avantaj,n≤5 gerçek adım başına; Peng/Williams1993
+    uyarlaması.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p170-i3
+  chapter: 8
+  page: 170
+  pdf_page: 192
+  kind: şekil
+  what: Numarasız PS ölçek grafiği:durum0/47/94/186/376/752/1504/3008/6016,y10..10^7 güncelleme(log),DynaQ/PS;
+    kendi açık ölçeklendirme47×2^k (188 dahil),5 koşu,optimal başlangıç yolu durdurması.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p170-i4
+  chapter: 8
+  page: 170
+  pdf_page: 192
+  kind: bilgi
+  what: Stokastik PS sayım modeli ve bütün ardıllar beklenen yedeği; düşük olasılıklı dallarda işlem harcanabilir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p171-i1
+  chapter: 8
+  page: 171
+  pdf_page: 193
+  kind: örnek
+  what: Örnek8.5 çubuk:20×20 merkez,36 yön/10°,14400 olası durum,engeller bir kısmını dışlar;4 eylem,uzun
+    eksen/dik eksen ötelemesi ve±dönme,öteleme≈alanın1/20'si; az adım hedefi;1993 tarihsel ölçek iddiası
+    modern olanaksızlık değildir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p171-i2
+  chapter: 8
+  page: 171
+  pdf_page: 193
+  kind: şekil
+  what: Numarasız çubuk şekli:dikdörtgen alan/çokgen engeller,Start/Goal çubukları,ara merkez kareleri
+    ve mavi yön dizileri; kendi açık geometri/eylem kurallarıyla hesaplanan rota.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p171-i3
+  chapter: 8
+  page: 171
+  pdf_page: 193
+  kind: bilgi
+  what: Örnekyedektekçekilişleparçalar;smallbackuptekdalınolasılıkağırlığınıörneklemedenyayar;bu küçük
+    işlerin sırası seçilerek PSötesiverimsağlanabilir(vanSeijenSutton2013).
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p171-i4
+  chapter: 8
+  page: 171
+  pdf_page: 193
+  kind: bilgi
+  what: Geriye odaklanma tek dağıtım değil;sık gidilen durumlardan erişilebilir ardıllara ileri odaklanma,Peng/Williams1993
+    ve Barto/Bradtke/Singh1995.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-oncelik
+- id: ch8-p172-i1
+  chapter: 8
+  page: 172
+  pdf_page: 194
+  kind: tanım
+  what: Üç ikili eksen V/Q,π/*,beklenen/örnek;8 hücrenin7'si kullanılan yöntem,örnek v* hücresi boş.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+- id: ch8-p172-i2
+  chapter: 8
+  page: 172
+  pdf_page: 194
+  kind: şekil
+  what: Şekil8.6 yedi yedek ağacı:Vπ politika değerlendirme/TD0,V* değer yinelemesi,Qπ Q-politika değerlendirme/SARSA,Q*
+    Q-değer yinelemesi/Qlearning;durum daireleri/eylem noktaları,p/π/max/R etiketleri ve boş hücre.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p172-i3
+  chapter: 8
+  page: 172
+  pdf_page: 194
+  kind: bilgi
+  what: Bütün yedekler planlamada;DynaQ örnek/beklenen q* veya qπ kullanabilir;DynaAC Vπ örnek+öğrenilenaktör(Ch13),stokastikPSbeklenen;dağılımmodeli
+    olmadanexpectedyok.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+- id: ch8-p173-i1
+  chapter: 8
+  page: 173
+  pdf_page: 195
+  kind: formül
+  what: 8.1expectedtamata/8.2örnekartımlı; b1/α1özdeşliğiödüldeterministikveyaörnektebeklenenödülvarsayımıyla.
+    Terminal ardıl (veya maxQ(s′)=0)+R±1 karşıörnek:expected0,örnek±1;örtük kaynak varsayımı açıklanır.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+  note: Kaynağın b1 eşitliğindeki örtük ödül koşulu açılır; terminal ardıl+R±1 karşı örneği kendi ek hesabıdır.
+- id: ch8-p173-i2
+  chapter: 8
+  page: 173
+  pdf_page: 195
+  kind: bilgi
+  what: b pozitif olasılıklı ardıl sayısı;beklenen yedek≈b örnek yedeğin maxQ maliyetinde, doğruluğu model/ardıl
+    Q doğruluğuyla sınırlı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+- id: ch8-p173-i3
+  chapter: 8
+  page: 173
+  pdf_page: 195
+  kind: bilgi
+  what: Tam hesap bittiyse örnekleme gürültüsü yok; bitirecek zaman yoksa ucuz örnekler çok çiftte erken
+    ilerleme sağlayabilir; her tek örneğin hatayı azaltma garantisi yok.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+- id: ch8-p174-i1
+  chapter: 8
+  page: 174
+  pdf_page: 196
+  kind: şekil
+  what: Şekil8.7 b2/10/100/1000/10000,RMS1→0,x maxQ sayısı0/b/2b; beklenen yedek b'de tamamlanıp0,örnekler
+    kademeli.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p174-i2
+  chapter: 8
+  page: 174
+  pdf_page: 196
+  kind: formül
+  what: Kaynak RMS sqrt((b−1)/(bt)), α1/t,eş olasılıklı b ve doğru ardıl değer varsayımı; varyans normalizasyonu
+    da gerekir. Genel RMS σp/√t; sabit ardıl karşı örneği.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+  note: Kaynak eğrisi σ²=(b−1)/b normalizasyonuyla verilir; yalnız b/eş olasılık/ilk hata bunu belirlemez.
+    Genel σ/√t türetimi eklendi.
+- id: ch8-p174-i3
+  chapter: 8
+  page: 174
+  pdf_page: 196
+  kind: bilgi
+  what: Büyük b'de küçük hesap payıyla birçok çifte erken bilgi; ardıl değerler de öğreniliyorsa iyi erken
+    tahmin iki kere yarar sağlayabilir; olasılık/öğrenme iddiası genel garanti değil.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yedek
+- id: ch8-p174-i4
+  chapter: 8
+  page: 174
+  pdf_page: 196
+  kind: alıştırma
+  what: 8.6:çok çarpık ardıl olasılığı örnek yedek lehindeki savı güçlendirir/zayıflatır mı; ağırlıklı
+    varyansla iki koşul ve sayısal karşı örnek.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p12
+- id: ch8-p175-i1
+  chapter: 8
+  page: 175
+  pdf_page: 197
+  kind: bilgi
+  what: Tüm uzayı eşit tarama büyük görevde bitmeyebilir/çok önemsiz durum günceller; DP eşit/exhaustive
+    olmak zorunda değil, yakınsama için yeterli tekrar koşulları.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+- id: ch8-p175-i2
+  chapter: 8
+  page: 175
+  pdf_page: 197
+  kind: tanım
+  what: Yörünge örnekleme:başlangıç dağılımı veya sürdürülen mevcut durumdan model/şimdiki politika ile
+    ardışık geçişler,karşılaşılan çiftlerde yedek.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+- id: ch8-p175-i3
+  chapter: 8
+  page: 175
+  pdf_page: 197
+  kind: bilgi
+  what: Onpolicydağılımıylaağırlıklıtam tarama yineexhaustive maliyeti taşır;dağılımıhesaplamaktam politika
+    değerlendirmesineyakın,politikadeğiştikçeyenilenir;yörünge doğal/etkin alternatif.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+- id: ch8-p175-i4
+  chapter: 8
+  page: 175
+  pdf_page: 197
+  kind: bilgi
+  what: Gerçek satranç konumlarını öğrenme sezgisi ve fonksiyon yaklaşımında önem; fazla uzayı atlama
+    avantajına karşı aynı az durumu gereksiz tekrar olasılığı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+- id: ch8-p176-i1
+  chapter: 8
+  page: 176
+  pdf_page: 198
+  kind: örnek
+  what: Kaynak deney:iki yöntem de (8.1) tek-adım expected inplace Q yedeği;uniform döngüsel tümçift tarama,onpolicy
+    aynıbaşlangıçtanε.1 yörünge;Q0,γ1,ikiA,b eş olasılıklı rassal ardıl,ek.1 terminal,dal beklenen ödülN(0,1).
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+- id: ch8-p176-i2
+  chapter: 8
+  page: 176
+  pdf_page: 198
+  kind: bilgi
+  what: Ölçüt Q'ya açgözlü politikanın gerçek vπ(S0) değeri;model doğruvarsayılarak kapsamlı politika
+    değerlendirmesi,ε getirisi/maxQ değil.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+- id: ch8-p176-i3
+  chapter: 8
+  page: 176
+  pdf_page: 198
+  kind: şekil
+  what: Şekil8.8 üst S1000/b1/3/10/200görev/20000update,alt S10000/b1/200görev/200000update;onpolicy/uniform
+    çizgileri,başlangıçgerçekV;8.8isteğiyle b3 ek;184m gerçek yedek ve politika Bellman sertifikası.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+  figure: türetildi
+  note: Tam200 görev bütçeleri ve gerçek politika değerlendirmesi;184m yedek. Kaynak sayısal yükseklikleriyle
+    fark açık; kendi model/tohum tercihleri kaynak verisi diye sunulmaz.
+- id: ch8-p176-i4
+  chapter: 8
+  page: 176
+  pdf_page: 198
+  kind: bilgi
+  what: Kaynakta başlangıçtaonpolicy hızlı,uzunvadedeuniform iyi;küçükb/büyükS etkiyiuzatır;kendi yeniden
+    deneyimizde her noktada değil;özgünsayısalyükseklikfarkı açık,kaynakmodel/tohum ayrıntıları bilinmiyor.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-yorunge
+- id: ch8-p177-i1
+  chapter: 8
+  page: 177
+  pdf_page: 199
+  kind: bilgi
+  what: Başlangıç yakın ardıllara odaklanma kısa vadede kazanç,uzunvadede zaten doğru durumların tekrarı
+    zarar;özel rastgele görevler kesin genel hüküm vermez.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p177-i2
+  chapter: 8
+  page: 177
+  pdf_page: 199
+  kind: alıştırma
+  what: 8.7:özellikleb1/uniform erken taraklanma,2S tarama dönemi ve başlangıca gecikmiş geri yayılım;grafik
+    ipuçları.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p13
+- id: ch8-p177-i3
+  chapter: 8
+  page: 177
+  pdf_page: 199
+  kind: alıştırma
+  what: 8.8 programlama:Şekil8.8 alt deneyi tamS10000/b1/200görev/200000update üret,sonrab3aynıbütçeyorumla.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p14
+- id: ch8-p177-i4
+  chapter: 8
+  page: 177
+  pdf_page: 199
+  kind: tanım
+  what: RTDP:yörüngede ziyaret edilen durumun beklenen max değer-yineleme yedeği;asenkron DP,gerçek veya
+    simüle deneyim;genel sırayı deneyim belirler.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p177-i5
+  chapter: 8
+  page: 177
+  pdf_page: 199
+  kind: şekil
+  what: Numarasız başlatım–ilgili–ilgisiz iç içe durum kümeleri;ilgili bazıoptimalpolitika altında herhangi
+    başlangıçtan erişilir,ilgisiz hiçbiroptimalpolitika altında erişilmez.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p178-i1
+  chapter: 8
+  page: 178
+  pdf_page: 200
+  kind: tanım
+  what: Optimal kısmi politika yalnız ilgili durumlarda optimal davranır,diğerlerinde keyfî/tanımsız olabilir;politika
+    tahmininde ziyaret edilmez durumlar daha kolayatlanır.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p178-i2
+  chapter: 8
+  page: 178
+  pdf_page: 200
+  kind: bilgi
+  what: GenelkontrolSARSA/RTDP tümçift∞ keşfi gerektirebilir;exploringstarts ile genelsonluindirimliMDP'de
+    asenkronVI yakınsaması;özelSSP tümuzay ziyaretini kaldırabilir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p178-i3
+  chapter: 8
+  page: 178
+  pdf_page: 200
+  kind: bilgi
+  what: RTDPγ1,absorbanGödül0,greedyrandomties,beklenenVIcurrentstate,isteğe bağlıara/ileribakışdurumları;başlangıçkümesinden
+    rastgele bölüm.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p178-i4
+  chapter: 8
+  page: 178
+  pdf_page: 200
+  kind: bilgi
+  what: Özelteorem:başlangıçV(G)0,herbaşlangıçtanw.p.1G'yegidenenazbirproperpolitika,nongoaldenherödülkesinnegatif,başlangıçV≥V*;tümV0yeterli;ilgilioptimalpolitikayaprob1yakınsama,Barto/Bradtke/Singh1995/Korf1990.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p178-i5
+  chapter: 8
+  page: 178
+  pdf_page: 200
+  kind: örnek
+  what: Stokastiken kısayol maliyetmin↔negatifödülmax;minimumzamanheradım−1,golfenazvuruş(Bölüm3.5).
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p179-i1
+  chapter: 8
+  page: 179
+  pdf_page: 201
+  kind: örnek
+  what: Örnek8.6 yarış:Alıştırma5.12'ye benzer ama hızüst sınırı YOK;potansiyelsonsuz ama başlangıçtanerişilirsonlu;başlangıçhız0,heradım−1,bitişçizgisiniilkgeçişterminal,kaza
+    rastgelebaşlangıca aynıbölümdevam.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p179-i2
+  chapter: 8
+  page: 179
+  pdf_page: 201
+  kind: bilgi
+  what: Kaynak tamharitayok;benzerküçükpist9115erişilir/599ilgili,10^7optimalbölümziyaretindetahmin;25ayrıtohumlukoşu,V0;
+    tablosayısıyazarölçümü,kendiüretimdeğil.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p179-i3
+  chapter: 8
+  page: 179
+  pdf_page: 201
+  kind: bilgi
+  what: DPyerindeGaussSeidel≈2×Jacobi,özelgüncellemesırası yok,stopmaxsweepchange<1e−4;RTDPyalnızcurrentstate,son20bölümsüreortalamastabilizasyonusezgiseldurdurma.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p179-i4
+  chapter: 8
+  page: 179
+  pdf_page: 201
+  kind: tablo
+  what: Numarasız tabloDP28sweep/252784yedek;RTDP4000ep/127600yedek/31.9epbaşına;%98.45≤100,%80.51≤10,%3.18hiçgüncellenmeyen.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p179-i5
+  chapter: 8
+  page: 179
+  pdf_page: 201
+  kind: bilgi
+  what: Herikipolitika14–15adım;RTDPyaklaşık290durumhiçyedeklenmeden ve değer-yakınsaması ölçütünde≈yarım
+    hesap.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p180-i1
+  chapter: 8
+  page: 180
+  pdf_page: 202
+  kind: bilgi
+  what: İyi politika tamV* yakınsamasından önce çıkabilir;standartVIgeneldedeğerdeğişimidurdurur,politikatestiekmaliyet;optimalpolitikaçokfarklıV'yegreedyolabilir(Bölüm4).
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p180-i2
+  chapter: 8
+  page: 180
+  pdf_page: 202
+  kind: bilgi
+  what: Kaynak ekpolitikatestindeDP15sweep=136725yedekteyakınoptimal;RTDP127600;yarıhesapiddiası252784tamdeğeryakınsamasınagöre,erkenpolitikakıyası≈%6.67az.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p180-i3
+  chapter: 8
+  page: 180
+  pdf_page: 202
+  kind: bilgi
+  what: Kaynak deneykesingenelkarşılaştırmadeğil;RTDPilgiliyerleregiderekhesapodaklar,teoremdahaazdurumaodaklanacağınısöyler.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p180-i4
+  chapter: 8
+  page: 180
+  pdf_page: 202
+  kind: tanım
+  what: Arkaplanplanlamaçokdurumiçin kalıcıtablo/ifadepolitikasınıöncedeniyileştirir,eylemdeyalnızdeğerbakılır.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rtdp
+- id: ch8-p181-i1
+  chapter: 8
+  page: 181
+  pdf_page: 203
+  kind: tanım
+  what: Karar anı planlama St görüldükten sonra o anın At'sini üretir,sonraki S'deyeniden;enbasiti modellebiradımsonrası/afterstatekarşılaştırması,geneldeçokadım.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p181-i2
+  chapter: 8
+  page: 181
+  pdf_page: 203
+  kind: bilgi
+  what: Arkaplan/karar-anıbirleşebilir;yerelQ/Vçoğuzamankarardansonraatılır,uzunsüredönülmeyecekdurumlardaazkayıp;gerekliykenodakla/yararlılarısakla.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p181-i3
+  chapter: 8
+  page: 181
+  pdf_page: 203
+  kind: örnek
+  what: Satrançtasaniye/dakikaveonlarcahamleileriaramayaizin;düşükgecikmedeöncedenhesaplanankalıcıpolitikaavantajı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p181-i4
+  chapter: 8
+  page: 181
+  pdf_page: 203
+  kind: tanım
+  what: Sezgiselarama:modelinolasılık/eylemağacındayaprakVyaklaşığı,expected/maxyedekleriylekökeyayıpAseç;köktensonrayedekleratılabilir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p182-i1
+  chapter: 8
+  page: 182
+  pdf_page: 204
+  kind: bilgi
+  what: GelenekselaramadaellekurulanVgeneldesabit,ama aramageriyeyedekleriyleVöğrenilebilir;greedy/ε/UCBbiradımörneği,derinlikbutabanıgenişletir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p182-i2
+  chapter: 8
+  page: 182
+  pdf_page: 204
+  kind: bilgi
+  what: Doğrumodel/kusurluV'dederinaramageneldeiyidir,tambölümonterminaloptimal,γ^k küçükyapraketkisi;hesap/gecikmebedeli.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p182-i3
+  chapter: 8
+  page: 182
+  pdf_page: 204
+  kind: dipnot
+  what: Pearl1984arama-patolojisiderinliğinherproblemdeiyileştirmeyebileceğiistisna;varsayımlıhataüst
+    sınırımonotongarantidenayrılır.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p182-i4
+  chapter: 8
+  page: 182
+  pdf_page: 204
+  kind: örnek
+  what: TDGammonkendioyunundanöğrenilmişafterstateV,zarolasılıklarıbilinir,rakibinkendipuanladığıeniyiyiseçeceğivarsayımı;genişdallanma/birkaçsaniyeseçicibirkaçply,ampirikiyileşmeveyavaşlama.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p182-i5
+  chapter: 8
+  page: 182
+  pdf_page: 204
+  kind: bilgi
+  what: Mevcutdurum/yakınardıllaraodakhesapvebelleğikurtarır;tümsatrançdurumlarınısaklamakyerinemilyonlarcaaramapozisyonu.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p183-i1
+  chapter: 8
+  page: 183
+  pdf_page: 205
+  kind: bilgi
+  what: Seçiciderinlikarama,aşağıdan yukarıtekadımexpected/maxyedeklerininaynısı;tablo+sıradoğruysabüyükçokadımlayıaynısonuç,yararodakdağılımındanda
+    gelir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p183-i2
+  chapter: 8
+  page: 183
+  pdf_page: 205
+  kind: şekil
+  what: Şekil8.9seçiciderinlikağacı;durumdaire/eylemnokta/olaydalı,10maviçevreli1-adımgüncelleme1..10aşağıdanyukarı;değerleriylekendiörneği.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p183-i3
+  chapter: 8
+  page: 183
+  pdf_page: 205
+  kind: tanım
+  what: Rollout:kökSt'deherAsonrasısabitπilemodelbölümleri,ortalamaMonteCarlogetiriqπ(St,A),enbüyükAuygulanır;sonrakidurumyeniarama.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+- id: ch8-p184-i1
+  chapter: 8
+  page: 184
+  pdf_page: 206
+  kind: bilgi
+  what: Tesauro/Galperin1997terimibackgammonpozisyonunufarklırastgelezardizileri/iki tarafsabitpolitikaylaoynayıpskorlamak;globalqπ/q*öğrenmeamaçdeğil,mevcutkökqπveatılanbellek.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p184-i2
+  chapter: 8
+  page: 184
+  pdf_page: 206
+  kind: türetim
+  what: π ve π′ s dışındaki bütün durumlarda aynı; s yerel eylem farkı ve qπ≥vπ politika iyileşmesi, strict
+    s için strict sonuç; sonlu MC sıralama/optimalite garantisi yok.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p184-i3
+  chapter: 8
+  page: 184
+  pdf_page: 206
+  kind: bilgi
+  what: Rollouttabanπyıiyileştirmeyeçalışır,globalq*amaçyok;tabanrastgeledeiyiolabilir,nitelik/MCsıralamasıbelirleyici;dahaiyitabansezgisinekaynak
+    GellySilver2007ile çekincekoyar,belgenintekbaşınakanıtlamadığıgenelhükümyazılmaz.; tek yerel politika
+    yinelemesi/asenkron değer yinelemesi bağlantısı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p184-i4
+  chapter: 8
+  page: 184
+  pdf_page: 206
+  kind: bilgi
+  what: İyitabandahahesappahalıolabilir;eylemsayısı,bölümuzunluğu,politikamaliyeti,gereklidenemesayısıvekısıtlıkararsüresiödünleşimi.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p185-i1
+  chapter: 8
+  page: 185
+  pdf_page: 207
+  kind: bilgi
+  what: Bağımsızrolloutlarparalel,yarımtrajektori+Vbootstrap,trajektoriesnasındaçokzayıf/kararayakıneylemleribudama;budamaparalelleştirmeyigüçleştirebilir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p185-i2
+  chapter: 8
+  page: 185
+  pdf_page: 207
+  kind: bilgi
+  what: KalıcıV/politikabellaksizrolloutalışılmışanlamdaöğrenmesayılmayabilir;MCörnekmodel/yörünge/politikaiyileştirmeRLilkelerinitaşır.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p185-i3
+  chapter: 8
+  page: 185
+  pdf_page: 207
+  kind: bilgi
+  what: MCTS2018kaynağınınzamantarihi:Go2005zayıfamatör→2015grandmaster6dan+,AlphaGo2016Lee18dünyaünvanıgalibiyet;DeepMindbirincilkaynakla4–1/Mart2016;güncelbaşarıiddiasıdeğil.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p185-i4
+  chapter: 8
+  page: 185
+  pdf_page: 207
+  kind: bilgi
+  what: MCTSgenelrekabetoyunlarıveucuzmodelitekajanakararproblemleri;hergerçekdurumdankökbaşlat,terminal/indirimihmalufkukadarsimülebölümler.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-rollout
+- id: ch8-p186-i1
+  chapter: 8
+  page: 186
+  pdf_page: 208
+  kind: tanım
+  what: MCTSöncekiyüksekgetiriliyörüngeöneklerineodaklananbüyüyenkısmiağaç;kalıcıglobalyaklaşıkgerekmez,sonrakiaramayayakınbazıQ'larısaklayabilir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-mcts
+- id: ch8-p186-i2
+  chapter: 8
+  page: 186
+  pdf_page: 208
+  kind: bilgi
+  what: Çokyörüngeucuzmodel+rolloutpolitikasıylahızlaüretilebilir,Qkenarortalamalarıyarlıklıazçiftte;treepolicybilgiliε/UCBkeşif/sömürü,ağaçdışında
+    ucuzrolloutpolicy.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-mcts
+- id: ch8-p186-i3
+  chapter: 8
+  page: 186
+  pdf_page: 208
+  kind: şekil
+  what: Şekil8.10 dört faz/tekrardöngüsü,treepolicysolid/rolloutkesik,eklenençocuk,terminalÜÇGEN,MCgetirisiyalnızgeçilentree
+    kenarlarınayukarı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-mcts
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p187-i1
+  chapter: 8
+  page: 187
+  pdf_page: 209
+  kind: bilgi
+  what: Selectionkökyaprak,Expansionbazıiterasyonlarda1+çocuk/atlanabilir,Simulationyaprakveyayeniçocuktanrolloutfull/truncatedbölüm.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-mcts
+- id: ch8-p187-i2
+  chapter: 8
+  page: 187
+  pdf_page: 209
+  kind: bilgi
+  what: Backup ağacıngeçilenkenarQ'larınaartımlıMCortalaması,ağaçdışırolloutdurumQ'susaklanmaz;öncekikenargetirileriprefixödüllerini
+    de içerir.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-mcts
+- id: ch8-p187-i3
+  chapter: 8
+  page: 187
+  pdf_page: 209
+  kind: bilgi
+  what: Kaynaksonaermesizaman/iterasyonsınırı;kökmaxQveyaaykırıortalamaya karşımaxziyaret;sıradakigerçekSyenikök,yalnızardıllarınısaklayıpdiğerleriniatmakveyayeniağaç.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-mcts
+- id: ch8-p187-i4
+  chapter: 8
+  page: 187
+  pdf_page: 209
+  kind: bilgi
+  what: İkioyuncudasimülasyonunhertarafıtree/rolloutpolicy;getiriperspektifitutarlıolmalı;AlphaGoCh16.6derinağlar/kendineoyunkarışımı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-mcts
+- id: ch8-p188-i1
+  chapter: 8
+  page: 188
+  pdf_page: 210
+  kind: bilgi
+  what: MCTSonlineartımlıMCdeğer/politikaiyileştirme,RLağaçkenaryedekleriyleyüksekgetiriliönekleriçekici
+    kılar;artımlılookupbelleğiyalnızyüksekgetiriliyolöneklerineayırıpglobalQyaklaşımınıönler.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p188-i2
+  chapter: 8
+  page: 188
+  pdf_page: 210
+  kind: bilgi
+  what: Modelstrengthdağılım/örnek;örnekdahakolay;planlama/öğrenmeaynıVveartımlıyedekmimarisi,tekalgoritmagerçek/simüledeneyimleçalışabilir.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p188-i3
+  chapter: 8
+  page: 188
+  pdf_page: 210
+  kind: bilgi
+  what: Dynaçevrimselöğrenme/model/planlama/eylem;başkaetkileşimlerzorunluveyayasakdeğil;asenkronparalelvepaylaşılanhesapbütçesindekeyfîverimliörgütleme.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p189-i1
+  chapter: 8
+  page: 189
+  pdf_page: 211
+  kind: bilgi
+  what: Planlamagüncellemeboyutuvekaynağı/dağılımı:tekadımörnek küçük,PSöncüller,onyörüngekarşılaşılançiftler/RTDP,kararanıilgilimevcutdurumsezgiselarama/rollout/MCTS.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p189-i2
+  chapter: 8
+  page: 189
+  pdf_page: 211
+  kind: bilgi
+  what: KısımIözetimethoduzayı:ortakVtahmini,gerçek/olasıyörüngedengeriyeyedek,GPIyaklaşıkV/politikayıkarşılıklıiyileştirir;kitabınyapay/doğalzekâdaörgütleyicigörüşükanıtlıevrensellikdeğil.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p189-i3
+  chapter: 8
+  page: 189
+  pdf_page: 211
+  kind: bilgi
+  what: Genişlikörnek↔beklenen,derinliktekadım↔tamgetiri;beklenenmodeldağılımı,örnekmodelveyagerçekortamgerektirir.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p190-i1
+  chapter: 8
+  page: 190
+  pdf_page: 212
+  kind: şekil
+  what: Şekil8.11genişlikyatay/derinlikdikeyrenkalan,TD/DP/MC/exhaustivesearchköşeağaçları,altköşeterminalKAREvekesikli
+    devam,n/mixediçalan,on/offdiküçüncüeksen.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+  figure: türetildi
+  note: Lisans nedeniyle kaynak görseli yayımlanmaz; bağımsız SVG/lab. Sayısal eğriler gerçek hesap ya
+    da belirtilen analitik formülden.
+- id: ch8-p190-i2
+  chapter: 8
+  page: 190
+  pdf_page: 212
+  kind: bilgi
+  what: SolkenardaTD→nstep→MCveBölüm12λ/izkarışımları;sağkenardaDP→sınırlıderinliksezgisel→terminal/indirimihmaltamaramalar;aynıyedekteörnek/dağılımkarışımıiçalan.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p190-i3
+  chapter: 8
+  page: 190
+  pdf_page: 212
+  kind: bilgi
+  what: OnpolicymevcutdavranışV,offpolicybaşkapolitikaV;keşifnedeniyledavranışçoğuzamandüşünüleneniyidenfarklı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p191-i1
+  chapter: 8
+  page: 191
+  pdf_page: 213
+  kind: bilgi
+  what: Diğer8boyut:getiri bölümlü/sürekli ve indirimli/indirimsiz;V/Q/afterstate(Vise model/aktör);ε/iyimser/softmax/UCB;sync/async;real/simoranı;konummodelsizyalnızkarşılaşılan/modelliysemodeldetanımlıkeyfîyer;önce/sonrazamanlama;kalıcı/geçicibellek.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p191-i2
+  chapter: 8
+  page: 191
+  pdf_page: 213
+  kind: bilgi
+  what: Boyutlartüketiciveayrıkdeğil,Dynagerçek/simüleyiaynıV'debirleştirir,birdençokV/eylemtemsilitutulabilir;ortaktasarımilkeleri.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p191-i3
+  chapter: 8
+  page: 191
+  pdf_page: 213
+  kind: bilgi
+  what: KısımIIdikfonksiyonyaklaşımıekseni:tablo→durumtoplulaştırma→doğrusal→çeşitlidoğrusalolmayan.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-boyutlar
+- id: ch8-p192-i1
+  chapter: 8
+  page: 192
+  pdf_page: 214
+  kind: kaynakça
+  what: §8.1ortakgörüş:Sutton1990/1991a/1991b;BartoBradtkeSingh1991/1995;SuttonPinette1985;SuttonBarto1981b;etkilerAgreChapman1990/Agre1988,BertsekasTsitsiklis1989,Singh1993.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p192-i2
+  chapter: 8
+  page: 192
+  pdf_page: 214
+  kind: kaynakça
+  what: §8.1psikolojietkileri:Tolman1932örtüköğrenme;GalanterGerstenhaber1956,Craik1943,Campbell1960,Dennett1978düşünce;Bölüm14.6ve15.11davranış/beyinbağlantıları.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p192-i3
+  chapter: 8
+  page: 192
+  pdf_page: 214
+  kind: kaynakça
+  what: §8.2 direct/indirect GoodwinSin1984; sistem tanılama GoodwinSin/LjungSoderstrom1983/Young1984;
+    Dyna ve bu §8.2 ile sonraki §8.3 deneyleri Sutton1990; BartoSingh1990 kıyas; lineer Dyna SuttonSzepesvariGeramifardBowling2008
+    ve ParrLiTaylorPainterWakefieldLittman2008.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p192-i4
+  chapter: 8
+  page: 192
+  pdf_page: 214
+  kind: kaynakça
+  what: E3 KearnsSingh2002/Rmax BrafmanTennenholtz2003:eksikkeşfedilenseçeneklerazamiödüllendiricisayılır,onlarıdenemek
+    için optimal yollar planlanır;ε/δ/ufuk koşullarıylapolinomgaranti,pratikyavaş/en kötüdurumgüçlükaynakdeğerlendirmesi.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p192-i5
+  chapter: 8
+  page: 192
+  pdf_page: 214
+  kind: kaynakça
+  what: §8.4PSbağımsızMooreAtkeson1993/PengWilliams1993,mazePeng/rodMoore;McMahanGordon2005,vanSeijenSutton2013.
+  status: genişletildi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p192-i6
+  chapter: 8
+  page: 192
+  pdf_page: 214
+  kind: kaynakça
+  what: §8.5Singh1993deneyetkisi;§8.6–7yörüngeörtükeskidenberi,RTDPBartoBradtkeSingh1995,Korf1990LRTA*.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p193-i1
+  chapter: 8
+  page: 193
+  pdf_page: 215
+  kind: kaynakça
+  what: §8.6–7KorfLRTA*asenkronDPstokastikuzantısı,RTDPeylemlerarasıçokdurumopsiyonu;Bartoetal1995kanıtıKorf1990+Bertsekas1982/BertsekasTsitsiklis1989SSP;AdaptiveRTDPmodelöğrenmeBartoetal1995/Barto2011.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p193-i2
+  chapter: 8
+  page: 193
+  pdf_page: 215
+  kind: kaynakça
+  what: §8.9RussellNorvig2009,Korf1988aramaokumaları;PengWilliams1993ileriyeodak.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p193-i3
+  chapter: 8
+  page: 193
+  pdf_page: 215
+  kind: kaynakça
+  what: §8.10Abramson1990ikioyuncurastgelebeklenensonuç;TesauroGalperin1997backgammonrolloutterimi;BertsekasTsitsiklisWu1997kombinatoryalopt,Bertsekas2013deterministikayrıkopt.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch8-p193-i4
+  chapter: 8
+  page: 193
+  pdf_page: 215
+  kind: kaynakça
+  what: §8.11Coulom2006/KocsisSzepesvari2006öncekiMCplanlamadanMCTS;BrownePowleyWhitehouseLucasCowlingRohlfshagenTavenerPerezSamothrakisColton2012survey;DavidSilverkatkı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-tarih
 chapter_counts:
   '1':
     items: 159
@@ -13245,6 +14634,15 @@ chapter_counts:
     code: 5
     tables: 0
     footnotes: 0
+  8:
+    items: 138
+    exercises: 8
+    figures: 17
+    numbered_figures: 11
+    unnumbered_figures: 6
+    code: 3
+    tables: 1
+    footnotes: 2
 part_dividers:
 - pdf_pages:
   - 45
@@ -13278,3 +14676,29 @@ teaching_extensions:
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-ileri
   note: Kaynak2018bilinen öneriler ifadesini açıklayan kendi öğretim uzantımız;kitaptaki yeni bilgi gibi
     sayılmaz.
+- id: teaching-ch8-search-bound
+  page: 182
+  pdf_page: 204
+  kind: türetim
+  what: Doğru model/tam k-adım ağaç/yaprakε için tek karar2γ^kε, tekrarlanan politika2γ^kε/(1−γ) kayıp
+    sınırı.
+  status: eklendi
+  where: content/modules/m11-10-planning/lesson.md#sutton-karar
+  note: Kendi öğretim türetimimiz; kaynak birim sayısına katılmaz.
+- id: teaching-ch8-reward-counterexample
+  page: 173
+  pdf_page: 195
+  kind: örnek
+  what: Tek terminal ardıl ve R±1:expected0/örnek±1; b1 tek başına özdeşlik getirmez.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p15
+  note: Kendi karşı örneğimiz; kaynak soru sayısına katılmaz.
+- id: teaching-ch8-rtdp-comparison
+  page: 180
+  pdf_page: 202
+  kind: türetim
+  what: İlk yakınoptimal politika kıyasında127600 vs136725=%6.67398az; tamdeğer kıyasındaki yarı hesaptan
+    ayrılır.
+  status: eklendi
+  where: content/modules/m11-10-planning/module.yaml#practice:p16
+  note: Kaynak sayılarına kendi ek hesabımız; kaynak soru sayısına katılmaz.

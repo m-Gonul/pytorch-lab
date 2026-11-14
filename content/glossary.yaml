@@ -271,3 +271,12 @@ terms:
     hatasının her zaman küçülmesi veyaγ1 için sıkı daralma değildir.
   q(σ): Örnekleme ile beklenti katsayılarını σ∈[0,1] ile karıştıran çok-adımlı aile. Kitabın7.17kontrol-değişkenli
     yazımı,σ1 için7.14Q-CV biçimine iner;düzSARSA ile her yolda aynı hedef değildir.
+
+
+  dağılım modeli: "Bir (s,a) için bütün sonraki durum/ödül sonuçlarını ve olasılıklarını veren çevre modeli. Beklenen yedekleri hesaplamaya ve örnek üretmeye izin verir."
+  örnek modeli: "Bir (s,a) için geçiş olasılıklarına uygun tek sonraki durum/ödül üreten model. Bütün dağılımı açıkça vermesi gerekmez."
+  arama denetimi: "Planlamada simüle deneyimin başlayacağı durum/eylem çiftlerini seçen süreç; yedeğin nereye uygulanacağını belirler."
+  öncelikli süpürme: "Değeri değişen durumların model öncüllerini hedef hatasının büyüklüğüyle önceliklendirip geriye doğru güncelleyen planlama yöntemi."
+  yörünge örnekleme: "Model ve politika ile ardışık geçişler üretip karşılaşılan durum/çiftleri güncellemek. Güncelleme yerini örneklemek, hedefin de örnek yedek olması demek değildir."
+  optimal kısmi politika: "Başlangıçlardan bazı optimal politikayla erişilebilen ilgili durumlarda optimal davranan; diğer durumlarda keyfî veya tanımsız bırakılabilen politika."
+  gerçek zamanlı dinamik programlama: "RTDP: ziyaret edilen durumlarda beklenen max değer-yineleme yedeği yapan asenkron planlama. Tüm durumları ziyaret etmeden optimal kısmi politika bulma sonucu, uygun en kısa yol ve iyimser başlangıç koşullarını gerektirir."
