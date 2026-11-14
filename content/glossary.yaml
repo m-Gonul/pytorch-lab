@@ -233,3 +233,12 @@ terms:
   özyükleme: Bir tahmini başka tahminleri kullanarak güncelleme (bootstrapping); DP ve TD yapar, tam getirili Monte Carlo yapmaz.
   önyükleme: 'RL içinde özyükleme ile aynı bootstrapping kavramı: tahminden tahmin güncellemesi.'
   nicemleme: Sürekli bir niceliği sonlu temsil düzeylerine ayırmak; ayrıntı kaybı karşılığında sonlu modelle hesap sağlar.
+
+  ilk ziyaret mc: "Bir bölümde bir durumun zaman sırasındaki ilk ziyaretinden sonraki tam getiriyi ortalayan Monte Carlo tahmini. Geri taramadaki ilk karşılaşma zaman sırasındaki son ziyarettir."
+  her ziyaret mc: "Bir bölümde bir durumun bütün ziyaretlerinden sonraki getirileri kullanan MC tahmini; bölüm içi bağımlılık nedeniyle sonlu örneklemde yanlı olabilir, uygun koşullarda tutarlıdır."
+  keşif başlangıçları: "Exploring starts: her durum-eylem çiftinin bölüm başlangıcı olarak pozitif olasılıkla seçilebilmesi. Gerçek deneyimde genellikle mümkün olmayan bir MC kontrol varsayımı."
+  kapsama koşulu: "Hedef π(a|s)>0 ise davranış b(a|s)>0 olmalı. Politika dışı önem örneklemesinde hedefin olası yollarına davranış verisinde erişim sağlar; durum ziyaretlerinin yeterliliği ayrıca gerekir."
+  ağırlıklı önem örnekleme: "Weighted/normalized IS: ΣρG/Σρ. Sonlu örneklemde yanlı olabilir; sınırlı getirilerde normalize ağırlıklar kestirimi getiri sınırları içinde tutar."
+  karar başına önem örnekleme: "Per-decision IS: her ödülün önüne yalnız o ödüle kadar olan eylem olasılık oranlarını koymak; gelecek oranları koşullu beklenti1 özelliğiyle elemek."
+  indirim duyarlı önem örnekleme: "Discounting-aware IS: indirgenmiş getiriyi düz kısmi getirilerin geometrik karışımı olarak yazıp her ufuk için yalnız gerekli önek oranını kullanmak."
+  dirichlet problemi: "Sınır değerleri verilmiş bir bölgede harmonik iç çözümü bulma. Ayrık soğurucu rastgele yürüyüşte çözüm beklenen terminal sınır değeridir; genel sabun minimal yüzeyiyle aynı denklem değildir."

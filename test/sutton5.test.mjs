@@ -1,0 +1,13 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {reference,index} from '../site/js/labs/blackjackmc.js';
+import {buildTrack,trackReference,trainTrack,rollout} from '../site/js/labs/racetrackmc.js';
+import {binomial,episodeEstimators} from '../site/js/labs/importancemc.js';
+import {rng} from '../site/js/labs/plot.js';
+const R=JSON.parse(fs.readFileSync(new URL('../notes/sutton-2018/measurements_ch5_python.json',import.meta.url)));
+const close=(x,y,t=1e-10)=>assert.ok(Math.abs(x-y)<t,`${x} vs ${y}`);
+test('Sutton5: independent 200-state NumPy Blackjack values and all actions',()=>{const r=reference();for(let i=0;i<200;i++){close(r.prediction.V[i],R.blackjack.prediction[i]);close(r.optimal.V[i],R.blackjack.optimal[i]);for(let a=0;a<2;a++)close(r.optimal.Q[i][a],R.blackjack.optimal_Q[i][a]);}close(r.prediction.V[index(13,1,2)],-.2772041918250023);});
+test('Sutton5: two full source tracks agree with all-legal-action NumPy optimum',()=>{for(let k=0;k<2;k++){const m=buildTrack(k),ref=trackReference(k),p=R.racetrack[k];assert.ok(ref.converged);p.flat_state_ids.forEach((s,i)=>close(ref.V[s],p.V[i],1e-9));const d=trainTrack(k,50000,1,.1,.1);for(const s of m.starts){assert.ok(rollout(m,d.policy,s,1,0).finished);assert.ok(rollout(m,ref.policy,s,1,0).finished);}if(k===0)assert.equal(m.next((28*m.W+14)*25+20,4),-1);}});
+test('Sutton5: full / per-decision / discount-aware estimators have correct expectations',()=>{for(const g of [0,.5,1]){let full=0,pdis=0,num=0,den=0;for(let mask=0;mask<8;mask++){const a=Array.from({length:3},(_,j)=>(mask>>j)&1),p=a.reduce((p,z)=>p*(z?.4:.6),1),w=a.map(z=>z?2:1/3),z=episodeEstimators(a,w,g);full+=p*z.full;pdis+=p*z.pdis;num+=p*z.num;den+=p*z.den;}const truth=.8*(1+g+g*g);close(full,truth);close(pdis,truth);close(num,truth);close(den,1);}});
+test('Sutton5: exact binomial count sampler preserves mean and variance',()=>{const random=rng(1),M=30000,n=100,p=.37;let s=0,ss=0;for(let i=0;i<M;i++){const k=binomial(n,p,random);assert.ok(k>=0&&k<=n&&Number.isInteger(k));s+=k;ss+=k*k;}const mean=s/M,variance=ss/M-mean*mean;assert.ok(Math.abs(mean-n*p)<.15);assert.ok(Math.abs(variance-n*p*(1-p))<.6);});

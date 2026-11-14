@@ -6,11 +6,11 @@ def draw(rng):
     return min(rng.randint(1, 13), 10)
 
 
-def play(rng):
+def play(rng, natural_rule=True):
     ...
 
 
-def mc_blackjack(n, seed=0):
+def mc_blackjack(n, seed=0, return_counts=False, natural_rule=True):
     ...
 
 

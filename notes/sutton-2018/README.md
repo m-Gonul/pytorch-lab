@@ -70,3 +70,27 @@ measurements_ch4.json;özgün/değişmiş441 durumlu Jack politikaları ve değe
 İlk dört bölüm işlendi;Bölüm 5–17 ve ön/arka materyal henüz tamamlanmadı.
 
 Mevcut x3 eşzamanlı kodu da doğrudan 0.25/0.55 ve üç eşikte çalıştırıldı. 10⁻⁶→10⁻¹² en büyük V farkları 1.74812×10⁻⁷ / 0.000189500726; politika değişimi 0. Bunlar yerinde tarama ölçümleriyle karıştırılmaz; x3_synchronous alanında bütün diziler saklıdır.
+
+## Bölüm 5
+
+Basılı s.91–117 / PDF113–139; PDF140 boş. 161 kaynak birimi,14 numaralı alıştırma ve2 numarasız soru,9 görsel(5 numaralı/4 numarasız),5 sözde-kod. M11.4/M11.5 içine eklenir; eski materyal korunur. Bağımsız ikinci okuma27 metinli sayfa ve12 kaynak görüntüsünü yalnız PDF/defter üzerinden denetledi; nihai takipte açık bulgu kalmadı.
+
+Özgün şemalar ve bağımsız NumPy referansları:
+
+```bash
+python3 -I notes/sutton-2018/generate_ch5.py /tmp/sutton-ch5
+OPENBLAS_NUM_THREADS=1 python3 -I notes/sutton-2018/measure_ch5.py /tmp/ch5-python.json
+node notes/sutton-2018/measure_ch5.mjs /tmp/ch5-python.json /tmp/ch5-js.json
+```
+
+Kayıtlı `measurements_ch5_python.json`:200 Blackjack durumunun doğrusal değerlendirmesi,bağımsız optimal Q/π,V,krupiye bitiş dağılımları;gerçek10000/500000 Python tahmin bölümü ve1 milyon MC ES bölümü. 100 milyon hedef getirisinin ek denetimi,hesaplanmış terminal sonuç olasılıklarından eşdeğer çokterimli sayım çekilişidir;100 milyon yolu tek tek yürütme iddiası değildir. Kaynak yaklaşık−0.27726,bağımsız model−0.277204191825. İki kaynak yarış geometrisinin bütün yasal eylemli NumPy Bellman çözümleri de aynı dosyadadır.
+
+`measurements_ch5_js.json`:gerçek500000 Blackjack tahmini/1 milyon ES,100×10000 IS Blackjack bölümü,iki pistte50000 MC bölümü,bütün başlangıçlardan gürültüsüz yörüngeler,MC/model politikaları ve değerler. JS/NumPy bütün200 Blackjack değeri/Q,krupiye dağılımları veiki pistin19181 durum değeriyle eşleşir(izler/sıralar farklı olabilir). Sol model/öğrenilmiş başlangıçV−12.112482/−14.458549,sağ−8.951270/−11.447987. Sonlu MC tam optimum diye sunulmaz. Referans tüm yasal eylemleri kullanır;öğrenilmiş hedefte başlangıç çizgisinde iki son hızı0 yapan eylemlerin elenmesi bu iki haritanın bütün optimumV değerlerini değiştirmedi. Bu kendi sürücü tercihimizdir,kaynakta yasaklanan ek bir çevre eylemi diye anlatılmaz. Çizimde hücre köşesi duvar teması çarpışma;bitiş yeşil hücre merkezlerinin düşey doğrusudur. Kaynak segment kesişimi ister,bu geometri ayrıntılarını tekilleştirmez.
+
+Şekil5.4 deneyinde10×100 milyon bölümün kümülatif noktaları,aralık başına pozitif yol-uzunluğu kategorilerinin çokterimli sayımlarıyla **dağılım korunarak** üretilir. Beta/binom özyinelemesi normal yaklaşım kullanmaz. 80 adımdan uzun kuyruk da ayrıca örneklenir ve düşürülmez. Bunun bir milyar yolun açık yürütülmesi olmadığı hem labda hem derste yazılıdır. Öğretim modeli per-decision/discount-aware karşılaştırması20 tekrar×10000 gerçek100 adımlı bölüm kullanır. Sonsuz varyans sonucu grafikten değil geometrik seriyle,ordinary tutarlılığı sonlu birinci moment ve Durrett Teorem2.4.1 ile doğrulanır.
+
+Kaynak s.107 “yakınsamaz” iddiası düzeltilir;MC ES açık-problem ve bilinen weighted-PDIS önerileri hakkındaki ifadeler2018 bağlamında kalır. Fiziksel sabun minimal yüzeyi genel olarak harmonik değildir;tel labı küçük-eğim/ayrık Dirichlet modelidir. Sonlu sabit ufukta ayrı normalize PDIS tutarlılığı kendi öğretim uzantısı olarak kaynak sayımından ayrıdır. Kaynak fotoğrafı ve PDF çizimleri yayımlanmaz;özgün SVG ve hesaplanan yüzeyler kullanılır.
+
+Python doğrulamasında küçük Torch çekirdeklerinin çok fazla iş parçacığı açmasını önlemek için `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1` ortamı kullanıldı. GPU/Triton gerektirmeyen iki değişen modül ve notebook gerçek CPU Torch ile denetlendi. Sayıdan bağımsız basit etiketler için üretim tekrarında tüm Monte Carlo koşularını yeniden çalıştırmak gerekmez.
+
+İlk beş bölüm işlendi;Bölüm6–17,ön/arka materyal,kısım ayırıcıları ve kitabın tüm kaynakça/dizin aktarımı tamamlanmadı.

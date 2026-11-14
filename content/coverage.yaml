@@ -3,7 +3,7 @@ intro: |
 
   **Nasıl denetlendi:** 82 PDF'in metni çıkarıldı (toplam ≈ 31 700 satır); her slayt başlığı ilgili modülün tüm dosyalarında (anlatım, alıştırma, kontrol, kod) aranıp eşleşmeyenler elle incelendi. **Erişim sınırı:** slaytlardaki şekil ve ekran görüntüleri metin olarak okunamadı; yalnız başlık, metin ve formüllerin metne dökülebilen kısmı karşılaştırıldı. Görsel içerikli slaytlar (ör. görüntü örnekleri, mimari çizimleri) konu başlığı üzerinden eşlendi.
 
-  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–4 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108 ve 109) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
+  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–5 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108, 109, 114, 116, 117, 119, 121, 122, 123, 128, 129, 132, 133 ve 134) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
 
   **Durumlar:** *kapsandı* — kaynaktaki konu sitede en az aynı derinlikte; *kapsandı + genişletildi* — sitede kaynakta olmayan türetim, alıştırma ya da deney de var; *kısmen* — konu var ama kaynaktaki bir alt başlık bilinçli olarak yüzeysel; *bilinçli olarak farklı* — kaynaktaki araç yerine başka bir araç (ör. Keras yerine PyTorch). Yeni kaynak geldikçe tablo genişletilir; tamamlanmış satırlar geri alınmaz.
 groups:
@@ -261,7 +261,7 @@ groups:
   - title: 'Sutton ve Barto — Reinforcement Learning: An Introduction, 2. baskı (2018)'
     note: 'Yüklenen PDF 548 sayfa. Envanterde 140 numaralı alıştırma, 104 numaralı şekil, 38 kutulu sözde-kod
       listesi var. Sayılar numarasız çizim, tablo ve metin içi algoritmaların tamamlık sayımı değildir. Bölüm
-      1–2 işlendi; kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
+      1–5 işlendi; kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
     rows:
     - src: Sutton ve Barto (2018), Bölüm 1 — Giriş (s. 1–22)
       topics: 5 numaralı alıştırma; 1 numaralı şekil. Numarasız XOX tahtası da işlendi.
@@ -305,14 +305,12 @@ groups:
         dizisi ve değer yüzeyi,4.3 tarama eğrileri yeniden hesaplandı. 441 durumlu özgün ve4.7 robot değil araba
         modelleri;0.25/0.55 kumarbaz koşuları. Bağımsız ikinci okuma ve kaynak/öğretim ayrımı tamamlandı;kitabın
         bütünü tamamlanmadı.
-    - src: Sutton ve Barto (2018), Bölüm 5 — Monte Carlo yöntemleri (s. 91–118)
-      topics: 14 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
-      pages:
-      - m11-4-mc-td
-      - m11-5-sarsa-q
-      status: eksik
-      gap: Kaynağın bu bölümü henüz aktarılmadı; hedefler yalnız konu eşlemesi adaylarıdır.
-      done: Sayfa ve numaralı öğe envanteri çıkarıldı. İçerik kapsamı tamamlanmış sayılmadı.
+    - src: Sutton ve Barto (2018), Bölüm 5 — Monte Carlo yöntemleri (s.91–118)
+      topics: İlk/her ziyaret,Blackjack,Dirichlet,MC ES,ε-soft iyileştirme,ordinary/weighted IS,sonsuz varyans,artımlı/indirim/karar başına IS,racetrack ve tarihçe.
+      pages: [m11-4-mc-td,m11-5-sarsa-q]
+      status: genis
+      gap: —
+      done: '161 birim:159 eklendi,1 genişletildi,1 düzeltildi. 14 numaralı+2 numarasız sorunun tamamı çözümlü;16 yeni kart,iki yeni programlama eki. 5 numaralı+4 numarasız kaynak görseli,5 sözde-kod;3 SVG grubu,4 yeni deney türü/5 yerleşim. Kaynak107 yakınsamama iddiası SLLN ile düzeltildi. Bütün200 Blackjack ve19181 yarış durumunda bağımsız NumPy/JS karşılaştırması. PDF113–140 bağımsız ikinci okuma;12 görüntü incelendi. Kitabın bütünü tamamlanmadı.'
     - src: Sutton ve Barto (2018), Bölüm 6 — Zamansal fark öğrenmesi (s. 119–140)
       topics: 14 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
       pages:

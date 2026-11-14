@@ -1,4 +1,4 @@
-### Değerlendirmeden kontrole: neden Q? {#q}
+### Değerlendirmeden kontrole: neden Q? {#q-deger}
 
 M11.4 sabit bir politikanın değerini model olmadan kestirdi. Asıl hedef ise en iyi politikayı bulmaktır (kontrol problemi). Politika yinelemesinin kalıbı (değerlendir, sonra açgözlü iyileştir) burada doğrudan işlemez. $V^\pi$'den açgözlü politika çıkarmak için
 $$\pi'(s)=\arg\max_a\Bigl[R(s,a)+\gamma\sum_{s^+}P(s^+\mid s,a)V^\pi(s^+)\Bigr]$$
@@ -92,6 +92,129 @@ $$Q_1(s,a)\leftarrow Q_1(s,a)+\alpha\Bigl[r+\gamma\,Q_2\bigl(s^+,\arg\max_{a^+}Q
 $Q_2$'nin gürültüsü $Q_1$'in seçiminden bağımsızdır. Seçilen eylemin değerinin yansız bir kestirimi elde edilir. Davranış için iki tablonun toplamı kullanılır. Derin RL'de aynı fikir Double DQN olarak kullanılır (M11.6).
 
 ::lab l2
+
+### Monte Carlo ile kontrol: GPI ve keşif başlangıçları {#sutton-mc-kontrol}
+
+Bu paket Sutton ve Barto (2018), s.96–103 ve 110–117 içindeki kontrol ayrıntılarını tamamlar. Getiri, ilk/her ziyaret ve politika dışı oranların türetimi [M11.4](m11-4-mc-td.html#sutton-mc-temel) içindedir. Kaynak§5.2, model olmadan yalnız $V$ bilmenin açgözlü eylemi seçmeye yetmediğini vurgular: bir-adım bakış geçiş modelini ister. **Q** ise her eylemin değerini doğrudan karşılaştırır.
+
+Belirlenimci bir politika altında birçok durum-eylem çifti hiç gözlenmez. Denenmeyen eylem iyi mi bilinemez; yalnız mevcut en iyi eylemi seçmek yetersizdir. **Keşif başlangıçları (exploring starts, ES)** her bölümün başlangıç çiftini, her $(s,a)$ için pozitif olasılıkla seçebilme varsayımıdır. Benzetimde ayarlanabilir; gerçek bir robotu her iç durumda başlatmak genellikle mümkün değildir. Her durumda bütün eylemleri pozitif olasılıkla seçen stokastik politikalar başka bir yoldur; ilgili durumlara ulaşmayı ve yeterli ziyaretleri ayrıca gerektirir.
+
+<figure class="fig wide"><svg viewBox="0 0 640 330" role="img" aria-label="MC Q politika GPI çevrimi ve tam değerlendirme zinciri" xmlns="http://www.w3.org/2000/svg"><defs><marker id="MC-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10" fill="var(--ink)"/></marker></defs><text x="128" y="90" text-anchor="middle" style="font-size:26px;fill:var(--ink)">π</text><text x="510" y="90" text-anchor="middle" style="font-size:26px;fill:var(--ink)">Q</text><path d="M150,70 Q320,10 490,70" fill="none" stroke="var(--ink)" stroke-width="2" marker-end="url(#MC-arrow)"/><path d="M490,110 Q320,190 150,110" fill="none" stroke="var(--ink)" stroke-width="2" marker-end="url(#MC-arrow)"/><text x="320" y="22" text-anchor="middle" style="font-size:16px;fill:var(--ink)">değerlendirme: Q → qπ</text><text x="320" y="192" text-anchor="middle" style="font-size:16px;fill:var(--ink)">iyileştirme: π → greedy(Q)</text><text x="80" y="244" text-anchor="middle" style="font-size:17px;fill:var(--ink)">π₀: a0</text><path d="M132,240 L180,240" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#MC-arrow)"/><text x="160" y="224" text-anchor="middle" style="font-size:16px;fill:var(--ink)">E</text><text x="240" y="244" text-anchor="middle" style="font-size:17px;fill:var(--ink)">qπ₀=(0,1)</text><path d="M292,240 L340,240" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#MC-arrow)"/><text x="320" y="224" text-anchor="middle" style="font-size:16px;fill:var(--ink)">I</text><text x="400" y="244" text-anchor="middle" style="font-size:17px;fill:var(--ink)">π₁: a1=π*</text><path d="M452,240 L500,240" fill="none" stroke="var(--ink)" stroke-width="1.5" marker-end="url(#MC-arrow)"/><text x="480" y="224" text-anchor="middle" style="font-size:16px;fill:var(--ink)">E</text><text x="560" y="244" text-anchor="middle" style="font-size:17px;fill:var(--ink)">qπ₁=q*</text><text x="320" y="295" text-anchor="middle" style="font-size:16px;fill:var(--ink)">Tek durum, iki terminal eylem, ödüller 0 ve 1; γ=0.9</text></svg><figcaption>Şekil 3 — Kaynak s.97 içindeki Q–π GPI çevrimi ve E/I zinciri. Alttaki değerler tek-adımlı özgün MDP için tam hesaplandı; ideal zincirin bir sonlu örneği. Kaynağın numarasız iki şeması yeniden türetildi.</figcaption></figure>
+
+Kaynak s.97 GPI şemasındaki değerlendirme oku $Q\approx q_\pi$, iyileştirme oku $\pi\approx\operatorname{greedy}(Q)$; iki süreç birbirinin hedefini değiştirir. İdeal politika yinelemesi zinciri $\pi_0\to q_{\pi_0}\to\pi_1\to q_{\pi_1}\to\cdots\to\pi_*\to q_*$ biçimindedir. Tam MC değerlendirmesi sonsuz veri ister. Şimdilik bunu ideal kabul edip ES altında $q_{\pi_k}$ tam biliniyorsa, kaynak (5.1) $\pi_{k+1}(s)\in\arg\max_aq_{\pi_k}(s,a)$ politika iyileştirmesidir. Bütün olası eylemleri düşünür, çevrenin modelini kullanmaz.
+
+### Bölüm başına iyileştirme ve Blackjack kontrolü {#sutton-mc-es}
+
+Sonsuz tam değerlendirme ideali gevşetilir; MC ES keşif başlangıçlarını korur: tam değer yakınsamasını beklemek yerine değişim yeterince küçük olduğunda değerlendirmeyi kesebiliriz; daha da ileri gidip **her bölümden sonra** iyileştirebiliriz. GPI değerlendirme/iyileştirme adımlarının tam bitmesini istemez. Bir yol tahmin hatasının büyüklüğüne ve olasılığına sınırlar koyup her aşamada bunları yeterince küçültecek kadar bölüm toplamaktır; yaklaşık doğruluk garantisi kurabilir ama küçük problemler dışında pahalı olabilir. Öteki yol değerlendirmeyi bitirmeden iyileştirmeye dönmektir: değer yinelemesi bir tarama, yerinde biçimi tek durum bazında bu etkileşimi kullanır. MC için doğal karşılık bölüm bazındadır. Kaynak s.99 MC ES kutusunun liste tutmayan eşdeğeri (Alıştırma 5.4):
+
+```python
+# policy keyfî, Q keyfî; N(s,a)=0.
+for episode in exploring_start_episodes(policy):
+    G = 0.0
+    for t in reversed(range(len(episode))):
+        s, a, r = episode[t]
+        G = r + gamma * G
+        if (s, a) in [(x, u) for x, u, _ in episode[:t]]:
+            continue
+        N[s, a] += 1
+        Q[s, a] += (G - Q[s, a]) / N[s, a]
+        policy[s] = stable_argmax(Q[s])
+```
+
+İlk ziyaret **çift** içindir, yalnız duruma bakılmaz. Bağ çözümü tutarlı seçilebilir. Kaynak bütün geçmiş getirileri, o sırada hangi politika kullanılmış olursa olsun biriktirir; politika değişince sayaçları sıfırlamaz. Sabit bir alt-optimal politikaya yerleşseydi, yeterli ziyaretle onun Q değerleri öğrenilecek ve iyileştirme yapılacaktı. Bu akıl yürütme bütün dizinin yakınsadığının kanıtı değildir.
+
+:::uyarı Kaynak notu: yakınsama ve tarih
+Kitap 2018, MC ES için optimal sabit noktaya kaçınılmaz yakınsamayı açık problem olarak sunup Tsitsiklis (2002) kısmi sonucuna atıf yapar. Burada bu, **baskının tarihsel ifadesi** olarak korunur. “Alt-optimal sabit nokta olamaz” savı, salınımın imkânsızlığını tek başına ispatlamaz; bugün için güncel literatür taraması iddia etmiyoruz.
+:::
+
+Kaynak Örnek 5.3 başlangıçta her 200 Blackjack durumu ve iki ilk eylemi eşit olasılıkla seçer. Sonraki eylemler politikayı izler; başlangıç politika 20/21 toplamında durur, Q başlangıcı 0 olabilir. Zorlanan 21 doğal olmayan karar durumudur. Mevcut x 3 bunun programını içerir; aşağıdaki deneyde 1000000 bölüm, iki as sınıfında çek/dur politikası ve $\max_aQ(s,a)$ yüzeyi gösterilir. Kaynak Şekil 5.2 içindeki optimal-değer yüzeyleri MC ES ile öğrenilen Q değerlerinden hesaplanır. Politika panelindeki 11 alt sınır etiketidir; karar verisi12–21 aralığındadır. Kaynak Şekil 5.2 bölüm bütçesi belirtmez; bir milyon bizim açık deney seçimimizdir.
+
+::lab l 3
+
+Tam-model optimumuyla JS politika uyumu 199/200, RMS değer farkı 0.0134602; Python aynı bütçede 199/200 ve 0.0137195 ölçüldü. Model referansında kullanılabilir-as 18 için krupiyeA karşısında çek,2…8 karşısında dur,9/10 karşısında çek çıkar. Kaynak Thorp (1966) “basic” stratejisiyle kullanılabilir-as panelinin en sol çentiği dışında eşleştiğini, bu farkın nedeninden emin olmadığını belirtir. Farkın sebebi diye doğrulanmamış bir açıklama uydurmuyoruz; bağımsız modelimiz verilen kurallardaki çentiği doğrular. Asız optimum durma eşikleri krupiyeA…10 sırasıyla 17,13,13,12,12,12,17,17,17,17; aslı eşikler 19,18,18,18,18,18,18,18,19,19.
+
+### ES olmadan ε-yumuşak kontrol {#sutton-mc-soft}
+
+Politika üstü öğrenmede veri üreten politika aynı zamanda iyileştirilir. **Yumuşak** politika bütün eylemlere pozitif olasılık verir. $m=|\mathcal A(s)|$ için **ε-yumuşak** politika her eylemde en az $\varepsilon/m$ verir. **ε-greedy**, bu tabanı verip kalan $1-\varepsilon$ kütleyi bir açgözlü eyleme koyar; bu sınıfta açgözlülüğe en yakın seçimdir. Belirlenimci optimum yerine keşfi sürdüren ε-yumuşak sınıfın en iyisi hedeflenir.
+
+Kaynak s.101 sözde-kodu MC ES ile aynı ilk-ziyaret Q ortalamasını kullanır; ES başlangıcı yerine normal başlangıçtan ε-yumuşak politika izlenir. Her güncellemeden sonra $a^*=\arg\max_aQ(s,a)$ seçilir ve **bütün** eylem olasılıkları yenilenir:
+
+$$\pi(a|s)=\begin{cases}1-\varepsilon+\varepsilon/m,&a=a^*,\\\varepsilon/m,&a\ne a^*.\end{cases}$$
+
+Q keyfî, başlangıç politika ε-yumuşak, getiri listeleri boş veya sayaçlar 0; bölüm sonuna kadar oyna, $G\leftarrow R+\gamma G$ ile geriye git, ilk çiftleri ortala, sonra bu dağılımı ata. Bu, kaynak kutunun tüm döngüsüdür; yalnız bir eyleme olasılık yazıp diğer eski olasılıkları bırakmak toplamı 1 tutmaz. $\varepsilon$ sabitse sonuç keşif maliyetini taşır; ES olmadan keşif varsayımını daha gerçekçi hale getirmenin karşılığı budur.
+
+:::türetim ε-yumuşak iyileştirme: kaynak (5.2)
+$0<\varepsilon<1$ ve $\pi(a|s)\ge\varepsilon/m$ olsun. $w_a=(\pi(a|s)-\varepsilon/m)/(1-\varepsilon)$, negatif olmayan ve toplamı 1 olan ağırlıklardır. Yeni ε-greedy $\pi'$ için
+
+$$q_\pi(s,\pi')=\frac\varepsilon m\sum_aq_\pi(s,a)+(1-\varepsilon)\max_aq_\pi(s,a)$$
+
+$$\ge\frac\varepsilon m\sum_aq_\pi(s,a)+(1-\varepsilon)\sum_aw_aq_\pi(s,a)
+=\sum_a\pi(a|s)q_\pi(s,a)=v_\pi(s).$$
+
+Politika iyileştirme teoremi $v_{\pi'}\ge v_\pi$ verir. $\varepsilon=1$ için tek seçenek düzgün politikadır; $1-\varepsilon$ ile bölme yapılmaz.
+
+Neden artık iyileşmeme ε-yumuşak optimumdur? Aynı durum/eylemli yeni çevre kurun: önerilen eylem $1-\varepsilon$ olasılıkla uygulanır, $\varepsilon$ olasılıkla düzgün rastgele başka bir seçimle değiştirilir. Yeni çevrede genel politikanın yapabilecekleri, eski çevrede ε-yumuşak politikaların yapabilecekleriyle aynıdır. Yeni Bellman optimum operatörü
+
+$$\widetilde Tv(s)=\frac\varepsilon m\sum_a\sum_{s',r}p(s',r|s,a)[r+\gamma v(s')]
++(1-\varepsilon)\max_a\sum_{s',r}p(s',r|s,a)[r+\gamma v(s')].$$
+
+İyileşme durduysa $v_\pi=\widetilde Tv_\pi$; bu optimum sabit nokta denklemiyle aynıdır. Sonlu $\gamma<1$ modelde tekliğinden $v_\pi=\widetilde v_*$; $\gamma=1$ için uygun sonlanma/tekillik koşulları ayrıca gerekir. İspat Q'nun **tam** $q_\pi$ olduğunu varsayar; sonlu örnek MC gürültüsünün bütün yakınsama analizini yerine koymaz.
+:::
+
+### Davranış keşfederken hedefin açgözlü olması {#sutton-mc-off}
+
+Politika dışı kontrol hedef ile davranışı ayırır. Hedef tutarlı `argmax Q` ile belirlenimci olabilir; davranış bütün eylemleri denemeyi sürdürür. Her çift için sonsuz sayıda uygun getiri ve kapsama gerekir; davranış ε-yumuşak seçilebilir. $b$ bölümler arasında hatta bölüm içinde değişebilir; seçilen eylemin **o andaki olasılığı** saklanır. Güncelleme sırasında yeni politikadan eski davranış olasılığını yeniden hesaplamayın.
+
+Kaynak s.111 kutusunun yeniden yazımı:
+
+```python
+# Q keyfî, C=0; pi=stable_argmax(Q).
+for episode in episodes_from_soft_behavior():
+    G, W = 0.0, 1.0
+    for s, a, r, b_probability in reversed(episode):
+        G = r + gamma * G
+        C[s, a] += W
+        Q[s, a] += (W / C[s, a]) * (G - Q[s, a])
+        pi[s] = stable_argmax(Q[s])
+        if a != pi[s]:
+            break
+        W /= b_probability
+```
+
+Önce mevcut çiftin Q değeri güncellenir, sonra hedef iyileşir. Hedefe uymayan eylemde sonraki daha eski **tam getirilerin** hedef oranı 0 olacaktır, bu yüzden dış geriye döngü bırakılır. Uyan eylemde $\pi(a|s)=1$ olduğundan oran $1/b(a|s)$; payda güncellemesinde hedef olasılığının yazılmaması Alıştırma 5.11 sorusunun cevabıdır. Q zaten mevcut eylemi koşulladığı için ilk ağırlık 1.
+
+Dezavantaj: yalnız bölümün sonundaki kesintisiz açgözlü kuyruğu kullanır. Uzun bölümde hedef dışı eylemler sıksa başlangıç durumlarına az veri kalır. Kaynak 2018 bunu araştırma sorunu olarak tartışır; TD ile önyükleme veya $\gamma<1$ iken indirim duyarlı önekler çözüm yollarıdır. Bu bir güncel literatür durumu iddiası değildir.
+
+### Yarış pistinde iki tam görev ve ölçülen politikalar {#sutton-racetrack}
+
+Alıştırma 5.12, Şekil 5.5 içindeki sol 17×32 ve sağ 32×30 ızgaralarda hızla dönüp bitişe varmayı ister. Sol 298 yol hücresi,6 başlangıç ve 6 bitiş; sağ 515 yol hücresi,23 başlangıç ve 9 bitiş içerir. Kaynak başlangıç çizgileri pembe/kırmızımsı, bitişler yeşildir; kendi hesaplanan çizimimizde başlangıç için turuncu, bitiş için yeşil kullanılır. İki hız bileşeni tam sayı 0…4; ikisi birlikte yalnız başlangıç çizgisinde 0 olabilir. Dokuz nominal ivme, her bileşende−1/0/+1 seçimidir. Sınır dışı son hız doğuran eylemler elenir; başka eyleme kırpılmaz.
+
+Başlangıç çizgisinden düzgün rastgele konum ve sıfır hız seçilir. Her adım−1; hareket parçası bitişi geçince bölüm biter. Önce duvara değerse sıfır hızla rastgele başlangıca dönülür, **bölüm bitmez**. Yalnız son hücreyi kontrol etmek duvarı atlayabilir veya bitişten sonra gelen dış hücreyi yanlış çarpışma sayabilir. İki kesişimin zaman sırasını hesaplarız. Hücre köşesinde duvara temas çarpışma, bitiş yeşil hücre merkezlerinin düşey doğrusu olarak seçildi; kaynak bu sürekli geometri ayrıntısını tekilleştirmediği için seçim açıktır. Eğitimde her adım %10 olasılıkla iki ivme birden 0 olur; yörünge gösteriminde bu gürültü kapatılır, çarpışma yeniden başlangıcı korunur.
+
+::lab l 4
+
+Yeni x 4 aşaması bütün geometriyi, segment fiziğini, gerçek bölümleri, weighted politika dışı MC ve yörünge üretimini içerir. Varsayılan 50 bin bölümde iki pist de çalıştırıldı. Q başlangıcı−1000; başlangıç bağ kuralı düşük hızlı hücre-uzaklığı sürücüsüdür. Başlangıç çizgisinde iki son hızı 0 yapan eylemler hedefte elenir, davranışta hâlâ denenebilir. Sıfır hızdan beklemek aynı duruma−1 ile döner; diğer başlangıç hızlarında bu ek sürücü kuralıdır. Bütün yasal eylemli tam-model çözümüyle karşılaştırmada bu iki haritanın tüm optimum V değerleri değişmedi. Bu önsel tam stokastik MDP optimumundan kopyalanmış değildir. Ağırlık güncellemesi log uzayında tam $W/C$ oranını korur; önem ağırlığını kırpmaz, bütçe aşımını sahte terminale dönüştürmez.
+
+Sol pist 50 bin bölümde 1049077 gerçek adım kullandı; bağımsız tam-model optimum başlangıç değeri−12.112482, öğrenilmiş hedef−14.458549. Kaynak “optimal politika” ister; sonlu MC çözümünü optimal diye adlandırmıyoruz. Deneyde model optimumu da seçilip aynı başlangıçlarda gösterilir, model artığı ve değer farkıyla kontrol edilir. Sağ pist 784925 gerçek adım kullandı; model optimumu−8.951270, öğrenilmiş hedef−11.447987. İki model çözümünün en büyük Bellman artığı 10⁻¹⁰ altında. Tam diziler üretim kaydındadır. Üç çizim sol/orta/sağ başlangıcı gösterir; bütün başlangıçlar ayrıca sayısal denetlendi. Gürültüsüz yörünge adım sayısı, eğitimde gürültü altında beklenen değerin negatifiyle aynı ölçü değildir.
+
+### İndirim duyarlı kontrol uyarlaması {#sutton-mc-discount}
+
+Alıştırma 5.14, M11.4 içindeki indirim duyarlı kestirimi kontrole taşır. Q için mevcut eylem koşullu olduğundan $\rho_{t+1:h-1}$ kullanın; boş çarpım 1. Her geriye adımda, o andaki hedef için
+
+$$N_t=\sum_{h=t+1}^{T}c_{t,h}\rho_{t+1:h-1}\bar G_{t:h},\qquad
+D_t=\sum_{h=t+1}^{T}c_{t,h}\rho_{t+1:h-1}$$
+
+hesaplayın. $D_t>0$ ise $C(s,a)\leftarrow C(s,a)+D_t$ ve
+
+$$Q(s,a)\leftarrow Q(s,a)+\frac{N_t-D_tQ(s,a)}{C(s,a)}$$
+
+yapıp hedefi yeniden açgözlü seçin. İç ufuk çarpımı 0 olduğunda daha uzun önekler atlanabilir; **dış geriye döngü γ<1 için durdurulmaz**, çünkü daha kısa önekler sonraki uyumsuz eylemi içermeyebilir. γ=0 yalnız ilk ödül, γ=1 eski tam-son-ek algoritmasını verir. Yeni x 5, değişen hedefi her t için yeniden hesaplayan açık O(T²) çözüm ve bu sınırların otomatik denetimidir. Sabit hedefte O(T) yineleme M11.4 içinde türetildi. Davranış olasılığını kayıt anından alın; böyle bir cebirsel uyarlama bütün kontrol problemlerinde kendiliğinden yakınsama teoremi sağlamaz.
+
+### MC kontrolünün tarihsel bağlantıları {#sutton-mc-kontrol-tarih}
+
+Kitap MC ES adını 1998 ilk baskısına bağlar; MC tahminiyle politika yinelemesine dayalı kontrol arasındaki ilk açık bağlantı **olabileceğini** söyler, kesin öncelik iddiası kurmaz. Michie–Chambers (1968) çubuk dengelemede her durum/eylem için beklenen dengeleme ömrünü bölüm sürelerini ortalayarak kestirip eylem seçimini bunlarla yönetiyordu; her-ziyaret MC ES ruhuna benzer. Narendra–Wheeler (1986), ergodik sonlu Markov zincirinde aynı duruma ardışık gelişler arasındaki getiriyi öğrenme otomatının eylem olasılıklarını ayarlayan ödül olarak kullandı. Yarış pisti Barto–Bradtke–Singh (1995) ve Gardner (1973) çalışmalarından uyarlanmıştır.
+
+Bölümün kontrol özeti: ES başlangıç çiftlerini kapsar; politika üstü yaklaşım keşfi sürdüren politikanın en iyisini arar; politika dışı yaklaşım keşif verisiyle ayrı açgözlü hedef öğrenir. Örneklerden hesaplama ve önyüklemesizlik iki ayrı tasarım tercihidir. Kaynak 2018 içindeki açık araştırma ifadeleri tarihsel olarak korunur.
 
 ### Özet {#ozet}
 
