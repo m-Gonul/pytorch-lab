@@ -2,7 +2,7 @@ id: m11-4-mc-td
 code: M11.4
 title: Modelden bağımsız değerlendirme — Monte Carlo ve TD
 phase: 11
-minutes: 710
+minutes: 800
 prereq:
 - m11-3-policy-iteration
 summary: 'Geçiş ve ödül modeli bilinmiyorsa değer, oynayarak kestirilir. Monte Carlo: bölüm sonuna kadar
@@ -23,6 +23,8 @@ goals:
 - Ordinary/weighted önem örnekleme; sonsuz varyans ile tutarlılığı ayırmak; indirim/karar başına oranlar
 - 'Sutton Bölüm6: zaman damgalı TD hataları, değişen tablo düzeltmesi ve eve dönüş'
 - Markov akışında sabit α sınırları; yürüyüşte başlatma/α taraması; batch kesinlik eşdeğeri
+- n-adım hedefin tablo sürümü,gecikmesi ve terminal sonrası flush
+- Kaynak7.1/7.3/7.5/7.8 kanıtları;7.2/7.10 programlanmış karşılaştırmalar
 sources:
 - title: 'Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 5–7 ve 12'
   url: http://incompleteideas.net/book/the-book-2nd.html
@@ -103,6 +105,12 @@ extras:
   engine: browser
 - id: x4
   title: 'Keşif yöntemleri: ε-greedy, azalan ε, Boltzmann, iyimser başlangıç'
+  engine: browser
+- id: x5
+  title: Güncel n-adım hedefi ve saklanmış TD hataları — Sutton7.2
+  engine: browser
+- id: x6
+  title: Politika dışı CV ile veri verimliliği — Sutton7.10
   engine: browser
 quiz:
 - q: TD hedefi neden yanlıdır?
@@ -483,6 +491,162 @@ labs:
   limits: Kaynak 5.4 noktaları multinomial artışlarla tam dağılımda örneklenir; bir milyar tekil yol dolaşılmaz.
     Diğer modlar gerçek yollar, en çok 10000 bölüm; γ karşılaştırması 20 tekrar. 0–2 çerçevesi dışındaki
     sıçramalar hesapta tutulur.
+- id: l6
+  lab: nstepwalk
+  title: 'Kaynak Şekil7.2 ve7.2/7.3: n-adım yürüyüş'
+  goal: Aynı yollarla n/α/başlangıç/görev ölçeğini karşılaştır.
+  predict:
+    q: Sol0/1 ve V0.5,sol−1/+1 ve V0 dönüşümü aynı n/α sıralamasını korur mu?
+    options:
+    - t: Evet;aynı yollar veγ1 altında V_yeni=2V_eski−1,RMS2 kat.
+      ok: true
+      why: Bütün210 kaynak ızgara değeriyle sayısal karşılaştırıldı.
+    - t: Her iki göreviV0 ile başlatınca da mutlaka aynı n iyi olur
+      why: Başlangıç dönüşmezse bu eşleme yok;ölçülen en iyi n4 yerine16 olabildi.
+  presets:
+  - name: Şekil7.2:100×10 ve on n
+    params:
+      view: 0
+      N: 1
+      left: 0
+      initial: 0
+      E: 10
+      R: 100
+      seed: 1
+    note: 'Kaynak19 durum,sol−1,sağ+1,V0;tohum1/21α noktası kendi seçimimiz. Ölçülen: Hedef yönteminde
+      bu ızgaranın en iyi n / α / RMS = 4 / 0.4 / 0.2683959; Gerçek bağımsız örnek yolu / çevre geçişi
+      = 1000 / 96588.'
+  - name: '7.3: beş durum'
+    params:
+      view: 0
+      N: 0
+      left: 0
+      initial: 0
+      E: 10
+      R: 100
+      seed: 1
+    note: 'Görev ölçeğini aynı ölçütle değiştir. Ölçülen: Hedef yönteminde bu ızgaranın en iyi n / α /
+      RMS = 1 / 0.35 / 0.2212029; Gerçek bağımsız örnek yolu / çevre geçişi = 1000 / 8944.'
+  - name: '7.3: sol0,başlangıç0.5'
+    params:
+      view: 0
+      N: 1
+      left: 1
+      initial: 1
+      E: 10
+      R: 100
+      seed: 1
+    note: 'Aynı yollar üzerinde merkezlenmiş kaynakla afin eşleme. Ölçülen: Hedef yönteminde bu ızgaranın
+      en iyi n / α / RMS = 4 / 0.4 / 0.134198; Gerçek bağımsız örnek yolu / çevre geçişi = 1000 / 96588.'
+  - name: '7.3: sol0,başlangıç yine0'
+    params:
+      view: 0
+      N: 1
+      left: 1
+      initial: 0
+      E: 10
+      R: 100
+      seed: 1
+    note: 'Başlangıcı dönüştürmeyince aynı en iyi n şart değildir. Ölçülen: Hedef yönteminde bu ızgaranın
+      en iyi n / α / RMS = 16 / 0.3 / 0.2701943; Gerçek bağımsız örnek yolu / çevre geçişi = 1000 / 96588.'
+  - name: '7.2: n4 hedef/δ karşılaştır'
+    params:
+      view: 1
+      N: 1
+      left: 0
+      initial: 0
+      E: 10
+      R: 100
+      seed: 1
+      n: 4
+    note: 'Her gerçek geçişte saklananδ,güncelleme sırasındakihedefle karşılaştırılır. Ölçülen: Hedef
+      yönteminde bu ızgaranın en iyi n / α / RMS = 4 / 0.4 / 0.2683959; δ toplamında en iyi α / RMS =
+      0.35 / 0.2733072.'
+  - name: '7.2: n8 ve büyükα sınırı'
+    params:
+      view: 1
+      N: 1
+      left: 0
+      initial: 0
+      E: 10
+      R: 100
+      seed: 1
+      n: 8
+    note: 'Bütün noktalartamloggrafikte;yüksek hatalar gizlenmez. Ölçülen: Hedef yönteminde bu ızgaranın
+      en iyi n / α / RMS = 8 / 0.25 / 0.2804985; δ toplamında en iyi α / RMS = 0.2 / 0.287275.'
+  - name: '7.2: n1 cebirsel kontrol'
+    params:
+      view: 1
+      N: 1
+      left: 0
+      initial: 0
+      E: 10
+      R: 100
+      seed: 1
+      n: 1
+    note: 'İki yöntem n1 için kayan nokta payı dışında aynıdır. Ölçülen: Hedef yönteminde bu ızgaranın
+      en iyi n / α / RMS = 1 / 0.8 / 0.3461627; δ toplamında en iyi α / RMS = 0.8 / 0.3461627.'
+  questions: []
+  limits: Kaynak bütçesi100 tekrar×ilk10 bölüm;aynı yollar bütün n/α ayarlarında. α21 nokta kendi örneklememiz.
+    Kaynak çerçevesi dışı değerler saklanır;hata hesabı bölüm sonunda. Sonlu tarama evrensel üstünlük
+    değildir.
+- id: l7
+  lab: controlvariate
+  title: 'Alıştırma7.10: kontrol değişkeni ile aynı veri'
+  goal: Tam oran ve karar başına CV güncellemelerini ölç.
+  predict:
+    q: n1 için iki state-value güncellemesi farklı mı?
+    options:
+    - t: Hayır;ρ(R+γV−V) biçiminde cebirsel eşitlik var.
+      ok: true
+      why: Bağımsız kodlar sayısal yuvarlama payında eşleşir.
+    - t: CV her problemde daha iyi olmak zorunda
+      why: Taban ve veri bağımlılığı önemlidir;ortalama0 eki her zaman daha düşük varyans demek değildir.
+  presets:
+  - name: '7.10: dört adım,1000×100'
+    params:
+      n: 2
+      p: 0.9
+      alpha: 0.1
+      E: 100
+      R: 1000
+      seed: 1
+    note: 'Dört durumlu zincirde aynı eylemler kullanılır. Ölçülen: Son MSE: tam oran / CV = 6.00438·10⁻⁷
+      / 7.1806·10⁻⁹; Son MSE standart hatası: tam oran / CV = 2.6·10⁻⁷ / 7.6·10⁻¹⁰.'
+  - name: n1 sınırı
+    params:
+      n: 0
+      p: 0.9
+      alpha: 0.1
+      E: 100
+      R: 1000
+      seed: 1
+    note: 'Cebirsel aynı güncelleme. Ölçülen: Son MSE: tam oran / CV = 1.97006·10⁻⁵ / 1.97006·10⁻⁵; Son
+      MSE standart hatası: tam oran / CV = 6.3·10⁻⁷ / 6.3·10⁻⁷.'
+  - name: 'π=b: oran1'
+    params:
+      n: 2
+      p: 0.5
+      alpha: 0.1
+      E: 100
+      R: 1000
+      seed: 1
+    note: 'Hedef/davranış aynıdır;iki yöntem örtüşür. Ölçülen: Son MSE: tam oran / CV = 7.05508·10⁻¹⁰
+      / 7.05508·10⁻¹⁰; Son MSE standart hatası: tam oran / CV = 0 / 0.'
+  - name: Daha büyükα
+    params:
+      n: 2
+      p: 0.9
+      alpha: 0.2
+      E: 100
+      R: 1000
+      seed: 1
+    note: 'Aynı veriyle yeni adım oranı ölçülür. Ölçülen: Son MSE: tam oran / CV = 2.18789·10⁻⁶ / 3.77399·10⁻¹⁷;
+      Son MSE standart hatası: tam oran / CV = 4.2·10⁻⁷ / 1.3·10⁻¹⁷.'
+  questions: []
+  limits: Kendi4durumlu/2eylemli zincir,γ1,V0,gerçekV1. MSE dört durum ve tekrarlar üzerinden;SE tekrarlar
+    arasıdır. Zincirde durum tekrarı yok,gelecek tabanlar sonraki eylemlerden bağımsız. Sonlu özel-görev
+    sonucu.
 practice:
 - id: p1
   type: çözülmüş
@@ -1021,6 +1185,176 @@ practice:
   - Bütün TD hatasına oran
   - BeklenenBellman yönü
   - Kapsama ve teorem koşulları
+- id: p26
+  title: Donmuş V ile n adım TD hata toplamı
+  type: kanıt
+  level: 2
+  goal: Donmuş V ile n adım TD hata toplamı
+  needs: TD hatası,indirim ve teleskopik toplam
+  q: 'Bölüm boyunca değerler değişmiyorsa (7.2) n-adım hatasını TD hatalarının toplamı olarak yazıp ispatlayın;
+    önceki MC özdeşliği (6.6) özel durum olsun.
+
+
+    Kaynak: Sutton ve Barto (2018), s.143, Alıştırma 7.1.'
+  solution: '$h=\min(t+n,T)$ olsun. Sabit V için $\delta_k=R_{k+1}+\gamma V(S_{k+1})-V(S_k)$. İndirimli
+    toplamı açınca iç durumların değer terimleri komşularıyla sadeleşir:
+
+
+    $$\sum_{k=t}^{h-1}\gamma^{k-t}\delta_k=\sum_{k=t}^{h-1}\gamma^{k-t}R_{k+1}+\gamma^{h-t}V(S_h)-V(S_t).$$
+
+
+    h<T ise ilk iki terim n-adım hedefidir; h=T ise terminal V=0 ve tam getiri kalır. Dolayısıyla toplam
+    $G_{t:t+n}-V(S_t)$. n1 tek-adım, h=T kaynak(6.6). V değişirse bu sadeleşme aynı tablo varsayımıyla
+    yapılamaz.'
+  rubric:
+  - h ve terminal0 tanımlandı
+  - İç V terimleri doğru üslerle eşlendi
+  - n1 ve MC uçları ayrıldı
+  hints:
+  - İki komşu TD hatasını indirimle toplayın.
+- id: p27
+  title: Saklanmış TD hatası daha iyi mi?
+  type: kod
+  level: 2
+  goal: Saklanmış TD hatası daha iyi mi?
+  needs: n-adım TD ve zaman içindeki tablo sürümleri
+  q: 'V adım adım değişirken önceki sorudaki TD hata toplamı farklı bir algoritma verir. Küçük bir deney
+    tasarlayıp programlayın; bu biçimin daha iyi mi, daha kötü mü olduğunu ölçün.
+
+
+    Kaynak: Sutton ve Barto (2018), s.143–144, Alıştırma 7.2.'
+  solution: x5 iki yöntemi aynı 19 durumlu yürüyüşlerde çalıştırır. Birincisi τ güncellemesinde mevcut
+    V ile n-adım hedefini hesaplar; ikincisi her gerçek geçişte güncelleme öncesi δ saklar ve gecikmiş
+    pencerede toplar. n1 eşleşmesi ve terminal flush kontrol edilir. Lab/provenans koşulu100 tekrar×ilk10
+    bölüm,21α noktası,tohum1. n4/α0.1 için RMS hedef0.41278907,saklıδ0.41047410; bu ayarda δ biraz düşük.
+    Ancak kendi en iyi α seçimleriyle hedef n4/α0.4:0.26839594,saklıδ n4/α0.35:0.27330718. Büyük α,eski
+    hatalarla aşırı güncellemeler üretir. Bu örnek bütün görevlerde bir yöntemin iyi olduğunu kanıtlamaz.
+    Son RMS ile ilk10 bölüm ortalamasını karıştırmayın; Python random ile labın aynı sayısal tohumu aynı
+    yolları üretmez.
+  rubric:
+  - Aynı örnek yolları kullanıldı
+  - δ yakalama zamanı ve flush açık
+  - n1 kontrol edildi
+  - Ölçüt/α taraması/sonuç kapsamı belirtildi
+  hints:
+  - V sürümlerini δ hesaplandığı anda saklayın.
+- id: p28
+  title: Görev boyutu, sol ödül ve en iyi n
+  type: yorumla
+  level: 2
+  goal: Görev boyutu, sol ödül ve en iyi n
+  needs: Rastgele yürüyüş ve afin dönüşüm
+  q: 'Neden bu bölümde5 yerine19 durumlu yürüyüş kullanılmış olabilir? Daha küçük yürüyüş avantajı farklı
+    n değerine kaydırır mı? Soldaki sonucun0 yerine−1 olması en iyi n seçimini değiştirir mi?
+
+
+    Kaynak: Sutton ve Barto (2018), s.145, Alıştırma 7.3.'
+  solution: 'Büyük yürüyüşte öğrenilecek daha uzak bağımlılıklar vardır. Eşit sol/sağ yürüyüşte merkezden
+    beklenen çıkış süresi N5 için9,N19 için100; uzun bootstrap ufku kısa görevde çoğu kez terminale kadar
+    uzanır ve MC gibi olur. Kendi100×10/21α koşumuzda N19 en iyi n4/α0.4,N5 en iyi n1/α0.35. Bu evrensel
+    sıralama değildir.
+
+
+    Ödül0/1→−1/+1 değişirken V başlangıcı0.5→0 dönüştürülürse,γ1 ve aynı yollarda her hedef/güncelleme
+    $V_{yeni}=2V_{eski}-1$ bağıntısına uyar. RMS2 kat olur; n/α sıralaması aynıdır. Başlangıç iki görevde
+    de0 bırakılırsa aynı sonuç gerekmez: kendi N19/sol0/V0 taramamız n16/α0.3 buldu. Kaynaktaki küçük
+    görev0.5,büyük görev0 başlangıcı bu merkezlemeyle uyumludur.'
+  rubric:
+  - Görev mesafesi ve çıkış süresi açıklandı
+  - Küçük görev/MC ilişkisi yorumlandı
+  - Ödül ve başlangıç birlikte dönüştürüldü
+  - Aynı başlangıç karşı durumu ayrıldı
+  hints:
+  - Yeni ödül eski terminal ödülünün2 katı eksi1 ise iç değer başlangıcı nasıl dönüşmeli?
+- id: p29
+  title: Durum değeri için karar başına CV sözde-kodu
+  type: kod
+  level: 2
+  goal: Durum değeri için karar başına CV sözde-kodu
+  needs: Politika dışı TD ve karar başına önem örneklemesi
+  q: '(7.13) hedefini (7.2) güncellemesiyle kullanan politika dışı durum-değer tahmininin tam sözde-kodunu
+    verin.
+
+
+    Kaynak: Sutton ve Barto (2018), s.150, Alıştırma 7.5.'
+  solution: 'Sabitπ ve kapsayan b seç; V keyfî,α∈(0,1],n pozitif. S/R/ρ kayıtları mod(n+1). Her bölüm
+    S0 terminal dışı,T=∞. t=0,1,... sırasında t<T ise At~b seç,ρt=π(At|St)/b(At|St) sakla,Rt+1/St+1 gözle;terminalseT=t+1.
+    τ=t−n+1. τ≥0 ise h=min(τ+n,T),G=0(h=T) veyaV(Sh). k=h−1,...,τ geriye:
+
+
+    $$G\leftarrow\rho_k[R_{k+1}+\gamma G]+(1-\rho_k)V(S_k).$$
+
+
+    Sonra $V(S_\tau)\leftarrow V(S_\tau)+\alpha[G-V(S_\tau)]$. τ=T−1 olana kadar flush et;sonrasında yeni
+    bölüm. Dışarı ikinciρ yok. Durum değerinde terminal ödülünü üreten son eyleminρ değeri de gerekir;
+    Q-CV''nin son-adım özel dalıyla karıştırmayın. x6 bu yordamı sonlu zincirde çalıştırır.'
+  rubric:
+  - S/R/ρ saklama ve kapsama var
+  - τ≥0,ufuk/terminal ve flush doğru
+  - State CV son eylem oranını koruyor
+  - Dış oran çift uygulanmıyor
+  hints:
+  - G_h tabanını kurup k yönünde geriye yürüyün.
+- id: p30
+  title: State CV hedefinin ağırlıklı TD toplamı
+  type: kanıt
+  level: 2
+  goal: State CV hedefinin ağırlıklı TD toplamı
+  needs: 7.1 ve7.13 sabit-tablo koşulu
+  q: 'V değişmezken (7.13) politika dışı n-adım getirisini durum temelli TD hatalarının (6.5) tam ve kompakt
+    toplamı olarak yazın.
+
+
+    Kaynak: Sutton ve Barto (2018), s.151, Alıştırma 7.8.'
+  solution: '$D_t=G_{t:h}-V(S_t)$,$\delta_t=R_{t+1}+\gamma V(S_{t+1})-V(S_t)$ ve h=min(t+n,T). (7.13)
+    doğrudan
+
+
+    $$D_t=\rho_t[\delta_t+\gamma D_{t+1}]$$
+
+
+    verir. Nonterminal ufukta G_h=V(Sh),terminalde her ikisi0 olduğundan D_h=0. Özyinelemeyi açın:
+
+
+    $$G_{t:h}-V(S_t)=\sum_{k=t}^{h-1}\gamma^{k-t}\left(\prod_{i=t}^{k}\rho_i\right)\delta_k.$$
+
+
+    İlkρt dahil;her sonraki hata için yalnız gerekli önek oranı vardır. π=b ile sıradan TD toplamı döner.
+    Değişen V için aynı sabit-tablo sadeleşmesini varsaymayın.'
+  rubric:
+  - D özyinelemesi doğru
+  - İlkρt ve üst h−1 doğru
+  - Ufuk/terminal tabanı0
+  - On-policy sınır kontrolü
+  hints:
+  - Hedeften V çıkarıp ortakρ çarpanını alın.
+- id: p31
+  title: CV ile aynı veriden daha hızlı tahmin deneyi
+  type: kod
+  level: 2
+  goal: CV ile aynı veriden daha hızlı tahmin deneyi
+  needs: n-adım IS,karar başına CV ve deney ölçütleri
+  q: 'Küçük bir politika dışı tahmin problemi kurun. (7.13)+(7.2) yönteminin, basit (7.1)+(7.9) yönteminden
+    daha veri verimli olabildiğini programlayarak gösterin.
+
+
+    Kaynak: Sutton ve Barto (2018), s.151, Alıştırma 7.10.'
+  solution: 'x6: dört durumlu zincir,iki eylem de bir sonraki duruma gider,yalnız son ödül1;γ1 ve gerçekV=(1,1,1,1).
+    b=(.5,.5),π=(.9,.1),n4,α.1,V0. Aynı eylem dizileriyle1000 bağımsız tekrar×100 bölüm çalıştırılır.
+    Her bölüm sonrasında dört durumun MSE değeri ortalanır. Labın tohum1 koşusunda son MSE tam oran6.00438×10⁻⁷,CV7.18060×10⁻⁹;ilk
+    MSE≤.001 bölümleri45/39. SE bağımsız tekrarlar arasındadır. CV,öğrenilmiş gelecek tabanları kullanarak
+    yararsız gelecek oranlarının gürültüsünü azaltır. Zincirde tekrar yok;gelecek tabanlar bu bölümün
+    sonraki eylemlerinden bağımsızdır. n1 veπ=b sınırlarında iki güncelleme eşit olmalı. Bu belirli görev/α
+    koşulu veri avantajı gösterir;her problem ve tabanda üstünlük değildir. α taramasıyla sağlamlığını
+    ayrıca araştırın.'
+  rubric:
+  - Problem/hedef/gerçekV açık
+  - Aynı veri ve iki doğru güncelleme
+  - MSE,tekrar ve bütçe açık
+  - n1/on-policy sınırları denetlendi
+  - Sonuç özel görevin kapsamıyla yorumlandı
+  hints:
+  - Eylemlerin etkisi aynıyken hedef/davranış olasılıklarını farklı tutun.
 pitfalls:
 - wrong: TD yanlı olduğu için yanlış değere yakınsar.
   right: TD'nin yanlılığı hedefin henüz yanlış olan tahmini kullanmasından gelir ve öğrenme ilerledikçe
@@ -1040,6 +1374,8 @@ pitfalls:
 - wrong: Sonsuz varyans ordinary IS tutarsızlığını kanıtlar.
   right: Örnek5.5 için E|X|=1; güçlü büyük sayılar yasası yakınsamayı sağlar. Sonlu varyans hız garantisi
     kaybolur.
+- wrong: Saklı TD hataları toplamı,değerler değişirken n-adım hedef hatasıyla aynıdır.
+  right: n1 dışında tablo sürümleri fark yaratır;aynı veriyle küçükαyararı veya büyükαkararsızlığı görülebilir.
 whatif:
 - q: Ödüller rastgele olsaydı (aynı geçişte farklı ödüller)?
   a: 'İki yöntem de değişmeden çalışır: MC getirileri, TD tek adımlık hedefleri ortalar; ödül gürültüsü

@@ -2,7 +2,7 @@ id: m11-5-sarsa-q
 code: M11.5
 title: Modelden bağımsız kontrol — SARSA, Q-öğrenme, keşif
 phase: 11
-minutes: 700
+minutes: 790
 prereq:
 - m11-4-mc-td
 summary: 'Değerlendirmeden kontrole: V yerine Q(s,a) öğren, çünkü açgözlü politikayı Q''dan model olmadan
@@ -22,6 +22,8 @@ goals:
 - İki kaynak yarış pistinde segment fiziği ve gerçek MC; indirim duyarlı Q güncellemesi
 - 'Sutton Bölüm6: SARSA/Q eylem seçim zamanlaması, GLIE ve dört kontrol kutusu'
 - King hamleleri/stokastik rüzgâr; tam kaynak bütçeli uçurum; double roller ve afterstate maliyeti
+- n-adım SARSA/Expected/IS/Tree/Qσ ve oranların tam sınırları
+- Kaynak7.4/7.6/7.7/7.9/7.11;kontrol değişkeninin koşullu beklentisi
 sources:
 - title: 'Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 5.3 ve 6.4–6.7'
   url: http://incompleteideas.net/book/the-book-2nd.html
@@ -105,6 +107,9 @@ extras:
   engine: browser
 - id: x6
   title: King hamleleri ve stokastik rüzgâr — Sutton6.9/6.10
+  engine: browser
+- id: x7
+  title: 'n-adım Q: IS/CV/Tree/Qσ ve terminal sınırları'
   engine: browser
 quiz:
 - q: Uçurum yürüyüşünde (ε = 0.1) Q-öğrenme uçurumun kenarından giden yolu öğrenir ama eğitim sırasında
@@ -549,6 +554,67 @@ labs:
   limits: 7×10 harita,kaynak sütundan rüzgâr,γ1,her geçiş−1,Q0. Stokastik değişim yalnız pozitif rüzgârlı
     sütunlarda;bitmemiş son parça ayrıca raporlanır. Gösterilen yörünge500,değerlendirme10000 adımlık
     bütçeli;bitmeyenler sayılır ve bitenlerin koşullu ortalaması tam beklenti diye verilmez.
+- id: l7
+  lab: multistepbackup
+  title: 'Kaynak7.11/7.14/7.16/7.17: hedefleri tek yolda aç'
+  goal: Oran sınırları,terminal ve Qσ-CV katsayılarını hesapla.
+  predict:
+    q: (7.17) biçiminde σ1,düz SARSA ile her örnek yolda aynı mı?
+    options:
+    - t: Kontrol-değişkenli7.14 biçimidir;örnek-başına düzSARSA eşitliği gerekmez.
+      ok: true
+      why: n1nonterminal sınırında bu biçim Expected hedefini verir.
+    - t: İçρ varken dışarı ikinciρ da çarpılmalı
+      why: Bu çift ağırlama tam iki-sonuç örneğinde beklentiyi1.5 yerine2.25 yaptı.
+  presets:
+  - name: Dört-adım Qσ-CV
+    params:
+      n: 4
+      gamma: 0.9
+      p: 0.75
+      sigma: 0.5
+      terminal: 0
+    note: 'Kendi sabitQ/ödül/eylem dizimiz. Ölçülen: 7.17 Q(σ) kontrol değişkeni = 2.2350852; Kaynak G=0
+      satırı aynen uygulanırsa = 1.9314788.'
+  - name: 'σ0: Tree sınırı'
+    params:
+      n: 4
+      gamma: 0.9
+      p: 0.75
+      sigma: 0
+      terminal: 0
+    note: 'Qσ veTree hedefleri eşleşir. Ölçülen: 7.17 Q(σ) kontrol değişkeni = 2.2372012; Kaynak G=0 satırı
+      aynen uygulanırsa = 2.1772295.'
+  - name: 'σ1: Q-CV sınırı'
+    params:
+      n: 4
+      gamma: 0.9
+      p: 0.75
+      sigma: 1
+      terminal: 0
+    note: 'Qσ ve7.14CV hedefleri eşleşir. Ölçülen: 7.17 Q(σ) kontrol değişkeni = 2.3588594; Kaynak G=0
+      satırı aynen uygulanırsa = 1.3993131.'
+  - name: Bir adım,nonterminal
+    params:
+      n: 1
+      gamma: 0.9
+      p: 0.75
+      sigma: 0.5
+      terminal: 0
+    note: 'Doğru ufuk tabanı Expected hedefini verir;G0satırı farkı görünür. Ölçülen: 7.17 Q(σ) kontrol
+      değişkeni = 2.35; Kaynak G=0 satırı aynen uygulanırsa = 1.7425.'
+  - name: Dördüncü geçişterminal
+    params:
+      n: 4
+      gamma: 0.9
+      p: 0.75
+      sigma: 0.5
+      terminal: 1
+    note: 'A_T veyaρ_T yok;son hedef gerçeködül. Ölçülen: 7.17 Q(σ) kontrol değişkeni = 2.0015418; Kaynak
+      G=0 satırı aynen uygulanırsa = 2.0015418.'
+  questions: []
+  limits: Sabit tablolar üzerinde gerçek yedekleme hesabı;öğrenme benzetimi değildir. İçρ kullananCVbiçimlerinde
+    dışoran1. KaynakQσ-CV ile düzSARSA uçları karıştırılmaz;X7 çalışan tahmin kodudur.
 practice:
 - id: p1
   type: çözülmüş
@@ -957,6 +1023,156 @@ practice:
     Ondan çıkan bütün olası sonraki eylemler siyah yapraklardır. Yaprakların üstündeki yay maksimum seçimini
     belirtir;olasılık ortalaması değildir. Expected SARSA aynı yaprakları politika olasılıklarıyla tartar,yay
     kullanmaz. Şekil 4 kendi Q=(0,1,2),R1,γ0.9 örneğinde Q hedefi 2.8,ε0.2 Expected hedefi 2.62 hesaplar.
+- id: p19
+  title: Değişen Q ile tam yeni TD hatası
+  type: kanıt
+  level: 2
+  goal: Değişen Q ile tam yeni TD hatası
+  needs: Teleskopik toplam ve Q zaman sürümleri
+  q: '(7.4) n-adım SARSA getirisinin,tablo değişse de şu tam özdeşliğini (7.6) kanıtlayın. $h=\min(t+n,T)$:
+
+
+    $$G_{t:t+n}=Q_{t-1}(S_t,A_t)+\sum_{k=t}^{h-1}\gamma^{k-t}[R_{k+1}+\gamma Q_k(S_{k+1},A_{k+1})-Q_{k-1}(S_k,A_k)].$$
+
+
+    Kaynak: Sutton ve Barto (2018), s.148, Alıştırma 7.4.'
+  solution: Köşeli parantezdeki yeni hata,sonraki çiftte Q_k ama mevcut çiftte Q_{k−1} kullanır. Toplamdaki
+    pozitif $\gamma^{k-t+1}Q_k(S_{k+1},A_{k+1})$ terimi,bir sonraki k satırının negatif terimiyle aynı
+    tablo sürümünde sadeleşir. Baştaki−Q_{t−1} dışarıdaki başlangıçla gider. Kalan ödül toplamı ve $\gamma^{h-t}Q_{h-1}(S_h,A_h)$
+    tam(7.4). h=T olduğunda terminalQ0;A_T seçmek gerekmez. Bu yeni hata,olağan SARSA hatasıyla aynı tablo-sürümü
+    seçimi değildir.
+  rubric:
+  - Komşu terimler aynı sürümle eşlendi
+  - BaşlangıçQ_t−1 doğru
+  - SonQ_h−1 ve terminal0 açık
+  hints:
+  - k+1 satırındaki negatif Q sürümüne bakın.
+- id: p20
+  title: Kontrol değişkeni beklentiyi neden değiştirmez?
+  type: kanıt
+  level: 2
+  goal: Kontrol değişkeni beklentiyi neden değiştirmez?
+  needs: Koşullu beklenti,IS kapsaması ve donmuş taban
+  q: '(7.13) ve (7.14) içindeki kontrol değişkeninin getiri beklentisini değiştirmediğini kanıtlayın;
+    gerekli koşullamayı belirtin.
+
+
+    Kaynak: Sutton ve Barto (2018), s.151, Alıştırma 7.6.'
+  solution: 'Eylem çekilmeden önceki uygun geçmişe koşullanın;tablo veπ/b o koşullamada sabit olsun,kapsama
+    sağlansın. $E_b\rho=\sum_a b(a)\pi(a)/b(a)=1$,dolayısıyla $E_b[(1-\rho)V(s)]=0$. Q için
+
+
+    $$E_b[\bar V(s)-\rho Q(s,A)]=\bar V(s)-\sum_a\pi(a\mid s)Q(s,a)=0.$$
+
+
+    Özyinelemede kule özelliğiyle bu sıfır beklentili ekler her seviyede aynı hedef beklentisini korur.
+    Gelecekte eyleme bakarak değiştirilmiş tabloyu otomatik bağımsız sayamayız. Örnek:b=(.5,.5),π=(.75,.25),V=1_{A0}
+    ise E[(1−ρ)V]=−.25. Bu koşulsuz bir ispat değildir. Ortalama0 eklenmesi tek başına her tabanda varyans
+    azalması da garanti etmez.'
+  rubric:
+  - Eρ1 koşullu ispatlandı
+  - State/Q iki terim ayrı işlendi
+  - Kule özelliği kullanıldı
+  - Uyarlanan tablo ve varyans sınırı açık
+  hints:
+  - Toplamı davranış eylemleri üzerinde açık yazın.
+- id: p21
+  title: Q-CV sözde-kodunda iki bitiş koşulu
+  type: kod
+  level: 3
+  goal: Q-CV sözde-kodunda iki bitiş koşulu
+  needs: 7.14 Q-CV özyinelemesi
+  q: '(7.14) politika dışı eylem-değer tahmininin sözde-kodunu yazın. Ufka varmak ile gerçek bölüm sonuna
+    varmak için farklı özyineleme koşullarına özellikle dikkat edin.
+
+
+    Kaynak: Sutton ve Barto (2018), s.151, Alıştırma 7.7. Kaynakta yıldızlı.'
+  solution: 'π sabit,b kapsayan,Q keyfî,α/n seç. S/A/R/ρ için mod(n+1) tampon. Başlangıç S0terminal dışı,A0~b,T∞.
+    t<T iken geçişi gözle;terminalseT=t+1,aksi halde A_t+1~b veρ_t+1=π/b sakla. τ=t−n+1 veτ≥0 için h=min(τ+n,T).
+    h<T ise G=Q(Sh,Ah);h=T iseG=0. k=h−1,...,τ geriye:
+
+
+    - k=T−1 ise G=R_T;terminalA_T veyaρ_T aranmaz.
+
+    - Diğer k için $G=R_{k+1}+\gamma\{\bar V(S_{k+1})+\rho_{k+1}[G-Q(S_{k+1},A_{k+1})]\}$.
+
+
+    $Q(S_\tau,A_\tau)+=\alpha[G-Q(S_\tau,A_\tau)]$;dışarı ikinciρ yok. τ=T−1 olana kadar flush. x7 kind=cv
+    bu sınırları çalıştırır. Ufukta G=barV kullanmak burada tanımlanan7.14 sınırı değildir;terminaldeyse
+    yalnız gerçek son ödül vardır.'
+  rubric:
+  - NonterminalG_h=Qa
+  - Gerçek terminalsonhedefRT
+  - A_T/ρ_T yok
+  - τ/flush ve dışρ yok
+  hints:
+  - Son gerçek geçişi ayrı yazıp özyinelemeyi bir adım geri açın.
+- id: p22
+  title: Q-CV için Expected TD hata toplamı
+  type: kanıt
+  level: 2
+  goal: Q-CV için Expected TD hata toplamı
+  needs: 7.8 ağırlıklı toplam ve Expected SARSA
+  q: '(7.14) getirisini,tablo değişmezken Expected SARSA TD hatalarının (6.9) toplamı olarak tam yazın;önceki
+    durum-değer sorusunu Q için tekrarlayın.
+
+
+    Kaynak: Sutton ve Barto (2018), s.151, Alıştırma 7.9.'
+  solution: '$D_t=G_{t:h}-Q(S_t,A_t)$ ve $\delta_t^{ES}=R_{t+1}+\gamma\bar V(S_{t+1})-Q(S_t,A_t)$. (7.14)
+    ile
+
+
+    $$D_t=\delta_t^{ES}+\gamma\rho_{t+1}D_{t+1}.$$
+
+
+    Ufukta G_h=Q_h,terminalde0 olduğundan D_h=0. Açılım:
+
+
+    $$G_{t:h}-Q(S_t,A_t)=\sum_{k=t}^{h-1}\gamma^{k-t}\left(\prod_{i=t+1}^{k}\rho_i\right)\delta_k^{ES}.$$
+
+
+    İlk hata için boş çarpım1;ρt yok,çünkü ilk eylem koşullanmış. Son hata h−1,son çarpanρ_h−1. n1 bu
+    CV biçiminde Expected hatasıdır. SabitQ/π koşulu sadeleşmenin parçasıdır.'
+  rubric:
+  - Expectedδ doğru
+  - İlk eylem oranı dışarıda
+  - Boş çarpım/ufuk/terminal doğru
+  - Özyineleme ile açılım bağlandı
+  hints:
+  - G−Q farkını tek adımda ayırın.
+- id: p23
+  title: Ağacın yaprakları ile Expected TD toplamı
+  type: kanıt
+  level: 2
+  goal: Ağacın yaprakları ile Expected TD toplamı
+  needs: DonmuşQ,tree backup ve Expectedδ
+  q: 'Q değişmezken (7.16) tree-backup getirisinin şu biçimini gösterin. $h=\min(t+n,T)$:
+
+
+    $$G_{t:t+n}=Q(S_t,A_t)+\sum_{k=t}^{h-1}\delta_k^{ES}\prod_{i=t+1}^{k}\gamma\pi(A_i\mid S_i).$$
+
+
+    Burada δ Expected SARSA hatası,barV(7.8) olsun.
+
+
+    Kaynak: Sutton ve Barto (2018), s.153, Alıştırma 7.11.'
+  solution: 'Yan eylemlerin toplamını $\bar V(S_{t+1})-\pi(A_{t+1}|S_{t+1})Q(S_{t+1},A_{t+1})$ olarak
+    ayırın. $D_t=G_{t:h}-Q(S_t,A_t)$ için
+
+
+    $$D_t=\delta_t^{ES}+\gamma\pi(A_{t+1}\mid S_{t+1})D_{t+1}.$$
+
+
+    D_h=0 tabanıyla tekrarlı açılım verilen toplamı verir. İlk hata katsayısı1,sonraki her hata omurgadaki
+    önceki eylemlerinπ olasılıklarıyla ağırlanır. h=T ise sonδ gerçekRT−Q ve terminalbarV0 kullanır. Bunlarρ
+    önem oranları değildir;davranışın olasılığı hesapta bulunmaz.'
+  rubric:
+  - Yan toplam doğru ayrıldı
+  - D özyinelemesi ve tabanı0
+  - Her ağırlık doğruπ ürünü
+  - TerminalveIS ayrımı açık
+  hints:
+  - 7.9 ispatındakiρ katsayısını ağaçtakiπ ile karşılaştırın.
 pitfalls:
 - wrong: Q-öğrenmenin Q*'a yakınsaması için davranış politikası sonunda açgözlü olmalıdır.
   right: Q-öğrenme politika dışıdır; her (s, a) sonsuz kez denenir ve Robbins–Monro koşulları sağlanırsa
@@ -978,6 +1194,9 @@ pitfalls:
 - wrong: γ<1 indirim duyarlı kontrolünde hedef dışı eylem görünce bütün geriye tarama kesilir.
   right: Daha kısa ufuklar o eylemi içermeyebilir; yalnız ilgili iç ufuk çarpımını kes, dış zaman taramasını
     sürdür.
+- wrong: Politika dışı nSARSA son bootstrap eyleminin önem oranını kullanmaz.
+  right: Ordinary SARSA7.11nonterminalA_t+n içinρ faktörünü içerir;Expected son eylemi topladığı için
+    bir faktör az kullanır.
 whatif:
 - q: Keşif hiç yapılmasaydı ama Q iyimser (büyük) değerlerle başlatılsaydı?
   a: 'Her denenen eylemin değeri gerçeğe doğru düşer ve ajan henüz denenmemiş, hâlâ iyimser değerli eylemlere

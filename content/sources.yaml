@@ -45,6 +45,7 @@ groups:
       - {key: td-1988-proof, title: "Sutton (1988) — TD Teorem2,dizi sonunda güncelleme (yalnız kanıt atfı)", url: "https://jmvidal.cse.sc.edu/library/sutton88a.pdf", license: "©;lisans doğrulanmadı", use: link, verified: false}
       - {key: sarsa-2000-proof, title: "Singh ve ark.(2000) — tek-adımlı politika üstü RL yakınsaması (yalnız kanıt atfı)", url: "https://sites.ualberta.ca/~szepesva/papers/singh98convergence.pdf", license: "©;lisans doğrulanmadı", use: link, verified: false}
       - {key: expected-sarsa-2009, title: "van Seijen,van Hasselt,Whiteson,Wiering (2009) — Expected SARSA (doğrulama atfı)", url: "https://www.ai.rug.nl/~mwiering/GROUP/ARTICLES/expected_sarsa.pdf", license: "©;lisans doğrulanmadı", use: link, verified: false}
+      - {key: qsigma-2018-check, title: "De Asis ve ark.(2018) — Multi-Step Reinforcement Learning (farklı Qσ biçimi için doğrulama atfı)", url: "https://cdn.aaai.org/ojs/11631/11631-13-15159-1-2-20201228.pdf", license: "©;lisans doğrulanmadı", use: link, verified: false}
       - {key: b3b1, title: "3Blue1Brown — Essence of Linear Algebra", url: "https://www.3blue1brown.com/topics/linear-algebra", license: "©", use: link}
   - title: Türkçe kaynaklar
     items:

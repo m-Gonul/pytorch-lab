@@ -26,7 +26,7 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: İlk6 bölüm işlendi;bu bölümün yayın CI ayrıca izlenir. Bölüm7–17,ön/arka materyal ve kısım ayırıcıları
+  note: İlk7 bölüm işlendi;bu bölümün yayın CI ayrıca izlenir. Bölüm8–17,ön/arka materyal ve kısım ayırıcıları
     henüz tümüyle işlenmedi;kitap tamamlanmadı.
   processed_chapters:
   - 1
@@ -35,8 +35,8 @@ progress:
   - 4
   - 5
   - 6
-  unprocessed_chapters:
   - 7
+  unprocessed_chapters:
   - 8
   - 9
   - 10
@@ -687,7 +687,7 @@ chapters:
   - m11-5-sarsa-q
   mapping_status: Bütün134 kaynak biriminin ders/kart/lab/el hesabı hedefleri doğrulandı;bağımsız ikinci
     okuma tamamlandı.
-  content_status: işlendi;yayın CI henüz çalıştırılmadı
+  content_status: işlendi;CI/Pages başarılı ve canlı içerik doğrulandı
   recorded_units: 134
   source_unnumbered_figures:
   - page: 121
@@ -732,6 +732,17 @@ chapters:
       soru,4 kod,1 tablo,1 dipnot ve tarih notları denetlendi. Son takipte açık somut eksik kalmadı.
     final_followup: Şekil6.2/6.4/6.5 içerikleri ve yalnız6.5/6.7/6.13 alıştırmalarının yıldızları son
       kez doğrulandı.
+  publication:
+    commit: e5e68df40e14793b2cba31a39acf36cc67a8dbe9
+    workflow_run: 43582756902
+    build: success
+    deploy: success
+    live_verified: true
+    live_pages:
+    - https://m-gonul.github.io/pytorch-lab/m11-4-mc-td.html#sutton-td-yakinsama
+    - https://m-gonul.github.io/pytorch-lab/m11-5-sarsa-q.html#sutton-ruzgar
+    evidence: İki canlı HTML üzerinde bölüm6 çapa/kart/deney işaretleri ve yayımlanan windytd/cliff verisi
+      doğrulandı.
 - chapter: 7
   title: n adımlı önyükleme
   pdf_pages:
@@ -844,8 +855,24 @@ chapters:
   candidate_modules:
   - m11-4-mc-td
   - m11-5-sarsa-q
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  mapping_status: 83 kaydın kesin hedefleri ve kaynak derinliği doğrulandı;bağımsız ikinci okuma tamamlandı.
+  content_status: işlendi;yerel testler ve yayın CI ayrıca izlenir
+  recorded_units: 83
+  source_unnumbered_figures:
+  - page: 152
+    pdf_page: 174
+    what: üç-adım tree backup
+  - page: 157
+    pdf_page: 179
+    what: dört-adım V-IS/Qσ özet çifti
+  second_read:
+    independent: true
+    text_pages: 18
+    rendered_pages: 17
+    extra_figure_crops: 1
+    findings_resolved: true
+    note: Ayrı ajan18metin sayfası,17görüntü ve1şekil büyütmesini yalnız kaynak/defter üzerinden okudu;koşul/etiket/ok
+      ayrıntıları tamamlandı. Son4ifade de takipte doğrulandı;açık bulgu yok.
 - chapter: 8
   title: Tablolu yöntemlerle planlama ve öğrenme
   pdf_pages:
@@ -2858,125 +2885,161 @@ page_audit:
   embedded_images: 0
   drawing_paths: 0
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 164
   printed_page: 142
   text_sha256: 368726b81dc698b1f0bd24e054d656e91e55add67931fa35ba3bbff7228dc762
   text_characters: 2415
   embedded_images: 0
   drawing_paths: 166
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 165
   printed_page: 143
   text_sha256: 239ed77bbb746f443bb53b7265a3c06b2870fe26d564b556858e1457679ad209
   text_characters: 3459
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 166
   printed_page: 144
   text_sha256: 9e7c8aa2d5f36935a0636eaf70959d370feb2383845465c5ea4fd1ecee287092
   text_characters: 2670
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 167
   printed_page: 145
   text_sha256: 4882799650e3e47298a25c509d73a0dc1a8e00f8a91c7e2566cd0f59f5866754
   text_characters: 2893
   embedded_images: 2
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 168
   printed_page: 146
   text_sha256: 08f19c54c91312ad71418d7793131bc391af04d7c8d9fe3c6255912bfcdf3ca4
   text_characters: 2111
   embedded_images: 0
   drawing_paths: 210
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 169
   printed_page: 147
   text_sha256: b9d2ef7e127b01eb8193eedb104826d3256b68a85c89b0c8a06d2006ccb9ef1b
   text_characters: 2286
   embedded_images: 0
   drawing_paths: 93
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 170
   printed_page: 148
   text_sha256: f5afac35e1bfba59f2357db7a33a2d4b3128d1a4e86f0f7c21189b778632e7fa
   text_characters: 2980
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 171
   printed_page: 149
   text_sha256: 2c1c8aa6b7e52f295161cd3cea53dd07cc2c95ef7883eff83391d20bf11f23ef
   text_characters: 3020
   embedded_images: 0
   drawing_paths: 4
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 172
   printed_page: 150
   text_sha256: 0c51195fa60ea88f822b1dc8e565a397ef31217da62d6b5c3440738030bb1284
   text_characters: 3446
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 173
   printed_page: 151
   text_sha256: aa7d134855c687322eda52bf2fafe0b81fe333d22ee4f3dda139a8685338c90d
   text_characters: 3620
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 174
   printed_page: 152
   text_sha256: d4213e0aa807c55a10f9b148ee5901abd7240bb4207578bfacc6e7fe4878e3ff
   text_characters: 3319
   embedded_images: 0
   drawing_paths: 67
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 175
   printed_page: 153
   text_sha256: c50d7968eddd1ebe1b6f4e3e85758c4082d35e2c1a3d2e4c66d5ce16c38e767c
   text_characters: 2711
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 176
   printed_page: 154
   text_sha256: 724405c7bbab42552c71d434dbbfa98af3bdd03301380cbb58f7882be4ee9a15
   text_characters: 2432
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 177
   printed_page: 155
   text_sha256: 26f35a561d2d54c30cb60ef2307d091e03b21ff2ec90240592fe1ee5a6aec479
   text_characters: 2886
   embedded_images: 0
   drawing_paths: 263
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 178
   printed_page: 156
   text_sha256: a0d20d22bbedca4a8d503e19dd67f284ece6543bd444a0d2fc153e359ee6e014
   text_characters: 1884
   embedded_images: 0
   drawing_paths: 4
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 179
   printed_page: 157
   text_sha256: c08fb6511804684e80361a3225311f922bfeee1f09e1645d56ff8ba974892a48
   text_characters: 2741
   embedded_images: 0
   drawing_paths: 120
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 180
   printed_page: 158
   text_sha256: 261f5d30193919ef22cf514c01fce2bce03692f4b4b3d5d3d3633680f95a8c34
   text_characters: 1484
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 181
   printed_page: 159
   text_sha256: cc62a7b0bdd0cf15d922d5a0bacd1135034c925a641f64c9c38aa8fb0635f8e5
@@ -12420,6 +12483,711 @@ items:
   what: Afterstate=post-decision state;Van Roy,Bertsekas,Lee,Tsitsiklis(1997),Powell(2011).
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch7-p141-i1
+  page: 141
+  pdf_page: 163
+  kind: bilgi
+  what: MC ile tek-adım TD her görevde en iyi değildir;n-adım arada süreklilik sağlar ve ara yöntemler
+    daha iyi olabilir.
+  status: vardı
+  where: content/modules/m11-4-mc-td/lesson.md#td-lambda
+- id: ch7-p141-i2
+  page: 141
+  pdf_page: 163
+  kind: bilgi
+  what: Tek zaman adımı eylem değiştirme sıklığıyla bootstrap ufkunu zorla bağlar;n-adım hızlı kararı
+    koruyup anlamlı durum değişimi boyunca uzun hedef kurar.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p141-i3
+  page: 141
+  pdf_page: 163
+  kind: bilgi
+  what: Eligibility traces genelde n-adımla tanıtılır;bu baskı konuları ayırıp izleri Bölüm12’ye bırakır;önce
+    sabit politika tahmini,sonra Q ve kontrol. İzler birden çok zaman aralığında aynı anda bootstrap sağlar;geri
+    bakış ve izler Bölüm12’ye ertelenir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-tarih
+- id: ch7-p142-i1
+  page: 142
+  pdf_page: 164
+  kind: bilgi
+  what: MC/TD arasındaki alan sorusunun cevabı iki/üç/dört/n gerçek ödül ve sonraki değerle bootstrap;terminalden
+    önce veya terminale kadar.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p142-i2
+  page: 142
+  pdf_page: 164
+  kind: tanım
+  what: Daha geç tahminle daha erken tahmin farkını öğrenen yöntemler de TD'dir;önceki bölümdekiler bir-adım
+    TD.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p142-i3
+  page: 142
+  pdf_page: 164
+  kind: şekil
+  what: Şekil7.1:1/2/3/n/sonsuz-adım V backup;başlangıç açık durum,örneklenen eylem siyah düğüm,sonlu
+    ufuk açık değer yaprağı,MC dolu kare terminal;genel n veMC kesik devamları. İlk panel etiketi1-adım
+    TD veTD(0).
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+  source_number: '7.1'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/deney ile karşılanır.
+- id: ch7-p142-i4
+  page: 142
+  pdf_page: 164
+  kind: bilgi
+  what: Politikaπ örnek bölümlerindeki S_t,R_t+1,...,R_T,S_T dizisi;eylemler gösterimde atlanır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p143-i1
+  page: 143
+  pdf_page: 165
+  kind: formül
+  what: Tam G_t=Σi=t+1..T γ^(i−t−1)R_i;MC güncelleme hedefi budur.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p143-i2
+  page: 143
+  pdf_page: 165
+  kind: formül
+  what: Bir-adım G_t:t+1=R_t+1+γV_t(S_t+1);iki-adım R_t+1+γR_t+2+γ²V_t+1(S_t+2);alt indisler hedefin kullandığı
+    veri ufkunu gösterir. V_t:S→R,t anındaki vπ tahmin fonksiyonudur.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p143-i3
+  page: 143
+  pdf_page: 165
+  kind: formül
+  what: Denklem7.1 n≥1,0≤t<T−n içinödüller toplamı+γ^n V_t+n−1(S_t+n);eksik getirinin düzeltmesi en güncel
+    tablo sürümündendir.
+  status: genişletildi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p143-i4
+  page: 143
+  pdf_page: 165
+  kind: bilgi
+  what: t+n≥T olduğunda eksik bütün terimler0,G_t:t+n=G_t;terminalde bootstrap yok.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-hedef
+- id: ch7-p143-i5
+  page: 143
+  pdf_page: 165
+  kind: bilgi
+  what: n>1 gelecekteki ödül/durum gerektirir;n-adım hedef ancak R_t+n ve V_t+n−1 görüldükten sonra kullanılabilir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-gecikme
+- id: ch7-p143-i6
+  page: 143
+  pdf_page: 165
+  kind: formül
+  what: 7.2 V_t+n(St)=V_t+n−1(St)+α[G_t:t+n−V_t+n−1(St)];diğer bütün durumlar aynı kalır,0≤t<T.
+  status: genişletildi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-gecikme
+- id: ch7-p143-i7
+  page: 143
+  pdf_page: 165
+  kind: bilgi
+  what: İlk n−1 saat indeksinde değişim yapılmaz;sondaki flush kalan örnekleri günceller.T≥n için sonrasında
+    n−1 güncelleme;T<n özelinde yalnızT gerçek örnek ve boş saatler ayrılır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-gecikme
+- id: ch7-p143-i8
+  page: 143
+  pdf_page: 165
+  kind: alıştırma
+  what: 7.1 V değişmezken7.2 n-adım hatasını TD hataları toplamı biçiminde göster;Bölüm6 MC özdeşliğini
+    genelle. Önceki MC özdeşliğinin tam etiketi6.6.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p26
+  source_number: '7.1'
+- id: ch7-p143-i9
+  page: 143
+  pdf_page: 165
+  kind: alıştırma
+  what: 7.2 Değerler adım adım değişirse depolanmış TD hataları toplamı farklı algoritmadır;daha iyi/kötü
+    oluşunu küçük programlanmış deneyle karşılaştır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p27
+  source_number: '7.2'
+  pages:
+  - 143
+  - 144
+  pdf_pages:
+  - 165
+  - 166
+- id: ch7-p144-i1
+  page: 144
+  pdf_page: 166
+  kind: kod
+  what: n-adımTD:π girdi,α∈(0,1],npozitif,Vkeyfi,S/R mod(n+1),S0terminaldışı,T∞,t<T örnekle/terminalTata,τ=t−n+1,γtoplamı/h<Tbootstrap,tekVsatırı,τ=T−1
+    olana dekflush. Güncelleme bloğuτ≥0 koşuluyla açılır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-gecikme
+- id: ch7-p144-i2
+  page: 144
+  pdf_page: 166
+  kind: formül
+  what: 7.3 en-kötü-durum beklenen n-adım hedef hatası≤γ^n en-kötü V hatası;donmuş V ve uygun koşullama
+    ile Tπ^n kontraksiyonunun ispatı.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-azaltma
+- id: ch7-p144-i3
+  page: 144
+  pdf_page: 166
+  kind: bilgi
+  what: Hata-azaltma özelliği uygun teknik şartlarda doğru tahmine yakınsamayı destekler;MC ve bir-adım
+    uçlardır.γ1 properness ve SA şartları ayrıca gerekir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-azaltma
+- id: ch7-p144-i4
+  page: 144
+  pdf_page: 166
+  kind: örnek
+  what: Örnek7.1 beş-durumlu yürüyüşte ilk bölüm C→D→E→sağterminal,G1,başlangıçV.5;bir-adım yalnız E'yi1
+    yönüne değiştirir. Başvurulan kaynak Örnek6.2,s.125.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-yuruyus
+  pages:
+  - 144
+  - 145
+  pdf_pages:
+  - 166
+  - 167
+- id: ch7-p145-i1
+  page: 145
+  pdf_page: 167
+  kind: örnek
+  what: Aynı bölümde iki-adım D/E,üç-adım veya n>2 C/D/E değerlerini aynı miktarla1 yönüne değiştirir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-yuruyus
+- id: ch7-p145-i2
+  page: 145
+  pdf_page: 167
+  kind: örnek
+  what: Büyük yürüyüş19durum,solsonuç−1,sağ+1,V0;önceki beş-duruma göre değişen koşullar açık.
+  status: vardı
+  where: content/modules/m11-4-mc-td/module.yaml#extra:x3
+- id: ch7-p145-i3
+  page: 145
+  pdf_page: 167
+  kind: şekil
+  what: Şekil7.2:α0…1 ve n1/2/4/8/16/32/64/128/256/512;19durum RMS,ilk10 bölüm ve100 bağımsız tekrar ortalaması;bütün
+    ayarlarda aynı yürüyüşler,ykaynak.25….55;ara n daha iyi. RMS bölüm sonundaki tahminlerden ölçülür;x
+    tikleri0/.2/.4/.6/.8/1,y tikleri.25/.30/.35/.40/.45/.50/.55.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#lab:l6
+  source_number: '7.2'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/deney ile karşılanır.
+- id: ch7-p145-i4
+  page: 145
+  pdf_page: 167
+  kind: bilgi
+  what: Hangi n daha iyi sorusu deneyle yanıtlanır;Şekil7.2 ara n iyiliğinin olabilirliğini gösterir,genel
+    bütün-görev teoremi değildir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#lab:l6
+- id: ch7-p145-i5
+  page: 145
+  pdf_page: 167
+  kind: alıştırma
+  what: 7.3 N19 nedenN5 yerine kullanıldı;daha küçük yürüyüş avantajı başka n değerine kaydırır mı;sol
+    ödül0→−1 değişimi en iyi n seçimini etkiler mi? Üç parça korunur.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p28
+  source_number: '7.3'
+- id: ch7-p145-i6
+  page: 145
+  pdf_page: 167
+  kind: bilgi
+  what: Tahminden kontrole geçiş sorusu:durumları durum-eylem çiftleriyle değiştir veε-greedy politika
+    kullan.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+  pages:
+  - 145
+  - 146
+  pdf_pages:
+  - 167
+  - 168
+- id: ch7-p146-i1
+  page: 146
+  pdf_page: 168
+  kind: tanım
+  what: n-adımSARSA adı;eski algoritma bir-adımSARSA/SARSA(0). Q çiftlerinden çiftlere örnek yolları.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+- id: ch7-p146-i2
+  page: 146
+  pdf_page: 168
+  kind: formül
+  what: 7.4 n-adımQ hedefi nödül+γ^n Q_t+n−1(S_t+n,A_t+n),n≥1,t<T−n;terminal ufukta tamG.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+- id: ch7-p146-i3
+  page: 146
+  pdf_page: 168
+  kind: formül
+  what: 7.5 Q_t+n(St,At)=Q_t+n−1+α(G−Q_t+n−1);öteki durum/eylemlerin hepsi aynı kalır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+- id: ch7-p146-i4
+  page: 146
+  pdf_page: 168
+  kind: şekil
+  what: Şekil7.3:1/2/3/n/sonsuzSARSA backup siyah eylemden başlar/eylemde biter,MC terminalkare;sonpanel
+    n-adımExpectedSARSA'nın son açık durumundan3temsili eylem dalı/πağırlıkları.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+  source_number: '7.3'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/deney ile karşılanır.
+- id: ch7-p147-i1
+  page: 147
+  pdf_page: 169
+  kind: kod
+  what: n-adımSARSA:Qkeyfi,πbaşlangıçεgreedy veya sabit,α∈(0,1],küçükε>0,npozitif,mod(n+1) S/A/R;A0önceden,T∞,t<Tilerle/terminaldeA′seçme,τgecikme,Gkısa/kesilmemiş,hedefπöğreniyorsaεgreedygüncelle,τ=T−1flush.
+    Güncelleme bloğuτ≥0 koşuluyla açılır. Kutu amacı öğrenilenπiçinq*,sabitπiçinqπ tahminidir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+- id: ch7-p147-i2
+  page: 147
+  pdf_page: 169
+  kind: şekil
+  what: Şekil7.4 üç8×10grid:tek17hamleli yörüngeGilebiter,Q0,sadeceGpozitif;bir-adım yalnızson eylemi,10-adım
+    son10eylemidegüçlendirir. Solüst(1,1),koordinat(sütun,satır):S(2,5),G(7,5).17yön→→↑→↑↑→→→↓↓→↓↓←←↑.
+    Tekgüçlenenok(7,6)↑;son10ok(6,2)→,(7,2)→,(8,2)↓,(8,3)↓,(8,4)→,(9,4)↓,(9,5)↓,(9,6)←,(8,6)←,(7,6)↑.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-izgara
+  source_number: '7.4'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/deney ile karşılanır.
+- id: ch7-p148-i1
+  page: 148
+  pdf_page: 170
+  kind: alıştırma
+  what: 7.4 Değişen Q ile7.4 hedefinin Q_t−1+Σγ^(k−t)[R_k+1+γQ_k(S_k+1,A_k+1)−Q_k−1(Sk,Ak)] tam özdeşliğini
+    ispatla;üst min(t+n,T)−1,terminalQ0. İspatlanacak tam özdeşliğin denklem etiketi7.6.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p19
+  source_number: '7.4'
+- id: ch7-p148-i2
+  page: 148
+  pdf_page: 170
+  kind: bilgi
+  what: ExpectedSARSA sorusu:yalnızson örnek eylemi bütünπolasılıklarının beklentisiyle değiştir;önceki
+    ödül/durum/eylemler örnektir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+- id: ch7-p148-i3
+  page: 148
+  pdf_page: 170
+  kind: formül
+  what: 7.7 n-adımExpected hedefi nödül+γ^n barV_t+n−1(S_t+n),t+n<T;aksi haldeG_t.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+- id: ch7-p148-i4
+  page: 148
+  pdf_page: 170
+  kind: tanım
+  what: 7.8 barV_t(s)=Σaπ(a|s)Q_t(s,a),bütüns;terminalbarV0. Sonraki eylem yöntemlerinde beklenen yaklaşıkdeğer
+    kullanılır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sarsa
+- id: ch7-p148-i5
+  page: 148
+  pdf_page: 170
+  kind: bilgi
+  what: Politika dışı hedefπ,veriüretenb;geneldeπgreedy,bε-greedy,dahaçokkeşif;gelecek n eylemin olasılıklarını
+    oranla düzelt. Politika dışı düzeltmenin kaynak içi başvurusu§5.5.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-is
+- id: ch7-p148-i6
+  page: 148
+  pdf_page: 170
+  kind: formül
+  what: 7.9 V güncellemesi α ρ_t:t+n−1 [G−V];öğrenme t+n anında. 7.10 ρ_t:h=Πk=t..min(h,T−1)π(Ak|Sk)/b(Ak|Sk).
+    Oran tanımı ayrıca kaynak5.3 başvurusuna bağlıdır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-is
+- id: ch7-p149-i1
+  page: 149
+  pdf_page: 171
+  kind: bilgi
+  what: Bir hedef olasılığı0isebütünilgili hedefsıfırağırlık;hedeftekarakteristik ama davranıştanadir
+    eylem büyük ağırlık alır. π=b iseoran1,eski TD aynen kapsanır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-is
+- id: ch7-p149-i2
+  page: 149
+  pdf_page: 171
+  kind: formül
+  what: 7.11 Q içinoran ρ_t+1:t+n:ilkAtkoşullanmış/güncelleneneylem,olasılığı yenidenağırlanmaz;bootstrapeylemiA_t+n
+    dahildir,t<T.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-qis
+- id: ch7-p149-i3
+  page: 149
+  pdf_page: 171
+  kind: kod
+  what: Politika dışı nSARSA sözde-kodu:tam destek b girdi,Q/greedyπ veya sabit,α/n,mod(n+1),bileAseçimi/terminal,τ/G/flush,πgreedy
+    güncelle. Kutudakiρüstüτ+n−1 hatalı;7.11ilemin(τ+n,T−1)olarak düzeltildi. τ≥0 bloğu,amaçq*veyaqπ.
+    Sağ kısaltma daρ_τ+1:t+n−1 basılmış;doğruρ_τ+1:τ+n,terminalkırpması7.10ile.
+  status: düzeltildi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-qis
+- id: ch7-p150-i1
+  page: 150
+  pdf_page: 172
+  kind: bilgi
+  what: n-adımExpectedSARSA oranı ρ_t+1:t+n−1:sondurumdaki eylem zaten beklentiyle toplandığı için sonρfaktörü
+    yok;hedef7.7.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-qis
+- id: ch7-p150-i2
+  page: 150
+  pdf_page: 172
+  kind: bilgi
+  what: Daha verimli politika dışı yöntem için Bölüm5.9 karar-başına önem örneklemesi;basit tam oran yüksek
+    varyanslı olabilir. Bölüm7.4 kaynakta yıldızlı ileri konudur.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-cv
+- id: ch7-p150-i3
+  page: 150
+  pdf_page: 172
+  kind: formül
+  what: 7.12 G_t:h=R_t+1+γG_t+1:h,t<h<T;G_h:h=V_h−1(Sh),höncekit+nufku.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-cv
+- id: ch7-p150-i4
+  page: 150
+  pdf_page: 172
+  kind: formül
+  what: 7.13 stateCV G_t:h=ρ_t(R_t+1+γG_t+1:h)+(1−ρ_t)V_h−1(St);G_h:h=V_h−1(Sh),t<h<T;güncelle7.2,dışarıekρyok.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-cv
+- id: ch7-p150-i5
+  page: 150
+  pdf_page: 172
+  kind: bilgi
+  what: ρ0ikensıfırhedefV'yiküçültürdü;CVhedefVveriphiçgüncellemez. İkinci terim kontrol değişkenidir;uygun
+    koşullamada Eρ1 ileortalama0,π=biseasılhedef.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-cv
+- id: ch7-p150-i6
+  page: 150
+  pdf_page: 172
+  kind: alıştırma
+  what: 7.5 7.13+7.2 içinpolitika dışı durum-değer tahmininin tam sözde-kodunu yaz;terminal/ufuk/ringbuffer/flush.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p29
+  source_number: '7.5'
+- id: ch7-p151-i1
+  page: 151
+  pdf_page: 173
+  kind: bilgi
+  what: QöğrenirkenilkAt hedefaltındaimkansızbileolsaardılödül/durumtam ağırlıklıdır;düzeltme ancak sonraki
+    eylemlere gelir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-qcv
+- id: ch7-p151-i2
+  page: 151
+  pdf_page: 173
+  kind: formül
+  what: Q içinbeklentiliözyinelemede G_h:h=barV_h−1(Sh) başlangıçı anılır;7.14kontrol-değişkenli özel
+    özyineleme sınırı aşağıdaQa olarak ayrıca tanımlanır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-qcv
+- id: ch7-p151-i3
+  page: 151
+  pdf_page: 173
+  kind: formül
+  what: 7.14 G=R+γ[ρGsonraki+barV−ρQsonraki]=R+γρ(Gsonraki−Qsonraki)+γbarV;h<T sınırıG_h:h=Q_h−1(Sh,Ah);h=TsonadımG_T−1:T=RT.
+    Güncelle7.5,beklenenSARSA benzeri.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-qcv
+- id: ch7-p151-i4
+  page: 151
+  pdf_page: 173
+  kind: alıştırma
+  what: 7.6 7.13/7.14 kontrol değişkeninin getiri beklentisini değiştirmediğini koşullama ve Eρ1 ile kanıtla.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p20
+  source_number: '7.6'
+- id: ch7-p151-i5
+  page: 151
+  pdf_page: 173
+  kind: alıştırma
+  what: 7.7 yıldızlı:7.14politika dışı Q tahmininin sözde-kodunu yaz;hufku ilebölümsonuterminalözyineleme
+    sınırlarına özellikle dikkat et.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p21
+  source_number: '7.7'
+  source_starred: true
+- id: ch7-p151-i6
+  page: 151
+  pdf_page: 173
+  kind: alıştırma
+  what: 7.8 V değişmezken7.13getirisini6.5 durumTDhatalarının tam kompakt ağırlıklı toplamına dönüştür.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p30
+  source_number: '7.8'
+- id: ch7-p151-i7
+  page: 151
+  pdf_page: 173
+  kind: alıştırma
+  what: 7.9 Aynısını7.14Qgetirisi ve6.9ExpectedSARSA TDhatası için tekrarla.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p22
+  source_number: '7.9'
+- id: ch7-p151-i8
+  page: 151
+  pdf_page: 173
+  kind: alıştırma
+  what: 7.10 Küçük politika dışı tahmin problemi kurup7.13+7.2kontrol-değişkenli algoritmanın7.1+7.9basit
+    algoritmadan daha veri verimli olduğunu programla göster.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p31
+  source_number: '7.10'
+- id: ch7-p151-i9
+  page: 151
+  pdf_page: 173
+  kind: bilgi
+  what: ISsağlam politika dışı öğrenmeyeolanakverir ama yüksekvaryans küçükα ve yavaşlık gerektirebilir;veridahaazilgiliolduğundanonpolicyden
+    yavaşlık olası2018yorumu,teoremdeğil. Kontrol değişkenleri kaynakta varyans azaltma yollarından biri
+    olarak ayrıca anılır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-cv
+- id: ch7-p151-i10
+  page: 151
+  pdf_page: 173
+  kind: kaynakça
+  what: Autostep(Mahmood,Sutton,Degris,Pilarski2012) gözlenen varyansa göre adım büyüklüklerini hızla
+    uyarlama;değişmez güncellemeler(Karampatziakis/Langford2010),TD'ye Tian hazırlıkçalışması2018bağlamı.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-tarih
+- id: ch7-p152-i1
+  page: 152
+  pdf_page: 174
+  kind: kaynakça
+  what: Mahmood2017/Mahmood veSutton2015 usage tekniği olasıçözümolarak2018tarihsel notta geçer;güncelhazırlıktamakaleiddiasıdeğil.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-tarih
+  pages:
+  - 151
+  - 152
+  pdf_pages:
+  - 173
+  - 174
+- id: ch7-p152-i2
+  page: 152
+  pdf_page: 174
+  kind: bilgi
+  what: ISolmadançok-adımlıpolitika dışıöğrenme? TekadımQ/Expectedyapar;n-adıma ağaç geri-taşıma geneller.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p152-i3
+  page: 152
+  pdf_page: 174
+  kind: şekil
+  what: Numarasız3-adımtreebackup:rootSt/At,üçörnekdurum/ödülveikiaraörnekeylemmerkezomurga;herdurumda3temsili
+    ey dalı,ilkiki seviyedeseçilmeyenyan2Qyaprağı,sonseviyebütün3yaprak;etiketSt+1..3,At+1..2,Rt+1..3.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/deney ile karşılanır.
+- id: ch7-p152-i4
+  page: 152
+  pdf_page: 174
+  kind: bilgi
+  what: SeçilmeyeneylemlerdeveriyoksaQilebootstrap;hedef bütün ağacın yapraklarından,omurgadaki içQ değerleri
+    doğrudan katılmaz.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p152-i5
+  page: 152
+  pdf_page: 174
+  kind: formül
+  what: Seviye1yaneylemπ(a|S_t+1);seviye2yaneylemπ(A_t+1|S_t+1)π(a′|S_t+2);seviye3yaprağıtamolarakπ(A_t+1|S_t+1)π(A_t+2|S_t+2)π(a″|S_t+3).
+    İkinci seviyenin seçilmeyen a′ yaprağı üçüncü seviyeye taşınmaz;seçilmiş omurga olasılıkları alt ağacın
+    bütününü ağırlıklar.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p153-i1
+  page: 153
+  pdf_page: 175
+  kind: bilgi
+  what: Üç-adım backup altıyarımadımdır:eylem→durumörneği,durum→eylembeklentisi dönüşümlüdür.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p153-i2
+  page: 153
+  pdf_page: 175
+  kind: formül
+  what: 7.15biradımhedefR+γΣπQ ExpectedSARSA;t<T−1,terminalRT.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p153-i3
+  page: 153
+  pdf_page: 175
+  kind: türetim
+  what: İkiadımhedefyanQtoplamı+γπseçilensonraki(Rsonraki+γΣπQ);toplamıseçilmişdalıayıraraközyinelemeyeçevir.
+    İki-adım türetimi t<T−2 için;bütün Q tablolarıQ_t+1 sürümündedir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p153-i4
+  page: 153
+  pdf_page: 175
+  kind: formül
+  what: 7.16 G_t:t+n=Rt+1+γΣa≠At+1πQ+γπ(At+1|St+1)G_t+1:t+n;Qh−1bütünterimlerde,n≥2,t<T−1;songeçişRT.
+    Güncelle7.5sadeceilgilisatır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p153-i5
+  page: 153
+  pdf_page: 175
+  kind: alıştırma
+  what: 7.11 Q değişmezkenağaçhedefiniQ(St,At)+Σk=t..min(t+n−1,T−1) δES_k Πi=t+1..k γπ(Ai|Si)olarak kanıtla;barV7.8.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p23
+  source_number: '7.11'
+- id: ch7-p154-i1
+  page: 154
+  pdf_page: 176
+  kind: kod
+  what: nTreeBackup:Qkeyfi,πgreedy/sabit,α/n,mod(n+1);davranışkeyfi/olasılığıbilinmedeneylemseçimi;τgecikme,ilkGterminalRTveyasonbeklenti,kmin(t,T−1)..τ+1gerirekürsiyon,tekQsatırı,greedyiyileştir/flush.
+    τ≥0 bloğu;amaçöğrenilenπiçinq*,sabitπiçinqπ. BaşlangıçG:t+1≥TiseRT,aksiR_t+1+γΣπQ(S_t+1). Geri sınır
+    k=min(t,T−1)..τ+1 veödülR_k.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-agac
+- id: ch7-p154-i2
+  page: 154
+  pdf_page: 176
+  kind: bilgi
+  what: Kaynak7.6yıldızlı:üçQalgoritmasınıbirleştirmesorusu;SARSAörnek,Treeheryerdebeklenti,Expectedyalnızsonbeklenti;heradımörnek/beklenti
+    seçimiylebirleşim.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sigma
+- id: ch7-p155-i1
+  page: 155
+  pdf_page: 177
+  kind: şekil
+  what: Şekil7.5 dört4-adımpanel:SARSA4örnekρ,Treeheryerde3temsildal/yanQ,Expectedilk3ρson3yaprakbeklenti,Qσ1/0/1/0sıraylaörnekρ/dal;σdevamlıveyaikili
+    seçimi. ρ işaretleri politika dışı durumda önem örneklemesi gereken yarım geçişleri gösterir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sigma
+  source_number: '7.5'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/deney ile karşılanır.
+- id: ch7-p155-i2
+  page: 155
+  pdf_page: 177
+  kind: tanım
+  what: σt∈[0,1]örnekleme derecesi;1tamörnek,0safbeklenti;durum,eylem,çift fonksiyonu veya rastgele olabilir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sigma
+- id: ch7-p155-i3
+  page: 155
+  pdf_page: 177
+  kind: türetim
+  what: TreehedefiniΣπQ−πQa+πGsonrakiolarakyaz;7.14QCViletekfarkomurgakatsayısıπyerineρ.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sigma
+- id: ch7-p155-i4
+  page: 155
+  pdf_page: 177
+  kind: formül
+  what: 7.17 G_t:h=R+γ[σt+1ρt+1+(1−σt+1)π(A_t+1|St+1)](G_t+1:h−Q_h−1(S_t+1,A_t+1))+γbarV_h−1(St+1).
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sigma
+- id: ch7-p156-i1
+  page: 156
+  pdf_page: 178
+  kind: bilgi
+  what: 7.17t<h≤T;sınırh<TiçinG_h:h=Q_h−1(Sh,Ah),h=TiçinG_T−1:T=RT. İçρvarken7.11dışρyenidenkullanılmaz;kutununα[G−Q]adımıizlenir.
+  status: düzeltildi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sigma
+- id: ch7-p156-i2
+  page: 156
+  pdf_page: 178
+  kind: kod
+  what: Qσkutusu:bpozitifdestek,Qkeyfi,πbaşlangıçεgreedy/sabit,α/küçükε/n;mod(n+1),bilesonrakiA,σveρsakla;τ,geritarama,Qupdatevegreedyπ/flush.
+    NonterminalufuktaG0yerineGH=Qh sınırıyla7.17uyumlu düzeltildi. τ≥0 bloğu;amaçq*veyaqπ. σ_t+1veρ_t+1
+    örnekleme anında seçilir/saklanır;değişenπilegeritaramada yenidenhesap aynıdeğildir. Geri sınır k=min(t+1,T)..τ+1;terminaldal
+    k=T→G=RT.
+  status: düzeltildi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-sigma
+- id: ch7-p157-i1
+  page: 157
+  pdf_page: 179
+  kind: bilgi
+  what: MC/TDarası aileninaraüyeleri çoğugörevdeiyiolabilir;gecikme,ekhesapveS/A/R/σ/ρiçinO(n)kayıtbedeli;izlersonraBölüm12,maliyettemsilveuygulamayabağlıdır.
+    Kaynak n-adımı izli yöntemlerden daha karmaşık fakat kavramsal açıdan açık bulur;izlerle de bir-adıma
+    göre ek hesap sürer.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-kapsam
+- id: ch7-p157-i2
+  page: 157
+  pdf_page: 179
+  kind: şekil
+  what: Numarasızözet2panel:4adımstateTDdörtρvesonVaçık;yandaki4adımQσ örnek1/0/1/0,ikiρveikibeklentidallanması.SırasıylaŞekil7.1/7.5türetimlerinde
+    yeniden karşılanır. Kaynak Qσ ailesinin Expected SARSA veQ-learning genellemesini açık söyler;örnek/contol-variate
+    sınır notu ayrıca verilir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-kapsam
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/deney ile karşılanır.
+- id: ch7-p157-i3
+  page: 157
+  pdf_page: 179
+  kind: bilgi
+  what: ISbasitfakatyüksekvaryans;π/bçokfarklıysaverimlilikaraştırma2018bağlamında.TreenaturalQ-genellemesi,ISyokamahedefindüşükolasılıklıeylemleriçarpımıetkinçok-adımlılığıkısaltır,nbüyükolsabile.
+    Tree yapı stokastik hedef politikalar içinQ-learning doğal çok-adım genellemesi olarak nitelenir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-kapsam
+- id: ch7-p158-i1
+  page: 158
+  pdf_page: 180
+  kind: kaynakça
+  what: Watkins1989n-adımgetirilervehataazaltma;ilkbaskıdakavramoluppratikgörülmüyordu.Cichosz1995veözelliklevanSeijen2016pratikliği
+    gösterdi;ikincibaskıöneçıkarıpgeribakışıBölüm12’ye bıraktı. Geri bakış ve eligibility traces tartışması
+    Bölüm12’ye ertelenir;Bölüm12 sonrası değildir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-tarih
+- id: ch7-p158-i2
+  page: 158
+  pdf_page: 180
+  kind: kaynakça
+  what: 7.1–2rastgele yürüyüşlerSutton1988veSingh/Sutton1996tabanlıbu kitapdeneyleridir;backupdiagramlarıbubölümanlatımındayeni.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-nstep-tarih
+- id: ch7-p158-i3
+  page: 158
+  pdf_page: 180
+  kind: kaynakça
+  what: 7.3–5geliştirmelerPrecup/Sutton/Singh2000,Precup/Sutton/Dasgupta2001,Sutton/Mahmood/Precup/vanHasselt2014çalışmalarına
+    dayanır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-tarih
+- id: ch7-p158-i4
+  page: 158
+  pdf_page: 180
+  kind: kaynakça
+  what: TreebackupPrecup/Sutton/Singh2000kaynaklıdır;kitaptakibu sunumyeni.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-tarih
+- id: ch7-p158-i5
+  page: 158
+  pdf_page: 180
+  kind: kaynakça
+  what: Qσbukitaptayeni;DeAsis,Hernandez-Garcia,Holland,Sutton2017yakınalgoritmalaraçalıştı.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-nstep-tarih
+  note: 2018AAAI/farklıδσ açıklaması dış birincil doğrulama kaynağıdır;bu kitabın bilgi envanterine ek
+    bir olgu diye sayılmaz.
 chapter_counts:
   '1':
     items: 159
@@ -12467,6 +13235,16 @@ chapter_counts:
     code: 4
     tables: 1
     footnotes: 1
+  7:
+    items: 83
+    exercises: 11
+    questions: 0
+    figures: 7
+    numbered_figures: 5
+    unnumbered_figures: 2
+    code: 5
+    tables: 0
+    footnotes: 0
 part_dividers:
 - pdf_pages:
   - 45

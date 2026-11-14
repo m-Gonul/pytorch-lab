@@ -3,7 +3,7 @@ intro: |
 
   **Nasıl denetlendi:** 82 PDF'in metni çıkarıldı (toplam ≈ 31 700 satır); her slayt başlığı ilgili modülün tüm dosyalarında (anlatım, alıştırma, kontrol, kod) aranıp eşleşmeyenler elle incelendi. **Erişim sınırı:** slaytlardaki şekil ve ekran görüntüleri metin olarak okunamadı; yalnız başlık, metin ve formüllerin metne dökülebilen kısmı karşılaştırıldı. Görsel içerikli slaytlar (ör. görüntü örnekleri, mimari çizimleri) konu başlığı üzerinden eşlendi.
 
-  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–6 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108, 109, 114, 116, 117, 119, 121, 122, 123, 128, 129, 132, 133, 134, 142, 143, 144, 145, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159 ve 162) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
+  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–7 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108, 109, 114, 116, 117, 119, 121, 122, 123, 128, 129, 132, 133, 134, 142, 143, 144, 145, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,162 ve164–180) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
 
   **Durumlar:** *kapsandı* — kaynaktaki konu sitede en az aynı derinlikte; *kapsandı + genişletildi* — sitede kaynakta olmayan türetim, alıştırma ya da deney de var; *kısmen* — konu var ama kaynaktaki bir alt başlık bilinçli olarak yüzeysel; *bilinçli olarak farklı* — kaynaktaki araç yerine başka bir araç (ör. Keras yerine PyTorch). Yeni kaynak geldikçe tablo genişletilir; tamamlanmış satırlar geri alınmaz.
 groups:
@@ -261,7 +261,7 @@ groups:
   - title: 'Sutton ve Barto — Reinforcement Learning: An Introduction, 2. baskı (2018)'
     note: 'Yüklenen PDF 548 sayfa. Envanterde 140 numaralı alıştırma, 104 numaralı şekil, 38 kutulu sözde-kod
       listesi var. Sayılar numarasız çizim, tablo ve metin içi algoritmaların tamamlık sayımı değildir. Bölüm
-      1–6 işlendi; kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
+      1–7 işlendi; kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
     rows:
     - src: Sutton ve Barto (2018), Bölüm 1 — Giriş (s. 1–22)
       topics: 5 numaralı alıştırma; 1 numaralı şekil. Numarasız XOX tahtası da işlendi.
@@ -317,14 +317,12 @@ groups:
       status: genis
       gap: —
       done: '134 kaynak birimi:118 eklendi,10 vardı,4 genişletildi,2 düzeltildi. 14 alıştırma ve2 numarasız soru çözüldü;15 yeni kart,1 mevcut el hesabı,1 programlama eki x6. 5 numaralı+9 numarasız görsel,4 kod,1 tablo,1 dipnot;7 hesaplanan SVG grubu,2 yeni deney ve4 mevcut deneyin genişletilmesi. Şekil6.3 tam50000×100 ve10×100000 bütçeleriyle19α×3 yöntem=114 koşulda342 milyon bölüm/13385049857 geçiş. Altı rüzgâr modelinin420 değeri NumPy/JS eşleşti. Sabitα ortalama yakınsaması ve Wiering adı düzeltildi. PDF141–162 bağımsız ikinci okuma,18 görüntü;kitap tamamlanmadı.'
-    - src: Sutton ve Barto (2018), Bölüm 7 — n adımlı önyükleme (s. 141–158)
-      topics: 11 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
-      pages:
-      - m11-4-mc-td
-      - m11-5-sarsa-q
-      status: eksik
-      gap: Kaynağın bu bölümü henüz aktarılmadı; hedefler yalnız konu eşlemesi adaylarıdır.
-      done: Sayfa ve numaralı öğe envanteri çıkarıldı. İçerik kapsamı tamamlanmış sayılmadı.
+    - src: Sutton ve Barto (2018), Bölüm 7 — n adımlı özyükleme (s.141–158)
+      topics: n-adım TD/SARSA/Expected,gecikme ve halka tamponu,hata azaltma,politika dışı oran sınırları,karar başına kontrol değişkeni,Tree backup,Qσ ve tarih.
+      pages: [m11-4-mc-td,m11-5-sarsa-q]
+      status: genis
+      gap: —
+      done: '83 kaynak birimi:76 eklendi,2 vardı,2 genişletildi,3 düzeltildi. 11/11 alıştırma çözümlü;11 yeni kart,3 yeni programlama eki,x3 genişletildi. 5 numaralı+2 numarasız görsel,5 kod;5 hesaplanan SVG grubu ve3 yeni deney. Şekil7.2 tam100 tekrar×ilk10 bölüm bütçesinde10n×21α,210 değer bağımsız Python/JS eşleşti. 7.2 iki tablo-sürümü algoritması,7.10 aynı veride400000geçişli CV deneyi çalıştı. SARSAsonρindeksi,Qσufukbaşlangıcı/ikinciρ düzeltildi;CV/düzSARSA uç ayrımı açık. PDF163–180 bağımsız ikinci okuma,17görüntü+1büyütme. Kitabın bütünü tamamlanmadı.'
     - src: Sutton ve Barto (2018), Bölüm 8 — Tablolu yöntemlerle planlama ve öğrenme (s. 159–194)
       topics: 8 numaralı alıştırma; 11 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
       pages:

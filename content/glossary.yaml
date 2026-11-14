@@ -258,3 +258,16 @@ terms:
     TD kontrol yöntemi. Eylem örnekleme varyansını kaldırır; çevre gürültüsünü bütünüyle kaldırmaz.
   çift öğrenme: Seçim ve değerlendirme rollerini iki kestirim arasında ayırma fikri. Double Q çevrimiçi tabloları
     ortak davranış ve çapraz özyükleme nedeniyle genel olarak bağımsız veya tam yansız değildir.
+
+  n adımlı getiri: n gerçek ödül ve nonterminalse n adım sonraki değer tahmininden oluşan hedef. Bölüm daha erken
+    biterse tam getiriye kesilir.
+  halka tamponu: Sonlu sayıda son kaydı indeks mod tampon-boyutu ile saklayan yapı. n-adım TD,S/A/R için n+1
+    yuva kullanabilir.
+  kontrol değişkeni: Beklentisi bilinen sıfır-ortalama bir terimi kestirime ekleyerek varyansı azaltmaya çalışan
+    yöntem. Uygun koşullama ve iyi taban gerekir;her taban varyansı azaltmaz.
+  ağaç geri taşıma: 'Tree backup: örnek yolun seçilmeyen eylemlerini Q yapraklarından,devam eden dalını hedef
+    politika olasılıklarıyla geri taşıyan çok-adımlı yöntem;davranış olasılığı oranını hesaplamaz.'
+  hata azaltma özelliği: Donmuş V ve uygun yeni örnek koşullamasında ||TπⁿV−vπ||∞≤γⁿ||V−vπ||∞ sınırı. Tek örnek
+    hatasının her zaman küçülmesi veyaγ1 için sıkı daralma değildir.
+  q(σ): Örnekleme ile beklenti katsayılarını σ∈[0,1] ile karıştıran çok-adımlı aile. Kitabın7.17kontrol-değişkenli
+    yazımı,σ1 için7.14Q-CV biçimine iner;düzSARSA ile her yolda aynı hedef değildir.

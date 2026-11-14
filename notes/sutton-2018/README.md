@@ -125,3 +125,31 @@ Bu uzun koşudur:19α×3 yöntem×2 ufuk=114 koşul;ilk100 bölüm her ayarda500
 En iyi ilk100 ortalamaları SARSAα.75:−68.807829,Qα.9:−73.253825,Expectedα1:−44.1558156. Uzunα1 Q−50.8246/Expected−20.7493 bağımsız model sınırlarıyla uyumludur;sonlu10 tekrarınSE bilgisi kayıttadır. C++ kaydı α/evre kontrolüyle görüntülenir;canlı seed/ε değişimi eski cliffwalk deneyinde yapılır. İki yolun anlamı arayüzde açıklanır.
 
 `cliffwalk` kaynağın gerçek terminal çeşidini varsayılan yapar;eski1000 adım kesmeli denemeler ayrı seçenek olarak kalır ve kesme sayısı bildirilir. SARSA A′ eylemini güncellemeden önce devreder;Q/Expected davranış eylemini güncellemeden sonra seçer. Geometrik düşüş noktası çizimi ve eski mutlak üstünlük/bağımsız çift-tablo iddiaları düzeltildi. Kaynaktaki Weiring adı,birincil2009 makalesine göre Wiering olarak düzeltildi. Kaynak2018 araştırma değerlendirmeleri tarihleriyle korunur.
+
+## Bölüm 7
+
+Basılı s.141–158 / PDF163–180. 83 kaynak birimi:11 alıştırma,7 görsel(5 numaralı/2 numarasız),5 kutulu sözde-kod;tablo/dipnot yok. Bağımsız ikinci okuma18 metin sayfası,17 kaynak görüntüsü ve1 büyütmeyi yalnız PDF/defter üzerinden denetledi. Bütün924 kümülatif hedef doğrulandı;ilk7 bölüm işlendi,8–17 ve ön/arka materyal tamamlanmadı.
+
+Beş özgün SVG grubunu ve bağımsız sayısal kayıtları yeniden üret:
+
+```bash
+python3 -I notes/sutton-2018/generate_ch7.py /tmp/sutton-ch7
+OPENBLAS_NUM_THREADS=1 python3 -I notes/sutton-2018/measure_ch7.py /tmp/ch7-python.json
+node notes/sutton-2018/measure_ch7.mjs /tmp/ch7-python.json /tmp/ch7-js.json
+```
+
+Python ve JavaScript ayrı uygulamalardır;bu bölümde **aynı örnek yolları tam karşılaştırmak için** Python tarafında JS Mulberry32 üretecinin bit işlemleri ayrıca yazıldı. Bu özel eşleştirme önceki bölümlerdeki NumPy/random üreteçleri için eşit sayısal tohumun eşit yollar ürettiği anlamına gelmez. Öğrenci x5/x6/x7 ekleri Python `random.Random` kullanır;onların örnekleri bu lab kayıtlarıyla birebir yol eşleştirmesi iddiası taşımaz.
+
+`measurements_ch7_python.json`:kaynak Şekil7.2 koşullarında19durum/sol−1/sağ+1/V0,100 tekrar×ilk10 bölüm;10n×21α=210 koşul. Ortak1000 yürüyüşte96588 gerçek geçiş üretilir ve bütün ayarlarda tekrar kullanılır. αızgarası0…1/adım.05 kendi açık örneklememizdir. Hata önce her bölümün sonundaki19 değerde RMS,sonra bölüm/tekrar ortalamasıdır;son bölüm hatasıyla değiştirilmez. En iyi n4/α.4:0.2683959398,SE.0047680346. Sol0/başlangıç.5 affineşlemesinde bütün210 hata yarıya iner,en büyük dönüşüm farkı1.11×10⁻¹⁶. Başlangıç yine0 kalınca en iyi n16/α.3:0.2701943266. N5,1000 yürüyüş/8944 geçiş koşulunda en iyi n1/α.35:0.2212028739.
+
+7.2 karşılaştırması,her gerçek geçişte güncelleme öncesi saklanan δ hatalarıyla,τ güncellemesinde güncel tablodan hesaplanan n-adım hedefi ayırır. n1 eşleşir;n4 için en iyi saklıδ α.35:0.2733071829,standart hedef α.4:0.2683959398. n4/α.1 saklıδ biraz daha düşük hata verir;bu her ayarda üstünlük değildir. n8/α.8 saklıδ RMS5.9733653×10¹⁹;bu noktalar hesaplardan çıkarılmadı. Birinci karşılaştırma grafiği0…1.2 aralığına odaklanır,ikincisi pozitif hataların tamamını log eksende gösterir. Terminal sonrası flush yeni δ veya yeni çevre adımı üretmez.
+
+7.10 için kendi4durumlu deterministik zincirimiz,b.5/π(.9,.1),γ1,V0,n4,α.1;1000 tekrar×100 bölüm=400000 ortak çevre geçişi. İki eylem aynı sonraki duruma gider,yalnız son ödül1;gerçekV1. Son MSE tam oran6.00438149×10⁻⁷/CV7.18059924×10⁻⁹;bağımsız tekrarlar arasıSE2.6×10⁻⁷/7.6×10⁻¹⁰. İlk MSE≤.001 bölümleri45/39. n1 karşılaştırmasında en büyük fark1.11×10⁻¹⁶;π=b için iki yöntem aynı veMSE=(1−α)^(2E). Durum tekrarı olmadığı için gelecekteki değer tabanları bu bölümün sonraki eylemlerinden bağımsızdır;beklenti ispatı bu açık koşulla yapılır. Kötü veya eylem sonrası seçilen tabanın her zaman varyans azalttığı iddia edilmez.
+
+Kayıt ayrıca3 kaynak düzeltmesinin tam sonuç sayımını içerir:7.11 sonρ faktörüyle beklenen Q katkısı2.5,eksik faktörle3;Qσ ufukG=Qa ile n1 hedef3,basılıG0 ile2/1;7.17 içindeρ kullandıktan sonra ikinci dışρ,iki-sonuç beklentisini1.5→2.25 yapar. KaynakQσ-CV'nin σ1 ucu7.14kontrol-değişkenli biçimdir;düzSARSA7.4 ile her yolda aynı değildir. Doğru n1 sınırı Expected hedefini verir. İlgili2017/2018AAAI karışıkδσ biçimi dış doğrulama kaynağı olarak açık ayrıldı;kitabın bilgi sayımına ek olgu diye katılmadı. Donmuş V için7.3 kontraksiyonu,gelecekteki uyarlanan tabloyu koşulsuz bağımsız saymaz.
+
+`measurements_ch7_js.json`,bütün16 yeni ön ayarın gerçekten çalıştırılmış ölçümlerini ve24 n/σ/terminal yedekleme örneğini saklar. Bütün210 kaynak hata ve63 saklıδ noktası ayrı Python ile karşılaştırıldı; kaynak için en büyük fark1.11×10⁻¹⁵. CV'nin200 hata noktası veσ0Tree/σ1CV/hata-toplamı özdeşlikleri de denetlendi.
+
+SVG üreticisi kaynak Şekil7.4 rotasını17 yasal hücre hareketi olarak doğrular;bir/on-adımda1/10 pozitif Q değişimini hesaplar. Kaynak pozitif ödülün büyüklüğünü vermez;+1/α.5 bizim ölçeğimizdir. Üç-adımTree'nin7 yaprakπ çarpımı1 eder;indirimli ödül/yaprak hesabı hedef3.048625 verir. Sonraki durum terminal olduğunda A_T veyaρ_T yoktur.
+
+Eski x3 API'nin N/gamma parametreleri varken RMS referansı19durum/γ1 olarak sabitti. Varsayılan çağrı ve scalar dönüş korundu;N5/19,sol0/−1,başlangıç veisteğe bağlı history eklendi. Genelγ için Thomas çözümü,16 ayrı NumPy Bellman sistemiyle karşılaştırılır;γ0 veγ1 kapalı sınırlar ayrıca test edilir. Kaynak Şekil7.2 ilk10 ortalaması,x3 eski varsayılanı son-RMS döndürür. x5/x6 veQ hedefleri için x7 tam starter/model/kontrol/Notebook olarak eklendi.
