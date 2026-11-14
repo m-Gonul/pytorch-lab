@@ -1,0 +1,10 @@
+// Shared arithmetic for chapter9; terminal feature is the all-zero vector.
+export const dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0);
+export function solve(A,b,tol=1e-12){const n=b.length,M=A.map((r,i)=>[...r,b[i]]);for(let j=0;j<n;j++){let k=j;for(let i=j+1;i<n;i++)if(Math.abs(M[i][j])>Math.abs(M[k][j]))k=i;if(Math.abs(M[k][j])<tol)throw new Error('Matris tekil veya sayısal olarak çok kötü koşullu.');[M[k],M[j]]=[M[j],M[k]];const p=M[j][j];for(let c=j;c<=n;c++)M[j][c]/=p;for(let i=0;i<n;i++)if(i!==j){const z=M[i][j];for(let c=j;c<=n;c++)M[i][c]-=z*M[j][c];}}return M.map(r=>r[n]);}
+export function smUpdate(inv,x,next,gamma){const y=x.map((a,i)=>a-gamma*next[i]),u=inv.map(r=>dot(r,x)),v=x.map((_,j)=>inv.reduce((s,r,i)=>s+y[i]*r[j],0)),den=1+dot(v,x);if(Math.abs(den)<1e-10)return {ok:false,den};return {ok:true,den,inv:inv.map((r,i)=>r.map((a,j)=>a-u[i]*v[j]/den))};}
+export function walk(r){let s=500;const out=[];while(s>=1&&s<=1000){const old=s,k=1+Math.floor(r()*100);s+=r()<.5?k:-k;out.push([old,s<1?-1:s>1000?1:0,s<1||s>1000?null:s]);}return out;}
+export function phi(s,kind,n,width=.2){return Array.from({length:n+1},(_,i)=>kind===0?s**i:kind===1?Math.cos(Math.PI*i*s):Math.exp(-.5*((s-i/n)/width)**2));}
+export function tileIDs(x,y,n=8,asym=true,width=1){return Array.from({length:n},(_,i)=>`${i}:${Math.floor(x/width+i/n)},${Math.floor(y/width+(asym?3:1)*i/n)}`);}
+export function overlap(a,b){const B=new Set(b);return a.reduce((s,x)=>s+Number(B.has(x)),0);}
+export function emphasis(n,mode,gamma=1){const I=[1,0,0,0],M=[];for(let t=0;t<4;t++)M[t]=mode===0?1:mode===1||n>=4?I[t]:I[t]+(t>=n?gamma**n*M[t-n]:0);return M;}
+export function interestRun(n,mode,episodes,alpha){const w=[0,0],xs=[0],hist=[[0],[0]],M=emphasis(n,mode);for(let e=0;e<episodes;e++){const a=alpha/(e+1)**.6;for(let t=0;t<4;t++){const end=Math.min(4,t+n),G=end-t+(end<4?w[Math.floor(end/2)]:0),g=Math.floor(t/2);w[g]+=a*M[t]*(G-w[g]);}if(e===0||(e+1)%Math.max(1,Math.floor(episodes/100))===0||e===episodes-1){xs.push(e+1);hist[0].push(w[0]);hist[1].push(w[1]);}}return {w,M,xs,hist};}

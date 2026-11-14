@@ -26,8 +26,8 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: İlk8 bölüm işlendi; Bölüm8 yayın CI ayrıca izlenir. Bölüm9–17, ön/arka materyal ve kısım ayırıcıları
-    henüz tümüyle işlenmedi; kitap tamamlanmadı.
+  note: İlk9 bölüm işlendi; Bölüm9 test/yayın ayrıca izlenir. Bölüm10–17, ön/arka materyal, kısım ayırıcıları,
+    tam kaynakça/dizin henüz bütünüyle işlenmedi; kitap tamamlanmadı.
   processed_chapters:
   - 1
   - 2
@@ -37,8 +37,8 @@ progress:
   - 6
   - 7
   - 8
-  unprocessed_chapters:
   - 9
+  unprocessed_chapters:
   - 10
   - 11
   - 12
@@ -986,7 +986,7 @@ chapters:
   - m11-10-planning
   mapping_status: 138 birimin kesin hedefleri doğrulandı; bağımsız ikinci okuma ve iki takipte bütün bulgular
     kapandı.
-  content_status: işlendi; yerel testler tamamlandı, yayın CI ayrıca izlenir
+  content_status: işlendi; CI ve Pages başarılı, canlı içerik doğrulandı
   recorded_units: 138
   source_unnumbered_figures:
   - page: 160
@@ -1048,6 +1048,16 @@ chapters:
       maximum_CPP_difference: 2.82e-12
     note: Son çubuk genişliği düzeltmesi hedef3/3 lab testi ve iki görünümde eksen-içi konum denetimiyle
       doğrulandı; hesap algoritması değişmedi.
+  publication:
+    commit: 04f127c8b7944e77036ef57440d6c48ea9411cdd
+    workflow_run: 43623883475
+    build: success
+    deploy: success
+    live_verified: true
+    live_pages:
+    - https://m-gonul.github.io/pytorch-lab/m11-10-planning.html
+    evidence: Canlı Dyna/RTDP/arama çapaları, p17 ve dynasource/sweepfocus/backupbudget/trajectoryplan
+      yerleşimleri doğrulandı.
 - chapter: 9
   title: Yaklaşımla politika üstü tahmin
   pdf_pages:
@@ -1161,8 +1171,65 @@ chapters:
     source_title: LSTD for estimating ˆv = w>x(·) ⇡v⇡(O(d2) version)
   candidate_modules:
   - m11-6-dqn
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  mapping_status: 208 kaynak birimi kesin hedefe bağlandı; dört mevcut aynı/derin hedef doğrulandı; kaynak/defter
+    bağımsız ikinci okuma kapandı.
+  content_status: işlendi; yerel testler tamamlandı, yayın CI ayrıca izlenir
+  recorded_units: 208
+  source_unnumbered_figures:
+  - page: 221
+    pdf_page: 243
+    what: 'Hash: dört ayrık bölge tek özellik'
+  - page: 235
+    pdf_page: 257
+    what: 'Örnek9.4: dört durumlu ilgi/vurgu zinciri'
+  second_read:
+    independent: true
+    text_pages: 45
+    rendered_pages: 44
+    blank_pages:
+    - 264
+    findings_resolved: true
+    note: Ayrı ajan yalnız PDF219–264 ve208 birimlik defteri okudu;26 denklem,15 numaralı+2 numarasız
+      görsel,5 alıştırma,4 kutu,2 dipnot doğrulandı. Denetimsiz ön eğitim amacı, sigmoid dışı aktivasyonlar,
+      her n için doğrusal yakınsama ve Barto1985 ilişki notu eklendi; son takipte açık bulgu yok. Üretim
+      dosyaları incelenmedi. Kısaltılan birim açıklamalarında13satırın koşulları geri kondu; son dar takipte
+      bütün kaynak/defter bulguları kapandı.
+  measurement_limits:
+  - Kaynak tohumları verilmedi; kendi Mulberry32 tohumlarımız ve eşlenmiş yollarımız kullanıldı.
+  - Şekil9.5 için caption sabit Fourier adımı kullanıldı; önerilen frekans normalizasyonu figür koşulu
+    diye varsayılmadı.
+  - Kare dalgada kaynak kesin aralık/genişlik vermedi; kendi [0,2] alanı ve .2/.4/1 genişlikleri açık.
+    Şekil ve lab farklı açık RNG dizileri kullanır.
+  - Şekil9.2 sol TD eğrisi yakın-asimptotik popülasyon moment çözümüdür, sonlu sabit adım örnek ortalaması
+    değildir.
+  - LeNet sentetik filtre çıktısı kendi çekirdeğimizdir; özgün eğitilmiş ağırlık veya kaynak görüntüsü
+    kullanılmadı.
+  validation:
+    node_tests: 817/817 tam son koşu;5 yeni sayısal test dahil
+    final_site_and_numeric: 12/12
+    final_changed_lab_tests: 21/21
+    module_tests: 1/1 gerçek CPU torch
+    notebook_tests: 1/1 gerçek CPU torch
+    independent_references:
+      CPP_MC_max_difference: 4.2717565595928875e-17
+      CPP_nstep_210_max_difference: 5.10702591327572e-15
+      CPP_bases_8_max_difference: 4.3298697960381105e-15
+      JS_LSTD_NumPy_max_w_difference: 7.549516567451064e-15
+    browser:
+      widths:
+      - 1280
+      - 390
+      presets: 33
+      combinations: 66
+      overflow: 0
+      inline_math_errors: 0
+      javascript_errors: 0
+      duplicate_ids: 0
+      AB_cases: 16
+      image_aspect: Tek ve A/B görünümde kare alanın fiziksel en/boy eşitliği doğrulandı.
+    preservation: Eski hand/stages/quiz/homework ve ilk3ek/2lab/6kart değer eşitliği; önceki1062 defter
+      kaydı aynı. İlgili dört eski teori genellemesi gerekçeyle düzeltildi.
+    final_geometry_lab_tests: 6/6 tilegeneral/interestvalue; son tilegeneral3/3
 - chapter: 10
   title: Yaklaşımla politika üstü kontrol
   pdf_pages:
@@ -3457,322 +3524,414 @@ page_audit:
   text_characters: 2278
   embedded_images: 0
   drawing_paths: 0
-  visual_review: incelenmedi
+  visual_review: başlık/metin, şekil yok
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 220
   printed_page: 198
   text_sha256: 53869883aaf6923173566fca2a209e62908675d0bed4428912c60a7757439c2d
   text_characters: 3517
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 221
   printed_page: 199
   text_sha256: 9b54e261350cbceeeeb4d14c36d0695fe15d8697bc2ba7f149b5072d03b7271c
   text_characters: 3058
   embedded_images: 0
   drawing_paths: 10
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 222
   printed_page: 200
   text_sha256: 6deb80903aca3bec6bfeb5144c607730b7406d3e339088b06579a32bae007ac3
   text_characters: 3645
   embedded_images: 0
   drawing_paths: 12
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 223
   printed_page: 201
   text_sha256: 33f8e49f7ab4d74f5a3e3d1c34b9c67d984ec3d706bb7113c7ca2a781b40b2dc
   text_characters: 3699
   embedded_images: 0
   drawing_paths: 7
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 224
   printed_page: 202
   text_sha256: 0f7ecac08cd8c226b98843b6aec8b6b5e4610940970b041f0bfebe885b8526c6
   text_characters: 3230
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 225
   printed_page: 203
   text_sha256: b7e8a29492eef47a1a9d56ee2d7c91553015d8f81f9e68cd7598642db0906de9
   text_characters: 3074
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 226
   printed_page: 204
   text_sha256: 4ff41d5df2fa9d26ed87d57cfe2da6fcfaff561f3b44cd3ed05c89dea305b14e
   text_characters: 2796
   embedded_images: 2
   drawing_paths: 26
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 227
   printed_page: 205
   text_sha256: 255ef2563cf08126de0ad20078925e0e881c33b2295ba3c000d837fc4f59e9a6
   text_characters: 3108
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 228
   printed_page: 206
   text_sha256: 4ec7d20a160e1825b6d7b6a61cf6df4e0bbc0bc896de92ad56f5a65ddca2ddda
   text_characters: 2992
   embedded_images: 0
   drawing_paths: 4
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 229
   printed_page: 207
   text_sha256: 13dae732472936c1676f67d4c00ffa275385648548b50ae795aba929b68be5e4
   text_characters: 3122
   embedded_images: 0
   drawing_paths: 8
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 230
   printed_page: 208
   text_sha256: e7772c951192d32cddd1302205b35b8e5e06afa4fc5ffd41d8e8881fc912d2bd
   text_characters: 4541
   embedded_images: 4
   drawing_paths: 20
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 231
   printed_page: 209
   text_sha256: cc24251812485f32ef37bed511e2d0884a82155b2e0f930ce34445bbb46012bf
   text_characters: 2385
   embedded_images: 0
   drawing_paths: 5
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 232
   printed_page: 210
   text_sha256: 726f0dfec79ddcc322ce42a67b7aad8215072549aca2ef453fa8997a79ece733
   text_characters: 3637
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 233
   printed_page: 211
   text_sha256: 82cc064d3308a0e6c1d5cfc7e9c330b847d346b13532556350553a992ff0db8c
   text_characters: 3254
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 234
   printed_page: 212
   text_sha256: ea9d840a0d952f52a02969516c39e70b194f444423c9032a9b348948a2617de2
   text_characters: 5977
   embedded_images: 0
   drawing_paths: 259
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 235
   printed_page: 213
   text_sha256: 4b8aed9c7ca50ccc92717954aa0f7b5b0ee8a366ba5d9a85ed206c0e17b09446
   text_characters: 3561
   embedded_images: 17
   drawing_paths: 43
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 236
   printed_page: 214
   text_sha256: 9abd665b337bf25b9a671dd14054ae512028583142072a92c0394bf4d38c592b
   text_characters: 2838
   embedded_images: 2
   drawing_paths: 4
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 237
   printed_page: 215
   text_sha256: a0689e4d486f503405bf39ad46e13d23fa64723bb83d3518f019c73919c48f63
   text_characters: 2335
   embedded_images: 0
   drawing_paths: 80
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 238
   printed_page: 216
   text_sha256: e0af36c0565cc7e0fc7cae6b46fdf1e6d58ed59a3aba53e3dc4aa7dd7db59f23
   text_characters: 2938
   embedded_images: 0
   drawing_paths: 28
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 239
   printed_page: 217
   text_sha256: 0e395700ec29770a0763cecbc3c740b9c570584e5858e4602caad0f1af5cdfdb
   text_characters: 3382
   embedded_images: 0
   drawing_paths: 115
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 240
   printed_page: 218
   text_sha256: f03422954478a4e963f10fabbbbd5f6c70b8dad6f9d0269852182a092049416c
   text_characters: 3253
   embedded_images: 2
   drawing_paths: 4
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 241
   printed_page: 219
   text_sha256: 62f22f1d24203b863d7f97385c56be92e34a7850fa5a0bd1ba7a16fbb04ef89f
   text_characters: 1720
   embedded_images: 0
   drawing_paths: 191
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 242
   printed_page: 220
   text_sha256: 01d6c0535a5b6887f30a1ab94b97a15820fed5262e6ae8a9a4fc985a69cd2874
   text_characters: 3228
   embedded_images: 0
   drawing_paths: 8
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 243
   printed_page: 221
   text_sha256: 3b6d23df47df3cf6d6397218bb1971b527c9a62668eb42cba20ed9e5a6a744c1
   text_characters: 2715
   embedded_images: 0
   drawing_paths: 25
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 244
   printed_page: 222
   text_sha256: cbf37032fb9a10e3798d49d99bc9562425b844b9c2bd7d37283cc5a58b7af25d
   text_characters: 3636
   embedded_images: 0
   drawing_paths: 4
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 245
   printed_page: 223
   text_sha256: 3f4f6fc95cb706f00d58f71af22d1b81e0e8198ad71a5630a72e3339e6d41501
   text_characters: 3340
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 246
   printed_page: 224
   text_sha256: 4e0c4ae6032c5f0f862979a6398ae4d9a7e7678caa194a5f9e068142923d7e82
   text_characters: 2390
   embedded_images: 0
   drawing_paths: 166
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 247
   printed_page: 225
   text_sha256: 64738bd6fec4f20a9374448046d9fe8bc4affd90293712c51279e671144030ad
   text_characters: 3746
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 248
   printed_page: 226
   text_sha256: d06034243b797d44548246e5f3f45a9d15353eb90d96c8fea87ff62e6b9d0dba
   text_characters: 3874
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 249
   printed_page: 227
   text_sha256: 3de6de66da2ca4d01426601a8015b7322986c36eea81201b1ce1ae3b53ee812c
   text_characters: 2997
   embedded_images: 2
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 250
   printed_page: 228
   text_sha256: 7d32a2248fb92662a7a8eb03377253025ecac0e8cfa5b1d849e7e87c214b55b0
   text_characters: 3131
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 251
   printed_page: 229
   text_sha256: dcb1a605cdfd8a6b79942e67a51fed089598ae22295fe283ac23aeb9f8469f0d
   text_characters: 3614
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 252
   printed_page: 230
   text_sha256: 6ee6c4b5415c54ecb94cccd9ef56bf63cbc6adbb1cb290c3fb75af0d3e32d40f
   text_characters: 2737
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 253
   printed_page: 231
   text_sha256: 227ae202bc15176998c6d061b9160161580914ec6f9ea4678f2a9eea87e5d841
   text_characters: 3626
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 254
   printed_page: 232
   text_sha256: 53a6f4178839b61000fb6f91f70a8648f154b00d699b765442e9bca5545eb527
   text_characters: 3346
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 255
   printed_page: 233
   text_sha256: 318a33827665d0a943f1f4eeb2816be6f1967c43a5289189f814825c439c5e16
   text_characters: 3205
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 256
   printed_page: 234
   text_sha256: f7653f65beb03a4c9a14fb3be2c8d75ee72b33e197c7930fc9285cbecda13423
   text_characters: 3155
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 257
   printed_page: 235
   text_sha256: a7b41abfdd92bf196f672d29e99a26c3ba0228416aaaef8008d081051a4f3470
   text_characters: 2834
   embedded_images: 0
   drawing_paths: 25
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 258
   printed_page: 236
   text_sha256: 73350bf73ceed048cb78fdc274435a5c856b8ad69eec8828b1346ee0330cda30
   text_characters: 3658
   embedded_images: 0
   drawing_paths: 4
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 259
   printed_page: 237
   text_sha256: 1d301d3173b467cf1401f025139b4d3c96f4e3ae61e85509bd363f3f9a088bcf
   text_characters: 3263
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 260
   printed_page: 238
   text_sha256: 1b3f9c18a35d654e82969d6fbdb2bf0e54d02d651d75925490ad9d9186335bd6
   text_characters: 3682
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 261
   printed_page: 239
   text_sha256: 01ad9738460a68db32b2ab0cb44608641a7e9ba1248f3a7c1ed8797ea8080b06
   text_characters: 3471
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 262
   printed_page: 240
   text_sha256: 20392891936a1109bf9ed157c16a7f16186a9e353fffe86cd4071cdbd96e9ff9
   text_characters: 3415
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 263
   printed_page: 241
   text_sha256: 3e81923a7fd341266c819f27b20ffb16560999c4dc81e5412a653db80043b1be
   text_characters: 3686
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: sayfa görüntüsü okundu; şekil/etiketler görselden doğrulandı
+  text_review: sayfa metni ve kaynak birimleri okundu
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 264
   printed_page: 242
   text_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   text_characters: 0
   embedded_images: 0
   drawing_paths: 0
-  visual_review: incelenmedi
+  visual_review: boş sayfa
+  text_review: boş sayfa; teknik bilgi yok
+  second_read: bağımsız kaynak/defter ikinci okuma tamamlandı
 - pdf_page: 265
   printed_page: 243
   text_sha256: 84a876bf76d935a26ebfe7a55957dca1faf3bd595f6b8bebcf7457289a5ff3da
@@ -14577,6 +14736,1610 @@ items:
   what: §8.11Coulom2006/KocsisSzepesvari2006öncekiMCplanlamadanMCTS;BrownePowleyWhitehouseLucasCowlingRohlfshagenTavenerPerezSamothrakisColton2012survey;DavidSilverkatkı.
   status: eklendi
   where: content/modules/m11-10-planning/lesson.md#sutton-tarih
+- id: ch9-p197-i1
+  page: 197
+  pdf_page: 219
+  kind: tanım
+  what: Sabit π için on-policy vπ tahmini; d genellikle durum sayısından küçük, w sütun vektörü ve genelleyen
+    vhat(s,w).
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-hedef
+- id: ch9-p197-i2
+  page: 197
+  pdf_page: 219
+  kind: örnek
+  what: Doğrusal katsayılar, sinir ağı bağlantıları veya karar ağacının eşik/yaprakları temsil parametresi
+    olabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-hedef
+- id: ch9-p197-i3
+  page: 197
+  pdf_page: 219
+  kind: bilgi
+  what: Gözlenmeyen bileşenleri birleştiren temsilin kısmi gözlenebilirliğe benzer etkisi; statik model
+    geçmiş belleği eklemez, §17.3. Bu kısımdaki yaklaşım teoremleri, kendi temsil/örnekleme varsayımları
+    altında kısmi gözlenebilirliğe de uygulanır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-hedef
+- id: ch9-p198-i1
+  page: 198
+  pdf_page: 220
+  kind: tanım
+  what: 's↦u eğitim çiftleri: MC getirisi, TD0, n-adım ve DP beklentisi; gerçek veya planlanan durumlar.
+    MC/TD karşılaşılan durumları, DP ise keyfî seçilen durumları günceller.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-hedef
+- id: ch9-p198-i2
+  page: 198
+  pdf_page: 220
+  kind: bilgi
+  what: Yaklaştırmanın tablo hücresinden farklı olarak başka durumların tahminini de değiştirmesi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-hedef
+- id: ch9-p198-i3
+  page: 198
+  pdf_page: 220
+  kind: bilgi
+  what: Sinir ağı, karar ağacı ve regresyon adayları; sabit veri üzerinde çok geçişli yöntemlerin online
+    uygunluğu ayrıca değerlendirilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-hedef
+- id: ch9-p198-i4
+  page: 198
+  pdf_page: 220
+  kind: bilgi
+  what: GPI politika değişimi ve sabit π altında hareketli bootstrap hedefleri; değişimi izleme gereği.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-hedef
+- id: ch9-p199-i1
+  page: 199
+  pdf_page: 221
+  kind: bilgi
+  what: 'Ortak parametreler durum hatalarını bağlar; iyileşme mutlaka başka durumu bozmaz: ortak doğru
+    sabit değer karşı örneği.'
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p199-i2
+  page: 199
+  pdf_page: 221
+  kind: formül
+  what: '9.1: µ≥0,Σµ=1 ile VE ve kökVE; sürekli görevde durağan politika üstü ziyaret ağırlığı.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+- id: ch9-p199-i3
+  page: 199
+  pdf_page: 221
+  kind: formül
+  what: '9.2–9.3: bölüm ziyaretleri η=h+Pᵀη ve µ=η/Ση; başlangıç dağılımının etkisi.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+- id: ch9-p199-i4
+  page: 199
+  pdf_page: 221
+  kind: bilgi
+  what: γ<1 için sanal sonlandırma ve ziyaret denkleminde γ; analizde kullanılan ağırlık ile eğitim dağılımının
+    eşleşmesi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+- id: ch9-p200-i1
+  page: 200
+  pdf_page: 222
+  kind: bilgi
+  what: Sürekli/bölümlü sonuçların koşulları farklı; en küçük VE en iyi politikayı zorunlu sağlamaz, alternatif
+    amaç tartışması2018 bağlamında.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+- id: ch9-p200-i2
+  page: 200
+  pdf_page: 222
+  kind: tanım
+  what: Küresel ve yerel minimum; doğrusal konvekslik ve eşdeğer ağırlıklar, doğrusal olmayan modelde
+    durağan nokta/kararsızlık.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+- id: ch9-p200-i3
+  page: 200
+  pdf_page: 222
+  kind: bilgi
+  what: Bütün denetimli yöntemler yerine basit ve teorisi açıklanabilir gradyan/doğrusal ailelere odaklanma.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+- id: ch9-p200-i4
+  page: 200
+  pdf_page: 222
+  kind: dipnot
+  what: Sütun vektör sözleşmesi, yatay listeyi sütuna çeviren transpoz ve w boyutu.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-amac
+- id: ch9-p201-i1
+  page: 201
+  pdf_page: 223
+  kind: bilgi
+  what: Doğru etiket verilse de sınırlı temsil/genelleme sorunu; örnek dağılımı ile VE ağırlığının eşleşmesi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p201-i2
+  page: 201
+  pdf_page: 223
+  kind: formül
+  what: '9.4–9.6: yarım kare kaybın gradyanı, doğru güncelleme işareti ve sütun kısmi türevler.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p201-i3
+  page: 201
+  pdf_page: 223
+  kind: bilgi
+  what: Bir örneği tek seferde uydurmanın durumlar arası dengeye etkisi; küçük/azalan adımlar ve toplam
+    koşulları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p201-i4
+  page: 201
+  pdf_page: 223
+  kind: bilgi
+  what: Adım toplamları genel yerel minimumu garantilemez; vhat=w², gerçek1,w0=0 sıkı yerel maksimum karşı
+    örneği.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p201-i5
+  page: 201
+  pdf_page: 223
+  kind: tanım
+  what: Gerçek değer yerine rastgele/yaklaşık Ut hedefi; gürültülü etiket veya bootstrap.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p202-i1
+  page: 202
+  pdf_page: 224
+  kind: formül
+  what: '9.7: genel hedefli güncelleme; uygun geçmişe koşullu yansızlık/gürültü varsayımları, yalnız E[U|s]
+    yeterli değildir.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p202-i2
+  page: 202
+  pdf_page: 224
+  kind: bilgi
+  what: Sabit π ve Markov koşullamasında yansız MC getirisi; doğrusal olmayan SGD güvenceleri koşulludur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p202-i3
+  page: 202
+  pdf_page: 224
+  kind: kod
+  what: 'Gradient MC kutusu: tam bölüm, her t için getiri ve güncel w ile diferansiyellenebilir model
+    güncellemesi.'
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p202-i4
+  page: 202
+  pdf_page: 224
+  kind: tanım
+  what: Bootstrap hedefinin w bağımlılığını türevlemeyen yarı gradyan; Barnard1993, hedef her w için zorunlu
+    yanlı değildir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p202-i5
+  page: 202
+  pdf_page: 224
+  kind: bilgi
+  what: Yarı gradyan için ayrı yakınsama teoremi; online/sürekli çalışma ve olası hız avantajı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-sgd
+- id: ch9-p203-i1
+  page: 203
+  pdf_page: 225
+  kind: kod
+  what: 'TD0 algoritma kutusu: π ile geçiş, terminal değer0 ve hemen yarı-gradyan güncellemesi.'
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p203-i2
+  page: 203
+  pdf_page: 225
+  kind: tanım
+  what: 'Durum toplama: grup başına tek ağırlık, bir-sıcak gradyan ve tam grup içi genelleme.'
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p203-i3
+  page: 203
+  pdf_page: 225
+  kind: örnek
+  what: Örnek9.1:1000durum, başlangıç500, ±1..100 sıçramalar1/200; taşmada±1, diğer ödül0,γ1; S1sol.5/S950sağ.25.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p203-i4
+  page: 203
+  pdf_page: 225
+  kind: örnek
+  what: 100000 MC bölümü, α2e−5 ve10grup×100durum; uçlarda yassılaşan gerçek değer ve merdiven tahmini.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p204-i1
+  page: 204
+  pdf_page: 226
+  kind: şekil
+  what: 'Şekil9.1: gerçek değer,10gruplu MC merdiveni ve µ dağılımı/başlangıç sivrisi; kaynak ölçekleri0/.0017/.0137.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p204-i2
+  page: 204
+  pdf_page: 226
+  kind: bilgi
+  what: MC gruplarının ağırlıklı VE minimumuna yaklaşması ve grubun ortak parametresi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p204-i3
+  page: 204
+  pdf_page: 226
+  kind: bilgi
+  what: µ500 yaklaşık%1.37, komşular%0.17, uçlar%0.0147; her bölümde başlangıç ve daha az tekrar ziyaret.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p204-i4
+  page: 204
+  pdf_page: 226
+  kind: bilgi
+  what: µ100>3µ1; sol grubun ağırlıklı değeri yukarı, sağınki aşağı kayar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p204-i5
+  page: 204
+  pdf_page: 226
+  kind: tanım
+  what: x(s) ile w aynı boyutta sütunlar; doğrusal sözü ağırlıklara göre doğrusallıktır.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p205-i1
+  page: 205
+  pdf_page: 227
+  kind: formül
+  what: '9.8: vhat=wᵀx, gradyan x ve doğrusal SGD güncellemesi.'
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p205-i2
+  page: 205
+  pdf_page: 227
+  kind: tanım
+  what: Öznitelik fonksiyonu/değeri ve baz seçimi; bağımsızlık yoksa baz sözcüğünün gevşek kullanımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p205-i3
+  page: 205
+  pdf_page: 227
+  kind: bilgi
+  what: Doğrusal VE konveks, yerel minimum küresel; uygun koşullarla MC minimumu, dejenerasyonda eşdeğer
+    ağırlıklar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p205-i4
+  page: 205
+  pdf_page: 227
+  kind: bilgi
+  what: TD için ayrı teori ve genelde VE minimumundan farklı sabit nokta; teorinin durumu2018 değerlendirmesi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p205-i5
+  page: 205
+  pdf_page: 227
+  kind: formül
+  what: '9.9–9.10: δx açılımı ve donmuş w sürüklenmesi b−Aw; uyarlanan Markov ağırlıklarına koşullama
+    ayrımı.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p206-i1
+  page: 206
+  pdf_page: 228
+  kind: formül
+  what: '9.11–9.12: b=E[Rx],A=E[x(x−γx′)ᵀ],AwTD=b; ters için destek/tam sütun rankı koşulu.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p206-i2
+  page: 206
+  pdf_page: 228
+  kind: türetim
+  what: '9.13: beklenen affine yineleme ve w−wTD hatası; kararlılık için yeterince küçük α.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p206-i3
+  page: 206
+  pdf_page: 228
+  kind: türetim
+  what: A=XᵀD(I−γP)X türetimi; P politika geçişi,Ddiagµ,X satırları xᵀ.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p206-i4
+  page: 206
+  pdf_page: 228
+  kind: bilgi
+  what: µ desteği,γ<1 ve tam sütun rankıyla sıkı pozitiflik; X nulluzayında A tekil olabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p207-i1
+  page: 207
+  pdf_page: 229
+  kind: türetim
+  what: 'Sutton1988/Varga1962 yolu: M+Mᵀ pozitifliği; satır/sütun toplamları(1−γ)µ ve sıkı köşegen baskınlık.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p207-i2
+  page: 207
+  pdf_page: 229
+  kind: bilgi
+  what: Nonsimetrik A,b kayması ve stokastik yakınsamanın ek varsayımları; her α için güvence yok.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p207-i3
+  page: 207
+  pdf_page: 229
+  kind: formül
+  what: '9.14: sürekli γ<1 için VE_TD≤minVE/(1−γ); γ1 episodik göreve doğrudan konmaz, hız/varyans ile
+    bias ayrılır.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p208-i1
+  page: 208
+  pdf_page: 230
+  kind: bilgi
+  what: Politika üstü SGDP aynı TD noktası; SGSARSA Bölüm10, dağılım değişiminde Bölüm11; episodik BT1996/TVR1997
+    koşulları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p208-i2
+  page: 208
+  pdf_page: 230
+  kind: örnek
+  what: 'Örnek9.2: aynı1000durum/10grupta TD''nin daha büyük asimptotik VE değeri; sonlu hız avantajı
+    mümkün.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p208-i3
+  page: 208
+  pdf_page: 230
+  kind: şekil
+  what: 'Şekil9.2: sol TD/gerçek değer, sağ20grup×50,n1..512,α0..1,100koşu×ilk10bölümün ağırlıksız RMS
+    hatası.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p209-i1
+  page: 209
+  pdf_page: 231
+  kind: bilgi
+  what: Tipik sıçrama yaklaşık50, tam ortalama50.5;50durum/grup ile19durumlu tablo görevi benzerliği;
+    µVE yerine eşit durum ağırlığı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p209-i2
+  page: 209
+  pdf_page: 231
+  kind: kod
+  what: 'n-adım kutusu: n+1halka tamponu,τ=t−n+1,T∞,terminalden sonra τ=T−1 olana kadar kalan güncellemeler.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p209-i3
+  page: 209
+  pdf_page: 231
+  kind: formül
+  what: '9.15–9.16: n ödül+γⁿ güncel bootstrap, terminalde kesme ve güncelleme öncesi ağırlıklar.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-yuruyus
+- id: ch9-p209-i4
+  page: 209
+  pdf_page: 231
+  kind: alıştırma
+  what: 'Alıştırma9.1: tablonun doğrusal yaklaşımın özel durumu olduğunu öznitelikleriyle göster.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p7
+- id: ch9-p210-i1
+  page: 210
+  pdf_page: 232
+  kind: bilgi
+  what: 'Özellik seçiminde önbilgi: nesne şekil/renk/boyut/işlev, robot konum/pil/sonar.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p210-i2
+  page: 210
+  pdf_page: 232
+  kind: örnek
+  what: Ayrı açı/hız özellikleri etkileşimi taşımaz; denge çubuğunda göreli yönler ve θω gibi ortak özellik.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p210-i3
+  page: 210
+  pdf_page: 232
+  kind: bilgi
+  what: Sayısal koordinatlar ve polinom interpolasyon/regresyon; basit monomların bu online görevlerdeki
+    sınırlılığı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p210-i4
+  page: 210
+  pdf_page: 232
+  kind: örnek
+  what: İki boyutta2,4ve9özellik örnekleri; sabit terim, etkileşim ve s1²s2² dahil tensor polinomlar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p211-i1
+  page: 211
+  pdf_page: 233
+  kind: formül
+  what: '9.17: ∏s_j^cij,cij0..n; (n+1)^k özellik, koordinat başına derece ve toplam kn ayrımı.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p211-i2
+  page: 211
+  pdf_page: 233
+  kind: bilgi
+  what: Üstel özellik sayısı; önbilgi/otomatik altküme seçimini artımlı ve değişen hedeflere uyarlama.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p211-i3
+  page: 211
+  pdf_page: 233
+  kind: alıştırma
+  what: 'Alıştırma9.2: tensor polinom sayımını göster.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p8
+- id: ch9-p211-i4
+  page: 211
+  pdf_page: 233
+  kind: alıştırma
+  what: 'Alıştırma9.3: dokuz özellik için n ve üs vektörlerini verilen sırayla bul.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p9
+- id: ch9-p211-i5
+  page: 211
+  pdf_page: 233
+  kind: tanım
+  what: Fourier periyoduτ, temel frekans1/τ ve tam sayı sin/cos katları; RL'de bilinmeyen katsayılar öğrenilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p211-i6
+  page: 211
+  pdf_page: 233
+  kind: bilgi
+  what: Sınırlı aperiodik hedefin periyodik uzantısı ve uygun düzgünlük/yakınsama türleri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p212-i1
+  page: 212
+  pdf_page: 234
+  kind: bilgi
+  what: τ2L çift uzantı ile yalnız cos; tek sin uzantısında başlangıç sıçraması, gerekirse iki aile.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p212-i2
+  page: 212
+  pdf_page: 234
+  kind: formül
+  what: '[0,1] için cos(iπs),i0..n; n+1 özellik ve sabit x0.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p212-i3
+  page: 212
+  pdf_page: 234
+  kind: şekil
+  what: 'Şekil9.3: i1/2/3/4 kosinüs eğrileri, s0..1 ve değer−1..1.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p212-i4
+  page: 212
+  pdf_page: 234
+  kind: formül
+  what: '9.18: çok boyutlu cos(πsᵀci); kaynakta son indeks(n+1)^k−1 olmalı, katsayı tuple sayısı değişmez.'
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p213-i1
+  page: 213
+  pdf_page: 235
+  kind: bilgi
+  what: Katsayılarla boyut frekansı/yönü; sıfır katsayı sabitlik, etkileşim ve başka sınırlı uzaya ölçekleme.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p213-i2
+  page: 213
+  pdf_page: 235
+  kind: şekil
+  what: 'Şekil9.4: c=(0,1),(1,0),(1,1),(0,5),(2,5),(5,2); görünür(0,5), metin çıkarımı(1,5) değil.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p213-i3
+  page: 213
+  pdf_page: 235
+  kind: formül
+  what: 'Konidaris–Osentoski–Thomas2011: c≠0 için α/||c||2, sabitteα önerisi.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p213-i4
+  page: 213
+  pdf_page: 235
+  kind: bilgi
+  what: Fourier özelliklerinin SGTD/SARSA uygulaması; polinom/RBF karşılaştırmasına geçiş. Fourier+SARSA,
+    polinom ve RBF aileleriyle karşılaştırmalarda iyi sonuç verebilir; her görevde üstünlük değil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p214-i1
+  page: 214
+  pdf_page: 236
+  kind: bilgi
+  what: Süreksizlikte ringing/Gibbs ve gereksiz yüksek frekansları ayıklama; koşulsuz düzgün yakınsama
+    değil. Keskin geçişi dar bölgede temsil etmek çok yüksek frekans isteyebilir; gürültü sayılan frekansları
+    filtreleme ayrı seçimdir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p214-i2
+  page: 214
+  pdf_page: 236
+  kind: bilgi
+  what: Küçük k≤5 için tam tensor; yüksek boyutta etkileşim/frekans altkümesi, global özellikte yerel
+    ayrıntı güçlüğü.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p214-i3
+  page: 214
+  pdf_page: 236
+  kind: şekil
+  what: 'Şekil9.5: polinom/Fourier5/10/20,30×5000MC bölümü, α.0001/.00005, kökµVE; frekans ölçekleme koşulu
+    belirtilmemiş.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p214-i4
+  page: 214
+  pdf_page: 236
+  kind: dipnot
+  what: Ortogonal polinomlar daha iyi olabilir; az RL deneyimi değerlendirmesi2018 dönemine ait.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-baz
+- id: ch9-p215-i1
+  page: 215
+  pdf_page: 237
+  kind: tanım
+  what: 'Kaba kodlama: örtüşen binary dairesel alıcı alanlar; daire veya binary olmak zorunda değil.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kaba
+- id: ch9-p215-i2
+  page: 215
+  pdf_page: 237
+  kind: şekil
+  what: 'Şekil9.6: S/S′, tam1ortak alan; etkin alanların union desteğine ve ortak sayıya bağlı genelleme.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kaba
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p215-i3
+  page: 215
+  pdf_page: 237
+  kind: formül
+  what: Tek doğrusal güncellemenin yayılımı Δv(s′)=αδx(s)ᵀx(s′); her alan tek ağırlık taşır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kaba
+- id: ch9-p215-i4
+  page: 215
+  pdf_page: 237
+  kind: şekil
+  what: 'Şekil9.7: aynı sayı/yoğunlukta dar, geniş ve uzamış alanlar; eğitim noktası/koyulukla yönlü yayılım.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kaba
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p216-i1
+  page: 216
+  pdf_page: 238
+  kind: bilgi
+  what: Geniş alanda zengin örtüşmeyle ince ayrım mümkün; çözünürlük özellik sayısı/yerleşimi/bağımsızlığına
+    da bağlı. Bu örnekte alan genişliği erken genellemeyi güçlü, son doğruluğu daha zayıf etkiler.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kaba
+- id: ch9-p216-i2
+  page: 216
+  pdf_page: 238
+  kind: örnek
+  what: 'Örnek9.3: yaklaşık50aralıkla kare dalga, uniform örnek ve α.2/naktif; kesin aralık/genişlik sayıları
+    kaynakta yok.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kaba
+- id: ch9-p216-i3
+  page: 216
+  pdf_page: 238
+  kind: şekil
+  what: 'Şekil9.8: üç genişlik×10/40/160/640/2560/10240örnek,18eğri; hedef ve alan genişliği çizgileri.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kaba
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p217-i1
+  page: 217
+  pdf_page: 239
+  kind: tanım
+  what: Karo döşemesi bütün uzayın ayrık partition'ı; tek döşeme toplama, aynı karoda tam genelleme.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p217-i2
+  page: 217
+  pdf_page: 239
+  kind: şekil
+  what: 'Şekil9.9: dört4×4ızgara,64çizilmiş özellik ve ortak iç noktada4aktif karo.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p217-i3
+  page: 217
+  pdf_page: 239
+  kind: bilgi
+  what: Kesirli karo genişliğiyle ofset, her döşemede bir aktif özellik; sınır karolarının doğru sayılması.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p217-i4
+  page: 217
+  pdf_page: 239
+  kind: bilgi
+  what: Sabit aktif sayı adım seçimini kolaylaştırır; tek örnekte tam öğrenme koşulu sonraki türetimde.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p218-i1
+  page: 218
+  pdf_page: 240
+  kind: şekil
+  what: 'Şekil9.10: genişlik200, bir/50döşeme, kayma4durum,α.0001/.0001/50;30×5000MC bölümü ve kökµVE.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p218-i2
+  page: 218
+  pdf_page: 240
+  kind: türetim
+  what: n farklı binary aktif içinα1/n tam,1/(10n) onda bir güncelleme; hash normu istisnası.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p218-i3
+  page: 218
+  pdf_page: 240
+  kind: bilgi
+  what: Sparse indeks toplamı/güncellemesi O(naktif), bütün d ile çarpım gerekmez; bellek ayrı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p218-i4
+  page: 218
+  pdf_page: 240
+  kind: bilgi
+  what: Uniform8döşemede64mikro hücrenin8örüntüsü; asimetrik ofset daha merkezli, tam izotropi değil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p219-i1
+  page: 219
+  pdf_page: 241
+  kind: şekil
+  what: 'Şekil9.11: uniform/asimetrik sekizer genelleme haritası, kara artı ve üç renkli ofset şemaları.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p219-i2
+  page: 219
+  pdf_page: 241
+  kind: formül
+  what: w/n temel birim, hücrede sabit temsil; bir aktif karo kimliği değişimi dense vektörde iki biti
+    değiştirebilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p219-i3
+  page: 219
+  pdf_page: 241
+  kind: formül
+  what: Uniform(1,1) ve asimetrik(1,3) ofset vektörleri, w/n ölçeği.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p219-i4
+  page: 219
+  pdf_page: 241
+  kind: kaynakça
+  what: Ofset incelemeleri Parks–Militzer1991,An1991,An–Miller–Parks1991,Miller–An–Glanz–Carter1990.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p220-i1
+  page: 220
+  pdf_page: 242
+  kind: formül
+  what: 'Miller–Glanz1996 önerisi: ilk tek sayılar, n2kuvveti≥4k;3D ilk dört ofset000/135/2610/3915.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p220-i2
+  page: 220
+  pdf_page: 242
+  kind: bilgi
+  what: Döşeme sayısı/genişliği ayrım gücünü, şekli genellemenin yönünü belirler.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p220-i3
+  page: 220
+  pdf_page: 242
+  kind: şekil
+  what: 'Şekil9.12: düzensiz çokgen, solda ince log dikey şerit, diagonal şerit; yüksek boyutta dilimlerle
+    bazı eksenleri yok sayma.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p220-i4
+  page: 220
+  pdf_page: 242
+  kind: bilgi
+  what: Yatay/dikey şeritleri karıştırmak tek başına bütün konjonksiyonları ayıramaz; dikdörtgenler de
+    gerekir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p220-i5
+  page: 220
+  pdf_page: 242
+  kind: bilgi
+  what: Düzensiz partition pratikte seyrek/standart yazılımın dışında; insan önbilgisi ve2018 otomatik
+    seçim sınırları, Sutton1996.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p221-i1
+  page: 221
+  pdf_page: 243
+  kind: tanım
+  what: 'Hash: çok karo kimliğini tutarlı küçük kovaya katlama; ayrık alanları bir özellikte birleştirme
+    ve seyrek görev belleği.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p221-i2
+  page: 221
+  pdf_page: 243
+  kind: şekil
+  what: 'Numarasız hash şekli: dört ayrık küçük kareden tek özelliğe oklar; kendi deterministik çakışma
+    hesabı.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p221-i3
+  page: 221
+  pdf_page: 243
+  kind: bilgi
+  what: Hash bellek büyümesini kontrol eder; her görevde istatistiksel boyut lanetini kaldırmaz.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-karo
+- id: ch9-p221-i4
+  page: 221
+  pdf_page: 243
+  kind: alıştırma
+  what: 'Alıştırma9.4: önemli koordinatta ayırıp dik yönde genelleyen karo şekillerini seç.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p10
+- id: ch9-p221-i5
+  page: 221
+  pdf_page: 243
+  kind: formül
+  what: RBF Gauss özelliği exp(−||s−ci||²/(2σi²)); merkez/genişlik,0..1 ve uygun uzaklık.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-rbf
+- id: ch9-p221-i6
+  page: 221
+  pdf_page: 243
+  kind: şekil
+  what: 'Şekil9.13: üç komşu Gauss, ci−1/ci/ci+1,σ yatay çizgisi ve kesik orta merkez.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-rbf
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p222-i1
+  page: 222
+  pdf_page: 244
+  kind: bilgi
+  what: Öklid Gauss düzgünlüğü; keyfî metrikte otomatik değil. Kaynağın maliyet/performans yorumu genel
+    yasak değildir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-rbf
+- id: ch9-p222-i2
+  page: 222
+  pdf_page: 244
+  kind: kaynakça
+  what: Dereceli alan çalışmaları An1991,Milleretal1991,Anetal1991,Lane–Handelman–Gelfand1992; ek maliyet/yüksek
+    boyut sınırları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-rbf
+- id: ch9-p222-i3
+  page: 222
+  pdf_page: 244
+  kind: bilgi
+  what: Sabit RBF merkez/genişlikte w doğrusal; bunları öğrenmek doğrusal olmayan ek uyum ve ayar getirir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-rbf
+- id: ch9-p222-i4
+  page: 222
+  pdf_page: 244
+  kind: bilgi
+  what: Manuel/otomatik adım, teori/pratik hız ayrımı; 1/t her FA/TD için uygunsuz değildir, sabit özellikte
+    örnek ortalaması karşı örneği.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-alpha
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p222-i5
+  page: 222
+  pdf_page: 244
+  kind: bilgi
+  what: Recursive least squares matris adımı O(d²), d ağırlığa göre d kat fazla parametre; büyük d maliyeti.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-alpha
+- id: ch9-p222-i6
+  page: 222
+  pdf_page: 244
+  kind: örnek
+  what: Tabloα1tek örnek, .1yaklaşık10/.01yaklaşık100sunum; zaman sabiti yaklaşık kural, yüksek doğruluk
+    garantisi değil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-alpha
+- id: ch9-p223-i1
+  page: 223
+  pdf_page: 245
+  kind: formül
+  what: 9.19:α≈1/[τE(xᵀx)]; benzer özelliklerde τ sunum zaman sabiti, norm değişkenliği ve kararlılık
+    koşulları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-alpha
+- id: ch9-p223-i2
+  page: 223
+  pdf_page: 245
+  kind: alıştırma
+  what: Alıştırma9.5:7×8şerit+21çift×2konjonksiyon=98aktif, yaklaşık10sunum içinα1/980.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p11
+- id: ch9-p223-i3
+  page: 223
+  pdf_page: 245
+  kind: bilgi
+  what: Sinir ağında gizli temsil öğrenimi; Bölüm16 RL başarıları ve§15.1 sinirbilim esini.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p223-i4
+  page: 223
+  pdf_page: 245
+  kind: tanım
+  what: Feedforward döngüsüz, recurrent geri bağlantılı;4girdi,2çıktı,iki gizli katman ve sinaps ağırlığı
+    benzetimi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p224-i1
+  page: 224
+  pdf_page: 246
+  kind: şekil
+  what: Şekil9.14:4–4–4–2 tam bağlı ağ,40kenar, dış girdi/çıktı okları; biaslar gösterilmez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p224-i2
+  page: 224
+  pdf_page: 246
+  kind: bilgi
+  what: Ağırlıklı toplam ve logistic/ReLU/eşik aktivasyonları; girdiler dışarıdan ayarlanır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p224-i3
+  page: 224
+  pdf_page: 246
+  kind: bilgi
+  what: Cybenko1989 sürekli/kompakt evrensel yaklaşım; varlık öğrenme garantisi değil, ılımlı koşullu
+    diğer nonlinear aktivasyonlar. Tek, yeterince geniş ve sonlu bir gizli katman yeterlidir.
+  status: vardı
+  where: content/modules/m3-8-perceptron/lesson.md#evrensel
+  note: Cybenko1989,sigmoid/kompakt/sürekli/istenenaccuracy,varlık-vs-öğrenme ayrımı ve daha güçlü koşullar
+    vardı.
+- id: ch9-p224-i4
+  page: 224
+  pdf_page: 246
+  kind: bilgi
+  what: Tamamen doğrusal/afin katman bileşkesi yine afin; nonlinear aktivasyonun gereği.
+  status: vardı
+  where: content/modules/m3-2-mlp-backprop/lesson.md#mlp
+  note: Doğrusal katman bileşkesi tekafin dönüşüm olarak aynı derinlikte anlatılıyor.
+- id: ch9-p224-i5
+  page: 224
+  pdf_page: 246
+  kind: bilgi
+  what: 'Bengio2009: derin bileşimlerin temsil verimi; derinlik her problemde üstünlük garantilemez.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p225-i1
+  page: 225
+  pdf_page: 247
+  kind: bilgi
+  what: Gizli özelliklerin otomatik öğrenilmesi; gözetimli kayıp, TD ve politika gradyanı/bandit sinyalleri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p225-i2
+  page: 225
+  pdf_page: 247
+  kind: bilgi
+  what: Geri yayılım ileri aktivasyon/geri türev; TD stop-target VE gradyanı değildir,§15.10 alternatif
+    RL birimleri. Alternatif RL birim öğrenmeleri daha az hesap verimli, ama biyolojik olarak daha makul
+    olabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p225-i3
+  page: 225
+  pdf_page: 247
+  kind: bilgi
+  what: Bir/iki gizli katmanda çalışan eğitim daha derinde kötü olabilir; uygun kapasite kapsaması optimizasyonu
+    garanti etmez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p225-i4
+  page: 225
+  pdf_page: 247
+  kind: bilgi
+  what: Az veri/fazla ağırlık aşırı uyumu ve girdiye yakın katmanlarda küçülen/patlayan gradyanlar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p226-i1
+  page: 226
+  pdf_page: 248
+  kind: bilgi
+  what: Online öğrenmede de genelleme gerekir; erken durdurma, düzenleme ve ağırlık paylaşımı; k-katlı
+    çapraz doğrulama ayrımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p226-i2
+  page: 226
+  pdf_page: 248
+  kind: bilgi
+  what: 'Srivastavaetal2014 dropout: birim düşürme, klasik testte keep çarpanı ve inverted PyTorch eğitim
+    ölçeklemesi.'
+  status: vardı
+  where: content/modules/m3-7-regularization-nn/lesson.md#dropout
+  note: Srivastava2014 ve ordinary/inverted dropout ölçekleme tablosu mevcut; kaynak9 bağlantısı kısa
+    tutulacak.
+- id: ch9-p226-i3
+  page: 226
+  pdf_page: 248
+  kind: bilgi
+  what: Rastgele özellik kümeleriyle birlikte öğrenme; ensemble sezgisi tam eşitlik değildir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p226-i4
+  page: 226
+  pdf_page: 248
+  kind: bilgi
+  what: 'Hinton–Osindero–Teh2006: görev amacını kullanmadan istatistiksel düzenlilikleri çıkaran denetimsiz
+    katman ön eğitimi, sonra fine-tuning. Girdiye yakın katmandan yukarı doğru sıra; rastgele başlangıca
+    göre iyi sonuç ve iyi ağırlık-uzayı bölgesi hipotezi.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p226-i5
+  page: 226
+  pdf_page: 248
+  kind: bilgi
+  what: 'Ioffe–Szegedy2015 BN: mini yığın istatistiği,0ortalama/birim varyans ve öğrenilen ölçek/kayma.'
+  status: vardı
+  where: content/modules/m3-6-norm/lesson.md#algoritma
+  note: IoffeSzegedy2015,minibatch0mean/unitvar ve learnedscale/shift daha ayrıntılı mevcut.
+- id: ch9-p226-i6
+  page: 226
+  pdf_page: 248
+  kind: bilgi
+  what: 'He–Zhang–Ren–Sun2016: kimlikten farkı öğrenen residual kısa yol; uygun boyutta kimlik parametresiz.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p227-i1
+  page: 227
+  pdf_page: 249
+  kind: bilgi
+  what: Residual CNN çift katman etrafı skip, benchmark sonuçları; BN/residual Go bağlantısı, projeksiyon
+    parametresi ayrımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p227-i2
+  page: 227
+  pdf_page: 249
+  kind: bilgi
+  what: CNN çok boyutlu/uzamsal veri ve erken görme esini, LeCun–Bottou–Bengio–Haffner1998.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p227-i3
+  page: 227
+  pdf_page: 249
+  kind: bilgi
+  what: Evrişim/altörnekleme sonra tam bağlı katmanlar; yerel ağırlık paylaşımı, equivariance/invariance
+    ayrımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p227-i4
+  page: 227
+  pdf_page: 249
+  kind: şekil
+  what: 'Şekil9.15: A32²→6×28²→6×14²→16×10²→16×5²→120→84→10Gauss çıkış; mevcut tam LeNet şeması ve yeni
+    sentetik alıcı alan hesabı.'
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p227-i5
+  page: 227
+  pdf_page: 249
+  kind: kaynakça
+  what: Özgün figür kredisi LeCunetal1998/ProceedingsIEEE86 ve kitapta IEEE/CCC izni; burada kaynak görseli
+    kullanılmaz.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p228-i1
+  page: 228
+  pdf_page: 250
+  kind: bilgi
+  what: C1:6harita,5×5çekirdek, stride1 ve4satır/sütun örtüşme;25kernel katsayısı, biasla26/harita ve156toplam.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p228-i2
+  page: 228
+  pdf_page: 250
+  kind: bilgi
+  what: 'S2: çakışmayan2×2ortalama→6×14²; daha az kayma duyarlılığı tam invariance değildir; teori değerlendirmesi2018
+    bağlamında.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-ann
+- id: ch9-p228-i3
+  page: 228
+  pdf_page: 250
+  kind: tanım
+  what: LSTD ampirik TD moment sistemini doğrudan çözer; veri verimliliği ile minimum VE ayrımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p228-i4
+  page: 228
+  pdf_page: 250
+  kind: formül
+  what: 9.20:εI+Σx(x−γx′)ᵀ,ΣRx; ortak t normalizasyonu iptal olur, düzenleme ε/t olarak azalır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p228-i5
+  page: 228
+  pdf_page: 250
+  kind: bilgi
+  what: 'εI genel sonlu TD matrisini terslenebilir yapmaz: ε1/8,γ1/2,x1,x′9/4 için A1=0 ve SM paydası0.'
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p229-i1
+  page: 229
+  pdf_page: 251
+  kind: formül
+  what: '9.21: w=Ahat⁻¹bhat ve tekrar iteratif TD çözümü yerine örnek momentlerini kullanma.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p229-i2
+  page: 229
+  pdf_page: 251
+  kind: bilgi
+  what: Dense TD O(d), dış çarpım/bellek O(d²), her sefer genel ters O(d³); veri adımından bağımsız maliyet.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p229-i3
+  page: 229
+  pdf_page: 251
+  kind: türetim
+  what: 9.22 Sherman–Morrison türetimi, nonsıfır payda, sağ transpoz ve tutarlı At+1 zaman indeksi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p229-i4
+  page: 229
+  pdf_page: 251
+  kind: bilgi
+  what: Başlangıç A0=εI ve saklanan ters; O(d²) artımlı çözümün veri/hesap dengesi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p229-i5
+  page: 229
+  pdf_page: 251
+  kind: bilgi
+  what: Adımαolmaması hiperparametresizlik değildir; ε küçükken oynak ters, büyükken öğrenme gecikmesi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p229-i6
+  page: 229
+  pdf_page: 251
+  kind: bilgi
+  what: Eski örnekleri unutmayan LSTD; GPI/politika değişiminde pencere/unutma gerekebilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p230-i1
+  page: 230
+  pdf_page: 252
+  kind: kod
+  what: 'LSTD kutusu: terminalφ0,B=ε⁻¹I,b0,v=Bᵀ(x−γx′),paydalı rank1 güncelleme,b+=Rx,w=Bb.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-lstd
+- id: ch9-p230-i2
+  page: 230
+  pdf_page: 252
+  kind: bilgi
+  what: Parametrik global w güncellemesi; örneği atma/saklama ve sorguda güncel fonksiyonu değerlendirme.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p230-i3
+  page: 230
+  pdf_page: 252
+  kind: tanım
+  what: Bellek tabanlı lazy/nonparametrik temsil; tüm örnek/altküme saklama, sorguda geçici tahmin.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p230-i4
+  page: 230
+  pdf_page: 252
+  kind: bilgi
+  what: Daha çok veriyle iyileşmenin kapsama/gürültü koşulları; sabit1NN gürültü varyansı otomatik kaybolmaz.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p231-i1
+  page: 231
+  pdf_page: 253
+  kind: tanım
+  what: Yerel öğrenme sorguya ilgili örnekleri uzaklık/benzerlikle getirir, geçici uyumu sorgudan sonra
+    atar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p231-i2
+  page: 231
+  pdf_page: 253
+  kind: örnek
+  what: 1NN,mesafeyle tartılan kNN ve yerel ağırlıklı regresyon örnekleri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p231-i3
+  page: 231
+  pdf_page: 253
+  kind: bilgi
+  what: Sabit global aile sınırını kaldırma, gerçek/simüle ziyaret bölgelerine doğrudan ve hemen uyum.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p231-i4
+  page: 231
+  pdf_page: 253
+  kind: bilgi
+  what: Nörnek/kboyut O(Nk) bellek; sabit Nde gridin üstel belleği yok, gereken veri sayısının boyut bağımlılığı
+    sürer.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p232-i1
+  page: 232
+  pdf_page: 254
+  kind: bilgi
+  what: Paralel/özel donanım ve k-d tree ile çok boyutlu sorgu; ikili uzay bölmeleri uygun veride alanları
+    eler.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p232-i2
+  page: 232
+  pdf_page: 254
+  kind: bilgi
+  what: Her sorguda yerel regresyon maliyeti ve bellek için örnek silme/unutma.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-bellek
+- id: ch9-p232-i3
+  page: 232
+  pdf_page: 254
+  kind: tanım
+  what: 'Kernel: uzaklıktan R→R ağırlık, genelde S×S→R benzerlik; yakınlık şart değil.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+- id: ch9-p232-i4
+  page: 232
+  pdf_page: 254
+  kind: bilgi
+  what: Bilginin örnekten yayılımı ve karo ofsetlerinin gizli xᵀx′ çekirdeği.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+- id: ch9-p232-i5
+  page: 232
+  pdf_page: 254
+  kind: formül
+  what: 9.23 ağırlıklı ortalama için toplam1 normalizasyonu; raw Gauss paydası ve yinelenen gürültülü
+    durumları ayrı indeksleme.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+- id: ch9-p233-i1
+  page: 233
+  pdf_page: 255
+  kind: bilgi
+  what: Yakınlık dışında kernel0ise sorguda bütün örnekleri kullanmak gerekmeyebilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+- id: ch9-p233-i2
+  page: 233
+  pdf_page: 255
+  kind: bilgi
+  what: Sabit merkezli parametrik RBF ile veri merkezli/büyüyen nonparametrik RBF kernel ayrımı; bant
+    genişliği hiperparametresi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+- id: ch9-p233-i3
+  page: 233
+  pdf_page: 255
+  kind: formül
+  what: 9.24 dot-kernel ham hedef toplamı OLS değildir; öğrenilmiş dual β=(K+λI)⁻¹g, w=Φᵀβ ve SGD hata
+    katsayıları.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p233-i4
+  page: 233
+  pdf_page: 255
+  kind: bilgi
+  what: Özellik açmadan kernel tasarımı; genel benzerlik ile simetrik PSD/RKHS iç çarpım çekirdeği ayrımı,
+    sonsuz özellik uzayı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+- id: ch9-p233-i5
+  page: 233
+  pdf_page: 255
+  kind: bilgi
+  what: Kernel trick yüksek d hesap avantajı sağlayabilir; Nörnek maliyeti sürer, her RL görevinde daha
+    ucuz değildir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-cekirdek
+- id: ch9-p234-i1
+  page: 234
+  pdf_page: 256
+  kind: bilgi
+  what: İndirimli bölüm başlangıcına ve seçilebilir eylemlere sınırlı temsil kapasitesi ayırma fikri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p234-i2
+  page: 234
+  pdf_page: 256
+  kind: bilgi
+  what: Eşit ziyaret ağırlıklı politika üstü analiz; aynı politikada başlangıç ağırlıklarıyla farklı dağılımlar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p234-i3
+  page: 234
+  pdf_page: 256
+  kind: tanım
+  what: Interest It≥0 nedensel durum/geçmiş/w fonksiyonu; normalize ağırlık için E[I]>0, uyarlanan ilginin
+    ek koşulları. VE içindeki µ, hedef π yörüngelerinde karşılaşılan durumların ilgiyle tartılmış dağılımıdır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p234-i4
+  page: 234
+  pdf_page: 256
+  kind: formül
+  what: '9.25: Mtile tartılan n-adım SG güncellemesi; vurgu ile ilgi aynı şey değildir.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p234-i5
+  page: 234
+  pdf_page: 256
+  kind: bilgi
+  what: '9.26: sabit n için Mt=It+γⁿM_(t−n), negatif zamanlarda0ve bölüm sıfırlama; MC için doğrudan M=I.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p235-i1
+  page: 235
+  pdf_page: 257
+  kind: örnek
+  what: 'Numarasız Örnek9.4 zinciri: dört durum/terminal kare,+1ödüller,γ1,v=(4,3,2,1),w1/w1/w2/w2,I=(1,0,0,0).'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p235-i2
+  page: 235
+  pdf_page: 257
+  kind: şekil
+  what: Paylaşılan parametreler farklı gerçek değerleri birleştirir; yalnız başlangıç doğruluğuna ilgi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+  figure: türetildi
+  note: Kendi ölçüm/formül/geometri hesabı; kaynak pikselleri yok. Şekil9.15 tam mimarisi mevcut M4.2#lenet
+    şemasıyla, sentetik A/C1/S2 yeni hesapla karşılanır.
+- id: ch9-p235-i3
+  page: 235
+  pdf_page: 257
+  kind: bilgi
+  what: Azalan adımda düz MC(3.5,1.5), ilgi MC(4,0); ikinci ağırlık başlangıcında kalır. (4,0) sıfır başlangıç
+    içindir; genel halde w1→4,w2 başlangıcında kalır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p235-i4
+  page: 235
+  pdf_page: 257
+  kind: bilgi
+  what: Düz2-adım TD(3.5,1.5), vurgulu M=(1,0,1,0) ile(4,2); ilk ve üçüncü durum güncellenir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p235-i5
+  page: 235
+  pdf_page: 257
+  kind: bilgi
+  what: Bootstrap edilen üçüncü durumu öğrenme gereği; kaynak sonuçları sonlu/sabit adım son noktası değil
+    asimptotik limitler.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-vurgu
+- id: ch9-p236-i1
+  page: 236
+  pdf_page: 258
+  kind: bilgi
+  what: Genelleme ve denetimli hedef çerçevesi; özetin politikaπw yazımı yerine sabitπde değer yaklaşımıw
+    olmalı.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kapsam
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p236-i2
+  page: 236
+  pdf_page: 258
+  kind: bilgi
+  what: Standart koşullarda doğrusal n-adım SGTD her n için yakınsar; n1TD0,nuzunMC ve hedefte w türevinin
+    atılması. MC limiti n→∞; çok büyük n sonlu sürede öğrenmeyi yavaşlatabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p236-i3
+  page: 236
+  pdf_page: 258
+  kind: bilgi
+  what: Özellik aileleri ve LSTD O(d²)/gradyan O(d) özeti; performans görüşleri örnekler/dönemle sınırlı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-kapsam
+- id: ch9-p236-i4
+  page: 236
+  pdf_page: 258
+  kind: formül
+  what: n-adım gevşek VE sınırında çarpan1/(1−γⁿ)→1, fazla payγⁿ/(1−γⁿ)minVE→0; minimum VE sıfır olmak
+    zorunda değil. Gösterilen sınır sürekli görevde γ<1 koşulludur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-dogrusal
+- id: ch9-p237-i1
+  page: 237
+  pdf_page: 259
+  kind: kaynakça
+  what: GenellemeRL'nintarihibileşeni;kitapdönemiBA:BT1996,Bertsekas2012,Sugiyamaetal2013genelfonksiyonyaklaşımı
+    kaynakları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p237-i2
+  page: 237
+  pdf_page: 259
+  kind: kaynakça
+  what: §9.3LMSWidrowHoff1960,ayrıntıWidrowStearns1985/Bishop1995/DudaHart1973;Sutton1984/1988linearTDλ,Ch12;semi-gradientterimi2.baskıyeniliği.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p237-i3
+  page: 237
+  pdf_page: 259
+  kind: kaynakça
+  what: İlkstateaggregationadayMichieChambersBOXES1968;SinghJaakkolaJordan1995/TsitsiklisVanRoy1996teori;Bellman1957aDPöncesikullanımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p237-i4
+  page: 237
+  pdf_page: 259
+  kind: kaynakça
+  what: §9.4Sutton1988mean-minVEbağımsızSTATEfeaturevektörlerinde;Peng1993,DayanSejnowski1994,Tsitsiklis1994,GurvitsLinHanson1994AS;JaakkolaJordanSingh1994online;buvarsayımd≥|S|,genelbağımlırowsDayan1992,TsitsiklisVanRoy1997sınır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p237-i5
+  page: 237
+  pdf_page: 259
+  kind: kaynakça
+  what: §9.5temsilseçimisunumuBarto1990;FourierKonidarisOsentoskiThomas2011çokboyutlu/sınırlıaperiyodikRL'yeuygunform.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p237-i6
+  page: 237
+  pdf_page: 259
+  kind: kaynakça
+  what: CoarsecodingterimiHinton1984,Şekil9.6onunçizimine dayalı;erkenRLkullanımWaltzFu1965.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p238-i1
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: Tile/hashAlbus1971/1981CMAC(cerebellarmodelarticulatorcontroller);tilecodingterimi1.baskı,yorumWatkins1989'dan.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p238-i2
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: TileRLuygulamalarıShewchukDean1990,LinKim1991,MillerScaleraKim1994,SofgeWhite1992,Tham1994,Sutton1996,Watkins1989;diğerkontrolKraftCampagna1990,KraftMillerDietz1992;MillerGlanz1996etkisi;tiles3çokdilyazılımbağı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p238-i3
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: RBF-BroomheadLowe1988ANNbağı,Powell1987erkenkullanımtaraması,PoggioGirosi1989/1990geliştirme/uygulama.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p238-i4
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: OtomatikαRMSpropTielemanHinton2012,AdamKingmaBa2015;DeltaBarDeltaJacobs1988,Sutton1992b/c,Mahmoodetal2012artımlı,Schraudolph1999/2002nonlinear.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p238-i5
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: RLαAlphaBoundDabneyBarto2012,SID/NOSIDDabney2014,TIDBDKearneyetalhazırlanıyor(kaynakdönemi;arXiv1804.03334v1,10Nisan2018doğrulandı),PGmetadescentSchraudolphYuAberdeen2006.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p238-i6
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: ANNtarihindeikinci§9.6etiketi§9.7olmalı:McCullochPitts1943,perceptronRosenblatt1962/ADALINEWidrowHoff1960;LeCun1985/RumelhartHintonWilliams1986backprop;BengioCourvilleVincent2012/GoodfellowBengioCourville2016temsil;Haykin1994,Bishop1995,Ripley2007kitaplar.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+  note: Kaynak düzeltmesi/koşul notu ders içinde açıklandı; kendi çalışan karşı örnekleri, sayım veya
+    birincil kernel dual formülüyle doğrulandı.
+- id: ch9-p238-i7
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: İlkRLANNFarleyClark1954lineerthresholdpolicy;WidrowGuptaMaitra1973critic/selectivebootstrapADALINEvaryantı;Werbos1987/1994BPilepolitikadeğertahminikontrol.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p238-i8
+  page: 238
+  pdf_page: 260
+  kind: kaynakça
+  what: AssociativememoryKohonen1977/AndersonSilversteinRitzJones1977→BartoSuttonBrouwer1981/BartoSutton1981bRLuzantıları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p239-i1
+  page: 239
+  pdf_page: 261
+  kind: kaynakça
+  what: BartoAndersonSutton1982iki-katmanlınonlinearpolicyveöğrenilentemsil;Hampson1983/1989valueANN;BartoSuttonAnderson1983actorcriticpoleveCh15.7/15.8.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p239-i2
+  page: 239
+  pdf_page: 261
+  kind: kaynakça
+  what: BartoAnandan1985stochasticARP,1973seçicibootstrapuzantısı;Barto (1985), kuralın çağdaş öğrenme
+    kurallarıyla ilişkisini de inceler; Barto1985/1986,BartoJordan1987globallybroadcastrewardileçokkatmanlılineerayrılamayanclassification,15.10bağı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p239-i3
+  page: 239
+  pdf_page: 261
+  kind: kaynakça
+  what: Anderson1986/1987/1989iki-katmanlıactor+criticBPpole/Hanoi'detekkatmandaniyi;Williams1988BP+RLkombinasyonları;Gullapalli1990/Williams1992continuousçıktılıüniteler.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p239-i4
+  page: 239
+  pdf_page: 261
+  kind: kaynakça
+  what: BartoSuttonWatkins1990sequentialdecisionANNrolü;Williams1992REINFORCE↔BPCh13.3;Tesauro1992/1994TDGammonTDλveCh16.1.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p239-i5
+  page: 239
+  pdf_page: 261
+  kind: kaynakça
+  what: Silveretal2016/2017a/2017bAlphaGo/Zero/AlphaZeroderinconvRLGo;Ch16.6;Schmidhuber2015taramasırecurrentANNdahil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p239-i6
+  page: 239
+  pdf_page: 261
+  kind: kaynakça
+  what: LSTDBradtke1993/1994,BradtkeBarto1996,BradtkeYdstieBarto1994;Boyan1999/2002,NedicBertsekas2003,Yu2010geliştirme;SM1949;LSkontrolLagoudakisParr2003/BusoniuLazaricGhavamzadehMunosBabuskaDeSchutter2012.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p240-i1
+  page: 240
+  pdf_page: 262
+  kind: kaynakça
+  what: MemoryyerelöğrenmeAtkesonMooreSchaal1997incelemesi/Atkeson1992robotbibliyografisi;StanfillWaltz1986parallelConnectionMachineönemi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p240-i2
+  page: 240
+  pdf_page: 262
+  kind: kaynakça
+  what: BairdKlopf1993memoryQ/pole,SchaalAtkeson1994robotjugglingmodeli,Peng1995NNvalue/policy/modelpole,TadepalliOk1996AGVvaluer,
+    BottouVapnik1992yerel/nonlocalpatternrecognitionverimi/genelleme.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p240-i3
+  page: 240
+  pdf_page: 262
+  kind: kaynakça
+  what: Bentley1975kdtree/ortalamaO(logN)gözlemi,FriedmanBentleyFinkel1977algoritma,Omohundro1987hierarchicalverim,MooreSchneiderDeng1997yerelağırlıklıreg;yüksekboyuttaen
+    kötügaran tideğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p240-i4
+  page: 240
+  pdf_page: 262
+  kind: kaynakça
+  what: KerneltarihipotentialfunctionsAizermanBravermanRozonoer1964elektrikyükpotansiyeli1/mesafeanaloji;ConnellUtgoff1987actorcriticpoleinverseweight,Shepard1968adı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p240-i5
+  page: 240
+  pdf_page: 262
+  kind: kaynakça
+  what: KernelRLOrmoneitSen2002,DietterichWang2002,XuXieHuLu2005,TaylorParr2009,BarretoPrecupPineau2011,BhatFariasMoallemi2012;EmphaticTD§11.8tarihnotuna
+    yönlendirme.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p241-i1
+  page: 241
+  pdf_page: 263
+  kind: kaynakça
+  what: İlkvalueFAadaySamuelcheckers1959/1967,Shannon1950yaklaşıklinearfeatureönerisi;lookuptable/signaturetableGriffith1966/1974,Page1977,BiermannFairfieldBeres1982.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p241-i2
+  page: 241
+  pdf_page: 263
+  kind: kaynakça
+  what: BellmanDreyfus1959DPFAeşzamanlı;Samuelileetkileşimkanıtıyok. Multigrid/spline/orthopolyBellmanKalabaKotkin1973,Daniel1976,Whitt1978,Reetz1977,SchweitzerSeidmann1985,ChowTsitsiklis1991,KushnerDupuis1992,Rust1996.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p241-i3
+  page: 241
+  pdf_page: 263
+  kind: kaynakça
+  what: Holland1986classifierwildcardsseçilmişboyutlarıeşleştiripdiğerleriniserbest bırakır;genetikalgoritmaylakolektifactionvalue;stateagg/eksen-paralelsınırlar/smoothölçekleme
+    sınırlılıklarıgelenekselformaait.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p241-i4
+  page: 241
+  pdf_page: 263
+  kind: bilgi
+  what: Holland etkisiamaauthorsevolutionyerinedetaylıöğrenmebilgisini kullanan supervisedgradient/ANNseçti;ANNzayıfsayılantarihselçağdanfarklı,gelecekbirleşimolanakları;Ch1bağı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch9-p241-i5
+  page: 241
+  pdf_page: 263
+  kind: kaynakça
+  what: ChristensenKorf1986satrançlinearreg,ChapmanKaelbling1991/Tan1991değerağacı,YeeSaxenaUtgoffBarto1990/DietterichFlann1995explanationbasedcompactvalue.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
 chapter_counts:
   '1':
     items: 159
@@ -14643,6 +16406,15 @@ chapter_counts:
     code: 3
     tables: 1
     footnotes: 2
+  9:
+    items: 208
+    exercises: 5
+    figures: 17
+    numbered_figures: 15
+    unnumbered_figures: 2
+    code: 4
+    tables: 0
+    footnotes: 2
 part_dividers:
 - pdf_pages:
   - 45
@@ -14702,3 +16474,27 @@ teaching_extensions:
   status: eklendi
   where: content/modules/m11-10-planning/module.yaml#practice:p16
   note: Kaynak sayılarına kendi ek hesabımız; kaynak soru sayısına katılmaz.
+- id: teaching-ch9-lstd
+  page: 228
+  pdf_page: 250
+  kind: örnek
+  what: Pozitif düzenlemeye rağmen tekil sonlu LSTD matrisi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p12
+  note: Kendi öğretim sorumuz; kaynak alıştırma sayısına katılmaz.
+- id: teaching-ch9-kernel
+  page: 233
+  pdf_page: 255
+  kind: örnek
+  what: Raw kernel/normalize ortalama/OLS sayısal ayrımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p13
+  note: Kendi öğretim sorumuz; kaynak alıştırma sayısına katılmaz.
+- id: teaching-ch9-interest
+  page: 235
+  pdf_page: 257
+  kind: türetim
+  what: İlgi-only bootstrap eksikliğini vurguyla düzeltme.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p14
+  note: Kendi öğretim sorumuz; kaynak alıştırma sayısına katılmaz.

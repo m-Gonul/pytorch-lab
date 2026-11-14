@@ -280,3 +280,12 @@ terms:
   yörünge örnekleme: "Model ve politika ile ardışık geçişler üretip karşılaşılan durum/çiftleri güncellemek. Güncelleme yerini örneklemek, hedefin de örnek yedek olması demek değildir."
   optimal kısmi politika: "Başlangıçlardan bazı optimal politikayla erişilebilen ilgili durumlarda optimal davranan; diğer durumlarda keyfî veya tanımsız bırakılabilen politika."
   gerçek zamanlı dinamik programlama: "RTDP: ziyaret edilen durumlarda beklenen max değer-yineleme yedeği yapan asenkron planlama. Tüm durumları ziyaret etmeden optimal kısmi politika bulma sonucu, uygun en kısa yol ve iyimser başlangıç koşullarını gerektirir."
+
+  durum toplama: "Bir durum grubuna tek parametre/değer ayıran bir-sıcak doğrusal temsil; grup içi güncellemeler tam paylaşılır."
+  kaba kodlama: "Örtüşen alıcı alanlarla temsil; doğrusal bir güncellemenin yayılımı aktif özniteliklerin iç çarpımıyla belirlenir."
+  döşeme: "Uzayı ayrık karolara bölen partition; her durumda her döşemede bir karo etkindir. Birkaç kaydırılmış döşeme ince ayrım sağlar."
+  radyal baz fonksiyonu: "Bir merkeze uzaklıkla değişen öznitelik; Gauss örneği exp(−||s−c||²/(2σ²)). Merkez/σ sabitse çıktı ağırlıklarda doğrusaldır."
+  lstd: "En küçük kareler TD: ampirik A=εI+Σx(x−γx′)ᵀ ve b=ΣRx sistemini çözer. Genel özelliklerde ε pozitif olsa bile matris tekil olabilir."
+  kernel ridge: "K=ΦΦᵀ için öğrenilen β=(K+λI)⁻¹g katsayılarıyla tahmin; ham hedeflerin normalizasyonsuz kernel toplamından farklıdır."
+  ilgi: "Interest I: hangi zaman/durumdaki doğruluğun önemli olduğunu belirten negatif olmayan ağırlık."
+  vurgu: "Emphasis M: gerçek güncellemeyi tartar; sabit n için M_t=I_t+γ^n M_(t−n), başlangıç ilgisini bootstrap edilen durumlara taşır."

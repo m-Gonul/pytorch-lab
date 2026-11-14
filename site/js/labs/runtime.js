@@ -148,16 +148,28 @@ function mount(sec, spec, cfg) {
     const out = ui.querySelector(".lab-out"), stats = ui.querySelector(".lab-stats"), note = ui.querySelector(".lab-note");
     if (!A.out || (B && !B.out)) { out.classList.add("stale"); return; }
     out.classList.remove("stale");
-    const plots = A.out.plots.map((P, i) => {
+    const plots = Array.from({ length: Math.max(A.out.plots.length, B?.out.plots.length || 0) }, (_, i) => {
+      const P = A.out.plots[i], Q = B?.out.plots[i];
       if (!B) return P.wide ? `<div class="plot-wide">${plot(P, P.size || {})}</div>` : plot(P, P.size || {});
-      const Q = B.out.plots[i];
-      if (P.img || P.side) return `<div class="lab-pair">${plot({ ...P, title: "A · " + (P.title || "") }, { w: 320, h: 260 })}${plot({ ...Q, title: "B · " + (Q.title || "") }, { w: 320, h: 260 })}</div>`;
+      // Modes may have different plot counts/units. Keep both results visible.
+      if (!P || !Q) {
+        const V = P || Q;
+        return plot({ ...V, title: `${P ? "A" : "B"} · ${V.title || ""}` }, V.size || {});
+      }
+      if (P.img || Q.img || P.field || Q.field || P.side || Q.side || P.xlabel !== Q.xlabel || P.ylabel !== Q.ylabel) return `<div class="lab-pair">${plot({ ...P, title: "A · " + (P.title || "") }, { w: 320, h: 260, ...(P.size || {}) })}${plot({ ...Q, title: "B · " + (Q.title || "") }, { w: 320, h: 260, ...(Q.size || {}) })}</div>`;
       const ser = [...P.series.map((s) => ({ ...s, name: s.name ? "A: " + s.name : s.name })), ...Q.series.map((s, k) => ({ ...s, c: s.c ?? k, dash: true, name: s.name ? "B: " + s.name : s.name }))];
       return plot({ ...P, series: ser, xlim: P.xlim, ylim: P.ylim && Q.ylim ? [Math.min(P.ylim[0], Q.ylim[0]), Math.max(P.ylim[1], Q.ylim[1])] : P.ylim });
     });
     out.innerHTML = `<div class="lab-plots">${plots.join("")}</div>`;
     const sa = A.out.stats || [], sb = B?.out.stats || [];
-    stats.innerHTML = sa.length ? `<table class="lab-tbl"><thead><tr><th>Ölçüm</th><th>${B ? "A" : "Değer"}</th>${B ? "<th>B</th>" : ""}</tr></thead><tbody>${sa.map((s, i) => `<tr><td>${s.label}</td><td>${typeof s.value === "number" ? fmt(s.value) : s.value}${s.unit ? " " + s.unit : ""}</td>${B ? `<td>${typeof sb[i]?.value === "number" ? fmt(sb[i].value) : sb[i]?.value ?? "—"}${sb[i]?.unit ? " " + sb[i].unit : ""}</td>` : ""}</tr>`).join("")}</tbody></table>` : "";
+    const rows = sa.map((s) => ({ label: s.label, a: s })), unused = [...sb];
+    for (const row of rows) {
+      const i = unused.findIndex((s) => s.label === row.label && (s.unit || "") === (row.a.unit || ""));
+      if (i >= 0) row.b = unused.splice(i, 1)[0];
+    }
+    for (const s of unused) rows.push({ label: s.label, b: s });
+    const value = (s) => s ? `${typeof s.value === "number" ? fmt(s.value) : s.value}${s.unit ? " " + s.unit : ""}` : "—";
+    stats.innerHTML = rows.length ? `<table class="lab-tbl"><thead><tr><th>Ölçüm</th><th>${B ? "A" : "Değer"}</th>${B ? `<th>B</th>` : ""}</tr></thead><tbody>${rows.map((r) => `<tr><td>${r.label}</td><td>${value(r.a)}</td>${B ? `<td>${value(r.b)}</td>` : ""}</tr>`).join("")}</tbody></table>` : "";
     note.innerHTML = B ? `${A.out.note ? `<p><b>A:</b> ${A.out.note}</p>` : ""}${B.out.note ? `<p><b>B:</b> ${B.out.note}</p>` : ""}` : A.out.note ? `<p>${A.out.note}</p>` : "";
   }
   sync();

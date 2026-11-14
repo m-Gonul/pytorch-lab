@@ -164,3 +164,76 @@ Eski x3 API'nin N/gamma parametreleri varken RMS referansı19durum/γ1 olarak sa
 - PS θ1e−4 büyük görevde ödül yayılımını erken keser; bu ilk deney saklandı. Ana karşılaştırma θ1e−12. PS1504 durum/seed4 koşusu2m etkileşimde optimal başlangıç yoluna ulaşmadı; tamamlanma ortalaması diye çizilmez. Durdurma bütün Q değerlerinin yakınsaması değil, ilk-eşitlik greedy yolunun BFS kadar kısa olmasıdır. Kaynağın186 işaretine karşı kendi çoğaltma geometrimiz188 durum verir; kaynak hatası iddia edilmez.
 - `python notes/sutton-2018/generate_ch8.py /tmp/ch8figs` bu çıktılardan12 SVG grubu üretir. Çubuk rotası kendi20×20×36 modelinde31 hareketlik BFS; iki pozitif yuvarlanmış eksen ötelemesi ve±10° dönme. Çarpışma hareket sonu çizgi-parçası/engel kesişimidir; süpürülen ara hareketi modellemez. Kaynağın tam geometrisi verilmez. 9115/599 durumlu yarış pisti/25 koşu tablosu yalnız yazar raporudur. Kaynak şekilleri veya PDF sayfaları yayımlanmaz.
 - Beklenen/örnek yedek eşitliğinde b1 tek başına yetmez: ödül de deterministik olmalı veya beklenen ödül örnek hedefte kullanılmalı. Şekil8.7 formülü ayrıca σ²=(b−1)/b normalizasyonunu gerektirir; genel RMS σ/√t. π′ yerel iyileştirmesinde diğer durumların politikası sabittir. Bunlar kaynak koşullarının açıklaştırılmasıdır.
+## Bölüm 9 — politika üstü değer yaklaştırma
+
+Kaynak: yüklenen 2018 PDF, basılı 197–242/PDF 219–264; son sayfa boş.
+Kaynak metni, görseli, gerçek eğri koordinatları veya öğrenilmiş LeNet ağırlıkları
+kopyalanmadı. `measurements_ch9_*` dosyaları kendi hesaplarımızdır.
+
+Yeniden üretim sırası (BLAS/torch için tek thread; C++ deneyinde 4 thread):
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python notes/sutton-2018/measure_ch9.py
+g++ -O3 -std=c++17 -fopenmp notes/sutton-2018/measure_ch9.cpp -o /tmp/ch9-walk
+OMP_NUM_THREADS=4 /tmp/ch9-walk notes/sutton-2018/reference_ch9.tsv > /tmp/ch9-walk.json
+cp /tmp/ch9-walk.json notes/sutton-2018/measurements_ch9_walk.json
+node notes/sutton-2018/measure_ch9.mjs
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python notes/sutton-2018/measure_ch9.py
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python notes/sutton-2018/generate_ch9.py /tmp/ch9-figures
+```
+
+Son komut 16 yeni SVG grubunu üretir ve `site/js/data/ch9-*.js` kendi veri
+modüllerini yeniler. Ders içinde toplam 17 figür grubu vardır; eski DQN figürü
+korundu. Kaynak Şekil 9.15 tam mimarisi mevcut M 4.2#lenet şemasıyla, yeni sentetik
+A/5 × 5 evrişim/2 × 2 ortalama panelleriyle birlikte karşılanır.
+
+* Yürüyüş 1000 durum/başlangıç 500; adımda uzaklık 1..100 sonra yön seçilir,
+  her signed jump 1/200. Sınır aşılınca±1 terminal, diğer ödüller 0,γ1.
+  Sonlu adım kesme veya yapay terminal yok.
+* Şekil 9.1: seed 900001,10 grup,α2 e−5,100000 gerçek bölüm/8302094 geçiş.
+* Şekil 9.2 sağ: seed 910001..910100,100×ilk 10 bölüm;10 n×21α.
+  Toplam 83603 farklı yol geçişi bütün yöntemlerde tekrar kullanılır; bunlar her
+  parametrenin ayrı yeni deneyim sayısı değildir. Ölçüt her bölüm sonrası
+ 1000 durumun ağırlıksız RMS'i, sonra ilk 10 ve 100 koşu ortalamasıdır.
+* Şekil 9.5/9.10: seed 920001..920030,30 × 5000 tam bölüm/12465376 farklı yol geçişi;
+  sekiz öğrenici aynı yollarda gerçekten güncellendi. KökµVE her 25 bölümde kaydedildi.
+  Monom/Fourier mertebe 5/10/20,i 0..nözellik; s=state/1000.
+  αmonom.0001,Fourier.00005 bütün özelliklerde sabit: caption'ın belirtmediği
+  frekans normalizasyonu figür koşulu diye eklenmedi. Sabit merkezli 1/50 döşemede
+  genişlik 200,ofset 4,α.0001/.0001/50. Karo kimlikleri ayrıdır; hash yok.
+  Her checkpoint'te koşuların RMS ortalaması ve örnek standart hatası saklıdır.
+* Tam değer/µ, bağımsız SciPy band sistemiyle; TD popülasyon noktası sparse
+  geçişten kurulan yoğun 10 grup sistemiyle çözüldü. Ayrı önek toplamlı Jacobi
+  değer farkı 7.44 e−15,ηfarkı 6.66 e−13. Beklenen bölüm 83.1524486824.
+  Sol TD çizgisi bu popülasyon çözümüdür; sabitαuyarlanan zincirin tam ortalaması
+  diye sunulmaz. Minimum MC kökVE.05437698,TD.11673527.
+* C++ ilk 10 MC bölümü, ilk koşunun bütün 210 n/αhatası ve sekiz baz/karonun 25 bölüm
+  sonuçları bağımsız Python ile eşleşir: en büyük fark 5.11 e−15.
+  Dört tarayıcı LSTD matrisinin tersi/ağırlığı bağımsız NumPy solve/inv ile
+  doğrulandı; en büyük w farkı 7.55 e−15. Ham A,b,B,w ve gerçek adımlar JSJSON'da.
+* Şekil 9.8 için kaynak kesin aralık/genişlik vermez. Kendi [0,2],(.5,1.5)hedef,
+ 50 eşit merkez,.2/.4/1 genişlik,α.2/naktif seçildi. Figürler NumPy PCG 64 seed 930001
+  ve aynı 10240 uniform örneği; etkileşimli lab Mulberry 32 kullanır. Ön ayar aynı
+  parametre durumunu verir, aynı rastgele yol iddiası yoktur.
+* İki boyutlu Fourier katsayıları görselden(0,1),(1,0),(1,1),(0,5),(2,5),(5,2).
+  p 235 metin çıkarımındaki(1,5)overlay'i kullanılmadı.16 karo kernel haritası
+  gerçekten ortak aktif özellik sayısından, Voronoi/log/diagonal partition'lar
+  hesaplanan koordinatlardan, dört hash bölgesi gerçek 32 bit karma kovasından gelir.
+* İlgi deneyinde deterministik 4 durum,α_e=α0/(e+1)^.6,bölümde reset; MC içinM=I,
+  sabitn içinM=I+γ^nM_(t−n). Analitik azalan-adım limitleri sonlu sonuçla ayrıdır.
+* Çalıştırılan karşı örnekler: SGD durağan yerel maksimumu, εIile tekil sonlu TD
+  matrisi, raw/normalize/OLS kernel ayrımı ve 1/(τn)zaman-sabiti kuralının%95 olmaması.
+  Kernel dual formülü Bishop 2006§6.1 ile, TIDBDön baskı tarihi arXiv 1804.03334 ile
+  doğrulandı; bu ek kaynakların tamamı içe aktarılmış sayılmaz.
+
+`test/ch9.test.mjs` bağımsız Bellman/occupancy kalanı, nonsimetrik 2 × 2 ters,
+kernel karşı örneği, vurgu destekleri ve tam bütçe/veri bağını denetler.
+Kaynak/defter ikinci okumasında üretim işleri devredilmedi.208 kaynak birimi,
+5 kaynak alıştırması,17 kaynak görseli,4 algoritma ve 2 dipnot ledger'dadır;
+üç ek öğretim kartı ayrı sayılır. Bütün kitap tamamlanmadı.
+
+A/B görünümü ayrıca `check_ch9_browser.py URL CHROMIUM` ile gerçek tarayıcıda
+denetlenir: farklı grafik sayısı/birimleri, ölçüm adlarının eşleşmesi ve tek/A/B
+kare görüntü oranı.1280/390 px için16A/B yolu temiz. Ortak runtime özel
+grafik boyutlarını korur; bir tarafta olmayan grafik/ölçüm diğerinden yanlış
+değer almaz.

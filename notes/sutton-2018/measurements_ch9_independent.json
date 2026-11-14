@@ -1,0 +1,35 @@
+{
+  "MC_fixture_max_difference": 4.2717565595928875e-17,
+  "nstep_210_max_difference": 5.10702591327572e-15,
+  "bases_8_max_difference": 4.3298697960381105e-15,
+  "browser_LSTD_numpy": [
+    {
+      "seed": 1,
+      "episodes": 200,
+      "steps": 16644,
+      "max_w_difference": 2.7755575615628914e-15,
+      "max_inverse_difference": 3.122502256758253e-17
+    },
+    {
+      "seed": 1,
+      "episodes": 1000,
+      "steps": 81762,
+      "max_w_difference": 6.5503158452884236e-15,
+      "max_inverse_difference": 1.1492543028346347e-17
+    },
+    {
+      "seed": 7,
+      "episodes": 200,
+      "steps": 17518,
+      "max_w_difference": 4.6629367034256575e-15,
+      "max_inverse_difference": 5.551115123125783e-17
+    },
+    {
+      "seed": 7,
+      "episodes": 1000,
+      "steps": 84061,
+      "max_w_difference": 7.549516567451064e-15,
+      "max_inverse_difference": 2.190088388420719e-17
+    }
+  ]
+}
