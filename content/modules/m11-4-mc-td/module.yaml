@@ -2,16 +2,16 @@ id: m11-4-mc-td
 code: M11.4
 title: Modelden bağımsız değerlendirme — Monte Carlo ve TD
 phase: 11
-minutes: 560
+minutes: 710
 prereq:
 - m11-3-policy-iteration
-summary: 'Geçiş ve ödül modeli bilinmiyorsa değer, oynayarak kestirilir. Monte Carlo: bölüm sonuna kadar oyna,
-  getiriyi ortala (ilk-ziyarette uygun koşullarla yansız, yüksek varyans); zamansal fark (TD): bir adım oyna,
-  $r+\gamma V(s'')$''ye doğru güncelle (yanlı, düşük varyans). Öğrenme oranı koşulları, toplu (batch) MC ve
-  TD''nin farklı cevaplara yakınsaması, n adımlı getiriler ve uygunluk izleriyle TD(λ). Saf Python''da 5 durumlu
-  rastgele yürüyüşte MC ve TD; NumPy''da toplu güncelleme ve Sutton''ın A–B örneği; PyTorch''ta ileri bakışlı
-  λ-getirisi ile geriye bakışlı izlerin çevrimdışı eşdeğerliği; en sonda 1000 bağımsız deneyi aynı anda yürüten
-  vektörel TD.
+summary: 'Geçiş ve ödül modeli bilinmiyorsa değer, oynayarak kestirilir. Monte Carlo: bölüm sonuna kadar
+  oyna, getiriyi ortala (ilk-ziyarette uygun koşullarla yansız, yüksek varyans); zamansal fark (TD): bir
+  adım oyna, $r+\gamma V(s'')$''ye doğru güncelle (yanlı, düşük varyans). Öğrenme oranı koşulları, toplu
+  (batch) MC ve TD''nin farklı cevaplara yakınsaması, n adımlı getiriler ve uygunluk izleriyle TD(λ).
+  Saf Python''da 5 durumlu rastgele yürüyüşte MC ve TD; NumPy''da toplu güncelleme ve Sutton''ın A–B örneği;
+  PyTorch''ta ileri bakışlı λ-getirisi ile geriye bakışlı izlerin çevrimdışı eşdeğerliği; en sonda 1000
+  bağımsız deneyi aynı anda yürüten vektörel TD.
 
   '
 goals:
@@ -21,6 +21,8 @@ goals:
 - n adımlı TD, λ-getirisi, uygunluk izleri
 - 'Sutton Bölüm5: ilk/her ziyaret, 200 durumlu Blackjack ve Dirichlet yüzeyi'
 - Ordinary/weighted önem örnekleme; sonsuz varyans ile tutarlılığı ayırmak; indirim/karar başına oranlar
+- 'Sutton Bölüm6: zaman damgalı TD hataları, değişen tablo düzeltmesi ve eve dönüş'
+- Markov akışında sabit α sınırları; yürüyüşte başlatma/α taraması; batch kesinlik eşdeğeri
 sources:
 - title: 'Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 5–7 ve 12'
   url: http://incompleteideas.net/book/the-book-2nd.html
@@ -41,6 +43,10 @@ sources:
 - title: 'Durrett — Probability: Theory and Examples, 5e, Teorem2.4.1 (güçlü büyük sayılar yasası)'
   url: https://sites.math.duke.edu/~rtd/PTE/PTE5_011119.pdf
   license: ©; lisans doğrulanmadı
+  use: link
+- title: Sutton (1988) — Teorem2, dizi sonunda güncelleme koşulunun birincil metni
+  url: https://jmvidal.cse.sc.edu/library/sutton88a.pdf
+  license: ©
   use: link
 hand:
   groups:
@@ -74,8 +80,8 @@ hand:
     - id: rc
       label: C'nin gerçek değeri
       answer: 0.5
-  verify: "answers = dict(inc=0.5 + (1 - 0.5) / 4, mc=0.5 + 0.1 * (1 - 0.5), td=0.5 + 0.1 * (0 + 0.7 - 0.5),\
-    \ dlt=0.2,\n               vb=6 / 8, amc=0.0, atd=6 / 8, rc=3 / 6)\n"
+  verify: "answers = dict(inc=0.5 + (1 - 0.5) / 4, mc=0.5 + 0.1 * (1 - 0.5), td=0.5 + 0.1 * (0 + 0.7 -\
+    \ 0.5), dlt=0.2,\n               vb=6 / 8, amc=0.0, atd=6 / 8, rc=3 / 6)\n"
 stages:
   b:
     engine: browser
@@ -110,8 +116,8 @@ quiz:
     why: Yanlılık hedefin kendisinden gelir.
 - q: Toplu (batch) MC ve TD aynı veride neden farklı V(A) bulur?
   options:
-  - t: MC gözlenen getirilerin ortalamasını (eğitim kare hatasını en aza indirir), TD ise veriye en uygun Markov
-      modelinin değerini (kesinlik eşdeğerliği) bulur
+  - t: MC gözlenen getirilerin ortalamasını (eğitim kare hatasını en aza indirir), TD ise veriye en uygun
+      Markov modelinin değerini (kesinlik eşdeğerliği) bulur
     ok: true
     why: A'dan hep B'ye geçildiği için TD, V(A) = V(B) der.
   - t: TD daha az bölüm kullandığı için
@@ -150,9 +156,9 @@ labs:
 - id: l1
   lab: mctd
   title: 'Beş durumlu rastgele yürüyüş: Monte Carlo ve TD(0)'
-  goal: 'Rastgele politikanın değerini her ziyaret Monte Carlo ve TD(0) ile kestir. Çok sayıda bağımsız çalıştırmanın
-    ortalama RMS hatasını bölüm sayısına göre çiz. Sabit öğrenme oranının gürültü tabanını, α = 1/n(s)''nin
-    davranışını ve iki yöntemin hız farkını gör.
+  goal: 'Rastgele politikanın değerini her ziyaret Monte Carlo ve TD(0) ile kestir. Çok sayıda bağımsız
+    çalıştırmanın ortalama RMS hatasını bölüm sayısına göre çiz. Sabit öğrenme oranının gürültü tabanını,
+    α = 1/n(s)''nin davranışını ve iki yöntemin hız farkını gör.
 
     '
   predict:
@@ -212,20 +218,55 @@ labs:
       E: 100
       R: 1
     note: Tek eğri gürültülü; ortalama almadan sonuç çıkarılamaz.
+  - name: 'Kaynak Örnek6.2: yedi α eğrisi'
+    params:
+      view: 1
+      init: 0
+      E: 100
+      R: 100
+      seed: 1
+    note: Kaynak s.125;MC0.01/0.02/0.03/0.04,TD0.15/0.1/0.05;tek öğretim koşusu tohum2.
+  - name: 'Alıştırma6.4: geniş α aralığı'
+    params:
+      view: 2
+      init: 0
+      E: 100
+      R: 100
+      seed: 1
+    note: Kendi16 noktalı0.001…1 taramamız;ölçüt ilk100 bölümün ortalama RMS hatası.
+  - name: 'Alıştırma6.5: gerçek değerlerden başla'
+    params:
+      view: 1
+      init: 3
+      E: 100
+      R: 100
+      seed: 1
+    note: İlk RMS0;sonraki örnekleme gürültüsü nedeniyle hata artabilir.
+  - name: 'Başlangıç0: aynı kaynak α eğrileri'
+    params:
+      view: 1
+      init: 1
+      E: 100
+      R: 100
+      seed: 1
+    note: Başlatmanın geçici davranışı gerçekten değiştirmesini gözle.
   questions:
   - q: Sabit α ile hata neden sıfıra inmiyor, ve hangi koşulda bu bir avantaj olur?
-    a: 'Sabit α Robbins–Monro''nun Σα² < ∞ koşulunu bozar: her güncelleme yeni gürültü ekler ve tahmin gerçek
-      değer etrafında α ile büyüyen bir dağılımla dolaşır. Ortam zamanla değişiyorsa (durağan değilse) bu bir
-      avantajdır: eski deneyim (1 − α)^k ağırlıkla unutulur ve tahmin değişen değeri izler; 1/n ise eski gözlemleri
-      sonsuza dek eşit ağırlıkta tutar.'
-  limits: Rastgele politika, γ = 1, başlangıç V = 0.5. MC her ziyaret; ödül yalnız sağ çıkışta olduğu için
-    getiri bölümün son ödülüdür. RMS, beş durumun eşit ağırlıklı ortalaması.
+    a: 'Sabit α Robbins–Monro''nun Σα² < ∞ koşulunu bozar: her güncelleme yeni gürültü ekler ve tahmin
+      gerçek değer etrafında α ile büyüyen bir dağılımla dolaşır. Ortam zamanla değişiyorsa (durağan değilse)
+      bu bir avantajdır: eski deneyim (1 − α)^k ağırlıkla unutulur ve tahmin değişen değeri izler; 1/n
+      ise eski gözlemleri sonsuza dek eşit ağırlıkta tutar.'
+  limits: Rastgele politika, γ = 1, başlangıç V = 0.5. MC her ziyaret; ödül yalnız sağ çıkışta olduğu
+    için getiri bölümün son ödülüdür. RMS, beş durumun eşit ağırlıklı ortalaması. Kaynak görünümü sabitα
+    yedi eğri ve0/1/10/100 tek koşu paneli ekler. Geniş tarama16 noktadır;kitaptan alınmış yeni sonuç
+    değil kendi deneyimiz. Init kontrolü0.5/0/1/tam gerçek değerleri seçer;eski karşılaştırma varsayılanı
+    korunur.
 - id: l2
   lab: batchmctd
   title: 'Toplu MC ve toplu TD: aynı veriden iki farklı cevap'
   goal: 'Sınırlı bir deneyim kümesi üzerinde yakınsayana dek tekrarlanan (toplu) MC ve TD güncellemelerinin
-    sabit noktalarını hesapla. Sutton''ın A–B örneğinde V(A)''nın iki yöntemde neden farklı çıktığını ve rastgele
-    yürüyüşte veri miktarı arttıkça hangisinin daha az hata yaptığını gör.
+    sabit noktalarını hesapla. Sutton''ın A–B örneğinde V(A)''nın iki yöntemde neden farklı çıktığını
+    ve rastgele yürüyüşte veri miktarı arttıkça hangisinin daha az hata yaptığını gör.
 
     '
   predict:
@@ -272,15 +313,22 @@ labs:
       E: 20
       R: 1
     note: Gürültülü eğriler.
+  - name: 'Kaynak Şekil6.2: batch100×100'
+    params:
+      data: 1
+      E: 100
+      R: 100
+      seed: 1
+    note: Her yeni bölümden sonra bütün verinin MC/TD limitleri;numaralı kaynak grafiği.
   questions:
-  - q: Süreç Markov değilse (ör. A'dan sonra gelen B'nin sonucu A'dan gelinip gelinmediğine bağlıysa) hangi
-      cevap daha güvenilirdir?
+  - q: Süreç Markov değilse (ör. A'dan sonra gelen B'nin sonucu A'dan gelinip gelinmediğine bağlıysa)
+      hangi cevap daha güvenilirdir?
     a: 'Toplu TD''nin kesinlik eşdeğeri, B''nin değerinin nereden gelindiğinden bağımsız olduğunu varsayar.
-      A''dan gelindiğinde B gerçekten hep 0 veriyorsa (gizli bir durum), Markov varsayımı yanlıştır ve MC''nin
-      V(A) = 0 cevabı daha doğrudur: MC durumlar arasında hiçbir yapı varsaymaz, yalnız gözlenen getirileri
-      ortalar. TD''nin üstünlüğü Markov özelliğinin doğru olmasına bağlıdır.'
-  limits: 'γ = 1; toplu sabit noktalar kapalı biçimde hesaplanıyor (MC: getirilerin ortalaması, TD: sayım oranlı
-    modelin doğrusal sistemi). Rastgele yürüyüşte hiç ziyaret edilmemiş durum 0.5 sayılıyor.'
+      A''dan gelindiğinde B gerçekten hep 0 veriyorsa (gizli bir durum), Markov varsayımı yanlıştır ve
+      MC''nin V(A) = 0 cevabı daha doğrudur: MC durumlar arasında hiçbir yapı varsaymaz, yalnız gözlenen
+      getirileri ortalar. TD''nin üstünlüğü Markov özelliğinin doğru olmasına bağlıdır.'
+  limits: 'γ = 1; toplu sabit noktalar kapalı biçimde hesaplanıyor (MC: getirilerin ortalaması, TD: sayım
+    oranlı modelin doğrusal sistemi). Rastgele yürüyüşte hiç ziyaret edilmemiş durum 0.5 sayılıyor.'
 - id: l3
   lab: blackjackmc
   title: 'Kaynak Şekil 5.1: 10000/500000 Blackjack bölümü'
@@ -375,8 +423,8 @@ labs:
   questions:
   - q: Başka iç noktaların değerlerini öğrenmeden P yüksekliği bulunabilir mi?
     a: Evet; P başlangıçlı yürüyüşlerin terminal sınır yüksekliğini ortalamak yeterlidir.
-  limits: 25×25 ızgara, dört komşu, sınırda soğurma. Analitik k(x²−y²+0.6 xy) denetimi. Fiziksel sabun için
-    küçük-eğim yaklaşımı; P konumu ızgaraya yuvarlanır.
+  limits: 25×25 ızgara, dört komşu, sınırda soğurma. Analitik k(x²−y²+0.6 xy) denetimi. Fiziksel sabun
+    için küçük-eğim yaklaşımı; P konumu ızgaraya yuvarlanır.
 - id: l5
   lab: importancemc
   title: 'Kaynak Şekil 5.3/5.4: önem örnekleme ve sonsuz varyans'
@@ -433,8 +481,8 @@ labs:
   - q: Sonsuz varyans tek başına ordinary ortalamanın yakınsamamasını gerektirir mi?
     a: Hayır; örnekte E|X|=1 olduğundan güçlü büyük sayılar yasasıyla tutarlıdır.
   limits: Kaynak 5.4 noktaları multinomial artışlarla tam dağılımda örneklenir; bir milyar tekil yol dolaşılmaz.
-    Diğer modlar gerçek yollar, en çok 10000 bölüm; γ karşılaştırması 20 tekrar. 0–2 çerçevesi dışındaki sıçramalar
-    hesapta tutulur.
+    Diğer modlar gerçek yollar, en çok 10000 bölüm; γ karşılaştırması 20 tekrar. 0–2 çerçevesi dışındaki
+    sıçramalar hesapta tutulur.
 practice:
 - id: p1
   type: çözülmüş
@@ -442,11 +490,12 @@ practice:
   title: Bir bölümden MC ve TD güncellemeleri
   goal: İki güncellemeyi aynı veriyle uygulamak
   needs: $G_t$, $\delta$
-  q: 'Rastgele yürüyüşte bütün değerler 0.5 iken bir bölüm gözleniyor: C → D → E → (sağdan çık, ödül 1). $\alpha=0.1$,
-    $\gamma=1$. Her ziyaret MC ve TD(0) güncellemelerinden sonra $V(C)$, $V(D)$, $V(E)$ nedir?'
+  q: 'Rastgele yürüyüşte bütün değerler 0.5 iken bir bölüm gözleniyor: C → D → E → (sağdan çık, ödül 1).
+    $\alpha=0.1$, $\gamma=1$. Her ziyaret MC ve TD(0) güncellemelerinden sonra $V(C)$, $V(D)$, $V(E)$
+    nedir?'
   solution: 'MC: her durumun getirisi 1; $V\leftarrow0.5+0.1(1-0.5)=0.55$ üçü için. TD (sırayla): C: $\delta=0+V(D)-V(C)=0$,
-    değişmez (0.5); D: $\delta=0+V(E)-V(D)=0$, 0.5; E: $\delta=1+0-0.5=0.5$, $V(E)=0.55$. TD bu bölümde yalnız
-    son durumu değiştirdi; bilgi önceki durumlara sonraki bölümlerde yayılır.'
+    değişmez (0.5); D: $\delta=0+V(E)-V(D)=0$, 0.5; E: $\delta=1+0-0.5=0.5$, $V(E)=0.55$. TD bu bölümde
+    yalnız son durumu değiştirdi; bilgi önceki durumlara sonraki bölümlerde yayılır.'
 - id: p2
   type: hesap
   level: 1
@@ -507,23 +556,24 @@ practice:
   title: Yanlış indirimlenen MC getirisi
   goal: Getirinin ziyaret anından indirimlenmesi
   needs: $G_t=\sum_{k\ge t}\gamma^{k-t}r_k$
-  q: Bir öğrenci her ziyaret MC'de, bölümün ödüllerinden `G = sum(gamma**k * r[k] for k in range(T))` getirisini
-    hesaplıyor ve bölümde ziyaret edilen her durumu bu $G$'ye doğru güncelliyor. $\gamma<1$ iken bölümün sonlarına
-    doğru ziyaret edilen durumların değerleri sistematik olarak yanlış çıkıyor. Neden?
+  q: Bir öğrenci her ziyaret MC'de, bölümün ödüllerinden `G = sum(gamma**k * r[k] for k in range(T))`
+    getirisini hesaplıyor ve bölümde ziyaret edilen her durumu bu $G$'ye doğru güncelliyor. $\gamma<1$
+    iken bölümün sonlarına doğru ziyaret edilen durumların değerleri sistematik olarak yanlış çıkıyor.
+    Neden?
   choices:
   - t: Öğrenme oranı fazla büyük
     why: Hata sistematik ve yönlü; oran değil hedef yanlış.
-  - t: Getiri bölümün başından indirimleniyor ve önceki ödülleri de içeriyor; t anındaki durum için G_t = Σ_{k≥t}
-      γ^{k−t} r_k olmalı
+  - t: Getiri bölümün başından indirimleniyor ve önceki ödülleri de içeriyor; t anındaki durum için G_t
+      = Σ_{k≥t} γ^{k−t} r_k olmalı
     ok: true
     why: Sonradan ziyaret edilen durumun hedefi hem geçmiş ödülleri hem de fazladan γ^t indirimi taşıyor.
   - t: İlk ziyaret yerine her ziyaret kullanılmış
     why: Her ziyaret MC de tutarlıdır; sorun getirinin tanımında.
   hints:
   - $t=5$'te ziyaret edilen bir durum $r_0$'dan etkilenmeli mi?
-  solution: 'Getiriler geriye doğru tek geçişte hesaplanır: `G = 0; for t in reversed(range(T)): G = r[t] +
-    gamma * G; ret[t] = G`. Kaynaktaki formül de indirimi mutlak zamandan başlatıyor; bu yalnız bölümün ilk
-    durumu için doğrudur.'
+  solution: 'Getiriler geriye doğru tek geçişte hesaplanır: `G = 0; for t in reversed(range(T)): G = r[t]
+    + gamma * G; ret[t] = G`. Kaynaktaki formül de indirimi mutlak zamandan başlatıyor; bu yalnız bölümün
+    ilk durumu için doğrudur.'
 - id: p6
   type: kanıt
   level: 3
@@ -541,26 +591,26 @@ practice:
   hints:
   - $\sum_{n=m+1}^\infty(1-\lambda)\lambda^{n-1}=\lambda^m$.
   solution: 'Teleskopik toplam: $\sum_{k=t}^{t+n-1}\gamma^{k-t}[r_k+\gamma V(s_{k+1})-V(s_k)]=\sum\gamma^{k-t}r_k+\gamma^nV(s_{t+n})-V(s_t)$.
-    λ ile ağırlıklandırınca $\delta_k$, $n>k-t$ olan bütün $G^{(n)}$''lerde $\gamma^{k-t}$ katsayısıyla yer
-    alır: $\gamma^{k-t}\lambda^{k-t}$. Değerler bölüm içinde değişirse eşdeğerlik yaklaşıktır (çevrimiçi TD(λ));
-    "true online TD(λ)" bunu tam yapar.'
+    λ ile ağırlıklandırınca $\delta_k$, $n>k-t$ olan bütün $G^{(n)}$''lerde $\gamma^{k-t}$ katsayısıyla
+    yer alır: $\gamma^{k-t}\lambda^{k-t}$. Değerler bölüm içinde değişirse eşdeğerlik yaklaşıktır (çevrimiçi
+    TD(λ)); "true online TD(λ)" bunu tam yapar.'
 - id: p7
   type: yorumla
   level: 2
   title: Blackjack yüzeyinin üç özelliği
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak blackjack yüzeyinin üç özelliği
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Şekil 5.1 sağ panellerinde arka son iki satır neden yükselir? Sol kenardaki bütün son satır neden düşer?
-    Üst panellerde öndeki değerler neden alt panellerden daha yüksektir?
+  q: 'Şekil 5.1 sağ panellerinde arka son iki satır neden yükselir? Sol kenardaki bütün son satır neden
+    düşer? Üst panellerde öndeki değerler neden alt panellerden daha yüksektir?
 
 
     Kaynak: Sutton ve Barto (2018), s.94, Alıştırma 5.1.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
   solution: 'Arka satırlar oyuncu 20/21 toplamıdır: politika burada çekmek yerine durur. Sol kenar krupiyeA
-    sütunudur; güçlü krupiye kaybetme riskini artırır. Öndeki düşük toplamlar için üstte kullanılabilir as
-    vardır;11 sayılan as gerektiğinde 1 olup aşmayı önler. Asız elde bu esneklik yoktur. Eksen yönlerini değiştiren
-    çizimde de aynı toplam/kart dilimlerini izleyin.'
+    sütunudur; güçlü krupiye kaybetme riskini artırır. Öndeki düşük toplamlar için üstte kullanılabilir
+    as vardır;11 sayılan as gerektiğinde 1 olup aşmayı önler. Asız elde bu esneklik yoktur. Eksen yönlerini
+    değiştiren çizimde de aynı toplam/kart dilimlerini izleyin.'
   rubric:
   - 20/21 politika değişimi
   - KrupiyeA etkisi
@@ -571,16 +621,17 @@ practice:
   title: Blackjack ilk ve her ziyaret
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak blackjack ilk ve her ziyaret
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Aynı Blackjack görevinde ilk-ziyaret yerine her-ziyaret MC kullanılırsa sonuçlar çok değişir mi? Neden?
+  q: 'Aynı Blackjack görevinde ilk-ziyaret yerine her-ziyaret MC kullanılırsa sonuçlar çok değişir mi?
+    Neden?
 
 
     Kaynak: Sutton ve Barto (2018), s.94, Alıştırma 5.2.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: 'Aynı ellerde sonuçlar tam aynıdır: tam durum üçlüsü tekrar etmez. Kullanılabilir-as sınıfı içinde
-    toplam artar; kullanılabilir as 11 değerinden 1 değerine inerse sınıf değişir ve toplam 12…21 aralığında
-    tekrar kullanılabilir as kazanılamaz. Bundan sonra sert toplam artar. Yalnız toplamın tekrar edebilmesi
-    tam durum tekrarı değildir.'
+  solution: 'Aynı ellerde sonuçlar tam aynıdır: tam durum üçlüsü tekrar etmez. Kullanılabilir-as sınıfı
+    içinde toplam artar; kullanılabilir as 11 değerinden 1 değerine inerse sınıf değişir ve toplam 12…21
+    aralığında tekrar kullanılabilir as kazanılamaz. Bundan sonra sert toplam artar. Yalnız toplamın tekrar
+    edebilmesi tam durum tekrarı değildir.'
   rubric:
   - Tam üçlü kullanıldı
   - As sınıfı geçişi açıklandı
@@ -591,16 +642,17 @@ practice:
   title: MC eylem-değeri backup diyagramı
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak mc eylem-değeri backup diyagramı
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: '$q_\pi(s,a)$ kestiriminin backup diyagramını tarif edip çizin. Kök ve terminal nedir, hangi tahmini değerler
-    hedefe girer?
+  q: '$q_\pi(s,a)$ kestiriminin backup diyagramını tarif edip çizin. Kök ve terminal nedir, hangi tahmini
+    değerler hedefe girer?
 
 
     Kaynak: Sutton ve Barto (2018), s.97, Alıştırma 5.3.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: Kök siyah eylem düğümü(s,a). Sonra örneklenen durum/eylem zinciri, π altındaki kararlar ve her
-    geçişin ödülü, terminal kareye kadar uzanır. Tek yol vardır; tam beklenti ağacı dallanmaz. Hedef G_t tam
-    getiridir; ara V/Q kestirimine önyükleme yapılmaz. M11.4 Şekil 3 sağ paneli hesaplanan bir örneği çizer.
+  solution: Kök siyah eylem düğümü(s,a). Sonra örneklenen durum/eylem zinciri, π altındaki kararlar ve
+    her geçişin ödülü, terminal kareye kadar uzanır. Tek yol vardır; tam beklenti ağacı dallanmaz. Hedef
+    G_t tam getiridir; ara V/Q kestirimine önyükleme yapılmaz. M11.4 Şekil 3 sağ paneli hesaplanan bir
+    örneği çizer.
   rubric:
   - Kök eylem düğümü
   - Terminale tek örnek yol ve ödüller
@@ -611,16 +663,16 @@ practice:
   title: Tek bölümde 10 ve 5.5
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak tek bölümde 10 ve 5.5
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Tek terminal olmayan durum ve tek eylem var. Olasılık p ile kendine,1−p ile terminale gider; her ödül+1,γ
-    1. On adımlık tek bölümün toplam getirisi 10. İlk-ziyaret ve her-ziyaret kestirimlerini bulun. Sayısal
-    alana her-ziyaret sonucunu girin.
+  q: 'Tek terminal olmayan durum ve tek eylem var. Olasılık p ile kendine,1−p ile terminale gider; her
+    ödül+1,γ 1. On adımlık tek bölümün toplam getirisi 10. İlk-ziyaret ve her-ziyaret kestirimlerini bulun.
+    Sayısal alana her-ziyaret sonucunu girin.
 
 
     Kaynak: Sutton ve Barto (2018), s.105, Alıştırma 5.5.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: İlk ziyaretin G değeri 10. Ziyaretlerden sonraki getiriler 10,9,…,1 olduğundan her-ziyaret ortalaması
-    55/10=5.5. Bu tek bölümdeki iki tahmindir; gerçek değer p<1 için 1/(1−p).
+  solution: İlk ziyaretin G değeri 10. Ziyaretlerden sonraki getiriler 10,9,…,1 olduğundan her-ziyaret
+    ortalaması 55/10=5.5. Bu tek bölümdeki iki tahmindir; gerçek değer p<1 için 1/(1−p).
   answer: 5.5
   calc: sum(range(1,11))/10
 - id: p11
@@ -629,15 +681,15 @@ practice:
   title: Weighted Q için doğru oran
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak weighted q için doğru oran
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Davranış b bölümlerinden, durum değeri için (5.6) yerine Q(s,a) tahmini yazın. Önem çarpımı hangi zamanda
-    başlar?
+  q: 'Davranış b bölümlerinden, durum değeri için (5.6) yerine Q(s,a) tahmini yazın. Önem çarpımı hangi
+    zamanda başlar?
 
 
     Kaynak: Sutton ve Barto (2018), s.108, Alıştırma 5.6.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: Ziyaret kümesini T(s,a) seçin. Q=Σρ_{t+1:T−1}G_t / Σρ_{t+1:T−1}; payda 0 ise 0. Mevcut eylem a
-    tanım gereği zorlanmıştır; politika farkı sonraki eylemlerle başlar. t oranını katmak pozitif sabitken
+  solution: Ziyaret kümesini T(s,a) seçin. Q=Σρ_{t+1:T−1}G_t / Σρ_{t+1:T−1}; payda 0 ise 0. Mevcut eylem
+    a tanım gereği zorlanmıştır; politika farkı sonraki eylemlerle başlar. t oranını katmak pozitif sabitken
     weighted ortalamada sadeleşir ama π(a|s)=0 iken bütün örnekleri yok eder; Q değeri yine tanımlıdır.
   rubric:
   - T(s,a) kümesi
@@ -649,16 +701,17 @@ practice:
   title: Weighted hata önce neden artabilir?
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak weighted hata önce neden artabilir?
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Şekil 5.3 içindeki ordinary hata azalırken weighted hata önce artıp sonra düşer. Verilen başlangıç durumu
-    ve kestirim 0 ile makul açıklama yapın.
+  q: 'Şekil 5.3 içindeki ordinary hata azalırken weighted hata önce artıp sonra düşer. Verilen başlangıç
+    durumu ve kestirim 0 ile makul açıklama yapın.
 
 
     Kaynak: Sutton ve Barto (2018), s.108, Alıştırma 5.7.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: Gerçek değer yaklaşık−0.27726;0 başlangıcının kare hatası 0.0768731. İlk pozitif ağırlıklı getiri±1
-    ise ağırlık sadeleşir ve sonuç±1 olur, çoğunlukla başlangıçtan daha uzaktır. Daha çok etkili örnek gelince
-    ortalama dengelenir. Weighted sonlu örneklemde yanlıdır; düşüşün her örnek ve tohumda tekdüze olması beklenmez.
+  solution: Gerçek değer yaklaşık−0.27726;0 başlangıcının kare hatası 0.0768731. İlk pozitif ağırlıklı
+    getiri±1 ise ağırlık sadeleşir ve sonuç±1 olur, çoğunlukla başlangıçtan daha uzaktır. Daha çok etkili
+    örnek gelince ortalama dengelenir. Weighted sonlu örneklemde yanlıdır; düşüşün her örnek ve tohumda
+    tekdüze olması beklenmez.
   rubric:
   - 0 başlangıcının yakınlığı
   - Tek pozitif ağırlıkta G
@@ -698,9 +751,9 @@ practice:
     Kaynak: Sutton ve Barto (2018), s.109, Alıştırma 5.9.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: 'V keyfî,N 0. Her tam bölümde G 0 ile geriye git: G=R_{t+1}+γG. S_t, S_0…S_{t−1} içinde yoksa N(S_t)+=1;
-    V(S_t)+=(G−V(S_t))/N(S_t). Returns listesi tutulmaz. Geri taramada yalnız bir seen kümesi kullanmak zaman
-    sırasındaki son ziyareti seçer, istenen ilk ziyaret değildir.'
+  solution: 'V keyfî,N 0. Her tam bölümde G 0 ile geriye git: G=R_{t+1}+γG. S_t, S_0…S_{t−1} içinde yoksa
+    N(S_t)+=1; V(S_t)+=(G−V(S_t))/N(S_t). Returns listesi tutulmaz. Geri taramada yalnız bir seen kümesi
+    kullanmak zaman sırasındaki son ziyareti seçer, istenen ilk ziyaret değildir.'
   rubric:
   - Önceki zaman öneki denetimi
   - N güncellemesi
@@ -711,18 +764,18 @@ practice:
   title: Ağırlıklı artımlı ortalamanın türetimi
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak ağırlıklı artımlı ortalamanın türetimi
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Kaynak (5.7) içindeki ilk n−1 getirinin weighted ortalamasından (5.8) güncellemesini türetin. C indekslerini
-    açık yazın.
+  q: 'Kaynak (5.7) içindeki ilk n−1 getirinin weighted ortalamasından (5.8) güncellemesini türetin. C
+    indekslerini açık yazın.
 
 
     Kaynak: Sutton ve Barto (2018), s.109, Alıştırma 5.10. Ağırlıksız güncelleme (2.3) türetiminin örüntüsünü
     izleyin.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: V_n=Σ_{k<n}W_kG_k/Σ_{k<n}W_k ve C_n=Σ_{k≤n}W_k olsun. Yeni pay=(C_n−W_n)V_n+W_nG_n; C_n ile bölünce
-    V_{n+1}=V_n+(W_n/C_n)(G_n−V_n). Kaynağın C_{n+1}=C_n+W_{n+1} indeksi bu tanımla uyumludur. Kodda önce C+=W,
-    sonra V+=(W/C)(G−V); C>0 şartını denetle. Ağırlıksız türetimdeki eski toplam=n·ortalama adımı burada eski
-    toplam=C_old·V_old olur; yeni ağırlık1 yerine W konur.
+  solution: V_n=Σ_{k<n}W_kG_k/Σ_{k<n}W_k ve C_n=Σ_{k≤n}W_k olsun. Yeni pay=(C_n−W_n)V_n+W_nG_n; C_n ile
+    bölünce V_{n+1}=V_n+(W_n/C_n)(G_n−V_n). Kaynağın C_{n+1}=C_n+W_{n+1} indeksi bu tanımla uyumludur.
+    Kodda önce C+=W, sonra V+=(W/C)(G−V); C>0 şartını denetle. Ağırlıksız türetimdeki eski toplam=n·ortalama
+    adımı burada eski toplam=C_old·V_old olur; yeni ağırlık1 yerine W konur.
   rubric:
   - Eski payın ağırlıkla yazımı
   - Yeni paydaya bölme
@@ -733,17 +786,18 @@ practice:
   title: Gelecek önem oranlarını ele
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak gelecek önem oranlarını ele
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Kaynak (5.12) tam yol oranlı ilk ödülden (5.14) karar başına özdeşliğine giden adımları gösterin. Ödülden
-    sonraki oranları neden silebiliriz?
+  q: 'Kaynak (5.12) tam yol oranlı ilk ödülden (5.14) karar başına özdeşliğine giden adımları gösterin.
+    Ödülden sonraki oranları neden silebiliriz?
 
 
     Kaynak: Sutton ve Barto (2018), s.115, Alıştırma 5.13.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
   solution: 'Sonlu ufukta en son eylemi koşullu ortalama alarak eleyin: geçmiş H_j verildiğinde E_b[π(A_j|S_j)/b(A_j|S_j)|H_j]=Σ_aπ(a|S_j)=1.
-    R_{t+1} ve önceki çarpanlar bu geçmişte ölçülebilir. Kule özelliğini j=T−1,…,t+1 boyunca uygulayın: E_b[ρ_{t:T−1}R_{t+1}]=E_b[ρ_{t:t}R_{t+1}].
-    R_k için t…k−1 öneki kalır; γ katsayılarıyla toplayınca tildeG. Rastgele sonlanmada terminal sonrası oran
-    1/sıfır ödül ile doldurma ve integrallenebilirlik gerekir. Koşulsuz bağımsızlık iddia edilmez.'
+    R_{t+1} ve önceki çarpanlar bu geçmişte ölçülebilir. Kule özelliğini j=T−1,…,t+1 boyunca uygulayın:
+    E_b[ρ_{t:T−1}R_{t+1}]=E_b[ρ_{t:t}R_{t+1}]. R_k için t…k−1 öneki kalır; γ katsayılarıyla toplayınca
+    tildeG. Rastgele sonlanmada terminal sonrası oran 1/sıfır ödül ile doldurma ve integrallenebilirlik
+    gerekir. Koşulsuz bağımsızlık iddia edilmez.'
   rubric:
   - Koşullu ortalama1
   - Sondan kule özelliği
@@ -755,8 +809,8 @@ practice:
   title: MC-V backup sorusu
   goal: Numarasız kaynak sorusunun tek örnek yolunu açıklamak
   needs: Tam getiri ve backup
-  q: 'Backup diyagramı fikri Monte Carlo değer tahminine nasıl genellenir? Kökteki durum, hedefe katkı veren
-    geçişler ve terminal nasıl gösterilir?
+  q: 'Backup diyagramı fikri Monte Carlo değer tahminine nasıl genellenir? Kökteki durum, hedefe katkı
+    veren geçişler ve terminal nasıl gösterilir?
 
 
     Kaynak: Sutton ve Barto (2018), s.94–95, numarasız metin içi soru.'
@@ -779,41 +833,223 @@ practice:
   - Bilinen öneriler ifadesini evrensel imkânsızlıktan ayırdım
   - Sabit sonlu ufuk örneğinde ayrı normalizasyon koşullarını yazdım
   hints:
-  - Her ödül zamanının öneklerini ayrı normalize etmek, bütün ziyaretlerin tek paydasını kullanmakla aynı mıdır?
-  solution: Kitap2018, yazarların bildiği o zamanki önerilerin tutarlı olmadığını söyler. Bu tarihsel bilgi,
-    tüm mümkün weighted yöntemlerin tutarsızlığı teoremi değildir. Kendi öğretim uzantımızda sabit sonlu H
-    için terminal sonrasını sıfır ödülle doldurup her zamanda ΣρönekR/Σρönek hesaplarız; kapsama ve integrallenebilirlikle
-    her zamanın oranı tutarlı, sonlu toplam da tutarlıdır. Yalnız hayatta kalanları normalize etmek terminal
-    olasılığını siler. Bu örnek kaynağın(5.10) formülüyle aynı yöntem değildir, rastgele sonsuz ufka koşulsuz
-    taşınmaz.
+  - Her ödül zamanının öneklerini ayrı normalize etmek, bütün ziyaretlerin tek paydasını kullanmakla aynı
+    mıdır?
+  solution: Kitap2018, yazarların bildiği o zamanki önerilerin tutarlı olmadığını söyler. Bu tarihsel
+    bilgi, tüm mümkün weighted yöntemlerin tutarsızlığı teoremi değildir. Kendi öğretim uzantımızda sabit
+    sonlu H için terminal sonrasını sıfır ödülle doldurup her zamanda ΣρönekR/Σρönek hesaplarız; kapsama
+    ve integrallenebilirlikle her zamanın oranı tutarlı, sonlu toplam da tutarlıdır. Yalnız hayatta kalanları
+    normalize etmek terminal olasılığını siler. Bu örnek kaynağın(5.10) formülüyle aynı yöntem değildir,
+    rastgele sonsuz ufka koşulsuz taşınmaz.
+- id: p19
+  type: kanıt
+  level: 3
+  title: Değişen V ile TD hata toplamı
+  goal: Kaynak koşullarıyla değişen v ile td hata toplamı
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: '$V_t$,$t$ anındaki TD hatasını hesaplarken kullanılan tablo olsun;terminal değerini0 tutun. Tablo
+    bölüm içinde değişirken kaynak(6.6) tam doğru değildir. $\sum_{k=t}^{T-1}\gamma^{k-t}\delta_k$ toplamına
+    hangi ek terim gelirse $G_t-V_t(S_t)$ elde edilir?
+
+
+    Kaynak:Sutton ve Barto (2018),s.121,Alıştırma6.1.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'Tablo sürümüyle hata $\delta_k=R_{k+1}+\gamma V_k(S_{k+1})-V_k(S_k)$. Toplamda komşu durum
+    terimlerini eşleştirince, terminal değerleri sabit 0 için eklenecek miktar
+
+
+    $$C_t=\sum_{j=t+1}^{T-1}\gamma^{j-t}[V_j(S_j)-V_{j-1}(S_j)].$$
+
+
+    Böylece $G_t-V_t(S_t)=\sum_{k=t}^{T-1}\gamma^{k-t}\delta_k+C_t$. Donmuş tabloda C sıfır. Aynı durumdan
+    iki 1 ödüllü geçişle terminale gidilen α0.1,V başlangıcı 0,γ1 örneğinde hatalar 1/0.9,toplam 1.9;MC
+    hatası 2,ek tablo farkı 0.1. Bütün tabloları tek V diye yazmak bu farkı gizler.'
+  rubric:
+  - Tablo sürümleriyleδ yazdım
+  - İndeks kaydırıp uçları eşledim
+  - Doğru işaretli ek toplamı buldum
+  - Terminal 0 ve donmuş tablo sınırını denetledim
+- id: p20
+  type: açıkla
+  level: 2
+  title: Yeni bina,bilinen otoyol
+  goal: Kaynak koşullarıyla yeni bina,bilinen otoyol
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Eve dönüş probleminde hangi geçmiş deneyim ve mevcut durum altında TD güncellemesinin MC güncellemesinden
+    ortalamada daha iyi olmasını beklersiniz? Yeni bina/otopark,aynı otoyol ipucunu ve ilk senaryoya bağlantıyı
+    kullanın.
+
+
+    İpucu:Eski eve dönüş güzergâhında çok sayıda deneyiminiz var;sonra yeni binaya ve otoparka taşınıyor,aynı
+    yerden otoyola bağlanıyorsunuz.
+
+
+    Kaynak:Sutton ve Barto (2018),s.123,Alıştırma 6.2.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: Otoyoldan eve kadar değerleri çok geçmiş deneyimle iyi bildiğinizi, yalnız yeni bina ve otoparktan
+    aynı otoyola ulaşmayı öğrenmekte olduğunuzu düşünün. TD yeni kısmın kısa örneğini bilinen devam değeriyle
+    tamamlar. MC, kalan bütün yolun trafik ve olay gürültüsünü tekrar örnekler. Böylece yeni başlangıçta
+    TD daha az varyansla eski bilgiyi paylaşabilir. İlk senaryodaki tanıdık alt yollar ve seyrek kamyon
+    gecikmesi de aynı yapıyı verebilir. Devam tahmini kötü veya temsil yanlışsa üstünlük zorunlu değildir.
+  rubric:
+  - Geçmişte öğrenilmiş devam
+  - Yeni başlangıca aktarım
+  - MC kalan yol varyansı
+  - İlk senaryoyla bağlantı
+- id: p21
+  type: hesap
+  level: 2
+  title: İlk bölümde yalnız A değişirse
+  goal: Kaynak koşullarıyla i̇lk bölümde yalnız a değişirse
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Kaynak yürüyüş grafiğinde ilk bölüm yalnızV(A) değerini değiştiriyor. Yol hangi uçta bitti? Neden
+    diğer değerler değişmedi? Tam değişimi ve yeniV(A) değerini bulun;alana yeni değeri girin.
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma 6.3.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'Başlangıç V0.5,α0.1,γ1. İç geçişlerde ödül 0 ve ardıl değer 0.5 olduğundan TD hatası 0. Son
+    geçiş soldaki terminale olmuş: hedef 0,A için hata−0.5. Değişim−0.05 ve yeni V(A)=0.45. Sağ terminal
+    olsaydı E+0.05 değişirdi.'
+  answer: 0.45
+  calc: .5+.1*(0-.5)
+- id: p22
+  type: yorumla
+  level: 2
+  title: Daha geniş α taraması sonucu değiştirir mi?
+  goal: Kaynak koşullarıyla daha geniş α taraması sonucu değiştirir mi?
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Kaynak yürüyüşün sağ grafiği seçilen α değerlerine bağlı. Daha geniş bir sabit α aralığı kullanılsa
+    hangi yöntemin daha iyi olduğuna ilişkin sıralama değişir miydi? Ayrı olarak,yöntemlerden biri gösterilmeyen
+    başka sabit α ile belirgin daha iyi performans verebilir miydi? İki soruyu gerekçeleriyle ayrı yanıtlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma6.4.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: Çok küçük α sınırlı ufukta ilk hatayı yavaş siler; büyük α örnekleme dalgalanmasını büyütür.
+    Kaynakta gösterilen makul aralığın dışında otomatik büyük iyileşme beklemek için gerekçe yoktur; bu
+    evrensel bir teorem değildir. Aynı görevde 16 noktalı 0.001…1 taramamız,100 tekrar/100 bölüm ve ilk
+    100 RMS ortalamasıyla MC α0.03 için 0.12077,TD α0.1 için 0.068395 buldu. Yalnız son bölüm hatası,başlatma
+    veya ufuk değişirse optimum ayar değişebilir. Sıralama sorusunda bu görev ve ölçütte ölçülen TD avantajı
+    değerlendirilir;başka görev/ufuk için sonuç çıkarılmaz. Tek yöntemin ayarı sorusunda ise çok küçük
+    oranla yavaş öğrenme ve çok büyük oranla gürültü dengelenir;16 noktalı tarama daha geniş aralık için
+    deneysel kontroldür,kesintisiz bütün α değerlerinin en iyisini ispatlamaz.
+  rubric:
+  - α/ufuk/ölçüt ayrımı
+  - Küçükα geçici hata/büyükα gürültü
+  - Geniş taramayı ölçütüyle yorumladım
+- id: p23
+  type: yorumla
+  level: 3
+  title: TD RMS önce inip sonra neden çıkabilir?
+  goal: Kaynak koşullarıyla td rms önce inip sonra neden çıkabilir?
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Yürüyüşte özellikle büyükα için TD RMS eğrisi önce düşüp sonra yükseliyor. Bunun nedeni ne olabilir?
+    Her zaman olur mu,başlatmaya bağlı olabilir mi?
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma 6.5. Kaynakta yıldızlı alıştırma.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: Bütün değerleri 0.5 başlatmak zaten doğrusal gerçek profile yakındır. İlk öğrenme sistematik
+    farkı azaltırken sabit büyük α son örneklerin gürültüsünü sürekli taşır; hata geçici bir minimumun
+    üstündeki düzeye çıkabilir. Başlatma değişirse geçici eğri de değişir. Tam gerçek değerlerden başlatmak
+    0 hata verir,sonraki rastgele güncellemeler artırabilir; önce düşüş zorunlu değildir.
+  rubric:
+  - Başlangıç yakınlığı
+  - Sabitα gürültü tabanı
+  - Her zaman değil
+  - Gerçek değerlerden başlatma karşı örneği
+- id: p24
+  type: kanıt
+  level: 2
+  title: Beş doğru değeri iki yolla bulmak
+  goal: Kaynak koşullarıyla beş doğru değeri iki yolla bulmak
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'A…E için 1/6,2/6,3/6,4/6,5/6 değerlerini en az iki farklı yöntemle hesaplayın. Yazarların hangisini
+    kullandığını tahmin edin ve gerekçe yazın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma 6.6.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'Birinci yol: $v_0=0,v_6=1$ sınırlarıyla $v_i=(v_{i-1}+v_{i+1})/2$ tridiagonal sistemini çözün.
+    Ardışık farklar eşit; altı farkın toplamı 1,her fark 1/6 ve $v_i=i/6$.
+
+
+    İkinci yol: simetrik yürüyüşte sağ uca varma olasılığını gambler''s ruin veya martingal ile hesaplayın.
+    Uygun sonlu-soğurma/durdurma koşullarıyla $\mathbb E[X_T\mid X_0=i]=i$. Son konum yalnız 0 veya 6
+    olduğundan $6\Pr(\text{sağ})=i$.
+
+
+    Çok örnekli MC de yaklaşım verir. Bu düzgün rasyonel sayılar için analitik veya doğrusal çözüm kullanılmış
+    olması makul tahmindir;yazarların gerçek hesap günlüğü verilmediğinden kesin bilgi değildir.'
+  rubric:
+  - Bellman sistemi ve sınırlar
+  - Sağ uç olasılığı/martingal yolu
+  - Durdurma koşulu
+  - Tahmin ile kaynak olgusunu ayırdım
+- id: p25
+  type: kanıt
+  level: 3
+  title: Politika dışı tek-adım TD
+  goal: Kaynak koşullarıyla politika dışı tek-adım td
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Keyfî hedefπ ve onu kapsayan davranışb için her adımdaρ_t:t kullanarak politika dışı TD(0) güncellemesini
+    tasarlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.128–129,Alıştırma 6.7. Kaynakta yıldızlı alıştırma.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'Tek-adımlı oran $\rho_{t:t}=\pi(A_t\mid S_t)/b(A_t\mid S_t)$ ile
+
+
+    $$V(S_t)\leftarrow V(S_t)+\alpha\rho_{t:t}[R_{t+1}+\gamma V(S_{t+1})-V(S_t)].$$
+
+
+    Geçmiş koşullu beklentide ağırlıklı ödül/ardıl terimi hedef Bellman beklentisine dönüşür; eksi V terimi
+    için $\mathbb E_b[\rho_{t:t}\mid S_t]=1$. Dolayısıyla beklenen yön $T_\pi V-V$. Kapsama ve seçildiği
+    andaki davranış olasılığı gerekir. Yeterli ziyaret,uygun moment/sonlanma ve öğrenme oranı koşulları
+    korunur;fonksiyon yaklaşımı otomatik kararlı olmaz.'
+  rubric:
+  - Tek adımlıρ
+  - Bütün TD hatasına oran
+  - BeklenenBellman yönü
+  - Kapsama ve teorem koşulları
 pitfalls:
 - wrong: TD yanlı olduğu için yanlış değere yakınsar.
-  right: TD'nin yanlılığı hedefin henüz yanlış olan tahmini kullanmasından gelir ve öğrenme ilerledikçe kaybolur;
-    Robbins–Monro koşulları ve yeterli ziyaretle tablo TD(0) doğru V^π'ye yakınsar.
+  right: TD'nin yanlılığı hedefin henüz yanlış olan tahmini kullanmasından gelir ve öğrenme ilerledikçe
+    kaybolur; Robbins–Monro koşulları ve yeterli ziyaretle tablo TD(0) doğru V^π'ye yakınsar.
 - wrong: Sabit öğrenme oranıyla da tahmin sonunda gerçek değere eşit olur.
-  right: 'Sabit α Σα² < ∞ koşulunu bozar: tahmin gerçek değer etrafında α ile orantılı bir gürültüyle dolaşmaya
-    devam eder (lab l1). Yakınsama için α_n = 1/n gibi azalan oranlar gerekir; değişen ortamlarda ise sabit
-    α bilinçli bir seçimdir.'
+  right: 'Sabit α Σα² < ∞ koşulunu bozar: tahmin gerçek değer etrafında α ile orantılı bir gürültüyle
+    dolaşmaya devam eder (lab l1). Yakınsama için α_n = 1/n gibi azalan oranlar gerekir; değişen ortamlarda
+    ise sabit α bilinçli bir seçimdir.'
 - wrong: Aynı veriyle toplu MC ve toplu TD aynı tahmini verir.
   right: Toplu MC eğitim getirilerine kare hatayı en küçükler; toplu TD veriden kestirilen Markov modelinin
     değerini (kesinlik eşdeğeri) bulur. A–B örneğinde V(A) = 0'a karşı 0.75.
 - wrong: Monte Carlo yansız olduğu için her zaman en iyi kestiricidir.
-  right: Yansızlık hata ölçüsünün yalnız bir parçasıdır; MC'nin yüksek varyansı aynı veriyle daha büyük ortalama
-    hata verir (C'de hedef varyansı 1/4'e karşı TD'de 1/36).
+  right: Yansızlık hata ölçüsünün yalnız bir parçasıdır; MC'nin yüksek varyansı aynı veriyle daha büyük
+    ortalama hata verir (C'de hedef varyansı 1/4'e karşı TD'de 1/36).
 - wrong: MC kestirimleri başka değerlere dayanmaz, dolayısıyla istatistiksel olarak bağımsızdır.
   right: Önyükleme yoktur; aynı bölümlerin ödüllerini paylaşan durum tahminleri yine bağımlı olabilir.
 - wrong: Sonsuz varyans ordinary IS tutarsızlığını kanıtlar.
-  right: Örnek5.5 için E|X|=1; güçlü büyük sayılar yasası yakınsamayı sağlar. Sonlu varyans hız garantisi kaybolur.
+  right: Örnek5.5 için E|X|=1; güçlü büyük sayılar yasası yakınsamayı sağlar. Sonlu varyans hız garantisi
+    kaybolur.
 whatif:
 - q: Ödüller rastgele olsaydı (aynı geçişte farklı ödüller)?
-  a: 'İki yöntem de değişmeden çalışır: MC getirileri, TD tek adımlık hedefleri ortalar; ödül gürültüsü her
-    iki hedefin varyansını artırır. TD''de yalnız bir ödülün gürültüsü, MC''de bölüm boyunca bütün ödüllerin
-    gürültüsü (γ^{2k} ağırlıklı) toplanır.'
+  a: 'İki yöntem de değişmeden çalışır: MC getirileri, TD tek adımlık hedefleri ortalar; ödül gürültüsü
+    her iki hedefin varyansını artırır. TD''de yalnız bir ödülün gürültüsü, MC''de bölüm boyunca bütün
+    ödüllerin gürültüsü (γ^{2k} ağırlıklı) toplanır.'
 - q: Durum sayısı çok büyük olsaydı (her durum en çok bir kez görülseydi)?
-  a: 'Tablo tahminleri hiç ortalama alamaz. Değer fonksiyonu parametrik bir fonksiyonla yaklaşılır: V(s) ≈
-    v(s; w), güncelleme w ← w + α δ ∇_w v(s; w) (yarı-gradyan TD). Benzer durumlar arasında genelleme yapılır;
-    bedeli TD''nin yakınsama güvencelerinin zayıflamasıdır (M11.6).'
+  a: 'Tablo tahminleri hiç ortalama alamaz. Değer fonksiyonu parametrik bir fonksiyonla yaklaşılır: V(s)
+    ≈ v(s; w), güncelleme w ← w + α δ ∇_w v(s; w) (yarı-gradyan TD). Benzer durumlar arasında genelleme
+    yapılır; bedeli TD''nin yakınsama güvencelerinin zayıflamasıdır (M11.6).'
 - q: λ bölüm içinde değişseydi (ör. durumun ne kadar tanıdık olduğuna göre)?
-  a: Durum bağımlı λ(s) ile iz e(s) ← γλ(s_t) e(s) + 1 olarak güncellenir. Tahmini güvenilir durumlarda küçük
-    λ (bootstrapping), belirsiz durumlarda büyük λ (gerçek getiriye güven) seçilebilir; Sutton ve Barto'nun
-    12. bölümündeki genel λ-getirisi bu fikrin biçimselleştirilmesidir.
+  a: Durum bağımlı λ(s) ile iz e(s) ← γλ(s_t) e(s) + 1 olarak güncellenir. Tahmini güvenilir durumlarda
+    küçük λ (bootstrapping), belirsiz durumlarda büyük λ (gerçek getiriye güven) seçilebilir; Sutton ve
+    Barto'nun 12. bölümündeki genel λ-getirisi bu fikrin biçimselleştirilmesidir.

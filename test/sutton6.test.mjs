@@ -1,0 +1,12 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {windModel,windStep} from '../site/js/labs/windytd.js';
+import {cliffSource} from '../site/js/labs/cliffsource.js';
+import {train,greedyPath} from '../site/js/labs/cliffwalk.js';
+const P=JSON.parse(fs.readFileSync(new URL('../notes/sutton-2018/measurements_ch6_python.json',import.meta.url)));
+const close=(a,b,t=1e-9)=>assert.ok(Math.abs(a-b)<t,`${a} vs ${b}`);
+test('Sutton6: all420 windy-state values agree with independent NumPy Bellman solves',()=>{for(const a of[4,8,9])for(const st of[false,true]){const z=windModel(a,st),r=P.wind[`${a}/${Number(st)}`];for(let s=0;s<70;s++)close(z.V[s],r.V[s]);}assert.deepEqual([-1,0,1].map(z=>windStep(38,3,z)),[37,27,17]);});
+test('Sutton6: full source-budget cliff runs approach independent model returns',()=>{const expected=cliffSource.rows.find(x=>x.method===2&&x.alpha===1&&x.episodes===100000),q=cliffSource.rows.find(x=>x.method===1&&x.alpha===1&&x.episodes===100000);close(expected.mean,P.cliff.expected_soft_optimum.V[36],.3);close(q.mean,P.cliff.greedy_optimum.epsilon_behavior_V[36],.3);assert.equal(cliffSource.rows.length,114);assert.equal(cliffSource.rows.reduce((n,x)=>n+x.steps,0),13385049857);});
+test('Sutton6: an old1000-step cutoff is reported,not called a terminal episode',()=>{const d=train(0,{full:0,alpha:.5,eps:.1},()=>0,1);assert.equal(d.truncated,1);assert.deepEqual(d.sums,[-1000]);});
+test('Sutton6: cliff diagnostic path records the actual hazard cell',()=>{const Q=Array.from({length:48},()=>[0,0,0,0]);Q[36][0]=1;for(const s of[24,25,26])Q[s][3]=1;Q[27][1]=1;assert.deepEqual(greedyPath(Q).at(-1),[3,3]);});

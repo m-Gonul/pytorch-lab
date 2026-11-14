@@ -94,3 +94,34 @@ Kaynak s.107 “yakınsamaz” iddiası düzeltilir;MC ES açık-problem ve bili
 Python doğrulamasında küçük Torch çekirdeklerinin çok fazla iş parçacığı açmasını önlemek için `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1` ortamı kullanıldı. GPU/Triton gerektirmeyen iki değişen modül ve notebook gerçek CPU Torch ile denetlendi. Sayıdan bağımsız basit etiketler için üretim tekrarında tüm Monte Carlo koşularını yeniden çalıştırmak gerekmez.
 
 İlk beş bölüm işlendi;Bölüm6–17,ön/arka materyal,kısım ayırıcıları ve kitabın tüm kaynakça/dizin aktarımı tamamlanmadı.
+
+## Bölüm 6
+
+Basılı s.119–140 / PDF141–162. 134 kaynak birimi:14 alıştırma,2 numarasız soru,14 görsel(5 numaralı/9 numarasız),4 kutulu kod,1 tablo ve1 gerçek dipnot. Bağımsız ikinci okuma22 metinli sayfa ve18 görüntüyü yalnız PDF/defter üzerinden denetledi;son takipte açık bulgu kalmadı. M11.4/M11.5 genişletildi;eski aşamalar ve deneyler korunur. İlk6 bölüm841 birimdir;Bölüm7–17 ve ön/arka materyal tamamlanmadı.
+
+Yedi özgün SVG grubunu,aritmetik ve bağımsız modelleri yeniden üret:
+
+```bash
+python3 -I notes/sutton-2018/generate_ch6.py /tmp/sutton-ch6
+OPENBLAS_NUM_THREADS=1 python3 -I notes/sutton-2018/measure_ch6.py /tmp/ch6-python.json
+node notes/sutton-2018/measure_ch6.mjs /tmp/ch6-python.json /tmp/ch6-js.json
+```
+
+`measurements_ch6_python.json`,eve dönüşün bütün zaman/ödül/hata dizilerini,6.1/6.3/6.12 hesaplarını,Predictor örneğini,afterstate maliyetini,altı4/8/9 eylemli belirlenimci/stokastik rüzgâr modelinin420 değerini ve bağımsız uçurum MDP çözümlerini içerir. Uçurumda optimal açgözlü V(S)=−13;bu politikanın ε0.1 davranışı−50.8000476668;ε-soft optimum değer−20.7076773987. Bunlar tam model referanslarıdır,sonlu öğrenilmiş tabloların otomatik optimum olduğunun iddiası değildir.
+
+Sabitα ortalama yakınsaması karşı örneği aynı kayıttadır. P=[[.8,.2],[.3,.7]],r=(0,1),γ.9 için gerçekV=(3.27272727,5.09090909);α.1 çevrimiçi Markov güncellemesinin dört birinci-moment denkleminden limiti(3.30319311,5.10246153). 4096 zincir×12000 adım(ilk6000 atılır) gerçek örneklemesi(3.30318634,5.10223722),zincirler arasıSE(.00134294,.00141588). Kaynak2018 s.124 ifadesi,atıf yapılan Sutton1988 Teorem2 içindeki dizi boyunca dondurulmuş/bölüm sonunda güncellenmiş ağırlık koşuluyla ayrılır. Modelin P spektral yarıçapı değil4×4 moment-yineleme matrisininki1 altındadır.
+
+`measurements_ch6_js.json`,eski/yeni bütün mctd,batchmctd,cliffwalk,maxbias ön ayarlarını gerçek JS koşularıyla saklar;her rüzgâr modelinin bütün V değerlerini NumPy ile karşılaştırır(en büyük fark0). Rüzgâr tohum6,8000 adım,α.5/ε.1 koşusu167 bölüm/15 adımlık açgözlü yol buldu. Stokastik8 eylem model optimumu10.9646090535;100000 adımlık öğrenme ardından1000 gerçek değerlendirme bölümü ortalaması13.982(SE.249648),0 bütçe aşımı. Bu iki sayı farklı politikaların değeridir. Tohum1,4 eylem,8000 adım karşı örneğinde son tablonun açgözlü yolu500 adımda bitmez;bu sonuç saklanır. JavaScript ve NumPy eşit sayısal tohumla eşit yollar üretmez.
+
+Kaynak Şekil6.3 tam bütçelerini yeniden çalıştırmak için:
+
+```bash
+g++ -O3 -std=c++17 notes/sutton-2018/measure_ch6_cliff.cpp -o /tmp/measure-ch6-cliff
+/tmp/measure-ch6-cliff /tmp/ch6-cliff.json 50000 10
+```
+
+Bu uzun koşudur:19α×3 yöntem×2 ufuk=114 koşul;ilk100 bölüm her ayarda50000 tekrar,ilk100000 bölüm her ayarda10 tekrar. Toplam342000000 gerçek bölüm ve13385049857 gerçek çevre geçişi yürütüldü;son-pencere ortalamasıyla değiştirilmedi ve bölüm sınırında yapay terminal kullanılmadı. Q0,γ1,ε.1,düzgün rastgele açgözlü bağ çözümü. Kaynak α ekseni açıkça19 nokta0.1…1/adım.05 ile örneklendi. Kayıt `measurements_ch6_cliff.json`;tarayıcı verisi `site/js/data/sutton-ch6-cliff.js` aynı satırları taşır. Satır sırası ilk çalıştırılan onda-birler ve ardından eklenen aradaki noktalar nedeniyle yeniden çalıştırmadan farklı olabilir;her koşul kendi sabit alt-akışını kullandığından değerler değişmez. Grafiğin−160 altı değerleri tabloda ve kayıtta korunur.
+
+En iyi ilk100 ortalamaları SARSAα.75:−68.807829,Qα.9:−73.253825,Expectedα1:−44.1558156. Uzunα1 Q−50.8246/Expected−20.7493 bağımsız model sınırlarıyla uyumludur;sonlu10 tekrarınSE bilgisi kayıttadır. C++ kaydı α/evre kontrolüyle görüntülenir;canlı seed/ε değişimi eski cliffwalk deneyinde yapılır. İki yolun anlamı arayüzde açıklanır.
+
+`cliffwalk` kaynağın gerçek terminal çeşidini varsayılan yapar;eski1000 adım kesmeli denemeler ayrı seçenek olarak kalır ve kesme sayısı bildirilir. SARSA A′ eylemini güncellemeden önce devreder;Q/Expected davranış eylemini güncellemeden sonra seçer. Geometrik düşüş noktası çizimi ve eski mutlak üstünlük/bağımsız çift-tablo iddiaları düzeltildi. Kaynaktaki Weiring adı,birincil2009 makalesine göre Wiering olarak düzeltildi. Kaynak2018 araştırma değerlendirmeleri tarihleriyle korunur.

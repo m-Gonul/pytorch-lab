@@ -2,23 +2,26 @@ id: m11-5-sarsa-q
 code: M11.5
 title: Modelden bağımsız kontrol — SARSA, Q-öğrenme, keşif
 phase: 11
-minutes: 540
+minutes: 700
 prereq:
 - m11-4-mc-td
-summary: 'Değerlendirmeden kontrole: V yerine Q(s,a) öğren, çünkü açgözlü politikayı Q''dan model olmadan çıkarabiliriz.
-  Monte Carlo kontrol (keşifçi başlangıçlar), politika üstü SARSA, politika dışı Q-öğrenme, beklenen SARSA,
-  maksimizasyon yanlılığı ve çift Q-öğrenme; keşif ve sömürü ikilemi (ε-açgözlü, Boltzmann, iyimser başlangıç).
-  Saf Python''da uçurum yürüyüşü, NumPy''da 10 000 deneyde maksimizasyon yanlılığı, PyTorch''ta eşzamanlı Q-öğrenmenin
-  Q*''a yakınsaması ve 1000 paralel ortamda kontrol.
+summary: 'Değerlendirmeden kontrole: V yerine Q(s,a) öğren, çünkü açgözlü politikayı Q''dan model olmadan
+  çıkarabiliriz. Monte Carlo kontrol (keşifçi başlangıçlar), politika üstü SARSA, politika dışı Q-öğrenme,
+  beklenen SARSA, maksimizasyon yanlılığı ve çift Q-öğrenme; keşif ve sömürü ikilemi (ε-açgözlü, Boltzmann,
+  iyimser başlangıç). Saf Python''da uçurum yürüyüşü, NumPy''da 10 000 deneyde maksimizasyon yanlılığı,
+  PyTorch''ta eşzamanlı Q-öğrenmenin Q*''a yakınsaması ve 1000 paralel ortamda kontrol.
 
   '
 goals:
-- Q-öğrenme hedefi $r+\gamma\max_{a'}Q(s',a')$, SARSA hedefi $r+\gamma Q(s',a')$, beklenen SARSA hedefi $r+\gamma\sum_{a'}\pi(a'|s')Q(s',a')$
+- Q-öğrenme hedefi $r+\gamma\max_{a'}Q(s',a')$, SARSA hedefi $r+\gamma Q(s',a')$, beklenen SARSA hedefi
+  $r+\gamma\sum_{a'}\pi(a'|s')Q(s',a')$
 - '[[politika dışı öğrenme]]: davranış politikası ε-açgözlü, öğrenilen politika açgözlü'
 - '[[maksimizasyon yanlılığı]]: $\mathbb E[\max\hat Q]\ge\max\mathbb E[\hat Q]$ ve çift Q-öğrenme'
 - '[[ε-açgözlü]], Boltzmann ve iyimser başlangıçla keşif; GLIE koşulu'
 - MC ES, ε-yumuşak iyileştirme, ağırlıklı politika dışı kontrol
 - İki kaynak yarış pistinde segment fiziği ve gerçek MC; indirim duyarlı Q güncellemesi
+- 'Sutton Bölüm6: SARSA/Q eylem seçim zamanlaması, GLIE ve dört kontrol kutusu'
+- King hamleleri/stokastik rüzgâr; tam kaynak bütçeli uçurum; double roller ve afterstate maliyeti
 sources:
 - title: 'Sutton & Barto — Reinforcement Learning: An Introduction (2. baskı), Bölüm 5.3 ve 6.4–6.7'
   url: http://incompleteideas.net/book/the-book-2nd.html
@@ -34,6 +37,14 @@ sources:
   use: link
 - title: Even-Dar & Mansour — Learning Rates for Q-learning (JMLR 2003)
   url: https://www.jmlr.org/papers/v5/evendar03a.html
+  license: ©
+  use: link
+- title: Singh,Jaakkola,Littman,Szepesvári (2000) — SARSA yakınsaması,Teorem1
+  url: https://sites.ualberta.ca/~szepesva/papers/singh98convergence.pdf
+  license: ©
+  use: link
+- title: van Seijen,van Hasselt,Whiteson,Wiering (2009) — Expected SARSA
+  url: https://www.ai.rug.nl/~mwiering/GROUP/ARTICLES/expected_sarsa.pdf
   license: ©
   use: link
 hand:
@@ -64,8 +75,8 @@ hand:
       label: 'İki eylemin gerçek değeri 0, kestirimler bağımsız N(0,1): $\mathbb E[\max]$ (= 1/√π)'
       answer: 0.5641895835477563
       tol: 1.0e-06
-  verify: "import math\nanswers = dict(ql=2 + 0.5 * (1 + 0.9 * 5 - 2), sa=2 + 0.5 * (1 + 0.9 * 3 - 2),\n  \
-    \             es=2 + 0.5 * (1 + 0.9 * (0.1 * 3 + 0.9 * 5) - 2),\n               bz=1 / (1 + math.exp(-2)),\
+  verify: "import math\nanswers = dict(ql=2 + 0.5 * (1 + 0.9 * 5 - 2), sa=2 + 0.5 * (1 + 0.9 * 3 - 2),\n\
+    \               es=2 + 0.5 * (1 + 0.9 * (0.1 * 3 + 0.9 * 5) - 2),\n               bz=1 / (1 + math.exp(-2)),\
     \ eg=0.9 + 0.1 / 4, mb=1 / math.sqrt(math.pi))\n"
 stages:
   b:
@@ -92,12 +103,15 @@ extras:
 - id: x5
   title: İndirim duyarlı Q kontrolü — Sutton5.14
   engine: browser
+- id: x6
+  title: King hamleleri ve stokastik rüzgâr — Sutton6.9/6.10
+  engine: browser
 quiz:
-- q: Uçurum yürüyüşünde (ε = 0.1) Q-öğrenme uçurumun kenarından giden yolu öğrenir ama eğitim sırasında SARSA'dan
-    daha az ödül toplar. Neden?
+- q: Uçurum yürüyüşünde (ε = 0.1) Q-öğrenme uçurumun kenarından giden yolu öğrenir ama eğitim sırasında
+    SARSA'dan daha az ödül toplar. Neden?
   options:
-  - t: Q-öğrenme açgözlü politikanın değerini öğrenir; ama ε-açgözlü davranırken kenarda rastgele adım uçuruma
-      düşürür. SARSA keşfi hesaba katar ve güvenli yolu seçer.
+  - t: Q-öğrenme açgözlü politikanın değerini öğrenir; ama ε-açgözlü davranırken kenarda rastgele adım
+      uçuruma düşürür. SARSA keşfi hesaba katar ve güvenli yolu seçer.
     ok: true
     why: Politika dışı ve politika üstü öğrenmenin farkı.
   - t: Q-öğrenme yakınsamaz
@@ -106,7 +120,8 @@ quiz:
     why: Aynı α.
 - q: Q-öğrenmede maksimizasyon yanlılığının kaynağı nedir?
   options:
-  - t: 'Aynı gürültülü kestirimlerle hem en iyi eylem seçilip hem de değerlendirilir: E[max Q̂] ≥ max E[Q̂]'
+  - t: 'Aynı gürültülü kestirimlerle hem en iyi eylem seçilip hem de değerlendirilir: E[max Q̂] ≥ max
+      E[Q̂]'
     ok: true
     why: Çift Q-öğrenme seçmeyi bir tabloyla, değerlendirmeyi diğeriyle yapar.
   - t: İndirim faktörünün 1'den küçük olması
@@ -129,9 +144,9 @@ homework:
   level: orta
   hours: 6
   goal: 'Makaledeki yakınsama koşullarını (her (s,a) sonsuz kez, $\sum\alpha=\infty$, $\sum\alpha^2<\infty$,
-    sınırlı ödül) deneysel olarak sına: rastgele MDP''lerde Q*''ı değer yinelemesiyle bul, Q-öğrenmeyi (a)
-    ε-açgözlü, (b) bazı (s,a) çiftlerini hiç denemeyen davranış politikasıyla, (c) $\alpha_n=1/n$, $1/n^{0.6}$
-    ve $1/(1+(1-\gamma)n)$ ile çalıştır.
+    sınırlı ödül) deneysel olarak sına: rastgele MDP''lerde Q*''ı değer yinelemesiyle bul, Q-öğrenmeyi
+    (a) ε-açgözlü, (b) bazı (s,a) çiftlerini hiç denemeyen davranış politikasıyla, (c) $\alpha_n=1/n$,
+    $1/n^{0.6}$ ve $1/(1+(1-\gamma)n)$ ile çalıştır.
 
     '
   steps:
@@ -145,9 +160,9 @@ homework:
   url: https://papers.nips.cc/paper/2010/hash/091d584fced301b442654dd8c23b3fc9-Abstract.html
   level: orta
   hours: 6
-  goal: 'Makalenin rulet ve 3×3 ızgara dünyası deneylerini yeniden üret. Izgarada her adımın ödülü −12 ya da
-    +10 (eşit olasılık), hedefte +5; ε = 1/√n(s) ve α = 1/n(s,a). Q-öğrenme ile çift Q-öğrenmenin adım başı
-    ortalama ödülünü ve başlangıç durumunun max Q kestirimini karşılaştır.
+  goal: 'Makalenin rulet ve 3×3 ızgara dünyası deneylerini yeniden üret. Izgarada her adımın ödülü −12
+    ya da +10 (eşit olasılık), hedefte +5; ε = 1/√n(s) ve α = 1/n(s,a). Q-öğrenme ile çift Q-öğrenmenin
+    adım başı ortalama ödülünü ve başlangıç durumunun max Q kestirimini karşılaştır.
 
     '
   steps:
@@ -160,20 +175,20 @@ labs:
 - id: l1
   lab: cliffwalk
   title: 'Uçurum yürüyüşü: SARSA, Q-öğrenme ve beklenen SARSA'
-  goal: '4 × 12 uçurum yürüyüşünde üç TD kontrol yöntemini aynı ε-açgözlü davranışla eğit. Bölüm başına toplam
-    ödülü ve öğrenilen açgözlü yolu karşılaştır; politika üstü ve politika dışı öğrenmenin farkını ve keşfin
-    bedelini gör.
+  goal: '4 × 12 uçurum yürüyüşünde üç TD kontrol yöntemini aynı ε-açgözlü davranışla eğit. Bölüm başına
+    toplam ödülü ve öğrenilen açgözlü yolu karşılaştır; politika üstü ve politika dışı öğrenmenin farkını
+    ve keşfin bedelini gör.
 
     '
   predict:
-    q: ε = 0.1 ile eğitim sırasında hangisi bölüm başına daha çok ödül toplar?
+    q: Varsayılan tohum1,α0.5 ve ε0.1 koşusunda son100 bölümde hangisi daha çok ödül toplar?
     options:
     - t: 'Q-öğrenme: en kısa yolu öğrenir'
-      why: En kısa yol kenardan geçer; ε-açgözlü davranışta rastgele adımlar uçuruma düşürür (son 100 bölüm
-        −48).
+      why: Q en kısa13 adımlık yolu bulur;keşif sırasında bazı aşağı hamleler düşüş yaratır. Ölçülen son100
+        bölüm ortalaması−48.7.
     - t: SARSA (ve beklenen SARSA)
       ok: true
-      why: 'Keşfi değere katıp güvenli yolu seçerler: −27 ve −20.'
+      why: Bu koşuda SARSA−27,beklenen SARSA−20.8;sonlu deney bütün ayarlar için sıralama teoremi değildir.
     - t: 'Üçü aynı: aynı ortamı öğreniyorlar'
       why: Hedefleri farklı politikaların değerini kestirir.
   presets:
@@ -183,49 +198,63 @@ labs:
       alpha: 0.5
       E: 500
       R: 20
-    note: SARSA −27 (17 adım), Q −48 (13 adım, kenar), beklenen SARSA −20.
+    note: 'Tohum1,gerçek terminal: SARSA −27 /17 adım,Q −48.7 /13,beklenen SARSA −20.8 /15;son100 bölüm
+      ortalaması.'
   - name: Keşif yok
     params:
       eps: 0
       alpha: 0.5
       E: 500
       R: 20
-    note: 'Üçü de 13 adımlık kenar yolu: −13.'
+    note: Tohum1:üçü de13 adımlık kenar yolunu buldu ve son100 bölüm ödülü−13;bu sonlu koşu algoritmaların
+      özdeşliği değildir.
   - name: Çok keşif
     params:
       eps: 0.2
       alpha: 0.5
       E: 500
       R: 20
-    note: Q-öğrenme −108; beklenen SARSA −28.
+    note: Tohum1:SARSA−39.7,Q−111,beklenen SARSA−28.6;son100 bölüm ortalaması.
   - name: Küçük α
     params:
       eps: 0.1
       alpha: 0.1
       E: 500
       R: 20
-    note: SARSA ve beklenen SARSA −22, 15 adım.
+    note: Tohum1:SARSA−22.3 ve beklenen SARSA−22.5;ikisi15 adımlık açgözlü yol buldu.
   - name: Kısa eğitim
     params:
       eps: 0.1
       alpha: 0.5
       E: 100
       R: 20
-    note: SARSA'nın açgözlü yolu henüz hedefe ulaşmıyor.
+    note: Tohum1:SARSA19 ve Q13 adımda biter;beklenen SARSA açgözlü değerlendirmesi60 adım içinde bitmez.
+  - name: Eski1000 adım sınırını karşılaştır
+    params:
+      full: 0
+      eps: 0.1
+      alpha: 0.5
+      E: 500
+      R: 20
+      seed: 1
+    note: Tohum1:SARSA/Q/Expected kesmeleri2/0/0;son100 deneme ödülleri−27.9/−52/−20.9. Kesme terminal
+      sayılmaz.
   questions:
   - q: Eğitim bittiğinde ε'u sıfıra indirip politikayı çalıştırırsak hangisi daha iyi performans gösterir?
-    a: 'Q-öğrenmenin politikası: açgözlü en kısa yolu (13 adım, −13) öğrenmiştir. SARSA''nın politikası ε-açgözlü
-      davranışa göre en iyidir ve uçurumdan uzak durur (15–17 adım). Q-öğrenme açgözlü politikanın değerini,
-      SARSA izlenen politikanın değerini öğrenir; hangisinin ''daha iyi'' olduğu, keşfin devreye girip girmeyeceğine
-      bağlıdır. ε zamanla sıfıra indirilirse (GLIE) SARSA da en kısa yola yakınsar.'
-  limits: Sabit ε ve α; Q sıfırla başlatılıyor; bölüm en çok 1000 adım. Eğriler R çalıştırmanın ortalaması
-    ve 10 bölümlük kayan ortalama; yollar son çalıştırmadan.
+    a: Varsayılan tohum1 koşusunda Q yolu13 adım,SARSA17,beklenen SARSA15 adım:keşif kapalıyken toplam
+      ödüller−13/−17/−15. Eğitim getirisi ayrı ölçüttür. Sabit α ve sonlu veride SARSA tablosunu tam ε-soft
+      optimum saymayın. Yeterli çift ziyareti,GLIE ve uygun azalan öğrenme oranları altında SARSA da optimal
+      q* hedefine yakınsar.
+  limits: Varsayılan kaynak çeşidinde gerçek hedefe varana kadar eğitim;1000 adımlık eski sınır ayrı seçenek
+    olarak korunur ve kesmeler sayılır. Son geçiş kesmede önyüklenir,terminal uydurulmaz. Q/Expected davranışı
+    güncellemeden sonra,SARSA önceden seçilmiş A′ ile devam eder. Eğriler10 deneme/bölüm ortalaması;alttaki
+    yollar60 adımlık açgözlü değerlendirme bütçesidir.
 - id: l2
   lab: maxbias
   title: 'Maksimizasyon yanlılığı: Q-öğrenme ve çift Q-öğrenme'
-  goal: 'A''dan sol B''ye, sağ bitişe gider; B''deki her eylem N(μ, 1) ödülle biter. μ < 0 iken en iyi politika
-    A''da hep sağdır. Q-öğrenmenin ve çift Q-öğrenmenin A''da solu seçme oranını bölümlere göre çiz ve B''deki
-    eylem sayısının, μ''nün ve ε''un etkisini gör.
+  goal: 'A''dan sol B''ye, sağ bitişe gider; B''deki her eylem N(μ, 1) ödülle biter. μ < 0 iken en iyi
+    politika A''da hep sağdır. Q-öğrenmenin ve çift Q-öğrenmenin A''da solu seçme oranını bölümlere göre
+    çiz ve B''deki eylem sayısının, μ''nün ve ε''un etkisini gör.
 
     '
   predict:
@@ -235,7 +264,8 @@ labs:
       why: Bu çift Q-öğrenmenin sonunda vardığı oran.
     - t: ≈ %90'ın üstüne kadar
       ok: true
-      why: '10 gürültülü kestirimin maksimumu pozitif: sol çekici görünüyor (1000 çalıştırmada en yüksek %94).'
+      why: '10 gürültülü kestirimin maksimumu pozitif: sol çekici görünüyor (1000 çalıştırmada en yüksek
+        %94).'
     - t: ≈ %50
       why: Bu çift Q'nun başlangıçtaki rastgele davranışına yakın.
   presets:
@@ -254,7 +284,8 @@ labs:
       eps: 0.1
       alpha: 0.1
       R: 1000
-    note: 'Yanlılık yok: iki yöntem aynı.'
+    note: B içinde tek eylemde max karşılaştırma yanlılığı yoktur;iki tablonun veri geçmişi farklı olduğundan
+      aynı eğri şart değildir.
   - name: 20 eylem
     params:
       n: 20
@@ -262,7 +293,7 @@ labs:
       eps: 0.1
       alpha: 0.1
       R: 1000
-    note: 'Yanlılık daha büyük: son 50 bölümde %18.'
+    note: Tohum1,1000 tekrar:Q en yüksek%96.6,son50 bölüm%20.8;çift Q son%7.44.
   - name: Sol iyi (μ = 0.1)
     params:
       n: 10
@@ -270,7 +301,8 @@ labs:
       eps: 0.1
       alpha: 0.1
       R: 1000
-    note: Doğru oran %95; çift Q yavaş öğreniyor.
+    note: Optimal ε-greedy sol oranı%95;tohum1,1000 tekrarda son50 bölüm Q%59.4,çift Q%13.4. Sonlu eğitimde
+      hedef orana henüz erişilmedi.
   - name: Çok kötü sol
     params:
       n: 10
@@ -279,14 +311,27 @@ labs:
       alpha: 0.1
       R: 1000
     note: Q-öğrenme yine %89'a kadar sol seçiyor ama son 50 bölümde %5'e iniyor.
+  - name: Kaynak Şekil6.5:10000 tekrar
+    params:
+      n: 10
+      mu: -0.1
+      eps: 0.1
+      alpha: 0.1
+      R: 10000
+      seed: 1
+    note: Kaynak s.135:300 bölüm,Q0,rastgele açgözlü bağ. B eylem sayısı10 bizim açık seçimimiz;metin
+      çok sayıda der.
   questions:
   - q: Q-öğrenmenin yanlılığı neden B'deki eylem sayısıyla büyür?
-    a: Hedef max_b Q(B, b) alınır; n bağımsız gürültülü kestirimin maksimumunun beklentisi, gerçek değerlerin
-      maksimumundan yaklaşık σ√(2 ln n) kadar yukarıdadır (n = 2'de 0.56, 10'da 1.54, 20'de 1.87 standart sapma).
-      Daha çok eylem, şans eseri yüksek görünen bir eylemin çıkma olasılığını artırır. Çift Q'da seçim ile
-      değerlendirme bağımsız gürültüler kullandığı için bu etki ortadan kalkar.
-  limits: 300 bölüm; γ = 1; Q sıfırla başlıyor; eşitlikler rastgele bozuluyor. Oranlar R çalıştırmanın ortalaması;
-    R = 1000'de hesap birkaç saniye sürebilir.
+    a: Eşit gerçek değerli,bağımsız ve aynı σ sapmalı Gauss kestirimleri örneğinde maksimumun yukarı sapması
+      n ile büyür;standart normalde n2 için0.564,n10 için1.54,n20 için1.87. Büyük n yaklaşımı σ√(2 ln
+      n). Uyarlanan MDP tabloları bu bağımsız Gauss modeliyle özdeş değildir. Double Q seçici ve değerlendiriciyi
+      ayırır;bağımsız örnekli bandit özelinde seçim yanlılığını kaldırır,genel çevrimiçi tablolarda bağımsızlık
+      veya tam yansızlık garanti edilmez.
+  limits: 300 bölüm; γ = 1; Q sıfırla başlıyor; eşitlikler rastgele bozuluyor. Oranlar R çalıştırmanın
+    ortalaması; R = 1000'de hesap birkaç saniye sürebilir. Kaynak bütçesi10000 tekrar seçilebilir;μ0 için
+    bütün eylem karışımları optimaldir. İki adaptif tablo genel olarak bağımsız veya tam yansız kabul
+    edilmez.
 - id: l3
   lab: blackjackmc
   title: 'Kaynak Şekil 5.2: MC ES politikası ve değerleri'
@@ -331,8 +376,8 @@ labs:
   questions:
   - q: Bir milyon MC bölümü bütün200 hücrede optimaliteyi kanıtlar mı?
     a: Hayır; sonlu tahmin model referansıyla karşılaştırılır, kalan fark açıkça ölçülür.
-  limits: İlk(s,a) düzgün rastgele, sonra güncel politika; Q 0 ve 20/21 duran başlangıç. Doğal olmayan ES 21
-    karar durumu. Tam model örnek öğrenmenin parçası değil bağımsız denetim.
+  limits: İlk(s,a) düzgün rastgele, sonra güncel politika; Q 0 ve 20/21 duran başlangıç. Doğal olmayan
+    ES 21 karar durumu. Tam model örnek öğrenmenin parçası değil bağımsız denetim.
 - id: l4
   lab: racetrackmc
   title: 'Kaynak Şekil 5.5: iki tam yarış pisti'
@@ -389,9 +434,121 @@ labs:
   questions:
   - q: Duvara çarpınca bölüm biter mi?
     a: Hayır; rastgele başlangıca sıfır hızla dönülür ve aynı bölüm sürer.
-  limits: Hız 0…4, başlangıç dışında iki hız birlikte 0 olamaz. Segmentte ilk duvar/bitiş; köşede duvara temas
-    çarpışma. Gürültü değerlendirmede 0. Sonlu MC optimalite kanıtı değildir; log ağırlık oranı kırpılmaz.
-    Hücreler kaynak görev geometrisinden yeniden kodlandı.
+  limits: Hız 0…4, başlangıç dışında iki hız birlikte 0 olamaz. Segmentte ilk duvar/bitiş; köşede duvara
+    temas çarpışma. Gürültü değerlendirmede 0. Sonlu MC optimalite kanıtı değildir; log ağırlık oranı
+    kırpılmaz. Hücreler kaynak görev geometrisinden yeniden kodlandı.
+- id: l5
+  lab: cliffsource
+  title: 'Kaynak Şekil6.3: tam bütçeli α taraması'
+  goal: Kısa ve uzun dönem getirilerini,ölçüm ufkunu ve standart hatayı ayır.
+  predict:
+    q: Kaynağın uzun dönem ölçütü yalnız son100 bölüm mü?
+    options:
+    - t: Hayır;100000 bölümün tamamının ortalaması,10 bağımsız tekrarla.
+      ok: true
+      why: Koşullar anlatım ve gerçek hesaplarda açık.
+    - t: Sonlu deney her MDP için aynı sonucu kanıtlar
+      why: Deney belirli görev,bütçe ve tohumla sınırlıdır.
+  presets:
+  - name: 'Şekil6.3: iki evre'
+    params:
+      phase: 2
+      alpha: 0.5
+    note: 114 gerçek koşul;50000×100 ve10×100000,19α,3yöntem.
+  - name: Yalnız ilk100 bölüm
+    params:
+      phase: 0
+      alpha: 1
+    note: Dolu noktalar bu19α içindeki en iyi ilk dönem ölçümüdür.
+  - name: Yalnız100000 ortalaması
+    params:
+      phase: 1
+      alpha: 1
+    note: Asimptotik etiketli kaynak ölçütü son pencere değildir.
+  - name: Küçük α ayrıntısı
+    params:
+      phase: 2
+      alpha: 0.1
+    note: Tablodaki SE,bağımsız tekrar ortalamaları arasındadır.
+  limits: Gerçek C++ ölçümleri kaydedilip gösterilir;tarayıcıda yeni Monte Carlo yapılmış gibi sunulmaz.
+    ε0.1,γ1,Q0,rastgele bağ;toplam13385049857 gerçek geçiş. α ve evre kontrolü görüntülenen gerçek veri
+    dilimini değiştirir. Kaynak0…−160 çerçevesi dışındaki değerler tabloda korunur.
+- id: l6
+  lab: windytd
+  title: 'Kaynak Örnek6.5 /6.9/6.10: rüzgârlı ızgara'
+  goal: Dört/sekiz/dokuz eylem,sabit/stokastik rüzgâr ve model/öğrenilmiş hedefi karşılaştır.
+  predict:
+    q: Sekiz hamleyle7 adımlık yol varken bekleme6 yapabilir mi?
+    options:
+    - t: Hayır;hedefin yatay uzaklığı7 ve bir eylem yatayda en çok1 ilerler.
+      ok: true
+      why: Koşullar anlatım ve gerçek hesaplarda açık.
+    - t: Sonlu deney her MDP için aynı sonucu kanıtlar
+      why: Deney belirli görev,bütçe ve tohumla sınırlıdır.
+  presets:
+  - name: Kaynak Örnek6.5:8000 adım
+    params:
+      actions: 4
+      stochastic: 0
+      steps: 8000
+      alpha: 0.5
+      epsilon: 0.1
+      seed: 6
+      ref: 0
+    note: Kendi tohum6:167 bölüm,öğrenilmiş açgözlü15;başka tohum garanti değildir.
+  - name: '6.9: sekiz hamle'
+    params:
+      actions: 8
+      stochastic: 0
+      steps: 8000
+      alpha: 0.5
+      epsilon: 0.1
+      seed: 1
+      ref: 0
+    note: Sekiz hamle minimum7;gerçek eğitim ve bağımsız model ayrı.
+  - name: '6.9: dokuzuncu bekleme'
+    params:
+      actions: 9
+      stochastic: 0
+      steps: 8000
+      alpha: 0.5
+      epsilon: 0.1
+      seed: 1
+      ref: 0
+    note: Bekleme yalnız rüzgâr kadar taşır;minimum yine7.
+  - name: '6.10: stokastik eğitim'
+    params:
+      actions: 8
+      stochastic: 1
+      steps: 100000
+      alpha: 0.1
+      epsilon: 0.1
+      seed: 1
+      ref: 0
+    note: Pozitif sütunlarda−1/0/+1,her biri1/3.1000 değerlendirmede kendi öğrenilmiş hedefi ölçülür.
+  - name: '6.10: bağımsız model optimumu'
+    params:
+      actions: 8
+      stochastic: 1
+      steps: 100000
+      alpha: 0.1
+      epsilon: 0.1
+      seed: 1
+      ref: 1
+    note: Optimal beklenen adım10.9646090534948;öğrenilmiş politika iddiası değildir.
+  - name: Sonlu tablonun sınırı:başka tohum
+    params:
+      actions: 4
+      stochastic: 0
+      steps: 8000
+      alpha: 0.5
+      epsilon: 0.1
+      seed: 1
+      ref: 0
+    note: Bu tohumda açgözlü hedef döngüye girebilir;kesme terminal sayılmaz.
+  limits: 7×10 harita,kaynak sütundan rüzgâr,γ1,her geçiş−1,Q0. Stokastik değişim yalnız pozitif rüzgârlı
+    sütunlarda;bitmemiş son parça ayrıca raporlanır. Gösterilen yörünge500,değerlendirme10000 adımlık
+    bütçeli;bitmeyenler sayılır ve bitenlerin koşullu ortalaması tam beklenti diye verilmez.
 practice:
 - id: p1
   type: çözülmüş
@@ -401,8 +558,8 @@ practice:
   needs: Üç güncelleme kuralı
   q: $Q(s,a)=0$, $r=-1$, $\gamma=1$, $Q(s^+,\cdot)=[2,6]$, $\alpha=0.5$. Davranış ε-açgözlü ($\epsilon=0.2$,
     2 eylem) ve sonraki eylem olarak $a^+=0$ çekildi. Üç yöntemle güncellenmiş $Q(s,a)$ nedir?
-  solution: 'Q-öğrenme hedefi $-1+6=5$, $Q=2.5$. SARSA hedefi $-1+Q(s^+,0)=1$, $Q=0.5$. Beklenen SARSA: $\pi(1\mid
-    s^+)=0.9$, $\pi(0\mid s^+)=0.1$; hedef $-1+0.1\cdot2+0.9\cdot6=4.6$, $Q=2.3$.'
+  solution: 'Q-öğrenme hedefi $-1+6=5$, $Q=2.5$. SARSA hedefi $-1+Q(s^+,0)=1$, $Q=0.5$. Beklenen SARSA:
+    $\pi(1\mid s^+)=0.9$, $\pi(0\mid s^+)=0.1$; hedef $-1+0.1\cdot2+0.9\cdot6=4.6$, $Q=2.3$.'
 - id: p2
   type: hesap
   level: 1
@@ -436,54 +593,54 @@ practice:
     msg: Değerlerin oranı (3/4) değil, üstellerin oranı.
   hints:
   - $e^{3/2}/(e^{1/2}+e^{3/2})=1/(1+e^{-1})$.
-  solution: $1/(1+e^{-(3-1)/2})=1/(1+e^{-1})=0.731$. Sıcaklık iki katına çıkınca açgözlü eylemin payı 0.881'den
-    0.731'e iner.
+  solution: $1/(1+e^{-(3-1)/2})=1/(1+e^{-1})=0.731$. Sıcaklık iki katına çıkınca açgözlü eylemin payı
+    0.881'den 0.731'e iner.
 - id: p4
   type: yöntem-seç
   level: 2
   title: Gerçek bir robotun eğitimi
   goal: Politika üstü ve dışı öğrenmeyi uygulamaya göre seçmek
   needs: SARSA, Q-öğrenme, keşif
-  q: Gerçek bir robot kol, eğitim sırasında da çalışıyor ve her çarpışma pahalı (keşif sırasında rastgele hareketler
-    kaçınılmaz). Eğitim boyunca toplanan ödülü korumak öncelikli. Hangisi?
+  q: Gerçek bir robot kol, eğitim sırasında da çalışıyor ve her çarpışma pahalı (keşif sırasında rastgele
+    hareketler kaçınılmaz). Eğitim boyunca toplanan ödülü korumak öncelikli. Hangisi?
   choices:
   - t: 'Q-öğrenme: en iyi açgözlü politikayı öğrenir'
-    why: Açgözlü politikanın değerini öğrenir ama keşifli davranışın risklerini hesaba katmaz; eğitimde uçurum
-      kenarında yürür.
-  - t: 'SARSA ya da beklenen SARSA: izlenen (keşifli) politikanın değerini öğrenir ve riskli bölgelerden uzak
-      durur'
+    why: Açgözlü politikanın değerini öğrenir ama keşifli davranışın risklerini hesaba katmaz; eğitimde
+      uçurum kenarında yürür.
+  - t: 'SARSA ya da beklenen SARSA: izlenen (keşifli) politikanın değerini öğrenir ve riskli bölgelerden
+      uzak durur'
     ok: true
     why: Uçurum yürüyüşündeki gibi eğitimde daha çok ödül toplar.
   - t: Keşfi kapatıp (ε = 0) Q-öğrenme
     why: Hiç denenmeyen eylemler öğrenilmez; en iyi olmayan bir politikaya takılabilir.
   hints:
   - Eğitim sırasındaki davranışın riski hangi yöntemin hedefinde var?
-  solution: Politika üstü yöntemler keşfin bedelini değere katar. Eğitim bitince ε azaltılarak (GLIE) en iyi
-    politikaya yaklaşılır. Benzetimde eğitip gerçek robota yalnız sonucu aktarmak mümkünse Q-öğrenmenin politika
-    dışı esnekliği öne çıkar.
+  solution: Politika üstü yöntemler keşfin bedelini değere katar. Eğitim bitince ε azaltılarak (GLIE)
+    en iyi politikaya yaklaşılır. Benzetimde eğitip gerçek robota yalnız sonucu aktarmak mümkünse Q-öğrenmenin
+    politika dışı esnekliği öne çıkar.
 - id: p5
   type: hata-bul
   level: 2
   title: Son durumda bootstrapping
   goal: Bölüm sonunu doğru ele almak
   needs: Son durumun değeri 0
-  q: Bir öğrencinin Q-öğrenme kodu her geçişte `target = r + gamma * max(Q[s_next])` kullanıyor; `s_next` son
-    durum olsa da. Son durumun Q satırı hiç sıfırlanmıyor, ve ilk bölümlerde rastgele bir sabitle başlatılmış.
-    Değerler neden yanlış çıkıyor?
+  q: Bir öğrencinin Q-öğrenme kodu her geçişte `target = r + gamma * max(Q[s_next])` kullanıyor; `s_next`
+    son durum olsa da. Son durumun Q satırı hiç sıfırlanmıyor, ve ilk bölümlerde rastgele bir sabitle
+    başlatılmış. Değerler neden yanlış çıkıyor?
   choices:
   - t: γ fazla büyük
     why: Sorun γ değil, son durumun değeri.
-  - t: Son durumdan sonra ödül yoktur, değeri tanım gereği 0'dır; hedef son geçişte yalnız r olmalı. Son durumun
-      rastgele başlangıç değeri her bölümde hedeflere sızıyor
+  - t: Son durumdan sonra ödül yoktur, değeri tanım gereği 0'dır; hedef son geçişte yalnız r olmalı. Son
+      durumun rastgele başlangıç değeri her bölümde hedeflere sızıyor
     ok: true
     why: Son durum hiç güncellenmediği için başlangıçtaki keyfî değer kalıcı bir yanlılık üretir.
   - t: Öğrenme oranı azaltılmamış
     why: Azalan α da sabit bir yanlılığı gidermez.
   hints:
   - Son durumdan hangi eylemler seçilip hangi ödüller alınır?
-  solution: '`target = r if done else r + gamma * max(Q[s_next])`. Zaman sınırıyla kesilen bölümlerde (gerçek
-    son durum değil) ise bootstrapping sürmelidir; iki durumu ayırmak için "terminated" ve "truncated" ayrı
-    tutulur (Gymnasium).'
+  solution: '`target = r if done else r + gamma * max(Q[s_next])`. Zaman sınırıyla kesilen bölümlerde
+    (gerçek son durum değil) ise bootstrapping sürmelidir; iki durumu ayırmak için "terminated" ve "truncated"
+    ayrı tutulur (Gymnasium).'
 - id: p6
   type: kanıt
   level: 3
@@ -491,7 +648,8 @@ practice:
   goal: Yanlılığın varlığını ve iki eylemde büyüklüğünü kanıtlamak
   needs: Jensen eşitsizliği, normal dağılım
   q: (a) $\hat Q(a)$ yansız kestirimler olsun. $E[\max_a\hat Q(a)]\ge\max_aE[\hat Q(a)]$ olduğunu gösterin.
-    (b) İki eylemin gerçek değeri 0 ve kestirimler bağımsız $N(0,1)$ ise $E[\max]=1/\sqrt\pi$ olduğunu gösterin.
+    (b) İki eylemin gerçek değeri 0 ve kestirimler bağımsız $N(0,1)$ ise $E[\max]=1/\sqrt\pi$ olduğunu
+    gösterin.
   rubric:
   - (a) Her a için max_b Q̂(b) ≥ Q̂(a) yazıp beklenti alarak E[max] ≥ E[Q̂(a)] ve sonra a üzerinden maksimum
     aldım
@@ -500,25 +658,25 @@ practice:
   - E[max] = (1/2)·√2·√(2/π) = 1/√π sonucuna vardım
   hints:
   - $\max(x,y)=\frac{x+y}2+\frac{|x-y|}2$.
-  solution: (a) $\max_b\hat Q(b)\ge\hat Q(a)$ her $a$ için; beklenti alınca $E[\max]\ge E[\hat Q(a)]$, her
-    $a$ için, dolayısıyla $\ge\max_aE[\hat Q(a)]$. (b) $E[\max]=0+\frac12E|X-Y|=\frac12\sqrt2\sqrt{2/\pi}=1/\sqrt\pi\approx0.564$.
+  solution: (a) $\max_b\hat Q(b)\ge\hat Q(a)$ her $a$ için; beklenti alınca $E[\max]\ge E[\hat Q(a)]$,
+    her $a$ için, dolayısıyla $\ge\max_aE[\hat Q(a)]$. (b) $E[\max]=0+\frac12E|X-Y|=\frac12\sqrt2\sqrt{2/\pi}=1/\sqrt\pi\approx0.564$.
 - id: p7
   type: açıkla
   level: 2
   title: MC ES listelerini sayaçla değiştir
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak mc es listelerini sayaçla değiştir
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'MC ES her(s,a) için bütün getirileri biriktirip tekrar ortalama alıyor. Yalnız ortalama ve sayımla aynı
-    işi yapan değişikliği verin.
+  q: 'MC ES her(s,a) için bütün getirileri biriktirip tekrar ortalama alıyor. Yalnız ortalama ve sayımla
+    aynı işi yapan değişikliği verin.
 
 
     Kaynak: Sutton ve Barto (2018), s.99, Alıştırma 5.4.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: Her çift için N 0,Qkeyfî başlat. Bölümün geriye taramasında çift daha önce zaman önekinde geçmiyorsa
-    N(s,a)+=1;Q(s,a)+=(G−Q(s,a))/N(s,a);π(s)=argmaxQ(s,·). Bütün geçmiş politikaların verisi tutulur, politika
-    değişince N sıfırlanmaz. İlk ziyaret çift içindir. Bu, kaynak getiri listesinin aynı aritmetik ortalamasını
-    O (1) bellekle tutar.
+  solution: Her çift için N 0,Qkeyfî başlat. Bölümün geriye taramasında çift daha önce zaman önekinde
+    geçmiyorsa N(s,a)+=1;Q(s,a)+=(G−Q(s,a))/N(s,a);π(s)=argmaxQ(s,·). Bütün geçmiş politikaların verisi
+    tutulur, politika değişince N sıfırlanmaz. İlk ziyaret çift içindir. Bu, kaynak getiri listesinin
+    aynı aritmetik ortalamasını O (1) bellekle tutar.
   rubric:
   - Çift sayacı
   - Artımlı Q
@@ -536,9 +694,10 @@ practice:
     Kaynak: Sutton ve Barto (2018), s.111, Alıştırma 5.11.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: Q ve açgözlü hedef güncellendikten sonra A_t≠π(S_t) ise geriye döngü zaten kesilir. Kalan durumda
-    hedef belirlenimci olduğundan π(A_t|S_t)=1 ve oran 1/b olur. Uyuşmazlıkta pay 0; daha eski tam-son-ek katkıları
-    0. Q mevcut eylemi koşulladığı için o çiftin güncellemesi bu oran eklenmeden önce yapılır.
+  solution: Q ve açgözlü hedef güncellendikten sonra A_t≠π(S_t) ise geriye döngü zaten kesilir. Kalan
+    durumda hedef belirlenimci olduğundan π(A_t|S_t)=1 ve oran 1/b olur. Uyuşmazlıkta pay 0; daha eski
+    tam-son-ek katkıları 0. Q mevcut eylemi koşulladığı için o çiftin güncellemesi bu oran eklenmeden
+    önce yapılır.
   rubric:
   - Önce Q/hedef güncelleme
   - Uyuşmazsa çıkış
@@ -550,20 +709,21 @@ practice:
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak i̇ki kaynak pistinde yarışçı
   needs: MC getiri, ilk/her ziyaret ve önem oranları
   q: 'Şekil 5.5 iki pist için politika dışı MC kontrolle hızlı bir politika öğrenin ve farklı başlangıçlardan
-    birkaç örnek yörünge gösterin. Ayrık konum/hız, bileşen başına−1/0/+1 ivme, hız 0…4, ikisi birlikte yalnız
-    başlangıçta 0. Her adım−1; düzgün başlangıç/sıfır hız; duvarda rastgele başlangıca dönüp aynı bölüme devam.
-    Bitişi geçince terminal. Eğitimde %10 olasılıkla iki ivme birlikte 0; yörünge gösteriminde bu gürültü olmasın.
+    birkaç örnek yörünge gösterin. Ayrık konum/hız, bileşen başına−1/0/+1 ivme, hız 0…4, ikisi birlikte
+    yalnız başlangıçta 0. Her adım−1; düzgün başlangıç/sıfır hız; duvarda rastgele başlangıca dönüp aynı
+    bölüme devam. Bitişi geçince terminal. Eğitimde %10 olasılıkla iki ivme birlikte 0; yörünge gösteriminde
+    bu gürültü olmasın.
 
 
     Kaynak: Sutton ve Barto (2018), s.111–112, Alıştırma 5.12.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: x 4 tam starter/model çözüm/kontrolleri ve racetrackmc/l 4 iki kaynak geometrisini sağlar. Hareket
-    parçasının ilk bitiş/duvar kesişimini denetle. Soft b olasılığını seçilirken sakla, weighted Q güncellemesini
-    geriye yap; eşleşmeyen hedefte eski tam getiriler 0. Her pist 50 bin bölüm gerçek çalıştırıldı; üç ve ayrıca
-    bütün başlangıçlardan gürültüsüz yörüngeler denetlendi. Bağımsız model optimumu sol−12.112482/sağ−8.951270;
-    sonlu öğrenilmiş hedef sol−14.458549/sağ−11.447987. Bu farkı gizleyip sonlu MC politikasını kanıtlanmış
-    optimum adlandırma. Model optimumu da deneyde seçilip gösterilir.
+  solution: x 4 tam starter/model çözüm/kontrolleri ve racetrackmc/l 4 iki kaynak geometrisini sağlar.
+    Hareket parçasının ilk bitiş/duvar kesişimini denetle. Soft b olasılığını seçilirken sakla, weighted
+    Q güncellemesini geriye yap; eşleşmeyen hedefte eski tam getiriler 0. Her pist 50 bin bölüm gerçek
+    çalıştırıldı; üç ve ayrıca bütün başlangıçlardan gürültüsüz yörüngeler denetlendi. Bağımsız model
+    optimumu sol−12.112482/sağ−8.951270; sonlu öğrenilmiş hedef sol−14.458549/sağ−11.447987. Bu farkı
+    gizleyip sonlu MC politikasını kanıtlanmış optimum adlandırma. Model optimumu da deneyde seçilip gösterilir.
   rubric:
   - İki kaynak geometri
   - Bütün hareket/gürültü/ödül koşulları
@@ -576,51 +736,260 @@ practice:
   title: İndirim duyarlı Q kontrolü
   goal: Sutton Bölüm 5 içindeki koşulları koruyarak i̇ndirim duyarlı q kontrolü
   needs: MC getiri, ilk/her ziyaret ve önem oranları
-  q: 'Politika dışı MC kontrol s.111 algoritmasını truncated weighted (5.10) fikriyle değiştirin; önce durumlardan
-    eylem değerlerine geçin.
+  q: 'Politika dışı MC kontrol s.111 algoritmasını truncated weighted (5.10) fikriyle değiştirin; önce
+    durumlardan eylem değerlerine geçin.
 
 
     Kaynak: Sutton ve Barto (2018), s.115, Alıştırma 5.14.'
   hints:
   - Getirinin hangi ziyaret anından ve hangi politika altında hesaplandığını açıkça yazın.
-  solution: 'Mevcut eylem koşullu: ρ_{t+1:h−1}. c katsayılarıyla N_t=Σ_h cρ·flatG ve D_t=Σ_hcρ hesapla. D>0
-    için C+=D;Q+=(N−DQ)/C; ardından tutarlı argmax hedefi güncelle. b olasılıkları seçildikleri andaki kayıtlar.
-    Sonraki hedef dışı eylem kısa önekleri yok etmez; γ<1 iken dış geriye döngüyü kırma. x 5 O(T²) her t için
-    o anki hedefle yeniden hesaplar. γ 0 tek ödül,γ 1 tam suffix algoritması. Sabit hedef için D_t=(1−γ)+γw_{t+1}D_{t+1};N_t=R_{t+1}D_t+γw_{t+1}N_{t+1};
-    son adım D 1,N=R_T. Değişen hedefte eski önbellek kullanılmaz.'
+  solution: 'Mevcut eylem koşullu: ρ_{t+1:h−1}. c katsayılarıyla N_t=Σ_h cρ·flatG ve D_t=Σ_hcρ hesapla.
+    D>0 için C+=D;Q+=(N−DQ)/C; ardından tutarlı argmax hedefi güncelle. b olasılıkları seçildikleri andaki
+    kayıtlar. Sonraki hedef dışı eylem kısa önekleri yok etmez; γ<1 iken dış geriye döngüyü kırma. x 5
+    O(T²) her t için o anki hedefle yeniden hesaplar. γ 0 tek ödül,γ 1 tam suffix algoritması. Sabit hedef
+    için D_t=(1−γ)+γw_{t+1}D_{t+1};N_t=R_{t+1}D_t+γw_{t+1}N_{t+1}; son adım D 1,N=R_T. Değişen hedefte
+    eski önbellek kullanılmaz.'
   rubric:
   - Q oranı t+1
   - N/D ve C/Q güncelleme
   - Kısa önekler için dış döngüyü sürdür
   - γ0/γ1 ve hedef değişimi
+- id: p11
+  type: kanıt
+  level: 2
+  title: Q hatalarının teleskopik toplamı
+  goal: Kaynak koşullarıyla q hatalarının teleskopik toplamı
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Değerler adımlar arasında değişmesin. δ_t=R_{t+1}+γQ(St+1,At+1)−Q(St,At) için (6.6) eylem-değeri
+    özdeşliğini kanıtlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.129,Alıştırma 6.8.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: '$\sum_{k=t}^{T-1}\gamma^{k-t}\delta_k$ toplamında her $+\gamma^{k-t+1}Q(S_{k+1},A_{k+1})$,sonraki
+    eksi terimle sadeleşir. Ödüller $G_t$ olur;başlangıçta $-Q(S_t,A_t)$,sonda $+\gamma^{T-t}Q(S_T,A_T)$
+    kalır. Terminal Q0 olduğu için
+
+
+    $$G_t-Q(S_t,A_t)=\sum_{k=t}^{T-1}\gamma^{k-t}\delta_k.$$
+
+
+    Q bölüm içinde değişirse tablo sürümü düzeltmeleri gerekir; soru donmuş Q varsayar.'
+  rubric:
+  - Ödül toplamı
+  - KomşuQ iptalleri
+  - Başlangıç ve terminal sınırı
+  - DonmuşQ koşulu
+- id: p12
+  type: kod
+  level: 3
+  title: Şahın sekiz hamlesi ve bekleme
+  goal: Kaynak koşullarıyla şahın sekiz hamlesi ve bekleme
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Rüzgârlı ızgarayı dört ana yöne ek kuzeydoğu,kuzeybatı,güneydoğu,güneybatı çapraz hamlelerle toplam
+    sekiz eylem kullanarak yeniden çözün. Ek eylemlerle ne kadar iyileşir? Yalnız rüzgârdan başka hareket
+    yaptırmayan dokuzuncu bekleme eylemiyle daha iyisi mümkün mü?
+
+
+    Kaynak:Sutton ve Barto (2018),s.130–131,Alıştırma6.9.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: x6 ve windytd/l6 aynı haritada 4/8/9 eylemi çözer. Kaynak sütunun rüzgârı,7×10 harita,S(3,0),G(3,7),her
+    geçiş−1 veγ1 korunur. Bağımsız modelde minimum dört eylem için 15,sekiz için 7,dokuz için 7. Ek yönler
+    minimumu 8 adım azaltır. Hedef yatay 7 hücre uzakta;tek hamle yatayda en çok 1 ilerlediğinden bekleme
+    7 altına indiremez. Gerçek SARSA için ε,α,tohum,bütçe ve yörüngeleri raporlayın. Sonlu öğrenilmiş
+    tablo ile model optimumunu ayrı gösterin.
+  rubric:
+  - Sekiz ve dokuz hareket kodu
+  - Kaynak rüzgâr/ödül koşulları
+  - 15/7/7 model sonucu
+  - Yatay uzaklık alt sınırı
+  - Gerçek eğitim/yörünge ve model ayrımı
+- id: p13
+  type: kod
+  level: 3
+  title: Stokastik rüzgârla yeniden öğrenmek
+  goal: Kaynak koşullarıyla stokastik rüzgârla yeniden öğrenmek
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Sekiz şah hamleli görevi stokastik rüzgârla yeniden çözün. Rüzgâr varsa üçtebir olasılıkla temel
+    sütun etkisi,üçtebir bir hücre üstü,üçtebir bir hücre altı uygulanır. Kaynağın verdiği örnekte hedefin
+    bir sağından sola gidince bir üstü,iki üstü ve hedefin kendisi her biri1/3 olasılıklıdır.
+
+
+    Kaynak:Sutton ve Barto (2018),s.131,Alıştırma6.10.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'x6 ve windytd stokastik çeşidi uygular. Yalnız WIND[c]>0 sütunlarında temel−1,temel,temel+1
+    eşit olasılıklı;0 sütunları değişmez. Hedefin sağı (3,8) konumundan sol hamle,hedef (3,7),bir üst
+    (2,7),iki üst (1,7) verir;her biri 1/3. SARSA sonraki eylemi güncellemeden önce seçer,bitmemiş son
+    parça terminal değildir.
+
+
+    Sekiz eylemin model optimumu 10.9646090534948 beklenen adım. Kendi JS koşumuzda 100000 adım,α0.1,ε0.1,tohum
+    1 sonrası öğrenilmiş hedef,1000 değerlendirmede 13.982 ortalama ve 0.249648 standart hata verdi. Model/öğrenim
+    ayrılır;bitmeyen örnek varsa yalnız bitenlerin koşullu ortalaması tam beklenti sayılamaz. Python ve
+    JS aynı sayısal tohumla aynı yolları üretmez.'
+  rubric:
+  - Pozitif sütunlarda üç rüzgâr
+  - Üç koordinat ve 1/3
+  - GerçekSARSA,yarım bölüm ayrımı
+  - Model/öğrenim ölçümlerinin ayrımı
+- id: p14
+  type: açıkla
+  level: 2
+  title: Q-öğrenme neden politika dışıdır?
+  goal: Kaynak koşullarıyla q-öğrenme neden politika dışıdır?
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Q-öğrenme neden politika dışı kontrol sayılır? Davranışın öğrendiği hedefe etkisi tamamen yok mudur?
+
+
+    Kaynak:Sutton ve Barto (2018),s.132,Alıştırma 6.11.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: Hedefte sonraki açgözlü eylemin maksimum Q değeri kullanılır;davranış ε-greedy veya başka
+    kapsayan politika olabilir. Davranış hangi durum-eylem çiftlerinin güncelleneceğini ve verimi belirler.
+    Hedefteki sonraki eylem beklentisi davranışa eşitlenmez. Yeterli ziyaret ve uygun öğrenme oranı koşulları
+    gerekir. Mevcut çift koşullu tek geçişte maksimumu hesaplamak için tam yol önem oranı gerekmez.
+  rubric:
+  - Hedef/behavior ayrımı
+  - Ziyaret etkisi
+  - Kapsama/öğrenme koşulları
+- id: p15
+  type: karşı-örnek
+  level: 3
+  title: Açgözlü SARSA ile Q aynı mı?
+  goal: Kaynak koşullarıyla açgözlü sarsa ile q aynı mı?
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Eylem seçimi hep açgözlü olsun. SARSA ile Q-öğrenme tam aynı algoritma mı;aynı eylemleri ve ağırlık
+    güncellemelerini mi yaparlar?
+
+
+    Kaynak:Sutton ve Barto (2018),s.132,Alıştırma 6.12.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'Genel olarak hayır. Tek durumlu öz döngü ve iki eylem alın: $Q(a)=1,Q(b)=0,r_a=-2,r_b=0,\gamma=0.9,\alpha=1$.
+    İlk hedef ikisinde de $-2+0.9\cdot1=-1.1$.
+
+
+    Ancak SARSA sonraki A′ eylemini güncellemeden önce eski Q ile a seçmiştir. Q-öğrenme sonraki adımda
+    yeni Q tablosundan b seçer. Sonraki eylemler ve güncellemeler ayrılır. Ardıl satır güncellemeden etkilenmiyorsa
+    ve bağlar aynı çözülüyorsa örtüşebilirler. Fonksiyon yaklaşımında bir güncelleme başka satırları da
+    değiştirebilir.'
+  rubric:
+  - Önce/sonra seçim farkı
+  - Geçerli öz döngü karşı örneği
+  - İlk−1.1 ve sonraki a/b ayrımı
+  - Örtüşme için koşul
+- id: p16
+  type: kanıt
+  level: 3
+  title: Double Expected SARSA güncellemeleri
+  goal: Kaynak koşullarıyla double expected sarsa güncellemeleri
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'ε-greedy hedef politikayla Double Expected SARSA güncelleme denklemlerini verin. Seçici/değerlendirici
+    tabloların ve davranışın rollerini açıkça tanımlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.136,Alıştırma 6.13. Kaynakta yıldızlı alıştırma.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'Açık bir rol seçimi yapalım: $a_i^*=\arg\max_uQ_i(s'',u)$ tutarlı tek bir bağ kuralıyla seçilsin.
+    Hedef $\pi_i(u\mid s'')=\varepsilon/m+(1-\varepsilon)\mathbf1_{u=a_i^*}$.
+
+
+    Adil para Q1 güncellemesini seçerse
+
+
+    $$Q_1(s,a)\leftarrow Q_1(s,a)+\alpha\left[r+\gamma\sum_u\pi_1(u\mid s'')Q_2(s'',u)-Q_1(s,a)\right].$$
+
+
+    Q2 seçilirse π2 ağırlıklarıyla Q1 değerlendirilir. Davranış ayrı ε-greedy(Q1+Q2) olabilir;terminal
+    devam 0. Bu bağ seçimiyle hedef ε0,Double Q güncellemesini;ε1,diğer tablonun düzgün ortalamasını verir.
+    Sabit pozitif ε hedefi,ε0 optimal q* ile aynı hedef değildir. Denklemler seçici/değerlendirici rollerini
+    tanımlar;iki adaptif tablonun bağımsızlığı veya genel tam yansızlık varsayılmaz.'
+  rubric:
+  - π1/π2 seçici rolü
+  - Çapraz değerlendirme toplamları
+  - Adil simetrik güncelleme
+  - Davranış/terminal veε sınırları
+- id: p17
+  type: açıkla
+  level: 2
+  title: Jack için afterstate ve bilinen maliyet
+  goal: Kaynak koşullarıyla jack için afterstate ve bilinen maliyet
+  needs: TD/SARSA hedefleri,koşullu beklenti ve temel Bellman denklemi
+  q: 'Jack’in Araba Kiralama görevini afterstate biçiminde yeniden tanımlayın. Bu görevde neden öğrenmenin
+    daha hızlı yakınsamasını beklersiniz?
+
+
+    Kaynak:Sutton ve Barto (2018),s.137,Alıştırma 6.14.'
+  hints:
+  - Hedefi hesapladığınız tablo sürümünü ve gerçek terminal sınırını açıkça belirtin.
+  solution: 'Afterstate x,gece bilinen taşıma sonrası iki şubenin araç sayısı olsun.
+
+
+    $$U_\pi(x)=\mathbb E[R_{\rm kira}+\gamma V_\pi(S_{\rm ertesi})\mid x],\qquad Q_\pi(s,a)=-2|a|+U_\pi(x(s,a)).$$
+
+
+    Bilinen taşıma maliyeti,öğrenilen ortak devamla karıştırılmaz. (10,10),a0 ve(11,9),a1 aynı (10,10)
+    x değerini verir;ama Q değerleri maliyet nedeniyle 2 farklıdır. Ortak kiralama/iade örnekleri her
+    iki çifte aktarılır.441 envanter afterstate''i çok daha fazla durum/taşıma çiftinin bilinmeyen devamını
+    paylaşır:daha az parametre,veri yeniden kullanımı ve bilinen ilk etkiyi hesaplama avantajı. Bir günün
+    taşıma ara aşamasına ayrı γ ekleyip iki kez indirimlemeyin. Hızlanmanın evrensel oranı ileri sürülmez.'
+  rubric:
+  - Afterstate envanteri
+  - Bilinen maliyeti ayırdım
+  - Ortakx farklıQ örneği
+  - Veri paylaşımı ve doğru zaman/indirim
+- id: p18
+  type: çözülmüş
+  level: 0
+  title: Q-öğrenme backup diyagramını tahmin et
+  goal: Numarasız kaynak sorusundaki kök ve maksimum yayını kurmak
+  needs: Örnek durum geçişi,Q hedefi
+  q: 'Q-öğrenme backup diyagramının kökü ve alt düğümleri nedir? Sonraki eylemlerin maksimumu nasıl gösterilir?
+    Şekil 6.4 cevabını açmadan önce tahmin edin.
+
+
+    Kaynak:Sutton ve Barto (2018),s.132,numarasız metin içi soru.'
+  solution: Kök siyah durum-eylem düğümü(s,a);tek örnek ödüllü geçiş açık ardıl durum düğümüne gider.
+    Ondan çıkan bütün olası sonraki eylemler siyah yapraklardır. Yaprakların üstündeki yay maksimum seçimini
+    belirtir;olasılık ortalaması değildir. Expected SARSA aynı yaprakları politika olasılıklarıyla tartar,yay
+    kullanmaz. Şekil 4 kendi Q=(0,1,2),R1,γ0.9 örneğinde Q hedefi 2.8,ε0.2 Expected hedefi 2.62 hesaplar.
 pitfalls:
 - wrong: Q-öğrenmenin Q*'a yakınsaması için davranış politikası sonunda açgözlü olmalıdır.
-  right: Q-öğrenme politika dışıdır; her (s, a) sonsuz kez denenir ve Robbins–Monro koşulları sağlanırsa sabit
-    ε ile de yakınsar. GLIE, SARSA'nın ve davranışın kendisinin en iyi hâle gelmesi için gerekir.
+  right: Q-öğrenme politika dışıdır; her (s, a) sonsuz kez denenir ve Robbins–Monro koşulları sağlanırsa
+    sabit ε ile de yakınsar. GLIE, SARSA'nın ve davranışın kendisinin en iyi hâle gelmesi için gerekir.
 - wrong: Q-öğrenme her zaman SARSA'dan daha iyi sonuç verir, çünkü en iyi politikayı öğrenir.
-  right: Eğitim sırasında keşifli davranışın getirisi önemliyse SARSA daha çok ödül toplar (uçurum yürüyüşünde
-    −27'ye karşı −48); Q-öğrenme yalnız keşif kapatıldıktan sonra üstündür.
+  right: Varsayılan uçurum koşusunda son100 bölüm SARSA−27,Q−48.7;keşif kapalı açgözlü yollar−17/−13.
+    Eğitim ve değerlendirme farklı ölçütlerdir. SARSA bütün görev ve ayarlarda daha iyi değildir;Q tablosunun
+    sonlu eğitimde tam optimum olması da garanti edilmez.
 - wrong: Kestirimler yansızsa onların maksimumu da yansızdır.
-  right: 'E[max Q̂] ≥ max E[Q̂]: iki bağımsız N(0, 1) kestirimde yanlılık 0.56, onda 1.54. Çift Q-öğrenme seçimi
-    ve değerlendirmeyi ayırarak bunu giderir.'
+  right: E[max Q̂]≥max E[Q̂]. İki bağımsız standart normal kestirimde fark1/√π≈0.564;onda≈1.54. Double
+    Q seçim ve değerlendirmeyi ayırır;genel adaptif MDP tablolarının bağımsız veya tam yansız olduğu sonucu
+    çıkmaz.
 - wrong: Q^π(s, a)'da sonraki durumun dağılımı π(s) ile belirlenir.
-  right: 'İlk geçiş seçilen a ile olur: Q^π(s, a) = E[r | s, a] + γ Σ P(s⁺ | s, a) V^π(s⁺); π ancak ondan sonra
-    devreye girer.'
+  right: 'İlk geçiş seçilen a ile olur: Q^π(s, a) = E[r | s, a] + γ Σ P(s⁺ | s, a) V^π(s⁺); π ancak ondan
+    sonra devreye girer.'
 - wrong: Yarışta çarpışma terminaldir.
-  right: Aynı bölümde rastgele başlangıca sıfır hızla dönülür; her geçiş−1. Hareket parçasında bitiş daha önceyse
-    terminaldir.
+  right: Aynı bölümde rastgele başlangıca sıfır hızla dönülür; her geçiş−1. Hareket parçasında bitiş daha
+    önceyse terminaldir.
 - wrong: γ<1 indirim duyarlı kontrolünde hedef dışı eylem görünce bütün geriye tarama kesilir.
   right: Daha kısa ufuklar o eylemi içermeyebilir; yalnız ilgili iç ufuk çarpımını kes, dış zaman taramasını
     sürdür.
 whatif:
 - q: Keşif hiç yapılmasaydı ama Q iyimser (büyük) değerlerle başlatılsaydı?
   a: 'Her denenen eylemin değeri gerçeğe doğru düşer ve ajan henüz denenmemiş, hâlâ iyimser değerli eylemlere
-    yönelir: keşif kendiliğinden ve sistematik olur. Ama yalnız başlangıçta işe yarar; ortam değişirse ya da
-    gürültü büyükse yetmez. Uçurum yürüyüşünde sıfır başlangıç (bütün gerçek değerler negatif) zaten iyimserdir.'
+    yönelir: keşif kendiliğinden ve sistematik olur. Ama yalnız başlangıçta işe yarar; ortam değişirse
+    ya da gürültü büyükse yetmez. Uçurum yürüyüşünde sıfır başlangıç (bütün gerçek değerler negatif) zaten
+    iyimserdir.'
 - q: Ortam zamanla değişseydi (ödüller kaysaydı)?
-  a: α = 1/n eski deneyimi sonsuza dek eşit ağırlıkta tutar ve değişimi izleyemez; sabit α son deneyime daha
-    çok ağırlık verir. Keşif de hiç sıfırlanmamalıdır; aksi hâlde eski en iyi eylem kötüleştiğinde fark edilmez.
+  a: α = 1/n eski deneyimi sonsuza dek eşit ağırlıkta tutar ve değişimi izleyemez; sabit α son deneyime
+    daha çok ağırlık verir. Keşif de hiç sıfırlanmamalıdır; aksi hâlde eski en iyi eylem kötüleştiğinde
+    fark edilmez.
 - q: Durumlar sürekli olsaydı (ör. bir arabanın konumu ve hızı)?
   a: 'Tablo kullanılamaz; ya durum uzayı ızgaraya bölünür (karo kodlama) ya da Q bir fonksiyonla yaklaşılır:
-    Q(s, a; w). Q-öğrenmenin hedefi aynı kalır ama yakınsama güvencesi kaybolur (fonksiyon yaklaşımı + bootstrapping
-    + politika dışı öğrenme = ''ölümcül üçlü''). DQN bu sorunu deneyim tekrarı ve hedef ağla hafifletir (M11.6).'
+    Q(s, a; w). Q-öğrenmenin hedefi aynı kalır ama yakınsama güvencesi kaybolur (fonksiyon yaklaşımı +
+    bootstrapping + politika dışı öğrenme = ''ölümcül üçlü''). DQN bu sorunu deneyim tekrarı ve hedef
+    ağla hafifletir (M11.6).'

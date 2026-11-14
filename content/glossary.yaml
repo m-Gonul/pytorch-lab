@@ -242,3 +242,19 @@ terms:
   karar başına önem örnekleme: "Per-decision IS: her ödülün önüne yalnız o ödüle kadar olan eylem olasılık oranlarını koymak; gelecek oranları koşullu beklenti1 özelliğiyle elemek."
   indirim duyarlı önem örnekleme: "Discounting-aware IS: indirgenmiş getiriyi düz kısmi getirilerin geometrik karışımı olarak yazıp her ufuk için yalnız gerekli önek oranını kullanmak."
   dirichlet problemi: "Sınır değerleri verilmiş bir bölgede harmonik iç çözümü bulma. Ayrık soğurucu rastgele yürüyüşte çözüm beklenen terminal sınır değeridir; genel sabun minimal yüzeyiyle aynı denklem değildir."
+
+  markov ödül süreci: 'MRP: eylem seçimi içermeyen durum geçişi ve ödül modeli. Sabit politika altında bir MDP, o
+    politikanın ürettiği MRP olarak değerlendirilebilir.'
+  glie: 'Greedy in the limit with infinite exploration: her durum-eylem çifti sonsuz kez ziyaret edilirken davranış
+    açgözlü sınıra gider. Yalnız ε→0 olması bütün çiftlerin ziyaretini garanti etmez.'
+  afterstate: 'Eylem sonrası durum: eylemin bilinen doğrudan etkisinden sonraki, henüz bilinmeyen çevre yanıtından
+    önceki temsil. Aynı devamı paylaşan durum-eylem çiftleri ortak değer öğrenebilir; bilinen anlık maliyet ayrıca
+    tutulur.'
+  örnek güncelleme: 'Sample update: modelde bütün ardılları toplamak yerine deneyimden alınan geçiş veya yörüngeyle
+    değer güncellemek. TD kısa örnekten, MC tam bölüm getirisinden yararlanır.'
+  certainty equivalence: Veriden en çok olabilirlikli çevre modelini kurup onu gerçek modelmiş gibi çözme ilkesi.
+    Tablolu batch TD uygun sonlanma koşullarında bu modelin Bellman değerini bulur.
+  expected sarsa: Sonraki eylemi örneklemek yerine hedef politika altında Σa π(a|s′)Q(s′,a) ortalamasını kullanan
+    TD kontrol yöntemi. Eylem örnekleme varyansını kaldırır; çevre gürültüsünü bütünüyle kaldırmaz.
+  çift öğrenme: Seçim ve değerlendirme rollerini iki kestirim arasında ayırma fikri. Double Q çevrimiçi tabloları
+    ortak davranış ve çapraz özyükleme nedeniyle genel olarak bağımsız veya tam yansız değildir.

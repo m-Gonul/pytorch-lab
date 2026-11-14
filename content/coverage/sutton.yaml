@@ -26,16 +26,16 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: Bölüm1–5 işlendi;yayın CI ayrıca izlenir. Bölüm6–17,ön/arka materyal ve kısım ayırıcıları henüz tümüyle
-    işlenmedi;kitap tamamlanmadı.
+  note: İlk6 bölüm işlendi;bu bölümün yayın CI ayrıca izlenir. Bölüm7–17,ön/arka materyal ve kısım ayırıcıları
+    henüz tümüyle işlenmedi;kitap tamamlanmadı.
   processed_chapters:
   - 1
   - 2
   - 3
   - 4
   - 5
-  unprocessed_chapters:
   - 6
+  unprocessed_chapters:
   - 7
   - 8
   - 9
@@ -99,8 +99,8 @@ chapters:
     independent: true
     findings_resolved: true
     note: Sayfa sayfa kaynak/defter karşılaştırması; 26 ayrıntı kaydı ve beş sorunun alt koşulları genişletildi.
-    final_followup: İki kalan ilişki ve özgün §9.6 atfı defterde açıklandı; beş alıştırmanın bütün alt soruları
-      denetlendi.
+    final_followup: İki kalan ilişki ve özgün §9.6 atfı defterde açıklandı; beş alıştırmanın bütün alt
+      soruları denetlendi.
 - chapter: 2
   title: Çok kollu banditler
   pdf_pages:
@@ -189,8 +189,8 @@ chapters:
     - 67
     independent: true
     findings_resolved: true
-    note: Altı şekil ve eksi işaretleri görüntüden denetlendi; 18 ayrıntı eklendi, Denklem 2.13 ve Kumar kategori
-      kaydı düzeltildi.
+    note: Altı şekil ve eksi işaretleri görüntüden denetlendi; 18 ayrıntı eklendi, Denklem 2.13 ve Kumar
+      kategori kaydı düzeltildi.
     final_followup: 106 kayıt yeniden denetlendi; önceki içerik bulguları kapandı, ek belirgin eksik bulunmadı;
       s.32–33 aralığı da eklendi.
 - chapter: 3
@@ -312,10 +312,10 @@ chapters:
     okuma tamamlandı.
   content_status: işlendi; bağımsız ikinci okuma tamamlandı
   recorded_units: 179
-  second_read: Bağımsız ajan yalnız PDF69–93 ve birim defteriyle bütün 25 metin sayfasını ve 12 şekilli sayfa
-    görüntüsünü okudu; 29 alıştırma,13 görsel,10satırlı tabloyu doğruladı. Anlam, koşul, alt soru ve konum
-    bulguları eklendi; takip okumada iki kısaltılmış koşul geri kondu ve MC sayfa aralığı genişletildi. Markov
-    koşullu bağımsızlığı ile temsil-kısıtı ayrı birimler olarak netleştirildi.
+  second_read: Bağımsız ajan yalnız PDF69–93 ve birim defteriyle bütün 25 metin sayfasını ve 12 şekilli
+    sayfa görüntüsünü okudu; 29 alıştırma,13 görsel,10satırlı tabloyu doğruladı. Anlam, koşul, alt soru
+    ve konum bulguları eklendi; takip okumada iki kısaltılmış koşul geri kondu ve MC sayfa aralığı genişletildi.
+    Markov koşullu bağımsızlığı ile temsil-kısıtı ayrı birimler olarak netleştirildi.
 - chapter: 4
   title: Dinamik programlama
   pdf_pages:
@@ -403,8 +403,8 @@ chapters:
   content_status: işlendi; bağımsız ikinci okuma tamamlandı
   recorded_units: 102
   second_read: Bağımsız ajan yalnız PDF95–112 ve defteri okuyup18sayfa ve9görüntüyü denetledi;10alıştırma,1numarasız
-    soru,7görsel,3kod doğrulandı. Koşul,alt soru,tarih,şekil ve sayfa aralığı bulguları kapatıldı;Poisson öğretim
-    türetimi kaynak birimi dışında tutuldu.
+    soru,7görsel,3kod doğrulandı. Koşul,alt soru,tarih,şekil ve sayfa aralığı bulguları kapatıldı;Poisson
+    öğretim türetimi kaynak birimi dışında tutuldu.
 - chapter: 5
   title: Monte Carlo yöntemleri
   pdf_pages:
@@ -563,8 +563,17 @@ chapters:
     - 133
     - 134
     findings_resolved: true
-    note: Yalnız PDF ve defterle bağımsız okuma;koşullar,alt sorular,5kod,9görsel,14numaralı+2numarasız soru,tarihçe,renk/eksen/kredi
-      ve kaynak/öğretim ayrımı denetlendi. Bulgular açık kayda işlendi.
+    note: Yalnız PDF ve defterle bağımsız okuma;koşullar,alt sorular,5kod,9görsel,14numaralı+2numarasız
+      soru,tarihçe,renk/eksen/kredi ve kaynak/öğretim ayrımı denetlendi. Bulgular açık kayda işlendi.
+  publication:
+    commit: d613718d56dec975638f6ff9002fa6593474d53f
+    run_id: 43573142454
+    build: success
+    deploy: success
+    live_verified: true
+    pages:
+    - https://m-gonul.github.io/pytorch-lab/m11-4-mc-td.html
+    - https://m-gonul.github.io/pytorch-lab/m11-5-sarsa-q.html
 - chapter: 6
   title: Zamansal fark öğrenmesi
   pdf_pages:
@@ -676,8 +685,53 @@ chapters:
   candidate_modules:
   - m11-4-mc-td
   - m11-5-sarsa-q
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  mapping_status: Bütün134 kaynak biriminin ders/kart/lab/el hesabı hedefleri doğrulandı;bağımsız ikinci
+    okuma tamamlandı.
+  content_status: işlendi;yayın CI henüz çalıştırılmadı
+  recorded_units: 134
+  source_unnumbered_figures:
+  - page: 121
+    pdf_page: 143
+    what: TD(0)backup
+  - page: 125
+    pdf_page: 147
+    what: beş durumlu MRP
+  - page: 125
+    pdf_page: 147
+    what: rastgele yürüyüşün iki grafiği
+  - page: 127
+    pdf_page: 149
+    what: A–B ençokolabilirlik modeli
+  - page: 129
+    pdf_page: 151
+    what: S/A/R olay zinciri
+  - page: 129
+    pdf_page: 151
+    what: SARSAbackup
+  - page: 130
+    pdf_page: 152
+    what: rüzgârlı ızgara ve öğrenme eğrisi
+  - page: 132
+    pdf_page: 154
+    what: uçurum ızgarası ve öğrenme eğrileri
+  - page: 137
+    pdf_page: 159
+    what: iki XOX hamlesinin aynı afterstate birleşimi
+  second_read:
+    pages:
+    - 119
+    - 140
+    pdf_pages:
+    - 141
+    - 162
+    independent: true
+    text_pages: 22
+    rendered_pages: 18
+    findings_resolved: true
+    note: Ayrı ajan yalnız kaynak ve defteri okudu;numarasız görseller,14 alıştırmanın alt koşulları,2
+      soru,4 kod,1 tablo,1 dipnot ve tarih notları denetlendi. Son takipte açık somut eksik kalmadı.
+    final_followup: Şekil6.2/6.4/6.5 içerikleri ve yalnız6.5/6.7/6.13 alıştırmalarının yıldızları son
+      kez doğrulandı.
 - chapter: 7
   title: n adımlı önyükleme
   pdf_pages:
@@ -2606,34 +2660,44 @@ page_audit:
   embedded_images: 0
   drawing_paths: 0
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 142
   printed_page: 120
   text_sha256: e996c62eb7b072d1face7005087e919681cfd1e6c541139daac4251357e1f967
   text_characters: 2806
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 143
   printed_page: 121
   text_sha256: 89064e74743d4dde553d8e4fc5e0abf317ed34e6d291de433fd33206ee4e64c3
   text_characters: 3558
   embedded_images: 0
   drawing_paths: 14
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 144
   printed_page: 122
   text_sha256: 906e8de75f02e87fdf878c00c5cac731013da4f93753fea00aa02184b0998a5f
   text_characters: 3893
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 145
   printed_page: 123
   text_sha256: e9f5abf8a8efa143b1e18efdefbea2b172841805fa81ddfbac1e192278146ed4
   text_characters: 3247
   embedded_images: 0
   drawing_paths: 49
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 146
   printed_page: 124
   text_sha256: ae3e61fe06d096e2ea68da7d778f10252cc3585bddb614b129eaffea6bfd76af
@@ -2641,97 +2705,125 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 147
   printed_page: 125
   text_sha256: 915b591251ef3a37a281c67c1d0b07bf984b52e3368b6b31d41d7316e93bbc20
   text_characters: 4137
   embedded_images: 0
   drawing_paths: 66
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 148
   printed_page: 126
   text_sha256: 8fe6a8fb313b45ab6a5e90b7305f204bf45db363a6aaef36dab4b0eed8389145
   text_characters: 3523
   embedded_images: 0
   drawing_paths: 6
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 149
   printed_page: 127
   text_sha256: 1ac64c2b5317ee8bcff719384a166cf107bb3ebb84188726fb87ff343d42b812
   text_characters: 3115
   embedded_images: 0
   drawing_paths: 23
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 150
   printed_page: 128
   text_sha256: eedbe32696c348ba3002ff3b6005b9096c7aba9937091e9d5be91d4a64fddb05
   text_characters: 3647
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 151
   printed_page: 129
   text_sha256: 892b5e67e1679a8e882112c618dcb8c7b49586b7143431a950d4ccfa23429a8d
   text_characters: 3561
   embedded_images: 0
   drawing_paths: 32
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 152
   printed_page: 130
   text_sha256: 268576bc156fc124b964bb495bf5d3e398e150af1d8bfebd37298d92acd676f2
   text_characters: 2941
   embedded_images: 0
   drawing_paths: 31
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 153
   printed_page: 131
   text_sha256: 01530cc4b79bdc736c9b5535a39a5cfc1e3454e9ab52edddeaabf18cadc21904
   text_characters: 2872
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 154
   printed_page: 132
   text_sha256: 3318bcd369d2fa74fd9db6be0f23c0eeaf2c1c006dd522f6939466f2bb7e190d
   text_characters: 3111
   embedded_images: 0
   drawing_paths: 44
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 155
   printed_page: 133
   text_sha256: 2751e2cc2547d2f2bdf50bfba4fe4f47b1aa9ecf1d051a80867f082e71b2be9b
   text_characters: 3981
   embedded_images: 0
   drawing_paths: 249
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 156
   printed_page: 134
   text_sha256: ff4da40692d312148f5d4ad8e6b8c15af68c2a17d50d80c423b95ae27c6eefc6
   text_characters: 2962
   embedded_images: 0
   drawing_paths: 48
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 157
   printed_page: 135
   text_sha256: c287abfa28bc266469a7d30c14cef33dc44b3e8adcb94f0a9cd0351934ae3570
   text_characters: 3490
   embedded_images: 6
   drawing_paths: 43
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 158
   printed_page: 136
   text_sha256: e749a3af41a8a400617a9daa8ed9eaec96b4d8e6fc5e4db32e118dde019f3380
   text_characters: 2745
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 159
   printed_page: 137
   text_sha256: ecc345317fec2ceec8c18e7d8fc1d6f7a8d0e085a0aeec9afdb99a7e0b21dbef
   text_characters: 2744
   embedded_images: 0
   drawing_paths: 10
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 160
   printed_page: 138
   text_sha256: e81ee7e93c81edf747a0b025a4f65f266d79a3e13c9a9cf8f10c89ddbeb48637
@@ -2739,6 +2831,8 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 161
   printed_page: 139
   text_sha256: 18112ff66ddfe8142c2d3672616ef1ef7b9fa2e7ef2259340989854370606f71
@@ -2746,13 +2840,17 @@ page_audit:
   embedded_images: 0
   drawing_paths: 1
   visual_review: incelenmedi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 162
   printed_page: 140
   text_sha256: e25cbc2d5ec20036277d07226c96cec2948a0ea620f27932b65d878af4f25e28
   text_characters: 1656
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: görüntü olarak incelendi
+  text_review: ilk okuma tamamlandı
+  second_read: kaynak/defter bağımsız ikinci okuma tamamlandı
 - pdf_page: 163
   printed_page: 141
   text_sha256: d201008e88c9212d218c3eb402b8c5e305ffe2d3859438178378e4d835099bc2
@@ -5836,8 +5934,8 @@ items:
   page: 9
   pdf_page: 31
   kind: bilgi
-  what: Kendi hamlesinden sonraki tahtalar değerlendirilir; çoğunlukla açgözlü, bazen diğer hamlelerden rastgele
-    seçim.
+  what: Kendi hamlesinden sonraki tahtalar değerlendirilir; çoğunlukla açgözlü, bazen diğer hamlelerden
+    rastgele seçim.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-xox
 - id: ch1-p9-i4
@@ -5851,7 +5949,8 @@ items:
   page: 10
   pdf_page: 32
   kind: şekil
-  what: Şekil 1.1 a–g oynanan yol, c*, e*, g*, rakip/biz sırası, kesikli alternatifler ve c→a/g→e öğrenme okları.
+  what: Şekil 1.1 a–g oynanan yol, c*, e*, g*, rakip/biz sırası, kesikli alternatifler ve c→a/g→e öğrenme
+    okları.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-xox
   figure: türetildi
@@ -5867,15 +5966,16 @@ items:
   page: 10
   pdf_page: 32
   kind: bilgi
-  what: Sabit rakipte uygun adım azalması ve yeterli örneklemeyle açgözlü optimal değerler; sıfırlanmayan adım
-    yavaş değişimi izler.
+  what: Sabit rakipte uygun adım azalması ve yeterli örneklemeyle açgözlü optimal değerler; sıfırlanmayan
+    adım yavaş değişimi izler.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-xox
 - id: ch1-p10-i4
   page: 10
   pdf_page: 32
   kind: bilgi
-  what: Sabit politikanın çok oyundaki kazanma sıklığı yansızdır; evrimsel değerlendirme oyun sonlarını kullanır.
+  what: Sabit politikanın çok oyundaki kazanma sıklığı yansızdır; evrimsel değerlendirme oyun sonlarını
+    kullanır.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-xox
 - id: ch1-p10-i5
@@ -5925,8 +6025,8 @@ items:
   page: 11
   pdf_page: 33
   kind: bilgi
-  what: Büyük durum uzayının yalnız küçük kısmı görülür; başarı uygun genellemeye bağlıdır, sürekli zaman teorisi
-    daha karmaşık ve giriş kapsamı dışındadır.
+  what: Büyük durum uzayının yalnız küçük kısmı görülür; başarı uygun genellemeye bağlıdır, sürekli zaman
+    teorisi daha karmaşık ve giriş kapsamı dışındadır.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-xox
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -5934,7 +6034,8 @@ items:
   page: 11
   pdf_page: 33
   kind: bilgi
-  what: TD-Gammon ayrıntısı kaynak §16.1; sinir ağı atfının §9.7 olması gerektiği aynı PDF başlıklarından denetlendi.
+  what: TD-Gammon ayrıntısı kaynak §16.1; sinir ağı atfının §9.7 olması gerektiği aynı PDF başlıklarından
+    denetlendi.
   status: düzeltildi
   where: content/modules/m5-5-rl/lesson.md#sutton-ag-atif
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi. Özgün s.11 atfı §9.6; aynı PDF başlıklarıyla
@@ -5965,8 +6066,8 @@ items:
   page: 12
   pdf_page: 34
   kind: bilgi
-  what: Doğru model kurmak darboğazsa modelsizlik yararlı; modelsiz yöntemler model tabanlı sistemlerde yapı
-    taşıdır.
+  what: Doğru model kurmak darboğazsa modelsizlik yararlı; modelsiz yöntemler model tabanlı sistemlerde
+    yapı taşıdır.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-xox
 - id: ch1-p12-i5
@@ -5989,8 +6090,8 @@ items:
   pdf_page: 34
   kind: alıştırma
   source_number: '1.2'
-  what: Simetriyi nasıl kullanırız; hangi öğrenme kazançları var; rakip asimetrikse paylaşmalı mıyız; değerler
-    zorunlu eşit mi?
+  what: Simetriyi nasıl kullanırız; hangi öğrenme kazançları var; rakip asimetrikse paylaşmalı mıyız;
+    değerler zorunlu eşit mi?
   status: eklendi
   where: content/modules/m5-5-rl/module.yaml#practice:p7
 - id: ch1-p12-i8
@@ -6126,8 +6227,8 @@ items:
   page: 14
   pdf_page: 36
   kind: kaynakça
-  what: Lovejoy 1991 kısmi gözlem; White 1985/1988/1993 uygulama; Rust 1996 yaklaşım; Bertsekas 1982/1983 asenkron;
-    Bryson 1996 kontrol tarihi.
+  what: Lovejoy 1991 kısmi gözlem; White 1985/1988/1993 uygulama; Rust 1996 yaklaşım; Bertsekas 1982/1983
+    asenkron; Bryson 1996 kontrol tarihi.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6194,8 +6295,8 @@ items:
   page: 15
   pdf_page: 37
   kind: kaynakça
-  what: Gallistel 2005; Herrnstein 1970; Kimble 1961/1967; Mazur 1994; Hilgard–Bower 1975; Dennett 1978; Campbell
-    1960; Cziko 1995.
+  what: Gallistel 2005; Herrnstein 1970; Kimble 1961/1967; Mazur 1994; Hilgard–Bower 1975; Dennett 1978;
+    Campbell 1960; Cziko 1995.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6246,8 +6347,8 @@ items:
   pdf_page: 38
   kind: örnek
   what: Ross 1933 yolu anahtarda; Walter 1951 öğrenen kaplumbağa; Theseus 1952 yolu zemindeki mıknatıs/rölede
-    saklar; Deutsch 1954, 1953 davranış teorisine dayanır. Deutsch model tabanlı RL ile ortak özellikler taşır
-    (kaynak Bölüm 8).
+    saklar; Deutsch 1954, 1953 davranış teorisine dayanır. Deutsch model tabanlı RL ile ortak özellikler
+    taşır (kaynak Bölüm 8).
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6263,8 +6364,8 @@ items:
   page: 17
   pdf_page: 39
   kind: bilgi
-  what: Rosenblatt 1962 ve Widrow–Hoff 1960 ödül diline karşın denetimli algoritmalardır; hata düzeltmek RL
-    demek değildir.
+  what: Rosenblatt 1962 ve Widrow–Hoff 1960 ödül diline karşın denetimli algoritmalardır; hata düzeltmek
+    RL demek değildir.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
 - id: ch1-p17-i2
@@ -6306,8 +6407,8 @@ items:
   page: 17
   pdf_page: 39
   kind: bilgi
-  what: Andreae 1969a,b; iç monolog gizli durumu, leakback yedeklemeli katkı atamayı hedefler; tanınmayan çalışmanın
-    sonraki etkisi sınırlıdır.
+  what: Andreae 1969a,b; iç monolog gizli durumu, leakback yedeklemeli katkı atamayı hedefler; tanınmayan
+    çalışmanın sonraki etkisi sınırlıdır.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6344,8 +6445,8 @@ items:
   page: 18
   pdf_page: 40
   kind: tanım
-  what: Widrow–Gupta–Maitra 1973 selective bootstrap adaptation, LMS'den başarı/başarısızlıkla blackjack ve
-    critic terimi.
+  what: Widrow–Gupta–Maitra 1973 selective bootstrap adaptation, LMS'den başarı/başarısızlıkla blackjack
+    ve critic terimi.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
 - id: ch1-p18-i5
@@ -6380,8 +6481,8 @@ items:
   page: 18
   pdf_page: 40
   kind: bilgi
-  what: MENACE mevcut kutudan rastgele boncukla hamle seçer; BOXES yalnız direk düşmesi veya ray sonuyla başarısızlık
-    sinyali alır.
+  what: MENACE mevcut kutudan rastgele boncukla hamle seçer; BOXES yalnız direk düşmesi veya ray sonuyla
+    başarısızlık sinyali alır.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6397,8 +6498,8 @@ items:
   page: 18
   pdf_page: 40
   kind: bilgi
-  what: Öğrenen otomat ödülle eylem olasılıklarını günceller; Alopex eylem-pekiştirme korelasyonu saptar; Tsetlin
-    1973 yayını ölüm sonrasıdır.
+  what: Öğrenen otomat ödülle eylem olasılıklarını günceller; Alopex eylem-pekiştirme korelasyonu saptar;
+    Tsetlin 1973 yayını ölüm sonrasıdır.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6413,8 +6514,8 @@ items:
   page: 19
   pdf_page: 41
   kind: bilgi
-  what: Ekonomi hattı AI'dan büyük ölçüde ayrı gelişti; stratejik oyun teorisi oyun oynayan programla aynı
-    konu değildir.
+  what: Ekonomi hattı AI'dan büyük ölçüde ayrı gelişti; stratejik oyun teorisi oyun oynayan programla
+    aynı konu değildir.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
 - id: ch1-p19-i3
@@ -6428,7 +6529,8 @@ items:
   page: 19
   pdf_page: 41
   kind: tanım
-  what: Holland 1975, 1976/1986 classifier systems; bucket brigade katkı atar, genetik algoritma temsil üretir.
+  what: Holland 1975, 1976/1986 classifier systems; bucket brigade katkı atar, genetik algoritma temsil
+    üretir.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
 - id: ch1-p19-i5
@@ -6481,8 +6583,8 @@ items:
   page: 20
   pdf_page: 42
   kind: tanım
-  what: TD aynı büyüklüğün ardışık tahmin farklarını kullanır; ikincil pekiştirici birincille eşleşerek etki
-    kazanır.
+  what: TD aynı büyüklüğün ardışık tahmin farklarını kullanır; ikincil pekiştirici birincille eşleşerek
+    etki kazanır.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
 - id: ch1-p20-i2
@@ -6496,16 +6598,16 @@ items:
   page: 20
   pdf_page: 42
   kind: bilgi
-  what: Samuel Minsky bağlantısını belirtmedi; Shannon–Bellman etkisi için kaynakta kanıt yok; Minsky 1961
-    ilişkilendirdi.
+  what: Samuel Minsky bağlantısını belirtmedi; Shannon–Bellman etkisi için kaynakta kanıt yok; Minsky
+    1961 ilişkilendirdi.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
 - id: ch1-p20-i4
   page: 20
   pdf_page: 42
   kind: tanım
-  what: Klopf 1972 genelleştirilmiş pekiştirmede her nöron uyarıcıyı ödül, baskılayıcıyı ceza sayar; bu modern
-    TD değildir.
+  what: Klopf 1972 genelleştirilmiş pekiştirmede her nöron uyarıcıyı ödül, baskılayıcıyı ceza sayar; bu
+    modern TD değildir.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
 - id: ch1-p20-i5
@@ -6534,8 +6636,8 @@ items:
   page: 20
   pdf_page: 42
   kind: bilgi
-  what: Kaynağa göre Samuel 1959 TD fikirlerini ilk önerip uygular; Minsky–Samuel sonrası yaklaşık on yılda
-    hesaplamalı TD görünüşe göre yoktur; §16.2.
+  what: Kaynağa göre Samuel 1959 TD fikirlerini ilk önerip uygular; Minsky–Samuel sonrası yaklaşık on
+    yılda hesaplamalı TD görünüşe göre yoktur; §16.2.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6595,8 +6697,8 @@ items:
   page: 21
   pdf_page: 43
   kind: bilgi
-  what: Anderson 1986 aktör–eleştirmeni geri yayılımlı ağlara genişletir; Witten TD(0) MDP uyarlamalı kontrolünde
-    görünüşe göre en erken yayımlanmış kural; Werbos 1977 sonrası birleşmeyi savunur.
+  what: Anderson 1986 aktör–eleştirmeni geri yayılımlı ağlara genişletir; Witten TD(0) MDP uyarlamalı
+    kontrolünde görünüşe göre en erken yayımlanmış kural; Werbos 1977 sonrası birleşmeyi savunur.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-tarih
   note: Bağımsız ikinci okuma bulgusu; metin ve defter denetlendi.
@@ -6604,8 +6706,8 @@ items:
   page: 22
   pdf_page: 44
   kind: kaynakça
-  what: Szepesvári 2010, Bertsekas–Tsitsiklis 1996, Kaelbling 1993a, Sugiyama–Hachiya–Morimura 2013 genel RL
-    okumaları.
+  what: Szepesvári 2010, Bertsekas–Tsitsiklis 1996, Kaelbling 1993a, Sugiyama–Hachiya–Morimura 2013 genel
+    RL okumaları.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-okumalar
 - id: ch1-p22-i2
@@ -6633,8 +6735,8 @@ items:
   page: 22
   pdf_page: 44
   kind: kaynakça
-  what: Barto 1995b, Kaelbling–Littman–Moore 1996, Keerthi–Ravindran 1997 taramaları; Wiering–van Otterlo 2012
-    derlemesi.
+  what: Barto 1995b, Kaelbling–Littman–Moore 1996, Keerthi–Ravindran 1997 taramaları; Wiering–van Otterlo
+    2012 derlemesi.
   status: eklendi
   where: content/modules/m5-5-rl/lesson.md#sutton-okumalar
 - id: ch1-p22-i6
@@ -6707,14 +6809,16 @@ items:
   page: 26
   pdf_page: 48
   kind: tanım
-  what: Açgözlü eylem en büyük kestirimli koldur; diğer eylem keşiftir, kalan ufuk ve belirsizlik dengeyi etkiler.
+  what: Açgözlü eylem en büyük kestirimli koldur; diğer eylem keşiftir, kalan ufuk ve belirsizlik dengeyi
+    etkiler.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
 - id: ch2-p26-i4
   page: 26
   pdf_page: 48
   kind: bilgi
-  what: Belirsiz fakat yakın-değerli kolu şimdi denemek kısa vadeli kayıp karşılığında gelecekte ödül sağlayabilir.
+  what: Belirsiz fakat yakın-değerli kolu şimdi denemek kısa vadeli kayıp karşılığında gelecekte ödül
+    sağlayabilir.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-geribildirim
 - id: ch2-p26-i5
@@ -6737,7 +6841,8 @@ items:
   page: 27
   pdf_page: 49
   kind: formül
-  what: Denklem 2.1 göstergeyle seçilmiş kol ödüllerinin toplamı/sayımı; sıfır sayımda başlangıç değeri kullanılır.
+  what: Denklem 2.1 göstergeyle seçilmiş kol ödüllerinin toplamı/sayımı; sıfır sayımda başlangıç değeri
+    kullanılır.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
 - id: ch2-p27-i3
@@ -6751,23 +6856,24 @@ items:
   page: 27
   pdf_page: 49
   kind: formül
-  what: Denklem 2.2 argmax seçiminde eşitlik keyfi veya rastgele bozulabilir; yalnız yararlanma yetersiz kalabilir.
+  what: Denklem 2.2 argmax seçiminde eşitlik keyfi veya rastgele bozulabilir; yalnız yararlanma yetersiz
+    kalabilir.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
 - id: ch2-p28-i1
   page: 28
   pdf_page: 50
   kind: bilgi
-  what: ε dalı bütün kolları eşit seçer; tek en iyi kola limit olasılığı 1−ε+ε/k, asimptotik sonuç hızlı öğrenme
-    garantisi değildir.
+  what: ε dalı bütün kolları eşit seçer; tek en iyi kola limit olasılığı 1−ε+ε/k, asimptotik sonuç hızlı
+    öğrenme garantisi değildir.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
 - id: ch2-p28-i2
   page: 28
   pdf_page: 50
   kind: şekil
-  what: 'Şekil 2.1: 10 eylem, N(0,1) gerçek ortalamalar, N(q*,1) ödül dağılımları; q*(1)…q*(10), ödül −3…3
-    ve eylem 1…10 eksenleri.'
+  what: 'Şekil 2.1: 10 eylem, N(0,1) gerçek ortalamalar, N(q*,1) ödül dağılımları; q*(1)…q*(10), ödül
+    −3…3 ve eylem 1…10 eksenleri.'
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
   figure: türetildi
@@ -6793,7 +6899,8 @@ items:
   page: 29
   pdf_page: 51
   kind: bilgi
-  what: 10 kollu deney yatağında 2000 bağımsız görev, her görevde 1000 adım; iki ayrı birim varyansın anlamı.
+  what: 10 kollu deney yatağında 2000 bağımsız görev, her görevde 1000 adım; iki ayrı birim varyansın
+    anlamı.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
 - id: ch2-p29-i2
@@ -6811,15 +6918,16 @@ items:
   page: 29
   pdf_page: 51
   kind: bilgi
-  what: Kaynak açgözlü eğrisi başlangıçta hızlıdır, yaklaşık 1 ödülde kalır; yaklaşık 1.55 mümkün en iyi değerden
-    düşüktür.
+  what: Kaynak açgözlü eğrisi başlangıçta hızlıdır, yaklaşık 1 ödülde kalır; yaklaşık 1.55 mümkün en iyi
+    değerden düşüktür.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
 - id: ch2-p30-i1
   page: 30
   pdf_page: 52
   kind: bilgi
-  what: Kaynakta açgözlü yaklaşık üçte bir görevde en iyi kolu bulur; kötü ilk örnek daha sonra dönmeyi önler.
+  what: Kaynakta açgözlü yaklaşık üçte bir görevde en iyi kolu bulur; kötü ilk örnek daha sonra dönmeyi
+    önler.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
 - id: ch2-p30-i2
@@ -6840,8 +6948,8 @@ items:
   page: 30
   pdf_page: 52
   kind: bilgi
-  what: Değişen kollar gürültüsüzken de keşif ister; sabit dış görevde öğrenen politika etkili durağan olmamaya
-    yol açar.
+  what: Değişen kollar gürültüsüzken de keşif ister; sabit dış görevde öğrenen politika etkili durağan
+    olmamaya yol açar.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-testbed
 - id: ch2-p30-i5
@@ -6850,8 +6958,8 @@ items:
   kind: alıştırma
   source_number: '2.2'
   what: Dört kol, bütün Q₁ = 0, örnek ortalaması ve ε-açgözlü seçim kullanılıyor. Gözlemler (A₁,R₁)=(1,−1),
-    (A₂,R₂)=(2,1), (A₃,R₃)=(2,−2), (A₄,R₄)=(2,2), (A₅,R₅)=(3,0). Hangi adımlarda rastgele ε dalı kesin gerçekleşmiştir?
-    Hangi adımlarda gerçekleşmiş olabilir?
+    (A₂,R₂)=(2,1), (A₃,R₃)=(2,−2), (A₄,R₄)=(2,2), (A₅,R₅)=(3,0). Hangi adımlarda rastgele ε dalı kesin
+    gerçekleşmiştir? Hangi adımlarda gerçekleşmiş olabilir?
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#practice:p8
 - id: ch2-p30-i6
@@ -6859,8 +6967,8 @@ items:
   pdf_page: 52
   kind: alıştırma
   source_number: '2.3'
-  what: Şekil 2.2 yöntemlerini uzun vadeli birikimli ödül ve en iyi kol seçme olasılığı yönünden ayrı ayrı
-    karşılaştırıp iki farkı nicelleştir.
+  what: Şekil 2.2 yöntemlerini uzun vadeli birikimli ödül ve en iyi kol seçme olasılığı yönünden ayrı
+    ayrı karşılaştırıp iki farkı nicelleştir.
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#practice:p9
 - id: ch2-p30-i7
@@ -6906,8 +7014,8 @@ items:
   page: 32
   pdf_page: 54
   kind: kod
-  what: 'Basit bandit sözde kodu: Q=N=0; ε/rastgele eşitlikli argmax; ödül; sayımı artır; seçili kolu 1/N ile
-    güncelle.'
+  what: 'Basit bandit sözde kodu: Q=N=0; ε/rastgele eşitlikli argmax; ödül; sayımı artır; seçili kolu
+    1/N ile güncelle.'
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-ortalama
 - id: ch2-p32-i2
@@ -6928,8 +7036,8 @@ items:
   page: 32
   pdf_page: 54
   kind: bilgi
-  what: Üstel ağırlıklı ortalama koşulu 0<α≤1; Denklem 2.7 kaynakta uygun stokastik koşullarla olasılık 1 yakınsamayı
-    amaçlar.
+  what: Üstel ağırlıklı ortalama koşulu 0<α≤1; Denklem 2.7 kaynakta uygun stokastik koşullarla olasılık
+    1 yakınsamayı amaçlar.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
   note: Bağımsız ikinci okuma ayrıntısı.
@@ -6966,8 +7074,8 @@ items:
   pdf_page: 55
   kind: alıştırma
   source_number: '2.4'
-  what: Adım büyüklükleri αₙ sabit değilse, Denklem 2.6 benzeri biçimde önceki her ödülün Qₙ içindeki ağırlığını
-    α dizisi cinsinden bul.
+  what: Adım büyüklükleri αₙ sabit değilse, Denklem 2.6 benzeri biçimde önceki her ödülün Qₙ içindeki
+    ağırlığını α dizisi cinsinden bul.
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#practice:p10
 - id: ch2-p33-i5
@@ -6976,18 +7084,18 @@ items:
   kind: alıştırma
   source_number: '2.5'
   what: 10 kolun gerçek değerleri eşit başlasın; her adımda her kola bağımsız N(0,0.01²) artış ekle. ε=0.1
-    ile artımlı örnek ortalamasını ve sabit α=0.1 yöntemini karşılaştır. 10000 adımlık çalıştırmalar ve Şekil
-    2.2 benzeri ödül/optimal kol grafikleri hazırla.
+    ile artımlı örnek ortalamasını ve sabit α=0.1 yöntemini karşılaştır. 10000 adımlık çalıştırmalar ve
+    Şekil 2.2 benzeri ödül/optimal kol grafikleri hazırla.
   status: genişletildi
   where: content/modules/m11-7-bandits/module.yaml#practice:p11
-  note: x2 ödül eğrisine genişletildi; eşit gerçek başlangıç değerlerinde her kolun optimal sayılması da düzeltildi
-    ve otomatik kontrol edildi.
+  note: x2 ödül eğrisine genişletildi; eşit gerçek başlangıç değerlerinde her kolun optimal sayılması
+    da düzeltildi ve otomatik kontrol edildi.
 - id: ch2-p34-i1
   page: 34
   pdf_page: 56
   kind: bilgi
-  what: Başlangıç kestirimi yanlılık ve ön bilgi taşır; örnek ortalamasında ilk gözlemde silinir, sabit α sonlu
-    adımda azalan etki taşır.
+  what: Başlangıç kestirimi yanlılık ve ön bilgi taşır; örnek ortalamasında ilk gözlemde silinir, sabit
+    α sonlu adımda azalan etki taşır.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
 - id: ch2-p34-i2
@@ -7028,8 +7136,8 @@ items:
   page: 35
   pdf_page: 57
   kind: bilgi
-  what: Başlangıç iyimserliği geçici keşif dürtüsüdür; yeni değişim başlangıcı yeniden yaratmaz; ortalama da
-    başlangıcı özel sayar.
+  what: Başlangıç iyimserliği geçici keşif dürtüsüdür; yeni değişim başlangıcı yeniden yaratmaz; ortalama
+    da başlangıcı özel sayar.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-izleme
 - id: ch2-p35-i2
@@ -7068,16 +7176,16 @@ items:
   pdf_page: 57
   kind: alıştırma
   source_number: '2.7'
-  what: α>0 sabit, o₀=0, oₙ=oₙ₋₁+α(1−oₙ₋₁), βₙ=α/oₙ olsun. βₙ ile ödül güncellemenin başlangıç yanlılığı taşımayan
-    üstel yakın-geçmiş ortalaması verdiğini Denklem 2.6 benzeri analizle göster.
+  what: α>0 sabit, o₀=0, oₙ=oₙ₋₁+α(1−oₙ₋₁), βₙ=α/oₙ olsun. βₙ ile ödül güncellemenin başlangıç yanlılığı
+    taşımayan üstel yakın-geçmiş ortalaması verdiğini Denklem 2.6 benzeri analizle göster.
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#practice:p13
 - id: ch2-p36-i1
   page: 36
   pdf_page: 58
   kind: tanım
-  what: ln doğal log, e≈2.71828; kol seçilince sayım artar/bonus azalır, seçilmezken ln t bonusu yavaş ve sınırsız
-    büyütür.
+  what: ln doğal log, e≈2.71828; kol seçilince sayım artar/bonus azalır, seçilmezken ln t bonusu yavaş
+    ve sınırsız büyütür.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-ucb
 - id: ch2-p36-i2
@@ -7102,8 +7210,8 @@ items:
   pdf_page: 58
   kind: alıştırma
   source_number: '2.8'
-  what: Şekil 2.4 içinde UCB performansı 11. adımda yükseliyor, sonraki adımlarda düşüyor. İki yönü de açıkla.
-    c=1 iken sıçramanın daha az belirgin olması açıklamana uysun.
+  what: Şekil 2.4 içinde UCB performansı 11. adımda yükseliyor, sonraki adımlarda düşüyor. İki yönü de
+    açıkla. c=1 iken sıçramanın daha az belirgin olması açıklamana uysun.
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#practice:p14
 - id: ch2-p36-i5
@@ -7181,8 +7289,8 @@ items:
   page: 38
   pdf_page: 60
   kind: şekil
-  what: 'Şekil 2.5: N(4,1) gerçek ortalamalar, α=.1/.4 tabanlı ve tabansız dört optimal-seçim eğrisi, 1–1000
-    adım.'
+  what: 'Şekil 2.5: N(4,1) gerçek ortalamalar, α=.1/.4 tabanlı ve tabansız dört optimal-seçim eğrisi,
+    1–1000 adım.'
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#lab:l4
   figure: türetildi
@@ -7200,8 +7308,8 @@ items:
   page: 38
   pdf_page: 60
   kind: bilgi
-  what: 'Şekil 2.5: tabanlı α=.4 başlangıçta hızlı, α=.1 sonda yüksek; tabansızlar düşük, tabansız α=.4 daha
-    kötüdür.'
+  what: 'Şekil 2.5: tabanlı α=.4 başlangıçta hızlı, α=.1 sonda yüksek; tabansızlar düşük, tabansız α=.4
+    daha kötüdür.'
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-gradient
   note: Bağımsız ikinci okuma ayrıntısı.
@@ -7252,8 +7360,8 @@ items:
   page: 41
   pdf_page: 63
   kind: örnek
-  what: Rastgele farklı bandit görevleri kimlik ipucusuz hızlı değişen tek görev görünür; renk ipucuyla kırmızı→kol1/yeşil→kol2
-    politikası öğrenilebilir.
+  what: Rastgele farklı bandit görevleri kimlik ipucusuz hızlı değişen tek görev görünür; renk ipucuyla
+    kırmızı→kol1/yeşil→kol2 politikası öğrenilebilir.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
 - id: ch2-p41-i2
@@ -7278,8 +7386,8 @@ items:
   source_number: '2.10'
   what: Her adımda 0.5 olasılıkla A durumunda gerçek değerler (0.1,0.2), 0.5 olasılıkla B durumunda (0.9,0.8)
     geliyor. Hangi durumda olduğunu bilmiyorsan en iyi beklenen başarı ve uygun davranış nedir? A/B etiketi
-    veriliyor ama değerler hâlâ bilinmiyorsa öğrenilebilecek en iyi başarı ve davranış nedir? Sayısal alana
-    ipuçlu limit başarıyı gir.
+    veriliyor ama değerler hâlâ bilinmiyorsa öğrenilebilecek en iyi başarı ve davranış nedir? Sayısal
+    alana ipuçlu limit başarıyı gir.
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#practice:p16
 - id: ch2-p41-i5
@@ -7313,8 +7421,8 @@ items:
   page: 42
   pdf_page: 64
   kind: bilgi
-  what: 'Şekil 2.6 aralıkları: ε 1/128–1/4, gradyan α 1/32–4, UCB c 1/16–4, iyimser Q 1/4–4; Q0/Q1 aynı ilk
-    kestirimdir.'
+  what: 'Şekil 2.6 aralıkları: ε 1/128–1/4, gradyan α 1/32–4, UCB c 1/16–4, iyimser Q 1/4–4; Q0/Q1 aynı
+    ilk kestirimdir.'
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-deneyler
   note: Bağımsız ikinci okuma ayrıntısı.
@@ -7322,24 +7430,24 @@ items:
   page: 43
   pdf_page: 65
   kind: bilgi
-  what: Kaynak taramasında ara optimumlar ve yaklaşık bir mertebe iyi ayar bölgesi; sadece tepe değil parametre
-    hassasiyeti önemlidir; UCB o ölçümde öndedir.
+  what: Kaynak taramasında ara optimumlar ve yaklaşık bir mertebe iyi ayar bölgesi; sadece tepe değil
+    parametre hassasiyeti önemlidir; UCB o ölçümde öndedir.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-deneyler
 - id: ch2-p43-i2
   page: 43
   pdf_page: 65
   kind: bilgi
-  what: Basit yöntemlerin en ileri düzey sayılması 2018 yazar görüşüdür; karmaşıklık/varsayım maliyeti tam
-    RL hedefinde önemlidir.
+  what: Basit yöntemlerin en ileri düzey sayılması 2018 yazar görüşüdür; karmaşıklık/varsayım maliyeti
+    tam RL hedefinde önemlidir.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
 - id: ch2-p43-i3
   page: 43
   pdf_page: 65
   kind: bilgi
-  what: Gittins bilinen önsel ve özel indirgeme koşullarında optimal olabilir; tam RL'ye kuram ve hesap taşınabilirliği
-    sınırlıdır.
+  what: Gittins bilinen önsel ve özel indirgeme koşullarında optimal olabilir; tam RL'ye kuram ve hesap
+    taşınabilirliği sınırlıdır.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
 - id: ch2-p43-i4
@@ -7354,15 +7462,16 @@ items:
   page: 43
   pdf_page: 65
   kind: tanım
-  what: Eylem/ödülle evrilen sonsal bilgi durumudur; 1000 adım, 2 eylem ve 2 ödül 4^1000=2^2000 yaprak verir.
+  what: Eylem/ödülle evrilen sonsal bilgi durumudur; 1000 adım, 2 eylem ve 2 ödül 4^1000=2^2000 yaprak
+    verir.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
 - id: ch2-p43-i6
   page: 43
   pdf_page: 65
   kind: bilgi
-  what: Tam Bayesçi olasılıklarla optimal denge planlanabilir, ağaç maliyeti büyür; yaklaşık RL yaklaşımı kaynakta
-    ileri araştırma konusudur.
+  what: Tam Bayesçi olasılıklarla optimal denge planlanabilir, ağaç maliyeti büyür; yaklaşık RL yaklaşımı
+    kaynakta ileri araştırma konusudur.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-baglam
 - id: ch2-p43-i7
@@ -7387,24 +7496,24 @@ items:
   page: 44
   pdf_page: 66
   kind: kaynakça
-  what: Thompson 1933/1934, Robbins 1952, Bellman 1956 ardışık deney; Berry–Fristedt 1985 istatistik; Narendra–Thathachar
-    1989 mühendislik; Bush–Mosteller 1955 ve Estes 1950 psikoloji.
+  what: Thompson 1933/1934, Robbins 1952, Bellman 1956 ardışık deney; Berry–Fristedt 1985 istatistik;
+    Narendra–Thathachar 1989 mühendislik; Bush–Mosteller 1955 ve Estes 1950 psikoloji.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
 - id: ch2-p44-i2
   page: 44
   pdf_page: 66
   kind: kaynakça
-  what: Pearl 1984 greedy arama; Witten 1976b tanılama-kontrol; Feldbaum 1965 dual control; Holland 1975 kullanım-yeni
-    bilgi çatışması.
+  what: Pearl 1984 greedy arama; Witten 1976b tanılama-kontrol; Feldbaum 1965 dual control; Holland 1975
+    kullanım-yeni bilgi çatışması.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
 - id: ch2-p44-i3
   page: 44
   pdf_page: 66
   kind: kaynakça
-  what: Thathachar–Sastry 1985 eylem değerli estimator algorithms; Watkins 1989 action value ve s.187 erken
-    ε-açgözlü, daha eski kullanım olasılığı açık.
+  what: Thathachar–Sastry 1985 eylem değerli estimator algorithms; Watkins 1989 action value ve s.187
+    erken ε-açgözlü, daha eski kullanım olasılığı açık.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
 - id: ch2-p44-i4
@@ -7434,16 +7543,16 @@ items:
   kind: alıştırma
   source_number: '2.11'
   what: Alıştırma 2.5 durağan olmayan ortamı için Şekil 2.6 benzeri parametre taraması üret. Örnek ortalamalı
-    yöntemlere sabit α=0.1 ε-açgözlüyü de kat. Her çalıştırma 200000 adım olsun; her yöntem/ayarın ölçütü son
-    100000 adımın ortalama ödülü olsun.
+    yöntemlere sabit α=0.1 ε-açgözlüyü de kat. Her çalıştırma 200000 adım olsun; her yöntem/ayarın ölçütü
+    son 100000 adımın ortalama ödülü olsun.
   status: eklendi
   where: content/modules/m11-7-bandits/module.yaml#practice:p17
 - id: ch2-p44-i8
   page: 44
   pdf_page: 66
   kind: kaynakça
-  what: Thathachar–Sastry 1985 bu bandit için ilk eylem-değeri yöntemleri; Feldbaum 1965 belirsizlikte eşzamanlı
-    tanılama/kontrol; Williams 1992 sonraki aktör–eleştirmen/PG ailesi.
+  what: Thathachar–Sastry 1985 bu bandit için ilk eylem-değeri yöntemleri; Feldbaum 1965 belirsizlikte
+    eşzamanlı tanılama/kontrol; Williams 1992 sonraki aktör–eleştirmen/PG ailesi.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
   note: Bağımsız ikinci okuma ayrıntısı.
@@ -7451,8 +7560,8 @@ items:
   page: 45
   pdf_page: 67
   kind: kaynakça
-  what: Greensmith–Bartlett–Baxter 2002/2004, Dick 2015 taban seçimi; Sutton 1984 erken sistematik deney; Bridle
-    1990 softmax adı, Luce 1959 seçim kuralı.
+  what: Greensmith–Bartlett–Baxter 2002/2004, Dick 2015 taban seçimi; Sutton 1984 erken sistematik deney;
+    Bridle 1990 softmax adı, Luce 1959 seçim kuralı.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
 - id: ch2-p45-i2
@@ -7475,16 +7584,16 @@ items:
   page: 45
   pdf_page: 67
   kind: kaynakça
-  what: Bellman 1956 Bayesçi DP; Gittins–Jones 1974 indis; Duff 1995 RL ile indis öğrenme; Kumar 1985 Bayesçi/Bayesçi
-    olmayan tarama; Lovejoy 1991 bilgi durumu.
+  what: Bellman 1956 Bayesçi DP; Gittins–Jones 1974 indis; Duff 1995 RL ile indis öğrenme; Kumar 1985
+    Bayesçi/Bayesçi olmayan tarama; Lovejoy 1991 bilgi durumu.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
 - id: ch2-p45-i5
   page: 45
   pdf_page: 67
   kind: tanım
-  what: Denetimli örnek karmaşıklığı hedef doğruluk için örnek sayısı; Kakade 2003 RL keşif karmaşıklığı yakın-optimal
-    seçilmeyen adımların sayısıdır.
+  what: Denetimli örnek karmaşıklığı hedef doğruluk için örnek sayısı; Kakade 2003 RL keşif karmaşıklığı
+    yakın-optimal seçilmeyen adımların sayısıdır.
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
 - id: ch2-p45-i6
@@ -7506,8 +7615,8 @@ items:
   page: 45
   pdf_page: 67
   kind: kaynakça
-  what: Kaynağa göre Bellman 1956 Bayesçi dengeyi DP ile optimal hesaplamayı ilk gösterir; information state
-    terimi kısmi gözlenen MDP literatüründendir (Lovejoy 1991).
+  what: Kaynağa göre Bellman 1956 Bayesçi dengeyi DP ile optimal hesaplamayı ilk gösterir; information
+    state terimi kısmi gözlenen MDP literatüründendir (Lovejoy 1991).
   status: eklendi
   where: content/modules/m11-7-bandits/lesson.md#sutton-kaynaklar
   note: Bağımsız ikinci okuma ayrıntısı.
@@ -7537,7 +7646,8 @@ items:
   page: 47
   pdf_page: 69
   kind: bilgi
-  what: Bandit q*(a) yerine MDP q*(s,a),v*(s) gerekir; uzun vadeli katkı eyleme yapıldığı durum içinde atanır.
+  what: Bandit q*(a) yerine MDP q*(s,a),v*(s) gerekir; uzun vadeli katkı eyleme yapıldığı durum içinde
+    atanır.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-etkilesim
 - id: ch3-p48-i1
@@ -7624,15 +7734,16 @@ items:
   page: 49
   pdf_page: 71
   kind: tanım
-  what: 'Markov yeterliliği: son durum ve eylem verildiğinde ortak gelecek dağılımı daha eski geçmişten bağımsızdır.'
+  what: 'Markov yeterliliği: son durum ve eylem verildiğinde ortak gelecek dağılımı daha eski geçmişten
+    bağımsızdır.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
 - id: ch3-p49-i3
   page: 49
   pdf_page: 71
   kind: bilgi
-  what: Kitap genel olarak Markov varsayar; Kısım II ile başlayan bazı yaklaşık yöntemler buna dayanmaz; Bölüm
-    17 temsil kurmayı işler.
+  what: Kitap genel olarak Markov varsayar; Kısım II ile başlayan bazı yaklaşık yöntemler buna dayanmaz;
+    Bölüm 17 temsil kurmayı işler.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
 - id: ch3-p49-i4
@@ -7700,8 +7811,8 @@ items:
   page: 49
   pdf_page: 71
   kind: bilgi
-  what: Markov özelliği karar sürecinden çok durum temsiline konan kısıttır; geçmişin geleceğe etkili bütün
-    bilgisi tutulur.
+  what: Markov özelliği karar sürecinden çok durum temsiline konan kısıttır; geçmişin geleceğe etkili
+    bütün bilgisi tutulur.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-ortak-model
 - id: ch3-p50-i1
@@ -7781,8 +7892,8 @@ items:
   pdf_page: 73
   kind: alıştırma
   source_number: '3.2'
-  what: MDP çerçevesi, amaç yönelimli bütün öğrenme görevlerini yararlı biçimde temsil etmeye yeter mi? Açık
-    istisnalar veya sınırlar öner.
+  what: MDP çerçevesi, amaç yönelimli bütün öğrenme görevlerini yararlı biçimde temsil etmeye yeter mi?
+    Açık istisnalar veya sınırlar öner.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p8
 - id: ch3-p51-i9
@@ -7791,8 +7902,8 @@ items:
   kind: alıştırma
   source_number: '3.3'
   what: Sürüşte eylem; gaz–direksiyon–fren konumu, lastik torkları, kas komutları veya gidilecek yer seçimi
-    olabilir. Ajan–ortam sınırı için doğru düzey hangisidir? Birini diğerine tercih etmenin ölçütleri ve temel
-    bir zorunluluk olup olmadığını tartış.
+    olabilir. Ajan–ortam sınırı için doğru düzey hangisidir? Birini diğerine tercih etmenin ölçütleri
+    ve temel bir zorunluluk olup olmadığını tartış.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p9
 - id: ch3-p52-i1
@@ -7878,7 +7989,8 @@ items:
   page: 53
   pdf_page: 75
   kind: bilgi
-  what: Koşullu ortalamalar tam ortak dağılımı belirlemez; Alıştırma3.4 ek belirlenimci ödül varsayımı gerektirir
+  what: Koşullu ortalamalar tam ortak dağılımı belirlemez; Alıştırma3.4 ek belirlenimci ödül varsayımı
+    gerektirir
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-robot
 - id: ch3-p53-i3
@@ -7993,8 +8105,8 @@ items:
   pdf_page: 77
   kind: alıştırma
   source_number: '3.5'
-  what: Denklem 3.3 devam eden görevde her (s,a) için geçerlidir. Bölümlü görev için küçük ama gerekli değişiklik
-    nedir? Değişmiş denklemi yaz.
+  what: Denklem 3.3 devam eden görevde her (s,a) için geçerlidir. Bölümlü görev için küçük ama gerekli
+    değişiklik nedir? Değişmiş denklemi yaz.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p11
 - id: ch3-p55-i2
@@ -8057,8 +8169,8 @@ items:
   page: 56
   pdf_page: 78
   kind: örnek
-  what: Devam eden çubuk dengesinde başarısızlık −1, diğer ödüller 0; kaynak −γ^K terimini kalan adımla ilişkilendirir.
-    Tek ceza tüm devam eden getiri değildir; K indeks seçimi açıklanır.
+  what: Devam eden çubuk dengesinde başarısızlık −1, diğer ödüller 0; kaynak −γ^K terimini kalan adımla
+    ilişkilendirir. Tek ceza tüm devam eden getiri değildir; K indeks seçimi açıklanır.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
 - id: ch3-p56-i4
@@ -8076,8 +8188,8 @@ items:
   pdf_page: 78
   kind: alıştırma
   source_number: '3.6'
-  what: 'Çubuk dengesini bölümlü ve indirimli ele al: başarısızlıkta −1, diğer bütün ödüller 0 olsun. Her andaki
-    getiri nedir? Devam eden ve indirimli formülasyondan farkı nedir?'
+  what: 'Çubuk dengesini bölümlü ve indirimli ele al: başarısızlıkta −1, diğer bütün ödüller 0 olsun.
+    Her andaki getiri nedir? Devam eden ve indirimli formülasyondan farkı nedir?'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p12
 - id: ch3-p56-i6
@@ -8086,8 +8198,8 @@ items:
   kind: alıştırma
   source_number: '3.7'
   what: Labirent robotuna kaçışta +1, diğer zamanlarda 0 veriliyor; görev bölümlü ve Denklem 3.7 indirimsiz
-    getirisi en çoklanıyor. Bir süre sonra hızlı kaçışta gelişme görünmüyor. Amaç etkili iletilmiş mi; sorun
-    ne olabilir?
+    getirisi en çoklanıyor. Bir süre sonra hızlı kaçışta gelişme görünmüyor. Amaç etkili iletilmiş mi;
+    sorun ne olabilir?
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p13
 - id: ch3-p56-i7
@@ -8095,8 +8207,8 @@ items:
   pdf_page: 78
   kind: alıştırma
   source_number: '3.8'
-  what: γ=0.5, T=5, R₁=−1, R₂=2, R₃=6, R₄=3, R₅=2. G₀,G₁,…,G₅ değerlerini tersten hesapla. Sayısal alana G₀
-    gir.
+  what: γ=0.5, T=5, R₁=−1, R₂=2, R₃=6, R₄=3, R₅=2. G₀,G₁,…,G₅ değerlerini tersten hesapla. Sayısal alana
+    G₀ gir.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p14
 - id: ch3-p56-i8
@@ -8133,8 +8245,8 @@ items:
   page: 57
   pdf_page: 79
   kind: şekil
-  what: 'Numarasız soğurucu şema: açık S0→S1→S2 daireleri, dolu terminal kare; +1,+1,+1 ardından karede öz
-    döngü, R4=R5=…=0, T=3.'
+  what: 'Numarasız soğurucu şema: açık S0→S1→S2 daireleri, dolu terminal kare; +1,+1,+1 ardından karede
+    öz döngü, R4=R5=…=0, T=3.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-getiri
   figure: türetildi
@@ -8192,8 +8304,8 @@ items:
   page: 58
   pdf_page: 80
   kind: bilgi
-  what: Monte Carlo, belirli sabit π izlenirken gerçek getirileri durum/eylem bazında ortalar; yeterli ziyaret
-    ve koşullarla yakınsar. Yöntemler Bölüm 5.
+  what: Monte Carlo, belirli sabit π izlenirken gerçek getirileri durum/eylem bazında ortalar; yeterli
+    ziyaret ve koşullarla yakınsar. Yöntemler Bölüm 5.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
   pages:
@@ -8207,8 +8319,8 @@ items:
   pdf_page: 80
   kind: alıştırma
   source_number: '3.11'
-  what: Şimdiki durum Sₜ olsun ve eylemler stokastik π ile seçilsin. E[Rₜ₊₁|Sₜ] beklentisini π ve dört argümanlı
-    p (3.2) ile yaz.
+  what: Şimdiki durum Sₜ olsun ve eylemler stokastik π ile seçilsin. E[Rₜ₊₁|Sₜ] beklentisini π ve dört
+    argümanlı p (3.2) ile yaz.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p17
 - id: ch3-p58-i7
@@ -8301,9 +8413,9 @@ items:
   pdf_page: 82
   kind: alıştırma
   source_number: '3.14'
-  what: Şekil 3.2 rastgele politika ızgarasının orta değeri +0.7; komşu değerleri +2.3,+0.4,−0.4,+0.7 (bir
-    ondalık). γ=0.9 ve her eylem 1/4. Bellman (3.14) eşitliğini sayısal göster. Sayısal alana yuvarlanmış komşularla
-    bulunan değeri gir.
+  what: Şekil 3.2 rastgele politika ızgarasının orta değeri +0.7; komşu değerleri +2.3,+0.4,−0.4,+0.7
+    (bir ondalık). γ=0.9 ve her eylem 1/4. Bellman (3.14) eşitliğini sayısal göster. Sayısal alana yuvarlanmış
+    komşularla bulunan değeri gir.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p20
 - id: ch3-p60-i6
@@ -8312,8 +8424,8 @@ items:
   kind: alıştırma
   source_number: '3.15'
   what: Ödül işaretleri mi farkları mı önemlidir? Denklem 3.8 ile herhangi bir π altında her ödüle c eklemenin
-    bütün V değerlerine aynı vc sabitini eklediğini kanıtla; göreli değerlerin değişmediğini göster ve vc(c,γ)
-    bul.
+    bütün V değerlerine aynı vc sabitini eklediğini kanıtla; göreli değerlerin değişmediğini göster ve
+    vc(c,γ) bul.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p21
   pages:
@@ -8341,7 +8453,8 @@ items:
   page: 61
   pdf_page: 83
   kind: şekil
-  what: 'Şekil 3.3: üst v_putt ve alt q*_driver; delik, green, tee, iki kum, küçük driver −1 ve −2/−3 bölgeleri.'
+  what: 'Şekil 3.3: üst v_putt ve alt q*_driver; delik, green, tee, iki kum, küçük driver −1 ve −2/−3
+    bölgeleri.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-golf
   figure: türetildi
@@ -8351,7 +8464,8 @@ items:
   page: 61
   pdf_page: 83
   kind: şekil
-  what: 'Numarasız qπ backup: dolu kök; ortam p/r ile iki açık ardıl duruma, her ardıldan π ile üç eyleme dallanır.'
+  what: 'Numarasız qπ backup: dolu kök; ortam p/r ile iki açık ardıl duruma, her ardıldan π ile üç eyleme
+    dallanır.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
   figure: türetildi
@@ -8361,8 +8475,8 @@ items:
   pdf_page: 83
   kind: alıştırma
   source_number: '3.16'
-  what: Labirent gibi bölümlü görevde bütün ödüllere c eklenirse önceki sorudaki gibi görev değişmeden kalır
-    mı? Neden? Bir örnek ver.
+  what: Labirent gibi bölümlü görevde bütün ödüllere c eklenirse önceki sorudaki gibi görev değişmeden
+    kalır mı? Neden? Bir örnek ver.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p22
 - id: ch3-p61-i6
@@ -8371,14 +8485,16 @@ items:
   kind: alıştırma
   source_number: '3.17'
   what: qπ(s,a) değerini olası sonraki durum–eylem çiftlerinin qπ(s′,a′) değerleriyle veren Bellman denklemini
-    yaz. Denklem 3.14 türetimine benzer biçimde, sağdaki Q geri taşıma şemasını kullanarak adım dizisini göster.
+    yaz. Denklem 3.14 türetimine benzer biçimde, sağdaki Q geri taşıma şemasını kullanarak adım dizisini
+    göster.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p23
 - id: ch3-p62-i1
   page: 62
   pdf_page: 84
   kind: şekil
-  what: 'Alıştırma 3.18 tek katmanlı V: açık s kökünden üç dolu a1,a2,a3 yaprağı; π olasılıkları ve qπ değerleri.'
+  what: 'Alıştırma 3.18 tek katmanlı V: açık s kökünden üç dolu a1,a2,a3 yaprağı; π olasılıkları ve qπ
+    değerleri.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
   figure: türetildi
@@ -8387,8 +8503,8 @@ items:
   page: 62
   pdf_page: 84
   kind: şekil
-  what: 'Alıştırma 3.19 tek katmanlı Q şeması: dolu s,a kökünden üç açık s′ yaprağına, koşullu beklenen r1,r2,r3
-    ödülleri; kaynakta p etiketi yoktur.'
+  what: 'Alıştırma 3.19 tek katmanlı Q şeması: dolu s,a kökünden üç açık s′ yaprağına, koşullu beklenen
+    r1,r2,r3 ödülleri; kaynakta p etiketi yoktur.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-politika-deger
   figure: türetildi
@@ -8404,7 +8520,8 @@ items:
   page: 62
   pdf_page: 84
   kind: bilgi
-  what: Uygun sonlu MDP koşullarında her durumda en iyi politika vardır; birden çok π* aynı değerleri paylaşır.
+  what: Uygun sonlu MDP koşullarında her durumda en iyi politika vardır; birden çok π* aynı değerleri
+    paylaşır.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
 - id: ch3-p62-i5
@@ -8419,8 +8536,8 @@ items:
   pdf_page: 84
   kind: alıştırma
   source_number: '3.18'
-  what: St=s verildiğinde vπ(s) ile qπ(s,a) yaprakları ilişkisini önce π izlemeye koşullanan beklenti, sonra
-    açık π toplamıyla yaz.
+  what: St=s verildiğinde vπ(s) ile qπ(s,a) yaprakları ilişkisini önce π izlemeye koşullanan beklenti,
+    sonra açık π toplamıyla yaz.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p24
 - id: ch3-p62-i7
@@ -8428,8 +8545,8 @@ items:
   pdf_page: 84
   kind: alıştırma
   source_number: '3.19'
-  what: Sₜ=s,Aₜ=a verildiğinde qπ(s,a) değerini bir sonraki ödül Rₜ₊₁ ve sonraki durum değeri vπ(Sₜ₊₁) ile
-    yaz. Önce π izlenmesine ayrıca koşullanmayan beklenti, sonra beklenti sembolsüz p toplamı ver.
+  what: Sₜ=s,Aₜ=a verildiğinde qπ(s,a) değerini bir sonraki ödül Rₜ₊₁ ve sonraki durum değeri vπ(Sₜ₊₁)
+    ile yaz. Önce π izlenmesine ayrıca koşullanmayan beklenti, sonra beklenti sembolsüz p toplamı ver.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p25
 - id: ch3-p63-i1
@@ -8493,8 +8610,8 @@ items:
   page: 64
   pdf_page: 86
   kind: şekil
-  what: 'Şekil 3.4: v* için üç eylem × iki ardıl, q* için iki ardıl × iki eylem; yalnız ajan seçiminde max
-    yayı, ortamda p/r beklentisi.'
+  what: 'Şekil 3.4: v* için üç eylem × iki ardıl, q* için iki ardıl × iki eylem; yalnız ajan seçiminde
+    max yayı, ortamda p/r beklentisi.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
   figure: türetildi
@@ -8504,7 +8621,8 @@ items:
   page: 64
   pdf_page: 86
   kind: bilgi
-  what: n durum için n bilinmeyenli doğrusal olmayan Bellman sistemi; bilinen modelle çözüm ve γ<1 için teklik.
+  what: n durum için n bilinmeyenli doğrusal olmayan Bellman sistemi; bilinen modelle çözüm ve γ<1 için
+    teklik.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
 - id: ch3-p64-i3
@@ -8518,15 +8636,16 @@ items:
   page: 64
   pdf_page: 86
   kind: bilgi
-  what: 'Bilgisayar bilimindeki miyop açgözlülük uyarısı: gerçek v* zaten bütün geleceği içerdiğinden burada
-    bir adım yeter.'
+  what: 'Bilgisayar bilimindeki miyop açgözlülük uyarısı: gerçek v* zaten bütün geleceği içerdiğinden
+    burada bir adım yeter.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
 - id: ch3-p64-i5
   page: 64
   pdf_page: 86
   kind: bilgi
-  what: q* gelecek bakışını önceden saklar; daha çok bellekle, eylem seçerken modele bakma ihtiyacını kaldırır.
+  what: q* gelecek bakışını önceden saklar; daha çok bellekle, eylem seçerken modele bakma ihtiyacını
+    kaldırır.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-optimal
   pages:
@@ -8584,23 +8703,24 @@ items:
   page: 66
   pdf_page: 88
   kind: örnek
-  what: Tavlada yaklaşık 10^20 durum; binlerce yıl ifadesi 2018 tarihli ölçektir. Modeli bilmek hesap engelini
-    çözmez.
+  what: Tavlada yaklaşık 10^20 durum; binlerce yıl ifadesi 2018 tarihli ölçektir. Modeli bilmek hesap
+    engelini çözmez.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
 - id: ch3-p66-i3
   page: 66
   pdf_page: 88
   kind: bilgi
-  what: Sezgisel arama derinlik boyunca ağaç açıp yaprak V değerini yaklaştırır; A* çoğunlukla bölümlü görev
-    içindir.
+  what: Sezgisel arama derinlik boyunca ağaç açıp yaprak V değerini yaklaştırır; A* çoğunlukla bölümlü
+    görev içindir.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
 - id: ch3-p66-i4
   page: 66
   pdf_page: 88
   kind: bilgi
-  what: Dinamik programlama ve gerçek geçiş örnekleriyle RL, Bellman en iyiliğine yaklaşmanın ilişkili yollarıdır.
+  what: Dinamik programlama ve gerçek geçiş örnekleriyle RL, Bellman en iyiliğine yaklaşmanın ilişkili
+    yollarıdır.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
 - id: ch3-p66-i5
@@ -8633,9 +8753,9 @@ items:
   pdf_page: 88
   kind: alıştırma
   source_number: '3.22'
-  what: Şekildeki devam eden üç durumlu MDP içinde tek karar üst durumdadır. Sol eylem +1 ile sol alt duruma,
-    oradan zorunlu 0 ile üste döner; sağ eylem 0 ile sağ alta, oradan zorunlu +2 ile üste döner. İki deterministik
-    politika π_sol ve π_sağ var. γ=0, γ=0.9 ve γ=0.5 için hangi politika en iyidir?
+  what: Şekildeki devam eden üç durumlu MDP içinde tek karar üst durumdadır. Sol eylem +1 ile sol alt
+    duruma, oradan zorunlu 0 ile üste döner; sağ eylem 0 ile sağ alta, oradan zorunlu +2 ile üste döner.
+    İki deterministik politika π_sol ve π_sağ var. γ=0, γ=0.9 ve γ=0.5 için hangi politika en iyidir?
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p28
 - id: ch3-p66-i9
@@ -8652,9 +8772,9 @@ items:
   pdf_page: 88
   kind: alıştırma
   source_number: '3.24'
-  what: Şekil 3.5 en iyi ızgara durumunun değerini bir ondalıkla 24.4 verir. En iyi politikayı ve Denklem 3.8
-    bilgisini kullanarak sembolik değerini yaz, sonra üç ondalığa hesapla. γ=0.9. Sayısal alana üç ondalıklı
-    sonucu gir.
+  what: Şekil 3.5 en iyi ızgara durumunun değerini bir ondalıkla 24.4 verir. En iyi politikayı ve Denklem
+    3.8 bilgisini kullanarak sembolik değerini yaz, sonra üç ondalığa hesapla. γ=0.9. Sayısal alana üç
+    ondalıklı sonucu gir.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p30
 - id: ch3-p66-i11
@@ -8698,8 +8818,8 @@ items:
   page: 67
   pdf_page: 89
   kind: tanım
-  what: Küçük sonlu uzayda durum/eylem başına bir girdi tabular yöntemdir; büyük uzay kompakt parametreli temsil
-    ister.
+  what: Küçük sonlu uzayda durum/eylem başına bir girdi tabular yöntemdir; büyük uzay kompakt parametreli
+    temsil ister.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
 - id: ch3-p67-i5
@@ -8720,8 +8840,8 @@ items:
   page: 67
   pdf_page: 89
   kind: bilgi
-  what: Çevrimiçi RL sık ziyaret edilen durumlara daha çok çaba ayırabilir; her durumda en iyilik tanımı yine
-    ayrıdır.
+  what: Çevrimiçi RL sık ziyaret edilen durumlara daha çok çaba ayırabilir; her durumda en iyilik tanımı
+    yine ayrıdır.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
 - id: ch3-p67-i8
@@ -8745,8 +8865,8 @@ items:
   pdf_page: 89
   kind: alıştırma
   source_number: '3.29'
-  what: vπ,v*,qπ,q* için dört Bellman denklemini, üç argümanlı p(s′|s,a) (3.4) ve iki argümanlı r(s,a) (3.5)
-    ile yeniden yaz.
+  what: vπ,v*,qπ,q* için dört Bellman denklemini, üç argümanlı p(s′|s,a) (3.4) ve iki argümanlı r(s,a)
+    (3.5) ile yeniden yaz.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/module.yaml#practice:p35
 - id: ch3-p68-i1
@@ -8760,7 +8880,8 @@ items:
   page: 68
   pdf_page: 90
   kind: tanım
-  what: Tam bilgide dört argümanlı p doğru ve eksiksiz bilinir; eksik bilgide tam ve doğru ortam modeli yoktur.
+  what: Tam bilgide dört argümanlı p doğru ve eksiksiz bilinir; eksik bilgide tam ve doğru ortam modeli
+    yoktur.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-yaklasim
 - id: ch3-p69-i1
@@ -8774,15 +8895,16 @@ items:
   page: 69
   pdf_page: 91
   kind: kaynakça
-  what: En iyi kontrol ve psikoloji kökleri; RL yaklaşım/eksik bilgi, AI planlamada daha genel amaç ve belirsizlik.
+  what: En iyi kontrol ve psikoloji kökleri; RL yaklaşım/eksik bilgi, AI planlamada daha genel amaç ve
+    belirsizlik.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 - id: ch3-p69-i3
   page: 69
   pdf_page: 91
   kind: kaynakça
-  what: 'MDP kuramı: Bertsekas (2005), White (1969), Whittle (1982,1983), Puterman (1994); Ross (1983) özellikle
-    sonlu durumun kısa sunumu.'
+  what: 'MDP kuramı: Bertsekas (2005), White (1969), Whittle (1982,1983), Puterman (1994); Ross (1983)
+    özellikle sonlu durumun kısa sunumu.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 - id: ch3-p69-i4
@@ -8796,16 +8918,16 @@ items:
   page: 69
   pdf_page: 91
   kind: kaynakça
-  what: Çok aşamalı/ardışık örnekleme kökleri Thompson (1933,1934), Robbins (1952); çok durumlu bandit prototip
-    MDP.
+  what: Çok aşamalı/ardışık örnekleme kökleri Thompson (1933,1934), Robbins (1952); çok durumlu bandit
+    prototip MDP.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 - id: ch3-p69-i6
   page: 69
   pdf_page: 91
   kind: kaynakça
-  what: Yazarların bildiği ilk RL–MDP tartışması Andreae (1969b); Witten–Corbin (1973) deneylerini Witten (1977,1976a)
-    sonradan MDP ile analiz eder.
+  what: Yazarların bildiği ilk RL–MDP tartışması Andreae (1969b); Witten–Corbin (1973) deneylerini Witten
+    (1977,1976a) sonradan MDP ile analiz eder.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 - id: ch3-p69-i7
@@ -8827,7 +8949,8 @@ items:
   page: 70
   pdf_page: 92
   kind: kaynakça
-  what: Ortak p ile standart P/ortalama r gösterimi farkı; örnek ödül ihtiyacı ve St/Rt ortak indeksinin pedagojisi.
+  what: Ortak p ile standart P/ortalama r gösterimi farkı; örnek ödül ihtiyacı ve St/Rt ortak indeksinin
+    pedagojisi.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 - id: ch3-p70-i2
@@ -8856,8 +8979,8 @@ items:
   page: 70
   pdf_page: 92
   kind: tanım
-  what: Bölümlü≈belirsiz ufuk, devam eden≈sonsuz ufuk. Sabit/sonunda biten/bitmeyen ufuklar; etkileşim doğası
-    ile amaç fonksiyonu ayrımı zorunlu eşleşmez.
+  what: Bölümlü≈belirsiz ufuk, devam eden≈sonsuz ufuk. Sabit/sonunda biten/bitmeyen ufuklar; etkileşim
+    doğası ile amaç fonksiyonu ayrımı zorunlu eşleşmez.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 - id: ch3-p70-i6
@@ -8879,8 +9002,8 @@ items:
   page: 70
   pdf_page: 92
   kind: kaynakça
-  what: Watkins (1989) Q-learning ile eylem değerini yaygınlaştırınca Q-functions adı yerleşir (Bölüm 6); Shannon
-    (1950) h(P,M) ile araştırılmaya değer hamleyi değerlendirir.
+  what: Watkins (1989) Q-learning ile eylem değerini yaygınlaştırınca Q-functions adı yerleşir (Bölüm
+    6); Shannon (1950) h(P,M) ile araştırılmaya değer hamleyi değerlendirir.
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
   pages:
@@ -8900,8 +9023,8 @@ items:
   page: 71
   pdf_page: 93
   kind: kaynakça
-  what: 'Hamilton asal fonksiyonu ve açgözlü Newton dinamiği: Goldstein (1957); Denardo (1967) büzülmeli dinamik
-    programlama.'
+  what: 'Hamilton asal fonksiyonu ve açgözlü Newton dinamiği: Goldstein (1957); Denardo (1967) büzülmeli
+    dinamik programlama.'
   status: eklendi
   where: content/modules/m11-2-mdp-vi/lesson.md#sutton-tarih
 - id: ch3-p71-i3
@@ -9021,8 +9144,8 @@ items:
   page: 75
   pdf_page: 97
   kind: bilgi
-  what: Durum/durum–eylem kökü ve ardıl birleştirme biçimi dört farklı beklenen güncelleme verir; backup şeması
-    bağı.
+  what: Durum/durum–eylem kökü ve ardıl birleştirme biçimi dört farklı beklenen güncelleme verir; backup
+    şeması bağı.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-dp
 - id: ch4-p75-i2
@@ -9114,8 +9237,8 @@ items:
   source_number: '4.2'
   what: '4×4 ızgaraya 13 konumunun altına yeni15 durumu ekle. Bu yeni durumda sol/yukarı/sağ/aşağı eylemleri
     sırasıyla12,13,14,15 konumlarına götürsün. Önce eski durumların geçişleri aynı kalsın: rastgele politika
-    için Vπ(15) nedir? Sonra13 durumunun aşağı eylemi de yeni15 konumuna gitsin. Bu kez Vπ(15) nedir? Her geçiş
-    −1, γ=1. Sayısal alana ikinci sonucu gir.
+    için Vπ(15) nedir? Sonra13 durumunun aşağı eylemi de yeni15 konumuna gitsin. Bu kez Vπ(15) nedir?
+    Her geçiş −1, γ=1. Sayısal alana ikinci sonucu gir.
 
     (Kaynak: Sutton ve Barto, s.76, Alıştırma4.2.)'
   status: eklendi
@@ -9215,8 +9338,8 @@ items:
   page: 80
   pdf_page: 102
   kind: tanım
-  what: PI değerlendirme ve iyileştirmeyi art arda yineler;sonlu deterministik politika ve tutarlı bağ kırmayla
-    sonlu sonlanma.
+  what: PI değerlendirme ve iyileştirmeyi art arda yineler;sonlu deterministik politika ve tutarlı bağ
+    kırmayla sonlu sonlanma.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
 - id: ch4-p80-i2
@@ -9232,8 +9355,8 @@ items:
   page: 80
   pdf_page: 102
   kind: bilgi
-  what: Her değerlendirmeyi önceki V ile başlatmak genelde hızlandırır,çünkü ardışık politikalar/değerler yakın
-    olabilir.
+  what: Her değerlendirmeyi önceki V ile başlatmak genelde hızlandırır,çünkü ardışık politikalar/değerler
+    yakın olabilir.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-politika-dongusu
 - id: ch4-p80-i4
@@ -9275,8 +9398,9 @@ items:
   page: 81
   pdf_page: 103
   kind: şekil
-  what: Şekil4.2:π0…π4 bütün politika konturları,her ardışık politika kesin iyileşir,π4optimal;son yüzey vπ4,düşey420/612,stok
-    eksenleri0–20,taşıma−4…5 ve yön işareti. π0 hiç araba taşımaz;pozitif1→2,negatif2→1 yönüdür.
+  what: Şekil4.2:π0…π4 bütün politika konturları,her ardışık politika kesin iyileşir,π4optimal;son yüzey
+    vπ4,düşey420/612,stok eksenleri0–20,taşıma−4…5 ve yön işareti. π0 hiç araba taşımaz;pozitif1→2,negatif2→1
+    yönüdür.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/module.yaml#lab:l4
   figure: türetildi
@@ -9314,7 +9438,8 @@ items:
   kind: alıştırma
   source_number: '4.5'
   what: 'S.80 V politika yinelemesine benzer biçimde q* hesaplayan tam bir Q politika yineleme algoritması
-    ver. Başlatma, değerlendirme, iyileştirme ve sonlanmayı eksiksiz belirt; bu fikir sonraki bölümlerde kullanılacak.
+    ver. Başlatma, değerlendirme, iyileştirme ve sonlanmayı eksiksiz belirt; bu fikir sonraki bölümlerde
+    kullanılacak.
 
     (Kaynak: Sutton ve Barto, s.82, Alıştırma4.5.)'
   status: eklendi
@@ -9324,8 +9449,8 @@ items:
   pdf_page: 104
   kind: alıştırma
   source_number: '4.6'
-  what: 'Her durumda her eylemin olasılığı en az ε/|A(s)| olan ε-yumuşak politikalarla sınırlısın. S.80 V politika
-    yinelemesinin sırasıyla3,2,1 adımlarında gereken değişiklikleri nitel olarak açıkla.
+  what: 'Her durumda her eylemin olasılığı en az ε/|A(s)| olan ε-yumuşak politikalarla sınırlısın. S.80
+    V politika yinelemesinin sırasıyla3,2,1 adımlarında gereken değişiklikleri nitel olarak açıkla.
 
     (Kaynak: Sutton ve Barto, s.82, Alıştırma4.6.)'
   status: eklendi
@@ -9355,8 +9480,8 @@ items:
   page: 83
   pdf_page: 105
   kind: bilgi
-  what: VI Bellman en iyiliğinin atamaya dönüşmesi;PE ile tek fark π ortalaması yerine max,backup farkı da
-    bu.
+  what: VI Bellman en iyiliğinin atamaya dönüşmesi;PE ile tek fark π ortalaması yerine max,backup farkı
+    da bu.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
 - id: ch4-p83-i3
@@ -9371,7 +9496,8 @@ items:
   page: 83
   pdf_page: 105
   kind: bilgi
-  what: Değerlendirme/VI taramalarının farklı dizileri kesilmiş PI ailesidir;çok PE taraması bazen daha hızlıdır.
+  what: Değerlendirme/VI taramalarının farklı dizileri kesilmiş PI ailesidir;çok PE taraması bazen daha
+    hızlıdır.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
   pages:
@@ -9405,7 +9531,8 @@ items:
   page: 84
   pdf_page: 106
   kind: bilgi
-  what: Kaynak0bahis de yazar;sonlanmayan sıfır döngü/γ1nüansı,pozitif bahisli proper politika seçimi açıklanır.
+  what: Kaynak0bahis de yazar;sonlanmayan sıfır döngü/γ1nüansı,pozitif bahisli proper politika seçimi
+    açıklanır.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-deger-yinelemesi
 - id: ch4-p84-i5
@@ -9430,8 +9557,8 @@ items:
   pdf_page: 106
   kind: alıştırma
   source_number: '4.8'
-  what: 'Kumarbazın en iyi politikası neden bu tuhaf biçimde? Özellikle50 sermayede tek atışta tamamını yatırırken51
-    sermayede neden tamamını yatırmamak iyi bir seçimdir? p_h=0.4 kaynak durumunu kullan.
+  what: 'Kumarbazın en iyi politikası neden bu tuhaf biçimde? Özellikle50 sermayede tek atışta tamamını
+    yatırırken51 sermayede neden tamamını yatırmamak iyi bir seçimdir? p_h=0.4 kaynak durumunu kullan.
 
     (Kaynak: Sutton ve Barto, s.84, Alıştırma4.8.)'
   status: eklendi
@@ -9441,9 +9568,9 @@ items:
   pdf_page: 106
   kind: alıştırma
   source_number: '4.9'
-  what: 'Kumarbaz için değer yinelemesini uygula; p_h=0.25 ve0.55 durumlarını çöz. İstersen0 ve100 kukla terminal
-    durumlarını V0=0,V100=1 ile kullan. Şekil4.3 benzeri değer/politika grafikleri üret. θ→0 iken sonuçların
-    kararlı olup olmadığını denetle.
+  what: 'Kumarbaz için değer yinelemesini uygula; p_h=0.25 ve0.55 durumlarını çöz. İstersen0 ve100 kukla
+    terminal durumlarını V0=0,V100=1 ile kullan. Şekil4.3 benzeri değer/politika grafikleri üret. θ→0
+    iken sonuçların kararlı olup olmadığını denetle.
 
     (Kaynak: Sutton ve Barto, s.84–85, Alıştırma4.9.)'
   status: eklendi
@@ -9473,7 +9600,8 @@ items:
   page: 85
   pdf_page: 107
   kind: tanım
-  what: AsenkronDP taramasız yerinde günceller;istenen sıra,eski/yeni değerler,bazı durumları çok sık seçme.
+  what: AsenkronDP taramasız yerinde günceller;istenen sıra,eski/yeni değerler,bazı durumları çok sık
+    seçme.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
 - id: ch4-p85-i3
@@ -9541,8 +9669,8 @@ items:
   page: 86
   pdf_page: 108
   kind: tanım
-  what: GPI değerlendirme/iyileştirme ayrıntı ve adım büyüklüğünden bağımsız etkileşir;ikisinin de bütün durumları
-    güncellemeyi sürdürmesi gerekir.
+  what: GPI değerlendirme/iyileştirme ayrıntı ve adım büyüklüğünden bağımsız etkileşir;ikisinin de bütün
+    durumları güncellemeyi sürdürmesi gerekir.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
 - id: ch4-p86-i2
@@ -9565,8 +9693,8 @@ items:
   page: 86
   pdf_page: 108
   kind: bilgi
-  what: Süreçler rekabet ve işbirliği yapar;politika değişimiVyi,Vdeğişimi açgözlülüğü bozabilir,ortak çözümde
-    birleşir.
+  what: Süreçler rekabet ve işbirliği yapar;politika değişimiVyi,Vdeğişimi açgözlülüğü bozabilir,ortak
+    çözümde birleşir.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
 - id: ch4-p87-i1
@@ -9598,14 +9726,16 @@ items:
   page: 87
   pdf_page: 109
   kind: bilgi
-  what: Doğrusal programlama da çözebilir,bazı güçlü en kötü durum garantileri;100kat ölçek yorumu2018e atfedilir.
+  what: Doğrusal programlama da çözebilir,bazı güçlü en kötü durum garantileri;100kat ölçek yorumu2018e
+    atfedilir.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
 - id: ch4-p87-i5
   page: 87
   pdf_page: 109
   kind: tanım
-  what: Boyut laneti durum değişkenleriyle üstel durum büyümesidir,problemin güçlüğü,DP’ye özgü kusur değildir.
+  what: Boyut laneti durum değişkenleriyle üstel durum büyümesidir,problemin güçlüğü,DP’ye özgü kusur
+    değildir.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-verim
 - id: ch4-p87-i6
@@ -9640,8 +9770,8 @@ items:
   page: 88
   pdf_page: 110
   kind: bilgi
-  what: GPI bazı klasik biçimlerde kanıtlı yakınsar;her yaklaşık yöntemde kanıtlı değildir,açıklayıcı kalıp
-    olarak yararlı.
+  what: GPI bazı klasik biçimlerde kanıtlı yakınsar;her yaklaşık yöntemde kanıtlı değildir,açıklayıcı
+    kalıp olarak yararlı.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-asenkron
 - id: ch4-p88-i4
@@ -9683,8 +9813,8 @@ items:
   page: 89
   pdf_page: 111
   kind: kaynakça
-  what: Minsky1961 Samuel dama dipnotu yazarların bildiği ilk DP–RL bağıdır;kapalı analitik geri taşıma sözü
-    DP yalnız analitik problemlere yarar,AIiçin ilgisizdir şeklinde yanlış anlaşılabilir.
+  what: Minsky1961 Samuel dama dipnotu yazarların bildiği ilk DP–RL bağıdır;kapalı analitik geri taşıma
+    sözü DP yalnız analitik problemlere yarar,AIiçin ilgisizdir şeklinde yanlış anlaşılabilir.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
 - id: ch4-p89-i6
@@ -9720,22 +9850,24 @@ items:
   page: 90
   pdf_page: 112
   kind: kaynakça
-  what: Jacobi/eşzamanlı iki dizi paraleli sırayla taklit eder;Gauss–Seidel yerinde,diğerDPtürlerinde de geçerli,Bertsekas–Tsitsiklis1989.
+  what: Jacobi/eşzamanlı iki dizi paraleli sırayla taklit eder;Gauss–Seidel yerinde,diğerDPtürlerinde
+    de geçerli,Bertsekas–Tsitsiklis1989.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
 - id: ch4-p90-i2
   page: 90
   pdf_page: 112
   kind: kaynakça
-  what: Asenkron/dağıtıkDP Bertsekas1982/1983;çokişlemcide haberleşme gecikmesi ve ortak saat olmaması motivasyonu.
+  what: Asenkron/dağıtıkDP Bertsekas1982/1983;çokişlemcide haberleşme gecikmesi ve ortak saat olmaması
+    motivasyonu.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
 - id: ch4-p90-i3
   page: 90
   pdf_page: 112
   kind: kaynakça
-  what: Bertsekas–Tsitsiklis1989kapsam;Jacobi/Gauss–Seidelözelbiçimler,Williams–Baird1990güncellemeyi daha
-    küçük asenkron parçalara ayırır.
+  what: Bertsekas–Tsitsiklis1989kapsam;Jacobi/Gauss–Seidelözelbiçimler,Williams–Baird1990güncellemeyi
+    daha küçük asenkron parçalara ayırır.
   status: eklendi
   where: content/modules/m11-3-policy-iteration/lesson.md#sutton-tarih
 - id: ch4-p90-i4
@@ -9786,7 +9918,8 @@ items:
   page: 91
   pdf_page: 113
   kind: bilgi
-  what: Durumların eylem seçimi problemleri sonraki politika değişince durağan olmayan bağlı banditlere benzer.
+  what: Durumların eylem seçimi problemleri sonraki politika değişince durağan olmayan bağlı banditlere
+    benzer.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-temel
 - id: ch5-p92-i1
@@ -9828,7 +9961,8 @@ items:
   page: 92
   pdf_page: 114
   kind: kod
-  what: 'İlk-ziyaret MC tahmin kutusu: keyfîV,boş getiriler,tamπ bölümü,geriG,önceki önekte durum yoksa ortalama.'
+  what: 'İlk-ziyaret MC tahmin kutusu: keyfîV,boş getiriler,tamπ bölümü,geriG,önceki önekte durum yoksa
+    ortalama.'
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-ziyaret
 - id: ch5-p93-i1
@@ -9842,7 +9976,8 @@ items:
   page: 93
   pdf_page: 115
   kind: bilgi
-  what: Her-ziyaret bölüm içi bağımlı; sonlu-veri yanlılığı ve uygun koşullarda ortalama karede/tutarlı yakınsama.
+  what: Her-ziyaret bölüm içi bağımlı; sonlu-veri yanlılığı ve uygun koşullarda ortalama karede/tutarlı
+    yakınsama.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-ziyaret
 - id: ch5-p93-i3
@@ -9893,8 +10028,8 @@ items:
   page: 93
   pdf_page: 115
   kind: bilgi
-  what: 20/21 toplamında duran politika;10000/500000 bölüm. Kullanılabilir as durumları seyrek olduğu için
-    tahminleri daha belirsiz ve düzensizdir.
+  what: 20/21 toplamında duran politika;10000/500000 bölüm. Kullanılabilir as durumları seyrek olduğu
+    için tahminleri daha belirsiz ve düzensizdir.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-blackjack
   pages:
@@ -9907,8 +10042,8 @@ items:
   page: 93
   pdf_page: 115
   kind: tanım
-  what: 'Kullanılabilir as: aşmadan11 sayılabilen as;1 saymak toplamı11 veya altına indireceğinden karar aralığında11
-    sayılır.'
+  what: 'Kullanılabilir as: aşmadan11 sayılabilen as;1 saymak toplamı11 veya altına indireceğinden karar
+    aralığında11 sayılır.'
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-blackjack
 - id: ch5-p94-i1
@@ -9933,8 +10068,8 @@ items:
   page: 94
   pdf_page: 116
   kind: bilgi
-  what: DP öncesinde bütün olasılıkları hesaplamak karmaşık/hatalı olabilir;örnek oyun üretmek kolaylığı MC
-    avantajıdır.
+  what: DP öncesinde bütün olasılıkları hesaplamak karmaşık/hatalı olabilir;örnek oyun üretmek kolaylığı
+    MC avantajıdır.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-blackjack
 - id: ch5-p94-i4
@@ -9949,8 +10084,8 @@ items:
   pdf_page: 116
   kind: alıştırma
   source_number: '5.1'
-  what: 'Şekil5.1 sağ panellerinde arka son iki satır neden yükselir? Sol kenardaki bütün son satır neden düşer?
-    Üst panellerde öndeki değerler neden alt panellerden daha yüksektir?
+  what: 'Şekil5.1 sağ panellerinde arka son iki satır neden yükselir? Sol kenardaki bütün son satır neden
+    düşer? Üst panellerde öndeki değerler neden alt panellerden daha yüksektir?
 
 
     Kaynak: Sutton ve Barto(2018), s.94, Alıştırma5.1.'
@@ -9961,7 +10096,8 @@ items:
   pdf_page: 116
   kind: alıştırma
   source_number: '5.2'
-  what: 'Aynı Blackjack görevinde ilk-ziyaret yerine her-ziyaret MC kullanılırsa sonuçlar çok değişir mi? Neden?
+  what: 'Aynı Blackjack görevinde ilk-ziyaret yerine her-ziyaret MC kullanılırsa sonuçlar çok değişir
+    mi? Neden?
 
 
     Kaynak: Sutton ve Barto(2018), s.94, Alıştırma5.2.'
@@ -9977,8 +10113,8 @@ items:
   - 116
   - 117
   kind: soru
-  what: 'Numarasız metin içi soru: backup diyagramı fikrini MC-V tahminine genelleme; durum kökü, tek tam yol,
-    terminal ve katkılar.'
+  what: 'Numarasız metin içi soru: backup diyagramı fikrini MC-V tahminine genelleme; durum kökü, tek
+    tam yol, terminal ve katkılar.'
   status: eklendi
   where: content/modules/m11-4-mc-td/module.yaml#practice:p17
 - id: ch5-p95-i1
@@ -10017,8 +10153,8 @@ items:
   page: 95
   pdf_page: 117
   kind: şekil
-  what: 'Numarasız fotoğraf: düzensiz tel,yüzey,P,h,x/y ve izdüşüm. Hersh–Griego(1969),©1969 Scientific American
-    kredisi; özgün hesaplanan harmonik modelle karşılandı.'
+  what: 'Numarasız fotoğraf: düzensiz tel,yüzey,P,h,x/y ve izdüşüm. Hersh–Griego(1969),©1969 Scientific
+    American kredisi; özgün hesaplanan harmonik modelle karşılandı.'
   status: eklendi
   where: content/modules/m11-4-mc-td/module.yaml#lab:l4
   figure: türetildi
@@ -10027,8 +10163,8 @@ items:
   page: 96
   pdf_page: 118
   kind: formül
-  what: Harmonik Dirichlet iç değeri dört komşunun ortalaması; sınır yüksekliği terminal ödül, dört yön eşit
-    olasılıklı yürüyüş.
+  what: Harmonik Dirichlet iç değeri dört komşunun ortalaması; sınır yüksekliği terminal ödül, dört yön
+    eşit olasılıklı yürüyüş.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-dirichlet
   pages:
@@ -10090,8 +10226,8 @@ items:
   page: 97
   pdf_page: 119
   kind: bilgi
-  what: Bütün eylemleri pozitif olasılıkla alan stokastik politikalar ES alternatifidir; ilgili durumlara ulaşım
-    ayrıca gerekir.
+  what: Bütün eylemleri pozitif olasılıkla alan stokastik politikalar ES alternatifidir; ilgili durumlara
+    ulaşım ayrıca gerekir.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-kontrol
 - id: ch5-p97-i2
@@ -10142,7 +10278,8 @@ items:
   page: 98
   pdf_page: 120
   kind: bilgi
-  what: Politika iyileştirme teoremi tam qπ ile geçerli; sonlu gürültülü tahmin için aynı sonuç doğrudan varsayılmaz.
+  what: Politika iyileştirme teoremi tam qπ ile geçerli; sonlu gürültülü tahmin için aynı sonuç doğrudan
+    varsayılmaz.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-es
 - id: ch5-p98-i2
@@ -10181,8 +10318,8 @@ items:
   page: 99
   pdf_page: 121
   kind: kod
-  what: 'MC ES kutusu: keyfî π/Q, boş getiriler, her başlangıç çiftine>0, π ile tam bölüm, geriye G, ilk çiftte
-    ortalama, açgözlü π.'
+  what: 'MC ES kutusu: keyfî π/Q, boş getiriler, her başlangıç çiftine>0, π ile tam bölüm, geriye G, ilk
+    çiftte ortalama, açgözlü π.'
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-es
 - id: ch5-p99-i2
@@ -10196,8 +10333,8 @@ items:
   page: 99
   pdf_page: 121
   kind: bilgi
-  what: Alt-optimal sabit politikaya yerleşme, Q öğrenimi ve iyileştirmeyle çelişir; bu bütün dizinin yakınsama
-    kanıtı değildir.
+  what: Alt-optimal sabit politikaya yerleşme, Q öğrenimi ve iyileştirmeyle çelişir; bu bütün dizinin
+    yakınsama kanıtı değildir.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-es
 - id: ch5-p99-i4
@@ -10212,15 +10349,16 @@ items:
   page: 99
   pdf_page: 121
   kind: örnek
-  what: 'Örnek5.3 Blackjack: 200 durum ve iki ilk eylem düzgün ES; başlangıç20/21 dur, Q0, sonra güncel π.'
+  what: 'Örnek5.3 Blackjack: 200 durum ve iki ilk eylem düzgün ES; başlangıç20/21 dur, Q0, sonra güncel
+    π.'
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-es
 - id: ch5-p99-i6
   page: 99
   pdf_page: 121
   kind: bilgi
-  what: Thorp(1966) temel stratejisiyle kullanılabilir-as en sol çentik dışında eşleşme; yazarların fark nedenini
-    kesin bilmemesi korunur.
+  what: Thorp(1966) temel stratejisiyle kullanılabilir-as en sol çentik dışında eşleşme; yazarların fark
+    nedenini kesin bilmemesi korunur.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-es
 - id: ch5-p99-i7
@@ -10239,8 +10377,8 @@ items:
   page: 100
   pdf_page: 122
   kind: şekil
-  what: 'Şekil5.2: iki as sınıfının çek/dur politikaları ve MC ES ile öğrenilenQ değerlerinden hesaplanan optimal-değer
-    yüzeyleri;12–21,A–10,−1…+1; politika alt sınır etiketi11.'
+  what: 'Şekil5.2: iki as sınıfının çek/dur politikaları ve MC ES ile öğrenilenQ değerlerinden hesaplanan
+    optimal-değer yüzeyleri;12–21,A–10,−1…+1; politika alt sınır etiketi11.'
   status: eklendi
   where: content/modules/m11-5-sarsa-q/module.yaml#lab:l3
   figure: türetildi
@@ -10250,8 +10388,8 @@ items:
   page: 100
   pdf_page: 122
   kind: tanım
-  what: Politika üstü yöntemde değerlendirilen/iyileştirilen politika veri üretir; politika dışı yöntemde hedef/davranış
-    ayrıdır.
+  what: Politika üstü yöntemde değerlendirilen/iyileştirilen politika veri üretir; politika dışı yöntemde
+    hedef/davranış ayrıdır.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-soft
 - id: ch5-p100-i3
@@ -10279,8 +10417,8 @@ items:
   page: 101
   pdf_page: 123
   kind: kod
-  what: 'On-policy ilk-ziyaret MC kontrol kutusu: ε-soft π,keyfî Q,boş getiriler,normal başlangıç,ilk çiftte
-    G ortalaması,tüm π olasılıklarını ε-greedy yenile.'
+  what: 'On-policy ilk-ziyaret MC kontrol kutusu: ε-soft π,keyfî Q,boş getiriler,normal başlangıç,ilk
+    çiftte G ortalaması,tüm π olasılıklarını ε-greedy yenile.'
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-soft
 - id: ch5-p101-i2
@@ -10315,7 +10453,8 @@ items:
   page: 102
   pdf_page: 124
   kind: örnek
-  what: ε keşfini çevreye taşıma:1−ε ile önerilen eylem, ε ile düzgün yeniden seçim; aynı durum/eylem kümesi.
+  what: ε keşfini çevreye taşıma:1−ε ile önerilen eylem, ε ile düzgün yeniden seçim; aynı durum/eylem
+    kümesi.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-soft
 - id: ch5-p102-i3
@@ -10329,7 +10468,8 @@ items:
   page: 102
   pdf_page: 124
   kind: türetim
-  what: İyileşme durunca aynı Bellman sabit noktası; teklikle ε-soft optimum; γ1 için sonlanma/tekillik koşulları.
+  what: İyileşme durunca aynı Bellman sabit noktası; teklikle ε-soft optimum; γ1 için sonlanma/tekillik
+    koşulları.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-soft
 - id: ch5-p103-i1
@@ -10343,15 +10483,16 @@ items:
   page: 103
   pdf_page: 125
   kind: tanım
-  what: Keşif/optimal hedef ikilemi; davranış b ile değerlendirilen hedef π ayrıdır; on-policy π=b özel durumudur.
+  what: Keşif/optimal hedef ikilemi; davranış b ile değerlendirilen hedef π ayrıdır; on-policy π=b özel
+    durumudur.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is
 - id: ch5-p103-i3
   page: 103
   pdf_page: 125
   kind: bilgi
-  what: Off-policy daha genel, genellikle yüksek varyanslı/yavaş; öğrenmeyen kontrolcü veya insan uzman verisinden
-    öğrenebilir.
+  what: Off-policy daha genel, genellikle yüksek varyanslı/yavaş; öğrenmeyen kontrolcü veya insan uzman
+    verisinden öğrenebilir.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is
 - id: ch5-p103-i4
@@ -10443,24 +10584,24 @@ items:
   page: 105
   pdf_page: 127
   kind: bilgi
-  what: Tek örnek weighted beklentisine doğrudan vb denemez; sıfır ρ varsa koşullama/payda0 nüansı ve karşı
-    örnek.
+  what: Tek örnek weighted beklentisine doğrudan vb denemez; sıfır ρ varsa koşullama/payda0 nüansı ve
+    karşı örnek.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is
 - id: ch5-p105-i4
   page: 105
   pdf_page: 127
   kind: bilgi
-  what: İlk-ziyaret ordinary yansız; weighted sonlu veride yanlı, asimptotik yanlılığı0; oran varyansı genel
-    olarak sınırsızdır.
+  what: İlk-ziyaret ordinary yansız; weighted sonlu veride yanlı, asimptotik yanlılığı0; oran varyansı
+    genel olarak sınırsızdır.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is
 - id: ch5-p105-i5
   page: 105
   pdf_page: 127
   kind: bilgi
-  what: Normalize ağırlık en çok1; sınırlı getiriler altında WIS varyansı0 değerine yakınsar; oranların varyansı
-    sonsuz olsa bile.
+  what: Normalize ağırlık en çok1; sınırlı getiriler altında WIS varyansı0 değerine yakınsar; oranların
+    varyansı sonsuz olsa bile.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is
 - id: ch5-p105-i6
@@ -10474,7 +10615,8 @@ items:
   page: 105
   pdf_page: 127
   kind: bilgi
-  what: Weighted çoğu kez pratik avantaj taşır; ordinary fonksiyon yaklaşımına daha kolay taşındığı için korunur.
+  what: Weighted çoğu kez pratik avantaj taşır; ordinary fonksiyon yaklaşımına daha kolay taşındığı için
+    korunur.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is
 - id: ch5-p105-i8
@@ -10490,9 +10632,9 @@ items:
   pdf_page: 127
   kind: alıştırma
   source_number: '5.5'
-  what: 'Tek terminal olmayan durum ve tek eylem var. Olasılık p ile kendine,1−p ile terminale gider; her ödül+1,γ1.
-    On adımlık tek bölümün toplam getirisi10. İlk-ziyaret ve her-ziyaret kestirimlerini bulun. Sayısal alana
-    her-ziyaret sonucunu girin.
+  what: 'Tek terminal olmayan durum ve tek eylem var. Olasılık p ile kendine,1−p ile terminale gider;
+    her ödül+1,γ1. On adımlık tek bölümün toplam getirisi10. İlk-ziyaret ve her-ziyaret kestirimlerini
+    bulun. Sayısal alana her-ziyaret sonucunu girin.
 
 
     Kaynak: Sutton ve Barto(2018), s.105, Alıştırma5.5.'
@@ -10502,8 +10644,8 @@ items:
   page: 106
   pdf_page: 128
   kind: örnek
-  what: 'Örnek5.4: başlangıç aslı13/krupiye2; hedef20/21 dur, b çek/dur yarım;100 tekrar×10000 bölüm, başlangıç
-    tahmini0.'
+  what: 'Örnek5.4: başlangıç aslı13/krupiye2; hedef20/21 dur, b çek/dur yarım;100 tekrar×10000 bölüm,
+    başlangıç tahmini0.'
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-varyans
 - id: ch5-p106-i2
@@ -10519,8 +10661,8 @@ items:
   page: 106
   pdf_page: 128
   kind: şekil
-  what: Şekil5.3 ordinary/weighted MSE:100 tekrar×10000, y0…5, kaynak ilk yatay etiket0; özgün hesap log eksende1
-    ile başlar ve bu farkı açıklar.
+  what: Şekil5.3 ordinary/weighted MSE:100 tekrar×10000, y0…5, kaynak ilk yatay etiket0; özgün hesap log
+    eksende1 ile başlar ve bu farkı açıklar.
   status: eklendi
   where: content/modules/m11-4-mc-td/module.yaml#lab:l5
   figure: türetildi
@@ -10538,8 +10680,8 @@ items:
   page: 107
   pdf_page: 129
   kind: örnek
-  what: 'Örnek5.5 tek durum: sol.9 ile R0/döngü veya.1 ile R1/terminal, sağ R0/terminal; hedef sol, b eylemleri
-    yarım, γ1, değer1.'
+  what: 'Örnek5.5 tek durum: sol.9 ile R0/döngü veya.1 ile R1/terminal, sağ R0/terminal; hedef sol, b
+    eylemleri yarım, γ1, değer1.'
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-varyans
 - id: ch5-p107-i2
@@ -10556,16 +10698,16 @@ items:
   page: 107
   pdf_page: 129
   kind: bilgi
-  what: 'Kaynak başlık ve metindeki yakınsamaz ifadesi düzeltildi: E|X|=1, SLLN ile ordinary hemen hemen kesin
-    yakınsar; sonsuz varyans hız güvencesini kaldırır.'
+  what: 'Kaynak başlık ve metindeki yakınsamaz ifadesi düzeltildi: E|X|=1, SLLN ile ordinary hemen hemen
+    kesin yakınsar; sonsuz varyans hız güvencesini kaldırır.'
   status: düzeltildi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-varyans
 - id: ch5-p107-i4
   page: 107
   pdf_page: 129
   kind: bilgi
-  what: Bu modelde bütün pozitif ağırlıklı getiriler1; WIS ilk pozitif sol-başarıdan sonra tam1 olur ve öyle
-    kalır.
+  what: Bu modelde bütün pozitif ağırlıklı getiriler1; WIS ilk pozitif sol-başarıdan sonra tam1 olur ve
+    öyle kalır.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-varyans
 - id: ch5-p108-i1
@@ -10587,8 +10729,8 @@ items:
   pdf_page: 130
   kind: alıştırma
   source_number: '5.6'
-  what: 'Davranış b bölümlerinden, durum değeri için(5.6) yerine Q(s,a) tahmini yazın. Önem çarpımı hangi zamanda
-    başlar?
+  what: 'Davranış b bölümlerinden, durum değeri için(5.6) yerine Q(s,a) tahmini yazın. Önem çarpımı hangi
+    zamanda başlar?
 
 
     Kaynak: Sutton ve Barto(2018), s.108, Alıştırma5.6.'
@@ -10670,28 +10812,28 @@ items:
   pdf_page: 131
   kind: alıştırma
   source_number: '5.10'
-  what: 'Kaynak(5.7) içindeki ilk n−1 getirinin weighted ortalamasından(5.8) güncellemesini türetin. C indekslerini
-    açık yazın.
+  what: 'Kaynak(5.7) içindeki ilk n−1 getirinin weighted ortalamasından(5.8) güncellemesini türetin. C
+    indekslerini açık yazın.
 
 
-    Kaynak: Sutton ve Barto(2018), s.109, Alıştırma5.10. Ağırlıksız(2.3) türetiminin örüntüsünü izleme yönlendirmesi
-    korunur.'
+    Kaynak: Sutton ve Barto(2018), s.109, Alıştırma5.10. Ağırlıksız(2.3) türetiminin örüntüsünü izleme
+    yönlendirmesi korunur.'
   status: eklendi
   where: content/modules/m11-4-mc-td/module.yaml#practice:p15
 - id: ch5-p110-i1
   page: 110
   pdf_page: 132
   kind: kod
-  what: 'Off-policy Q prediction kutusu: keyfî Q,C0,G0,W1,tam bölüm; geriye G/C/Q, sonra π/b; W0 ise kes; Q
-    oranı t+1 ile başlar.'
+  what: 'Off-policy Q prediction kutusu: keyfî Q,C0,G0,W1,tam bölüm; geriye G/C/Q, sonra π/b; W0 ise kes;
+    Q oranı t+1 ile başlar.'
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-artimli
 - id: ch5-p110-i2
   page: 110
   pdf_page: 132
   kind: bilgi
-  what: Off-policy kontrolde hedef açgözlü ve belirlenimci, soft b keşfeder; her çift için sonsuz uygun getiri
-    gerekir.
+  what: Off-policy kontrolde hedef açgözlü ve belirlenimci, soft b keşfeder; her çift için sonsuz uygun
+    getiri gerekir.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-off
 - id: ch5-p110-i3
@@ -10721,24 +10863,24 @@ items:
   page: 111
   pdf_page: 133
   kind: bilgi
-  what: Kaynak2018 potansiyel sorun/literatür yetersizliğini tarihsel olarak aktarır; TD ve γ<1 indirim duyarlı
-    yöntemler alternatiflerdir.
+  what: Kaynak2018 potansiyel sorun/literatür yetersizliğini tarihsel olarak aktarır; TD ve γ<1 indirim
+    duyarlı yöntemler alternatiflerdir.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-off
 - id: ch5-p111-i4
   page: 111
   pdf_page: 133
   kind: bilgi
-  what: Racetrack ayrık konum ve hız, dokuz(−1,0,+1)² ivme; her hız0…4, ikisi birlikte yalnız başlangıç çizgisinde0
-    olabilir.
+  what: Racetrack ayrık konum ve hız, dokuz(−1,0,+1)² ivme; her hız0…4, ikisi birlikte yalnız başlangıç
+    çizgisinde0 olabilir.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-racetrack
 - id: ch5-p111-i5
   page: 111
   pdf_page: 133
   kind: bilgi
-  what: Düzgün rastgele başlangıç konumu ve sıfır hız; her adım−1. Duvara çarpınca aynı bölümde rastgele başlangıca
-    iki hız0 ile dönülür; bitişi geçmek terminaldir.
+  what: Düzgün rastgele başlangıç konumu ve sıfır hız; her adım−1. Duvara çarpınca aynı bölümde rastgele
+    başlangıca iki hız0 ile dönülür; bitişi geçmek terminaldir.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-racetrack
 - id: ch5-p111-i6
@@ -10759,9 +10901,10 @@ items:
   kind: alıştırma
   source_number: '5.12'
   what: 'Şekil5.5 iki pist için politika dışı MC kontrolle hızlı bir politika öğrenin ve farklı başlangıçlardan
-    birkaç örnek yörünge gösterin. Ayrık konum/hız, bileşen başına−1/0/+1 ivme, hız0…4, ikisi birlikte yalnız
-    başlangıçta0. Her adım−1; düzgün başlangıç/sıfır hız; duvarda rastgele başlangıca dönüp aynı bölüme devam.
-    Bitişi geçince terminal. Eğitimde %10 olasılıkla iki ivme birlikte0; yörünge gösteriminde bu gürültü olmasın.
+    birkaç örnek yörünge gösterin. Ayrık konum/hız, bileşen başına−1/0/+1 ivme, hız0…4, ikisi birlikte
+    yalnız başlangıçta0. Her adım−1; düzgün başlangıç/sıfır hız; duvarda rastgele başlangıca dönüp aynı
+    bölüme devam. Bitişi geçince terminal. Eğitimde %10 olasılıkla iki ivme birlikte0; yörünge gösteriminde
+    bu gürültü olmasın.
 
 
     Kaynak: Sutton ve Barto(2018), s.111–112, Alıştırma5.12.'
@@ -10825,7 +10968,8 @@ items:
   page: 113
   pdf_page: 135
   kind: türetim
-  what: Tam G düz kısmi getirilerin geometrik karışımıdır; son katsayı γ^(T−t−1); her ödülün katsayısı kanıtlanır.
+  what: Tam G düz kısmi getirilerin geometrik karışımıdır; son katsayı γ^(T−t−1); her ödülün katsayısı
+    kanıtlanır.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-ileri
 - id: ch5-p113-i4
@@ -10936,8 +11080,8 @@ items:
   pdf_page: 137
   kind: alıştırma
   source_number: '5.13'
-  what: 'Kaynak(5.12) tam yol oranlı ilk ödülden(5.14) karar başına özdeşliğine giden adımları gösterin. Ödülden
-    sonraki oranları neden silebiliriz?
+  what: 'Kaynak(5.12) tam yol oranlı ilk ödülden(5.14) karar başına özdeşliğine giden adımları gösterin.
+    Ödülden sonraki oranları neden silebiliriz?
 
 
     Kaynak: Sutton ve Barto(2018), s.115, Alıştırma5.13.'
@@ -10948,8 +11092,8 @@ items:
   pdf_page: 137
   kind: alıştırma
   source_number: '5.14'
-  what: 'Politika dışı MC kontrol s.111 algoritmasını truncated weighted(5.10) fikriyle değiştirin; önce durumlardan
-    eylem değerlerine geçin.
+  what: 'Politika dışı MC kontrol s.111 algoritmasını truncated weighted(5.10) fikriyle değiştirin; önce
+    durumlardan eylem değerlerine geçin.
 
 
     Kaynak: Sutton ve Barto(2018), s.115, Alıştırma5.14.'
@@ -10960,16 +11104,16 @@ items:
   page: 115
   pdf_page: 137
   kind: soru
-  what: 'Numarasız soru: weighted karar-başına IS var mı? 2018 bilinen-öneri notu tarihsel kapsamıyla, sabit
-    sonlu ufuk öğretim uzantısından ayrı açıklanır.'
+  what: 'Numarasız soru: weighted karar-başına IS var mı? 2018 bilinen-öneri notu tarihsel kapsamıyla,
+    sabit sonlu ufuk öğretim uzantısından ayrı açıklanır.'
   status: eklendi
   where: content/modules/m11-4-mc-td/module.yaml#practice:p18
 - id: ch5-p116-i1
   page: 116
   pdf_page: 138
   kind: bilgi
-  what: ES gerçek deneyimde zor; on-policy keşfeden en iyiyi, off-policy ayrı belirlenimci optimum hedefi öğrenmeyi
-    amaçlar.
+  what: ES gerçek deneyimde zor; on-policy keşfeden en iyiyi, off-policy ayrı belirlenimci optimum hedefi
+    öğrenmeyi amaçlar.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-kontrol-tarih
 - id: ch5-p116-i2
@@ -11012,16 +11156,16 @@ items:
   page: 116
   pdf_page: 138
   kind: kaynakça
-  what: Barto–Duff(1994), Curtiss(1954) doğrusal sistem MC çözümlemesiyle büyük politika tahminlerinde hesap
-    avantajını ilişkilendirir.
+  what: Barto–Duff(1994), Curtiss(1954) doğrusal sistem MC çözümlemesiyle büyük politika tahminlerinde
+    hesap avantajını ilişkilendirir.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-tarih
 - id: ch5-p116-i8
   page: 116
   pdf_page: 138
   kind: kaynakça
-  what: MC ES1998 ilk baskı; MC tahmini ve politika-yineleme kontrolünün ilk açık bağlantısı olabilir ifadesinin
-    belirsizliği korunur.
+  what: MC ES1998 ilk baskı; MC tahmini ve politika-yineleme kontrolünün ilk açık bağlantısı olabilir
+    ifadesinin belirsizliği korunur.
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-kontrol-tarih
   pages:
@@ -11042,8 +11186,8 @@ items:
   page: 117
   pdf_page: 139
   kind: kaynakça
-  what: 'Narendra–Wheeler(1986): ergodik sonlu Markov zincirinde aynı duruma ardışık iki ziyaret arasında biriken
-    getiri,öğrenme otomatının eylem olasılıklarını ayarlayan ödüldür.'
+  what: 'Narendra–Wheeler(1986): ergodik sonlu Markov zincirinde aynı duruma ardışık iki ziyaret arasında
+    biriken getiri,öğrenme otomatının eylem olasılıklarını ayarlayan ödüldür.'
   status: eklendi
   where: content/modules/m11-5-sarsa-q/lesson.md#sutton-mc-kontrol-tarih
 - id: ch5-p117-i3
@@ -11057,7 +11201,8 @@ items:
   page: 117
   pdf_page: 139
   kind: kaynakça
-  what: Weighted/normalized adı Koller–Friedman(2009); Rubinstein(1981), Hesterberg(1988), Shelton(2001), Liu(2001).
+  what: Weighted/normalized adı Koller–Friedman(2009); Rubinstein(1981), Hesterberg(1988), Shelton(2001),
+    Liu(2001).
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-tarih
 - id: ch5-p117-i5
@@ -11078,17 +11223,1203 @@ items:
   page: 117
   pdf_page: 139
   kind: kaynakça
-  what: İndirim duyarlı sunum Sutton–Mahmood–Precup–van Hasselt(2014) analizine dayanır; en ayrıntılı geliştirme
-    Mahmood(2017),Mahmood–van Hasselt–Sutton(2014).
+  what: İndirim duyarlı sunum Sutton–Mahmood–Precup–van Hasselt(2014) analizine dayanır; en ayrıntılı
+    geliştirme Mahmood(2017),Mahmood–van Hasselt–Sutton(2014).
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-tarih
 - id: ch5-p117-i8
   page: 117
   pdf_page: 139
   kind: kaynakça
-  what: Per-decision IS Precup–Sutton–Singh(2000); off-policy TD, izler ve yaklaşımın incelikleri sonraki bölümlerdedir.
+  what: Per-decision IS Precup–Sutton–Singh(2000); off-policy TD, izler ve yaklaşımın incelikleri sonraki
+    bölümlerdedir.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-tarih
+- id: ch6-p119-i1
+  page: 119
+  pdf_page: 141
+  kind: bilgi
+  what: TD örnek deneyimden modelsiz öğrenmeyi,DP gibi öğrenilmiş tahminlere önyüklemeyle birleştirir;nihai
+    sonucu beklemez.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p119-i2
+  page: 119
+  pdf_page: 141
+  kind: bilgi
+  what: n-adım yöntemleri Bölüm7 içinde TD/MC köprüsü,TD(λ) Bölüm12 içinde ortak çerçevedir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p119-i3
+  page: 119
+  pdf_page: 141
+  kind: bilgi
+  what: Önce sabit politikanın tahmini;kontrol DP/TD/MC için GPI ile genişler,temel fark tahmin yöntemidir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p119-i4
+  page: 119
+  pdf_page: 141
+  kind: formül
+  what: Kaynak(6.1):sabitα her-ziyaretMC,V+=α(G−V);durağan olmayan ortamlara uygun yakın geçmiş ağırlığı.
+  status: vardı
+  where: content/modules/m11-4-mc-td/lesson.md#mc
+- id: ch6-p120-i1
+  page: 120
+  pdf_page: 142
+  kind: formül
+  what: Kaynak(6.2):V(St)+=α[Rt+1+γV(St+1)−V(St)],bir sonraki geçişte güncelleme.
+  status: vardı
+  where: content/modules/m11-4-mc-td/lesson.md#td
+- id: ch6-p120-i2
+  page: 120
+  pdf_page: 142
+  kind: tanım
+  what: TD(0),tek-adımlıTD ve TD(λ)/n-adım özel halidir;sıfır adım bakış anlamına gelmez.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p120-i3
+  page: 120
+  pdf_page: 142
+  kind: kod
+  what: TD(0) kutusu:politikaπ,α∈(0,1],keyfînonterminalV,terminalV0;her bölüm başlangıç,πeylem,R/S′,güncelle,ilerle,terminalde
+    bitir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p120-i4
+  page: 120
+  pdf_page: 142
+  kind: formül
+  what: Kaynak(6.3):vπ(s)=Eπ[Gt|St=s].
+  status: vardı
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-mc-ziyaret
+- id: ch6-p120-i5
+  page: 120
+  pdf_page: 142
+  kind: formül
+  what: Kaynak(6.4):getiriyi ilk ödül ve indirgenmiş devamına ayırarakEπ[R+γvπ(S′)|s] elde etme.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p120-i6
+  page: 120
+  pdf_page: 142
+  kind: bilgi
+  what: MC bilinmeyen beklentiyi örnek getirir;DP tam model beklentisi ama bilinmeyen gerçek ardıl yerineV;TD
+    her iki yaklaşımı yapar.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p121-i1
+  page: 121
+  pdf_page: 143
+  kind: bilgi
+  what: Örnek güncelleme tek örnek ardıla,DP beklenen güncellemesi bütün ardılların dağılımına bakar;MC
+    ve TD örnek güncellemeleridir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+- id: ch6-p121-i2
+  page: 121
+  pdf_page: 143
+  kind: şekil
+  what: Numarasız TD(0) backup:durum kökü,örnek eylem ve ödüllü geçiş,hemen ardıl durumun tahmini yaprağı.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-uc-yol
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p121-i3
+  page: 121
+  pdf_page: 143
+  kind: formül
+  what: Kaynak(6.5):δt=Rt+1+γV(St+1)−V(St).
+  status: vardı
+  where: content/modules/m11-4-mc-td/lesson.md#td
+- id: ch6-p121-i4
+  page: 121
+  pdf_page: 143
+  kind: bilgi
+  what: δt,t anının tahmin hatasıdır ama sonraki ödül/durum gerektiği için ancak t+1 anında bulunur.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-hata
+- id: ch6-p121-i5
+  page: 121
+  pdf_page: 143
+  kind: türetim
+  what: Kaynak(6.6):donmuşV altındaG−V=Σγδ;geometrik TD hata toplamında komşu V terimleri iptal,terminalG/V0.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-hata
+- id: ch6-p121-i6
+  page: 121
+  pdf_page: 143
+  kind: bilgi
+  what: Bölüm içindeV güncellenirse özdeşlik genel olarak yaklaşık;αküçükse fark küçülebilir,genellemeleri
+    sonraki algoritmalara temel.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-hata
+- id: ch6-p121-i7
+  page: 121
+  pdf_page: 143
+  kind: alıştırma
+  source_number: '6.1'
+  what: 'V bölüm boyunca değiştiğinde (6.6) tam değildir. V_t,t anındaki TD hatası ve güncellemede kullanılan
+    tablo olsun. TD hata toplamına hangi ek miktar gelirse G_t−V_t(S_t) elde edilir?
+
+
+    Kaynak:Sutton ve Barto (2018),s.121,Alıştırma 6.1.'
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p19
+- id: ch6-p122-i1
+  page: 122
+  pdf_page: 144
+  kind: örnek
+  what: Örnek6.1:Cuma18:00 ofisten30dakika tahmin;18:05 yağmurda kalan35/toplam40;18:20 otoyoldan iyi
+    çıkınca kalan15/toplam35.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+- id: ch6-p122-i2
+  page: 122
+  pdf_page: 144
+  kind: örnek
+  what: Dar yol kamyonu geciktirir;18:30 kalan10/toplam40;18:40 ev sokağı kalan3/toplam43;18:43 varış
+    kalan0/toplam43.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+- id: ch6-p122-i3
+  page: 122
+  pdf_page: 144
+  kind: tablo
+  what: Numarasız altı satır:Gözlem,geçen[0,5,20,30,40,43],tahmini kalan[30,35,15,10,3,0],tahmini toplam[30,40,35,40,43,43].
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+- id: ch6-p122-i4
+  page: 122
+  pdf_page: 144
+  kind: tanım
+  what: Ödüller geçişte geçen süre[5,15,10,10,3],γ1;değer beklenen kalan süredir,gerçek getiri fiilî kalan
+    süre.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+- id: ch6-p122-i5
+  page: 122
+  pdf_page: 144
+  kind: dipnot
+  what: Kaynakdipnot1:yalnız tahmin yapıldığı için pozitif süre ödülleri;kontrolde süreyi azaltmak için
+    negatif süre seçilirdi.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+- id: ch6-p122-i6
+  page: 122
+  pdf_page: 144
+  kind: örnek
+  what: MC otoyol çıkışındaV15/gerçekG23/hata8;α0.5değeri4artırıp19yapar;seyrek kamyon için bu fazla olabilir;yalnız
+    eve varınca bilinir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+- id: ch6-p123-i1
+  page: 123
+  pdf_page: 145
+  kind: şekil
+  what: MC/TD iki toplam-süre paneli;altı durum,30/35/40/45 ve gerçek43;MC okları43 yönüne,TD sonraki
+    toplam tahmine,α1. Özellikle araçtaki40 toplam tahmini TD ile35 yönünde aşağı,MC ile43 yönünde yukarı
+    düzelir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+  source_number: '6.1'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p123-i2
+  page: 123
+  pdf_page: 145
+  kind: örnek
+  what: Başka gün25dakika sonra hâlâ trafikte ve25dakika daha bekleme→toplam50;tüm getiri bilinmeden eski30tahmini
+    iyimser olduğu öğrenilebilir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+  pages:
+  - 122
+  - 123
+  pdf_pages:
+  - 144
+  - 145
+- id: ch6-p123-i3
+  page: 123
+  pdf_page: 145
+  kind: bilgi
+  what: TD her toplam tahmini sonraki tahmine taşır;hatalar zamansal tahmin farklarına orantılıdır,beklemeden
+    öğrenmenin hesap avantajı vardır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-eve-donus
+- id: ch6-p123-i4
+  page: 123
+  pdf_page: 145
+  kind: alıştırma
+  source_number: '6.2'
+  what: 'Eve dönüş probleminde hangi geçmiş deneyim ve mevcut durum altında TD güncellemesinin MC güncellemesinden
+    ortalamada daha iyi olmasını beklersiniz? Yeni bina/otopark,aynı otoyol ipucunu ve ilk senaryoya bağlantıyı
+    kullanın.
+
+
+    İpucu:Eski eve dönüş güzergâhında çok sayıda deneyiminiz var;sonra yeni binaya ve otoparka taşınıyor,aynı
+    yerden otoyola bağlanıyorsunuz.
+
+
+    Kaynak:Sutton ve Barto (2018),s.123,Alıştırma 6.2.'
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p20
+- id: ch6-p124-i1
+  page: 124
+  pdf_page: 146
+  kind: bilgi
+  what: TD,DP’nin aksine açık ödül ve sonraki durum olasılık modeli istemez.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-yakinsama
+- id: ch6-p124-i2
+  page: 124
+  pdf_page: 146
+  kind: bilgi
+  what: MC tam bölüm bekler;TD tek geçişte artımlıdır;uzun bölümler ve bölümsüz sürekli görevlerde bu
+    kritik olabilir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-yakinsama
+- id: ch6-p124-i3
+  page: 124
+  pdf_page: 146
+  kind: bilgi
+  what: Politika dışı MC ilerideki keşif eylemleri nedeniyle bazı tam getirileri yok sayabilir/indirebilir;TD
+    gelecekteki tüm kararları beklemeden geçişten öğrenir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-yakinsama
+- id: ch6-p124-i4
+  page: 124
+  pdf_page: 146
+  kind: bilgi
+  what: Sabitπ için sabitα ortalamada tamvπ yakınsama sözü koşulsuz çevrimiçi Markov akışına uygulanamaz;dizi-sonu
+    teorem koşulu ve exact birinci-moment karşı örneğiyle düzeltildi.
+  status: düzeltildi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-yakinsama
+  verification: Sabitα:notes/sutton-2018/measure_ch6.py exact4moments ve bağımsız zincir deneyi,Sutton1988Teorem2dizi-sonu
+    koşulu. Soyadı:2009birincilmakalePDFyazarlistesi.
+- id: ch6-p124-i5
+  page: 124
+  pdf_page: 146
+  kind: bilgi
+  what: TabloTD(0) uygun azalan oranlar/yeterli ziyaret/moment/sonlanma koşullarıyla olasılık1yakınsar;bazı
+    sonuçlar uygun doğrusal yaklaşıma genişler,Bölüm9.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-yakinsama
+- id: ch6-p124-i6
+  page: 124
+  pdf_page: 146
+  kind: bilgi
+  what: 2018genel TD/MC hız sıralaması ve bunu formülleştirme hâlâ açık diye aktarır;evrensel güncel üstünlük
+    iddiası kurulmaz. Kaynak,pratikte stokastik görevlerde TD’nin genellikle sabit-α MC’den hızlı bulunduğu2018
+    deneysel değerlendirmesini de verir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-yakinsama
+- id: ch6-p125-i1
+  page: 125
+  pdf_page: 147
+  kind: tanım
+  what: MRP eylemsiz MDP;politika değerlendirmede çevre ve sabit ajanın etkileri tek ödüllü zincirde birleştirilebilir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-rastgele-yuruyus
+- id: ch6-p125-i2
+  page: 125
+  pdf_page: 147
+  kind: örnek
+  what: Örnek6.2:beş iç durumA–E,başlangıçC,her adım eşit sol/sağ,iki uçterminal,sağ+1diğer0,γ1;örnekC,0,B,0,C,0,D,0,E,1.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-rastgele-yuruyus
+- id: ch6-p125-i3
+  page: 125
+  pdf_page: 147
+  kind: şekil
+  what: Numarasız MRP haritası:iki terminalkare,A–E açık düğümler,iki yönlü komşuluklar,Cstart,beş0ödül
+    ve sağson1 etiketi.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-rastgele-yuruyus
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p125-i4
+  page: 125
+  pdf_page: 147
+  kind: formül
+  what: Gerçek değer sağ uçtan çıkma olasılığı;A…E için1/6…5/6,C0.5.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-rastgele-yuruyus
+- id: ch6-p125-i5
+  page: 125
+  pdf_page: 147
+  kind: şekil
+  what: Numarasız iki grafik:tekTDkoşusuα0.1,V0.5,0/1/10/100snapshot;RMS100bağımsıztekrar100bölüm,MCα.01/.02/.03/.04,TD.15/.1/.05.
+    Kaynak sol eksenleri A–E/tahmini değer0…0.8,sağ eksenleri0…100 bölüm/RMS0…0.25.
+  status: genişletildi
+  where: content/modules/m11-4-mc-td/module.yaml#lab:l1
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p125-i6
+  page: 125
+  pdf_page: 147
+  kind: bilgi
+  what: RMS önce beş durum üzerinde,sonra100tekrar üzerinde ortalanır;ortalama tablonun RMS'i değildir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-rastgele-yuruyus
+- id: ch6-p125-i7
+  page: 125
+  pdf_page: 147
+  kind: bilgi
+  what: Sabitα tahminleri son bölüm sonuçlarıyla sonsuza dek dalgalandırır;100bölümdeki yakınlık tam yakınsama
+    değildir;bu görevde kaynakTD üstünlüğü.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-rastgele-yuruyus
+- id: ch6-p126-i1
+  page: 126
+  pdf_page: 148
+  kind: bilgi
+  what: Sonlu veri örnekleri10bölüm/100geçiş;aynı deneyimi tekrar işleme,bütün batch artışlarını aynıVile
+    hesaplayıp bir kez toplam güncelleme.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p126-i2
+  page: 126
+  pdf_page: 148
+  kind: bilgi
+  what: Küçükα altında deterministik batch limitleri α'dan bağımsızdır;MC/TD farklı sonuca gider;tekil/görülmeyen
+    durum koşulları açıklandı.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p126-i3
+  page: 126
+  pdf_page: 148
+  kind: bilgi
+  what: Normal çevrimiçi yöntemler batch limitlerine bir seferde gitmez;kabaca bu yönlere hareket eder.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p126-i4
+  page: 126
+  pdf_page: 148
+  kind: örnek
+  what: Örnek6.3:her yeni bölümden sonra o ana kadarki bütün veri batch yapılır,yakınsatılır,beş durum
+    RMS100bağımsızdeneyde ortalanır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p126-i5
+  page: 126
+  pdf_page: 148
+  kind: alıştırma
+  source_number: '6.3'
+  what: 'Kaynak yürüyüş grafiğinde ilk bölüm yalnızV(A) değerini değiştiriyor. Yol hangi uçta bitti? Neden
+    diğer değerler değişmedi? Tam değişimi ve yeniV(A) değerini bulun;alana yeni değeri girin.
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma 6.3.'
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p21
+- id: ch6-p126-i6
+  page: 126
+  pdf_page: 148
+  kind: alıştırma
+  source_number: '6.4'
+  what: 'Kaynak yürüyüşün sağ grafiği seçilen α değerlerine bağlı. Daha geniş bir sabit α aralığı kullanılsa
+    hangi yöntemin daha iyi olduğuna ilişkin sıralama değişir miydi? Ayrı olarak,yöntemlerden biri gösterilmeyen
+    başka sabit α ile belirgin daha iyi performans verebilir miydi? İki soruyu gerekçeleriyle ayrı yanıtlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma6.4.'
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p22
+- id: ch6-p126-i7
+  page: 126
+  pdf_page: 148
+  kind: alıştırma
+  source_number: '6.5'
+  what: 'Yürüyüşte özellikle büyükα için TD RMS eğrisi önce düşüp sonra yükseliyor. Bunun nedeni ne olabilir?
+    Her zaman olur mu,başlatmaya bağlı olabilir mi?
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma 6.5. Kaynakta yıldızlı alıştırma.'
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p23
+  source_starred: true
+- id: ch6-p126-i8
+  page: 126
+  pdf_page: 148
+  kind: alıştırma
+  source_number: '6.6'
+  what: 'A…E için 1/6,2/6,3/6,4/6,5/6 değerlerini en az iki farklı yöntemle hesaplayın. Yazarların hangisini
+    kullandığını tahmin edin ve gerekçe yazın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.126,Alıştırma 6.6.'
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p24
+- id: ch6-p127-i1
+  page: 127
+  pdf_page: 149
+  kind: şekil
+  what: Şekil6.2:batch-training MC/TD RMS grafiği,y0…0.25,x1…100bölüm;her yeni bölümde bütün verinin ayrı
+    limitleri,100 bağımsız deney;TD kaynakta daha düşük RMS.
+  status: genişletildi
+  where: content/modules/m11-4-mc-td/module.yaml#lab:l2
+  source_number: '6.2'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p127-i2
+  page: 127
+  pdf_page: 149
+  kind: bilgi
+  what: Batch MC gözlenen getirilerde en küçük kare hatayı bulur;bu eğitim verisinde optimalite,gerçek/gelecek
+    veri açısından genel optimalite değildir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p127-i3
+  page: 127
+  pdf_page: 149
+  kind: örnek
+  what: Örnek6.4sekizbölüm:birA0B0,altıB1,birB0;Bsekizgözlemden6başarı→VB3/4,Atekgerçekgetiri0.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p127-i4
+  page: 127
+  pdf_page: 149
+  kind: şekil
+  what: Numarasız A→B kesin0ödüllü geçiş,B→terminalR1%75/R0%25;ençok olabilirlik modelini çizip VA=VB3/4
+    hesaplama. A/B açık durum düğümleri ve iki ayrı dolu terminal kare vardır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p127-i5
+  page: 127
+  pdf_page: 149
+  kind: soru
+  what: Örnek6.4numarasızpredictorsorusu:sekizbölümdenV(A)/V(B) için hangi tahminler eniyi;TD3/4veMC0,VB3/4
+    mevcutelhesabında.
+  status: vardı
+  where: content/modules/m11-4-mc-td/module.yaml#hand:amc
+  pages:
+  - 127
+  - 128
+  pdf_pages:
+  - 149
+  - 150
+- id: ch6-p128-i1
+  page: 128
+  pdf_page: 150
+  kind: bilgi
+  what: A için MC0 gözlenenAgetirisini tam tutar;TD3/4 Markov modelinin devamını paylaşır;gelecek gerçek
+    süreç verilmediğinden gerçekgenellemehatası ölçülmüş sayılmaz.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p128-i2
+  page: 128
+  pdf_page: 150
+  kind: tanım
+  what: Ençok olabilirlik parametresi veriyi üretme olasılığını enbüyükler;geçişolasılıklarıNij/Ni,herkenarın
+    ödülü o kenardaki ortalamadır.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p128-i3
+  page: 128
+  pdf_page: 150
+  kind: tanım
+  what: Certainty equivalence:tahmin edilen süreç kesin biliniyormuş gibi doğru değeri hesaplama;batchTD
+    bu ampirik Bellman çözümüne gider.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p128-i4
+  page: 128
+  pdf_page: 150
+  kind: türetim
+  what: BatchTDtoplamartış0 koşulundanV_i=rhat_i+γΣ(Nij/Ni)Vj;MCdurumbaşına gözlenen getirilerin ortalamasını
+    bulur.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p128-i5
+  page: 128
+  pdf_page: 150
+  kind: bilgi
+  what: BatchRMS üstünlüğü veçevrimiçiTD'ninaynıyöndeadımı kaynak hız açıklamasıdır;duvarsaati/evrenselverim
+    teoremi değildir,2018göreli verim araştırma sınırı.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p128-i6
+  page: 128
+  pdf_page: 150
+  kind: bilgi
+  what: Yoğun modelkurmaO(n²)bellek,gelenekselçözümO(n³)işlem;TDdeğertablosuO(n)çalışmabelleğiyle veri
+    tekrarı,veri arşivi belleği ayrıca.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-batch-sutton
+- id: ch6-p128-i7
+  page: 128
+  pdf_page: 150
+  kind: alıştırma
+  source_number: '6.7'
+  what: 'Keyfî hedefπ ve onu kapsayan davranışb için her adımdaρ_t:t kullanarak politika dışı TD(0) güncellemesini
+    tasarlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.128–129,Alıştırma 6.7. Kaynakta yıldızlı alıştırma.'
+  status: eklendi
+  where: content/modules/m11-4-mc-td/module.yaml#practice:p25
+  pages:
+  - 128
+  - 129
+  pdf_pages:
+  - 150
+  - 151
+  source_starred: true
+- id: ch6-p129-i1
+  page: 129
+  pdf_page: 151
+  kind: bilgi
+  what: TD kontrol GPI ile kurulur;keşif/sömürü,on-policy/off-policy ayrımı;önce mevcut davranışπ için
+    bütün(s,a) değerleri tahmini.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p129-i2
+  page: 129
+  pdf_page: 151
+  kind: şekil
+  what: Numarasız olay zinciri:açık S_t,siyah A_t,ödüllü okla S_t+1/A_t+1 ve iki ardıl çift daha;durum/eylem/ödül
+    sırası.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p129-i3
+  page: 129
+  pdf_page: 151
+  kind: bilgi
+  what: Sabitπ altında durum–eylem çiftlerinin geçişi de ödüllü Markov zinciri;V tahmininin tablo sonuçları
+    Q tahminine taşınır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p129-i4
+  page: 129
+  pdf_page: 151
+  kind: formül
+  what: Kaynak(6.7) SARSA:Q(St,At)+=α[R+γQ(St+1,At+1)−Q(St,At)].
+  status: vardı
+  where: content/modules/m11-5-sarsa-q/lesson.md#q-ogrenme
+- id: ch6-p129-i5
+  page: 129
+  pdf_page: 151
+  kind: tanım
+  what: SARSA beşlinin bütün elemanlarını kullanır;her nonterminal kaynaktan güncelleme,ardıl terminalde
+    Q0.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p129-i6
+  page: 129
+  pdf_page: 151
+  kind: şekil
+  what: Numarasız SARSA backup:siyah mevcut eylem kökü,açık tek ardıl durum,siyah gerçekten seçilmiş ardıl
+    eylem yaprağı.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p129-i7
+  page: 129
+  pdf_page: 151
+  kind: bilgi
+  what: SARSA Q'ya göre davranışı ε-greedy/soft yöne iyileştirir;olasılık1 optimum için sonsuz çift ziyareti,açgözlü
+    sınır ve SA öğrenme oranları.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p129-i8
+  page: 129
+  pdf_page: 151
+  kind: bilgi
+  what: ε1/t açgözlü sınıra örnektir,sonsuz keşif ayrıca gerekir;sabitα deney kutusu olasılık1 teoreminin
+    koşullarıyla aynı değildir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p129-i9
+  page: 129
+  pdf_page: 151
+  kind: alıştırma
+  source_number: '6.8'
+  what: 'Değerler adımlar arasında değişmesin. δ_t=R_{t+1}+γQ(St+1,At+1)−Q(St,At) için (6.6) eylem-değeri
+    özdeşliğini kanıtlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.129,Alıştırma 6.8.'
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p11
+- id: ch6-p130-i1
+  page: 130
+  pdf_page: 152
+  kind: kod
+  what: SARSA kutusu:keyfî Q,terminal0,α∈(0,1],küçükε;reset S,seç A,geçiş R/S′,güncellemeden önce A′,Q
+    güncelle,S/A devret,terminalde bitir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p130-i2
+  page: 130
+  pdf_page: 152
+  kind: örnek
+  what: Örnek6.5:7×10 ızgara,S(3,0),G(3,7),dört yön;kolon rüzgârı0,0,0,1,1,1,2,2,1,0,kaynak sütundan yukarı
+    etki,sınırda kırpma.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ruzgar
+- id: ch6-p130-i3
+  page: 130
+  pdf_page: 152
+  kind: örnek
+  what: Hedefin bir sağından sola gidince bir üstüne varılır;her geçiş−1,γ1,Q0,ε0.1,α0.5,8000 adım.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ruzgar
+- id: ch6-p130-i4
+  page: 130
+  pdf_page: 152
+  kind: şekil
+  what: Numarasız rüzgâr haritası ve bölüm/çevre-adımı eğrisi:S/G,bütün rüzgâr sayıları,yukarı oklar,dört
+    yön simgesi,örnek optimal rota;0…8000 adım,üstte yaklaşık170 bölüm.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#lab:l6
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p130-i5
+  page: 130
+  pdf_page: 152
+  kind: bilgi
+  what: Artan eğim bölümlerin kısalması;8000 adımda kaynak açgözlü minimum15,keşifli ortalama yaklaşık17;kendi
+    tohum ölçümleri ayrı.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ruzgar
+- id: ch6-p130-i6
+  page: 130
+  pdf_page: 152
+  kind: bilgi
+  what: Bütün politikalar sonlanmaz;aynı yerde kalan politika MC bölümünü bitirmeyebilir,SARSA bölüm içinde
+    öğrenip davranışını değiştirebilir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ruzgar
+- id: ch6-p130-i7
+  page: 130
+  pdf_page: 152
+  kind: alıştırma
+  source_number: '6.9'
+  what: 'Rüzgârlı ızgarayı dört ana yöne ek kuzeydoğu,kuzeybatı,güneydoğu,güneybatı çapraz hamlelerle
+    toplam sekiz eylem kullanarak yeniden çözün. Ek eylemlerle ne kadar iyileşir? Yalnız rüzgârdan başka
+    hareket yaptırmayan dokuzuncu bekleme eylemiyle daha iyisi mümkün mü?
+
+
+    Kaynak:Sutton ve Barto (2018),s.130–131,Alıştırma6.9.'
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p12
+  pages:
+  - 130
+  - 131
+  pdf_pages:
+  - 152
+  - 153
+  code_where: content/modules/m11-5-sarsa-q/x6.md
+- id: ch6-p131-i1
+  page: 131
+  pdf_page: 153
+  kind: formül
+  what: Kaynak(6.8) Q-learning:Q+=α[R+γmaxQ(S′)−Q];hedef q*,davranıştan ayrıdır.
+  status: vardı
+  where: content/modules/m11-5-sarsa-q/lesson.md#q-ogrenme
+- id: ch6-p131-i2
+  page: 131
+  pdf_page: 153
+  kind: bilgi
+  what: Davranış ziyaretleri etkiler;genel optimum garantisi için bütün çiftlerin güncellenmesi minimum
+    gereklilik,uygun SA oranlarıyla olasılık1 q*.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p131-i3
+  page: 131
+  pdf_page: 153
+  kind: kod
+  what: Q-learning kutusu:keyfî Q/terminal0,α∈(0,1],ε;her bölüm reset,her adım güncel Q'dan A,geçiş,maksimum
+    hedefi,Q güncelle,S′ye ilerle,terminalde bitir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+- id: ch6-p131-i4
+  page: 131
+  pdf_page: 153
+  kind: alıştırma
+  source_number: '6.10'
+  what: 'Sekiz şah hamleli görevi stokastik rüzgârla yeniden çözün. Rüzgâr varsa üçtebir olasılıkla temel
+    sütun etkisi,üçtebir bir hücre üstü,üçtebir bir hücre altı uygulanır. Kaynağın verdiği örnekte hedefin
+    bir sağından sola gidince bir üstü,iki üstü ve hedefin kendisi her biri1/3 olasılıklıdır.
+
+
+    Kaynak:Sutton ve Barto (2018),s.131,Alıştırma6.10.'
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p13
+  code_where: content/modules/m11-5-sarsa-q/x6.md
+- id: ch6-p132-i1
+  page: 132
+  pdf_page: 154
+  kind: örnek
+  what: Örnek6.6:4×12 ızgara,dört yön,S sol alt/G sağ alt,10 uçurum hücresi,γ1;normal−1,uçurum−100 ve
+    aynı bölümde başlangıca dönüş.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ucurum
+- id: ch6-p132-i2
+  page: 132
+  pdf_page: 154
+  kind: şekil
+  what: Numarasız uçurum haritası ve eğri:optimal kenar/güvenli üst rota,başlangıca dönüş okları,R−1/−100;0…500
+    bölüm SARSA/Q eğitim ödülleri,y yaklaşık−100…−25.
+  status: genişletildi
+  where: content/modules/m11-5-sarsa-q/module.yaml#lab:l1
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p132-i3
+  page: 132
+  pdf_page: 154
+  kind: bilgi
+  what: Q kenardaki kısa optimal yolu öğrenir,ε0.1 davranışta düşmeler olabilir;SARSA keşif maliyetini
+    değere katıp güvenli yolu seçebilir,eğitim ödülleri farklıdır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ucurum
+- id: ch6-p132-i4
+  page: 132
+  pdf_page: 154
+  kind: bilgi
+  what: ε azalınca yeterli ziyaret/uygun oranlarla iki yöntem optimal hedefe gidebilir;eğitim getirisi
+    ve keşifsiz açgözlü değerlendirme ayrı ölçüttür.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ucurum
+- id: ch6-p132-i5
+  page: 132
+  pdf_page: 154
+  kind: alıştırma
+  source_number: '6.11'
+  what: 'Q-öğrenme neden politika dışı kontrol sayılır? Davranışın öğrendiği hedefe etkisi tamamen yok
+    mudur?
+
+
+    Kaynak:Sutton ve Barto (2018),s.132,Alıştırma 6.11.'
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p14
+- id: ch6-p132-i6
+  page: 132
+  pdf_page: 154
+  kind: alıştırma
+  source_number: '6.12'
+  what: 'Eylem seçimi hep açgözlü olsun. SARSA ile Q-öğrenme tam aynı algoritma mı;aynı eylemleri ve ağırlık
+    güncellemelerini mi yaparlar?
+
+
+    Kaynak:Sutton ve Barto (2018),s.132,Alıştırma 6.12.'
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p15
+- id: ch6-p132-i7
+  page: 132
+  pdf_page: 154
+  kind: soru
+  what: Numarasız Q-learning backup tahmin sorusu:kök/alt eylem düğümleri ve maksimum yayı;Şekil6.4 öncesi
+    kendi çizimini tahmin et.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p18
+- id: ch6-p133-i1
+  page: 133
+  pdf_page: 155
+  kind: formül
+  what: Kaynak(6.9) Expected SARSA:r+γEπQ(S′,A′)=r+γΣaπ(a|S′)Q(S′,a) hedefi.
+  status: vardı
+  where: content/modules/m11-5-sarsa-q/lesson.md#q-ogrenme
+- id: ch6-p133-i2
+  page: 133
+  pdf_page: 155
+  kind: bilgi
+  what: S′ verildiğinde SARSA ile aynı beklenen yönde deterministik hedef;A′ örnekleme varyansını kaldırır,ek
+    olasılık toplamı hesabı ister.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ucurum
+- id: ch6-p133-i3
+  page: 133
+  pdf_page: 155
+  kind: şekil
+  what: Şekil6.3:SARSA/Q/Expected,α0.1…1,ilk100 ve100000 bölüm ortalamaları,ε0.1;50000 kısa/10 uzun tekrar;dolu
+    noktalar en iyi ilk100,altı eğri,y−160…0.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#lab:l5
+  source_number: '6.3'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p134-i1
+  page: 134
+  pdf_page: 156
+  kind: şekil
+  what: Şekil6.4:Q-learning ve Expected SARSA backup;eylem kökü,açık tek ardıl durum,her panelde üç temsili
+    siyah ardıl eylem yaprağı.Q-learning maksimum yayı,Expected politika ağırlıkları ve yay yok;genel
+    algoritmada tüm geçerli eylemler temsil edilir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol
+  source_number: '6.4'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p134-i2
+  page: 134
+  pdf_page: 156
+  kind: bilgi
+  what: Belirlenimci uçurumda yalnız politika rastgeleliği;Expected α1 ile iyi uzun dönem performans,normal
+    SARSA uzun dönemde küçükα ister;genel rastgele görevlere garanti değil.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ucurum
+- id: ch6-p134-i3
+  page: 134
+  pdf_page: 156
+  kind: bilgi
+  what: Expected SARSA on-policy uçurum örneğinden geneldir;hedefπ/davranış ayrılabilir,açgözlü hedef
+    seçilince Q-learning özel durum olur.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ucurum
+- id: ch6-p134-i4
+  page: 134
+  pdf_page: 156
+  kind: bilgi
+  what: Kaynak2018,küçük ek hesap dışında Expected'ın diğerlerini bastırabileceğini düşünür;bu evrensel
+    hata/süre üstünlüğü teoremi diye aktarılmaz.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-ucurum
+- id: ch6-p134-i5
+  page: 134
+  pdf_page: 156
+  kind: tanım
+  what: Maksimizasyon yanlılığı:yansız kestirimlerde bile EmaxQ≥maxEQ;gerçek değerler0 iken beklentide
+    yukarı sapma,Jensen.
+  status: vardı
+  where: content/modules/m11-5-sarsa-q/lesson.md#cift-q
+- id: ch6-p134-i6
+  page: 134
+  pdf_page: 156
+  kind: bilgi
+  what: Q-learning maksimum hedefte,ε-greedy SARSA politika yapımında örtük max kullanır;tek gerçekleşmede
+    maksimum pozitif olmak zorunda değildir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p134-i7
+  page: 134
+  pdf_page: 156
+  kind: örnek
+  what: Örnek6.7:A başlangıç,sağ0 terminal,sol0 B;B'nin çok eylemi N(−0.1,1) ödüllü terminal;sol beklenen−0.1
+    olduğu için kötüdür.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p135-i1
+  page: 135
+  pdf_page: 157
+  kind: şekil
+  what: Şekil6.5:A/B MDP alt şeması ve Q/Double Q sol seçim oranları;10000 tekrar,300 bölüm,Q başlangıcı0,α=ε=0.1,γ1,rastgele
+    bağ çözümü,%5 optimal referans.B için10 eylem kendi açık seçimimiz;kitap çok sayıda der.
+  status: genişletildi
+  where: content/modules/m11-5-sarsa-q/module.yaml#lab:l2
+  source_number: '6.5'
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p135-i2
+  page: 135
+  pdf_page: 157
+  kind: bilgi
+  what: Kaynakta Q ilk başta solu çok tercih eder,uzun dönemde minimum%5 üzerinde yaklaşık5 yüzde puan;300
+    bölümlük son pencere sonsuz-zaman limiti değildir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p135-i3
+  page: 135
+  pdf_page: 157
+  kind: örnek
+  what: Bandit örneklerini bağımsız iki kümeye ayır,Q1 ile argmax seç,Q2 ile değerlendir;rolleri ters
+    çevirerek ikinci tahmin elde et.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p135-i4
+  page: 135
+  pdf_page: 157
+  kind: formül
+  what: Bağımsız yansız değerlendiricide E[Q2(A*)|A*]=q(A*),koşulsuz E=Eq(A*);gerçek maksimuma otomatik
+    yansızlık değildir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p135-i5
+  page: 135
+  pdf_page: 157
+  kind: bilgi
+  what: İki tablo belleği ikiye çıkarır;her çevre adımında/örnekte bir tablo güncellenir. Toplam/argmax
+    ek işi olabilir,güncelleme sayısı ikiye katlanmaz.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p136-i1
+  page: 136
+  pdf_page: 158
+  kind: formül
+  what: Kaynak(6.10):Q1 hedefi r+γQ2(S′,argmax Q1(S′));Q2 için simetrik roller.
+  status: vardı
+  where: content/modules/m11-5-sarsa-q/lesson.md#cift-q
+- id: ch6-p136-i2
+  page: 136
+  pdf_page: 158
+  kind: kod
+  what: Double Q kutusu:0<α≤1,küçükε>0;keyfî Q1/Q2,terminal0,b=ε-greedy(Q1+Q2);adil0.5 para ile bir tabloyu
+    çapraz hedefle güncelle,S′ye ilerle,terminalde bitir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p136-i3
+  page: 136
+  pdf_page: 158
+  kind: bilgi
+  what: Davranış iki Q toplamı veya ortalamasına dayanabilir;çift sürümler SARSA/Expected için de kurulur;bağımsız
+    bandit varsayımı adaptif MDP'ye koşulsuz taşınmaz.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-cift-ogrenme
+- id: ch6-p136-i4
+  page: 136
+  pdf_page: 158
+  kind: bilgi
+  what: Genel Q şemasının istisnası:ilk bölüm XOX değeri normal V veya Q değil,ajan hamlesi sonrası tahta
+    değeridir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-afterstate
+  pages:
+  - 136
+  - 137
+  pdf_pages:
+  - 158
+  - 159
+- id: ch6-p136-i5
+  page: 136
+  pdf_page: 158
+  kind: alıştırma
+  source_number: '6.13'
+  what: 'ε-greedy hedef politikayla Double Expected SARSA güncelleme denklemlerini verin. Seçici/değerlendirici
+    tabloların ve davranışın rollerini açıkça tanımlayın.
+
+
+    Kaynak:Sutton ve Barto (2018),s.136,Alıştırma 6.13. Kaynakta yıldızlı alıştırma.'
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p16
+  source_starred: true
+- id: ch6-p137-i1
+  page: 137
+  pdf_page: 159
+  kind: tanım
+  what: Afterstate,ajanın bilinen ilk hamle etkisi sonrası durum;normal V karar öncesini,afterstate hamle
+    sonrasını değerlendirir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-afterstate
+- id: ch6-p137-i2
+  page: 137
+  pdf_page: 159
+  kind: bilgi
+  what: Satrançta kendi hamlemizin tahta etkisini bilir,rakibin tepkisini bilmeyebiliriz;kısmi model bilgisinden
+    yararlanılır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-afterstate
+- id: ch6-p137-i3
+  page: 137
+  pdf_page: 159
+  kind: şekil
+  what: Numarasız XOX şeması:X0O4+X5 ve O4X5+X0 çiftleri ortak X0O4X5 tahtasına oklarla birleşir;iki artı
+    ve ayrı hamle ızgaraları.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-afterstate
+  figure: türetildi
+  note: Kaynak sayfa görüntüsü incelendi;özgün hesap/şema/örnekleme ile bütün ilişkiler karşılandı.
+- id: ch6-p137-i4
+  page: 137
+  pdf_page: 159
+  kind: bilgi
+  what: Ayrı Q çiftleri yerine aynı bilinmeyen devam için ortak afterstate değeri;bir çiftin örneği diğerine
+    hemen aktarılır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-afterstate
+- id: ch6-p137-i5
+  page: 137
+  pdf_page: 159
+  kind: örnek
+  what: Kuyruk görevlerinde müşteriyi sunucuya atamak,reddetmek veya bilgiyi atmak gibi anlık etkisi bilinen
+    eylemler afterstate verir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-afterstate
+- id: ch6-p137-i6
+  page: 137
+  pdf_page: 159
+  kind: bilgi
+  what: Bütün özel görevleri saymak mümkün değildir;GPI politika/afterstate değer etkileşimi ve on/off-policy
+    keşif seçimi aynı ilkelerle sürer.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-afterstate
+- id: ch6-p137-i7
+  page: 137
+  pdf_page: 159
+  kind: alıştırma
+  source_number: '6.14'
+  what: 'Jack’in Araba Kiralama görevini afterstate biçiminde yeniden tanımlayın. Bu görevde neden öğrenmenin
+    daha hızlı yakınsamasını beklersiniz?
+
+
+    Kaynak:Sutton ve Barto (2018),s.137,Alıştırma 6.14.'
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/module.yaml#practice:p17
+- id: ch6-p138-i1
+  page: 138
+  pdf_page: 160
+  kind: bilgi
+  what: GPI'nin iki süreci:mevcut politikanın getirisini doğru tahmin etmek,Q'ya göre yerel politika iyileştirmesi;yaklaşık
+    süreçler optimal hedefe yönelir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p138-i2
+  page: 138
+  pdf_page: 160
+  kind: bilgi
+  what: Deneyimden öğrenen GPI'de yeterli keşif gerekir;SARSA on-policy,Q off-policy,Expected burada genel
+    off-policy çerçevesindedir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p138-i3
+  page: 138
+  pdf_page: 160
+  kind: bilgi
+  what: Aktör–eleştirmen TD kontrolüne üçüncü genişletmedir;bu bölümde verilmez,kitap Bölüm13/M11.9 içindedir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p138-i4
+  page: 138
+  pdf_page: 160
+  kind: bilgi
+  what: 2018 yaygınlık yorumu:sadelik,çevrimiçi az hesap,tek eşitlik/küçük program;güncel yöntem sıralaması
+    diye sunulmaz.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p138-i5
+  page: 138
+  pdf_page: 160
+  kind: bilgi
+  what: Bu bölüm bir-adımlı,tablo,modelden bağımsız TD;Bölüm7 n-adım MC köprüsü,8 model/planlama DP köprüsü,ikinci
+    kısım yaklaşım derin ağ köprüsü;öz TD hatalarıdır.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p138-i6
+  page: 138
+  pdf_page: 160
+  kind: bilgi
+  what: TD genel dinamik-sistem uzun dönem tahmini yöntemidir;finans,yaşam süresi,seçim,hava,hayvan davranışı,enerji
+    talebi,müşteri alışverişi2018 potansiyel alan listesidir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-tahmin-tarih
+- id: ch6-p138-i7
+  page: 138
+  pdf_page: 160
+  kind: bilgi
+  what: Salt tahmin olarak incelemek kuramı anlamayı kolaylaştırdı;kontrol dışı kullanımlar az incelendi
+    sözü2018 değerlendirmesidir,güncel alan iddiası değildir.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-tahmin-tarih
+- id: ch6-p139-i1
+  page: 139
+  pdf_page: 161
+  kind: kaynakça
+  what: TD kökleri hayvan öğrenmesi psikolojisi/AI;Samuel(1959),Klopf(1972),Samuel örnek olay§16.2.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-tahmin-tarih
+- id: ch6-p139-i2
+  page: 139
+  pdf_page: 161
+  kind: kaynakça
+  what: Holland(1975,1976) tahmin tutarlılığı,Barto1970–1975 Michigan lisansüstü,Holland orada öğretim
+    üyesi;Booker(1982),Holland(1986) bucket brigade etkileri.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-tahmin-tarih
+- id: ch6-p139-i3
+  page: 139
+  pdf_page: 161
+  kind: kaynakça
+  what: Sutton(1988) TD(0),rastgele yürüyüş,TD terimi;DP/MC ilişkisi Watkins(1989),Werbos(1987) etkisi;backup
+    diyagramları ilk baskı yeniliği.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-tahmin-tarih
+- id: ch6-p139-i4
+  page: 139
+  pdf_page: 161
+  kind: kaynakça
+  what: Sutton(1988) ortalama yakınsamasının özel koşulları;Dayan(1992) olasılık1,Watkins–Dayan(1992)
+    temeli;Jaakkola–Jordan–Singh(1994),Tsitsiklis(1994) SA genişletmeleri.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-tahmin-tarih
+- id: ch6-p139-i5
+  page: 139
+  pdf_page: 161
+  kind: kaynakça
+  what: Batch TD optimalitesi Sutton(1988);Barnard(1993) model öğrenimi ve modelden bir tahmin adımı birleşimi;kesinlik
+    eşdeğeri Goodwin–Sin(1984) uyarlamalı kontrol.
+  status: eklendi
+  where: content/modules/m11-4-mc-td/lesson.md#sutton-td-tahmin-tarih
+- id: ch6-p139-i6
+  page: 139
+  pdf_page: 161
+  kind: kaynakça
+  what: SARSA Rummery–Niranjan(1994) ile NN/Modified Connectionist Q-learning;Sutton(1996) adı;Singh–Jaakkola–Littman–Szepesvári(2000)
+    yakınsama;rüzgâr Tom Kalt.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p139-i7
+  page: 139
+  pdf_page: 161
+  kind: kaynakça
+  what: Holland(1986) bucket brigade tetikleyen kural kredilerinden zamanca önceki bütün kurallara gelişir;Wilson(1994)
+    sadeleştirmeleri neredeyse bir-adımlı SARSA.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p140-i1
+  page: 140
+  pdf_page: 162
+  kind: kaynakça
+  what: Q Watkins(1989) ispat çerçevesi,Watkins–Dayan(1992) kesinleştirme;Jaakkola–Jordan–Singh(1994),Tsitsiklis(1994)
+    genelleme.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p140-i2
+  page: 140
+  pdf_page: 162
+  kind: kaynakça
+  what: Expected SARSA John(1994) Q-learning adı ve off-policy avantajı;ilk baskı yazarları ve van Seijen
+    ve arkadaşları2009 sırasında bu çalışmayı bilmiyordu. Kitabın ilk baskısında alıştırma olarak sunulduğu
+    açıkça belirtilir.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p140-i3
+  page: 140
+  pdf_page: 162
+  kind: kaynakça
+  what: van Seijen,van Hasselt,Whiteson,Wiering(2009) yakınsama/üstünlük koşulları ve Şekil6.3;kitapta
+    Weiring yazımı birincil makalenin yazar listesiyle Wiering düzeltildi.
+  status: düzeltildi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+  verification: Sabitα:notes/sutton-2018/measure_ch6.py exact4moments ve bağımsız zincir deneyi,Sutton1988Teorem2dizi-sonu
+    koşulu. Soyadı:2009birincilmakalePDFyazarlistesi.
+- id: ch6-p140-i4
+  page: 140
+  pdf_page: 162
+  kind: kaynakça
+  what: İlk baskı/2009 Expected yalnız on-policy;2018 genel hedef/davranış ayrımı;van Hasselt(2011) General
+    Q-learning adı.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p140-i5
+  page: 140
+  pdf_page: 162
+  kind: kaynakça
+  what: Maksimizasyon yanlılığı ve double learning van Hasselt(2010,2011);örnek MDP onun2011 Şekil4.1
+    uyarlaması.
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
+- id: ch6-p140-i6
+  page: 140
+  pdf_page: 162
+  kind: kaynakça
+  what: Afterstate=post-decision state;Van Roy,Bertsekas,Lee,Tsitsiklis(1997),Powell(2011).
+  status: eklendi
+  where: content/modules/m11-5-sarsa-q/lesson.md#sutton-td-kontrol-tarih
 chapter_counts:
   '1':
     items: 159
@@ -11126,6 +12457,16 @@ chapter_counts:
     exercises: 14
     code: 5
     questions: 2
+  '6':
+    items: 134
+    figures: 14
+    numbered_figures: 5
+    unnumbered_figures: 9
+    exercises: 14
+    questions: 2
+    code: 4
+    tables: 1
+    footnotes: 1
 part_dividers:
 - pdf_pages:
   - 45
@@ -11153,7 +12494,9 @@ teaching_extensions:
   page: 115
   pdf_page: 137
   kind: türetim
-  what: Sabit sonlu ufukta zaman başına ayrı normalize edilmiş PDIS tutarlılığı;terminal sonrası0 ile doldurma.
+  what: Sabit sonlu ufukta zaman başına ayrı normalize edilmiş PDIS tutarlılığı;terminal sonrası0 ile
+    doldurma.
   status: eklendi
   where: content/modules/m11-4-mc-td/lesson.md#sutton-is-ileri
-  note: Kaynak2018bilinen öneriler ifadesini açıklayan kendi öğretim uzantımız;kitaptaki yeni bilgi gibi sayılmaz.
+  note: Kaynak2018bilinen öneriler ifadesini açıklayan kendi öğretim uzantımız;kitaptaki yeni bilgi gibi
+    sayılmaz.

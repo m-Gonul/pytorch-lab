@@ -53,7 +53,7 @@ export default {
     }
     const P = [`${q.R} tekrar ortalaması, ${q.E} bölümde RMS: toplu MC ${fmt(em[q.E - 1], 3)}, toplu TD ${fmt(et[q.E - 1], 3)}. Hiç ziyaret edilmemiş durumlar 0.5 sayıldı.`];
     const lower = em.filter((v, i) => et[i] < v).length;
-    P.push(lower === q.E ? "Her veri miktarında toplu TD daha düşük hata veriyor: Markov yapısını kullanarak her geçişi, o geçişten sonra gelen bütün durumların tahminine bağlıyor." : `Toplu TD, ${q.E} veri miktarından ${lower} tanesinde daha düşük hata veriyor (tek bölümde iki yöntem aynı: her durumun tek getirisi ve tek geçişi aynı bilgiyi taşır).`);
+    P.push(lower === q.E ? "Her veri miktarında toplu TD daha düşük hata veriyor: Markov yapısını kullanarak her geçişi, o geçişten sonra gelen bütün durumların tahminine bağlıyor." : `Toplu TD, ${q.E} veri miktarından ${lower} tanesinde daha düşük hata veriyor (bu yürüyüşün tek bölümünde görülen bütün durumların tam getirisi aynı uç ödülüdür;iki ampirik limit bu yüzden eşleşir. Bu gerekçe genel çok ödüllü görevler için geçerli değildir).`);
     if (q.R < 10) P.push("Az tekrarla eğriler gürültülü; tek bir veri kümesinde MC şans eseri daha iyi olabilir.");
     return {
       plots: [{ title: "Toplu eğitimde RMS hata ve veri miktarı", xlabel: "bölüm sayısı", ylabel: "RMS", wide: true, size: { w: 620, h: 230 }, series: [{ name: "toplu MC", x: Es, y: em, c: 0 }, { name: "toplu TD", x: Es, y: et, c: 2 }] }],

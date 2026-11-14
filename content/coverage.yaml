@@ -3,7 +3,7 @@ intro: |
 
   **Nasıl denetlendi:** 82 PDF'in metni çıkarıldı (toplam ≈ 31 700 satır); her slayt başlığı ilgili modülün tüm dosyalarında (anlatım, alıştırma, kontrol, kod) aranıp eşleşmeyenler elle incelendi. **Erişim sınırı:** slaytlardaki şekil ve ekran görüntüleri metin olarak okunamadı; yalnız başlık, metin ve formüllerin metne dökülebilen kısmı karşılaştırıldı. Görsel içerikli slaytlar (ör. görüntü örnekleri, mimari çizimleri) konu başlığı üzerinden eşlendi.
 
-  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–5 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108, 109, 114, 116, 117, 119, 121, 122, 123, 128, 129, 132, 133 ve 134) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
+  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–6 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108, 109, 114, 116, 117, 119, 121, 122, 123, 128, 129, 132, 133, 134, 142, 143, 144, 145, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159 ve 162) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
 
   **Durumlar:** *kapsandı* — kaynaktaki konu sitede en az aynı derinlikte; *kapsandı + genişletildi* — sitede kaynakta olmayan türetim, alıştırma ya da deney de var; *kısmen* — konu var ama kaynaktaki bir alt başlık bilinçli olarak yüzeysel; *bilinçli olarak farklı* — kaynaktaki araç yerine başka bir araç (ör. Keras yerine PyTorch). Yeni kaynak geldikçe tablo genişletilir; tamamlanmış satırlar geri alınmaz.
 groups:
@@ -261,7 +261,7 @@ groups:
   - title: 'Sutton ve Barto — Reinforcement Learning: An Introduction, 2. baskı (2018)'
     note: 'Yüklenen PDF 548 sayfa. Envanterde 140 numaralı alıştırma, 104 numaralı şekil, 38 kutulu sözde-kod
       listesi var. Sayılar numarasız çizim, tablo ve metin içi algoritmaların tamamlık sayımı değildir. Bölüm
-      1–5 işlendi; kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
+      1–6 işlendi; kitabın tamamı bitmedi. Lisans sayfası PDF 4: CC BY-NC-ND 2.0; kaynak görseller yayımlanmadı.'
     rows:
     - src: Sutton ve Barto (2018), Bölüm 1 — Giriş (s. 1–22)
       topics: 5 numaralı alıştırma; 1 numaralı şekil. Numarasız XOX tahtası da işlendi.
@@ -311,14 +311,12 @@ groups:
       status: genis
       gap: —
       done: '161 birim:159 eklendi,1 genişletildi,1 düzeltildi. 14 numaralı+2 numarasız sorunun tamamı çözümlü;16 yeni kart,iki yeni programlama eki. 5 numaralı+4 numarasız kaynak görseli,5 sözde-kod;3 SVG grubu,4 yeni deney türü/5 yerleşim. Kaynak107 yakınsamama iddiası SLLN ile düzeltildi. Bütün200 Blackjack ve19181 yarış durumunda bağımsız NumPy/JS karşılaştırması. PDF113–140 bağımsız ikinci okuma;12 görüntü incelendi. Kitabın bütünü tamamlanmadı.'
-    - src: Sutton ve Barto (2018), Bölüm 6 — Zamansal fark öğrenmesi (s. 119–140)
-      topics: 14 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
-      pages:
-      - m11-4-mc-td
-      - m11-5-sarsa-q
-      status: eksik
-      gap: Kaynağın bu bölümü henüz aktarılmadı; hedefler yalnız konu eşlemesi adaylarıdır.
-      done: Sayfa ve numaralı öğe envanteri çıkarıldı. İçerik kapsamı tamamlanmış sayılmadı.
+    - src: Sutton ve Barto (2018), Bölüm 6 — Zamansal fark öğrenmesi (s.119–140)
+      topics: TD tahmin,hata teleskobu,eve dönüş,MRP,batch MC/TD ve ençok olabilirlik,SARSA/rüzgâr,Q/uçurum,Expected SARSA,maxbias/Double Q,afterstate ve tarih.
+      pages: [m11-4-mc-td,m11-5-sarsa-q]
+      status: genis
+      gap: —
+      done: '134 kaynak birimi:118 eklendi,10 vardı,4 genişletildi,2 düzeltildi. 14 alıştırma ve2 numarasız soru çözüldü;15 yeni kart,1 mevcut el hesabı,1 programlama eki x6. 5 numaralı+9 numarasız görsel,4 kod,1 tablo,1 dipnot;7 hesaplanan SVG grubu,2 yeni deney ve4 mevcut deneyin genişletilmesi. Şekil6.3 tam50000×100 ve10×100000 bütçeleriyle19α×3 yöntem=114 koşulda342 milyon bölüm/13385049857 geçiş. Altı rüzgâr modelinin420 değeri NumPy/JS eşleşti. Sabitα ortalama yakınsaması ve Wiering adı düzeltildi. PDF141–162 bağımsız ikinci okuma,18 görüntü;kitap tamamlanmadı.'
     - src: Sutton ve Barto (2018), Bölüm 7 — n adımlı önyükleme (s. 141–158)
       topics: 11 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
       pages:
