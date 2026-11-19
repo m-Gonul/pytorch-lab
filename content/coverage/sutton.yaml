@@ -26,8 +26,8 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: İlk10 bölüm işlendi; Bölüm10 test/yayın ayrıca izlenir. Bölüm11–17, ön/arka materyal, kısım ayırıcıları,
-    tam kaynakça/dizin henüz bütünüyle işlenmedi; kitap tamamlanmadı.
+  note: İlk11 bölüm işlendi; Bölüm11 test/yayın ayrıca izlenir. Bölüm12–17, ön/arka materyal, kısım ayırıcıları,tam
+    kaynakça/dizin henüz bütünüyle işlenmedi; kitap tamamlanmadı.
   processed_chapters:
   - 1
   - 2
@@ -39,8 +39,8 @@ progress:
   - 8
   - 9
   - 10
-  unprocessed_chapters:
   - 11
+  unprocessed_chapters:
   - 12
   - 13
   - 14
@@ -1394,10 +1394,16 @@ chapters:
       ve bütün14 kart/9 lab/5 ek korundu; eski ders paragrafları birebir korundu. x1 fizik/bütçe hataları
       gerekçeyle düzeltildi.
   publication:
-    commit: null
-    build: bekleniyor
-    deploy: bekleniyor
-    live_verified: false
+    commit: 6cd08a6f60dc83c007ac4b3d5c356455f202b73d
+    workflow_run: 44612001764
+    build: success
+    deploy: success
+    live_verified: true
+    live_pages:
+    - https://m-gonul.github.io/pytorch-lab/m11-6-dqn.html
+    - https://m-gonul.github.io/pytorch-lab/m11-13-average-reward.html
+    evidence: Canlı iki sayfa,46 önayar ve16 A/B görünümü1280/390px temiz; taşma/KaTeX/JS/duplicate-id0.
+    verified_date: '2026-11-20'
 - chapter: 11
   title: Yaklaşımla politika dışı yöntemler
   pdf_pages:
@@ -1441,8 +1447,101 @@ chapters:
   code_boxes: []
   candidate_modules:
   - m11-6-dqn
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  mapping_status: 156 kesin ders/kart/lab/ek hedefi tamamlandı; hedef denetimi ayrıca kaydedilir.
+  content_status: işlendi;bağımsız kaynak/defter ikinci okuması tamamlandı
+  recorded_units: 156
+  source_numbered_equations: 29
+  source_footnotes: 4
+  source_unnumbered_figures:
+  - page: 260
+    pdf_page: 282
+    what: w→2w parçası
+  - page: 263
+    pdf_page: 285
+    what: TVR iki-durum LS modeli
+  - page: 271
+    pdf_page: 293
+    what: A-split
+  - page: 273
+    pdf_page: 295
+    what: A-presplit
+  - page: 274
+    pdf_page: 296
+    what: iid0/2 MRP çifti
+  - page: 276
+    pdf_page: 298
+    what: BE öğrenilemezlik MRP çifti
+  second_read:
+    independent: true
+    text_pages: 30
+    visual_pages:
+    - 279
+    - 280
+    - 281
+    - 282
+    - 283
+    - 284
+    - 285
+    - 286
+    - 287
+    - 288
+    - 289
+    - 290
+    - 291
+    - 292
+    - 293
+    - 294
+    - 295
+    - 296
+    - 297
+    - 298
+    - 299
+    - 300
+    - 301
+    - 302
+    - 303
+    - 304
+    - 305
+    - 306
+    - 307
+    - 308
+    findings_resolved: true
+    note: Ayrı ajan yalnız kaynak+156birim defterini okudu;13bulgu grubu+takip kapandı. Üretim işi devredilmedi.
+  verification:
+    node_tests: 858/858
+    site_and_numeric_tests: 13/13
+    changed_module_CPU_torch: 1/1
+    changed_notebook_CPU_torch: 1/1
+    new_lab_tests: 12/12
+    independent_numeric_tests: 6/6
+    source_CPP_Python_value_max_relative: 4.21593539062649e-15
+    source_CPP_Python_Q_max_relative: 2.782374677055751e-15
+    whitened_QR_difference_max: 3.3306690738754696e-16
+    PBE_gradient_finite_difference_max: 1.6040543893147685e-11
+    actual_Q_steps: 400000
+    ETD_distribution_runs: 4096
+    ETD_distribution_steps: 4096000
+    ETD_distribution_censored: 0
+    browser:
+      widths:
+      - 1280
+      - 390
+      preset_checks: 48
+      AB_checks: 18
+      SVG_groups: 12
+      horizontal_overflow: 0
+      math_errors: 0
+      javascript_errors: 0
+      duplicate_ids: 0
+      SVG_text_bounds_errors: 0
+    preservation: Önceki1348 kaynak+12 öğretim kaydı birebir; M11.6 eski el hesabı/aşamalar/quiz/ödev/17kart/11lab/6ek
+      ve bütün eski ders paragrafları korundu. İlk lab açıklaması/TDC koşulları/gerçek adım raporu gerekçeyle
+      düzeltildi.
+  publication:
+    commit: null
+    build: bekleniyor
+    deploy: bekleniyor
+    live_verified: false
 - chapter: 12
   title: Uygunluk izleri
   pdf_pages:
@@ -17031,6 +17130,1169 @@ items:
   what: Discount sınırlılıkları ilk baskı sonrası yazar farkındalığı; erken basılı gözlem Singh–Jaakkola–Jordan1994.
   status: eklendi
   where: content/modules/m11-13-average-reward/lesson.md#tarih
+- id: ch11-p257-i1
+  page: 257
+  pdf_page: 279
+  kind: bilgi
+  what: Bölüm5–7 politika üstü/dışı keşif-sömürü GPI;9–10 politika üstü FA, burada politika dışı FA daha
+    güç ve daha zayıf teori/deney araştırma durumu2018. Bölüm başlığı kaynakta yıldızlıdır (*).
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p257-i2
+  page: 257
+  pdf_page: 279
+  kind: tanım
+  what: Tahminde sabit verilen π/b ve vπ/qπ; kontrolde q yaklaşımlı πgreedy ve bexploratory değişir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p257-i3
+  page: 257
+  pdf_page: 279
+  kind: bilgi
+  what: 'İki ayrı güçlük: güncelleme hedefini πye düzeltmek ve örneklenen durum/güncelleme dağılımının
+    πye uymaması; hedef kelimesi hedef politikadan ayrıdır.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p258-i1
+  page: 258
+  pdf_page: 280
+  kind: bilgi
+  what: Önem örneklemesi hedefi düzeltir, varyansı artırabilir; tablo ve yaklaşım algoritmalarında önceki
+    yöntemlerin uzantısı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p258-i2
+  page: 258
+  pdf_page: 280
+  kind: bilgi
+  what: İkinci sorun için dağılımı yeniden ağırlıklandırıp doğrusal yarı-gradyan kararlılığı veya özel
+    dağılıma dayanmayan gerçek gradyan yöntemleri; hangisi pratikte iyi2018de açık değerlendirmesi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p258-i3
+  page: 258
+  pdf_page: 280
+  kind: bilgi
+  what: Tablo dizisi yerine w güncellemesi/özellik gradyanı; basit FA yarı-gradyan yöntemleri bazı örneklerde
+    ıraksar ama sıklıkla başarılıdır; tablo garantileri uygun adım/ziyaret/sonlanma koşullarıyladır. Kaynak
+    tablo yöntemlerini asimptotik yanlılıksız sayar; özellik seçimiyle yarı-gradyan yöntemlerini birleştirip
+    kararlılık kurma olasılığını ayrıca önerir.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p258-i4
+  page: 258
+  pdf_page: 280
+  kind: formül
+  what: 11.1:ρt=π(At|St)/b(At|St),πdestek kapsamında bpozitif gerekir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p258-i5
+  page: 258
+  pdf_page: 280
+  kind: formül
+  what: 11.2:offpolicySGTD0w+=αρtδt∇vhat(St,w).
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p258-i6
+  page: 258
+  pdf_page: 280
+  kind: formül
+  what: 11.3:episodik/indirimliδ=R+γvhat(S′,w)−vhat(S,w),terminal0.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p258-i7
+  page: 258
+  pdf_page: 280
+  kind: formül
+  what: 11.4:sürekli/ortalamaδ=R−Rbar+vhat(S′,w)−vhat(S,w).
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i1
+  page: 259
+  pdf_page: 281
+  kind: formül
+  what: 11.5:tek-adımExpectedSARSAw+=αδ∇q; hedefR+γΣπq′ veyaR−Rbar+Σπq′−q;At için ayrıρgerekmez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i2
+  page: 259
+  pdf_page: 281
+  kind: bilgi
+  what: Tabloda koşullu At değeri için yalnız örneklenen At vardır; FAortak parametrelerinde durum-eylem
+    ağırlıklandırması nüansı ve kaynak dönemi açık kuram sorusu.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i3
+  page: 259
+  pdf_page: 281
+  kind: formül
+  what: 11.6:n-adımSGExpectedSARSAρt+1..ρt+n−1 ve güncelwt+n−1; basılı örneklenmiş sonQyerine beklenti
+    veya sonρdüzeltmesi gerekir; n1ile11.5tutarlılığı denetlenir.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i4
+  page: 259
+  pdf_page: 281
+  kind: formül
+  what: 11.6iki getiri:episodikindirimliRtoplamı/sonbootstrap,süreklidekaynakzamanRbar_t..t+n−1çıkarımı;Bölüm10ortakgüncelgainfarkı
+    açık.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i5
+  page: 259
+  pdf_page: 281
+  kind: bilgi
+  what: Episodiksonaşımıiçink≥Tρ1,TyevarıncaGt:n=Gt;Qbootterminal0;Tgerçeksondur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i6
+  page: 259
+  pdf_page: 281
+  kind: formül
+  what: 11.7:SGTreeBackupw+=α[G−qhat(St,At,güncelw)]∇qhat;önemörneklemesiyok.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i7
+  page: 259
+  pdf_page: 281
+  kind: formül
+  what: '11.8:TreeBackupgetirisiQbaşlangıcı+ΣkδkΠiγπ(Ai|Si);basılıwt−1/güncelwt+n−1karışımıtek-snapshotile11.5n1tutarlılığıçözülür.
+    Kaynakta üç zaman indeksi ayrı: başlangıç w_(t−1), δ_k içindeki w_k ve güncellemede w_(t+n−1).'
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i8
+  page: 259
+  pdf_page: 281
+  kind: bilgi
+  what: Qσbütün eylem-değer algoritmalarını birleştirir; kaynak SGQσve n-adım durum değerini okuyucuya
+    bırakır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-hedef
+- id: ch11-p259-i9
+  page: 259
+  pdf_page: 281
+  kind: alıştırma
+  what: 11.1:7.9n-adımoffpolicyTDyi yarı-gradyana çevir, episodik ve sürekli getiri tanımlarını ver.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p18
+- id: ch11-p259-i10
+  page: 259
+  pdf_page: 281
+  kind: alıştırma
+  what: 11.2:7.11/7.17n-adımQσyi yarı-gradyana çevir, episodik ve sürekli tanımları kapsa. Kaynak Alıştırma11.2
+    yıldızlıdır (*).
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p19
+- id: ch11-p260-i1
+  page: 260
+  pdf_page: 282
+  kind: bilgi
+  what: Güncelleme dağılımı πdağılımıyla eşleşmeyince politika dışı SGTD basit karşı örneklerde ıraksayabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p260-i2
+  page: 260
+  pdf_page: 282
+  kind: şekil
+  what: Numarasızw→2wparçası:tek parametre,x1/2,ilkdurumdatekeylemikinciyedeterministikR0; tamMDPdeğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p260-i3
+  page: 260
+  pdf_page: 282
+  kind: örnek
+  what: w010,γyaklaşık1,α.1ilew11→12.1yaklaşıkveikincideğer20→22; TD hatası büyür.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p260-i4
+  page: 260
+  pdf_page: 282
+  kind: formül
+  what: δ=(2γ−1)w,ρ1,SGgüncelleme[1+α(2γ−1)]w;γ>.5,α>0vew0≠0içinbüyüme,αhızdeğiştirir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p260-i5
+  page: 260
+  pdf_page: 282
+  kind: bilgi
+  what: Aynıparçageçişitekrar,yalnızdiğergeçişlerdeρ0olduğundaonlarınsönümlemesindenkaçabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p261-i1
+  page: 261
+  pdf_page: 283
+  kind: bilgi
+  what: Politikaüstündeherρ1;w→2wsonrasıçıkışdakihayaliödülvaatleriödenmelidir,sonluγ<1modeldebüyümeninbaşkayönlerdeazalmasıgerekir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p261-i2
+  page: 261
+  pdf_page: 283
+  kind: örnek
+  what: Baird7durum2eylem:kesikdüzgün6üst,düzalt7; b6/7kesik1/7düz,πhepdüz,R0,γ.99,bdağılımı/başlangıçdüzgün7,πuzundönemalt.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p261-i3
+  page: 261
+  pdf_page: 283
+  kind: şekil
+  what: Şekil11.1:6üst2wi+w8,altw7+2w8,düzhepsindenalta/altöz-döngü,kesikalttanüst6veüstlerarası;olasılıklar/γetiketleri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p261-i4
+  page: 261
+  pdf_page: 283
+  kind: bilgi
+  what: Kaynakepisodikderama7durumşemasındaterminalyok;hesaplananmodeldevameden7durumolarakaçık,verilmemişterminaluydurulmaz.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p262-i1
+  page: 262
+  pdf_page: 284
+  kind: formül
+  what: Bairdx1=(2,0,0,0,0,0,0,1)vegenel7×8X;vgerçek0,w0temsili,yedibağımsızsatır8parametre=>çözümlerçok,ranksütun8değil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p262-i2
+  page: 262
+  pdf_page: 284
+  kind: bilgi
+  what: SGTDuygunsuzAmodundayalnızküçükαilekurtulmaz;özelbaşlangıçaltuzayı/uygunkoşullarayrılır.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p262-i3
+  page: 262
+  pdf_page: 284
+  kind: formül
+  what: 11.9:deterministikeşzamanlıSGDPw+=α/|S|Σs[Eπ(R+γv′|s)−v(s)]∇v(s);rasgelelikveasenkronyok.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p262-i4
+  page: 262
+  pdf_page: 284
+  kind: şekil
+  what: Şekil11.2:SGoffpolicyTD1000adım/SGDP1000sweep,α.01,w=(1,1,1,1,1,1,10,1),w8/w1..6büyür,w7ayrı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p262-i5
+  page: 262
+  pdf_page: 284
+  kind: bilgi
+  what: UniformDPyerineπgüncelleme dağılımı doğrusal TDuygunkoşullarıyla9.14hatasınırınıverir;alttekdestekteüstdeğerlerbelirlenmez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p263-i1
+  page: 263
+  pdf_page: 285
+  kind: bilgi
+  what: Q-learningdebenzerıraksamalar;yakınb/πεgreedykurtarabilirfikrivekarşıörnekbilinmediği/noanalysisiddiası2018yazarufku,genelbugüngarantisideğil.
+    Q-learning kontrol yöntemleri içinde en iyi yakınsama garantili yöntem diye kaynak dönemi değerlendirmesi
+    de korunur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p263-i2
+  page: 263
+  pdf_page: 285
+  kind: bilgi
+  what: Her Bellmanhedefine tamLSuydurmakBairdbağımsızsatırlarındaexactDPyekurtarır,amaözellikuzayıkısıtlıysagarantiyok.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p263-i3
+  page: 263
+  pdf_page: 285
+  kind: örnek
+  what: Örnek11.1Tsitsiklis–VanRoy:ikiözellik1/2,w0gerçek0temsil;heradımuniformVEileBellmanhedefineentamLSuydurmabileıraksayabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p263-i4
+  page: 263
+  pdf_page: 285
+  kind: şekil
+  what: NumarasızTVRşeması:w→2w0,ikincide1−εöz-döngü/εterminal,kareterminal,R0.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p263-i5
+  page: 263
+  pdf_page: 285
+  kind: formül
+  what: 11.10:argmin[(w−2γwk)²+(2w−(1−ε)2γwk)²]⇒wnew=γ(6−4ε)/5wk;γ>5/(6−4ε),w0≠0ıraksar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p264-i1
+  page: 264
+  pdf_page: 286
+  kind: tanım
+  what: Averagergözlenenhedeflerindışınaekstrapoleyapmayanuygunpozitifnormalizeağırlıklıyaklaşım;NN/yerelağırlıklıregresyonörnek,genelkaro/ANNotomatikdeğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p264-i2
+  page: 264
+  pdf_page: 286
+  kind: alıştırma
+  what: 11.3programlama:Bairdkarşıörneğinetek-adımSGQ-learninguygula,ağırlıkıraksamasınıempirikgöster;eylem-özellikuzantısıaçıklanır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p20
+- id: ch11-p264-i3
+  page: 264
+  pdf_page: 286
+  kind: tanım
+  what: Ölümcülüçlü:fonksiyonyaklaştırma,bootstrap,politika dışı güncelleme dağılımı;uniformtüm-durumDPdeπdağılımınıizlemez.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p264-i4
+  page: 264
+  pdf_page: 286
+  kind: bilgi
+  what: Sorunkontrol/GPIvegürültüdeğil,sabitπtahminvebilinenmodelDPdebilevardır;ikiliuygunyöntemlekararlıolabilir,herkeyfiadımgarantideğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p264-i5
+  page: 264
+  pdf_page: 286
+  kind: bilgi
+  what: Yaklaştırmayıterketmekölçeklenebilirliği/gücüfedaeder;doğrusalçoközellikgerekir,kaynakkümeyiçokzayıf/nonparametrikbüyümeyipahalı,LSTDquadraticbüyükproblempahalıgörür.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p264-i6
+  page: 264
+  pdf_page: 286
+  kind: bilgi
+  what: 'BootstrapolmayanMCöngörüilegetirisonuarasıgeçmişbelleğivesondaöbekhesapister;özelparaleldonanımdamaliyetvonNeumannseriölçümündengizlenebilir.
+    Yön açık: MC maliyeti seri von Neumann bilgisayarda belirgin görünmez, özel donanımda görünür.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p265-i1
+  page: 265
+  pdf_page: 287
+  kind: bilgi
+  what: Bootstrap/izlerveriyiüretildiğiyer/zamandaonlinesonekezişleyerekiletişim/bellekkazandırır;Bölüm12bağlantısı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p265-i2
+  page: 265
+  pdf_page: 287
+  kind: bilgi
+  what: Yürüyüş7.2/9.2,MountainCar10.4ve12.14bootstrapileverihızıkazancı;herproblemdeğil,Tetriszayıftemsil/genellemeSimsekAlgortaKothiyal2016ve9.14asemptotikyanlılıksınırı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p265-i3
+  page: 265
+  pdf_page: 287
+  kind: bilgi
+  what: Uzunnveyaλ≈1ilebootstrapazaltılabilir;durumuagainrecognizestatepropertydeğerlidir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p265-i4
+  page: 265
+  pdf_page: 287
+  kind: bilgi
+  what: Tekhedefmodel-freegörevdeSARSAileoffpolicyvazgeçilebilir;davranışıhedefpolitikadanayırmaesneklikgetirir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p265-i5
+  page: 265
+  pdf_page: 287
+  kind: bilgi
+  what: Çoklupolitika/değertahmininötrduyusalolaylarıdaöğrenir;hayvan/insanbeklentilerigözsonrasıgörüntü,eveyürümesüresi,basketşansı,yeniprojememnuniyeti.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p265-i6
+  page: 265
+  pdf_page: 287
+  kind: bilgi
+  what: Tekdavranışakışındançokfarklıhedefpolitikalarparalelöğrenileceğindenbhepsineeşitolamaz;örtüşeneylem/durumdesteklerioffpolicyveplanlamamodeliöğrenmeyimotiveeder.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-irmak
+- id: ch11-p266-i1
+  page: 266
+  pdf_page: 288
+  kind: tanım
+  what: TümdeğerfonksiyonlarıR^|S|vektörü,çoğupolitikadeğerideğil/parametrikaileyletemsiledilemez;açıkçaçokbüyükvektöryalnızkavramsal.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p266-i2
+  page: 266
+  pdf_page: 288
+  kind: örnek
+  what: 3durum2parametrelidoğrusalXwtemsilleribirdüzlem,wkoordinatları;genelNNtemsilmanifoldudüzlemolmayabilir,vπdüzlemdışında.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p266-i3
+  page: 266
+  pdf_page: 288
+  kind: formül
+  what: 11.11:||v||µ²=Σµ(s)v(s)²,VE=||Xw−vπ||µ²;ilgi/ziyaretµağırlığı,düzÖklidyerine;µ0olanlardayarı-norm/tekiltemsilnüansı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p267-i1
+  page: 267
+  pdf_page: 289
+  kind: şekil
+  what: Şekil11.3:3Ddeğeruzayı/2Dparametredüzlemi,vw,Bπvw,ΠBπvw,PBEveBE/VEvektörleri;tamBellmanveprojeksiyonluyörünge,4ayrıVE/BE/PBE/TDEminimumu.
+    w_TD sabit nokta ve w_1/w_2 parametre eksen etiketleri korunur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p267-i2
+  page: 267
+  pdf_page: 289
+  kind: bilgi
+  what: ŞekildeTDE0etiketigenelbirstokastikproblemdeolamaz;yenigörselhesaplanmışminimumTDEdiyeetiketlenir,4amaçfarkıaçık.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p267-i3
+  page: 267
+  pdf_page: 289
+  kind: formül
+  what: 11.12:Πv=Xargmin||v−Xw||µ²;eniyiVEtemsiliΠvπ,uygunMCasemptotiğibunubulur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p267-i4
+  page: 267
+  pdf_page: 289
+  kind: formül
+  what: 11.13:vπ(s)=ΣaπΣs′,rp[r+γvπ(s′)];Bellmandenklemi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p268-i1
+  page: 268
+  pdf_page: 290
+  kind: formül
+  what: 11.14:Π=X(XᵀDX)−1XᵀD,Dbüyükdiagonalµ,Xsatırx(s)ᵀ;tersyoksapseudoinverse,rank/µdestekkoşulları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p268-i2
+  page: 268
+  pdf_page: 290
+  kind: formül
+  what: 11.15:||v||µ²=vᵀDv.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p268-i3
+  page: 268
+  pdf_page: 290
+  kind: formül
+  what: 11.16:vw=Xw.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p268-i4
+  page: 268
+  pdf_page: 290
+  kind: formül
+  what: 11.17:δbarw(s)=ΣaπΣs′,rp[r+γvw(s′)]−vw(s).
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p268-i5
+  page: 268
+  pdf_page: 290
+  kind: formül
+  what: 11.18:BellmanhatasıkoşullubeklenenTDhatasıEπ[δ|S=s].
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p268-i6
+  page: 268
+  pdf_page: 290
+  kind: formül
+  what: 11.19:BE(w)=||δbarw||µ²;genelde0olamaz,vπtamtemsilgerekir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p268-i7
+  page: 268
+  pdf_page: 290
+  kind: bilgi
+  what: BEminimumuVEminimumundanayrı;tekbirwiddiasıfullrank/pozitifağırlıkkoşuluister,Bairdparametreyedekliliğindewtekdeğildir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p269-i1
+  page: 269
+  pdf_page: 291
+  kind: formül
+  what: 11.20:(Bπv)(s)=ΣaπΣp[r+γv(s′)],BEvektörüBπvw−vw.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p269-i2
+  page: 269
+  pdf_page: 291
+  kind: formül
+  what: 11.21:vπ=Bπvπteksabitnokta,γ<1sınırlılık/properlikkoşulu;Bellmaniterasyonutamuzaydavπyegider.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p269-i3
+  page: 269
+  pdf_page: 291
+  kind: bilgi
+  what: TemsiluzayıdışındagezilemiyorsaΠBπtekraruygulanır;BEprojeksiyonuPBE=Πδbar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p269-i4
+  page: 269
+  pdf_page: 291
+  kind: formül
+  what: 11.22:PBE(w)=||Πδbarw||µ²,TDsabitnoktaAw=bvarsa0,geneloffpolicyherzaman0garantisiAterslenebilirlik/tutarlılıkister.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p269-i5
+  page: 269
+  pdf_page: 291
+  kind: bilgi
+  what: SıfırPBEvarolduğundabileSGTDoffpolicykararsızolabilir;VE/BEminimumundanfarklı,GTD/ETDsonrakibölümlerdir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p269-i6
+  page: 269
+  pdf_page: 291
+  kind: bilgi
+  what: GerçekSGDamaçgradyanıyaklaşımınakararlılıksezgisi;iniş/herbaşlangıçyakınsamasıiçinadım/düzenlilik/gürültükoşullarıgerekir.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-geometri
+- id: ch11-p270-i1
+  page: 270
+  pdf_page: 292
+  kind: bilgi
+  what: MCgerçekSGD,SGbootstrapdeğil;MCgenelNNyakınsamasıuygunSA/Lipschitz/boundedkoşullarla,herkeyfiadımgarantideğil;TsitsiklisVanRoy1997nonlinearSGkarşıörnekleri.
+    Kaynağın hem on-policy/off-policy hem doğrusal olmayan yaklaşım altında sağlam yakınsama değerlendirmesi
+    belirtilir; ek teknik koşullarla okunur.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p270-i2
+  page: 270
+  pdf_page: 292
+  kind: bilgi
+  what: BEamacıpopüleramabuincelemedeçifteörnekleme/yanlıhedef/öğrenilemezlikyüzündensorunlu;yalnızkaynakdönemigenelaraştırmayorumu.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p270-i3
+  page: 270
+  pdf_page: 292
+  kind: tanım
+  what: TDE(w)=ΣµEπδ²=ΣµEbρδ²=Ebρδ²ancakµbdurağandağılımıysa;δR+γv′−v.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p270-i4
+  page: 270
+  pdf_page: 292
+  kind: formül
+  what: 11.23:naiveresidualgradientw+=αρδ[∇v−γ∇v′],örnekhatasınınkaresigerçekgradyanı,TDEyihedeflerBEyigeneldedeğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p271-i1
+  page: 271
+  pdf_page: 293
+  kind: örnek
+  what: Örnek11.2A-split:episodikγ1,onpolicy/tablo,Abaşlangıç,B/Cyarıyarıya,Rilk0,Bson+1,Cson0;trueA.5,B1,C0.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p271-i2
+  page: 271
+  pdf_page: 293
+  kind: şekil
+  what: NumarasızA-splitşemasıA→B0/B→term1,A→C0/C→term0,ikidalyarıyarıya.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p271-i3
+  page: 271
+  pdf_page: 293
+  kind: örnek
+  what: NaiveRG/TDEoptA.5,B.75,C.25;ilkvesonadımδ±.25,kare1/16,ortalamaTDE1/16.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p271-i4
+  page: 271
+  pdf_page: 293
+  kind: örnek
+  what: TrueVdeilkδ±.5karesi1/4,sonδ0,ikiadımaortalamaTDE1/8>1/16;gelenRortalamasıdeğilortalamakarehata.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p272-i1
+  page: 272
+  pdf_page: 294
+  kind: bilgi
+  what: TablodaexactVtemsiledilsebileTDEminimumutemporal smoothingyapar,doğrutahminyerineödültahminartışınıyumuşatır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p272-i2
+  page: 272
+  pdf_page: 294
+  kind: türetim
+  what: BEiçinkoşullugradyan−E_bρδ·E_bρ∇δ,ikiçarpanbağımlısonrakidurumuçiftörneklemeli;Eρ1ileyenidendüzenlenenuzunsatırlaradımadım.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p272-i3
+  page: 272
+  pdf_page: 294
+  kind: bilgi
+  what: AynıörnekleikiEçarpımıyanlı;bağımsızikigelecekörneğiiçinkoşulluaynıgerçekSresetoracle/simülatörgeri-almayetkisigerekir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p272-i4
+  page: 272
+  pdf_page: 294
+  kind: bilgi
+  what: Koşullugeçiş/hedefdeterministikseçifteörnekaynıdır;modelde(S,A)deterministikolmasırasgelehedefeylemliVdebütünPπyideterministikkılmaz.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p272-i5
+  page: 272
+  pdf_page: 294
+  kind: bilgi
+  what: ResidualGDuygunSAkoşullarındaBEminimum/durağannokta;linearteklikrankkoşullu,nonlineargenelglobalminvaadideğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p272-i6
+  page: 272
+  pdf_page: 294
+  kind: dipnot
+  what: Dipnot1:Vdeρyerleşimindeküçükfarkkalır,eylem-değerdedirektsampleikicharpanınaiveyerinekoymaaynıalgoritmayadöner.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p273-i1
+  page: 273
+  pdf_page: 295
+  kind: bilgi
+  what: ResidualGDyavaş;BairdMoore1999baştaSGsonraresidualkarışımıyla hızönerir;tabloBE0yapabiliramaFAdeğerikötüolabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p273-i2
+  page: 273
+  pdf_page: 295
+  kind: örnek
+  what: Örnek11.3A-presplit:A1/A2ayrıgerçekdurumortakAözelliği,başlangıç.5/.5,A1→B0→term1,A2→C0→term0;B/Cayrıbağımsızözellik.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p273-i3
+  page: 273
+  pdf_page: 295
+  kind: şekil
+  what: NumarasızA-presplitşeması4gerçekdurum/3gözlemveikikiterminal,aliasA1/A2vurgusu;basılı3-stateifadesigözlemisayısınıkarıştırır.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p273-i4
+  page: 273
+  pdf_page: 295
+  kind: örnek
+  what: A-splitleaynıgözlemverisi,VEiyiA.5/B1/C0,SGTDoraya;naiveRGveBEminimumuA.5/B.75/C.25,alttageçişlerdeterministik=>BE=TDE.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-residual
+- id: ch11-p274-i1
+  page: 274
+  pdf_page: 296
+  kind: tanım
+  what: BuradaöğrenilebilirlikPACpolinomverimlilikdeğil;sonsuzözellik/eylem/ödülverisindenbileenazbiridentifiabilityimkanı;gizliMDPbilinirsehesaplanabilipveridençıkarılamayabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p274-i2
+  page: 274
+  pdf_page: 296
+  kind: dipnot
+  what: Dipnot2:yalnızözellikyerinegerçekdurumdizisigözlensebuyapılaröğrenilebilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p274-i3
+  page: 274
+  pdf_page: 296
+  kind: dipnot
+  what: Dipnot3:MRPherdurumdatekeylemliMDPdir,karşıörneklerMDPyegeçer.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p274-i4
+  page: 274
+  pdf_page: 296
+  kind: şekil
+  what: NumarasızikiMRP:soltekx1öz-döngüödül0/2yarıyarıya;sağikix1durumyarıyarıyakal/geç,ödülkaynakduruma0veya2.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p274-i5
+  page: 274
+  pdf_page: 296
+  kind: örnek
+  what: İkimodeldeaynıgözlenenözellik1/ödüliid0/2;sağbaşlangıçdüzgün,sezgiselayrıgizliyapısonsuza kadarayırtedilemez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p275-i1
+  page: 275
+  pdf_page: 297
+  kind: bilgi
+  what: Ödülünrastgeleliğininhangi gizli durumdankaynaklandığı/gerçekdurumsayısıayırtedilemez;sağmodelinödülüdurumlakoşulludeterministikamaPgeçişihâlârasgele.
+    Kaynağın özgün MRP stokastik mi deterministik mi öğrenilemez ifadesi ayrıca verilir; ödül/koşullu
+    geçiş ayrımıyla düzeltilir.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p275-i2
+  page: 275
+  pdf_page: 297
+  kind: örnek
+  what: γ0içintruevsol1/sağ0,2;w1ikensolVE0/sağVE1;aynıveridağılımınarağmenVEöğrenilemez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p275-i3
+  page: 275
+  pdf_page: 297
+  kind: bilgi
+  what: µeşleninceikiMRPninVEargminiw1ortak;amaçdeğerininkendisiöğrenilemeyebilirfakatminimizeedenparametrekümesiöğrenilebilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p275-i4
+  page: 275
+  pdf_page: 297
+  kind: formül
+  what: 11.24:RE=E[(G−vhat)²]=VE+E[(G−vπ)²],ikinciterimwindependent;sonluikinci momentveaynıµkoşulu. Denklem11.24
+    kaynakta açıkça on-policy durumda sunulur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p275-i5
+  page: 275
+  pdf_page: 297
+  kind: alıştırma
+  what: 11.4:REyiSye koşulla,vπekleçıkar,kareyiaç,karma terimin0olmasınıgöstererek11.24kanıtla. Kaynak
+    Alıştırma11.4 yıldızlıdır (*).
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p21
+- id: ch11-p275-i6
+  page: 275
+  pdf_page: 297
+  kind: bilgi
+  what: BEdehemamaçhemminimizeedenparametreninöğrenilememesiiçinbirsonrakikutudaayrıkarşıörnek.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p276-i1
+  page: 276
+  pdf_page: 298
+  kind: örnek
+  what: Örnek11.4aynıgözlemverilifarklıBEminimumluikiMRP;sol2farklıözellikA/B,sağ3durumB/B′alias2parametre.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p276-i2
+  page: 276
+  pdf_page: 298
+  kind: şekil
+  what: NumarasızBEkarşıörneğisolA→B0,B→A+1yarı/B→B−1yarı;sağA→B/B′0yarı,B→A+1,B′→B/B′−1yarı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p276-i3
+  page: 276
+  pdf_page: 298
+  kind: bilgi
+  what: Sağµüçtede1/3,solgözlemµA1/3,B2/3;görünenBkuzunluğu2^−k,herBödül−1sonB+1,herAödül0;istatistikayrımıyok.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p276-i4
+  page: 276
+  pdf_page: 298
+  kind: örnek
+  what: w0solBE0sağBE2/3;BEveridağılımınıntekfonksiyonudeğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p276-i5
+  page: 276
+  pdf_page: 298
+  kind: formül
+  what: SolBEargmin0γ<1;sağbasılılimγ↑1(−.5,0)B0merkezlenmişlimit,hamLSlimit(−1/3,1/6);normaldenklemlekoşul/düzeltmeveorijinalsayıberaberverilir.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p276-i6
+  page: 276
+  pdf_page: 298
+  kind: bilgi
+  what: AnegatifgelenB+1ileB≈0koşulununA≈−1istemesi/gidenA0ileA≈Bistemesiarasındauzlaşmadır;B0merkezlemedeA−.5.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p277-i1
+  page: 277
+  pdf_page: 299
+  kind: şekil
+  what: Şekil11.4ikiakış:aynıveriyifarklıMDPüretir,VE1/VE2farklıamaortakw*veRE;BE1/BE2farklıminimumlar,öğrenilenPBE/TDEayrıminima.
+    Sağdaki ayrı minimum sembolleri w*_1/w*_2 (BE),w*_3 (PBE),w*_4 (TDE) ve soldaki ortak w* korunur.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p277-i2
+  page: 277
+  pdf_page: 299
+  kind: bilgi
+  what: BEgerçekdurumveyaaynıalttakiSçifteörnekresetoracleyetkisivarsaöğrenilebilir;aynıözelliklivegizliceayrıSyiyerinekoymayerliyetmez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p277-i3
+  page: 277
+  pdf_page: 299
+  kind: bilgi
+  what: BEyanlışamaç/öğrenilemezliksorunlarıPBEyedikkatyöneltir;buidentifiabilitysonucumodelbilgisiniyasaklayanveriscopeiçindir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-ogrenilebilir
+- id: ch11-p278-i1
+  page: 278
+  pdf_page: 300
+  kind: bilgi
+  what: GTD,PBEgradyanınıO(d)hedefler,LSTDO(d²)yerineikinciöğrenilenvektörlehesap/bellekyaklaşıkikikat;linearsıfırPBEiddiasıAtutarlılıkkoşullu.
+    Kaynak GTD için on-policy/off-policy ve doğrusal olmayan yaklaşımda sağlam yakınsama iddiasında bulunur;
+    doğrusal formül ile nonlinear uzantı/kanıt koşulları ayrılır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p278-i2
+  page: 278
+  pdf_page: 300
+  kind: formül
+  what: 11.25:PBE=δbarᵀΠᵀDΠδbar=δbarᵀDXC−1XᵀDδbar;ΠᵀDΠözdeşliğitüretilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p278-i3
+  page: 278
+  pdf_page: 300
+  kind: formül
+  what: 11.26:PBE=(XᵀDδbar)ᵀC−1(XᵀDδbar);C=XᵀDX,pseudoinversenüansı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p278-i4
+  page: 278
+  pdf_page: 300
+  kind: türetim
+  what: Sabitπ/b/doğrusalXile∇PBE=2∇[XᵀDδbar]ᵀC−1[XᵀDδbar];µbdurumdağılımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p278-i5
+  page: 278
+  pdf_page: 300
+  kind: formül
+  what: XᵀDδbar=Eρδx;gradyantransposeE[ρ(γx′−x)xᵀ];C=E[xxᵀ],hedefeyleminρortalaması1.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p279-i1
+  page: 279
+  pdf_page: 301
+  kind: formül
+  what: 11.27:∇PBE=2E[ρ(γx′−x)xᵀ]E[xxᵀ]−1E[ρδx],teksonrakidurumörneğiyleikiçarpanıçarpmaçifteörneklemeyanlılığı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p279-i2
+  page: 279
+  pdf_page: 301
+  kind: bilgi
+  what: Üçbeklentiyi/tümveyakısmiikimatrisiayrıdepolamakveSMtersgüncellemeO(d²)kalır;O(d)iyileştirmeyetmez.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p279-i3
+  page: 279
+  pdf_page: 301
+  kind: formül
+  what: 11.28:yardımcıv≈C−1Eρδx,ikincivektörünvπdurumdeğerindenayrımı.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p279-i4
+  page: 279
+  pdf_page: 301
+  kind: formül
+  what: LMSv+=βρ(δ−vᵀx)x;ρδregresyonuordinaryLMSβ(ρδ−vᵀx)xfarkıaynıbeklenendrift/noisefarkıylaaçık.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p279-i5
+  page: 279
+  pdf_page: 301
+  kind: formül
+  what: 11.29:GTD2türetimiC−1Eρδxyerinevsonraörnekleme⇒w+=αρ(x−γx′)(xᵀv),iççarpımönceO(d).
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p280-i1
+  page: 280
+  pdf_page: 302
+  kind: tanım
+  what: GTD2soniççarpımxᵀvönceyapılırsaO(d),matrisoluşturmadan.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p280-i2
+  page: 280
+  pdf_page: 302
+  kind: türetim
+  what: TDCtüretimiEρxxᵀ=E[xxᵀ]=CileilkparçayıEρδxgeridöndürür;w+=αρ[δx−γx′(xᵀv)],TD0withgradientcorrection/GTD0adları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p280-i3
+  page: 280
+  pdf_page: 302
+  kind: şekil
+  what: Şekil11.5örnekTDC/expectedTDC1000adım/sweep,α.005β.05,w0Baird/yardımcıbaşlangıç0kendiuygulamadaaçık;w1..6/w7/w8/√VE/√PBEetiketleri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p280-i4
+  page: 280
+  pdf_page: 302
+  kind: bilgi
+  what: PBEyakın0iken1000sonra√VEyaklaşık2,bileşenler0değil;ufakPBEdeğertahmininindoğruolduğunugöstermez,yavaşilerleme.
+    Metin VE yaklaşık2 der, grafik sqrt(VE) gösterir; özgün metin/grafik büyüklük ayrımı açık tutulur.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p281-i1
+  page: 281
+  pdf_page: 303
+  kind: formül
+  what: Bairdtrue0içinw∝(1,1,1,1,1,1,4,−2);büyüknegatifsonbileşen/gaugeparametreyedekliliği.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p281-i2
+  page: 281
+  pdf_page: 303
+  kind: bilgi
+  what: GTD2/TDCikiöğrenimcascade;wbirincil,yardımcıvδyebağımlıamaikincizamanölçeğindewquasifrozen,kaynaktakietkilenmezsözüliteralbağımsızlıkdeğil.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p281-i3
+  page: 281
+  pdf_page: 303
+  kind: formül
+  what: İkizamanölçekliproofβt→0veαt/βt→0,SA/toplam/boundedkoşullarla;Sabitαβdeneyi buproofkoşullarını
+    sağlamaz.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p281-i4
+  page: 281
+  pdf_page: 303
+  kind: kaynakça
+  what: GTD/GQkontrolMaei2010,izlerMaei2011/MaeiSutton2010,nonlinearMaei2009,hybridHackman2012/WhiteWhite2016,proximal-controlvariateMahadevan2014/Du2017;ençokbilinen/kullanılaniddiası2018.
+    Hybrid yöntemler π/b çok farklıysa GTD, aynıysa yarı-gradyan gibi davranır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p281-i5
+  page: 281
+  pdf_page: 303
+  kind: bilgi
+  what: ETDikinciyol:onpolicyApozitifyapısınıyenidenağırlıklandırma;ρhedefgeçişinidüzeltiramadurumµbkalır,uyumsuzlukkararlılıksorunu.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p281-i6
+  page: 281
+  pdf_page: 303
+  kind: dipnot
+  what: Dipnot4basılıAcross-momentE[xEπx′ᵀ]eksik;9.11/türetimleA=E_b[ρx(x−γx′)ᵀ]olmalı,x/γterimlerigerikonur.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-gtd
+- id: ch11-p282-i1
+  page: 282
+  pdf_page: 304
+  kind: bilgi
+  what: Tekbironpolicydurumdağılımıyok;episodikfarklıbaşlangıçlarπgeçişlerinisonakadarizleyincefarklıgeçerliziyaretağırlıklarıyaratır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-etd
+- id: ch11-p282-i2
+  page: 282
+  pdf_page: 304
+  kind: bilgi
+  what: İndirimγ.9heradım.1pseudoterminationgibigörülebilir;alttakidurumakışınıdeğiştirmez,öğrenilengetiriyi/iziveyenidenbaşlangıçsayımınıetkiler.
+    Yeniden başlatma isteğe bağlıdır; sözde sonlanma yeni durumları on-policy dağılıma eklemeye devam
+    etme zorunluluğunu kaldırır, restart sayılmazsa indirim sınırlı on-policy dağılım verir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-etd
+- id: ch11-p282-i3
+  page: 282
+  pdf_page: 304
+  kind: formül
+  what: ETD0δ=R+γv′−v,w+=αMtρtδ∇v,Mt=γρt−1Mt−1+It,M−1=0,ilgiInegatifolmayanuygundestekli;başlangıçvecurrentρzamanindeksleri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-etd
+- id: ch11-p282-i4
+  page: 282
+  pdf_page: 304
+  kind: bilgi
+  what: BairdbeklenentamgüncellemelerdeI1veα.03salınıpsonraVE0;örneklenmişETDyüksekvaryansnedeniylegüvenilirgösterilmez,teorikuygunkoşulyakınsamasıpratiksabitadımiddiasıdeğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-etd
+- id: ch11-p282-i5
+  page: 282
+  pdf_page: 304
+  kind: bilgi
+  what: KaynağınbeklentiyörüngesiodaklıdeterministiksweepverisiniadaptiförnekwtamEsiyleözdeşsaymamak;gürültüsüzbeklenengüncellemeyadeklarasyonaçık.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-etd
+- id: ch11-p283-i1
+  page: 283
+  pdf_page: 305
+  kind: şekil
+  what: Şekil11.6beklenenETD1000sweep,α.03,I1,wbaşlangıçBaird,w1..6/w7/w8/√VEetiketleri,erkenbüyüktepe/salınımsonraVE0.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+  figure: türetildi
+  note: 'Plan: kendi hesaplanmış SVG/deney karşılığı; kaynak pikselleri/eğrileri alınmaz. Sayısal tutarlılık/koşul
+    düzeltmeleri özgün rapordan ayrılır.'
+- id: ch11-p283-i2
+  page: 283
+  pdf_page: 305
+  kind: bilgi
+  what: Offpolicyninuzakhedeftebilgisi/varyansısorunlu,hiçörtüşmezsebaşkagörevdenöğrenilemez;herestimatördevaryanskesinbüyüriddiasıdeğil.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p283-i3
+  page: 283
+  pdf_page: 305
+  kind: bilgi
+  what: Birçokyakınamafarklıpolitikayagenellemehedefi,komşupolitikalarveveriörtüşmesiileoffpolicymotivasyonu.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p283-i4
+  page: 283
+  pdf_page: 305
+  kind: formül
+  what: Önemoranlarıkoşullubeklentide1,ardışıkoranlaruyguncoverageileilişkisizamaillabağımsızdeğil;çarpımortalaması1,towerproperty,varyansıbüyükolabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p283-i5
+  page: 283
+  pdf_page: 305
+  kind: bilgi
+  what: ρürünleriαileçarpılıpbüyüktekadım/noktadagradyanyöndeğişimineyolaçar,SGDçokadımortalamasısezgisinizorlar.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p284-i1
+  page: 284
+  pdf_page: 306
+  kind: bilgi
+  what: Enbüyüksıçramayaküçükαseçmekortalamaöğrenmeyiyavaşlatır.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p284-i2
+  page: 284
+  pdf_page: 306
+  kind: kaynakça
+  what: Varyans/yavaşlıkiçinmomentumDerthick1984,Polyak1990/Ruppert1988/PolyakJuditsky1992ortalama,Jacobs1988/Sutton1992b,cparametreadımları,KarampatziakisLangford2010importance-aware.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p284-i3
+  page: 284
+  pdf_page: 306
+  kind: kaynakça
+  what: AğırlıklıISgeneldebuyapılardadahaiyihuylu,varyanskarşılaştırmasıkoşullu;FAyeO(d)yaklaşıkuyarlamaMahmoodSutton2015.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p284-i4
+  page: 284
+  pdf_page: 306
+  kind: kaynakça
+  what: TreeBackupönemoranıkullanmadanoffpolicy;MunosStepletonHarutyunyanBellemare2016/MahmoodYuSutton2017kararlıverimliuzantılar(kaynak‘offpolicyyeuzatma’sözüilkalgoritmayıonpolicysaydırmaz).
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p284-i5
+  page: 284
+  pdf_page: 306
+  kind: kaynakça
+  what: Precup2006recognizerhedefpolitikayıbkısmenbelirleyerekoranlarısınırlar;baştaistenentargetözgürlüğündenödün.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p284-i6
+  page: 284
+  pdf_page: 306
+  kind: bilgi
+  what: Özet:keşif-sömürüveçokluhedeföğrenme,davranıştahakkümündenözgürlük;özelörneklerdemümkünamaistenenherdurumdaverimligarantideğil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p284-i7
+  page: 284
+  pdf_page: 306
+  kind: bilgi
+  what: İlkhedefdüzeltmesi/tablodanuzantılarISvaryansbedeli,ikinciSGbootstrapFAkararlılığıüçlübirleşimindesürer.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-varyans
+- id: ch11-p285-i1
+  page: 285
+  pdf_page: 307
+  kind: bilgi
+  what: 'Özetsonu:BEözellikverisindenöğrenilemez;PBEgradyanıO(d)ikinciw/adımister,ETDdurumağırlığıözelkararlılığıonarır;hangiaraçeniyiaçıkaraştırmadurumu2018.
+    Açık araştırma soruları: yeni yöntem karmaşıklıkları gerçekten gerekli mi; hangileri varyans azaltmayla
+    etkili birleştirilir?'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p285-i2
+  page: 285
+  pdf_page: 307
+  kind: kaynakça
+  what: 11.1Sutton1988linearTDλ,semi-gradientadı2015a,genelρoffpolicyTD0açıkbiçimSuttonMahmoodWhite2016;eylemdeğerPrecupSuttonSingh2000+izler;ortalamauzantılarsınırlıaraştırılmış/nstepyenikaynakdönemi.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p285-i3
+  page: 285
+  pdf_page: 307
+  kind: kaynakça
+  what: 11.2w→2w/TVRkarşıörnekTsitsiklisVanRoy1996;Baird1995küçükdeğişiklikli,Gordon1995/1996baveragers,BoyanMoore1995offpolicyDP;Bradtke1993linearLQRQyakınsamasınarağmenkararsızpolitikaya.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p285-i4
+  page: 285
+  pdf_page: 307
+  kind: kaynakça
+  what: 11.3üçlüyüSutton1995bfarketti,TVR1997inceledi,adSutton2015a.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p285-i5
+  page: 285
+  pdf_page: 307
+  kind: kaynakça
+  what: 11.4linearoperatoranaliziTVR1996/1997,geometrişemalarıLagoudakisParr2003iledevam.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p286-i1
+  page: 286
+  pdf_page: 308
+  kind: kaynakça
+  what: KitabınBπBellmanoperatorüliteratürdeTπdynamicprogrammingoperator,genelTλTDλoperatorTVR1996/1997.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p286-i2
+  page: 286
+  pdf_page: 308
+  kind: kaynakça
+  what: 11.5BEamacıSchweitzerSeidmann1985DP,Baird1995/1999TD/residualmin;A-splitDayan1992,ikibiçimSutton2009a.
+    BE=Bellman error/Bellman residual, BE minimization=Bellman residual minimization ad eşleşmeleri.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p286-i3
+  page: 286
+  pdf_page: 308
+  kind: bilgi
+  what: 11.6learnabilityincelemesibubaskıdayeni.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p286-i4
+  page: 286
+  pdf_page: 308
+  kind: kaynakça
+  what: 11.7GTDilkSuttonSzepesvariMaei2009b,buradayöntemlerSutton2009a/Mahmood2014,proximalMahadevan2014(kaynakMahadevalyazımı),empirikGeistScherrer2014/DannNeumannPeters2014/White2015/GhiassianWhiteWhiteSuttonhazırlık2018,Yu2017teori.
+    Listelenen ampirik çalışmalar kaynak dönemine kadar en duyarlı incelemeler diye değerlendirilmiştir.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
+- id: ch11-p286-i5
+  page: 286
+  pdf_page: 308
+  kind: kaynakça
+  what: 11.8ETDSuttonMahmoodWhite2016,tamkanıtYu2015/2016/YuMahmoodSutton2017,HallakTamarMannor2015/HallakTamarMunosMannor2016.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-off-tarih
 chapter_counts:
   '1':
     items: 159
@@ -17230,3 +18492,28 @@ teaching_extensions:
   status: eklendi
   what: İndirimli sabit başlangıç ile kendi durağan amaç sıralaması farkı.
   where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: teach-ch11-22
+  kind: alıştırma
+  what: Kendi koşul denetimi:C16/7,A0,b10/7=>PBE25/28.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p22
+- id: teach-ch11-23
+  kind: alıştırma
+  what: 'Kendi hata bulma: küçükPBE/VE ve parametre null yönü.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p23
+- id: teach-ch11-24
+  kind: alıştırma
+  what: 'Kendi yöntem seçimi: aynı fizikselS bağımsız ikinci gelecek oracle.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p24
+- id: teach-ch11-25
+  kind: örnek
+  what: Kendi çözülmüş A-split amaç karşılaştırması.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p25
+- id: teach-ch11-8
+  kind: kod
+  what: Kendi PyTorch tam artık ve bağımsız ikinci örnek çalışması.
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#extra:x8

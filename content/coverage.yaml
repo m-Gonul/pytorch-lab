@@ -358,12 +358,11 @@ groups:
         yeni kod eki. Mountain Car141294181 fiziksel geçiş/tek sansürlü ayar; erişim8×2m ve bağımsız44-durum oracle.
         Bütün kitap tamamlanmadı.
     - src: Sutton ve Barto (2018), Bölüm 11 — Yaklaşımla politika dışı yöntemler (s. 257–286)
-      topics: 4 numaralı alıştırma; 6 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
-      pages:
-      - m11-6-dqn
-      status: eksik
-      gap: Kaynağın bu bölümü henüz aktarılmadı; hedefler yalnız konu eşlemesi adaylarıdır.
-      done: Sayfa ve numaralı öğe envanteri çıkarıldı. İçerik kapsamı tamamlanmış sayılmadı.
+      topics: Hedef/dağılım ayrımı, yarı-gradyan off-policy n-adım/Qσ, Baird/TVR/üçlü, VE/BE/PBE/TDE geometrisi, çift örnekleme/öğrenilebilirlik, GTD2/TDC, ETD/varyans ve tarih.
+      pages: [m11-6-dqn]
+      status: genis
+      gap: Bu bölümde açık kaynak birimi yok. Kitabın12–17 bölümleri ve ön/arka materyali işlenmedi.
+      done: 156 kaynak birimi,4 çözümlü alıştırma,12 kaynak görseli karşılığı,29 numaralı denklem,4 dipnot.30 metin ve30PNG sayfası; bağımsız kaynak/defter okuması kapandı. M11.6 korunup genişletildi;8 yeni kart,4 deney/24 önayar,12 hesaplanan SVG grubu,2 kod eki. Dört100000-geçiş Q koşusu ve4096×1000 gerçek ETD koşusu bağımsız hesaplarla denetlendi. Kitap tamamlanmadı.
     - src: Sutton ve Barto (2018), Bölüm 12 — Uygunluk izleri (s. 287–320)
       topics: 14 numaralı alıştırma; 14 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
       pages:

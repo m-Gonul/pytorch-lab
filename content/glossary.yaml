@@ -293,3 +293,10 @@ terms:
   diferansiyel değer: "Bias: uzun dönem ortalama ödüle göre geçici beklenen avantaj; Poisson çözümü bir sabite kadar belirlenir, normalizasyon ve limit tanımı belirtilir."
   poisson denklemi: "Ortalama ödül için h=r−ρ1+Ph denklemi; h referans durum veya durağan ortalamasıyla sabitlenir. Poisson sayım dağılımıyla aynı kavram değildir."
   abel limiti: "Önce sabit γ<1 için sonsuz ağırlıklı toplamı hesaplayıp sonra γ↑1 almak; periyodik süreçte normal kısmi toplam limitinden ayrılabilir."
+
+  projected bellman error: "İzdüşümlü Bellman hatası: Bellman artığının özellik uzayına µ-ağırlıklı izdüşümünün kare normu; doğrudan değer hatası değildir."
+  double sampling: "Çifte örnekleme: aynı gerçek duruma koşullu iki bağımsız gelecek örneğiyle iki koşullu beklentinin çarpımını örneklemek."
+  tdc: "TD with gradient correction: ikinci vektörle izdüşümlü Bellman hata gradyanı yönünü öğrenen doğrusal off-policy yöntem."
+  gtd2: "Gradient TD2: ters özellik kovaryansı ile çarpılmış beklenen TD özellik hatasını yardımcı vektörle izleyen O(d) yöntem."
+  followon trace: "Takip izi: önceki önem oranı ve indirimle geçmiş ilgiyi bugünkü vurgu ağırlığına taşıyan ETD izi."
+  averager: "Hedefleri sabit, normalize ve negatif olmayan ağırlıklarla birleştirip hedef aralığı dışına taşmayan yaklaşım operatörü."

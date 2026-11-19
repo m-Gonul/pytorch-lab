@@ -1,0 +1,16 @@
+{
+  "CPP_first100_transitions_checked": 400,
+  "CPP_4_algorithms_final_relative_difference": 4.21593539062649e-15,
+  "CPP_Q_4x100000_final_relative_difference": 2.782374677055751e-15,
+  "whitened_QR_vs_normal_equations_max_differences": [
+    3.3306690738754696e-16,
+    2.220446049250313e-16
+  ],
+  "MSPBE_gradient_finite_difference_max_differences": [
+    1.6040543893147685e-11,
+    1.2510326108383651e-11,
+    7.955178182861289e-12
+  ],
+  "projection_identities": true,
+  "return_error_identity": true
+}
