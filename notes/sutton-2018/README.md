@@ -237,3 +237,41 @@ denetlenir: farklı grafik sayısı/birimleri, ölçüm adlarının eşleşmesi 
 kare görüntü oranı.1280/390 px için16A/B yolu temiz. Ortak runtime özel
 grafik boyutlarını korur; bir tarafta olmayan grafik/ölçüm diğerinden yanlış
 değer almaz.
+
+## Bölüm 10
+
+Basılı s.243–256 / PDF265–278:14 metin sayfası ve14 PNG okundu;78 kaynak birimi,9 alıştırma,5 şekil,4 algoritma kutusu,2 dipnot. Kaynak/defter ikinci okumasını ayrı ajan yaptı; üretim dosyalarını görmedi. Episodik kontrol M11.6 içinde genişledi; yeni M11.13 ortalama/diferansiyel kontrolü içerir. İlk10 bölümün1348 kaynak birimi işlendi; bütün kitap henüz tamamlanmadı.
+
+Yeniden üretim (Python NumPy/SciPy gerektirir):
+
+```bash
+g++ -O3 -std=c++17 -fopenmp notes/sutton-2018/measure_ch10_mountain.cpp -o /tmp/ch10-mountain
+OMP_NUM_THREADS=8 /tmp/ch10-mountain > notes/sutton-2018/measurements_ch10_mountain.json
+g++ -O3 -std=c++17 notes/sutton-2018/measure_ch10_access.cpp -o /tmp/ch10-access
+/tmp/ch10-access > notes/sutton-2018/measurements_ch10_access.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python notes/sutton-2018/verify_ch10_mountain.py
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python notes/sutton-2018/measure_ch10_reference.py
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python notes/sutton-2018/verify_ch10_online.py
+python notes/sutton-2018/generate_ch10.py /tmp/sutton-ch10-figures
+node --test test/ch10-numeric.test.mjs
+```
+
+Mountain Car4 tam100×500 eğri,74 ilk50 ayarı ve9000 bölümlük maliyet yüzeyi koşusu toplam141294181 fiziksel geçiş. **73 tarama ayarı tam100 koşu**, n4/8α1.540702 ayarında99 koşu tamamlandı; koşu47 (tohum1010048), sıfırdan bölüm49,2m bölüm adımı sınırına takıldı. O ayarın mean/SE alanları `null`; başarısızlık/gerçek geçiş saklanır. Kaynak eğrilerine sonradan uydurma yapılmadı. Her tamamlanan bölüm gerçek x=+.5 terminaline ulaştı. Yüzeyler λ0.9/replacing/toplam adım0.3: kaynak dipnotu SARSA(λ) der ama bu ayarları vermez. Step428 ve bölüm12/104/1000/9000 anlarının ağırlıkları,41² maliyet alanları JSON içindedir. Başlangıç tohumları1010001…1010100; eylem akışı+99173. Yüzey tohumu1110001.
+
+Karo kuantizasyonu kaynak tiles3 ölçekleri/odd offsets ile eşlenir. Ham koordinatlar2640 boyutlu doğrudan indeksle saklanır; kaynak IHT4096 kapasitesi bu görevde çakışmayı gerektirmez. Resmî tiles3 URL HTTP/HTTPS bu oturumda500/503 döndürdü; resmî dosyanın indirildiği iddia edilmedi. API integer action girdisi `[a]` olarak açıklanır, doğrulanmamış yazım hatası suçlaması yapılmaz. Eski x1 kendi faz/ofset düzenini korur; gerçek sağ sınır ve idari kesmede bootstrap düzeltildi, default iki çıktılı API korundu.
+
+Bağımsız doğrudan Python ilk50 tek-adım uzunluğunu birebir doğruladı. Beş maliyet alanının en büyük farkı5.997×10⁻¹²; NumPy replacing iz ağırlıkları Step428/bölüm12 için4.95×10⁻¹⁴ /4.97×10⁻¹³. `verify_ch10_online.py`, halka kullanmadan bütün bölüm durumlarını tutar; n1/2/8/16 ve bütçe1/8/1000 örnekleri kompakt JS halkasının bütün2640 ağırlığıyla karşılaştırılır.
+
+Erişim kontrolü iki açık boşalma sırası×tohum1/2/1000001/1000002:16m gerçek adım. Pilot tohumlar1000001/2 korundu;1/2, UI tohum aralığında kaynak ön ayarı oluşturmak için sonuçlarına bakılmadan seçildi.10 sunucu, p0.06, α=β0.01, ε0.1, Q/Rbar0. Her meşgul sunucu için bağımsız Bernoulli bizim açık model varsayımımızdır. Ana sırada yeni iş aynı adımda boşalabilir; alternatifte yalnız eski meşguller denenir. Kaynak zamanlama/bağımlılık yapısını tam belirlemez. Son Rbar ve gerçek ortalama, her10000 adımda gain/ortalama/blok,88 Q,44 ziyaret ve ilk100 geçiş saklıdır. JS iki milyonluk sekiz koşunun tamamını Q/gain/ziyaret/ödül için C++ ile eşler.
+
+NumPy11 durum (öncelik öncesi) modeli, bağımsız SciPy44 durum modeliyle denetlendi. İlk taslakta f0 eylem indeksini değiştirmek aynı satırı iki kez topluyordu; satır toplamı2 ve hatalı yaklaşık2.96 gain ortaya çıktı. Asıl eylem ile gerçek kabul ayrıldı; bütün satırlar1 ve gain2.74764195. Diğer sıranın optimumu2.67319221; ε0.1 kısıtlı değerler2.64689437/2.56973866. Kaynağın yaklaşık2.31 kestirimi ve6/4/2/1 öğrenilmiş eşikleri kendi raporumuzla karıştırılmadı. Öğrenen p/model bilmez; oracle yalnız doğrulama içindir.
+
+Bilimsel kapsam notları: ham merkezli sonsuz rastgele toplam genelde yakınsamaz; beklenen-kısmi-toplam/Poisson/Abel tanımı gerekir. h ortak sabite kadar belirlenir. Jγ=ρ/(1−γ) kanıtı **her politikanın kendi durağan dağılımını** kullanır; bütün discounted FA kontrolünün olanaksızlığı çıkmaz. n-adım gain izinde δ/n veya nβ izi gerekir; başlangıç katsayısını kaldırmak adaptif Q hedeflerinde gerçek gain yansızlığı değildir. Wan–Naik–Sutton (2021) birincil PDF yalnız Differential Q-learning biçimini/koşullarını doğrulamak için okundu; bütün makale aktarılmadı. Sabit adım/genel FA yakınsama iddiası yok.
+
+Kompakt tarayıcı verisini yeniden üretmek için figür betiğinin ürettiği `ch10-mountain.js` dosyasını `site/js/data/` altına kopyalayın. Yerel build/sunucu ardından görsel denetimleri yeniden çalıştırın (Playwright ve `/usr/bin/chromium` gerekir):
+
+```bash
+python notes/sutton-2018/check_ch10_browser.py --base http://localhost:8000 --out /tmp/ch10-shots
+python notes/sutton-2018/check_ch10_ab.py --base http://localhost:8000 --out /tmp/ch10-ab-shots
+python notes/sutton-2018/check_ch10_svg.py --base http://localhost:8000 --out /tmp/ch10-svg-shots
+```

@@ -203,4 +203,3 @@ data_dir.mkdir(parents=True,exist_ok=True)
 for name,data in [('walk',D),('exact',{k:E[k]for k in ['V','mu','reward','groups','expected_episode_length']})]:
  (data_dir/f'ch9-{name}.js').write_text('// Own computed data; reproducible scripts in notes/sutton-2018.\nexport default '+json.dumps(data,separators=(',',':'))+';\n')
 print('16 new figure groups; 18 square-wave curves; 16 tile kernels; own computed geometry.')
-

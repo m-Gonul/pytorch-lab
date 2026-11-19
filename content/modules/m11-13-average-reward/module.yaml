@@ -1,0 +1,515 @@
+id: m11-13-average-reward
+code: M11.13
+title: 'Sürekli görevler: ortalama ödül ve diferansiyel kontrol'
+phase: 11
+minutes: 480
+prereq:
+- m11-1-markov
+- m11-2-mdp-vi
+- m11-6-dqn
+summary: 'Doğal bitişi olmayan görevlerde adım başı ödülü optimize et: durağan dağılım, gain, diferansiyel
+  değer ve Poisson denklemi. Periyodik halka/Abel limiti, yarı-gradyan SARSA, 10 sunuculu erişim kontrolü,
+  indirimli amacın kapsamı ve n-adım başlangıç izi. Saf Python geçiş/öğrenme → NumPy tam model → PyTorch stop-gradient
+  → bağımsız ajanları vektörleştirme; altı kaynak sorusu çözümlü.'
+goals:
+- '[[ortalama ödül]] ρ ile [[diferansiyel değer]] h kavramlarını ayırmak'
+- '[[poisson denklemi]] h=r−ρ1+Ph ve normalizasyon koşulunu çözmek'
+- Cesàro ortalaması, tek-zaman limiti ve Abel bias farkını açıklamak
+- Diferansiyel SARSA/Q-learning hedeflerini ve koşullarını yazmak
+- Erişim kontrolünde son Rbar, gerçek ortalama ve sabit politika gain değerini ayrı ölçmek
+- n-adım gain izinde δ/n ölçeğini ve başlangıç katsayısını türetmek
+sources:
+- title: Sutton & Barto — Reinforcement Learning, 2e, Bölüm10 (s.243–256)
+  url: http://incompleteideas.net/book/the-book-2nd.html
+  license: CC BY-NC-ND 2.0
+  use: link
+- title: Wan, Naik, Sutton (2021) — Learning and Planning in Average-Reward Markov Decision Processes (yalnız
+    tablosal Q doğrulaması)
+  url: https://proceedings.mlr.press/v139/wan21a.html
+  license: Lisans doğrulanmadı
+  use: link
+hand:
+  groups:
+  - title: A→B→C→A; yalnız A varışı +1
+    fields:
+    - id: rho3
+      label: Ortalama ödül ρ
+      answer: 0.3333333333333333
+    - id: ha
+      label: µᵀh=0 için h(A)
+      answer: -0.3333333333333333
+    - id: hc
+      label: µᵀh=0 için h(C)
+      answer: 0.3333333333333333
+  - title: A ilk1, B ilk0; ödüller dönüşümlü
+    fields:
+    - id: rho2
+      label: Ortalama ödül
+      answer: 0.5
+    - id: abel
+      label: Abel limiti h(A)
+      answer: 0.25
+  - title: n2, β0.1, Rbar0=10, ödül toplamı2, Q farkı0
+    fields:
+    - id: delta
+      label: Ham δ
+      answer: -18
+    - id: bad
+      label: İlk naif iz sonrası Rbar
+      answer: -8
+    - id: good
+      label: İlk doğru iz sonrası Rbar
+      answer: 1
+  verify: 'answers=dict(rho3=1/3,ha=-1/3,hc=1/3,rho2=1/2,abel=1/4,delta=2-2*10,bad=10+(2-2*10),good=10+(2-2*10)/2)
+
+    '
+stages:
+  b:
+    engine: browser
+  c:
+    engine: browser
+  d:
+    engine: torch
+  e:
+    engine: torch
+extras:
+- id: x1
+  title: '10.9: gerçek n-adım diferansiyel SARSA ve gain izi'
+  engine: browser
+- id: x2
+  title: '10.4: tablosal Differential Q-learning, azalan adım'
+  engine: browser
+quiz:
+- q: Diferansiyel değer fonksiyonuna bütün durumlarda aynı sabit eklenirse ne olur?
+  options:
+  - t: Gain ve TD farkı aynı kalır.
+    ok: true
+    why: Sonraki ve mevcut değerdeki sabitler iptal olur.
+  - t: Her ödüle bu sabit eklenir.
+    why: Ödül ortam verisidir; yalnız değer normalizasyonu değişti.
+- q: Sabit adımlı son Rbar neyi ölçer?
+  options:
+  - t: Uzun dönem ödül için dalgalanan bir TD kestirimini.
+    ok: true
+    why: Gerçek toplam ödül / adım ile özdeş değildir.
+  - t: Öğrenme sırasında ödüllerin tam örnek ortalamasını.
+    why: Bu ayrı toplanmalıdır.
+homework:
+- title: Erişim kontrolünde zamanlama ve n-adım karşılaştırması
+  paper: Sutton–Barto, Örnek10.2 ve Alıştırma10.9
+  url: http://incompleteideas.net/book/the-book-2nd.html
+  level: ileri
+  hours: 8
+  goal: Her iki boşalma sırası için n1/2/4/8, en az10 tohum ve her koşu2m gerçek geçişle diferansiyel SARSA
+    karşılaştır. Öğrenen p bilmesin; son politikayı oracle ile ayrı değerlendir.
+  steps:
+  - α,β ve iz tanımını sonuçlara bakmadan seç; n ölçeğini kaydet.
+  - Rbar, gerçek ortalama, son blok ve dondurulmuş politika gain ölç; ziyaretleri sakla.
+  - Aynı normalizasyonla Q ve Poisson değerlerini karşılaştır; az görülen durumları işaretle.
+  accept:
+  - Tüm fiziksel adımlar sayılmış; eksik koşular gizlenmemiş.
+  - Tohumlar arası SE ve her modelin kesin gain referansı raporlanmış.
+  - Sonlu sabit-adım deneyinden genel yakınsama teoremi çıkarılmamış.
+labs:
+- id: l1
+  lab: returnbias
+  title: Merkezli toplam, Poisson ve Abel
+  goal: Periyodik halka ile ergodik gürültülü tek durumu ayrı hesapla.
+  predict:
+    q: Doğru Poisson değerleri varken periyodik kısmi toplam yine salınabilir mi?
+    options:
+    - t: Evet
+      ok: true
+      why: Üç durumlu halkada h çözülebilir ama merkezli toplam ufuk mod3 ile değişir.
+    - t: Hayır
+      why: Koşulları formül ve ölçümle karşılaştırın.
+  presets:
+  - name: '10.6: üç durum'
+    params:
+      kind: 0
+      T: 24
+      g: 0.999
+      stay: 0
+    note: ρ1/3; merkezlenmiş h(A)=−1/3.
+  - name: '10.7: iki durum'
+    params:
+      kind: 1
+      T: 24
+      g: 0.999
+      stay: 0
+    note: Abel A değeri0.2501251, limit1/4.
+  - name: Kendi aperiodik uzantımız
+    params:
+      kind: 0
+      T: 100
+      g: 0.99
+      stay: 0.2
+    note: Kalma ödülü0; beklenti kısmi toplamı Poisson bias değerine yaklaşır.
+  - name: Tek durum ±1
+    params:
+      kind: 2
+      T: 100
+      g: 0.95
+      seed: 1
+    note: Ham toplamın standart sapması10; beklenen her kısmi toplam0.
+  questions:
+  - q: Bu sonuç hangi koşullarda geçerlidir?
+    a: Sonlu modelde matrisle beklenen değerler; gürültü modunda yalnız tek örnek yol. Ham toplamın varlığı
+      varsayılmaz. Pozitif kalma kaynak değil kendi modelimiz.
+  limits: Sonlu modelde matrisle beklenen değerler; gürültü modunda yalnız tek örnek yol. Ham toplamın varlığı
+    varsayılmaz. Pozitif kalma kaynak değil kendi modelimiz.
+- id: l2
+  lab: accesscontrol
+  title: '10 sunucu: gerçek diferansiyel SARSA'
+  goal: Öğrenilen politika, ziyaret ve üç farklı gain ölçüsünü karşılaştır.
+  predict:
+    q: Sabit adımlı son Rbar ile gerçek ödül ortalaması farklı olabilir mi?
+    options:
+    - t: Evet
+      ok: true
+      why: Tohum1/2m koşusunda Rbar2.60472981, gerçek ortalama2.6349205.
+    - t: Hayır
+      why: Koşulları formül ve ölçümle karşılaştırın.
+  presets:
+  - name: 'Şekil10.5: 2m, tohum1'
+    params:
+      steps: 2000000
+      p: 0.06
+      alpha: 0.01
+      beta: 0.01
+      eps: 0.1
+      order: 0
+      seed: 1
+    note: Son Rbar2.60472981, gerçek ortalama2.6349205.
+  - name: Aynı bütçe, tohum2
+    params:
+      steps: 2000000
+      p: 0.06
+      alpha: 0.01
+      beta: 0.01
+      eps: 0.1
+      order: 0
+      seed: 2
+    note: Son Rbar2.89719034, gerçek ortalama2.636292.
+  - name: Önceden meşguller boşalsın
+    params:
+      steps: 2000000
+      p: 0.06
+      alpha: 0.01
+      beta: 0.01
+      eps: 0.1
+      order: 1
+      seed: 1
+    note: Son Rbar2.67504907, gerçek ortalama2.557305.
+  - name: Kısa koşu
+    params:
+      steps: 10000
+      p: 0.06
+      alpha: 0.01
+      beta: 0.01
+      eps: 0.1
+      order: 0
+      seed: 1
+    note: Aynı algoritma, daha az ziyaret; sonucu çalışma sonunda okuyun.
+  questions:
+  - q: Bu sonuç hangi koşullarda geçerlidir?
+    a: Bağımsız Bernoulli boşalma ve açık zamanlama kendi seçimimiz; kaynak sıralamayı vermez. Oracle öğrenmeye
+      katılmaz. Sonlu tablo, sabit adım ve sınırlı tohumlar; yakınsama/optimalite garantisi yok.
+  limits: Bağımsız Bernoulli boşalma ve açık zamanlama kendi seçimimiz; kaynak sıralamayı vermez. Oracle öğrenmeye
+    katılmaz. Sonlu tablo, sabit adım ve sınırlı tohumlar; yakınsama/optimalite garantisi yok.
+- id: l3
+  lab: discountobjective
+  title: Başlangıç amacı ile durağan amaç
+  goal: İki politika için indirimli ve ortalama amaçları hesapla.
+  predict:
+    q: Sabit başlangıçta γ değişince politika sırası değişebilir mi?
+    options:
+    - t: Evet
+      ok: true
+      why: Kendi örneğimizde eşik γ2/3; kendi durağan dağılımında sıra değişmez.
+    - t: Hayır
+      why: Koşulları formül ve ölçümle karşılaştırın.
+  presets:
+  - name: Kısa ufuk
+    params:
+      g: 0.5
+      ra: 2
+      rb: 4
+      p: 0.5
+    note: Başlangıç değerleri A4, B3.2; gain A2, B8/3.
+  - name: Uzun ufuk
+    params:
+      g: 0.9
+      ra: 2
+      rb: 4
+      p: 0.5
+    note: Başlangıç değerleri A20, B24.827586.
+  - name: γ0
+    params:
+      g: 0
+      ra: 2
+      rb: 4
+      p: 0.5
+    note: S0 başlangıcında B0; durağan amaçta B gain8/3.
+  questions:
+  - q: Bu sonuç hangi koşullarda geçerlidir?
+    a: Kendi iki durumlu modelimiz; kaynak kanıtının kendi µπ ile ağırlıklama koşulunu sınar. Genel discounted
+      FA kontrolünü olanaksız saymaz.
+  limits: Kendi iki durumlu modelimiz; kaynak kanıtının kendi µπ ile ağırlıklama koşulunu sınar. Genel discounted
+    FA kontrolünü olanaksız saymaz.
+- id: l4
+  lab: gainbias
+  title: n-adım izinde başlangıç katsayısı
+  goal: Ham δ ile δ/n normalizasyonunu karşılaştır.
+  predict:
+    q: n2 için naif β/o·δ başlangıç değerini ilk adımda koruyabilir mi?
+    options:
+    - t: Evet
+      ok: true
+      why: ρ0=10 için ilk naif sonuç−8; doğru δ/n yöntemi1.
+    - t: Hayır
+      why: Koşulları formül ve ölçümle karşılaştırın.
+  presets:
+  - name: '10.9: n2'
+    params:
+      n: 2
+      beta: 0.1
+      initial: 10
+      noise: 0
+      T: 30
+    note: İlk ham8.2, naif−8, doğru1.
+  - name: n1
+    params:
+      n: 1
+      beta: 0.1
+      initial: 10
+      noise: 0
+      T: 30
+    note: Naif ve doğru iz n1 için aynı olur.
+  - name: Farklı başlangıç
+    params:
+      n: 2
+      beta: 0.1
+      initial: -10
+      noise: 0
+      T: 30
+    note: İlk doğru sonuç yine1.
+  - name: Dışsal gürültü
+    params:
+      n: 4
+      beta: 0.1
+      initial: 10
+      noise: 1
+      T: 50
+      seed: 1
+    note: Yalnız başlangıç katsayısı gider; hedef gürültüsü kalır.
+  questions:
+  - q: Bu sonuç hangi koşullarda geçerlidir?
+    a: Öğrenenden bağımsız sabit dışsal hedefler. Gerçek sürekli n-adım öğrenme x1 içinde; iz, adaptif hedeflerde
+      gerçek gain için yansızlık iddiası değildir.
+  limits: Öğrenenden bağımsız sabit dışsal hedefler. Gerçek sürekli n-adım öğrenme x1 içinde; iz, adaptif hedeflerde
+    gerçek gain için yansızlık iddiası değildir.
+practice:
+- id: p1
+  type: kod
+  level: 2
+  title: 10.4 — Diferansiyel Q-learning
+  goal: 10.4 — Diferansiyel Q-learning
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: 'Sürekli görev için diferansiyel yarı-gradyan Q-learning sözde-kodu yazın. Davranış eylemini, hedefteki
+    maksimumu, ortalama ödül kestirimini ve parametre güncellemesini belirtin. (Kaynak: Sutton–Barto, s.250,
+    Alıştırma 10.4.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: 'Qθ ve ρbar başlatın, bir S alın. Her adımda bütün izinli eylemleri yeterince ziyaret eden davranıştan
+    A seçin; R,S′ gözleyin. Eski değerlerle δ=R−ρbar+max_b Qθ(S′,b)−Qθ(S,A) hesaplayın. ρbar←ρbar+βδ, θ←θ+αδ∇Qθ(S,A),
+    S←S′. Hedef eyleminin gradyanı alınmaz; terminal veya bölüm sıfırlaması yoktur. Bu biçimsel uzantı için
+    genel fonksiyon yaklaşımı yakınsama iddiası yoktur. x2, Wan–Naik–Sutton (2021) tablosal Differential Q-learning
+    biçimini uygular: tüm güncellemelerde ρbar←ρbar+ηα_t(s,a)δ ve Q(s,a)←Q(s,a)+α_t(s,a)δ. Bu iki adımın bağıntısı,
+    ziyaret ve azalan adım koşulları teoremin parçasıdır; yalnız açgözlü eylemde gain güncelleyen başka R-learning
+    varyantıyla karıştırılmaz.'
+  rubric:
+  - Davranış ile max hedefi ayrılır.
+  - Aynı eski δ iki güncellemede kullanılır.
+  - Hedef türevi alınmaz, γ ve terminal yoktur.
+  - Genel FA için koşulsuz yakınsama ileri sürülmez.
+- id: p2
+  type: açıkla
+  level: 1
+  title: 10.5 — Diferansiyel TD(0) tam algoritması
+  goal: 10.5 — Diferansiyel TD(0) tam algoritması
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: 'Diferansiyel TD(0) için δ=R−ρbar+vθ(S′)−vθ(S) dışında hangi denklemler gerekir? (Kaynak: Sutton–Barto,
+    s.250, Alıştırma 10.5.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: Sabit π altında A∼π(·|S) ile geçiş toplanır; başlangıç θ,ρbar ve S belirlenir. Her geçişte eski
+    değerlerden δ alınır; ρbar←ρbar+βδ ve θ←θ+αδ∇vθ(S), ardından S←S′. Tablosal sürümde yalnız v(S) değişir.
+    Model tabanlı tanımlama için ayrıca ρ=µᵀr, µᵀP=µᵀ ve h=r−ρ1+Ph gerekir; h bir referansa veya µᵀh=0 koşuluna
+    bağlanır. Sabit π için uygun SA/rank/Markov koşulları ayrıca gereklidir; bu satırlar her doğrusal olmayan
+    tahminciye yakınsama kanıtı olmaz.
+  rubric:
+  - Gain ve değer güncellemeleri yazılır.
+  - Sabit politika ve durum ilerlemesi belirtilir.
+  - Diferansiyel değer normalizasyonu açıklanır.
+- id: p3
+  type: hesap
+  level: 1
+  title: 10.6 — Üç durumlu halka
+  goal: 10.6 — Üç durumlu halka
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: 'A→B→C→A deterministik döngüsünde yalnız A durumuna varış +1, diğer geçişler 0 ödül verir. Diferansiyel
+    değerleri bulun. µᵀh=0 normalizasyonunu kullanın; sayısal alana h(A) girin. (Kaynak: Sutton–Barto, s.251,
+    Alıştırma 10.6.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: 'ρ=1/3. Poisson denklemleri hA=−1/3+hB, hB=−1/3+hC, hC=2/3+hA; çözüm (c,c+1/3,c+2/3). Durağan dağılım
+    (1/3,1/3,1/3) ile sıfır ortalama c=−1/3 verir: h=(−1/3,0,+1/3). Halka periyodiktir; sıradan sonsuz merkezli
+    toplamın limiti varmış gibi işlem yapılamaz. Burada Poisson/Abel bias seçilmiştir; hA=0 referansı da (0,1/3,2/3)
+    verir ve aynı politikayı temsil eder.'
+  answer: -0.3333333333333333
+  calc: -1/3
+  tol: 1.0e-07
+  mistakes:
+  - answer: 0
+    msg: Bu A referansını seçer; soru µ-ortalaması0 koşulunu ister.
+- id: p4
+  type: kanıt
+  level: 2
+  title: 10.7 — Önce ufuk, sonra indirim limiti
+  goal: 10.7 — Önce ufuk, sonra indirim limiti
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: 'Ödüller sonsuza kadar +1,0,+1,0… biçiminde dönüşümlüdür. A durumunda ilk ödül +1, B durumunda ilk ödül
+    0. Ortalama ödülü ve h(s)=lim_{γ↑1} lim_{H→∞}Σ_{t=0}^{H−1}γ^t(E[R_{t+1}|s]−ρ) değerlerini bulun. (Kaynak:
+    Sutton–Barto, s.252, Alıştırma 10.7; Denklem 10.13.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: 'ρ=1/2. Sabit 0≤γ<1 için A toplamı (1/2)(1−γ+γ²−…)=1/[2(1+γ)], B bunun negatifidir. Önce sonsuz
+    geometrik toplam alınır, sonra γ↑1: hA=+1/4, hB=−1/4. Sonlu H toplamında önce γ=1 koymak pariteye göre
+    salınır ve bu limiti vermez. Sabit eklemek Bellman denklemini korur; Abel tanımı bu simetrik normalizasyonu
+    seçer.'
+  rubric:
+  - ρ=1/2 bulunur.
+  - Geometrik toplam sabit γ<1 koşuluyla yazılır.
+  - hA=1/4 ve hB=−1/4 elde edilir.
+  - Limit sırasının değiştirilemeyeceği belirtilir.
+- id: p5
+  type: yorumla
+  level: 2
+  title: 10.8 — Ödül hatası mı, TD hatası mı?
+  goal: 10.8 — Ödül hatası mı, TD hatası mı?
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: 'Alıştırma 10.6 halkasında ρbar zaten 1/3. ρbar güncellemesinde R−ρbar kullanılmasıyla δ=R−ρbar+h(S′)−h(S)
+    kullanılmasını karşılaştırın. Hangisi daha kararlı olabilir ve hangi koşulla? (Kaynak: Sutton–Barto, s.252–253,
+    Alıştırma 10.8.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: 'Başlangıç A için yalnız ödül hataları (−1/3,−1/3,+2/3) olarak tekrarlanır. Doğru h=(−1/3,0,+1/3)
+    ile üç TD hatası da0: örneğin A→B için −1/3+0−(−1/3)=0. Böylece gain kestirimi sabit kalır, ödül-only güncellemesi
+    çevrim boyunca dalgalanır. Bu karşılaştırma doğru diferansiyel değeri kullanır. Kötü öğrenilmiş Q/h, TD
+    gürültüsünü büyütebilir; genel varyans azalması teoremi yoktur. Sabit h ve durağan π altında E[h(S′)−h(S)]=0,
+    dolayısıyla iki hatanın ortalaması aynıdır. Öğrenen rastgele ağırlıklar Markov durumuyla ilişkiliyse bu
+    eşitliği koşulsuz sabit-h kanıtı gibi kullanamayız.'
+  choices:
+  - t: Doğru diferansiyel h ile δ bu halkada0; kötü h için üstünlük garantisi yok.
+    ok: true
+    why: Geçişteki öngörülebilir merkezli ödülü h farkı tam iptal eder.
+  - t: TD hatası her yaklaşık h için daha az varyanslıdır.
+    why: Yanlış h kendi değişkenliğini ekleyebilir.
+- id: p6
+  type: kanıt
+  level: 3
+  title: 10.9 — n-adımda başlangıç etkisini kaldırmak
+  goal: 10.9 — n-adımda başlangıç etkisini kaldırmak
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: 'Küçük β ile ρbar başlangıcının etkisi uzun sürer; örnek ortalaması ise sonradan değişime yavaş yanıt
+    verir. Bölüm2 sabit-adım iz hilesini diferansiyel n-adım SARSA kutusuna uyarlayın. (Kaynak: Sutton–Barto,
+    s.255, Alıştırma 10.9.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: 'Aynı güncel ρbar ile δ=Σ_{i=1}^n R_i−nρbar+qboot−qold. Ortalama hedefi Y=(ΣR+qboot−qold)/n olduğundan
+    δ=n(Y−ρbar). o0=0, o_k=o_{k−1}+β(1−o_{k−1}), ρbar_k=ρbar_{k−1}+(β/o_k)(δ_k/n). Q güncellemesi αδ∇q olarak
+    kalır. o1=β olduğu için ilk gain adımı doğrudan Y1 olur, başlangıç katsayısı0. Genel olarak o_k=1−(1−β)^k;
+    gain, Y_i hedeflerinin β(1−β)^{k−i}/o_k ağırlıklı ortalamasıdır. Ham kutudaki βδ katsayısını aynen sürdürmek
+    isterseniz iz adımı nβ olmalıdır: o←o+nβ(1−o), ρbar←ρbar+(β/o)δ; dışbükey ortalama için 0<nβ≤1. Naif β/o·δ,
+    n>1 için ilk gain değerinde (1−n)ρbar0 bırakır: n2,ρbar0=10,ΣR2,q farkı0 için −8; doğru sonuç1. Bu, verilen
+    hedef dizisine göre başlangıç katsayısını kaldırır; adaptif Q/politika altında gerçek ρ için yansızlık
+    ve ilk Q adımının başlangıçtan bağımsızlığı anlamına gelmez. x1 gerçek sürekli n-adım döngüsünü uygular.'
+  rubric:
+  - δ içindeki nρbar fark edilir.
+  - Gain için δ/n ve Q için ham δ ayrılır.
+  - İz ve ilk güncelleme hesabı verilir.
+  - Yansız gerçek gain iddiasının sınırı belirtilir.
+- id: p7
+  type: hesap
+  level: 1
+  title: Bir sabit ekleyince ne değişir?
+  goal: Bir sabit ekleyince ne değişir?
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: ρ=1/3 ve h=(−1/3,0,1/3). Bütün durumlara +7 eklenirse A→B, ödül0 geçişindeki TD hatası nedir? (Kendi öğretim
+    sorumuz.)
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: δ=0−1/3+(0+7)−(−1/3+7)=0. Sabit iptal olur; gain, avantaj farkı ve açgözlü politika değişmez. Tekil
+    değer raporunda normalizasyon yine belirtilmelidir.
+  answer: 0
+  calc: -1/3+(0+7)-(-1/3+7)
+  tol: 1.0e-07
+- id: p8
+  type: yöntem-seç
+  level: 1
+  title: Öğrenen mi, doğrulama modeli mi?
+  goal: Öğrenen mi, doğrulama modeli mi?
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: Ajan p değerini bilmiyor. Son tablosundan oluşturulan ε-politikayı bilinen geçiş matrisiyle değerlendirdik.
+    Bu sayı neyi ölçer? (Kendi öğretim sorumuz.)
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: Tablo o anda dondurulup aynı ε davranışı sonsuza kadar sürdürülse, açıkça seçilen model altındaki
+    politika gain değeridir. Öğrenme sırasında toplanmış gerçek ortalama değildir; son Rbar da değildir. Oracle
+    yalnız doğrulama için kullanılır, öğrenene verilmez.
+  choices:
+  - t: Dondurulmuş son politikanın model altındaki uzun dönem ödülü.
+    ok: true
+    why: Poisson/durağan model hesabı bu sabit politikayı değerlendirir.
+  - t: Öğrenme boyunca alınan ödüllerin tam örnek ortalaması.
+    why: Bu, ödül toplamı / gerçek adım sayısıyla ölçülür.
+- id: p9
+  type: karşı-örnek
+  level: 2
+  title: Ergodiklik ham toplamı kurtarır mı?
+  goal: Ergodiklik ham toplamı kurtarır mı?
+  needs: Diferansiyel Bellman denklemi ve yarı-gradyan güncelleme
+  q: Tek durumlu, ödülü bağımsız ve eşit olasılıklı ±1 olan süreçte ρ=0. Ham Σ(R−ρ) neredeyse kesin yakınsar
+    mı? Beklenen-kısmi-toplam bias değeri nedir? (Kendi öğretim sorumuz.)
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: Hayır. Yakınsayan bir serinin artışları0 değerine gitmelidir; burada her artışın mutlak değeri1.
+    Bu nedenle ham toplam hiçbir örnek yolda yakınsayamaz. Süreç tek durumlu ve aperiodiktir; durum ergodikliği
+    bu sorunu çözmez. Her sonlu ufuktaki beklenen toplam0, dolayısıyla beklenen-kısmi-toplam bias0; Poisson/Abel
+    tanımı da0 verir. E[sonsuz toplam] yazıp limit ile beklentiyi gerekçesiz değiştirmeyin.
+  rubric:
+  - Seri artışlarının0 gereği kullanılır.
+  - Ham rastgele toplam ile beklenen kısmi toplam ayrılır.
+  - Bias0 ve normalizasyon belirtilir.
+pitfalls:
+- wrong: Ergodik zincirde Σ(R−ρ) bir rastgele değişken olarak mutlaka yakınsar.
+  right: Tek durumlu bağımsız ±1 örneğinde bile yakınsamaz. Beklenen-kısmi-toplam bias/Poisson veya açık Abel
+    tanımı gerekir.
+- wrong: Durağan dağılım varsa sabit başlangıçtan dağılım limiti de vardır.
+  right: Periyodik halkada durağan dağılım vardır ama tek-zaman dağılımı salınır; Cesàro ortalaması ayrıdır.
+- wrong: Kaynak bütün indirimli fonksiyon yaklaşımı kontrolünü olanaksız kanıtlar.
+  right: Kanıt her politikanın kendi durağan dağılımıyla ağırlıklanan J amaç fonksiyonu içindir. Sabit başlangıç
+    amacı farklıdır.
+- wrong: β/o izini ham n-adım δ ile kullanmak başlangıcı hemen siler.
+  right: δ içinde nRbar vardır; ortalama hedefi için δ/n ya da nβ ile kurulan iz gerekir.
+- wrong: Hiç görülmeyen durumda Q0 gerçek değeri gösterir.
+  right: Başlangıç değeri ve seyrek ziyaret politikada sahte eşitlikler yaratabilir; ziyaret sayısını inceleyin.
+whatif:
+- q: Bütün h değerlerine7 eklersek?
+  a: TD hatası ve politika değişmez; sayısal raporda seçilen referans belirtilir.
+- q: γ0 seçilince durağan amaç myopik olur mu?
+  a: J=µπᵀr hâlâ politikanın uzun dönem ziyaretlerini içerir; µπ politika değişince değişir.
+- q: Sunucu boşalmasını kabulden önce sayarsak?
+  a: Geçiş çekirdeği ve optimal gain değişir. Buradaki iki açık sıra için kısıtsız optimum2.74764195 ve2.67319221;
+    bunlar kendi modellerimizin sonuçlarıdır.

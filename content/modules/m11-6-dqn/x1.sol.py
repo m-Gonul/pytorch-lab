@@ -4,8 +4,8 @@ import random
 
 def mc_step(p, v, a):
     v = min(max(v + 0.001 * (a - 1) - 0.0025 * math.cos(3 * p), -0.07), 0.07)
-    p = p + v
-    if p < -1.2:
+    p = min(p + v, 0.5)
+    if p <= -1.2:
         p, v = -1.2, 0.0
     return p, v, p >= 0.5
 
@@ -21,7 +21,7 @@ def tiles(p, v, a, n_tilings=8, n=8):
     return out
 
 
-def sarsa_mc(n_eps, alpha=0.5, seed=0, n_tilings=8, max_steps=5000):
+def sarsa_mc(n_eps, alpha=0.5, seed=0, n_tilings=8, max_steps=5000, return_details=False):
     rng = random.Random(seed)
     w = [0.0] * (n_tilings * 9 * 9 * 3)
     step = alpha / n_tilings
@@ -34,7 +34,7 @@ def sarsa_mc(n_eps, alpha=0.5, seed=0, n_tilings=8, max_steps=5000):
         m = max(qs)
         return rng.choice([a for a in range(3) if qs[a] == m])
 
-    lens = []
+    lens, truncated = [], []
     for _ in range(n_eps):
         p, v = rng.uniform(-0.6, -0.4), 0.0
         a = act(p, v)
@@ -44,17 +44,21 @@ def sarsa_mc(n_eps, alpha=0.5, seed=0, n_tilings=8, max_steps=5000):
             steps += 1
             F = tiles(p, v, a, n_tilings)
             qsa = sum(w[i] for i in F)
-            if done or steps >= max_steps:
+            cutoff = max_steps is not None and steps >= max_steps and not done
+            if done:
                 target = -1.0
             else:
                 a2 = act(p2, v2)
                 target = -1.0 + q(p2, v2, a2)
             for i in F:
                 w[i] += step * (target - qsa)
-            if done or steps >= max_steps:
+            if done or cutoff:
                 break
             p, v, a = p2, v2, a2
         lens.append(steps)
+        truncated.append(cutoff)
+    if return_details:
+        return w, lens, dict(truncated=truncated, completed=sum(not t for t in truncated))
     return w, lens
 
 

@@ -6,6 +6,9 @@ def check(ns, R_):
         p, v, d = need(ns, "mc_step")(-0.5, 0.0, 2)
         ensure(abs(v - (0.001 - 0.0025 * __import__("math").cos(-1.5))) < 1e-12 and not d, "fizik")
         ensure(ns["mc_step"](-1.19, -0.07, 0)[:2] == (-1.2, 0.0), "sol duvar")
+        ensure(ns["mc_step"](.49, .02, 2)[0] == .5 and ns["mc_step"](.49, .02, 2)[2], "gerçek sağ sınır")
+        _, capped, detail = need(ns, "sarsa_mc")(2, max_steps=1, return_details=True)
+        ensure(capped == [1,1] and detail["truncated"] == [True,True] and detail["completed"] == 0, "idari kesme başarılı bölüm değildir")
         T = need(ns, "tiles")(-0.5, 0.01, 1)
         ensure(len(T) == 8 and len(set(T)) == 8 and all(i % 3 == 1 for i in T), "8 farklı karo, eylem kodlu")
         res = [need(ns, "sarsa_mc")(100, 0.5, s)[1] for s in range(3)]
@@ -14,5 +17,5 @@ def check(ns, R_):
         ensure(first > 400 and last < 250, f"bölüm uzunluğu {first:.0f} → {last:.0f}")
         R_.table("Dağ arabası, yarı-gradyan SARSA, 8 karo katmanı, α = 0.5/8 (3 tohum)", ["bölüm", "ort. adım"],
                  [[k + 1, f"{sum(r[k] for r in res) / 3:.0f}"] for k in (0, 1, 4, 9, 24, 49, 99)],
-                 note="Araba doğrudan tırmanamaz: önce geri gidip ivme kazanması gerekir. İyimser başlangıç (w = 0) keşfi tek başına sağlar (Sutton Şekil 10.2).")
+                 note="Araba doğrudan tırmanamaz: önce geri gidip ivme kazanması gerekir. İyimser başlangıç (w = 0) online güncellemeler ve rastgele eşitlik seçimiyle keşif sağlar. Sutton Şekil10.2 ile aynı problem türü; burada kendi faz/ofset düzenimiz,3tohum ve100bölüm kullanılıyor. Kaynak100×500bütçesi x6/anlatımda ayrıdır.")
     R_.test("dağ arabası", t)

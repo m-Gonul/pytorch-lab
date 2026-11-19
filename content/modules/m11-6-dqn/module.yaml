@@ -2,17 +2,19 @@ id: m11-6-dqn
 code: M11.6
 title: Fonksiyon yaklaştırma ve derin Q-ağları (DQN)
 phase: 11
-minutes: 960
+minutes: 1140
 prereq:
 - m11-5-sarsa-q
 summary: "Tablo sığmayınca (Go'da ~3^361 durum, Atari'de 210×160×3 piksel) değer bir fonksiyonla yaklaşık hesaplanır:\
-  \ $Q_w(s,a)$. Yarı-gradyan güncelleme, hedefin de w'ye bağlı olması sorunu, durum toplama, karo kodlama, \"ölümcül\
-  \ üçlü\" (yaklaştırma + önyükleme + politika dışı) ve Baird karşı örneği; DQN'nin iki hilesi deneyim tekrarı ve\
-  \ hedef ağ, Huber kaybı, çift DQN hedefi, Atari ön işleme. Saf Python'da 1000 durumlu yürüyüş, NumPy'da Baird\
-  \ ıraksaması ve TDC, PyTorch'ta CartPole'u çözen DQN, sonda binlerce doğrusal politikayı paralel değerlendiren\
-  \ rastgele arama.\n Sutton–Barto Bölüm9: µ-ağırlıklı VE, gradyan MC, doğrusal TD momentleri/rank koşulları, n-adım,\
-  \ polinom/Fourier, kaba/karo/hash/RBF, LSTD, bellek/çekirdek ve ilgi/vurgu; tam bütçeli kaynak deneyleri ve beş\
-  \ kaynak alıştırmasının çözümleri."
+  \ $Q_w(s,a)$. Yarı-gradyan güncelleme, hedefin de w'ye bağlı olması sorunu, durum toplama, karo kodlama,\
+  \ \"ölümcül üçlü\" (yaklaştırma + önyükleme + politika dışı) ve Baird karşı örneği; DQN'nin iki hilesi deneyim\
+  \ tekrarı ve hedef ağ, Huber kaybı, çift DQN hedefi, Atari ön işleme. Saf Python'da 1000 durumlu yürüyüş,\
+  \ NumPy'da Baird ıraksaması ve TDC, PyTorch'ta CartPole'u çözen DQN, sonda binlerce doğrusal politikayı paralel\
+  \ değerlendiren rastgele arama.\n Sutton–Barto Bölüm9: µ-ağırlıklı VE, gradyan MC, doğrusal TD momentleri/rank\
+  \ koşulları, n-adım, polinom/Fourier, kaba/karo/hash/RBF, LSTD, bellek/çekirdek ve ilgi/vurgu; tam bütçeli\
+  \ kaynak deneyleri ve beş kaynak alıştırmasının çözümleri. Sutton–Barto Bölüm10 episodik kontrol: kaynakla\
+  \ eşlenmiş Mountain Car, n-adım SARSA, Expected SARSA ve tam bütçeli100×500 deneyleri; sürekli ortalama ödül\
+  \ M11.13 içinde."
 goals:
 - 'Yarı-gradyan TD: $w\leftarrow w+\alpha[r+\gamma\hat v(s'',w)-\hat v(s,w)]\nabla\hat v(s,w)$ — hedefin gradyanı
   alınmaz'
@@ -23,6 +25,8 @@ goals:
 - Özellik iç çarpımından genellemeyi ve doğru adım normalizasyonunu hesaplamak
 - LSTD paydasını ve kernel primal–dual katsayılarını denetlemek
 - İlgi I ile bootstrap zincirine yayılan vurgu M farkını açıklamak
+- Kaynak karo koordinatlarıyla episodik yarı-gradyan kontrolü kurmak
+- Mountain Car için n-adım hedefini, terminal kuyruğunu ve idari bütçe kesmesini ayırmak
 sources:
 - title: Mnih ve ark. — Playing Atari with Deep Reinforcement Learning (arXiv:1312.5602, 2013)
   url: https://arxiv.org/abs/1312.5602
@@ -88,8 +92,8 @@ hand:
 
     c3 = (c2 - 3) // 1 + 1
 
-    answers = dict(w1=0.5 + 0.1 * (3 - 1.5) * 1, w2=0.5 + 0.1 * (3 - 1.5) * 2, mse=3, hub=1, c1=c1, c3=c3 * c3 *
-    64, b1=3, b7=12)
+    answers = dict(w1=0.5 + 0.1 * (3 - 1.5) * 1, w2=0.5 + 0.1 * (3 - 1.5) * 2, mse=3, hub=1, c1=c1, c3=c3 *
+    c3 * 64, b1=3, b7=12)
 
     '
 stages:
@@ -117,6 +121,9 @@ extras:
 - id: x5
   title: 'LSTD: batch çözüm ve Sherman–Morrison'
   engine: browser
+- id: x6
+  title: 'Kaynak Mountain Car: asimetrik karo, n-adım ve gerçek terminal'
+  engine: browser
 quiz:
 - q: DQN'de hedef ağ neden kullanılır?
   options:
@@ -139,8 +146,8 @@ quiz:
     why: Mnih ve ark. bunu açıkça not eder.
 - q: Baird örneğinde yarı-gradyan TD neden ıraksar?
   options:
-  - t: 'Güncellemeler davranış dağılımıyla (düzgün) ağırlıklanır ama hedef politika başka bir dağılım üretir: yaklaştırma
-      + önyükleme + politika dışı'
+  - t: 'Güncellemeler davranış dağılımıyla (düzgün) ağırlıklanır ama hedef politika başka bir dağılım üretir:
+      yaklaştırma + önyükleme + politika dışı'
     ok: true
     why: Politika üstü dağılımda aynı güncelleme kararlıdır.
   - t: Öğrenme oranı çok büyük
@@ -153,14 +160,15 @@ homework:
   url: https://arxiv.org/abs/1312.5602
   level: ileri
   hours: 20
-  goal: 'Makaledeki DQN''yi uygula ve Pong ile Breakout''ta (Gymnasium + ALE) eğit: ön işleme (x2), 4 kare yığını,
-    ağ (16 adet 8×8/4, 32 adet 4×4/2, 256 tam bağlı), RMSProp, mini-batch 32, ε 1''den 0.1''e ilk 1 M karede doğrusal,
-    tampon 1 M, kare atlama k = 4, ödül kırpma. Nature (2015) sürümüne (hedef ağ, 3 conv) ve çift DQN hedefine geç
-    ve farkı ölç.
+  goal: 'Makaledeki DQN''yi uygula ve Pong ile Breakout''ta (Gymnasium + ALE) eğit: ön işleme (x2), 4 kare
+    yığını, ağ (16 adet 8×8/4, 32 adet 4×4/2, 256 tam bağlı), RMSProp, mini-batch 32, ε 1''den 0.1''e ilk 1
+    M karede doğrusal, tampon 1 M, kare atlama k = 4, ödül kırpma. Nature (2015) sürümüne (hedef ağ, 3 conv)
+    ve çift DQN hedefine geç ve farkı ölç.
 
     '
   steps:
-  - Bu modülün d aşamasındaki Replay, td_target ve soft_update'i kullan; tamponu uint8 kareler olarak sakla (bellek!).
+  - Bu modülün d aşamasındaki Replay, td_target ve soft_update'i kullan; tamponu uint8 kareler olarak sakla
+    (bellek!).
   - Ortalama Q değerini sabit bir durum kümesinde izle (makale Şekil 2).
   - Pong'da ≥ +18 ortalama skor; Breakout'ta eğitim eğrisi.
   accept:
@@ -172,29 +180,29 @@ homework:
   url: https://arxiv.org/abs/1509.06461
   level: orta
   hours: 6
-  goal: 'Makalenin Bölüm 3 deneyini yeniden üret: gerçek $Q_*(s,a)=V_*(s)$ (ör. $\sin s$) ve her eylem için ayrı
-    polinom yaklaştırıcı (derece 6), birkaç örnek noktadan uydurulmuş; $\max_aQ_t(s,a)$ ile $V_*$ arasındaki fark
-    ve çift kestirimci. Ardından d aşamasındaki DQN''yi double=False/True ile CartPole''da 5 tohumla çalıştır ve
-    tutulan durumlardaki Q ortalamasını gerçek getiriyle karşılaştır.
+  goal: 'Makalenin Bölüm 3 deneyini yeniden üret: gerçek $Q_*(s,a)=V_*(s)$ (ör. $\sin s$) ve her eylem için
+    ayrı polinom yaklaştırıcı (derece 6), birkaç örnek noktadan uydurulmuş; $\max_aQ_t(s,a)$ ile $V_*$ arasındaki
+    fark ve çift kestirimci. Ardından d aşamasındaki DQN''yi double=False/True ile CartPole''da 5 tohumla çalıştır
+    ve tutulan durumlardaki Q ortalamasını gerçek getiriyle karşılaştır.
 
     '
   steps:
   - NumPy ile polinom uydurma; eylem sayısı 2, 10 ve 100.
   accept:
-  - Eylem sayısı arttıkça tek kestirimcinin yanlılığı artar, çift kestirimci yanlılığı küçük tutar (makale Şekil
-    2).
+  - Eylem sayısı arttıkça tek kestirimcinin yanlılığı artar, çift kestirimci yanlılığı küçük tutar (makale
+    Şekil 2).
 labs:
 - id: l1
   lab: baird
   title: 'Baird''in karşı örneği: ölümcül üçlü'
   goal: 'Yedi durumlu, sekiz ağırlıklı doğrusal değer fonksiyonunda bütün ödüller 0 ve doğru çözüm temsil edilebilir
-    (w = 0). Politika dışı yarı-gradyan TD(0)''ın ağırlıklarının ıraksamasını izle; aynı yöntemi politika üstü örneklemeyle
-    ve politika dışı gradyan-TD (TDC) ile karşılaştır.
+    (w = 0). Politika dışı yarı-gradyan TD(0)''ın ağırlıklarının ıraksamasını izle; aynı yöntemi politika üstü
+    örneklemeyle ve politika dışı gradyan-TD (TDC) ile karşılaştır.
 
     '
   predict:
-    q: Ödüller hep 0, doğru değer her yerde 0 ve bu değer temsil edilebilir. Politika dışı yarı-gradyan TD(0) (γ
-      = 0.99) 1000 adımda ağırlıklara ne yapar?
+    q: Ödüller hep 0, doğru değer her yerde 0 ve bu değer temsil edilebilir. Politika dışı yarı-gradyan TD(0)
+      (γ = 0.99) 1000 adımda ağırlıklara ne yapar?
     options:
     - t: 'Sıfıra götürür: doğru çözüm temsil edilebilir'
       why: Temsil edilebilirlik yakınsamayı güvence etmez.
@@ -249,22 +257,22 @@ labs:
   questions:
   - q: Küçük bir öğrenme oranı neden ıraksamayı önlemiyor, yalnız geciktiriyor?
     a: 'Beklenen yarı-gradyan TD güncellemesi w ← w + α(b − Aw) biçimindedir. Politika dışı dağılımda A matrisinin
-      negatif reel kısımlı özdeğerleri vardır: I − αA''nın bir özdeğeri 1''den büyüktür ve her α > 0 için o yönde
-      üstel büyüme olur. α yalnız büyüme hızını belirler. Politika üstü dağılımda A pozitif tanımlıdır ve yeterince
-      küçük α ile güncelleme bir büzülmedir.'
+      negatif reel kısımlı özdeğerleri vardır: I − αA''nın bir özdeğeri 1''den büyüktür ve her α > 0 için o
+      yönde üstel büyüme olur. α yalnız büyüme hızını belirler. Politika üstü dağılımda A pozitif tanımlıdır
+      ve yeterince küçük α ile güncelleme bir büzülmedir.'
   limits: Sutton & Barto Örnek 11.1'in örneklemeli sürümü; önem örneklemesi ρ ∈ {0, 7}; TDC'de β = 5α. Ağırlıklar
     10¹² aşınca simülasyon durduruluyor.
 - id: l2
   lab: replaylab
   title: 'Deneyim tekrarı: ilişkili örneklerden öğrenmek'
   goal: 'Durum [0, 1] aralığında yavaşça ileri geri kayarken bir fonksiyonu gürültülü örneklerden öğren. Yalnız
-    son örnekle güncellenen çevrimiçi SGD''yi, son N örneği tutan bir tampondan düzgün mini yığınlar çeken deneyim
-    tekrarıyla karşılaştır; hata bütün aralıkta ölçülüyor.
+    son örnekle güncellenen çevrimiçi SGD''yi, son N örneği tutan bir tampondan düzgün mini yığınlar çeken
+    deneyim tekrarıyla karşılaştır; hata bütün aralıkta ölçülüyor.
 
     '
   predict:
-    q: Küresel (Fourier) özniteliklerle ve aynı sayıda güncellemeyle, son 2000 adımda bütün aralıktaki hatayı hangisi
-      daha düşük tutar?
+    q: Küresel (Fourier) özniteliklerle ve aynı sayıda güncellemeyle, son 2000 adımda bütün aralıktaki hatayı
+      hangisi daha düşük tutar?
     options:
     - t: 'Çevrimiçi SGD: her zaman en taze örneği kullanıyor'
       why: En taze örnek yalnız o anki bölgeyi temsil ediyor (0.29).
@@ -329,14 +337,15 @@ labs:
       T: 6000
     note: Bu basit problemde 100'lük tampon da yetiyor (0.022).
   questions:
-  - q: Tek örnekli tekrar (B = 1) çevrimiçi SGD ile aynı sayıda gradyan hesaplar. Yine de hata neden sekiz kat düşük?
-    a: 'Fark örneklerin sırasındadır. Çevrimiçi SGD ardışık, neredeyse aynı x''lerle güncellenir: gradyanlar aynı
-      yöne iter ve küresel özniteliklerde o an bulunulan bölgeye aşırı uyulur, uzak bölgeler bozulur. Tampondan
-      düzgün çekilen örnekler yakın geçmişin bütün dağılımından gelir; ardışık güncellemeler birbirinden bağımsıza
-      yakındır ve SGD''nin varsaydığı i.i.d. koşula yaklaşılır. Mini yığın (B > 1) bunun üstüne varyansı azaltır
-      ve her örneği birçok kez kullanır.'
-  limits: 'Gözetimli bir benzer: hedef sabit bir fonksiyon (bootstrapping yok), doğrusal model, 20 öznitelik; kayma
-    sinüs biçiminde. DQN''deki hareketli hedef ve hedef ağın etkisi bu deneyde yok.'
+  - q: Tek örnekli tekrar (B = 1) çevrimiçi SGD ile aynı sayıda gradyan hesaplar. Yine de hata neden sekiz
+      kat düşük?
+    a: 'Fark örneklerin sırasındadır. Çevrimiçi SGD ardışık, neredeyse aynı x''lerle güncellenir: gradyanlar
+      aynı yöne iter ve küresel özniteliklerde o an bulunulan bölgeye aşırı uyulur, uzak bölgeler bozulur.
+      Tampondan düzgün çekilen örnekler yakın geçmişin bütün dağılımından gelir; ardışık güncellemeler birbirinden
+      bağımsıza yakındır ve SGD''nin varsaydığı i.i.d. koşula yaklaşılır. Mini yığın (B > 1) bunun üstüne varyansı
+      azaltır ve her örneği birçok kez kullanır.'
+  limits: 'Gözetimli bir benzer: hedef sabit bir fonksiyon (bootstrapping yok), doğrusal model, 20 öznitelik;
+    kayma sinüs biçiminde. DQN''deki hareketli hedef ve hedef ağın etkisi bu deneyde yok.'
 - id: l3
   lab: approxwalk
   title: 'Kaynak yürüyüşleri: tam bütçeli MC / TD / baz / karo'
@@ -379,7 +388,8 @@ labs:
   questions:
   - q: İki RMSneden farklı?
     a: n-adım grafiği bütün 1000 duruma eşit ağırlık verir; baz/MCgrafikleri ziyaret µile tartılır.
-  limits: Önceden hesaplanan kendi verimiz; etkileşim yeni koşu başlatmaz. Kaynak tohumları bilinmiyor. SE noktasaldır.
+  limits: Önceden hesaplanan kendi verimiz; etkileşim yeni koşu başlatmaz. Kaynak tohumları bilinmiyor. SE
+    noktasaldır.
 - id: l4
   lab: basisvalue
   title: 'Baz iç çarpımı: tek örnek nereye geneller?'
@@ -485,7 +495,8 @@ labs:
   questions:
   - q: Çok geniş alan her zaman iyi mi?
     a: Hayır; bütün özellikler aynı olduğunda ince ayrım temsil edilemez.
-  limits: Kaynak kesin genişlik/aralık vermiyor; kendi üç genişliğimiz. Sonlu merkez sayısı ve kenar etkisi var.
+  limits: Kaynak kesin genişlik/aralık vermiyor; kendi üç genişliğimiz. Sonlu merkez sayısı ve kenar etkisi
+    var.
 - id: l6
   lab: tilegeneral
   title: Döşeme ofsetleri ve hash çakışmaları
@@ -532,8 +543,8 @@ labs:
   questions:
   - q: Bir karo kimliği değişince kaç dense bit değişir?
     a: 'Eski 1 kapanır, yeni 1 açılır: genelde iki; kimlik kodunda bir bileşen değişir.'
-  limits: '[0,1]²alanı 56²sorguda görüntülenir. Hash sözleşmesi çakışmaları saymaktır; kaynak 1/nsonucu hash öncesi
-    binary içindir.'
+  limits: '[0,1]²alanı 56²sorguda görüntülenir. Hash sözleşmesi çakışmaları saymaktır; kaynak 1/nsonucu hash
+    öncesi binary içindir.'
 - id: l7
   lab: lstdvalue
   title: 'LSTD: örnek momentleri ve tekillik'
@@ -675,6 +686,93 @@ labs:
   - q: Bu sayılar sabit adım son noktası mı?
     a: Hayır; azalan adım asimptotik limitleri. Sonlu sayı gerçek hesaplanır.
   limits: Deterministik zincir,γ1,başlangıç w 0,αe=α0/(e+1)^.6. Genel uyarlanan ilgi yakınsaması kanıtı değildir.
+- id: l10
+  lab: mountainmeasured
+  title: 'Kaynak Mountain Car: tam bütçe ve maliyet'
+  goal: 100×500 sonuçları, ilk50 taramasını ve beş maliyet anını seç.
+  predict:
+    q: Bu hesaplarda n8, n1 karşılaştırmasından daha kısa son bölüm ortalaması verdi mi?
+    options:
+    - t: Evet
+      ok: true
+      why: n1/8α.5 son122.07, n8/8α.3 son110.13; yalnız bu koşullar için.
+    - t: Hayır
+      why: Koşulları formül ve ölçümle karşılaştırın.
+  presets:
+  - name: Şekil10.2
+    params:
+      mode: 0
+      band: 0
+    note: Üç α, her biri100×500 tamamlanmış bölüm.
+  - name: Şekil10.3
+    params:
+      mode: 1
+      band: 1
+    note: n1/8 ve8-adım karşılaştırması, noktasal ±1SE.
+  - name: Şekil10.4
+    params:
+      mode: 2
+      band: 1
+    note: 74 ayardan73 tam; bir sansürlü ayar boş.
+  - name: 'Şekil10.1: Step428'
+    params:
+      mode: 3
+      frame: 0
+    note: İlk bölüm bitmedi; maliyet tepe13.51926.
+  - name: 'Şekil10.1: Bölüm9000'
+    params:
+      mode: 3
+      frame: 4
+    note: 973196 geçiş; tepe122.14259.
+  questions:
+  - q: Bu sonuç hangi koşullarda geçerlidir?
+    a: Önceden hesaplanmış kendi verimiz. Kaynak tohumları ve λ/iz ayarları bilinmez; bizim seçimler açık.
+      SE noktasal; başarısız ayar gizlenmez.
+  limits: Önceden hesaplanmış kendi verimiz. Kaynak tohumları ve λ/iz ayarları bilinmez; bizim seçimler açık.
+    SE noktasal; başarısız ayar gizlenmez.
+- id: l11
+  lab: mountainonline
+  title: Yeni n-adım koşusu başlat
+  goal: Canlı gerçek fizik/karo güncellemelerinde n, adım ve bütçeyi değiştir.
+  predict:
+    q: İdari bütçede yarım kalan parça başarı grafiğinden çıkarılmalı mı?
+    options:
+    - t: Evet
+      ok: true
+      why: Gerçek terminal+.5; bütçe idari sınır, tamamlanmış bölüm değildir.
+    - t: Hayır
+      why: Koşulları formül ve ölçümle karşılaştırın.
+  presets:
+  - name: Tek-adım
+    params:
+      n: 0
+      alpha: 0.5
+      episodes: 30
+      budget: 100000
+      seed: 1
+    note: Canlı tek koşu; sonucu çalışma sonunda okuyun.
+  - name: 8-adım
+    params:
+      n: 3
+      alpha: 0.3
+      episodes: 30
+      budget: 100000
+      seed: 1
+    note: Aynı türetilmiş başlangıç/action akışları, farklı öğrenme.
+  - name: Kısıtlı bütçe
+    params:
+      n: 0
+      alpha: 0.5
+      episodes: 100
+      budget: 1000
+      seed: 1
+    note: Tamamlanan ve yarım bölüm ayrı raporlanır.
+  questions:
+  - q: Bu sonuç hangi koşullarda geçerlidir?
+    a: Tarayıcı koşusu en çok300000 gerçek geçiş. Tek tohum,100 koşu kaynak ortalaması değildir. Terminal kuyruğu
+      ile bütçe kesmesi ayrı tutulur.
+  limits: Tarayıcı koşusu en çok300000 gerçek geçiş. Tek tohum,100 koşu kaynak ortalaması değildir. Terminal
+    kuyruğu ile bütçe kesmesi ayrı tutulur.
 practice:
 - id: p1
   type: çözülmüş
@@ -684,16 +782,17 @@ practice:
   needs: $\nabla_wQ_w(s,a)=x$
   q: '$Q_w(s,a)=w^\top x$, $x=(1,0,2)$, $w=(0.5,1,0.25)$. Geçiş: $r=1$, $\gamma=0.9$, $\max_{a^+}Q_{\bar w}(s^+,a^+)=2$,
     $\alpha=0.1$. Güncellenmiş $w$ nedir?'
-  solution: $Q_w(s,a)=0.5+0+0.5=1$. Hedef $1+0.9\cdot2=2.8$, $\delta=1.8$. $w\leftarrow w+0.1\cdot1.8\cdot x=(0.68,1,0.61)$.
-    Yalnız $x$'in sıfır olmayan bileşenleri değişir; hedefin $w$'ye bağımlılığı türevlenmez (yarı-gradyan).
+  solution: $Q_w(s,a)=0.5+0+0.5=1$. Hedef $1+0.9\cdot2=2.8$, $\delta=1.8$. $w\leftarrow w+0.1\cdot1.8\cdot
+    x=(0.68,1,0.61)$. Yalnız $x$'in sıfır olmayan bileşenleri değişir; hedefin $w$'ye bağımlılığı türevlenmez
+    (yarı-gradyan).
 - id: p2
   type: hesap
   level: 1
   title: Nature DQN'nin evrişim çıktısı
   goal: Evrişim boyutlarını hesaplamak
   needs: $\lfloor(H-k)/s\rfloor+1$
-  q: 2013 DQN ağında girdi 84 × 84 × 4, ardından 16 tane 8 × 8 filtre (adım 4) ve 32 tane 4 × 4 filtre (adım 2).
-    İkinci evrişimden sonra düzleştirilmiş vektörün boyu nedir?
+  q: 2013 DQN ağında girdi 84 × 84 × 4, ardından 16 tane 8 × 8 filtre (adım 4) ve 32 tane 4 × 4 filtre (adım
+    2). İkinci evrişimden sonra düzleştirilmiş vektörün boyu nedir?
   answer: 2592
   calc: ((((84-8)//4+1)-4)//2+1)**2*32
   tol: 0
@@ -704,8 +803,8 @@ practice:
     msg: Bu birinci evrişimden sonra (20 · 20 · 16); ikinci katmanı unutmayın.
   hints:
   - Birinci katmandan sonra kenar $(84-8)/4+1=20$.
-  solution: $20\to(20-4)/2+1=9$; $9\cdot9\cdot32=2592$. Tam bağlı katman $2592\cdot256+256\approx6.6\cdot10^5$ parametreyle
-    ağın en büyük parçası.
+  solution: $20\to(20-4)/2+1=9$; $9\cdot9\cdot32=2592$. Tam bağlı katman $2592\cdot256+256\approx6.6\cdot10^5$
+    parametreyle ağın en büyük parçası.
 - id: p3
   type: hesap
   level: 1
@@ -723,16 +822,16 @@ practice:
     msg: 'uint8: piksel başına 1 bayt, float32 değil.'
   hints:
   - Bir yığın $84\cdot84\cdot4=28\,224$ bayt.
-  solution: '$10^6\cdot2\cdot28\,224=5.6\cdot10^{10}$ bayt ≈ 56 GB. Uygulamalar yalnız tek tek kareleri (84·84 bayt)
-    saklayıp yığınları indekslerle yeniden kurar: ≈ 7 GB.'
+  solution: '$10^6\cdot2\cdot28\,224=5.6\cdot10^{10}$ bayt ≈ 56 GB. Uygulamalar yalnız tek tek kareleri (84·84
+    bayt) saklayıp yığınları indekslerle yeniden kurar: ≈ 7 GB.'
 - id: p4
   type: yöntem-seç
   level: 2
   title: Tampondan hangi hedef?
   goal: Deneyim tekrarının politika dışı öğrenme gerektirdiğini görmek
   needs: SARSA ve Q-öğrenme hedefleri
-  q: Bir ajan deneyim tekrarıyla eğitiliyor; tamponda 500 000 adım önceki politikayla toplanmış geçişler de var.
-    Hangi hedef doğrudur?
+  q: Bir ajan deneyim tekrarıyla eğitiliyor; tamponda 500 000 adım önceki politikayla toplanmış geçişler de
+    var. Hangi hedef doğrudur?
   choices:
   - t: 'SARSA: r + γQ(s⁺, a⁺), a⁺ tampondaki sonraki eylem'
     why: a⁺ eski politikayla seçilmiş; hedef eski politikanın değerini kestirir.
@@ -744,8 +843,8 @@ practice:
   hints:
   - Hangi hedef, verinin hangi politikayla toplandığından bağımsızdır?
   solution: Tampondaki veri bir politika karışımından gelir. Q-öğrenmenin $\max$ hedefi yalnız $(s,a,r,s^+)$'ya
-    bağlıdır. Çok adımlı hedefler (Rainbow'daki n adımlı getiri) yaklaşık olarak kullanılır; düzeltme için önem
-    örneklemesi ya da Retrace gerekir.
+    bağlıdır. Çok adımlı hedefler (Rainbow'daki n adımlı getiri) yaklaşık olarak kullanılır; düzeltme için
+    önem örneklemesi ya da Retrace gerekir.
 - id: p5
   type: hata-bul
   level: 2
@@ -757,25 +856,27 @@ practice:
   choices:
   - t: MSE yerine Huber kullanılmalı
     why: Huber yardımcı olur ama asıl hata başka.
-  - t: 'Hedef aynı ağla ve gradyanla hesaplanıyor: geri yayılım hedefi de kestirime doğru itiyor (tam gradyan, yarı-gradyan
-      değil) ve hedef her adımda kayıyor. Hedef ayrı bir ağla ve torch.no_grad() / detach() ile hesaplanmalı'
+  - t: 'Hedef aynı ağla ve gradyanla hesaplanıyor: geri yayılım hedefi de kestirime doğru itiyor (tam gradyan,
+      yarı-gradyan değil) ve hedef her adımda kayıyor. Hedef ayrı bir ağla ve torch.no_grad() / detach() ile
+      hesaplanmalı'
     ok: true
     why: Hedefin türevi alınmamalı; DQN hedef ağı C adım dondurur.
   - t: max yerine argmax kullanılmalı
     why: Hedef değeri ister, indeksi değil.
   hints:
   - '`target.requires_grad` nedir?'
-  solution: '`with torch.no_grad(): target = r + gamma * (1 - done) * target_net(s_next).max(1).values` ve her C
-    adımda `target_net.load_state_dict(q_net.state_dict())`. Son durumlarda bootstrapping de kapatılmalı (`1 - done`).'
+  solution: '`with torch.no_grad(): target = r + gamma * (1 - done) * target_net(s_next).max(1).values` ve
+    her C adımda `target_net.load_state_dict(q_net.state_dict())`. Son durumlarda bootstrapping de kapatılmalı
+    (`1 - done`).'
 - id: p6
   type: kanıt
   level: 3
   title: Politika dışı doğrusal TD'nin ıraksaması
   goal: Iraksamanın en küçük örneğini çözümlemek
   needs: Doğrusal yineleme
-  q: 'Tek ağırlıklı doğrusal bir değer fonksiyonu düşünün: $v(s_1)=w$, $v(s_2)=2w$. Yalnız $s_1\to s_2$ geçişi (ödül
-    0) güncelleniyor (politika dışı dağılım: $s_2$''den çıkan geçiş hiç örneklenmiyor). Yarı-gradyan TD güncellemesinin
-    $w$''yi her $\alpha>0$ için $\gamma>1/2$ iken ıraksattığını gösterin.'
+  q: 'Tek ağırlıklı doğrusal bir değer fonksiyonu düşünün: $v(s_1)=w$, $v(s_2)=2w$. Yalnız $s_1\to s_2$ geçişi
+    (ödül 0) güncelleniyor (politika dışı dağılım: $s_2$''den çıkan geçiş hiç örneklenmiyor). Yarı-gradyan
+    TD güncellemesinin $w$''yi her $\alpha>0$ için $\gamma>1/2$ iken ıraksattığını gösterin.'
   rubric:
   - δ = 0 + γ·2w − w = (2γ − 1)w yazdım
   - ∇v(s₁) = 1 ile w ← w + α(2γ − 1)w = (1 + α(2γ − 1))w buldum
@@ -783,23 +884,23 @@ practice:
   - s₂'den çıkan geçiş de örneklenseydi (politika üstü) ek terimin büyümeyi dengeleyeceğini belirttim
   hints:
   - Gerçek değer 0 ve $w=0$ temsil edilebilir.
-  solution: $w_{k+1}=(1+\alpha(2\gamma-1))w_k$; $\gamma>1/2$ ise $w\to\pm\infty$. Bu Sutton & Barto'nun "w → 2w"
-    örneğidir (Örnek 11.1'in ilk biçimi). $s_2$ de ziyaret edilseydi onun güncellemesi $\alpha(\gamma v(s')-2w)\cdot2$
-    ile w'yi küçültürdü; politika üstü dağılımda toplam etki büzülmedir.
+  solution: $w_{k+1}=(1+\alpha(2\gamma-1))w_k$; $\gamma>1/2$ ise $w\to\pm\infty$. Bu Sutton & Barto'nun "w
+    → 2w" örneğidir (Örnek 11.1'in ilk biçimi). $s_2$ de ziyaret edilseydi onun güncellemesi $\alpha(\gamma
+    v(s')-2w)\cdot2$ ile w'yi küçültürdü; politika üstü dağılımda toplam etki büzülmedir.
 - id: p7
   type: kanıt
   level: 2
   title: '9.1: tablo doğrusal yaklaşımın özel durumudur'
   goal: '9.1: tablo doğrusal yaklaşımın özel durumudur'
   needs: Bölüm 9 konu anlatımı
-  q: 'Tabloyla durum-değeri tahmininin doğrusal yaklaşımın özel durumu olduğunu gösterin. Öznitelik vektörleri nasıl
-    seçilir? Kaynak: Sutton–Barto, s.209, Alıştırma 9.1.'
+  q: 'Tabloyla durum-değeri tahmininin doğrusal yaklaşımın özel durumu olduğunu gösterin. Öznitelik vektörleri
+    nasıl seçilir? Kaynak: Sutton–Barto, s.209, Alıştırma 9.1.'
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
-  solution: Sonlu durumları $s_1,...,s_m$ sırala. $d=m$, $x(s_i)=e_i$ bir-sıcak vektörü ve $w_i=V(s_i)$ seç. O zaman
-    $w^\top x(s_i)=w_i$ ve gradyan $e_i$. Her $w\leftarrow w+\alpha(U-w_i)e_i$ adımı yalnız o tablo hücresini değiştirir.
-    Eylem değerleri için her $(s,a)$ çiftine ayrı bir-sıcak koordinat ayırılır. Genelleyen düşük boyutlu yaklaşımda
-    bu ayrılık kalkar.
+  solution: Sonlu durumları $s_1,...,s_m$ sırala. $d=m$, $x(s_i)=e_i$ bir-sıcak vektörü ve $w_i=V(s_i)$ seç.
+    O zaman $w^\top x(s_i)=w_i$ ve gradyan $e_i$. Her $w\leftarrow w+\alpha(U-w_i)e_i$ adımı yalnız o tablo
+    hücresini değiştirir. Eylem değerleri için her $(s,a)$ çiftine ayrı bir-sıcak koordinat ayırılır. Genelleyen
+    düşük boyutlu yaklaşımda bu ayrılık kalkar.
   rubric:
   - Her duruma bir koordinat verdim
   - İç çarpımın tablo hücresini seçtiğini gösterdim
@@ -814,10 +915,10 @@ practice:
     s.211, Alıştırma 9.2.'
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
-  solution: 'Her üs $c_{ij}$ için 0..n arasında n+1 seçim var. k koordinatın seçimleri bağımsız olduğundan tuple
-    sayısı $(n+1)^k$. Her tuple bir monom verir. Bir açık sürekli alanda farklı üs tuple''ları farklı polinom fonksiyonlarıdır;
-    kısıtlı/ayrık bir veri kümesinde sütunlar yine bağımlı olabilir. Bu sayım toplam derece≤n değildir: her koordinat
-    ayrı ayrı≤n, toplam derece en çok kn olur.'
+  solution: 'Her üs $c_{ij}$ için 0..n arasında n+1 seçim var. k koordinatın seçimleri bağımsız olduğundan
+    tuple sayısı $(n+1)^k$. Her tuple bir monom verir. Bir açık sürekli alanda farklı üs tuple''ları farklı
+    polinom fonksiyonlarıdır; kısıtlı/ayrık bir veri kümesinde sütunlar yine bağımlı olabilir. Bu sayım toplam
+    derece≤n değildir: her koordinat ayrı ayrı≤n, toplam derece en çok kn olur.'
   rubric:
   - Her üs için n+1 seçim saydım
   - Bağımsız seçimlerin çarpımını aldım
@@ -828,8 +929,8 @@ practice:
   title: '9.3: dokuz özelliğin üs vektörleri'
   goal: '9.3: dokuz özelliğin üs vektörleri'
   needs: Bölüm 9 konu anlatımı
-  q: 'İki-boyutlu $(1,s_1,s_2,s_1s_2,s_1^2,s_2^2,s_1s_2^2,s_1^2s_2,s_1^2s_2^2)$ vektörünü (9.17) ile üretmek için
-    n ve $c_{ij}$ değerlerini bulun. Kaynak: Sutton–Barto, s.211, Alıştırma 9.3.'
+  q: 'İki-boyutlu $(1,s_1,s_2,s_1s_2,s_1^2,s_2^2,s_1s_2^2,s_1^2s_2,s_1^2s_2^2)$ vektörünü (9.17) ile üretmek
+    için n ve $c_{ij}$ değerlerini bulun. Kaynak: Sutton–Barto, s.211, Alıştırma 9.3.'
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
   solution: n=2,k=2. Verilen sırayla üs tuple'ları $(0,0)$, $(1,0)$, $(0,1)$, $(1,1)$, $(2,0)$, $(0,2)$, $(1,2)$,
@@ -844,14 +945,14 @@ practice:
   title: '9.4: önemli boyutta ayır, ötekinde genelle'
   goal: '9.4: önemli boyutta ayır, ötekinde genelle'
   needs: Bölüm 9 konu anlatımı
-  q: 'İki durum boyutundan birinin değer üzerinde daha önemli etkisi varsa hangi karo şekilleri uygun olur? Kaynak:
-    Sutton–Barto, s.221, Alıştırma 9.4.'
+  q: 'İki durum boyutundan birinin değer üzerinde daha önemli etkisi varsa hangi karo şekilleri uygun olur?
+    Kaynak: Sutton–Barto, s.221, Alıştırma 9.4.'
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
-  solution: 'Önemli koordinat x 1 ise karolar x 1 boyunca DAR, daha az önemli x 2 boyunca UZUN olmalıdır: x 1 değişimini
-    ayıran dikey şeritler örnek. Uzun eksen önemli koordinata dik yöndedir. Önemli koordinat boyunca uzatmak tam
-    tersine değişen değerleri birbirine karıştırır. Etkileşimler varsa yalnız şeritlerle yetinmeyip daha küçük dikdörtgen
-    konjonksiyonları da ekleriz; ölçüt görevdeki değer duyarlılığıdır.'
+  solution: 'Önemli koordinat x 1 ise karolar x 1 boyunca DAR, daha az önemli x 2 boyunca UZUN olmalıdır: x
+    1 değişimini ayıran dikey şeritler örnek. Uzun eksen önemli koordinata dik yöndedir. Önemli koordinat boyunca
+    uzatmak tam tersine değişen değerleri birbirine karıştırır. Etkileşimler varsa yalnız şeritlerle yetinmeyip
+    daha küçük dikdörtgen konjonksiyonları da ekleriz; ölçüt görevdeki değer duyarlılığıdır.'
   rubric:
   - Önemli boyutta ince ayrım
   - Daha az önemli boyutta uzunluk/genelleme
@@ -863,14 +964,14 @@ practice:
   goal: '9.5: 98 aktif döşeme için adım'
   needs: Bölüm 9 konu anlatımı
   q: '7 boyutun her birinde 8 şerit döşeme ve her boyut çifti için 2 konjonktif döşeme var. Aynı örneği yaklaşık
-    10 kez göstererek öğrenme zaman ölçeği için (9.19) hangi α önerir? Hash çakışması yok, her döşemede bir aktif
-    binary özellik varsayın. Kaynak: Sutton–Barto, s.223, Alıştırma 9.5.'
+    10 kez göstererek öğrenme zaman ölçeği için (9.19) hangi α önerir? Hash çakışması yok, her döşemede bir
+    aktif binary özellik varsayın. Kaynak: Sutton–Barto, s.223, Alıştırma 9.5.'
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
   solution: Şeritler 7 × 8=56; çiftler C(7,2)=21, her biri 2 döşeme:42. Toplam 98 aktif özellik, $x^\top x=98$.
     Kural $\alpha\approx1/(10\cdot98)=1/980=0.0010204081632653062$ verir. Aynı sabit hedefte her gösterim hatanın%10
-    kadarını giderir;10 gösterim sonrası .9¹⁰=.34867844 hata kalır. Bu yaklaşık bir zaman sabiti kuralıdır,10 sunumda%95
-    doğruluk garantisi değildir.
+    kadarını giderir;10 gösterim sonrası .9¹⁰=.34867844 hata kalır. Bu yaklaşık bir zaman sabiti kuralıdır,10
+    sunumda%95 doğruluk garantisi değildir.
   answer: 0.0010204081632653062
   calc: 1/(10*(7*8+(7*6//2)*2))
   tol: 1.0e-10
@@ -885,8 +986,8 @@ practice:
   title: Pozitif ε her LSTD matrisini kurtarır mı?
   goal: Pozitif ε her LSTD matrisini kurtarır mı?
   needs: Bölüm 9 konu anlatımı
-  q: Başlangıç düzenlemesi εI, sonlu bir LSTD örneğinde tekilliği mutlaka önler mi? γ=.5,x=1,x′=2.25,ε=.125 için
-    A ve Sherman–Morrison paydasını hesaplayın. Kendi öğretim sorumuz.
+  q: Başlangıç düzenlemesi εI, sonlu bir LSTD örneğinde tekilliği mutlaka önler mi? γ=.5,x=1,x′=2.25,ε=.125
+    için A ve Sherman–Morrison paydasını hesaplayın. Kendi öğretim sorumuz.
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
   solution: Hayır. y=1−.5 × 2.25=−.125; A=.125+1×(−.125)=0. Başlangıç B=8 için payda 1+yBx=1−1=0. TD dış çarpımı
@@ -902,13 +1003,13 @@ practice:
   title: Kernel hedefleri katsayı sanmak
   goal: Kernel hedefleri katsayı sanmak
   needs: Bölüm 9 konu anlatımı
-  q: X=(1,2),g=(1,0),sorgu 3. Bir öğrenci dot-kernel hedef toplamının OLS ile aynı olduğunu söylüyor. OLS, ham toplam
-    ve normalize ortalamayı karşılaştırın. Kendi öğretim sorumuz.
+  q: X=(1,2),g=(1,0),sorgu 3. Bir öğrenci dot-kernel hedef toplamının OLS ile aynı olduğunu söylüyor. OLS,
+    ham toplam ve normalize ortalamayı karşılaştırın. Kendi öğretim sorumuz.
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
-  solution: 'OLS w=(1²+2²)⁻¹(1 × 1+2 × 0)=.2→.6. Ham kernel toplamı 3; normalize toplam 3/(3+6)=1/3. Doğru ridge/OLS
-    dual karşılıkta katsayılar öğrenilir: λ>0 için β=(K+λI)⁻¹g ve w=Xᵀβ; ham g doğrudan β değildir. Örneğin λ1 için
-    primal ve dual.5 verir.'
+  solution: 'OLS w=(1²+2²)⁻¹(1 × 1+2 × 0)=.2→.6. Ham kernel toplamı 3; normalize toplam 3/(3+6)=1/3. Doğru
+    ridge/OLS dual karşılıkta katsayılar öğrenilir: λ>0 için β=(K+λI)⁻¹g ve w=Xᵀβ; ham g doğrudan β değildir.
+    Örneğin λ1 için primal ve dual.5 verir.'
   rubric:
   - .6 /3 /1⁄3 üç farklı sonuç
   - Öğrenilen dual katsayıların gereği
@@ -918,17 +1019,77 @@ practice:
   title: İlgi 0 olan durumu neden öğrenelim?
   goal: İlgi 0 olan durumu neden öğrenelim?
   needs: Bölüm 9 konu anlatımı
-  q: Örnek 9.4 zincirinde ilgi yalnız S 1 için 1. İki adımlı TD neden S 3 değerini de güncellemelidir? Yalnız ilgi
-    ve vurgu sonuçlarını ayırın. Kaynak örneğinden kendi öğretim sorumuz.
+  q: Örnek 9.4 zincirinde ilgi yalnız S 1 için 1. İki adımlı TD neden S 3 değerini de güncellemelidir? Yalnız
+    ilgi ve vurgu sonuçlarını ayırın. Kaynak örneğinden kendi öğretim sorumuz.
   hints:
   - Önce gösterimin boyutlarını ve varsayımları yazın.
   solution: İlk durumun 2-adım hedefi 2+w 2 olduğu için S 3 değerine ihtiyaç vardır. Yalnız Iile S 3 güncellenmez;
-    w 2 başlangıç 0 kalır ve w 1→2. M=I+M_(t−2), M=(1,0,1,0) üretir; S 3 hedefi 2 ile w 2→2, sonra w 1→4. Düz 2-adım(3.5,1.5),
-    vurgulu 2-adım(4,2). Azalan adım limitleri, sonlu koşu sayılarıyla karıştırılmaz.
+    w 2 başlangıç 0 kalır ve w 1→2. M=I+M_(t−2), M=(1,0,1,0) üretir; S 3 hedefi 2 ile w 2→2, sonra w 1→4. Düz
+    2-adım(3.5,1.5), vurgulu 2-adım(4,2). Azalan adım limitleri, sonlu koşu sayılarıyla karıştırılmaz.
   rubric:
   - Bootstrap edilen S 3
   - M=(1,0,1,0)
   - Yalnız I:2; vurgu:4 başlangıç değeri
+- id: p15
+  type: açıkla
+  level: 2
+  title: 10.1 — Yaklaşımla Monte Carlo kontrolü
+  goal: 10.1 — Yaklaşımla Monte Carlo kontrolü
+  needs: MC getiri, iyimser başlangıç ve n-adım halka tamponu
+  q: 'Bu bölümdeki yarı-gradyan kontrol yöntemlerinin MC karşılığı nedir? Ayrıca yeni sözde-kod gerekir mi?
+    Mountain Car performansı için ne beklersiniz? (Kaynak: Sutton–Barto, s.248, Alıştırma10.1.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: 'Bölüm bitene kadar (S_t,A_t,R_{t+1}) kaydedilir; geriye G_t=R_{t+1}+γG_{t+1} hesaplanır ve w←w+α[G_t−qhat(S_t,A_t,w)]∇qhat
+    yapılır; kontrol ε-greedy ile iyileştirilir. n-adım kutusunda n≥T seçilmesi zaten bütün hedefleri tam getiriye
+    çevirir; ayrı bir temel kutu gerekmez. Çevrimiçi TD, ilk bölüm içinde gidilmiş yerleri negatif yaparak
+    Q0 iyimserliğini kullanır. MC bölüm bitmeden bu bilgiyi yayamaz: ilk bölümde deterministik eşitlik seçimi
+    her zaman nötr itişi seçerse x=−π/6,v0 sabit noktasında hiç bitmeyebilir. Rastgele eşitlik veya ε keşfi
+    sonlanmaya yardım eder; MC için ölçülmemiş evrensel süre iddiası kurmayız. Kaynağın kontrol görevinde MC
+    davranışı bu gecikmeden zorlanabilir, ama bütün ortamlarda daha kötü teoremi değildir.'
+  rubric:
+  - Tam episodik getiriyle yarı-gradyan güncelleme yazılır.
+  - n≥T eşdeğerliği ve bölüm içi gecikme açıklanır.
+  - Eşitlik seçimi/sonlanma varsayımı görünür tutulur.
+- id: p16
+  type: kod
+  level: 2
+  title: 10.2 — Yarı-gradyan Expected SARSA
+  goal: 10.2 — Yarı-gradyan Expected SARSA
+  needs: SARSA, ε-greedy ve stop-gradient
+  q: 'Tek-adım yarı-gradyan Expected SARSA kontrolü için sözde-kod verin. (Kaynak: Sutton–Barto, s.248, Alıştırma10.2.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: w,α,ε başlatın. Her bölümde S başlangıcını alın ve mevcut ε-greedy politikadan A seçin. R,S′ gözleyin.
+    Terminalse U=R; değilse her izinli b için eski qhat(S′,b,w) hesaplayıp aynı ε-greedy π ile U=R+γΣ_b π(b|S′)qhat(S′,b,w)
+    kurun ve sonraki davranış eylemi A′ seçin. Sonra w←w+α[U−qhat(S,A,w)]∇qhat(S,A,w). Terminalde bölüm bitsin;
+    değilse S,A←S′,A′. Hedefe stop-gradient uygulanır. k eylem/m eşit maksimum varsa π(b)=ε/k+(1−ε)/m maksimumlarda,
+    diğerlerinde ε/k. Bu sıra sonraki eylemi güncellemeden önce seçen kutuyla eşlenir. Beklentiyi hesaplamak
+    örneklenmiş sonraki eylemin koşullu gürültüsünü giderir; bütün öğrenme varyansını sıfırlamaz.
+  rubric:
+  - ΣπQ hedefi ve terminal0 bootstrap kullanılır.
+  - Aynı ε-greedy politikanın eşitlik olasılıkları belirtilir.
+  - Yalnız mevcut Q türevi alınır.
+- id: p17
+  type: açıkla
+  level: 1
+  title: 10.3 — Uzun getiri ve standart hata
+  goal: 10.3 — Uzun getiri ve standart hata
+  needs: Örnek standart sapma ve SE
+  q: 'Şekil10.4 içinde büyük n ayarlarında standart hatalar neden daha büyük raporlanmış olabilir? (Kaynak:
+    Sutton–Barto, s.248, Alıştırma10.3.)'
+  hints:
+  - Önce hangi niceliğin sabite kadar tanımlandığını ve hedefin hangi politikanın eylemini kullandığını ayırın.
+  solution: Daha uzun getiri daha çok rastgele geçiş/başlangıç etkisini taşır; kontrollü deneyde ağırlıklar
+    ve dolayısıyla politika da değiştiğinden küçük erken farklar sonraki yörüngeleri ayırabilir. Başarısız
+    uzun bölümler ve n ile birlikte seçilen α duyarlılığı koşular arası saçılmayı büyütebilir. Kaynağın yaklaşık
+    SE0.5→4 gözlemi bu Mountain Car/ilk50 bölüm/100 koşu düzenine aittir; SE=s_runs/√100. Uzun n için varyansın
+    her problemde monoton arttığı teoremi değildir; ödül kovaryansları ve bootstrap hatası bunu değiştirebilir.
+    Kendi taramamız SE değerlerini ayrı gösterir ve bir sansürlü ayarı başarılı99 koşunun ortalamasıyla doldurmaz.
+  rubric:
+  - Koşular arası SE ve100 koşu paydası ayrılır.
+  - Daha uzun dönüş ve adaptif politika etkisi açıklanır.
+  - Monoton genel garanti ileri sürülmez.
 pitfalls:
 - wrong: Doğrusal fonksiyon yaklaşımıyla Q-öğrenme her zaman yakınsar; ıraksama yalnız sinir ağlarında olur.
   right: Baird'in karşı örneğinde doğrusal politika dışı TD bile ıraksar. Ölümcül üçlü (yaklaşım + bootstrapping
@@ -937,11 +1098,12 @@ pitfalls:
   right: 'Hedefin türevi alınmaz: yöntem yarı-gradyandır ve hiçbir fonksiyonun inişi değildir. Bu yüzden gradyan
     inişinin yakınsama güvenceleri geçerli değildir.'
 - wrong: 2013 DQN makalesi deneyim tekrarı ve hedef ağ kullandı.
-  right: 2013 makalesinde ayrı bir hedef ağ yoktur; hedef aynı parametrelerle hesaplanır. Hedef ağ (C = 10 000)
-    2015 Nature sürümünde gelir.
+  right: 2013 makalesinde ayrı bir hedef ağ yoktur; hedef aynı parametrelerle hesaplanır. Hedef ağ (C = 10
+    000) 2015 Nature sürümünde gelir.
 - wrong: Deneyim tekrarı yalnız veri verimliliği içindir.
-  right: Asıl kazançlardan biri ardışık örneklerin ilişkisini kırmaktır; tek örnekli tekrar bile çevrimiçi SGD'den
-    çok daha düşük hata verir (lab l2). Ayrıca politika ile veri dağılımı arasındaki geri besleme döngüsünü yumuşatır.
+  right: Asıl kazançlardan biri ardışık örneklerin ilişkisini kırmaktır; tek örnekli tekrar bile çevrimiçi
+    SGD'den çok daha düşük hata verir (lab l2). Ayrıca politika ile veri dağılımı arasındaki geri besleme döngüsünü
+    yumuşatır.
 - wrong: TD sabit noktası minimum VE çözümüdür.
   right: Genelde farklıdır; aynı 10 grupta popülasyon kökVE .1167353, MCminimumu .0543770.
 - wrong: εI bütün LSTD matrislerini terslenebilir yapar.
@@ -952,20 +1114,20 @@ pitfalls:
   right: Zaman sabiti kuralıdır; τ10 ise 10 sunum sonrası .9^10 hata kalır.
 whatif:
 - q: Ödül kırpılmasaydı?
-  a: Oyundan oyuna puan ölçekleri (Pong'da ±1, Seaquest'te yüzler) gradyan büyüklüklerini çok farklı yapar; tek
-    bir öğrenme oranı her oyunda çalışmaz. Kırpma bunu çözer ama ajan büyük ve küçük ödülü ayıramaz. Sonraki çalışmalar
-    (Pop-Art, 2016) hedefleri uyarlamalı olarak normalize ederek kırpmadan aynı kararlılığı sağlar.
+  a: Oyundan oyuna puan ölçekleri (Pong'da ±1, Seaquest'te yüzler) gradyan büyüklüklerini çok farklı yapar;
+    tek bir öğrenme oranı her oyunda çalışmaz. Kırpma bunu çözer ama ajan büyük ve küçük ödülü ayıramaz. Sonraki
+    çalışmalar (Pop-Art, 2016) hedefleri uyarlamalı olarak normalize ederek kırpmadan aynı kararlılığı sağlar.
 - q: Hedef ağ her adımda güncellenseydi (C = 1)?
-  a: 'Hedef ağ olmayan duruma döner: her gradyan adımı hedefi de kaydırır ve geri besleme döngüsü kararsızlık yaratabilir.
-    Çok büyük C ise yeni bilginin hedefe geç yansıması demektir: öğrenme yavaşlar. Pratik değerler 10³–10⁴ adım
-    ya da yumuşak güncellemede τ ≈ 0.005.'
+  a: 'Hedef ağ olmayan duruma döner: her gradyan adımı hedefi de kaydırır ve geri besleme döngüsü kararsızlık
+    yaratabilir. Çok büyük C ise yeni bilginin hedefe geç yansıması demektir: öğrenme yavaşlar. Pratik değerler
+    10³–10⁴ adım ya da yumuşak güncellemede τ ≈ 0.005.'
 - q: Eylem uzayı sürekli olsaydı (ör. robot eklem torkları)?
   a: 'max_a Q(s, a) her adımda bir eniyileme problemi olur ve DQN doğrudan uygulanamaz. Çözümler: eylem uzayını
     ızgaraya bölmek (boyutla üstel büyür), ya da max''ı öğrenilmiş bir aktörle yaklaşmak (DDPG, TD3, SAC: aktör–eleştirmen,
     M11.9).'
 - q: Özellik sütunları bağımlı olsaydı?
-  a: Atekil olabilir; aynı değeri veren ağırlıklar tek değildir. Ters yerine uygun altuzay veya sözde ters koşulları
-    açıklanır.
+  a: Atekil olabilir; aynı değeri veren ağırlıklar tek değildir. Ters yerine uygun altuzay veya sözde ters
+    koşulları açıklanır.
 - q: İlgi yalnız başlangıçta olsa ve 2-adımda M yerine I kullansaydık?
   a: Bootstrap edilen üçüncü durum öğrenilmez; başlangıç tahmini 4 yerine 2 ye gider.
 - q: Hash bütün aktif karoları tek kovada birleştirseydi?

@@ -1,0 +1,5 @@
+**Aynı zamanı paylaşan, ayrı öğrenen ajanlar.** `batched_access` B bağımsız ortamın tablolarını `Q[B,44,2]`, gain kestirimlerini `rho[B]` ve ziyaretlerini `visits[B,44]` biçiminde taşısın. Yalnız zaman döngüsü kalsın. Her adımda bütün ortamlarda bırakmaları B×10 Bernoulli matrisiyle çek, gerçekten meşgul sunucularla maskele. Öncelikler düzgün0..3. Yeni işi aynı adımda bitebilir kabul ediyoruz.
+
+Bir mini yığından tek ortak ağ öğrenmiyoruz: her ortam kendi ağırlığını günceller. Bu yüzden ortalama kayıpla B'ye bölünmüş ortak gradyan yok; her satır için `Q[b,s,a] += alpha*delta[b]`. Gain ve sonraki eylemler de bağımsızdır. Büyüklüğü Bolan indeks dizisiyle gather/scatter kullan. Dönen sözlük `Q,rho,reward_mean,visits`; bütün sayılar ortam başına verilir.
+
+Rastgele sayılar vektör halinde farklı sırada tüketildiğinden aynı seed, döngülü b aşamasıyla birebir aynı yolları vaat etmez. Birden çok bağımsız koşu üretme amacı ve güncelleme kuralları aynıdır. Hız iddiası için aynı donanımda ölçüm gerekir.

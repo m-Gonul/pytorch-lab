@@ -1,0 +1,3 @@
+Bir sunucu kuyruğunun doğal sonu yoktur. Yalnız ilk müşterinin veya yakındaki ödülün değerini büyütmek yerine **adım başına ortalama ödülü** artırabiliriz. Bu amaçta γ yoktur; her gelecek adım aynı ağırlıktadır. Değer fonksiyonu, geleceğin toplam ödülünü değil, uzun dönem ortalamasına göre önden veya geriden gitmeyi ölçer.
+
+Önce üç durumlu halkayı elle çözün. Sonra saf Python ile diferansiyel SARSA, NumPy ile bağımsız model hesabı, PyTorch ile hedefin türevini durdurma ve birçok bağımsız ajanı vektörleştirme geliyor. Model yalnız doğrulama aracıdır; öğrenen sunucunun boşalma olasılığını bilmez. Episodik Mountain Car kontrolü [M11.6](m11-6-dqn.html#sutton-kontrol-hedef) içindedir.

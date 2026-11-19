@@ -26,7 +26,7 @@ progress:
   complete: false
   unit_inventory_complete: false
   second_read_complete: false
-  note: İlk9 bölüm işlendi; Bölüm9 test/yayın ayrıca izlenir. Bölüm10–17, ön/arka materyal, kısım ayırıcıları,
+  note: İlk10 bölüm işlendi; Bölüm10 test/yayın ayrıca izlenir. Bölüm11–17, ön/arka materyal, kısım ayırıcıları,
     tam kaynakça/dizin henüz bütünüyle işlenmedi; kitap tamamlanmadı.
   processed_chapters:
   - 1
@@ -38,8 +38,8 @@ progress:
   - 7
   - 8
   - 9
-  unprocessed_chapters:
   - 10
+  unprocessed_chapters:
   - 11
   - 12
   - 13
@@ -1173,7 +1173,7 @@ chapters:
   - m11-6-dqn
   mapping_status: 208 kaynak birimi kesin hedefe bağlandı; dört mevcut aynı/derin hedef doğrulandı; kaynak/defter
     bağımsız ikinci okuma kapandı.
-  content_status: işlendi; yerel testler tamamlandı, yayın CI ayrıca izlenir
+  content_status: işlendi; CI/Pages başarılı ve canlı içerik doğrulandı
   recorded_units: 208
   source_unnumbered_figures:
   - page: 221
@@ -1230,6 +1230,17 @@ chapters:
     preservation: Eski hand/stages/quiz/homework ve ilk3ek/2lab/6kart değer eşitliği; önceki1062 defter
       kaydı aynı. İlgili dört eski teori genellemesi gerekçeyle düzeltildi.
     final_geometry_lab_tests: 6/6 tilegeneral/interestvalue; son tilegeneral3/3
+  publication:
+    commit: dc2db89309d4b6df823a72faececf812ad27f187
+    workflow_run: 43634722876
+    build: success
+    deploy: success
+    live_verified: true
+    live_pages:
+    - https://m-gonul.github.io/pytorch-lab/m11-6-dqn.html
+    evidence: Canlı kaynak-fa/vurgu çapaları,p14,l9,x5,approxwalk/lstdvalue/kernelvalue ve yayımlanan
+      gerçek-bütçe veri modülü doğrulandı. Ortak runtime A/B metrik eşlemesi canlı dosyada mevcut.
+    verified_date: '2026-11-15'
 - chapter: 10
   title: Yaklaşımla politika üstü kontrol
   pdf_pages:
@@ -1325,8 +1336,68 @@ chapters:
     source_title: Diﬀerential semi-gradient n-step Sarsa for estimating ˆq ⇡q⇡or q⇤
   candidate_modules:
   - m11-6-dqn
-  mapping_status: aynı derinlik denetimi yapılmadı
-  content_status: işlenmedi
+  - m11-13-average-reward
+  mapping_status: 78 kaynak birimi kesin hedefe bağlandı; kaynak/defter bağımsız ikinci okuma kapandı.
+  content_status: işlendi; yerel testler temiz, CI/Pages/canlı doğrulaması bekleniyor
+  recorded_units: 78
+  source_unnumbered_figures: []
+  second_read:
+    independent: true
+    text_pages: 14
+    rendered_pages: 14
+    blank_pages: []
+    findings_resolved: true
+    note: Ayrı ajan yalnız PDF265–278 ve78 birimlik defteri okudu;9 alıştırma,5 numaralı şekil,4 kutu,2
+      dipnot,15 numaralı denklem ve4 Bellman denklemi doğrulandı. Temsil/özet gerekçesi, doğrusal ε-greedy
+      ile diferansiyellenebilir seçim sonuçlarının koşulları ve bağımsız boşalmaların kendi varsayımımız
+      olduğu tamamlandı. Son dar takipte açık kaynak/defter bulgusu yok. Üretim dosyaları incelenmedi.
+  measurement_limits:
+  - Kaynak tohumları verilmedi; kendi Mulberry32 akışlarımız açık. Eğri/tepe/gain değerleri zorla eşlenmedi.
+  - Şekil10.1 SARSA(λ) verisidir. Kendi λ0.9/replacing/toplam adım0.3 seçimlerimiz kaynakta verilmemiştir.
+  - 74 ilk50 ayarından biri n4/8α1.540702,99/100 tamamlandı; kalan koşunun son bölümünde2m sınırı. Ortalama/SE
+    null; başarılı99 koşuyla doldurulmadı.
+  - Erişim kontrolünde bağımsız sunucu boşalmaları ve yeni işin aynı adımda boşalıp boşalamaması açık
+    kendi varsayımlarımızdır. İki zamanlama ayrı hesaplandı.
+  - Son Rbar, gerçek ödül ortalaması, son dondurulmuş ε-politika ve model optimumu ayrı niceliklerdir.
+    Oracle öğrenene verilmez.
+  - Ham sonsuz merkezli rastgele toplam yerine uygun beklenen-kısmi-toplam/Poisson/Abel tanımı ve değer
+    normalizasyonu belirtildi.
+  - n-adım izinin başlangıç katsayısını silmesi adaptif Q/politika altında gerçek gain yansızlığı anlamına
+    gelmez.
+  validation:
+    node_tests: 840/840 tam koşu
+    final_site_and_numeric: 12/12
+    module_tests: 2/2 gerçek CPU torch
+    notebook_tests: 2/2 gerçek CPU torch
+    changed_lab_tests: 18/18; son mountainmeasured/gainbias6/6 ve returnbias3/3
+    independent_references:
+      access_CPP_JS_cases: 8
+      access_steps_each: 2000000
+      access_full44_max_gain_difference: 5.329070518200751e-15
+      mountain_first50_lengths_identical: true
+      mountain_cost_field_max_difference: 5.9969806898152456e-12
+      mountain_trace_weight_max_difference: 4.973799150320701e-13
+      mountain_episode_array_fixtures: 7
+    browser:
+      widths:
+      - 1280
+      - 390
+      presets: 23
+      combinations: 46
+      AB_cases: 16
+      overflow: 0
+      inline_math_errors: 0
+      javascript_errors: 0
+      duplicate_ids: 0
+      final_SVG_text_bounds_errors: 0
+    preservation: Önceki1270 defter kaydı ve8 öğretim kaydı aynı. M11.6 eski el hesabı/aşamalar/quiz/ödev/yanılgı/whatif
+      ve bütün14 kart/9 lab/5 ek korundu; eski ders paragrafları birebir korundu. x1 fizik/bütçe hataları
+      gerekçeyle düzeltildi.
+  publication:
+    commit: null
+    build: bekleniyor
+    deploy: bekleniyor
+    live_verified: false
 - chapter: 11
   title: Yaklaşımla politika dışı yöntemler
   pdf_pages:
@@ -3938,98 +4009,98 @@ page_audit:
   text_characters: 2079
   embedded_images: 0
   drawing_paths: 0
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 266
   printed_page: 244
   text_sha256: cd95a961f508a9e276005cac0e8810e10059e7cde633f7f74aa29121c8f0ba35
   text_characters: 2836
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 267
   printed_page: 245
   text_sha256: 742c0e447b61a4d7bdbd8b0ccf84f460b05bdb7a867fdd10c818b314b0cef3e8
   text_characters: 5461
   embedded_images: 1
   drawing_paths: 26
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 268
   printed_page: 246
   text_sha256: 727d2f308d625a5ca462087d6bef9f141284098ea424e93ab8e49bfa503384dd
   text_characters: 2689
   embedded_images: 2
   drawing_paths: 8
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 269
   printed_page: 247
   text_sha256: b2f9e88da4f545984195b3a9a81eb27c3e984be6119c2308cea4f2c2732f79b9
   text_characters: 2516
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 270
   printed_page: 248
   text_sha256: e491a9c96f6ed13404969e4495316e5dfa9908bf84348473a0a349aa5080271e
   text_characters: 2850
   embedded_images: 4
   drawing_paths: 5
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 271
   printed_page: 249
   text_sha256: 420a99193e6951af0bcab877065ab0ebac69bb6f5bdff3be3d02f7468ed13be5
   text_characters: 3200
   embedded_images: 0
   drawing_paths: 2
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 272
   printed_page: 250
   text_sha256: 1ed083c7e1fde33c287057ef3ed252febb7ec642b30c7c9da40938ee813c8122
   text_characters: 2995
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 273
   printed_page: 251
   text_sha256: fe3f6446b6ab623d32067cc62b9ca04bba10ebbe0db13a00b7337f0763dcdda0
   text_characters: 2888
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 274
   printed_page: 252
   text_sha256: 8a1ee0e53c7271b08e5fafb9519919319d881db096c23ccb9b080132e425f9c4
   text_characters: 3324
   embedded_images: 2
   drawing_paths: 20
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 275
   printed_page: 253
   text_sha256: 7173ad3e6b9a3a3b25e14a9fc7f74309944f8a87b16735ca84e00a192d279746
   text_characters: 3517
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 276
   printed_page: 254
   text_sha256: 6a8edbb8f01d8f4ec51463618ebc368806b9685112f5f38210ab49056154eea7
   text_characters: 3013
   embedded_images: 0
   drawing_paths: 5
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 277
   printed_page: 255
   text_sha256: 12c7f5a10282af4ba2dd42d07cd855c55da605a4072776a14a8126e088924526
   text_characters: 2745
   embedded_images: 0
   drawing_paths: 3
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 278
   printed_page: 256
   text_sha256: 061a140bae45276aab45e1c2ce14329736798ca10d5d8debd3219161ca9cbe07
   text_characters: 3010
   embedded_images: 0
   drawing_paths: 1
-  visual_review: incelenmedi
+  visual_review: PNG görüntüsü incelendi; metin/formül/şekil ve kaynak/defter ikinci okuması tamamlandı.
 - pdf_page: 279
   printed_page: 257
   text_sha256: 1475d7fbea0fc14c6f9920ac87882db703286def1fc28e9d942d4704303ba9b9
@@ -16340,6 +16411,626 @@ items:
   what: ChristensenKorf1986satrançlinearreg,ChapmanKaelbling1991/Tan1991değerağacı,YeeSaxenaUtgoffBarto1990/DietterichFlann1995explanationbasedcompactvalue.
   status: eklendi
   where: content/modules/m11-6-dqn/lesson.md#sutton-fa-tarih
+- id: ch10-p243-i1
+  page: 243
+  pdf_page: 265
+  kind: tanım
+  what: Sonlu w ile qhat(s,a,w)≈q* kontrolü; bu bölüm on-policy, off-policy Bölüm11.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p243-i2
+  page: 243
+  pdf_page: 265
+  kind: bilgi
+  what: Bölüm9 TD tahmininin eylem değerlerine ve ε-greedy GPI kontrolüne uzantısı; episodik ve sürekli
+    durumların ayrı ele alınması.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p243-i3
+  page: 243
+  pdf_page: 265
+  kind: bilgi
+  what: Kaynağın yaklaşımla indirimi bırakma önerisi kendi-durağan-dağılım amaç kapsamındadır; bütün discounted
+    FA kontrolü olanaksız sonucu değildir.
+  status: düzeltildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+  note: 'Koşul düzeltmesi: durağan-ağırlıklı indirimli amaç bütün kontrol problemleriyle özdeş değil;
+    ham merkezli rastgele toplam genelde yakınsamaz.'
+- id: ch10-p243-i4
+  page: 243
+  pdf_page: 265
+  kind: tanım
+  what: Eğitim çifti (St,At)↦Ut; Ut gerçek qπ yaklaşımı, MC getirisi veya n-adım SARSA hedefi olabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p244-i1
+  page: 244
+  pdf_page: 266
+  kind: formül
+  what: '10.1: w+=α[U−qhat]∇qhat; eylem-değer gradyan tahmini.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p244-i2
+  page: 244
+  pdf_page: 266
+  kind: formül
+  what: '10.2: episodik tek-adım semigrad SARSA hedefi R+γqhat(S′,A′); hedef türevi alınmaz.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p244-i3
+  page: 244
+  pdf_page: 266
+  kind: bilgi
+  what: Sabit politika için önceki TD yakınsaması/sınırı uygun doğrusal/rank/örnekleme koşullarıyla geçer;
+    herhangi differentiable q için koşulsuz değil.
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p244-i4
+  page: 244
+  pdf_page: 266
+  kind: bilgi
+  what: Küçük ayrık eylem kümesinde her a için q hesapla, argmax bul, aynı ε-greedy politikayla davran/değerlendir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p244-i5
+  page: 244
+  pdf_page: 266
+  kind: bilgi
+  what: Sürekli veya çok büyük eylem kümesinde eylem seçimi çözüm güçlüğü2018araştırma değerlendirmesi;
+    bugüne evrensel belirsizlik diye taşınmaz.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p244-i6
+  page: 244
+  pdf_page: 266
+  kind: kod
+  what: 'Episodic semigrad SARSA kutusu: w/α/ε başlangıcı, S/A başlat, geçiş, terminalde R−q ve yeni bölüm,
+    değilse A′seç/güncelle/S,Ailerlet.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p244-i7
+  page: 244
+  pdf_page: 266
+  kind: örnek
+  what: 'Örnek10.1: motoru eğime yetmeyen dağ arabası; önce hedeften uzaklaşıp karşı yamaçtan momentum
+    toplama.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-hedef
+- id: ch10-p245-i1
+  page: 245
+  pdf_page: 267
+  kind: şekil
+  what: 'Şekil10.1: vadi/araba/hedef ve −max_a q maliyet yüzeyleri; Step428,ep12/104/1000/9000, yazar
+    koşusu tepe ölçekleri4/27/46/104/120; konum/hız eksenleri.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+  figure: türetildi
+  note: Kendi gerçek hesaplarından türetildi; yazar sayıları ile kendi ölçümlerimiz ayrı. Kaynak pikselleri/eğrileri
+    yayımlanmadı.
+- id: ch10-p245-i2
+  page: 245
+  pdf_page: 267
+  kind: bilgi
+  what: Hedefe yaklaşmak için önce uzaklaşma gereği; insan tasarım desteği yoksa bazı kontrol yöntemlerinde
+    güçlük.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p245-i3
+  page: 245
+  pdf_page: 267
+  kind: formül
+  what: 'Dağ arabası: v′=clip(v+.001A−.0025cos3x,±.07),x′=clip(x+v′,−1.2,.5), solda hız0, sağda terminal;
+    A−1/0/+1,her adım−1.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p245-i4
+  page: 245
+  pdf_page: 267
+  kind: örnek
+  what: Başlangıç x∈[−.6,−.4),v0;8döşeme, her eksende sınırlı aralığın1/8genişliği ve asimetrik ofsetler.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p246-i1
+  page: 246
+  pdf_page: 268
+  kind: formül
+  what: '10.3: qhat=wᵀx(s,a); her eylemin ayrı tile özelliği, binary aktif ağırlık toplamı.'
+  status: genişletildi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p246-i2
+  page: 246
+  pdf_page: 268
+  kind: bilgi
+  what: Q0başlangıcı gerçek negatif değerlere göre iyimser; ε0ile bile güncellemeler görülmüş yerleri
+    kötüleştirerek keşif doğurabilir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p246-i3
+  page: 246
+  pdf_page: 268
+  kind: bilgi
+  what: Step428henüz ilk bölüm bitmeden vadiyi dolaşma; durum uzayında halkasal yörüngeler ve görülmeyen
+    yerlerin yüksek kalması.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p246-i4
+  page: 246
+  pdf_page: 268
+  kind: şekil
+  what: 'Şekil10.2: SARSA100koşu×500bölüm, ε0,α.1/8,.2/8,.5/8; bölüm adımı logy,100/200/400/1000ölçeği.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+  figure: türetildi
+  note: Kendi gerçek hesaplarından türetildi; yazar sayıları ile kendi ölçümlerimiz ayrı. Kaynak pikselleri/eğrileri
+    yayımlanmadı.
+- id: ch10-p246-i5
+  page: 246
+  pdf_page: 268
+  kind: dipnot
+  what: tiles3URL/IHT4096,8tiling, özellik ölçeği8x/1.7 ve8v/.14, action ints argümanı; kendi faz/ofset
+    seçimi kaynakla eşleştirilecek.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p246-i6
+  page: 246
+  pdf_page: 268
+  kind: dipnot
+  what: Şekil10.1verisi gerçekte semigrad SARSA(λ) koşusudur; sıradan SARSA benzer davranabilir ama aynı
+    veri değildir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-dag-arabasi
+- id: ch10-p247-i1
+  page: 247
+  pdf_page: 269
+  kind: formül
+  what: '10.4: nödül+γⁿqhat(St+n,At+n,güncelw),terminalde tam Gt;10.5 güncel w ile n-adım yarı-gradyan
+    güncellemesi.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-nstep
+- id: ch10-p247-i2
+  page: 247
+  pdf_page: 269
+  kind: kod
+  what: Episodik n-adım SARSA kutusu:π tahmini veya ε-greedy kontrol,n+1halka,T∞,τ=t−n+1,terminal sonrası
+    τ=T−1oluncaya kadar boşaltma.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-nstep
+- id: ch10-p247-i3
+  page: 247
+  pdf_page: 269
+  kind: bilgi
+  what: Sabitπ tahmini ile kontrolün eylem seçimi ayrımı; diferansiyellenebilir q,α,ε,n ve wbaşlangıç
+    koşulları.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-nstep
+- id: ch10-p247-i4
+  page: 247
+  pdf_page: 269
+  kind: bilgi
+  what: Bu deneyde n1yerine orta ufuk/n8ile daha hızlı/daha iyi son performans; her görev/n için monotonic
+    garanti değil.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-nstep
+- id: ch10-p248-i1
+  page: 248
+  pdf_page: 270
+  kind: şekil
+  what: 'Şekil10.3: n1/α.5/8 ve n8/α.3/8,100koşu×500bölüm; adım sayısı logy.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-nstep
+  figure: türetildi
+  note: Kendi gerçek hesaplarından türetildi; yazar sayıları ile kendi ölçümlerimiz ayrı. Kaynak pikselleri/eğrileri
+    yayımlanmadı.
+- id: ch10-p248-i2
+  page: 248
+  pdf_page: 270
+  kind: şekil
+  what: 'Şekil10.4: n1/2/4/8/16,100koşu×ilk50bölüm ortalama uzunluğu, x=8α, log seçilmiş α noktaları doğrularla
+    bağlanır; y220..300.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-nstep
+  figure: türetildi
+  note: Kendi gerçek hesaplarından türetildi; yazar sayıları ile kendi ölçümlerimiz ayrı. Kaynak pikselleri/eğrileri
+    yayımlanmadı.
+- id: ch10-p248-i3
+  page: 248
+  pdf_page: 270
+  kind: bilgi
+  what: Yazar sonuçlarında n4iyi; standart hatalar n1için.5ila n16için4, ana farkların anlamlılığı kaynak
+    raporudur, kendi ölçümümüz değildir.
+  status: eklendi
+  where: content/modules/m11-6-dqn/lesson.md#sutton-kontrol-nstep
+- id: ch10-p248-i4
+  page: 248
+  pdf_page: 270
+  kind: alıştırma
+  what: '10.1: bu bölümdeki MC yöntemleri nasıl olur, neden ayrıca pseudocode gerekmeyebilir, MountainCar
+    performansı nasıl beklenir?'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p15
+- id: ch10-p248-i5
+  page: 248
+  pdf_page: 270
+  kind: alıştırma
+  what: '10.2: semigrad tek-adım Expected SARSA kontrol pseudocode yaz.'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p16
+- id: ch10-p248-i6
+  page: 248
+  pdf_page: 270
+  kind: alıştırma
+  what: '10.3: Şekil10.4büyük n sonuçlarının SEdeğeri neden daha büyük?'
+  status: eklendi
+  where: content/modules/m11-6-dqn/module.yaml#practice:p17
+- id: ch10-p249-i1
+  page: 249
+  pdf_page: 271
+  kind: tanım
+  what: 'Episodik/indirimli yanında üçüncü klasik amaç: doğal son ve özel başlangıç zamanı olmayan sürekli
+    görevde adım başı ortalama ödül.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-amac
+- id: ch10-p249-i2
+  page: 249
+  pdf_page: 271
+  kind: bilgi
+  what: İndirim yok; geç ödüle de aynı önem, klasik DP'de yaygın/RL'de daha az kullanım kaynak dönemi
+    değerlendirmesi.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-amac
+- id: ch10-p249-i3
+  page: 249
+  pdf_page: 271
+  kind: formül
+  what: '10.6: ρ(π)=lim_h(1/h)ΣEπ[Rt|S0];10.7tek-zaman beklenti limiti ve durağan µπile ortalama ödül
+    toplamı.'
+  status: genişletildi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-amac
+- id: ch10-p249-i4
+  page: 249
+  pdf_page: 271
+  kind: tanım
+  what: 'Buradaki ergodiklik: her π için Pr(St=s)limiti var ve başlangıçtan bağımsız; ilk kararlar ancak
+    geçici etkili, limitlerin varlığı için yeterli.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-amac
+- id: ch10-p249-i5
+  page: 249
+  pdf_page: 271
+  kind: bilgi
+  what: Periyodik zincirde durağan dağılım olabilir ama sabit başlangıçtan dağılım limiti olmayabilir;
+    Cesaro ve tek-zaman limitleri ayrılır.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-amac
+- id: ch10-p249-i6
+  page: 249
+  pdf_page: 271
+  kind: bilgi
+  what: Ortalama ödülde optimalite türleri farklı olabilir; bu bölüm en büyük ρelde eden bütün politikaları
+    gain-optimal sayar.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-amac
+- id: ch10-p249-i7
+  page: 249
+  pdf_page: 271
+  kind: formül
+  what: '10.8: Σsµπ(s)Σaπ(a|s)p(s′|s,a)=µπ(s′); durağanlık dağılımı korur.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-amac
+- id: ch10-p250-i1
+  page: 250
+  pdf_page: 272
+  kind: formül
+  what: '10.9: biçimsel diferansiyel getiri Σ(R−ρ); merkezli rastgele toplam genelde a.s.yakınsamaz, uygun
+    beklenen-kısmi-toplam/Abel bias tanımı gerekir.'
+  status: düzeltildi
+  where: content/modules/m11-13-average-reward/lesson.md#diferansiyel-deger
+  note: 'Koşul düzeltmesi: durağan-ağırlıklı indirimli amaç bütün kontrol problemleriyle özdeş değil;
+    ham merkezli rastgele toplam genelde yakınsamaz.'
+- id: ch10-p250-i2
+  page: 250
+  pdf_page: 272
+  kind: tanım
+  what: Diferansiyel vπ/qπ ve optimal değerler; Poisson çözümü eklenen sabite kadar, bir referans/µ-ortalamasıyla
+    normalizasyon gerekir.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#diferansiyel-deger
+- id: ch10-p250-i3
+  page: 250
+  pdf_page: 272
+  kind: formül
+  what: 'Dört Bellman denklemi: sabitπ için v/q, optimalρve maxile v*/q*; γkalkar, Ryerine R−ρkonur.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#diferansiyel-deger
+- id: ch10-p250-i4
+  page: 250
+  pdf_page: 272
+  kind: formül
+  what: '10.10–10.11: durum ve eylem-değer diferansiyel δ=R−Rbar+sonraki tahmin−mevcut tahmin.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#diferansiyel-deger
+- id: ch10-p250-i5
+  page: 250
+  pdf_page: 272
+  kind: bilgi
+  what: Rbar ortalama ödül kestirimi; uygun varsayımlarla birçok algoritma/sonuç diferansiyel biçime uzanır,
+    koşulsuz her teorem değil.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#diferansiyel-deger
+- id: ch10-p250-i6
+  page: 250
+  pdf_page: 272
+  kind: formül
+  what: '10.12: w+=αδ∇qhat; Rbar güncellemesiyle beraber diferansiyel SARSA.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#diferansiyel-deger
+- id: ch10-p250-i7
+  page: 250
+  pdf_page: 272
+  kind: alıştırma
+  what: '10.4: diferansiyel semigrad Q-learning pseudocode ver.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p1
+- id: ch10-p250-i8
+  page: 250
+  pdf_page: 272
+  kind: alıştırma
+  what: '10.5: diferansiyel TD0için10.10dışında hangi denklemler gerekir?'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p2
+- id: ch10-p251-i1
+  page: 251
+  pdf_page: 273
+  kind: kod
+  what: Diferansiyel SARSA kutusu:α/β,w/Rbar,S/Abaşlat; sürekli geçiş,A′seç,δ,Rbar+=βδ,w+=αδ∇q,S/Ailerlet;
+    terminal/reset yok.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-sarsa
+- id: ch10-p251-i2
+  page: 251
+  pdf_page: 273
+  kind: alıştırma
+  what: '10.6: deterministik A→B→C→A halkasında yalnız A''ya varışta+1, diğer0; diferansiyel değerler
+    nedir? Periyodiklik/normalizasyon açıklaştırılır.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p3
+- id: ch10-p251-i3
+  page: 251
+  pdf_page: 273
+  kind: örnek
+  what: Örnek10.2:10sunucu, dolu kuyruk,4eşit öncelik ve1/2/4/8kabul ödülü; adımda tek kabul/red,red0,
+    boşsunucu0ise zorunlu red.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-sarsa
+- id: ch10-p251-i4
+  page: 251
+  pdf_page: 273
+  kind: örnek
+  what: Her meşgul sunucu p.06ile boşalır; bağımsız Bernoulli çekilişi kendi benzetim tercihimiz olarak
+    ayrıca belirtilecek; ajan geliş/ayrılış istatistiklerini bilmez, mevcut öncelik/boş sunucuyla karar
+    verir.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-sarsa
+- id: ch10-p251-i5
+  page: 251
+  pdf_page: 273
+  kind: bilgi
+  what: Tablo da genel FA'nın özel durumu; durum=(boşsunucu,öncelik),a=kabul/red;α.01,β.01,ε.1,Q/Rbar0başlangıcı.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#ortalama-sarsa
+- id: ch10-p252-i1
+  page: 252
+  pdf_page: 274
+  kind: şekil
+  what: Şekil10.5:2mgerçek adımdan bulunan politika eşikleri öncelik1/2/4/8için boş≥6/4/2/1; dört eniyi-eylem
+    diferansiyel değer eğrisi veRbar≈2.31yazar raporu.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#erisim-kontrol
+  figure: türetildi
+  note: Kendi gerçek hesaplarından türetildi; yazar sayıları ile kendi ölçümlerimiz ayrı. Kaynak pikselleri/eğrileri
+    yayımlanmadı.
+- id: ch10-p252-i2
+  page: 252
+  pdf_page: 274
+  kind: bilgi
+  what: Sağ uç değer düşüşü muhtemelen yetersiz veri; birçok durum hiç görülmemiş. Kendi ziyaret/moment
+    ölçümleriyle kaynak raporu ayrılır.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#erisim-kontrol
+- id: ch10-p252-i3
+  page: 252
+  pdf_page: 274
+  kind: alıştırma
+  what: 10.7:1/0periyodik sonsuz ödül,ρnedir? Ailk+1/Bilk0;10.13Abel sınırıyla iki değeri bul, h→∞sonraγ→1sırasını
+    koru.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p4
+- id: ch10-p252-i4
+  page: 252
+  pdf_page: 274
+  kind: formül
+  what: '10.13: limγ→1 limh→∞Σγ^t(E[Rt+1|S0=s]−ρ); periyodik bias için alternatif tanım.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#erisim-kontrol
+- id: ch10-p252-i5
+  page: 252
+  pdf_page: 274
+  kind: alıştırma
+  what: '10.8başlangıcı: üç-durum halkasında Rbar zaten1/3iken ödül-only veδhata dizilerini karşılaştır.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p5
+- id: ch10-p253-i1
+  page: 253
+  pdf_page: 275
+  kind: bilgi
+  what: '10.8devamı: Rbar güncellense hangi hata daha kararlı olur,neden? δsıfırlığı doğru diferansiyel
+    değer varsayar.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p5
+- id: ch10-p253-i2
+  page: 253
+  pdf_page: 275
+  kind: bilgi
+  what: Tabloda durum başına indirimi ayrı tanımlama; FA'da durumları ayıramayan/aynı-özellikli uç örnek
+    ve sürekli özel zaman olmaması.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p253-i3
+  page: 253
+  pdf_page: 275
+  kind: bilgi
+  what: Kendi politika ziyaret dağılımında discounted return ortalamasıρ/(1−γ); γaynı politika sıralamasını
+    verir,γ0da dahil.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p253-i4
+  page: 253
+  pdf_page: 275
+  kind: türetim
+  what: 'Simetri: her ödül her geleceğe bakış konumunda bir kez yer alır, ağırlık toplamı1+γ+...=1/(1−γ).'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p253-i5
+  page: 253
+  pdf_page: 275
+  kind: bilgi
+  what: Bu amaç altında γgörev sıralaması parametresi olmaktan çıkıp çözüm yöntemi parametresi olabilir;
+    discounted update ortalama-ödül optimalitesini otomatik garantilemez.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p254-i1
+  page: 254
+  pdf_page: 276
+  kind: türetim
+  what: 'Kutulu tam kanıt: J=Σµπvγ;Bellman, ödül toplamı,durağanlık,sıra değiştirme ileJ=ρ+γJ→ρ/(1−γ).'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p254-i2
+  page: 254
+  pdf_page: 276
+  kind: bilgi
+  what: Yaklaşık değerle ε-greedification genel politika iyileştirmesi garantilemez; yalnız bir durumdaki
+    approximate improvement yeterli değildir.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p254-i3
+  page: 254
+  pdf_page: 276
+  kind: bilgi
+  what: Bu boşluk episodik/ortalama kontrol için de geçerli; Bölüm13parametrik politika/PG teoremi farklı
+    güvence, yakınsama iddiası değildir.
+  status: genişletildi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p254-i4
+  page: 254
+  pdf_page: 276
+  kind: kaynakça
+  what: Perkins–Precup2003olası kısmi yaklaşım,Gordon1996a chattering/iyi politikalar arasında salınma;
+    değerlendirme2018ufkunda.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci
+- id: ch10-p255-i1
+  page: 255
+  pdf_page: 277
+  kind: formül
+  what: '10.14: nödülden aynı güncelRbar çıkarılıp güncel qbootstrap eklenir; devam eden görevdeT∞,n≥1.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#n-adim
+- id: ch10-p255-i2
+  page: 255
+  pdf_page: 277
+  kind: formül
+  what: 10.15:δ=Gdiff−qhat; w+=αδ∇q ve Rbar+=βδ; hamδiçinde nRbar bulunur.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#n-adim
+- id: ch10-p255-i3
+  page: 255
+  pdf_page: 277
+  kind: kod
+  what: Diferansiyel n-adım SARSA kutusu:π/ε-greedy,S/A/Rn+1tampon,τ=t−n+1,τ≥0güncellemesi; terminal yok,
+    nödülde ortak güncel gain.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#n-adim
+- id: ch10-p255-i4
+  page: 255
+  pdf_page: 277
+  kind: alıştırma
+  what: '10.9: yavaşβbaşlangıç biası ile örnek ortalamasının uzun dönem yavaşlığı;2.7unbiased sabit-adım
+    hilesini kutuya uyarla.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p6
+- id: ch10-p255-i5
+  page: 255
+  pdf_page: 277
+  kind: bilgi
+  what: 10.9uyarlamasında nölçeği gerekir:δ/nortalama hedefiyle izo+=β(1−o),Rbar+=(β/o)(δ/n); eşdeğer
+    ham-βizinde nβ. İlk güncellemenin başlangıç ağırlığını sıfırlaması denetlenir.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#n-adim
+- id: ch10-p256-i1
+  page: 256
+  pdf_page: 278
+  kind: bilgi
+  what: 'Bölüm özeti: episodik parametreli kontrol ve ortalama-ödüllü sürekli formülasyon; discounted-kontrol
+    olanaksızlığı iddiasının amaç kapsamı görünür.'
+  status: düzeltildi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
+  note: 'Koşul düzeltmesi: durağan-ağırlıklı indirimli amaç bütün kontrol problemleriyle özdeş değil;
+    ham merkezli rastgele toplam genelde yakınsamaz.'
+- id: ch10-p256-i2
+  page: 256
+  pdf_page: 278
+  kind: bilgi
+  what: 'Diferansiyel değer/Bellman/TD ve algoritmalar klasik aileyle paraleldir. Kaynağın özet gerekçesi:
+    kısıtlı yaklaşımda çoğu politika bir değer fonksiyonuyla temsil edilemez; geriye kalan keyfî politikaları
+    tek skaler ortalama ödülle sıralama önerisi.'
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
+- id: ch10-p256-i3
+  page: 256
+  pdf_page: 278
+  kind: kaynakça
+  what: Rummery–Niranjan1994ilk semigrad SARSA; kaynakta doğrusal+ε-greedy için olağan yakınsama yok,
+    en iyi çözüm yakınında bounded region (Gordon1996a/2001); Precup–Perkins2003diferansiyellenebilir
+    eylem seçimiyle yakınsama. Perkins–Pendrith2002/Melo–Meyn–Ribeiro2008diğer okumalar; tek başına differentiability
+    genel garanti değildir.
+  status: genişletildi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
+- id: ch10-p256-i4
+  page: 256
+  pdf_page: 278
+  kind: kaynakça
+  what: MountainCar öncüsü Moore1990, burada kesin görev Sutton1996.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
+- id: ch10-p256-i5
+  page: 256
+  pdf_page: 278
+  kind: kaynakça
+  what: Episodik n-adım SARSA,vanSeijen2016forwardSARSAλ; deneyler kitabın2.baskısına yeni.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
+- id: ch10-p256-i6
+  page: 256
+  pdf_page: 278
+  kind: kaynakça
+  what: Ortalama ödül:Puterman1994,Mahadevan1996,Tadepalli–Ok1994,Bertsekas–Tsitsiklis1996,Tsitsiklis–VanRoy1999.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
+- id: ch10-p256-i7
+  page: 256
+  pdf_page: 278
+  kind: kaynakça
+  what: On-policy analogR-learningSchwartz1993;Qsonrası alfabetik ad/relative yorum; access-control Carlström–Nordström1997.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
+- id: ch10-p256-i8
+  page: 256
+  pdf_page: 278
+  kind: kaynakça
+  what: Discount sınırlılıkları ilk baskı sonrası yazar farkındalığı; erken basılı gözlem Singh–Jaakkola–Jordan1994.
+  status: eklendi
+  where: content/modules/m11-13-average-reward/lesson.md#tarih
 chapter_counts:
   '1':
     items: 159
@@ -16412,6 +17103,15 @@ chapter_counts:
     figures: 17
     numbered_figures: 15
     unnumbered_figures: 2
+    code: 4
+    tables: 0
+    footnotes: 2
+  10:
+    items: 78
+    exercises: 9
+    figures: 5
+    numbered_figures: 5
+    unnumbered_figures: 0
     code: 4
     tables: 0
     footnotes: 2
@@ -16498,3 +17198,35 @@ teaching_extensions:
   status: eklendi
   where: content/modules/m11-6-dqn/module.yaml#practice:p14
   note: Kendi öğretim sorumuz; kaynak alıştırma sayısına katılmaz.
+- id: teaching-ch10-gauge
+  kind: hesap
+  note: Kendi öğretim birimimiz; kaynak birimi/alıştırma sayısına katılmaz.
+  page: 250
+  pdf_page: 272
+  status: eklendi
+  what: Ortak sabitin TD farkında iptali.
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p7
+- id: teaching-ch10-oracle
+  kind: bilgi
+  note: Kendi öğretim birimimiz; kaynak birimi/alıştırma sayısına katılmaz.
+  page: 250
+  pdf_page: 272
+  status: eklendi
+  what: Son dondurulmuş politikayı modelde değerlendirmenin kapsamı.
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p8
+- id: teaching-ch10-random-sum
+  kind: karşı-örnek
+  note: Kendi öğretim birimimiz; kaynak birimi/alıştırma sayısına katılmaz.
+  page: 250
+  pdf_page: 272
+  status: eklendi
+  what: Tek durumlu iid±1 ham toplamın yakınsamaması.
+  where: content/modules/m11-13-average-reward/module.yaml#practice:p9
+- id: teaching-ch10-fixed-start
+  kind: karşı-örnek
+  note: Kendi öğretim birimimiz; kaynak birimi/alıştırma sayısına katılmaz.
+  page: 250
+  pdf_page: 272
+  status: eklendi
+  what: İndirimli sabit başlangıç ile kendi durağan amaç sıralaması farkı.
+  where: content/modules/m11-13-average-reward/lesson.md#indirim-amaci

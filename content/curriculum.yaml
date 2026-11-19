@@ -163,3 +163,4 @@ phases:
       - {id: m11-10-planning, code: M11.10, title: "Model tabanlı RL: Dyna-Q ve MCTS", core: "UCT seçimi elle → Dyna-Q → MCTS", src: [sutton, silver]}
       - {id: m11-11-alphazero, code: M11.11, title: "AlphaGo'dan AlphaZero'ya", core: "PUCT elle → policy-value ağı + MCTS ile kendi kendine oyun", src: [p-alphago, p-alphagozero]}
       - {id: m11-12-trust-region, code: M11.12, title: "Trust region yöntemleri ve PPO", core: "trust region alt problemi elle → TRPO sezgisi → PPO-clip", src: [cs285, spinup]}
+      - {id: m11-13-average-reward, code: M11.13, title: "Sürekli görevler: ortalama ödül ve diferansiyel kontrol", core: "gain/bias elle → diferansiyel SARSA → Poisson modeli → PyTorch ve bağımsız ajanlar", src: [sutton, puterman]}

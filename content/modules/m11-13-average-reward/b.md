@@ -1,0 +1,5 @@
+**Kuyruk hiç bitmiyor.**10 sunucu, dört eşit öncelik, kabul ödülleri1/2/4/8. Her adımda bir müşteri kabul veya reddedilir. Boş sunucu yoksa kabul eylemi de zorunlu reddir. `access_step` yeni boş sayısını, önceliği ve ödülü döndürsün.
+
+Kaynak ayrı ayrı her meşgul sunucu için bırakma olasılığı.06 verir. Burada bırakmaları **bağımsız Bernoulli** seçiyoruz. `release_new=True` durumunda yeni kabul edilen iş de aynı adımın sonunda bitebilir; `False` yalnız önceden meşgul sunucuları bırakır. Bu zamanlama, kaynakta açıkça belirlenmeyen bir model tercihidir.
+
+`differential_sarsa` gerçek geçişlerden öğrenir; modeli kullanmaz. Tablo `Q[free][priority][action]`, başlangıç0; ε-greedy eşitlikleri rastgele. Terminal, reset veya γ yok. Sonraki eylemi **ağırlıkları değiştirmeden önce** seçin. Tek hata `delta=reward-rho+Qnext-Qcurrent` hem `rho += beta*delta` hem `Q += alpha*delta` için kullanılır. Çıktı `Q`, `rho`, gerçek ödül ortalaması `reward_mean` ve `visits` sözlüğü olsun. Kaynak: Sutton–Barto, s.251, Örnek10.2 ve diferansiyel SARSA kutusu.

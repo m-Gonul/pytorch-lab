@@ -3,7 +3,7 @@ intro: |
 
   **Nasıl denetlendi:** 82 PDF'in metni çıkarıldı (toplam ≈ 31 700 satır); her slayt başlığı ilgili modülün tüm dosyalarında (anlatım, alıştırma, kontrol, kod) aranıp eşleşmeyenler elle incelendi. **Erişim sınırı:** slaytlardaki şekil ve ekran görüntüleri metin olarak okunamadı; yalnız başlık, metin ve formüllerin metne dökülebilen kısmı karşılaştırıldı. Görsel içerikli slaytlar (ör. görüntü örnekleri, mimari çizimleri) konu başlığı üzerinden eşlendi.
 
-  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–9 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108, 109, 114, 116, 117, 119, 121, 122, 123, 128, 129, 132, 133, 134, 142, 143, 144, 145, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 164–180 ve182–215,220–263) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
+  **Yeni kitap denetimi:** Sutton ve Barto PDF kaynağının işlenen Bölüm 1–10 içindeki şekilli sayfaları (PDF 30, 32, 50, 51, 56, 58, 60, 64, 70, 74, 75, 78, 79, 81, 82, 83, 84, 86, 87, 88, 97, 98, 99, 102, 103, 105, 106, 108, 109, 114, 116, 117, 119, 121, 122, 123, 128, 129, 132, 133, 134, 142, 143, 144, 145, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 162, 164–180 ve182–215,220–263,265–278) görüntü olarak incelendi. Eski slaytlarla ilgili yukarıdaki erişim sınırı bu çalışma ile kaldırılmış sayılmaz. Kitap için ayrıntılı ve henüz tamamlanmamış birim defteri `content/coverage/sutton.yaml` içindedir.
 
   **Durumlar:** *kapsandı* — kaynaktaki konu sitede en az aynı derinlikte; *kapsandı + genişletildi* — sitede kaynakta olmayan türetim, alıştırma ya da deney de var; *kısmen* — konu var ama kaynaktaki bir alt başlık bilinçli olarak yüzeysel; *bilinçli olarak farklı* — kaynaktaki araç yerine başka bir araç (ör. Keras yerine PyTorch). Yeni kaynak geldikçe tablo genişletilir; tamamlanmış satırlar geri alınmaz.
 groups:
@@ -346,12 +346,17 @@ groups:
         n-adım100×10, baz/karo30×5000bölüm; bağımsız V/µ ve C++/Python/JS/NumPy denetimleri. PDF219–264 bağımsız
         ikinci okuma kapandı. İlk9bölüm1270birim; bütün kitap tamamlanmadı.'
     - src: Sutton ve Barto (2018), Bölüm 10 — Yaklaşımla politika üstü kontrol (s. 243–256)
-      topics: 9 numaralı alıştırma; 5 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
+      topics: Episodik yarı-gradyan SARSA/Expected SARSA/n-adım, Mountain Car; ortalama ödül, diferansiyel değer/Poisson/Abel,
+        erişim kontrolü, indirimli amaç kapsamı, n-adım gain izi ve tarih.
       pages:
       - m11-6-dqn
-      status: eksik
-      gap: Kaynağın bu bölümü henüz aktarılmadı; hedefler yalnız konu eşlemesi adaylarıdır.
-      done: Sayfa ve numaralı öğe envanteri çıkarıldı. İçerik kapsamı tamamlanmış sayılmadı.
+      - m11-13-average-reward
+      status: genis
+      gap: Bu bölümde açık kaynak birimi yok. Kitabın11–17 bölümleri ve ön/arka materyali işlenmedi.
+      done: 78 kaynak birimi,9 çözümlü alıştırma,5 kaynak şekli karşılığı,4 algoritma,2 dipnot.14 metin/PNG sayfası
+        ve bağımsız kaynak/defter ikinci okuması. M11.6 genişletildi; yeni M11.13,6 deney/23 ön ayar,12 yeni kart ve3
+        yeni kod eki. Mountain Car141294181 fiziksel geçiş/tek sansürlü ayar; erişim8×2m ve bağımsız44-durum oracle.
+        Bütün kitap tamamlanmadı.
     - src: Sutton ve Barto (2018), Bölüm 11 — Yaklaşımla politika dışı yöntemler (s. 257–286)
       topics: 4 numaralı alıştırma; 6 numaralı şekil. Ön envanter; bilgi birimleri ve numarasız görseller denetlenecek.
       pages:

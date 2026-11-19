@@ -289,3 +289,7 @@ terms:
   kernel ridge: "K=ΦΦᵀ için öğrenilen β=(K+λI)⁻¹g katsayılarıyla tahmin; ham hedeflerin normalizasyonsuz kernel toplamından farklıdır."
   ilgi: "Interest I: hangi zaman/durumdaki doğruluğun önemli olduğunu belirten negatif olmayan ağırlık."
   vurgu: "Emphasis M: gerçek güncellemeyi tartar; sabit n için M_t=I_t+γ^n M_(t−n), başlangıç ilgisini bootstrap edilen durumlara taşır."
+  ortalama ödül: "Gain: bir politikanın uzun dönemde adım başına beklenen ödülü; tek-gain koşulunda başlangıçtan bağımsızdır."
+  diferansiyel değer: "Bias: uzun dönem ortalama ödüle göre geçici beklenen avantaj; Poisson çözümü bir sabite kadar belirlenir, normalizasyon ve limit tanımı belirtilir."
+  poisson denklemi: "Ortalama ödül için h=r−ρ1+Ph denklemi; h referans durum veya durağan ortalamasıyla sabitlenir. Poisson sayım dağılımıyla aynı kavram değildir."
+  abel limiti: "Önce sabit γ<1 için sonsuz ağırlıklı toplamı hesaplayıp sonra γ↑1 almak; periyodik süreçte normal kısmi toplam limitinden ayrılabilir."
